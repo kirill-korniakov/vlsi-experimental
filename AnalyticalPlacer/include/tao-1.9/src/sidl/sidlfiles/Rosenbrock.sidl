@@ -1,0 +1,8 @@
+	
+package Rosenbrock version 0.0.2 {
+  class RosenbrockModel implements-all Optimize.OptimizationModel {
+    void setNumberVariables(in int n);
+    void setAlpha(in double alpha);
+  };
+}
+
