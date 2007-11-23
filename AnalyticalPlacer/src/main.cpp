@@ -1,4 +1,4 @@
-#if 1
+#if 0
 /* 
 * main.cpp
 * this is a part of itlDragon
@@ -178,7 +178,7 @@ void main(int argc, char* argv[])
 }
 #endif
 
-#if 0
+#if 1
 /*$Id$*/
 
 /* Program usage: mpiexec -np 1 itlAnalyticalPlacer [-help] [all TAO options] */
