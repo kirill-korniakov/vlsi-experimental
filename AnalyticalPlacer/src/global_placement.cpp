@@ -22,6 +22,7 @@ using namespace MultilevelFramework;
 
 MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
 {
+  double currentWL;
   vector<Cluster> clusters(circuit.nNodes);
   NetList netList(circuit.nNets);    // vector of nets of clusters (cluster indexes are stored in netList)
   vector<ConnectionsList> currTableOfConnections(clusters.size());
@@ -37,11 +38,11 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   
   // First V-cycle
   Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, Affinity, clusteringLog);
-  cout << netList[2][1] << endl;
   Relaxation(circuit, clusters, netList);
   PrintToTmpPL(circuit);
-  double currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
-  cout << "currWL on the coarsest level = " << currentWL << endl;
+
+  currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
+  cout << "currWL after relaxation = " << currentWL << endl;
 
   netLevelsIterator = netLevels.rbegin();
   clusteringLogIterator = clusteringLog.rbegin();

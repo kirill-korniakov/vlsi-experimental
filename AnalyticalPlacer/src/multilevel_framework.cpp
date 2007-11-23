@@ -306,13 +306,13 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   Allocate storage space for Hessian matrix; 
   Hessian information is optional -- unless a Newton method is selected
   */
-  info = MatCreateSeqBDiag(PETSC_COMM_SELF, numOfClusters * 2, numOfClusters * 2,0,2,0,0,&H);CHKERRQ(info);
+  info = MatCreateSeqBDiag(PETSC_COMM_SELF, numOfClusters * 2, numOfClusters * 2, 0, 2, 0, 0, &H);CHKERRQ(info);
   info = MatSetOption(H,MAT_SYMMETRIC); CHKERRQ(info);
 
   /* The TAO code begins here */
 
   /* Create TAO solver with desired solution method */
-  info = TaoCreate(PETSC_COMM_SELF,"tao_nm",&tao); CHKERRQ(info);
+  info = TaoCreate(PETSC_COMM_SELF, "tao_nm", &tao); CHKERRQ(info);
   info = TaoApplicationCreate(PETSC_COMM_SELF,&taoapp); CHKERRQ(info);
 
   /* Set solution vec and an initial guess */
@@ -346,22 +346,38 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
 
   VecSetValues(x, 2 * numOfClusters, idxs, initValues, INSERT_VALUES);
 
-  info = TaoAppSetInitialSolutionVec(taoapp,x); CHKERRQ(info); 
+  info = TaoAppSetInitialSolutionVec(taoapp, x); CHKERRQ(info); 
 
   /* Set routines for function, gradient, hessian evaluation */
-  info = TaoAppSetObjectiveAndGradientRoutine(taoapp,AnalyticalObjectiveAndGradient,(void *)&user); 
+  info = TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient,(void *)&user); 
   CHKERRQ(info);
 
   /* Check for TAO command line options */
-  info = TaoSetOptions(taoapp,tao); CHKERRQ(info);
+  info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
 
   /* SOLVE THE APPLICATION */
-  info = TaoSolveApplication(taoapp,tao); CHKERRQ(info);
+  info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
 
   /* Get termination information */
-  info = TaoGetTerminationReason(tao,&reason); CHKERRQ(info);
+  info = TaoGetTerminationReason(tao, &reason); CHKERRQ(info);
   if (reason <= 0)
     PetscPrintf(MPI_COMM_WORLD,"Try a different TAO method, adjust some parameters, or check the function evaluation routines\n");
+
+  // read solution vector to array of clusters coordinates
+  VecGetValues(x, PetscInt(2*numOfClusters), idxs, initValues);
+  idx = 0;
+  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
+  {
+    if (clusters[i].isFake == false)
+    {
+      clusters[i].xCoord = initValues[2*idx+0];
+      clusters[i].yCoord = initValues[2*idx+1];
+      idx++;
+    }
+  }
+  
+  UpdateCoords(circuit, clusters);
+  PrintToTmpPL(circuit);
 
   //PetscInt ni = numOfClusters*2;
   //static PetscInt *idxs = new PetscInt[numOfClusters*2];
@@ -385,21 +401,6 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /* Finalize TAO */
   TaoFinalize();
   PetscFinalize();
-
-  // read solution vector to array of clusters coordinates
-  VecGetValues(x, PetscInt(2*numOfClusters), idxs, initValues);
-  idx = 0;
-  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
-  {
-    if (clusters[i].isFake == false)
-    {
-      clusters[i].xCoord = initValues[2*idx+0];
-      clusters[i].yCoord = initValues[2*idx+1];
-      idx++;
-    }
-  }
-  
-  UpdateCoords(circuit, clusters);
 
   delete[] rndCoords;
   delete[] initValues;
