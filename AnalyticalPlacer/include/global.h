@@ -104,13 +104,13 @@ extern __int64 rngLITotalTime;
 
 extern int rnCATotalCount;
 
-ITLDRAGON_ERROR Initialization(Circuit& circuit, Statistics& statistics);
+MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics);
 void MakeTableOfConnections(Circuit& circuit);
 void FreeMemory();
 void Exit();
 
-void CheckCode(ITLDRAGON_ERROR errorCode);
-void PrintErrorMessage(char* errorMsg, ITLDRAGON_ERROR errorCode);
+void CheckCode(MULTIPLACER_ERROR errorCode);
+void PrintErrorMessage(char* errorMsg, MULTIPLACER_ERROR errorCode);
 
 class Tccout
 {

@@ -43,9 +43,9 @@ namespace DetailedPlacementNS
 }
 enum HorSearchDir{ LEFT, RIGHT, RANDOM };
 
-ITLDRAGON_ERROR DetailedPlacement(Circuit& circuit, Statistics& statistics);
+MULTIPLACER_ERROR DetailedPlacement(Circuit& circuit, Statistics& statistics);
 
-ITLDRAGON_ERROR Legalize(Circuit& circuit);
+MULTIPLACER_ERROR Legalize(Circuit& circuit);
 
 double HorizontalSearch(HorSearchDir direction, RowElement** greedy_array, int* numOfCellsInRow, int row, 
         int number, Circuit& circuit, Statistics& statistics, int** arrOfSites);

@@ -13,8 +13,6 @@
 #include <algorithm>
 #include "..\include\parser.h"
 #include "..\include\global_placement.h"
-#include "..\include\directed_bin_swapping.h"
-#include "..\include\simulated_annealing.h"
 #include "..\include\overlap_removing.h"
 #include "..\include\detailed_placement.h"
 #include "..\include\output.h"
@@ -25,12 +23,17 @@
 
 using namespace DetailedPlacementNS;
 
+static  char help[] = "This example demonstrates use of the TAO package to \n\
+                      solve an unconstrained minimization problem on a single processor.  We \n\
+                      minimize the extended Rosenbrock function: \n\
+                      sum_{i=0}^{n/2-1} ( alpha*(x_{2i+1}-x_{2i}^2)^2 + (1-x_{2i})^2 ) \n";
+
 void main(int argc, char* argv[])
 {  
   Circuit    circuit;
   Statistics statistics;
 
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   clock_t startTime  = 0;
   clock_t finishTime = 0;
@@ -45,9 +48,12 @@ void main(int argc, char* argv[])
   errorCode = Initialization(circuit, statistics);
   CheckCode(errorCode);
 
+  PetscInitialize(&argc,&argv,(char *)0,help);
+  TaoInitialize(&argc,&argv,(char *)0,help);
+
   // we shift point of origin to the bottom left corner of placement area
   ShiftCoords(circuit);
-  statistics.currentWL = cf_recalc_all(1, circuit.nNets, circuit.nets, circuit.placement);
+  statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   
   PrintCircuitInfo(circuit);
 
@@ -76,7 +82,7 @@ void main(int argc, char* argv[])
   { 
     if (gOptions.doOverlapRemoving) // otherwise executed with key -dp
     {
-      errorCode = CreateBinGrid(circuit);
+      //errorCode = CreateBinGrid(circuit);
       CheckCode(errorCode);
     }
   }
@@ -91,7 +97,7 @@ void main(int argc, char* argv[])
   // dump GP if needed
   if (gOptions.doDumpGP)
   {
-    statistics.currentWL = cf_recalc_all(1, circuit.nNets, circuit.nets, circuit.placement);
+    statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
 
     finishTime = clock();
     statistics.totalWT = (double)(finishTime - startTime) / CLOCKS_PER_SEC;
@@ -106,7 +112,7 @@ void main(int argc, char* argv[])
   }
     
   // update nets' lengths
-  statistics.currentWL = cf_recalc_all(1, circuit.nNets, circuit.nets, circuit.placement);
+  statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
 
   //*************** D E T A I L E D   P L A C E M E N T **************//
   if (gOptions.doDetailedPlacement/* = false*/)
@@ -264,7 +270,7 @@ int main(int argc,char **argv)
   /* The TAO code begins here */
 
   /* Create TAO solver with desired solution method */
-  info = TaoCreate(PETSC_COMM_SELF,"tao_lmvm",&tao); CHKERRQ(info);
+  info = TaoCreate(PETSC_COMM_SELF,"tao_nm",&tao); CHKERRQ(info);
   info = TaoApplicationCreate(PETSC_COMM_SELF,&taoapp); CHKERRQ(info);
 
   /* Set solution vec and an initial guess */
@@ -282,6 +288,12 @@ int main(int argc,char **argv)
 
   /* SOLVE THE APPLICATION */
   info = TaoSolveApplication(taoapp,tao); CHKERRQ(info);
+
+  PetscInt ix[2] = {0, 1};
+  PetscScalar solution[2];
+  VecGetValues(x, PetscInt(2), ix, solution);
+  printf("hello from here!\n");
+  printf("%f\t%f\n", solution[0], solution[1]);
 
   /* Get termination information */
   info = TaoGetTerminationReason(tao,&reason); CHKERRQ(info);

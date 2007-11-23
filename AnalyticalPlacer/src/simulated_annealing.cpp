@@ -50,9 +50,9 @@ double* rowLengths = NULL;  // sum lengths of cells in rows
 int currBinRowIdx = -1;
 int currBinColIdx = -1; 
 
-ITLDRAGON_ERROR errorCode = OK;
+MULTIPLACER_ERROR errorCode = OK;
 
-inline ITLDRAGON_ERROR TryDisplace( const int currCellIdx, 
+inline MULTIPLACER_ERROR TryDisplace( const int currCellIdx, 
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement, Node* const nodes )                    
@@ -73,7 +73,7 @@ inline ITLDRAGON_ERROR TryDisplace( const int currCellIdx,
   return OK;
 }
 
-inline ITLDRAGON_ERROR TryExchange( const int currCellIdx, const int newCellIdx, 
+inline MULTIPLACER_ERROR TryExchange( const int currCellIdx, const int newCellIdx, 
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement, Node* const nodes )           
@@ -100,7 +100,7 @@ inline ITLDRAGON_ERROR TryExchange( const int currCellIdx, const int newCellIdx,
   return OK;
 }
  
-inline ITLDRAGON_ERROR RejectDisplace( const int currCellIdx, 
+inline MULTIPLACER_ERROR RejectDisplace( const int currCellIdx, 
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement )
@@ -114,7 +114,7 @@ inline ITLDRAGON_ERROR RejectDisplace( const int currCellIdx,
   return OK;
 }
 
-inline ITLDRAGON_ERROR RejectExchange( const int currCellIdx, int newCellIdx, 
+inline MULTIPLACER_ERROR RejectExchange( const int currCellIdx, int newCellIdx, 
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement )
@@ -172,7 +172,7 @@ inline int IsRowBalanceBetter( const int rowIdx, const double oldLength, const d
   return true;
 }
 
-inline ITLDRAGON_ERROR GenerateRandomNeighbour( const int currBinRowIdx, const int currBinColIdx,
+inline MULTIPLACER_ERROR GenerateRandomNeighbour( const int currBinRowIdx, const int currBinColIdx,
                             const int numOfBinRows, const int numOfBinCols, 
                             int* const horOffset, int* const vertOffset,
                             const int idxOfRandNum,
@@ -185,7 +185,7 @@ inline ITLDRAGON_ERROR GenerateRandomNeighbour( const int currBinRowIdx, const i
   return OK;
 }
 
-inline ITLDRAGON_ERROR GenerateTopologicalNeighbour( const int currCellIdx, const int numOfBinCols,
+inline MULTIPLACER_ERROR GenerateTopologicalNeighbour( const int currCellIdx, const int numOfBinCols,
                                  const int numOfNets, Net* const nets,
                                  vector<int>* tableOfConnections, pBin** const arrOfBins,
                                  const double binHeight, Place* placement,
@@ -245,7 +245,7 @@ inline ITLDRAGON_ERROR GenerateTopologicalNeighbour( const int currCellIdx, cons
   return OK;
 }
 
-inline ITLDRAGON_ERROR GenerateOptTopologicalNeighbour( const int currCellIdx, const int numOfBinCols, const int numOfBinRows,
+inline MULTIPLACER_ERROR GenerateOptTopologicalNeighbour( const int currCellIdx, const int numOfBinCols, const int numOfBinRows,
                                          const int numOfNets, Net* const nets,
                                          vector<int>* tableOfConnections, pBin** const arrOfBins,
                                          const double binHeight, Place* placement,
@@ -344,7 +344,7 @@ inline ITLDRAGON_ERROR GenerateOptTopologicalNeighbour( const int currCellIdx, c
     newBinColIdx = left;
 }
 
-inline ITLDRAGON_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numOfBinCols, const int numOfBinRows, 
+inline MULTIPLACER_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numOfBinCols, const int numOfBinRows, 
                              const int numOfNets, Net* const nets, 
                              vector<int>* tableOfConnections, pBin** const arrOfBins,
                              const double binHeight, Place* placement,  
@@ -423,7 +423,7 @@ inline ITLDRAGON_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numO
   return OK;
 }
 
-ITLDRAGON_ERROR SimulatedAnnealing(Circuit& circuit, Statistics& statistics)
+MULTIPLACER_ERROR SimulatedAnnealing(Circuit& circuit, Statistics& statistics)
 {
   pBin** const arrOfBins = circuit.arrOfBins;
   // parameters of SA

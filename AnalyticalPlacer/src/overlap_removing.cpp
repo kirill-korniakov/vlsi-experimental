@@ -79,9 +79,9 @@ void FillArrOfSites(Circuit& circuit)
  *  (number of bin rows has to be equal number of rows on the die)
  *  its aim is to create the placement, in which cells are placed within rows without overlaps
  */
-ITLDRAGON_ERROR OverlapRemoving(Circuit& circuit)
+MULTIPLACER_ERROR OverlapRemoving(Circuit& circuit)
 {   
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   // check legality of Bins
   errorCode = CheckXEquality(circuit);
@@ -165,7 +165,7 @@ ITLDRAGON_ERROR OverlapRemoving(Circuit& circuit)
   return errorCode;
 }
 
-ITLDRAGON_ERROR LegalizeRow(Circuit& circuit, int rowIdx)
+MULTIPLACER_ERROR LegalizeRow(Circuit& circuit, int rowIdx)
 {
   double siteWidth = circuit.rows[0].siteWidth;
   double siteHeight = circuit.rows[0].height;
@@ -387,9 +387,9 @@ ITLDRAGON_ERROR LegalizeRow(Circuit& circuit, int rowIdx)
  *  this function takes placement in which all cells are placed in the centers of bins
  *  (number of bin rows has to be equal to number of rows on the die)
  */
-ITLDRAGON_ERROR EqualizeRowLengths(Circuit& circuit)
+MULTIPLACER_ERROR EqualizeRowLengths(Circuit& circuit)
 {   
-  ITLDRAGON_ERROR errorCode = CheckBinsOnMacros(circuit);
+  MULTIPLACER_ERROR errorCode = CheckBinsOnMacros(circuit);
   if (errorCode != OK) return errorCode;
   
   // we aim to distribute total cell area equally between rows
@@ -493,7 +493,7 @@ ITLDRAGON_ERROR EqualizeRowLengths(Circuit& circuit)
 
 int Juggle(Circuit& circuit, double* desiredRowLength, int direction)
 {
-  ITLDRAGON_ERROR errorCode;
+  MULTIPLACER_ERROR errorCode;
   // we are trying to make total cell width in row close to the
   // desired row width and then legalize placement within row
   // free sites distributed between cells equally
@@ -519,7 +519,7 @@ int Juggle(Circuit& circuit, double* desiredRowLength, int direction)
   return 0;
 }
 
-ITLDRAGON_ERROR EqualizeRow(Circuit& circuit, double desiredRowWidth, int rowIdx, int direction)
+MULTIPLACER_ERROR EqualizeRow(Circuit& circuit, double desiredRowWidth, int rowIdx, int direction)
 {
   double currWidth = 0.0;
   double oldCurrWidth = 0.0;
@@ -710,7 +710,7 @@ ITLDRAGON_ERROR EqualizeRow(Circuit& circuit, double desiredRowWidth, int rowIdx
   cout << "\ttotal cell width: " << currWidth;
   cout << "\t" << currWidth/desiredRowWidth*100 << "% of desired, direction " << direction << endl;
   
-  /*ITLDRAGON_ERROR errorCode = CheckOrder(circuit);
+  /*MULTIPLACER_ERROR errorCode = CheckOrder(circuit);
   if (errorCode != OK) return errorCode;
   errorCode = CheckYEquality(circuit);
   if (errorCode != OK) return errorCode;

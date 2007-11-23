@@ -1,7 +1,7 @@
 #include <iostream>
 #include "..\include\errors.h"
 
-//void CheckCode(ITLDRAGON_ERROR errorCode)
+//void CheckCode(MULTIPLACER_ERROR errorCode)
 //{
 //  if (errorCode == OK) return;
 //  

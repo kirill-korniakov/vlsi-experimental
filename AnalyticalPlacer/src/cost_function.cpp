@@ -9,11 +9,13 @@
 
 #include "..\include\cost_function.h"
 #include <algorithm>
+#include "math.h"
 
+using namespace MultilevelFramework;
 
 // all functions calculate wirelength for current placement  
 
-double cf_recalc_all( int flag, const int numOfNets, Net* const nets, 
+double cf_recalc_all(bool flag, const int numOfNets, Net* const nets, 
        const Place* const placement) 
 {
   int  i, j; // loop counters
@@ -53,7 +55,7 @@ double cf_recalc_all( int flag, const int numOfNets, Net* const nets,
 }
 
 
-double cf_recalc_some_nets( int flag, const int numOfNets, Net* const nets,
+double cf_recalc_some_nets( bool flag, const int numOfNets, Net* const nets,
          double currentWL, const int* const netsIdx, 
          int numOfChangedNets, const Place* const placement)
 {
@@ -95,7 +97,7 @@ double cf_recalc_some_nets( int flag, const int numOfNets, Net* const nets,
   return currentWL;
 }
 
-double rude_cf_recalc_some_nets( int flag, Net* const nets,
+double rude_cf_recalc_some_nets( bool flag, Net* const nets,
                                  double currentWL, 
                                  const int* const netsIdx1, int numOfChangedNets1,
                                  const int* const netsIdx2, int numOfChangedNets2,
@@ -172,7 +174,7 @@ double rude_cf_recalc_some_nets( int flag, Net* const nets,
   return currentWL;
 }
 
-double rude_cf_recalc_some_nets( int flag, Net* const nets,
+double rude_cf_recalc_some_nets( bool flag, Net* const nets,
                                  double currentWL, 
                                  const int* const netsIdx, int numOfChangedNets,
                                  const Place* const placement )
@@ -219,7 +221,7 @@ double rude_cf_recalc_some_nets( int flag, Net* const nets,
 
 
 
-double cf_recalc_some_nodes( int flag, const int numOfNets, Net* const nets,
+double cf_recalc_some_nodes( bool flag, const int numOfNets, Net* const nets,
          double currentWL, const int* const nodesIdx, 
          int numOfChangedNodes, vector<int>* tableOfConnections,
          const Place* const placement)
@@ -283,7 +285,7 @@ double cf_recalc_some_nodes( int flag, const int numOfNets, Net* const nets,
   return currentWL;
 }
 
-double cf_recalc_some_nodes1( int flag, const int numOfNets, Net* const nets,
+double cf_recalc_some_nodes1( bool flag, const int numOfNets, Net* const nets,
          double currentWL, vector<int>* nodesIdx, 
          int numOfChangedNodes, vector<int>* tableOfConnections,
          const Place* const placement)
@@ -346,7 +348,7 @@ double cf_recalc_some_nodes1( int flag, const int numOfNets, Net* const nets,
   return currentWL;
 }
  
-double cf_recalc_some_nodes2( int flag, const int numOfNets, Net* const nets,
+double cf_recalc_some_nodes2( bool flag, const int numOfNets, Net* const nets,
          double currentWL, 
          vector<int> nodesIdx1, int numOfChangedNodes1,
          vector<int> nodesIdx2, int numOfChangedNodes2,
@@ -419,4 +421,36 @@ double cf_recalc_some_nodes2( int flag, const int numOfNets, Net* const nets,
     }
   } // for (i = 0; i < numOfChangedNets; ++i)
   return currentWL;
+}
+
+double LogSumExp(const int& numOfNets, Net* const nets, const Place* const placement, const double& alpha)
+{
+  int idx;
+  double sum = 0.0;
+  double logsum1 = 0.0;
+  double logsum2 = 0.0;
+  double logsum3 = 0.0;
+  double logsum4 = 0.0;
+
+  for (int i = 0; i < numOfNets; ++i)
+  {
+    logsum1 = 0.0;
+    logsum2 = 0.0;
+    logsum3 = 0.0;
+    logsum4 = 0.0;
+
+    for (int j = 0; j < nets[i].numOfPins; ++j)
+    {
+      idx = nets[i].arrPins[j].cellIdx;
+
+      logsum1 += exp( placement[idx].xCoord / alpha); // FIX ME: use + nets[i].arrPins[0].xOffset
+      logsum2 += exp(-placement[idx].xCoord / alpha);
+      logsum3 += exp( placement[idx].yCoord / alpha);
+      logsum4 += exp(-placement[idx].yCoord / alpha);
+    }
+
+    sum += log(logsum1) + log(logsum2) + log(logsum3) + log(logsum4);
+  }
+
+  return alpha * sum;
 }

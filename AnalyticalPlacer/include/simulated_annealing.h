@@ -23,7 +23,7 @@
 /// the function virtually moves the cell to another bin: 
 /// it changes cell's coordinates, but doesn't change contents of bins
 
-inline ITLDRAGON_ERROR TryDisplace( const int currCellIdx, const int currBinRowIdx, const int currBinColIdx,
+inline MULTIPLACER_ERROR TryDisplace( const int currCellIdx, const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfpBins, Place* const placement, Node* const nodes );
 
@@ -33,16 +33,16 @@ inline ITLDRAGON_ERROR TryDisplace( const int currCellIdx, const int currBinRowI
 /// the function virtually swops two cells (the current and a new randomly chosen one):  
 /// exchanges cells coordinates, but doesn't change contents of bins
 
-inline ITLDRAGON_ERROR TryExchange( const int currCellIdx, const int newCellIdx, 
+inline MULTIPLACER_ERROR TryExchange( const int currCellIdx, const int newCellIdx, 
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement, Node* const nodes );
 
-inline ITLDRAGON_ERROR RejectDisplace( const int currCellIdx, const int currBinRowIdx, const int currBinColIdx,
+inline MULTIPLACER_ERROR RejectDisplace( const int currCellIdx, const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfpBins, Place* const placement );
 
-inline ITLDRAGON_ERROR RejectExchange( const int currCellIdx, const int newCellIdx,
+inline MULTIPLACER_ERROR RejectExchange( const int currCellIdx, const int newCellIdx,
            const int currBinRowIdx, const int currBinColIdx,
            const int newBinRowIdx, const int newBinColIdx, 
            pBin** const arrOfBins, Place* const placement );
@@ -52,13 +52,13 @@ inline int IsBinBalanceBetter( const int binRowIdx, const int binColIdx, const d
 
 inline int IsRowBalanceBetter( const int rowIdx, const double oldLength, const double rowUnbalance );
 
-inline ITLDRAGON_ERROR GenerateRandomNeighbour( const int currBinRowIdx, const int currBinColIdx,
+inline MULTIPLACER_ERROR GenerateRandomNeighbour( const int currBinRowIdx, const int currBinColIdx,
                             const int numOfBinRows, const int numOfBinCols, 
                             int* const horOffset, int* const vertOffset,
                             const int idxOfRandNum,
                             int& newBinRowIdx, int& newBinColIdx );
 
-inline ITLDRAGON_ERROR GenerateTopologicalNeighbour( const int currCellIdx, const int numOfBinCols,
+inline MULTIPLACER_ERROR GenerateTopologicalNeighbour( const int currCellIdx, const int numOfBinCols,
                                  const int numOfNets, Net* const nets,
                                  vector<int>* tableOfConnections, pBin** const arrOfBins,
                                  const double binHeight, Place* placement,
@@ -66,14 +66,14 @@ inline ITLDRAGON_ERROR GenerateTopologicalNeighbour( const int currCellIdx, cons
                                  float* const randNet, float* const randPin, const int idxOfRandNum );
 
 
-inline ITLDRAGON_ERROR GenerateOptTopologicalNeighbour( const int currCellIdx, const int numOfBinCols, const int numOfBinRows,
+inline MULTIPLACER_ERROR GenerateOptTopologicalNeighbour( const int currCellIdx, const int numOfBinCols, const int numOfBinRows,
                                              const int numOfNets, Net* const nets,
                                              vector<int>* tableOfConnections, pBin** const arrOfBins,
                                              const double binHeight, Place* placement,
                                              int& newBinRowIdx, int& newBinColIdx, const int numOfNodes,
                                              float* const randNet, float* const randPin, const int idxOfRandNum );
 
-inline ITLDRAGON_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numOfBinCols, const int numOfBinRows, 
+inline MULTIPLACER_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numOfBinCols, const int numOfBinRows, 
                                  const int numOfNets, Net* const nets,
                                  vector<int>* tableOfConnections, pBin** const arrOfBins,
                                  const double binHeight, Place* placement,
@@ -86,6 +86,6 @@ inline ITLDRAGON_ERROR GenerateOptimalNeighbour( int currCellIdx, const int numO
 /// income and outcome placements;
 /// in outcome placement cells are still placed in the centers of bins
 
-ITLDRAGON_ERROR SimulatedAnnealing(Circuit& circuit, Statistics& statistics);
+MULTIPLACER_ERROR SimulatedAnnealing(Circuit& circuit, Statistics& statistics);
 
 #endif

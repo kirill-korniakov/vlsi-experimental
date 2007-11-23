@@ -5,9 +5,9 @@
 const int MAX_REPORTED_ERRORS = 3;
 
 // checks the legality of the current placement
-ITLDRAGON_ERROR CheckLegalityOfPlacement(const Circuit& circuit)
+MULTIPLACER_ERROR CheckLegalityOfPlacement(const Circuit& circuit)
 {   
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   // check if cell lay onto site
   errorCode = CheckSiteBelonging(circuit);
@@ -37,7 +37,7 @@ ITLDRAGON_ERROR CheckLegalityOfPlacement(const Circuit& circuit)
   }
 }
 
-ITLDRAGON_ERROR CheckSiteBelonging(const Circuit& circuit)
+MULTIPLACER_ERROR CheckSiteBelonging(const Circuit& circuit)
 {
   int errorCounter = 0;
 
@@ -64,7 +64,7 @@ ITLDRAGON_ERROR CheckSiteBelonging(const Circuit& circuit)
     return NOT_ONTO_SITE;
 }
 
-ITLDRAGON_ERROR CheckRowBelonging(const Circuit& circuit)
+MULTIPLACER_ERROR CheckRowBelonging(const Circuit& circuit)
 {
   int errorCounter = 0;
 
@@ -90,7 +90,7 @@ ITLDRAGON_ERROR CheckRowBelonging(const Circuit& circuit)
     return NOT_INTO_ROW;
 }
 
-ITLDRAGON_ERROR CheckBorders(const Circuit& circuit)
+MULTIPLACER_ERROR CheckBorders(const Circuit& circuit)
 {
   int errorCounter = 0;
 
@@ -170,7 +170,7 @@ ITLDRAGON_ERROR CheckBorders(const Circuit& circuit)
     return BORDER_EXCEEDED;
 }
 
-ITLDRAGON_ERROR CheckXBorders(const Circuit& circuit, int rowIdx)
+MULTIPLACER_ERROR CheckXBorders(const Circuit& circuit, int rowIdx)
 {
   int errorCounter = 0;
 
@@ -226,7 +226,7 @@ ITLDRAGON_ERROR CheckXBorders(const Circuit& circuit, int rowIdx)
     return BORDER_EXCEEDED;
 }
 
-ITLDRAGON_ERROR CheckOverlaps(const Circuit& circuit)
+MULTIPLACER_ERROR CheckOverlaps(const Circuit& circuit)
 { 
   int errorCounter = 0;
 
@@ -294,7 +294,7 @@ ITLDRAGON_ERROR CheckOverlaps(const Circuit& circuit)
   else return OVERLAP;
 }
 
-ITLDRAGON_ERROR CheckOverlaps(const Circuit& circuit, int rowIdxToCheck)
+MULTIPLACER_ERROR CheckOverlaps(const Circuit& circuit, int rowIdxToCheck)
 {
   int errorCounter = 0;
 
@@ -358,9 +358,9 @@ ITLDRAGON_ERROR CheckOverlaps(const Circuit& circuit, int rowIdxToCheck)
   else return OVERLAP;
 }
 
-ITLDRAGON_ERROR CheckBins(const Circuit& circuit)
+MULTIPLACER_ERROR CheckBins(const Circuit& circuit)
 {
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   /*errorCode = IsNotEmpty(circuit);
   if (errorCode != OK) return errorCode;*/
@@ -472,7 +472,7 @@ int CheckOrder(const Circuit& circuit)
   return OK;
 }
 
-ITLDRAGON_ERROR CheckBinsOnMacros(const Circuit& circuit)
+MULTIPLACER_ERROR CheckBinsOnMacros(const Circuit& circuit)
 {
   for (int i = 0; i < circuit.nBinRows; ++i)
   {
@@ -546,7 +546,7 @@ int CheckArrOfSites(const Circuit& circuit, int** arrOfSites)
   return OK;
 }
 
-ITLDRAGON_ERROR CheckRowLength(const Circuit& circuit, double availableRowLength, int rowIdx)
+MULTIPLACER_ERROR CheckRowLength(const Circuit& circuit, double availableRowLength, int rowIdx)
 {
   double rowLength1 = 0.0;
   double rowLength2 = 0.0;

@@ -1792,7 +1792,7 @@ int  Factorial (unsigned int a)
   return temp;
 }
 
-ITLDRAGON_ERROR Legalize(Circuit& circuit)
+MULTIPLACER_ERROR Legalize(Circuit& circuit)
 {
   // Array of cells sorted by their x-coord
   RowElement *sortedCells;

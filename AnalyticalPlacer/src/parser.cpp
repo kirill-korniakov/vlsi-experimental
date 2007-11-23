@@ -434,7 +434,7 @@ int ParseScl(const char* fileName, Circuit& circuit)
   return 0;
 }
 
-ITLDRAGON_ERROR CMDParse(int argc, char* argv[])
+MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
 {
   if (argc == 1)
   {
@@ -829,7 +829,7 @@ int ParseNets(const char* fileName, Circuit& circuit)
   return 0;
 }
 
-ITLDRAGON_ERROR ValidateKeys()
+MULTIPLACER_ERROR ValidateKeys()
 {
   
   return OK;

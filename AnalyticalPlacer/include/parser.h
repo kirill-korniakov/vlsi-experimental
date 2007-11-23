@@ -33,10 +33,10 @@ int findNameBS(str* A, int Lb, int Ub, char* Key);
 
 void QSortStrExtend(strExtend* a, long N);
 
-ITLDRAGON_ERROR CMDParse(int argc, char* argv[]);
+MULTIPLACER_ERROR CMDParse(int argc, char* argv[]);
 void CfgParse(char* fileName);
 
-ITLDRAGON_ERROR ValidateKeys();
+MULTIPLACER_ERROR ValidateKeys();
 void SetDefaultKeysValues();
 
 int ParseAux(const char* fileName, Circuit& circuit);

@@ -14,11 +14,11 @@
 #include "..\include\check_legality.h"
 #include "..\include\output.h"
 
-ITLDRAGON_ERROR OverlapRemoving(Circuit& circuit);
+MULTIPLACER_ERROR OverlapRemoving(Circuit& circuit);
 
-ITLDRAGON_ERROR LegalizeRow(Circuit& circuit, int rowIdx);
+MULTIPLACER_ERROR LegalizeRow(Circuit& circuit, int rowIdx);
 
-ITLDRAGON_ERROR EqualizeRowLengths(Circuit& circuit);
+MULTIPLACER_ERROR EqualizeRowLengths(Circuit& circuit);
 
 int Juggle(Circuit& circuit, double* desiredRowLength, int direction);
 

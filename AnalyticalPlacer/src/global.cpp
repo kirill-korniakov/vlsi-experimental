@@ -44,9 +44,9 @@ void InitializeStatistics(Statistics& statistics)
   statistics.localImprovementWT     = 0.0;
 }
 
-ITLDRAGON_ERROR InitializeCircuit(Circuit& circuit)
+MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit)
 {
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   cout << "itlDragon started to parse \"" << gOptions.benchmarkName << "\"\n";
   errorCode = ParseAux(gOptions.benchmarkName, circuit);
@@ -94,7 +94,7 @@ void SetDefaultKeysValues()
   gOptions.GRHorizCapacity       = 0;
 }
 
-void CheckCode(ITLDRAGON_ERROR errorCode)
+void CheckCode(MULTIPLACER_ERROR errorCode)
 {
   if (errorCode == OK) return;
 
@@ -151,9 +151,9 @@ void PrintErrorMessage(char* errorMsg, int errorCode)
   //strcpy( errorMsg, "\nNo errors detected while programm execution\nDeleting memory...\n" );
 }
 
-ITLDRAGON_ERROR Initialization(Circuit& circuit, Statistics& statistics)
+MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics)
 {
-  ITLDRAGON_ERROR errorCode = OK;
+  MULTIPLACER_ERROR errorCode = OK;
 
   ccout.Start();
   

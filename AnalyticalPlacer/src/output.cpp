@@ -17,7 +17,7 @@ void PrintCircuitInfo(Circuit& circuit)
        << "Number of terminals:\t" << circuit.nTerminals << "\n\n";
 }
 
-void PrintResultString(int argc, char* argv[], Statistics& statistics, ITLDRAGON_ERROR errorCode)
+void PrintResultString(int argc, char* argv[], Statistics& statistics, MULTIPLACER_ERROR errorCode)
 {
   FILE *resultFile, *configFile;
   char string[64], *pVar, vslString[256], resultString[1024];
@@ -280,7 +280,7 @@ void PrintPLT(const char* fileName, Circuit& circuit, Statistics& statistics)
   }
 }
 
-ITLDRAGON_ERROR ShiftCoords(Circuit& circuit)
+MULTIPLACER_ERROR ShiftCoords(Circuit& circuit)
 {
   if (circuit.nNodes && circuit.nTerminals && circuit.placement)
   {
@@ -308,7 +308,7 @@ ITLDRAGON_ERROR ShiftCoords(Circuit& circuit)
   return EMPTY_DATA_STRUCTURES;
 }
 
-ITLDRAGON_ERROR ReshiftCoords(Circuit& circuit)
+MULTIPLACER_ERROR ReshiftCoords(Circuit& circuit)
 {
   if (circuit.nNodes && circuit.nTerminals && circuit.placement)
   {
@@ -335,7 +335,7 @@ ITLDRAGON_ERROR ReshiftCoords(Circuit& circuit)
   return EMPTY_DATA_STRUCTURES; 
 }
 
-void CreateHTMLReport(double wireLength, double workTime, ITLDRAGON_ERROR errorCode)
+void CreateHTMLReport(double wireLength, double workTime, MULTIPLACER_ERROR errorCode)
 {
   FILE *testResFileTXT;
   FILE *testResFileHTM;
