@@ -1,4 +1,4 @@
-#if 1
+#if 0
 /* 
 * main.cpp
 * this is a part of itlDragon
@@ -28,7 +28,7 @@ static  char help[] = "This example demonstrates use of the TAO package to \n\
                       minimize the extended Rosenbrock function: \n\
                       sum_{i=0}^{n/2-1} ( alpha*(x_{2i+1}-x_{2i}^2)^2 + (1-x_{2i})^2 ) \n";
 
-void main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {  
   Circuit    circuit;
   Statistics statistics;
@@ -50,6 +50,17 @@ void main(int argc, char* argv[])
 
   PetscInitialize(&argc,&argv,(char *)0,help);
   TaoInitialize(&argc,&argv,(char *)0,help);
+
+  int info;       // used to check for functions returning nonzeros
+  int size,rank;  // number of processes running
+  info = MPI_Comm_size(PETSC_COMM_WORLD,&size); CHKERRQ(info);
+  info = MPI_Comm_rank(PETSC_COMM_WORLD,&rank); CHKERRQ(info);
+
+  if (size >1) {
+    if (rank == 0)
+      PetscPrintf(PETSC_COMM_SELF,"This example is intended for single processor use!\n");
+    SETERRQ(1,"Incorrect number of processors");
+  }
 
   // we shift point of origin to the bottom left corner of placement area
   ShiftCoords(circuit);
@@ -175,10 +186,12 @@ void main(int argc, char* argv[])
   }
 
   Exit();
+
+  return 0;
 }
 #endif
 
-#if 0
+#if 1
 /*$Id$*/
 
 /* Program usage: mpiexec -np 1 itlAnalyticalPlacer [-help] [all TAO options] */

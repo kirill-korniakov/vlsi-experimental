@@ -84,7 +84,7 @@ void PrintResultString(int argc, char* argv[], Statistics& statistics, MULTIPLAC
   fclose( resultFile );
 }
 
-void PrintToPL(const char* fileName, Circuit circuit, Statistics& statistics,
+void PrintToPL(const char* fileName, Circuit& circuit, Statistics& statistics,
      double shiftX, double shiftY)
 {
   if (fileName == 0)   
@@ -162,7 +162,61 @@ void PrintToPL(const char* fileName, Circuit circuit, Statistics& statistics,
   }
 }
 
-void PrintToTmpPL(Circuit circuit, Statistics& statistics, double shiftX, double shiftY)
+void PrintToPL(const char* fileName, Circuit& circuit,
+               double shiftX, double shiftY)
+{
+  if (fileName == 0)   
+  {
+    printf("Error: null pointer of pl file\n");
+    return;
+  }
+  time_t ltime;
+  time( &ltime );
+  FILE *f;
+  char buffer[256];
+  char newFileName[256];
+  char *pVal;
+  strcpy(newFileName, fileName);
+  if (circuit.nNodes && circuit.nTerminals && circuit.placement)
+  {
+    ReshiftCoords(circuit);
+    pVal = strrchr(newFileName, '\\');
+    if (pVal) strcpy(newFileName, ++pVal);
+    pVal = strrchr(newFileName, '.');
+    if (pVal) pVal[0] = '\0';
+    strcat(newFileName, " itlDragon ");
+    strcat(newFileName, ctime( &ltime ));
+    pVal = strrchr(newFileName, '\n');
+    if (pVal) pVal[0] = '\0';
+    strcat(newFileName, ".pl");
+    while (1)
+    {
+      pVal = strchr(newFileName, ' ');
+      if (pVal) pVal[0] = '_';
+      else break;
+    }
+    while (1)
+    {
+      pVal = strchr(newFileName, ':');
+      if (pVal) pVal[0] = '_';
+      else break;
+    }
+    f = fopen( newFileName , "w");
+    sprintf(buffer, "UCLA pl 1.0\n");
+    fputs( buffer, f);
+    sprintf(buffer, "# ITLab\n# Created : %s", ctime( &ltime ));
+    fputs( buffer, f);
+    for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+    {
+      sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
+      fputs( buffer, f);
+    }
+    fclose(f);
+    ShiftCoords(circuit);
+  }
+}
+
+void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, double shiftY)
 {
   time_t ltime;
   time( &ltime );
@@ -197,7 +251,7 @@ void PrintToTmpPL(Circuit circuit, Statistics& statistics, double shiftX, double
   } 
 }
 
-void PrintToTmpPL(Circuit circuit, double shiftX, double shiftY)
+void PrintToTmpPL(Circuit& circuit, double shiftX, double shiftY)
 {
   time_t ltime;
   time( &ltime );

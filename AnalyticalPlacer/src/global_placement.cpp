@@ -31,13 +31,18 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   ClusteringLogIterator clusteringLogIterator;    // reverse_iterator по clusteringLog'у
   list<NetList> netLevels;  // список из нетлистов на каждом уровне кластеризации
   list<NetList>::reverse_iterator netLevelsIterator;
+  int currNClusters;
 
-  // initial filling
+  // initial filling  
   InitializeDataStructures(circuit, clusters, netList, circuit.nNodes);
   netLevels.push_back(netList);
   
   // First V-cycle
-  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, Affinity, clusteringLog);
+  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, Affinity, clusteringLog, currNClusters);
+  // set initial placement
+  SetInitialState(clusters, circuit, currNClusters);
+  UpdateCoords(circuit, clusters);
+  //PrintToTmpPL(circuit);
   Relaxation(circuit, clusters, netList);
   PrintToTmpPL(circuit);
 
@@ -62,7 +67,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   netList = netLevels.front();
   netLevels.resize(1);
   clusteringLog.clear();
-  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, AffinitySP, clusteringLog);
+  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, AffinitySP, clusteringLog, currNClusters);
   UpdateCoords(circuit, clusters);
   PrintToTmpPL(circuit);
 
