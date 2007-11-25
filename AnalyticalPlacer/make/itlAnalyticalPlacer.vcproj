@@ -197,10 +197,6 @@
 				Name="algo"
 				>
 				<File
-					RelativePath="..\src\bin_swapping.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\detailed_placement.cpp"
 					>
 				</File>
@@ -213,15 +209,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\multilevel_framework.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\optimal_region_determination.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\overlap_removing.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\simulated_annealing.cpp"
 					>
 				</File>
 			</Filter>
@@ -271,10 +267,6 @@
 				Name="algo"
 				>
 				<File
-					RelativePath="..\include\bin_swapping.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\detailed_placement.h"
 					>
 				</File>
@@ -287,15 +279,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\multilevel_framework.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\optimal_region_determination.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\overlap_removing.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\simulated_annealing.h"
 					>
 				</File>
 			</Filter>
