@@ -13,7 +13,7 @@
 
 using namespace MultilevelFramework;
 
-void MultilevelFramework::SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters)
+void MultilevelFramework :: SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters)
 {
   float* rndCoords = new float[2 * numOfClusters];
   GetFloatRandomNumbers(rndCoords, 2 * numOfClusters, 0.0, 1.0);
@@ -220,6 +220,7 @@ typedef struct {
   int numOfClusters;
   float alpha;
   PetscInt* lookUpTable;
+  vector<ConnectionsList>* currTableOfConnections;
 } AppCtx;
 
 static  char help[] = "This example demonstrates use of the TAO package to \n\
@@ -262,13 +263,17 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   PetscScalar *x,*g;
 
   /* Get pointers to vector data */
-  info = VecGetArray(X,&x); CHKERRQ(info);
-  info = VecGetArray(G,&g); CHKERRQ(info);
+  info = VecGetArray(X, &x); CHKERRQ(info);
+  info = VecGetArray(G, &g); CHKERRQ(info);
 
   /* Compute G(X) */
   // TODO: implement
 
   *f = LogSumExpForClusters(x, user);
+  //cout << "before GradientLogSumExpForClusters" << endl;
+  GradientLogSumExpForClusters(x, g, user);
+  //cout << "after GradientLogSumExpForClusters" << endl;
+  //*f = TestObjectiveFunc(x, user);
 
 /* Restore vectors */
   info = VecRestoreArray(X,&x); CHKERRQ(info);
@@ -277,7 +282,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   return 0;
 }
 
-MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList)
+MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
+                                                    vector<ConnectionsList>& currTableOfConnections)
 {
   int numOfClusters = static_cast<int>(clusters.size());
 
@@ -314,6 +320,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   user.numOfClusters = numOfClusters;
   user.lookUpTable = lookUpTable;
   user.alpha = 100; //todo: make this correct parameter
+  user.currTableOfConnections = &currTableOfConnections;
 
   /* Check for command line arguments to override defaults */
   //info = PetscOptionsGetInt(PETSC_NULL,"-n",&user.n,&flg); CHKERRQ(info);
@@ -324,7 +331,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
 
   /* The TAO code begins here */
   /* Create TAO solver with desired solution method */
-  info = TaoCreate(PETSC_COMM_SELF, "tao_nm", &tao); CHKERRQ(info);
+  info = TaoCreate(PETSC_COMM_SELF, "tao_cg", &tao); CHKERRQ(info);
   info = TaoApplicationCreate(PETSC_COMM_SELF,&taoapp); CHKERRQ(info);
 
   /* Set solution vec and an initial guess */
@@ -346,9 +353,6 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
     idxs[i] = i;
   }
 
-  UpdateCoords(circuit, clusters);
-  PrintToTmpPL(circuit);
-
   VecSetValues(x, 2 * numOfClusters, idxs, initValues, INSERT_VALUES);
 
   info = TaoAppSetInitialSolutionVec(taoapp, x); CHKERRQ(info); 
@@ -366,7 +370,10 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /* Get termination information */
   info = TaoGetTerminationReason(tao, &reason); CHKERRQ(info);
   if (reason <= 0)
+  {
     PetscPrintf(MPI_COMM_WORLD,"Try a different TAO method, adjust some parameters, or check the function evaluation routines\n");
+    PetscPrintf(MPI_COMM_WORLD,"reason = %d\n", reason);
+  }
 
   // read solution vector to array of clusters coordinates
   VecGetValues(x, PetscInt(2*numOfClusters), idxs, initValues);
@@ -380,8 +387,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
       idx++;
     }
   }  
-  UpdateCoords(circuit, clusters);
-  PrintToTmpPL(circuit);
+  //UpdateCoords(circuit, clusters);
+  //PrintToTmpPL(circuit);
 
 
   /* Free TAO data structures */
@@ -419,8 +426,8 @@ void MultilevelFramework :: UnclusterLevelUp(vector<Cluster>& clusters, vector<C
 }
 
 MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
-                                         vector<ConnectionsList>& currTableOfConnections, list<NetList>& netLevels,
-                                         affinityFunc Affinity, list<ClusteringInfoAtEachLevel>& clusteringLog, int& currNClusters)
+                                                    list<NetList>& netLevels, affinityFunc Affinity, 
+                                                    list<ClusteringInfoAtEachLevel>& clusteringLog, int& currNClusters)
 {  
   int i = 0;
   
@@ -430,6 +437,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
   int numOfClusters = 0;
   double totalCellArea = 0.0;
   double targetClusterArea;
+  vector<ConnectionsList> currTableOfConnections(clusters.size());
   vector<ClusterData> clustersData(clusters.size());
   list<ClusterData> clustersDataList;
   list<ClusterData>::iterator clustersDataIterator;
@@ -456,6 +464,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     targetNumOfClusters = static_cast<int>(numOfClusters / CLUSTER_RATIO);
     targetClusterArea   = (totalCellArea / targetNumOfClusters) * CLUSTERS_AREA_TOLERANCE;
     
+    //targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
+
     CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
 
     for (int i = 0; i < static_cast<int>(netList.size()); ++i)
@@ -929,4 +939,73 @@ double MultilevelFramework :: LogSumExpForClusters(PetscScalar *coordinates, voi
   
   //PetscPrintf(PETSC_COMM_SELF,"\nExit LogSumExp func\n");
   return userData->alpha * sum;
+}
+
+void MultilevelFramework :: GradientLogSumExpForClusters(PetscScalar *coordinates, PetscScalar *grad, void* data)
+{
+  double sum = 0.0;
+  double sum1 = 0.0;
+  double sum2 = 0.0;
+  double sum3 = 0.0;
+  double sum4 = 0.0;
+
+  AppCtx* userData = (AppCtx*)data;
+
+  int realClusterIdx;
+  int clusterIdxInCoordinatesArray;
+  int netIdx;
+  for (int i = 0; i < userData->numOfClusters; ++i)
+  {
+    grad[2*i+0] = 0;
+    grad[2*i+1] = 0;
+    //PetscPrintf(PETSC_COMM_SELF,"\ni = %d\n", i);
+    //PetscPrintf(PETSC_COMM_SELF,"\nsize = %d\n", static_cast<int>((*userData->currTableOfConnections)[i].size()));
+    for (int j = 0; j < static_cast<int>((*userData->currTableOfConnections)[i].size()); ++j)
+    {     
+      sum1 = 0.0;
+      sum2 = 0.0;
+      sum3 = 0.0;
+      sum4 = 0.0;
+      netIdx = (*userData->currTableOfConnections)[i][j];
+      //PetscPrintf(PETSC_COMM_SELF,"\nnetIdx = %d\t", netIdx);
+      //PetscPrintf(PETSC_COMM_SELF,"netSize = %d\n", (*userData->netList)[netIdx].size());
+      for (int k = 0; k < static_cast<int>((*userData->netList)[netIdx].size()); ++k)
+      {
+        //PetscPrintf(PETSC_COMM_SELF,"\nk = %d\t", k);
+        realClusterIdx = (*userData->netList)[netIdx][k];
+        //PetscPrintf(PETSC_COMM_SELF,"realClusterIdx = %d\n", realClusterIdx);
+        clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
+        sum1 += exp(+coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
+        sum2 += exp(-coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
+        sum3 += exp(+coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
+        sum4 += exp(-coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
+      }
+      grad[2*i+0] += exp(+coordinates[2*i+0] / userData->alpha) / sum1 - 
+                     exp(-coordinates[2*i+0] / userData->alpha) / sum2;
+      grad[2*i+1] += exp(+coordinates[2*i+1] / userData->alpha) / sum3 - 
+                     exp(-coordinates[2*i+1] / userData->alpha) / sum4;
+    }
+  }
+}
+
+double MultilevelFramework :: TestObjectiveFunc(PetscScalar *coordinates, void* data)
+{
+  double sum = 0.0;
+  int realClusterIdx;
+  int clusterIdxInCoordinatesArray;
+
+  AppCtx* userData = (AppCtx*)data;
+
+  for (int i = 0; i < static_cast<int>(userData->netList->size()); ++i)
+  {
+    for (int j = 0; j < static_cast<int>((*userData->netList)[i].size()); ++j)
+    {
+      realClusterIdx = (*userData->netList)[i][j];
+      clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
+      
+      sum += pow((coordinates[clusterIdxInCoordinatesArray] - userData->circuit->height / 2), 2);
+    }
+  }
+
+  return sum;
 }

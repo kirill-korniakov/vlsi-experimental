@@ -38,13 +38,15 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   netLevels.push_back(netList);
   
   // First V-cycle
-  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, Affinity, clusteringLog, currNClusters);
+  Clusterize(circuit, clusters, netList, netLevels, Affinity, clusteringLog, currNClusters);
+  CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
   // set initial placement
   SetInitialState(clusters, circuit, currNClusters);
   UpdateCoords(circuit, clusters);
-  //PrintToTmpPL(circuit);
-  Relaxation(circuit, clusters, netList);
-  PrintToTmpPL(circuit);
+
+  PrintToPL("before relaxation", circuit);
+  Relaxation(circuit, clusters, netList, currTableOfConnections);
+  PrintToPL("after  relaxation", circuit);
 
   currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   cout << "currWL after relaxation = " << currentWL << endl;
@@ -67,7 +69,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   netList = netLevels.front();
   netLevels.resize(1);
   clusteringLog.clear();
-  Clusterize(circuit, clusters, netList, currTableOfConnections, netLevels, AffinitySP, clusteringLog, currNClusters);
+  Clusterize(circuit, clusters, netList, netLevels, AffinitySP, clusteringLog, currNClusters);
   UpdateCoords(circuit, clusters);
   PrintToTmpPL(circuit);
 

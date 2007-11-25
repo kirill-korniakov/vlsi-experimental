@@ -87,13 +87,13 @@ namespace MultilevelFramework
   
   void Merge(vector<int>& a, vector<int>& b, int result[]);
 
-  MULTIPLACER_ERROR Clusterize(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
-                             vector<ConnectionsList>& currTableOfConnections, list<NetList>& netLevels,
-                             affinityFunc Affinity, list<ClusteringInfoAtEachLevel>& clusteringLog, int& currNClustrers);
+  MULTIPLACER_ERROR Clusterize(Circuit& circuit, vector<Cluster>& clusters, NetList& netList, list<NetList>& netLevels,
+                               affinityFunc Affinity, list<ClusteringInfoAtEachLevel>& clusteringLog, int& currNClustrers);
 
   void InitializeDataStructures(Circuit& circuit, vector<Cluster>& clusters, NetList& netList, const int& nNodes);
 
-  MULTIPLACER_ERROR Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList);
+  MULTIPLACER_ERROR Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
+                               vector<ConnectionsList>& currTableOfConnections);
   
   MULTIPLACER_ERROR Interpolation(Circuit& circuit, vector<Cluster>& clusters, 
                                   vector<ConnectionsList>& currTableOfConnections, NetList& netList);
@@ -128,6 +128,8 @@ namespace MultilevelFramework
                                 NetList& netList, const int& nNodes);
 
   double LogSumExpForClusters(PetscScalar *coordinates, void* data);
+  void GradientLogSumExpForClusters(PetscScalar *coordinates, PetscScalar *grad, void* data);
+  double TestObjectiveFunc(PetscScalar *coordinates, void* data);
   void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
 }
 

@@ -539,8 +539,8 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
     }
     else if (stricmp( argv[i], "-test") == 0)
     {
-      gOptions.doTest = true;
-	  gOptions.doDumpGP = true;
+      gOptions.doTest   = true;
+	    gOptions.doDumpGP = true;
       continue;
     }
     else if (stricmp( argv[i], "-dumpGP") == 0)
