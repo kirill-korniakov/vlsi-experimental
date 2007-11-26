@@ -105,6 +105,7 @@ extern __int64 rngLITotalTime;
 extern int rnCATotalCount;
 
 MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics);
+void PrintNetsInfo(Circuit& circuit);
 void MakeTableOfConnections(Circuit& circuit);
 void FreeMemory();
 void Exit();

@@ -16,7 +16,9 @@ using namespace MultilevelFramework;
 void MultilevelFramework :: SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters)
 {
   float* rndCoords = new float[2 * numOfClusters];
-  GetFloatRandomNumbers(rndCoords, 2 * numOfClusters, 0.0, 1.0);
+  GetFloatRandomNumbers(rndCoords, numOfClusters * 2, 0.0, 1.0);
+  /*GetFloatRandomNumbers(rndCoords, numOfClusters / 2, 0.0, 1.0);
+  GetFloatRandomNumbers(rndCoords + numOfClusters / 2, 1.5 * numOfClusters, 0.0, 0.2);*/
 
   int idx = 0;
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
@@ -127,6 +129,7 @@ void MultilevelFramework :: UpdateCoords(Circuit& circuit, vector<Cluster>& clus
 MULTIPLACER_ERROR MultilevelFramework :: Interpolation(Circuit& circuit, vector<Cluster>& clusters,
                                                        vector<ConnectionsList>& currTableOfConnections, NetList& netList)
 {
+  // todo : consider terminals during interpolation
   vector<ClusterData> clustersData(clusters.size());
   list<ClusterData> clustersDataList;
   list<ClusterData>::iterator clustersDataIterator;
@@ -135,6 +138,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Interpolation(Circuit& circuit, vector<
   int currClusterIdx;
   int neighborIdx;
   int netIdx;
+  int nNodes = circuit.nNodes;
   vector<int> currCPoints;
   double sumX;
   double sumY;
@@ -149,7 +153,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Interpolation(Circuit& circuit, vector<
       continue;
     
     CalculateScore(i, currTableOfConnections, netList, 
-                   NULL, clusters, clustersData[i].score, clustersData[i].bestNeighborIdx, false, AffinityInterp);
+                   NULL, clusters, clustersData[i].score, clustersData[i].bestNeighborIdx, false, AffinityInterp, nNodes);
     isCPoint[i] = false;
   }
   sort(clustersData.begin(), clustersData.end(), PredicateClusterDataGreater);
@@ -178,7 +182,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Interpolation(Circuit& circuit, vector<
       for (int k = 0; k < static_cast<int>(netList[netIdx].size()); ++k)
       {
         neighborIdx = netList[netIdx][k];
-        if (isCPoint[neighborIdx] == false)
+        if (!IsNotTerminal(neighborIdx) || isCPoint[neighborIdx] == false)
           continue;
         // remember all placed (fixed) neighbors of current cluster
         currCPoints.push_back(neighborIdx);
@@ -266,9 +270,6 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   info = VecGetArray(X, &x); CHKERRQ(info);
   info = VecGetArray(G, &g); CHKERRQ(info);
 
-  /* Compute G(X) */
-  // TODO: implement
-
   *f = LogSumExpForClusters(x, user);
   //cout << "before GradientLogSumExpForClusters" << endl;
   GradientLogSumExpForClusters(x, g, user);
@@ -300,7 +301,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
     if (clusters[i].isFake == false)
     {
       lookUpTable[i] = j;
-      j++;
+      ++j;
     }
     else
       lookUpTable[i] = -1;
@@ -387,7 +388,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
       idx++;
     }
   }  
-  //UpdateCoords(circuit, clusters);
+  UpdateCoords(circuit, clusters);
   //PrintToTmpPL(circuit);
 
 
@@ -451,6 +452,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
   int mergeCount = 0;
   ClusteredNodes buffer;
 
+  int nNodes = circuit.nNodes;
+
   numOfClusters = static_cast<int>(clusters.size());
   netAreas = new double[netList.size()];
   
@@ -468,7 +471,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
 
     CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
 
-    for (int i = 0; i < static_cast<int>(netList.size()); ++i)
+    /*for (int i = 0; i < static_cast<int>(netList.size()); ++i)
     { 
       currNetArea = 0.0;
       for (int j = 0; j < static_cast<int>(netList[i].size()); ++j)
@@ -476,7 +479,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
         currNetArea += clusters[netList[i][j]].area;
       }
       netAreas[i] = currNetArea;
-    }
+    }*/
     
     for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
     {
@@ -488,7 +491,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
       
       CalculateScore(i, currTableOfConnections, netList, 
                      netAreas, clusters, clustersData[i].score, clustersData[i].bestNeighborIdx,
-                     DONT_MARK_NEIGHBORS_INVALID, Affinity);
+                     DONT_MARK_NEIGHBORS_INVALID, Affinity, nNodes);
     }
     sort(clustersData.begin(), clustersData.end(), PredicateClusterDataGreater);
     
@@ -506,6 +509,13 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
       clustersDataIterator = clustersDataList.begin();
       currClusterIdx  = clustersDataIterator->clusterIdx;
       bestNeighborIdx = clustersDataIterator->bestNeighborIdx;
+      
+      if (!IsNotTerminal(currClusterIdx) || !IsNotTerminal(bestNeighborIdx))
+      {
+        clustersDataList.pop_front();
+        continue;
+      }
+
       if ( clusters[currClusterIdx].isValid && 
           (clusters[currClusterIdx].area + clusters[bestNeighborIdx].area <= targetClusterArea))
       {
@@ -532,7 +542,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
       {
         CalculateScore(currClusterIdx, currTableOfConnections, netList, 
                        netAreas, clusters, clustersDataIterator->score, clustersDataIterator->bestNeighborIdx,
-                       DONT_MARK_NEIGHBORS_INVALID, Affinity);
+                       DONT_MARK_NEIGHBORS_INVALID, Affinity, nNodes);
         InsertInHeap(clustersDataList);
         clusters[currClusterIdx].isValid = true;
         continue;
@@ -546,7 +556,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
       clustersDataIterator = clustersDataList.begin();
       CalculateScore(currClusterIdx, currTableOfConnections, netList, 
                      netAreas, clusters, clustersDataIterator->score, clustersDataIterator->bestNeighborIdx,
-                     MARK_NEIGHBORS_INVALID, Affinity);
+                     MARK_NEIGHBORS_INVALID, Affinity, nNodes);
       // insert the new object into the heap
       InsertInHeap(clustersDataList);
     }
@@ -658,8 +668,8 @@ void MultilevelFramework :: InitializeDataStructures(Circuit& circuit, vector<Cl
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
     {
       cellIdx = circuit.nets[i].arrPins[j].cellIdx;
-      if (IsNotTerminal(cellIdx))
-        netList[i].push_back(cellIdx);
+      //if (IsNotTerminal(cellIdx))
+      netList[i].push_back(cellIdx);
     }
   }
   for (int i = 0; i < static_cast<int>(netList.size()); ++i)
@@ -731,7 +741,7 @@ inline MULTIPLACER_ERROR MultilevelFramework :: MergeClusters(const int& firstCl
       netAreas[netIdx] = 0;
     }
   }
-  double currNetArea = 0.0;
+  /*double currNetArea = 0.0;
   for (int i = 0; i < static_cast<int>(currTableOfConnections[firstClusterIdx].size()); ++i)
   {
     netIdx = currTableOfConnections[firstClusterIdx][i];
@@ -743,7 +753,7 @@ inline MULTIPLACER_ERROR MultilevelFramework :: MergeClusters(const int& firstCl
       currNetArea += clusters[netList[netIdx][j]].area;
     }
     netAreas[netIdx] = currNetArea;
-  }
+  }*/
   
   clusters[firstClusterIdx].xCoord = (clusters[firstClusterIdx ].xCoord * clusters[firstClusterIdx ].area + 
                                       clusters[secondClusterIdx].xCoord * clusters[secondClusterIdx].area) / 
@@ -785,13 +795,16 @@ inline MULTIPLACER_ERROR MultilevelFramework :: AffinityInterp(const int& firstC
   return OK;
 }
 
-MULTIPLACER_ERROR MultilevelFramework :: CalculateScore(const int& currClusterIdx, vector<ConnectionsList>& currTableOfConnections, NetList& netList, 
-                                             double* netAreas, vector<Cluster>& clusters, double& score, int& bestNeighborIdx, bool isToMark,
-                                             affinityFunc Affinity)
+MULTIPLACER_ERROR MultilevelFramework :: CalculateScore(const int& currClusterIdx,
+                                                        vector<ConnectionsList>& currTableOfConnections, NetList& netList, 
+                                                        double* netAreas, vector<Cluster>& clusters, double& score,
+                                                        int& bestNeighborIdx, bool isToMark,
+                                                        affinityFunc Affinity, int nNodes)
 {
   int netIdx;
   double result;
   int neighborIdx;
+  //int nNodes = circuit->nNodes;
   
   score = 0.0;
   for (int j = 0; j < static_cast<int>(currTableOfConnections[currClusterIdx].size()); ++j)
@@ -800,7 +813,7 @@ MULTIPLACER_ERROR MultilevelFramework :: CalculateScore(const int& currClusterId
     for (int k = 0; k < static_cast<int>(netList[netIdx].size()); ++k)
     {
       neighborIdx = netList[netIdx][k];
-      if (neighborIdx == currClusterIdx)
+      if (neighborIdx == currClusterIdx || !IsNotTerminal(currClusterIdx) || !IsNotTerminal(neighborIdx))
         continue;
       Affinity(currClusterIdx, neighborIdx, clusters, netList, currTableOfConnections, netAreas, result);
       if (Affinity != AffinityInterp && score < result)
@@ -830,11 +843,12 @@ void MultilevelFramework :: CreateTableOfConnections(vector<Cluster>& clusters, 
     for (int j = 0; j < static_cast<int>(netList[i].size()); ++j)
     {
       cellIdx = netList[i][j];
-      if (clusters[cellIdx].isFake == true)
-        continue;
-      // do not consider terminals
       if (IsNotTerminal(cellIdx))
+      {
+        if (clusters[cellIdx].isFake == true)
+          continue;
         currTableOfConnections[cellIdx].push_back(i);
+      }
     }
   }
 }
@@ -904,18 +918,23 @@ MULTIPLACER_ERROR MultilevelFramework :: AffinitySP(const int& firstClusterIdx, 
 
 double MultilevelFramework :: LogSumExpForClusters(PetscScalar *coordinates, void* data)
 {
+  AppCtx* userData = (AppCtx*)data;
+  
   double sum = 0.0;
   double logsum1 = 0.0;
   double logsum2 = 0.0;
   double logsum3 = 0.0;
   double logsum4 = 0.0;
-
-  AppCtx* userData = (AppCtx*)data;
-
-  //PetscPrintf(PETSC_COMM_SELF,"\nEnter LogSumExp func\n");
+  double x = 0.0;
+  double y = 0.0;
+  double alpha = userData->alpha;
   
+  int nNodes = userData->circuit->nNodes;
   int realClusterIdx;
   int clusterIdxInCoordinatesArray;
+
+  //PetscPrintf(PETSC_COMM_SELF,"\nEnter LogSumExp func\n");
+
   for (int i = 0; i < static_cast<int>(userData->netList->size()); ++i)
   {
     logsum1 = 0.0;
@@ -926,47 +945,64 @@ double MultilevelFramework :: LogSumExpForClusters(PetscScalar *coordinates, voi
     for (int j = 0; j < static_cast<int>((*userData->netList)[i].size()); ++j)
     {
       realClusterIdx = (*userData->netList)[i][j];
-      clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
-      //PetscPrintf(PETSC_COMM_SELF,"\n%d\n", idx);
-      logsum1 += exp(+(float)coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
-      logsum2 += exp(-(float)coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
-      logsum3 += exp(+(float)coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
-      logsum4 += exp(-(float)coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
+      if (IsNotTerminal(realClusterIdx))
+      {
+        clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
+        //PetscPrintf(PETSC_COMM_SELF,"\n%d\n", idx);
+        x = coordinates[2*clusterIdxInCoordinatesArray+0];
+        y = coordinates[2*clusterIdxInCoordinatesArray+1];
+      }
+      else
+      {
+        x = 1 * userData->circuit->placement[realClusterIdx].xCoord;
+        y = 1 * userData->circuit->placement[realClusterIdx].yCoord;
+      }
+      logsum1 += exp(+x / alpha);
+      logsum2 += exp(-x / alpha);
+      logsum3 += exp(+y / alpha);
+      logsum4 += exp(-y / alpha);
     }
 
     sum += log(logsum1) + log(logsum2) + log(logsum3) + log(logsum4);
   }
   
   //PetscPrintf(PETSC_COMM_SELF,"\nExit LogSumExp func\n");
-  return userData->alpha * sum;
+  return alpha * sum;
 }
 
 void MultilevelFramework :: GradientLogSumExpForClusters(PetscScalar *coordinates, PetscScalar *grad, void* data)
 {
+  AppCtx* userData = (AppCtx*)data;
+  
   double sum = 0.0;
   double sum1 = 0.0;
   double sum2 = 0.0;
   double sum3 = 0.0;
   double sum4 = 0.0;
-
-  AppCtx* userData = (AppCtx*)data;
-
+  double x = 0.0;
+  double y = 0.0;
+  double alpha = userData->alpha;
+  
   int realClusterIdx;
   int clusterIdxInCoordinatesArray;
+  int clusterIdx = 0;
   int netIdx;
-  for (int i = 0; i < userData->numOfClusters; ++i)
+  int nNodes = userData->circuit->nNodes;
+
+  for (int i = 0; i < userData->numOfClusters; ++i, ++clusterIdx)
   {
     grad[2*i+0] = 0;
     grad[2*i+1] = 0;
+    while ((*userData->clusters)[clusterIdx].isFake == true) ++clusterIdx;
     //PetscPrintf(PETSC_COMM_SELF,"\ni = %d\n", i);
     //PetscPrintf(PETSC_COMM_SELF,"\nsize = %d\n", static_cast<int>((*userData->currTableOfConnections)[i].size()));
-    for (int j = 0; j < static_cast<int>((*userData->currTableOfConnections)[i].size()); ++j)
+    for (int j = 0; j < static_cast<int>((*userData->currTableOfConnections)[clusterIdx].size()); ++j)
     {     
       sum1 = 0.0;
       sum2 = 0.0;
       sum3 = 0.0;
       sum4 = 0.0;
-      netIdx = (*userData->currTableOfConnections)[i][j];
+      netIdx = (*userData->currTableOfConnections)[clusterIdx][j];
       //PetscPrintf(PETSC_COMM_SELF,"\nnetIdx = %d\t", netIdx);
       //PetscPrintf(PETSC_COMM_SELF,"netSize = %d\n", (*userData->netList)[netIdx].size());
       for (int k = 0; k < static_cast<int>((*userData->netList)[netIdx].size()); ++k)
@@ -974,16 +1010,26 @@ void MultilevelFramework :: GradientLogSumExpForClusters(PetscScalar *coordinate
         //PetscPrintf(PETSC_COMM_SELF,"\nk = %d\t", k);
         realClusterIdx = (*userData->netList)[netIdx][k];
         //PetscPrintf(PETSC_COMM_SELF,"realClusterIdx = %d\n", realClusterIdx);
-        clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
-        sum1 += exp(+coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
-        sum2 += exp(-coordinates[2*clusterIdxInCoordinatesArray+0] / userData->alpha);
-        sum3 += exp(+coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
-        sum4 += exp(-coordinates[2*clusterIdxInCoordinatesArray+1] / userData->alpha);
+        if (IsNotTerminal(realClusterIdx))
+        {
+          clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
+          x = coordinates[2*clusterIdxInCoordinatesArray+0];
+          y = coordinates[2*clusterIdxInCoordinatesArray+1];
+        }
+        else
+        {
+          x = 1 * userData->circuit->placement[realClusterIdx].xCoord;
+          y = 1 * userData->circuit->placement[realClusterIdx].yCoord;
+        }
+        sum1 += exp(+x / alpha);
+        sum2 += exp(-x / alpha);
+        sum3 += exp(+y / alpha);
+        sum4 += exp(-y / alpha);
       }
-      grad[2*i+0] += exp(+coordinates[2*i+0] / userData->alpha) / sum1 - 
-                     exp(-coordinates[2*i+0] / userData->alpha) / sum2;
-      grad[2*i+1] += exp(+coordinates[2*i+1] / userData->alpha) / sum3 - 
-                     exp(-coordinates[2*i+1] / userData->alpha) / sum4;
+      grad[2*i+0] += exp(+coordinates[2*i+0] / alpha) / sum1 - 
+                     exp(-coordinates[2*i+0] / alpha) / sum2;
+      grad[2*i+1] += exp(+coordinates[2*i+1] / alpha) / sum3 - 
+                     exp(-coordinates[2*i+1] / alpha) / sum4;
     }
   }
 }

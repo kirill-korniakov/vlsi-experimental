@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
   if (size >1) {
     if (rank == 0)
-      PetscPrintf(PETSC_COMM_SELF,"This example is intended for single processor use!\n");
+      PetscPrintf(PETSC_COMM_SELF,"This application is intended for single processor use!\n");
     SETERRQ(1,"Incorrect number of processors");
   }
 

@@ -37,7 +37,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[]);
 void CfgParse(char* fileName);
 
 MULTIPLACER_ERROR ValidateKeys();
-void SetDefaultKeysValues();
+//void SetDefaultKeysValues();
 
 int ParseAux(const char* fileName, Circuit& circuit);
 int ParseNodes(const char* fileName, Circuit& circuit);

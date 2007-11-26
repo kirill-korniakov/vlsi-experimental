@@ -15,6 +15,7 @@ void PrintCircuitInfo(Circuit& circuit)
        << "Number of nodes:\t"   << circuit.nNodes << "\n"
        << "Number of pins:\t\t"  << circuit.nPins  << "\n"
        << "Number of terminals:\t" << circuit.nTerminals << "\n\n";
+  PrintNetsInfo(circuit);
 }
 
 void PrintResultString(int argc, char* argv[], Statistics& statistics, MULTIPLACER_ERROR errorCode)

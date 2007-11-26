@@ -121,7 +121,7 @@ namespace MultilevelFramework
   MULTIPLACER_ERROR CalculateScore(const int& currClusterIdx, vector<ConnectionsList>& currTableOfConnections,
                                    NetList& netList, double* netAreas, vector<Cluster>& clusters,
                                    double& score, int& bestNeighborIdx, bool isToMark,
-                                   affinityFunc Affinity);
+                                   affinityFunc Affinity, int nNodes);
   MULTIPLACER_ERROR InsertInHeap(list<ClusterData>& clustersDataList);
 
   void CreateTableOfConnections(vector<Cluster>& clusters, vector<ConnectionsList>& currTableOfConnections,

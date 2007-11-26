@@ -61,10 +61,49 @@ MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit)
   circuit.shiftY = circuit.rows[0].coordinate;
   
   circuit.rowTerminalBorders = new vector<double>[circuit.nRows];
-  
+
   MakeTableOfConnections(circuit);
 
   return errorCode;
+}
+
+void PrintNetsInfo(Circuit& circuit)
+{
+  int max = circuit.nNodes + circuit.nTerminals;
+  int min = 1;
+  
+  for (int i = 0; i < circuit.nNets; ++i)
+  {
+    if (max < circuit.nets[i].numOfPins)
+      max = circuit.nets[i].numOfPins;
+    if (min > circuit.nets[i].numOfPins)
+      min = circuit.nets[i].numOfPins;
+  }
+
+  int size = max - min + 1;
+  int* stat = new int[size];
+  for (int i = 0; i < size; ++i)
+  {
+    stat[i] = 0;
+  }
+  int netSize = 0;
+  for (int i = 0; i < circuit.nNets; ++i)
+  {
+    netSize = circuit.nets[i].numOfPins;
+    stat[netSize]++;
+  }
+
+  cout << "Nets statistics:" << endl;
+  for (int i = 0; i < size; ++i)
+  {
+    if (stat[i] != 0)
+    {
+      cout << "There are " << stat[i] << "\tnets of size\t" << i << endl;
+    }
+  }
+  cout << endl;
+
+  delete []stat;
 }
 
 void SetDefaultKeysValues()
