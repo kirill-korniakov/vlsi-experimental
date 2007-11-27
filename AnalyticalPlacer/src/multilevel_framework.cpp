@@ -313,6 +313,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   TAO_APPLICATION taoapp;     // TAO application context
   TaoTerminateReason reason;  // terminate reason
   AppCtx          user;       // user-defined application context
+  double binHeight;
+  double binWidth;
 
   /* Initialize problem parameters */
   user.circuit = &circuit;
@@ -365,6 +367,9 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /* Check for TAO command line options */
   info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
 
+  /* Calculate current bin grid */
+  CalcBinGrid(clusters, circuit, numOfClusters, binHeight, binWidth);
+
   /* SOLVE THE APPLICATION */
   info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
 
@@ -373,6 +378,9 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   if (reason <= 0)
   {
     PetscPrintf(MPI_COMM_WORLD,"Try a different TAO method, adjust some parameters, or check the function evaluation routines\n");
+  }
+  else if (reason > 0)
+  {
     PetscPrintf(MPI_COMM_WORLD,"reason = %d\n", reason);
   }
 
@@ -467,7 +475,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     targetNumOfClusters = static_cast<int>(numOfClusters / CLUSTER_RATIO);
     targetClusterArea   = (totalCellArea / targetNumOfClusters) * CLUSTERS_AREA_TOLERANCE;
     
-    //targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
+    targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
 
     CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
 
@@ -1054,4 +1062,23 @@ double MultilevelFramework :: TestObjectiveFunc(PetscScalar *coordinates, void* 
   }
 
   return sum;
+}
+
+void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
+                                        double& binHeight, double& binWidth)
+{
+  double average = 0.0;
+
+  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
+  {
+    if (clusters[i].isFake == false)
+      average += sqrt(clusters[i].area);
+  }
+  cout << "average = " << average << endl;
+  average /= sqrt((double)numOfClusters);
+
+  binWidth  = average * (circuit.width  / circuit.height);
+  binHeight = average * (circuit.height / circuit.width );
+  cout << "average = " << average << endl;
+  cout << binWidth << "\t" << binHeight << endl;
 }
