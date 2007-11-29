@@ -24,7 +24,7 @@ using namespace std;
 namespace MultilevelFramework
 {
   const int CLUSTER_RATIO = 5; // decrease of the number of clusters after each iteration
-  const int FINAL_NCLUSTERS = 2502;
+  const int FINAL_NCLUSTERS = 2000;
   const double CLUSTERS_AREA_TOLERANCE = 1.5;
 
   struct Cluster

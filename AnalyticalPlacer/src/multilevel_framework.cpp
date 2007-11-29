@@ -368,6 +368,9 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
 
   /* Calculate current bin grid */
+  binWidth  = 2 * circuit.width;
+  binHeight = circuit.height / dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
+  //cout << dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
   CalcBinGrid(clusters, circuit, numOfClusters, binHeight, binWidth);
 
   /* SOLVE THE APPLICATION */
@@ -475,7 +478,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     targetNumOfClusters = static_cast<int>(numOfClusters / CLUSTER_RATIO);
     targetClusterArea   = (totalCellArea / targetNumOfClusters) * CLUSTERS_AREA_TOLERANCE;
     
-    targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
+    //targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
 
     CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
 
@@ -1067,7 +1070,7 @@ double MultilevelFramework :: TestObjectiveFunc(PetscScalar *coordinates, void* 
 void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
                                         double& binHeight, double& binWidth)
 {
-  double average = 0.0;
+  /*double average = 0.0;
 
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
   {
@@ -1075,10 +1078,13 @@ void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circ
       average += sqrt(clusters[i].area);
   }
   cout << "average = " << average << endl;
-  average /= sqrt((double)numOfClusters);
+  average /= sqrt((double)numOfClusters);*/
 
-  binWidth  = average * (circuit.width  / circuit.height);
+  /*binWidth  = average * (circuit.width  / circuit.height);
   binHeight = average * (circuit.height / circuit.width );
   cout << "average = " << average << endl;
-  cout << binWidth << "\t" << binHeight << endl;
+  cout << binWidth << "\t" << binHeight << endl;*/
+
+  binWidth  /= 4.0;
+  binHeight /= CLUSTER_RATIO;
 }
