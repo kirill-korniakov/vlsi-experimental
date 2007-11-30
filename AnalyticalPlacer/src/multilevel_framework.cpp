@@ -272,7 +272,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   info = VecGetArray(X, &x); CHKERRQ(info);
   info = VecGetArray(G, &g); CHKERRQ(info);
 
-  *f = LogSumExpForClusters(x, user) + 0.1 * CalcPenalty(x, user);
+  *f = LogSumExpForClusters(x, user) + 10 * CalcPenalty(x, user);
   //cout << "before GradientLogSumExpForClusters" << endl;
   GradientLogSumExpForClusters(x, g, user);
   //cout << "after GradientLogSumExpForClusters" << endl;
