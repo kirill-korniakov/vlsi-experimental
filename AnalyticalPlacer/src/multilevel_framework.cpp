@@ -225,6 +225,8 @@ typedef struct {
   float alpha;
   PetscInt* lookUpTable;
   vector<ConnectionsList>* currTableOfConnections;
+  double binHeight;
+  double binWidth;
 } AppCtx;
 
 static  char help[] = "This example demonstrates use of the TAO package to \n\
@@ -270,7 +272,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   info = VecGetArray(X, &x); CHKERRQ(info);
   info = VecGetArray(G, &g); CHKERRQ(info);
 
-  *f = LogSumExpForClusters(x, user);
+  *f = LogSumExpForClusters(x, user) + 0.1 * CalcPenalty(x, user);
   //cout << "before GradientLogSumExpForClusters" << endl;
   GradientLogSumExpForClusters(x, g, user);
   //cout << "after GradientLogSumExpForClusters" << endl;
@@ -313,8 +315,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   TAO_APPLICATION taoapp;     // TAO application context
   TaoTerminateReason reason;  // terminate reason
   AppCtx          user;       // user-defined application context
-  double binHeight;
-  double binWidth;
+  /*double binHeight;
+  double binWidth;*/
 
   /* Initialize problem parameters */
   user.circuit = &circuit;
@@ -368,10 +370,10 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
 
   /* Calculate current bin grid */
-  binWidth  = 2 * circuit.width;
-  binHeight = circuit.height / dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
+  user.binWidth  = 2 * circuit.width;
+  user.binHeight = CLUSTER_RATIO * circuit.height / dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
   //cout << dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
-  CalcBinGrid(clusters, circuit, numOfClusters, binHeight, binWidth);
+  CalcBinGrid(clusters, circuit, numOfClusters, user.binHeight, user.binWidth);
 
   /* SOLVE THE APPLICATION */
   info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
@@ -1088,3 +1090,114 @@ void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circ
   binWidth  /= 4.0;
   binHeight /= CLUSTER_RATIO;
 }
+
+double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
+{
+  AppCtx* userData = (AppCtx*)data;
+  Bin **binPenalties;
+  //double penVal;
+  double penX;
+  double penY;
+  double dx;
+  double dy;
+  double meanBinArea;
+  double sum = 0.0;
+  double totalCellArea = 0.0;
+  double alpha;
+  const double rx = userData->binWidth;
+  const double ry = userData->binHeight;
+  int nBinRows = static_cast<int>(userData->circuit->height / userData->binHeight);
+  int nBinCols = static_cast<int>(userData->circuit->width  / userData->binWidth);
+  int row;
+  int col;
+
+  binPenalties = new Bin*[nBinRows];
+  for (int j = 0; j < nBinRows; ++j)
+  {
+    binPenalties[j] = new Bin[nBinCols];
+  }
+
+  for (int i = 0; i < nBinRows; ++i)
+  {
+    for (int j = 0; j < nBinCols; ++j)
+    {
+      binPenalties[i][j].xCoord = (j + 0.5) * userData->binWidth;
+      binPenalties[i][j].yCoord = (i + 0.5) * userData->binHeight;
+    }
+  }
+
+  for (int i = 0; i < userData->numOfClusters; ++i)
+  {
+    row = static_cast<int>(x[2*i+0] / userData->binWidth);
+    col = static_cast<int>(x[2*i+1] / userData->binHeight);
+    
+    row = max(0, row - 1);
+    col = max(0, col - 1);
+
+    for (int k = row; k < min(nBinRows - 1, row + 2); ++k)
+    {
+      for (int j = col; j < min(nBinCols - 1, col + 2); ++j)
+      {
+        dx = fabs(binPenalties[k][j].xCoord - x[2*i+0]);
+        dy = fabs(binPenalties[k][j].yCoord - x[2*i+1]);
+        if (dx > rx || dy > ry)
+          continue;
+        // ELSE: this cluster affects this bin
+        if (dy <= ry / 2)
+          penY = 1 - 2 * pow(dy / ry, 2);
+        else
+          penY = 2 * pow((dy - ry) / ry, 2);
+        
+        if (dx <= rx / 2)
+          penX = 1 - 2 * pow(dx / rx, 2);
+        else
+          penX = 2 * pow((dx - rx) / rx, 2);
+        
+        binPenalties[k][j].sumLength += penX * penY;
+      }
+    }
+  }
+
+  for (int i = 0; i < nBinRows; ++i)
+  {
+    for (int j = 0; j < nBinCols; ++j)
+    {
+      sum += binPenalties[i][j].sumLength;
+    }
+  }
+  for (int i = 0; i < userData->numOfClusters; ++i)
+  {
+    totalCellArea += (*userData->clusters)[i].area;
+  }
+  alpha = sum / totalCellArea;
+
+  for (int i = 0; i < nBinRows; ++i)
+  {
+    for (int j = 0; j < nBinCols; ++j)
+    {
+      binPenalties[i][j].sumLength *= alpha;
+    }
+  }
+
+  meanBinArea = totalCellArea / nBinCols / nBinRows;
+
+  sum = 0.0;
+  for (int i = 0; i < nBinRows; ++i)
+  {
+    for (int j = 0; j < nBinCols; ++j)
+    {
+      //cout << "sum = " << sum << endl;
+      sum += pow(binPenalties[i][j].sumLength - meanBinArea, 2);
+    }
+  }
+
+  for (int j = 0; j < nBinRows; ++j)
+  {
+    delete []binPenalties[j];
+  }
+  delete []binPenalties;
+  
+  //cout << "sum = " << sum << endl;
+  return sum;
+}
+

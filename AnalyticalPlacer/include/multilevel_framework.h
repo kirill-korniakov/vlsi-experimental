@@ -133,6 +133,7 @@ namespace MultilevelFramework
   void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
   void CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
                    double& binHeight, double& binWidth);
+  double CalcPenalty(PetscScalar *x, void* data);
 }
 
 #endif
