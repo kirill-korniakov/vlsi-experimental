@@ -16,6 +16,7 @@
 #include <list>
 
 #define IsNotTerminal(nodeIdx) ((nodeIdx < nNodes) ? true : false)
+#define sign(x) ((x > 0) ? 1 : ((x < 0) ? -1 : 0))
 #define MARK_NEIGHBORS_INVALID true
 #define DONT_MARK_NEIGHBORS_INVALID false
 
@@ -133,7 +134,7 @@ namespace MultilevelFramework
   void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
   void CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
                    double& binHeight, double& binWidth);
-  double CalcPenalty(PetscScalar *x, void* data);
+  double CalcPenalty(PetscScalar *x, PetscScalar *grad, void* data);
 }
 
 #endif
