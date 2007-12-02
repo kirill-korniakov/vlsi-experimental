@@ -129,12 +129,13 @@ namespace MultilevelFramework
                                 NetList& netList, const int& nNodes);
 
   double LogSumExpForClusters(PetscScalar *coordinates, void* data);
-  void GradientLogSumExpForClusters(PetscScalar *coordinates, PetscScalar *grad, void* data);
+  void CalcLogSumExpForClustersGrad(PetscScalar *coordinates, PetscScalar *grad, void* data);
   double TestObjectiveFunc(PetscScalar *coordinates, void* data);
   void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
   void CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
                    double& binHeight, double& binWidth);
-  double CalcPenalty(PetscScalar *x, PetscScalar *grad, void* data);
+  double CalcPenalty(PetscScalar *x, void* data);
+  void CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data);
 }
 
 #endif

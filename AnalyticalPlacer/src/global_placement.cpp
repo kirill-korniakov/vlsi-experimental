@@ -44,13 +44,17 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   SetInitialState(clusters, circuit, currNClusters);
   UpdateCoords(circuit, clusters);
 
-  PrintToPL("before relaxation", circuit);
+  //PrintToPL("before relaxation", circuit);
   Relaxation(circuit, clusters, netList, currTableOfConnections);
   PrintToPL("after  relaxation", circuit);
+  /*Relaxation(circuit, clusters, netList, currTableOfConnections);
+  PrintToPL("after  relaxation", circuit);*/
 
   currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   cout << "currWL after relaxation = " << currentWL << endl;
 
+  //getch();
+  Exit();
   netLevelsIterator = netLevels.rbegin();
   clusteringLogIterator = clusteringLog.rbegin();
   if (netLevelsIterator != netLevels.rend()) ++netLevelsIterator;
@@ -58,9 +62,10 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   for (; clusteringLogIterator != clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
   {
     UnclusterLevelUp(clusters, currTableOfConnections, (*netLevelsIterator), clusteringLogIterator, circuit.nNodes);
-    Interpolation(circuit, clusters, currTableOfConnections, (*netLevelsIterator));
+    //Interpolation(circuit, clusters, currTableOfConnections, (*netLevelsIterator));
     PrintToTmpPL(circuit);
-    //Relaxation(circuit, clusters);
+    Relaxation(circuit, clusters, (*netLevelsIterator), currTableOfConnections);
+    PrintToPL("after  relaxation", circuit);
     currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
     cout << "currWL = " << currentWL << endl;
   }

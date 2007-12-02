@@ -184,6 +184,10 @@ int main(int argc, char* argv[])
   {
     CreateHTMLReport(statistics.currentWL, statistics.totalWT, errorCode);
   }
+  
+  /* Finalize TAO */
+  TaoFinalize();
+  PetscFinalize();
 
   Exit();
 
