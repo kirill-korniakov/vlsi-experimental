@@ -231,6 +231,7 @@ typedef struct {
   double binWidth;
   int nBinRows;
   int nBinCols;
+  double mu0;
   double mu;
   double totalCellArea;
   double meanBinArea;
@@ -305,8 +306,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   TaoTerminateReason reason;  // terminate reason
   AppCtx          user;       // user-defined application context
   PetscScalar *solution;
-  PetscScalar *gradPen = new PetscScalar[2*numOfClusters];
-  PetscScalar *gradWL  = new PetscScalar[2*numOfClusters];
+  
   /*double binHeight;
   double binWidth;*/
 
@@ -373,37 +373,12 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
           " x " << user.nBinCols << endl;
 
   /* Get the mu value */
-  user.binPenalties = new Bin*[user.nBinRows];
-  for (int j = 0; j < user.nBinRows; ++j)
-  {
-    user.binPenalties[j] = new Bin[user.nBinCols];
-  }
-  for (int i = 0; i < user.nBinRows; ++i)
-  {
-    for (int j = 0; j < user.nBinCols; ++j)
-    {
-      user.binPenalties[i][j].xCoord = (j + 0.5) * user.binWidth;
-      user.binPenalties[i][j].yCoord = (i + 0.5) * user.binHeight;
-    }
-  }
-  user.totalCellArea = 0.0;
-  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
-  {
-    if (clusters[i].isFake == false)
-    {
-      user.totalCellArea += clusters[i].area;
-    }
-  }
-  user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
-  for (int i = 0; i < 2*numOfClusters; ++i)
-  {
-    gradPen[i] = 0;
-  }
   VecGetArray(x, &solution);
-  CalcLogSumExpForClustersGrad(solution, gradWL, &user);
-  CalcPenalty(solution, &user);
-  CalcPenaltyGrad(solution, gradPen, &user);
+  CalcMu0(solution, &user);
   VecRestoreArray(x, &solution);
+  user.mu = 1.0 / (2 * user.mu0);
+  /*cout << "mu0 = " << user.mu0 << endl;
+  PetscPrintf(MPI_COMM_WORLD, "mu = %f", user.mu);*/
 
   /* SOLVE THE APPLICATION */
   info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
@@ -441,8 +416,6 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
 
   delete[] initValues;
   delete[] idxs;
-  delete[] gradPen;
-  delete[] gradWL;
   for (int j = 0; j < user.nBinRows; ++j)
   {
     delete []user.binPenalties[j];
@@ -1244,7 +1217,7 @@ double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
 
   //delete []_penalties;
   
-  //cout << "sum = " << sum << endl;
+  //cout << "The penalty = " << sum << endl;
   return sum;
 }
 
@@ -1333,4 +1306,114 @@ void MultilevelFramework :: CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, v
     }
     //cout << "Num of enters " << counter << endl;
   }
+}
+
+void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
+{
+  AppCtx* user = (AppCtx*)data;
+ 
+  PetscScalar *gradPen = new PetscScalar[2*user->numOfClusters];
+  PetscScalar *gradWL  = new PetscScalar[2*user->numOfClusters];
+  
+  double penX;
+  double penY;
+  double _penX;  // производные
+  double _penY;
+  double dx;
+  double dy;
+  const double rx = 1*user->binWidth;
+  const double ry = 1*user->binHeight;
+  double gradX;
+  double gradY;
+  double sumSDModXY = 0.0;
+  double sumNumerator = 0.0;
+  double sumDenominator = 0.0;
+
+  user->binPenalties = new Bin*[user->nBinRows];
+  for (int j = 0; j < user->nBinRows; ++j)
+  {
+    user->binPenalties[j] = new Bin[user->nBinCols];
+  }
+  for (int i = 0; i < user->nBinRows; ++i)
+  {
+    for (int j = 0; j < user->nBinCols; ++j)
+    {
+      user->binPenalties[i][j].xCoord = (j + 0.5) * user->binWidth;
+      user->binPenalties[i][j].yCoord = (i + 0.5) * user->binHeight;
+    }
+  }
+  user->totalCellArea = 0.0;
+  for (int i = 0; i < static_cast<int>(user->clusters->size()); ++i)
+  {
+    if ((*user->clusters)[i].isFake == false)
+    {
+      user->totalCellArea += (*user->clusters)[i].area;
+    }
+  }
+  user->meanBinArea = user->totalCellArea / user->nBinCols / user->nBinRows;
+  for (int i = 0; i < 2*user->numOfClusters; ++i)
+  {
+    gradPen[i] = 0;
+  }
+
+  CalcLogSumExpForClustersGrad(x, gradWL, user);
+  CalcPenalty(x, user);
+  for (int k = 0; k <= user->nBinRows - 1; ++k)
+  {
+    for (int j = 0; j <= user->nBinCols - 1; ++j)
+    {
+      sumSDModXY = 0.0;
+      for (int i = 0; i < user->numOfClusters; ++i)
+      {    
+        dx = fabs(user->binPenalties[k][j].xCoord - x[2*i+0]);
+        dy = fabs(user->binPenalties[k][j].yCoord - x[2*i+1]);
+        if (dx > rx || dy > ry)
+          continue;
+        // ELSE: this cluster affects this bin
+        if (dy <= ry / 2)
+        {
+          penY  = 1 - 2 * pow(dy / ry, 2);
+          _penY = 4 * (user->binPenalties[k][j].yCoord - x[2*i+1]) / ry / ry;
+        }
+        else
+        {
+          penY  = 2 * pow((dy - ry) / ry, 2);
+          _penY = -4 * sign(user->binPenalties[k][j].yCoord - x[2*i+1]) *
+            (dy - ry)/ ry / ry;
+        }
+
+        if (dx <= rx / 2)
+        {
+          penX  = 1 - 2 * pow(dx / rx, 2);
+          _penX = 4 * (user->binPenalties[k][j].xCoord - x[2*i+0]) / rx / rx;
+        }
+        else
+        {
+          penX  = 2 * pow((dx - rx) / rx, 2);
+          _penX = -4 * sign(user->binPenalties[k][j].xCoord - x[2*i+0]) *
+            (dx - rx)/ rx / rx;
+        }
+
+        gradX = user->mu * 2 * (user->binPenalties[k][j].sumLength - user->meanBinArea) *
+          user->penAlpha * _penX * penY;
+        gradY = user->mu * 2 * (user->binPenalties[k][j].sumLength - user->meanBinArea) * 
+          user->penAlpha * _penY * penX;
+        sumSDModXY += fabs(gradX) + fabs(gradY);
+      }
+      sumSDModXY *= fabs(user->binPenalties[k][j].sumLength - user->meanBinArea);
+      sumNumerator += sumSDModXY;
+    }
+    //cout << "Num of enters " << counter << endl;
+  }
+  for (int i = 0; i < user->numOfClusters; ++i)
+  {
+    sumDenominator += fabs(gradWL[2*i+0]) + fabs(gradWL[2*i+1]);
+  }
+  //CalcPenaltyGrad(x, gradPen, &user);
+
+  delete[] gradPen;
+  delete[] gradWL;
+
+  user->mu0 = 0.5 * sumNumerator / sumDenominator;
+  /*cout << "mu0 = " << user->mu0 << endl;*/
 }
