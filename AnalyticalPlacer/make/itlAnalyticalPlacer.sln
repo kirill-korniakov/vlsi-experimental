@@ -1,14 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bin", "bin", "{FE002F2A-167C-4E85-A580-764CD95A0B3F}"
-	ProjectSection(SolutionItems) = preProject
-		..\bin\readme.txt = ..\bin\readme.txt
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "itlAnalyticalPlacer", "itlAnalyticalPlacer.vcproj", "{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{506597B1-53F9-4B88-B624-BBF48E2E14C8}"
 	ProjectSection(SolutionItems) = preProject
+		..\bin\readme.txt = ..\bin\readme.txt
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
