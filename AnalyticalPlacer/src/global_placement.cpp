@@ -44,7 +44,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   SetInitialState(clusters, circuit, currNClusters);
   UpdateCoords(circuit, clusters);
 
-  //PrintToPL("before relaxation", circuit);
+  PrintToPL("before relaxation", circuit);
   Relaxation(circuit, clusters, netList, currTableOfConnections);
   PrintToPL("after  relaxation", circuit);
   Relaxation(circuit, clusters, netList, currTableOfConnections);
@@ -54,7 +54,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   cout << "currWL after relaxation = " << currentWL << endl;
 
   //getch();
-  Exit();
+  //Exit();
   netLevelsIterator = netLevels.rbegin();
   clusteringLogIterator = clusteringLog.rbegin();
   if (netLevelsIterator != netLevels.rend()) ++netLevelsIterator;
@@ -71,26 +71,27 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   }
   
   // Second V-cycle
-  netList = netLevels.front();
-  netLevels.resize(1);
-  clusteringLog.clear();
-  Clusterize(circuit, clusters, netList, netLevels, AffinitySP, clusteringLog, currNClusters);
-  UpdateCoords(circuit, clusters);
-  PrintToTmpPL(circuit);
+  //netList = netLevels.front();
+  //netLevels.resize(1);
+  //clusteringLog.clear();
+  //Clusterize(circuit, clusters, netList, netLevels, AffinitySP, clusteringLog, currNClusters);
+  //UpdateCoords(circuit, clusters);
+  //PrintToTmpPL(circuit);
 
-  netLevelsIterator = netLevels.rbegin();
-  clusteringLogIterator = clusteringLog.rbegin();
-  if (netLevelsIterator != netLevels.rend()) ++netLevelsIterator;
+  //netLevelsIterator = netLevels.rbegin();
+  //clusteringLogIterator = clusteringLog.rbegin();
+  //if (netLevelsIterator != netLevels.rend()) ++netLevelsIterator;
 
-  for (; clusteringLogIterator != clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
-  {
-    UnclusterLevelUp(clusters, currTableOfConnections, (*netLevelsIterator), clusteringLogIterator, circuit.nNodes);
-    Interpolation(circuit, clusters, currTableOfConnections, (*netLevelsIterator));
-    PrintToTmpPL(circuit);
-    //Relaxation(circuit, clusters);
-    currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
-    cout << "currWL = " << currentWL << endl;
-  }
+  //for (; clusteringLogIterator != clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
+  //{
+  //  UnclusterLevelUp(clusters, currTableOfConnections, (*netLevelsIterator), clusteringLogIterator, circuit.nNodes);
+  //  /*Interpolation(circuit, clusters, currTableOfConnections, (*netLevelsIterator));
+  //  PrintToTmpPL(circuit);*/
+  //  Relaxation(circuit, clusters, (*netLevelsIterator), currTableOfConnections);
+  //  PrintToPL("after  relaxation", circuit);
+  //  currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
+  //  cout << "currWL = " << currentWL << endl;
+  //}
 
   return OK;
 }

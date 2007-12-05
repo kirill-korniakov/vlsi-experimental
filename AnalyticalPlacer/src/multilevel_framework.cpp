@@ -286,7 +286,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
       --numOfClusters;
   }
 
-  static PetscInt *lookUpTable = new PetscInt[clusters.size()]; //todo: move this memory work from function
+  PetscInt *lookUpTable = new PetscInt[clusters.size()]; //todo: move this memory work from function
   int j = 0;  
   for(int i=0; i < static_cast<int>(clusters.size());i++)
   {
@@ -318,7 +318,6 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   user.lookUpTable = lookUpTable;
   user.alpha = 100; //todo: make this correct parameter
   user.currTableOfConnections = &currTableOfConnections;
-  user.mu = 0.01;
 
   /* Check for command line arguments to override defaults */
   //info = PetscOptionsGetInt(PETSC_NULL,"-n",&user.n,&flg); CHKERRQ(info);
@@ -369,14 +368,37 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   CalcBinGrid(clusters, circuit, numOfClusters, user.binHeight, user.binWidth);
   user.nBinRows = (int)(circuit.height / user.binHeight);
   user.nBinCols = (int)(circuit.width  / user.binWidth );
-  cout << "Current bin grid: " << user.nBinRows <<
-          " x " << user.nBinCols << endl;
+  /*if (user.nBinRows == 19) user.nBinCols = 16;
+  else if (user.nBinRows == 96) user.nBinCols = 32;
+  user.binWidth = circuit.width / user.nBinCols;*/
 
+  if (user.nBinRows == 19) 
+  {
+    /*user.nBinCols = 8;
+    user.binWidth = circuit.width / user.nBinCols;*/
+  }
+  else
+    if (user.nBinRows == 96)
+    {
+      user.nBinCols = 32;
+      user.binWidth = circuit.width / user.nBinCols;
+    }
+  cout << "Current bin grid: " << user.nBinRows <<
+    " x " << user.nBinCols << endl;
   /* Get the mu value */
   VecGetArray(x, &solution);
   CalcMu0(solution, &user);
   VecRestoreArray(x, &solution);
-  user.mu = 1.0 / (2 * user.mu0);
+  //user.mu = 1.0 / (2 * user.mu0);
+  user.mu = 0.00001;
+  /*if (user.nBinRows == 19)
+    user.mu = 0.0001;
+  else*/
+    if (user.nBinRows == 96)
+    {
+      user.mu = 0.001;
+    }
+  
   /*cout << "mu0 = " << user.mu0 << endl;
   PetscPrintf(MPI_COMM_WORLD, "mu = %f", user.mu);*/
 
@@ -414,6 +436,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /* Free PETSc data structures */
   info = VecDestroy(x); CHKERRQ(info);
 
+  delete[] lookUpTable;
   delete[] initValues;
   delete[] idxs;
   for (int j = 0; j < user.nBinRows; ++j)
@@ -900,7 +923,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Affinity(const int& firstClusterIdx, co
 
 double dist(const int& firstClusterIdx, const int& secondClusterIdx, vector<Cluster>& clusters)
 {
-  return sqrt(pow(clusters[firstClusterIdx].xCoord - clusters[secondClusterIdx].xCoord, 2) + pow(clusters[firstClusterIdx].yCoord - clusters[secondClusterIdx].yCoord, 2));
+  return sqrt(pow(clusters[firstClusterIdx].xCoord - clusters[secondClusterIdx].xCoord, 2) + 
+              pow(clusters[firstClusterIdx].yCoord - clusters[secondClusterIdx].yCoord, 2));
 }
 
 MULTIPLACER_ERROR MultilevelFramework :: AffinitySP(const int& firstClusterIdx, const int& secondClusterIdx, vector<Cluster>& clusters, NetList& netList, 
@@ -1163,7 +1187,7 @@ double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
           penX  = 2 * pow((dx - rx) / rx, 2);
         }
         
-        userData->binPenalties[k][j].sumLength += penX * penY;
+        userData->binPenalties[k][j].sumLength += penX * penY;// * (*userData->clusters)[i].area;
       }
     }
   }
