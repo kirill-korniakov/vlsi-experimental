@@ -13,12 +13,12 @@
 
 using namespace MultilevelFramework;
 
-void MultilevelFramework :: SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters)
+void MultilevelFramework :: SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& nClusters)
 {
-  float* rndCoords = new float[2 * numOfClusters];
-  GetFloatRandomNumbers(rndCoords, numOfClusters * 2, 0.0, 1.0);
-  /*GetFloatRandomNumbers(rndCoords, numOfClusters / 2, 0.0, 1.0);
-  GetFloatRandomNumbers(rndCoords + numOfClusters / 2, 1.5 * numOfClusters, 0.0, 0.2);*/
+  float* rndCoords = new float[2 * nClusters];
+  GetFloatRandomNumbers(rndCoords, nClusters * 2, 0.0, 1.0);
+  /*GetFloatRandomNumbers(rndCoords, nClusters / 2, 0.0, 1.0);
+  GetFloatRandomNumbers(rndCoords + nClusters / 2, 1.5 * nClusters, 0.0, 0.2);*/
 
   int idx = 0;
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
@@ -216,33 +216,27 @@ MULTIPLACER_ERROR MultilevelFramework :: Interpolation(Circuit& circuit, vector<
 
 /* 
 User-defined application context - contains data needed by the 
-application-provided call-back routines that evaluate the function,
-gradient, and hessian.
+application-provided call-back routines that evaluate the function and gradient
 */
 typedef struct {
-  Circuit* circuit;
-  vector<Cluster>* clusters;
-  NetList* netList;
-  int numOfClusters;
-  float alpha;
-  PetscInt* lookUpTable;
+  Circuit*          circuit;
+  vector<Cluster>*  clusters;
+  NetList*          netList;
+  int               nClusters;
+  float             alpha;
+  PetscInt*         lookUpTable;
   vector<ConnectionsList>* currTableOfConnections;
-  double binHeight;
-  double binWidth;
-  int nBinRows;
-  int nBinCols;
-  double mu0;
-  double mu;
-  double totalCellArea;
-  double meanBinArea;
-  double penAlpha;
-  Bin **binPenalties;
+  double            binHeight;
+  double            binWidth;
+  int               nBinRows;
+  int               nBinCols;
+  double            mu0;
+  double            mu;
+  double            totalCellArea;
+  double            meanBinArea;
+  double            penAlpha;
+  Bin               **binPenalties;
 } AppCtx;
-
-static  char help[] = "This example demonstrates use of the TAO package to \n\
-                      solve an unconstrained minimization problem on a single processor.  We \n\
-                      minimize the extended Rosenbrock function: \n\
-                      sum_{i=0}^{n/2-1} ( alpha*(x_{2i+1}-x_{2i}^2)^2 + (1-x_{2i})^2 ) \n";
 
 int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec G, void *ptr)
 {
@@ -250,12 +244,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   int    info;
   PetscScalar *x, *g;
 
-  /* Get pointers to vector data */
+  // Get pointers to vector data
   info = VecGetArray(X, &x); CHKERRQ(info);
   info = VecGetArray(G, &g); CHKERRQ(info);
-
   
-  for (int i = 0; i < user->numOfClusters; ++i)
+  for (int i = 0; i < user->nClusters; ++i)
   {
     g[2*i+0] = 0;
     g[2*i+1] = 0;
@@ -266,24 +259,23 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   
   //cout << "before CalcLogSumExpForClustersGrad" << endl;
   //cout << "after CalcLogSumExpForClustersGrad" << endl;
-  //*f = TestObjectiveFunc(x, user);
 
-/* Restore vectors */
+  // Restore vectors
   info = VecRestoreArray(X,&x); CHKERRQ(info);
   info = VecRestoreArray(G,&g); CHKERRQ(info);
-  //info = PetscLogFlops(nn*15); CHKERRQ(info);
+
   return 0;
 }
 
 MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
                                                     vector<ConnectionsList>& currTableOfConnections)
 {
-  int numOfClusters = static_cast<int>(clusters.size());
+  int nClusters = static_cast<int>(clusters.size());
 
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
   {
     if (clusters[i].isFake == true)
-      --numOfClusters;
+      --nClusters;
   }
 
   PetscInt *lookUpTable = new PetscInt[clusters.size()]; //todo: move this memory work from function
@@ -314,7 +306,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   user.circuit = &circuit;
   user.clusters = &clusters;
   user.netList = &netList;
-  user.numOfClusters = numOfClusters;
+  user.nClusters = nClusters;
   user.lookUpTable = lookUpTable;
   user.alpha = 100; //todo: make this correct parameter
   user.currTableOfConnections = &currTableOfConnections;
@@ -324,7 +316,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   //info = PetscOptionsGetReal(PETSC_NULL,"-alpha",&user.alpha,&flg); CHKERRQ(info);
 
   /* Allocate vectors for the solution and gradient */
-  info = VecCreateSeq(PETSC_COMM_SELF, numOfClusters * 2, &x); CHKERRQ(info);
+  info = VecCreateSeq(PETSC_COMM_SELF, nClusters * 2, &x); CHKERRQ(info);
 
   /* The TAO code begins here */
   /* Create TAO solver with desired solution method */
@@ -333,7 +325,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
 
   /* Set solution vec and an initial guess */
   int idx = 0;  
-  PetscScalar* initValues = new PetscScalar[2 * numOfClusters];
+  PetscScalar* initValues = new PetscScalar[2 * nClusters];
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
   {
     if (clusters[i].isFake == false)
@@ -344,17 +336,17 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
     }
   }
 
-  int* idxs = new int[2 * numOfClusters];
-  for (int i = 0; i < 2 * numOfClusters; ++i)
+  int* idxs = new int[2 * nClusters];
+  for (int i = 0; i < 2 * nClusters; ++i)
   {
     idxs[i] = i;
   }
 
-  VecSetValues(x, 2 * numOfClusters, idxs, initValues, INSERT_VALUES);
+  VecSetValues(x, 2 * nClusters, idxs, initValues, INSERT_VALUES);
 
   info = TaoAppSetInitialSolutionVec(taoapp, x); CHKERRQ(info); 
 
-  /* Set routines for function, gradient, hessian evaluation */
+  /* Set routines for function and gradient evaluation */
   info = TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient,(void *)&user); 
   CHKERRQ(info);
 
@@ -363,9 +355,9 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
 
   /* Calculate current bin grid */
   user.binWidth  = circuit.width;
-  user.binHeight = CLUSTER_RATIO * circuit.height / dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
-  //cout << dtoi((double)circuit.nRows / (circuit.nNodes / numOfClusters));
-  CalcBinGrid(clusters, circuit, numOfClusters, user.binHeight, user.binWidth);
+  user.binHeight = CLUSTER_RATIO * circuit.height / dtoi((double)circuit.nRows / (circuit.nNodes / nClusters));
+  //cout << dtoi((double)circuit.nRows / (circuit.nNodes / nClusters));
+  CalcBinGrid(clusters, circuit, nClusters, user.binHeight, user.binWidth);
   user.nBinRows = (int)(circuit.height / user.binHeight);
   user.nBinCols = (int)(circuit.width  / user.binWidth );
   /*if (user.nBinRows == 19) user.nBinCols = 16;
@@ -414,7 +406,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   }
 
   // read solution vector to array of clusters coordinates
-  VecGetValues(x, PetscInt(2*numOfClusters), idxs, initValues);
+  VecGetValues(x, PetscInt(2*nClusters), idxs, initValues);
   idx = 0;
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
   {
@@ -471,10 +463,10 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
 {  
   int i = 0;
   
-  int targetNumOfClusters;
+  int targetnClusters;
   int netIdx = 0;
   int currClusterIdx = 0;
-  int numOfClusters = 0;
+  int nClusters = 0;
   double totalCellArea = 0.0;
   double targetClusterArea;
   vector<ConnectionsList> currTableOfConnections(clusters.size());
@@ -493,7 +485,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
 
   int nNodes = circuit.nNodes;
 
-  numOfClusters = static_cast<int>(clusters.size());
+  nClusters = static_cast<int>(clusters.size());
   netAreas = new double[netList.size()];
   
   for (int i = 0; i < circuit.nNodes; ++i)
@@ -501,12 +493,12 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     totalCellArea += clusters[i].area;
   }
 
-  while (numOfClusters > FINAL_NCLUSTERS)
+  while (nClusters > FINAL_NCLUSTERS)
   {
-    targetNumOfClusters = static_cast<int>(numOfClusters / CLUSTER_RATIO);
-    targetClusterArea   = (totalCellArea / targetNumOfClusters) * CLUSTERS_AREA_TOLERANCE;
+    targetnClusters = static_cast<int>(nClusters / CLUSTER_RATIO);
+    targetClusterArea   = (totalCellArea / targetnClusters) * CLUSTERS_AREA_TOLERANCE;
     
-    //targetNumOfClusters = min(targetNumOfClusters, FINAL_NCLUSTERS);
+    //targetnClusters = min(targetnClusters, FINAL_NCLUSTERS);
 
     CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
 
@@ -543,7 +535,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     }
     
     mergeCount = 0;
-    while (clustersDataList.size() && numOfClusters - mergeCount > targetNumOfClusters)
+    while (clustersDataList.size() && nClusters - mergeCount > targetnClusters)
     {
       clustersDataIterator = clustersDataList.begin();
       currClusterIdx  = clustersDataIterator->clusterIdx;
@@ -638,10 +630,10 @@ MULTIPLACER_ERROR MultilevelFramework :: Clusterize(Circuit& circuit, vector<Clu
     netLevels.push_back(netList);
     clusteringLog.push_back(clusteringLogAtEachLevel);
 
-    numOfClusters = static_cast<int>(clusters.size() - numOfFakes);
-    currNClusters = numOfClusters;
+    nClusters = static_cast<int>(clusters.size() - numOfFakes);
+    currNClusters = nClusters;
     
-    cout << "Currently there are " << numOfClusters << " clusters\n";
+    cout << "Currently there are " << nClusters << " clusters\n";
     cout << "targetClusterArea = " << targetClusterArea << "\n";
     min = totalCellArea, max = 0.0;
     
@@ -1029,7 +1021,7 @@ void MultilevelFramework :: CalcLogSumExpForClustersGrad(PetscScalar *coordinate
   int netIdx;
   int nNodes = userData->circuit->nNodes;
 
-  for (int i = 0; i < userData->numOfClusters; ++i, ++clusterIdx)
+  for (int i = 0; i < userData->nClusters; ++i, ++clusterIdx)
   {
     grad[2*i+0] = 0;
     grad[2*i+1] = 0;
@@ -1096,7 +1088,7 @@ double MultilevelFramework :: TestObjectiveFunc(PetscScalar *coordinates, void* 
   return sum;
 }
 
-void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
+void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& nClusters,
                                         double& binHeight, double& binWidth)
 {
   /*double average = 0.0;
@@ -1107,7 +1099,7 @@ void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circ
       average += sqrt(clusters[i].area);
   }
   cout << "average = " << average << endl;
-  average /= sqrt((double)numOfClusters);*/
+  average /= sqrt((double)nClusters);*/
 
   /*binWidth  = average * (circuit.width  / circuit.height);
   binHeight = average * (circuit.height / circuit.width );
@@ -1137,7 +1129,7 @@ double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
   int row;
   int col;
 
-  //_penalties = new double[2 * userData->numOfClusters];
+  //_penalties = new double[2 * userData->nClusters];
   //binPenalties = userData->binPenalties;
   /*for (int j = 0; j < userData->nBinRows; ++j)
   {
@@ -1152,13 +1144,13 @@ double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
     }
   }
 
-  for (int i = 0; i < userData->numOfClusters; ++i)
+  for (int i = 0; i < userData->nClusters; ++i)
   {
     col = static_cast<int>(x[2*i+0] / userData->binWidth);
     row = static_cast<int>(x[2*i+1] / userData->binHeight);
     
-    row = max(0, row - 1);
-    col = max(0, col - 1);
+    row = max(0, row-1);
+    col = max(0, col-1);
 
     for (int k = row; k <= min(userData->nBinRows - 1, row + 2); ++k)
     {
@@ -1277,7 +1269,7 @@ void MultilevelFramework :: CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, v
     }
   }*/
 
-  for (int i = 0; i < userData->numOfClusters; ++i)
+  for (int i = 0; i < userData->nClusters; ++i)
   {
     col = static_cast<int>(x[2*i+0] / userData->binWidth);
     row = static_cast<int>(x[2*i+1] / userData->binHeight);
@@ -1336,8 +1328,8 @@ void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
 {
   AppCtx* user = (AppCtx*)data;
  
-  PetscScalar *gradPen = new PetscScalar[2*user->numOfClusters];
-  PetscScalar *gradWL  = new PetscScalar[2*user->numOfClusters];
+  PetscScalar *gradPen = new PetscScalar[2*user->nClusters];
+  PetscScalar *gradWL  = new PetscScalar[2*user->nClusters];
   
   double penX;
   double penY;
@@ -1375,7 +1367,7 @@ void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
     }
   }
   user->meanBinArea = user->totalCellArea / user->nBinCols / user->nBinRows;
-  for (int i = 0; i < 2*user->numOfClusters; ++i)
+  for (int i = 0; i < 2*user->nClusters; ++i)
   {
     gradPen[i] = 0;
   }
@@ -1387,7 +1379,7 @@ void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
     for (int j = 0; j <= user->nBinCols - 1; ++j)
     {
       sumSDModXY = 0.0;
-      for (int i = 0; i < user->numOfClusters; ++i)
+      for (int i = 0; i < user->nClusters; ++i)
       {    
         dx = fabs(user->binPenalties[k][j].xCoord - x[2*i+0]);
         dy = fabs(user->binPenalties[k][j].yCoord - x[2*i+1]);
@@ -1429,7 +1421,7 @@ void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
     }
     //cout << "Num of enters " << counter << endl;
   }
-  for (int i = 0; i < user->numOfClusters; ++i)
+  for (int i = 0; i < user->nClusters; ++i)
   {
     sumDenominator += fabs(gradWL[2*i+0]) + fabs(gradWL[2*i+1]);
   }
