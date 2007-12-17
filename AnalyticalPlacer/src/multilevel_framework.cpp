@@ -298,6 +298,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   TaoTerminateReason reason;  // terminate reason
   AppCtx          user;       // user-defined application context
   PetscScalar *solution;
+  double discrepancy;
   
   /*double binHeight;
   double binWidth;*/
@@ -363,11 +364,13 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /*if (user.nBinRows == 19) user.nBinCols = 16;
   else if (user.nBinRows == 96) user.nBinCols = 32;
   user.binWidth = circuit.width / user.nBinCols;*/
-
+  
+  double targetDisc = 2.0;
   if (user.nBinRows == 19) 
   {
-    /*user.nBinCols = 8;
-    user.binWidth = circuit.width / user.nBinCols;*/
+    user.nBinCols = 8;
+    user.binWidth = circuit.width / user.nBinCols;
+    targetDisc = 2.5;
   }
   else
     if (user.nBinRows == 96)
@@ -381,22 +384,31 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   VecGetArray(x, &solution);
   CalcMu0(solution, &user);
   VecRestoreArray(x, &solution);
-  //user.mu = 1.0 / (2 * user.mu0);
-  user.mu = 0.00001;
+  //cout << "user.mu0 = " << user.mu0 << endl;
+  user.mu = user.mu0;
+  //user.mu = 0.00001;
   /*if (user.nBinRows == 19)
     user.mu = 0.0001;
   else*/
-    if (user.nBinRows == 96)
+    /*if (user.nBinRows == 96)
     {
       user.mu = 0.001;
-    }
+    }*/
   
   /*cout << "mu0 = " << user.mu0 << endl;
   PetscPrintf(MPI_COMM_WORLD, "mu = %f", user.mu);*/
 
-  /* SOLVE THE APPLICATION */
-  info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
-
+  do
+  {
+    /* SOLVE THE APPLICATION */
+    info = TaoSolveApplication(taoapp, tao); CHKERRQ(info);
+    user.mu *= 2;
+    VecGetArray(x, &solution);
+    discrepancy = GetDiscrepancy(solution, &user);
+    VecRestoreArray(x, &solution);
+    cout << "discrepancy = " << discrepancy << endl;
+  } while(discrepancy > targetDisc);
+  
   /* Get termination information */
   info = TaoGetTerminationReason(tao, &reason); CHKERRQ(info);
   if (reason != 0)
@@ -1431,5 +1443,41 @@ void MultilevelFramework :: CalcMu0(PetscScalar *x, void* data)
   delete[] gradWL;
 
   user->mu0 = 0.5 * sumNumerator / sumDenominator;
-  /*cout << "mu0 = " << user->mu0 << endl;*/
+  //cout << "mu0 = " << user->mu0 << endl;
+}
+
+double MultilevelFramework :: GetDiscrepancy(PetscScalar *x, void* data)
+{
+  AppCtx* user = (AppCtx*)data;
+
+  //double binArea = user->binHeight * user->binWidth;
+  double *clustersAreasInBins = new double[user->nBinRows * user->nBinCols];
+  double max = 0;
+  int col;
+  int row;
+
+  for (int i = 0; i < user->nBinRows * user->nBinCols; ++i)
+  {
+    clustersAreasInBins[i] = 0;
+  }
+
+  for (int i = 0; i < user->numOfClusters; ++i)
+  {
+    col = static_cast<int>(x[2*i+0] / user->binWidth);
+    row = static_cast<int>(x[2*i+1] / user->binHeight);
+    
+    clustersAreasInBins[row * user->nBinCols + col] += (*user->clusters)[i].area;
+  }
+
+  for (int i = 0; i < user->nBinRows * user->nBinCols; ++i)
+  {
+    if (max < clustersAreasInBins[i])
+    {
+      max = clustersAreasInBins[i];
+    }
+  }
+
+  delete []clustersAreasInBins;
+
+  return max / user->meanBinArea;
 }

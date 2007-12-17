@@ -47,8 +47,8 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   PrintToPL("before relaxation", circuit);
   Relaxation(circuit, clusters, netList, currTableOfConnections);
   PrintToPL("after  relaxation", circuit);
-  Relaxation(circuit, clusters, netList, currTableOfConnections);
-  PrintToPL("after  relaxation", circuit);
+  /*Relaxation(circuit, clusters, netList, currTableOfConnections);
+  PrintToPL("after  relaxation", circuit);*/
 
   currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   cout << "currWL after relaxation = " << currentWL << endl;

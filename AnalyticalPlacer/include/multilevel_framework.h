@@ -137,6 +137,7 @@ namespace MultilevelFramework
   double CalcPenalty(PetscScalar *x, void* data);
   void CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data);
   void CalcMu0(PetscScalar *x, void* data);
+  double GetDiscrepancy(PetscScalar *x, void* data);
 }
 
 #endif
