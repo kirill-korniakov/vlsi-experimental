@@ -383,6 +383,7 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /* Get the mu value */
   VecGetArray(x, &solution);
   CalcMu0(solution, &user);
+  printf("mu0 = %.10f\n", user.mu0);
   VecRestoreArray(x, &solution);
   //cout << "user.mu0 = " << user.mu0 << endl;
   user.mu = user.mu0;
@@ -398,6 +399,8 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
   /*cout << "mu0 = " << user.mu0 << endl;
   PetscPrintf(MPI_COMM_WORLD, "mu = %f", user.mu);*/
 
+  int nIters = 300;
+  int iter = 0;
   do
   {
     /* SOLVE THE APPLICATION */
@@ -406,8 +409,9 @@ MULTIPLACER_ERROR MultilevelFramework :: Relaxation(Circuit& circuit, vector<Clu
     VecGetArray(x, &solution);
     discrepancy = GetDiscrepancy(solution, &user);
     VecRestoreArray(x, &solution);
-    cout << "discrepancy = " << discrepancy << endl;
-  } while(discrepancy > targetDisc);
+    iter++;
+    cout << "CGM iter# " << iter << "\tmu = " << user.mu << "\tdiscrepancy = " << discrepancy << endl;
+  } while(discrepancy > targetDisc && iter < nIters);
   
   /* Get termination information */
   info = TaoGetTerminationReason(tao, &reason); CHKERRQ(info);
@@ -1124,6 +1128,106 @@ void MultilevelFramework :: CalcBinGrid(vector<Cluster>& clusters, Circuit& circ
 
 double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
 {
+#if 1
+  AppCtx* userData = (AppCtx*)data;
+
+  double penX;
+  double penY;
+
+  double dx;  // x-distance from cell to center of cluster
+  double dy;  // y-distance from cell to center of cluster
+
+  double totalPenalty = 0.0;
+  const double rx = 1*userData->binWidth;   // radius of x-potential
+  const double ry = 1*userData->binHeight;  // radius of y-potential
+
+  int row;
+  int col;
+
+  // null the penalties
+  for (int i = 0; i < userData->nBinRows; ++i)
+  {
+    for (int j = 0; j < userData->nBinCols; ++j)
+    {
+      userData->binPenalties[i][j].sumLength = 0.0;
+    }
+  }
+
+  for (int i = 0; i < userData->nClusters; ++i)
+  {
+    int min_row, min_col, max_row, max_col;
+    min_col = static_cast<int>(floor((x[2*i+0]-rx) / userData->binWidth));
+    min_row = static_cast<int>(floor((x[2*i+1]-ry) / userData->binHeight));
+    max_col = static_cast<int>(ceil((x[2*i+0]+rx) / userData->binWidth));
+    max_row = static_cast<int>(ceil((x[2*i+1]+ry) / userData->binHeight));
+
+    min_col = max(0, min_col);
+    min_row = max(0, min_row);
+    max_col = min(max_col, userData->nBinCols);
+    max_row = min(max_row, userData->nBinRows);
+
+    // todo: perform cell-based potential scaling
+    for (int k = min_row; k <= max_row; ++k)
+    {
+      for (int j = min_col; j <= max_col; ++j)
+      {
+        dx = fabs(userData->binPenalties[k][j].xCoord - x[2*i+0]); //xCoord is center of a bin??
+        dy = fabs(userData->binPenalties[k][j].yCoord - x[2*i+1]);
+        if (dx > rx || dy > ry)
+          continue;
+        // ELSE: this cluster affects this bin
+        if (dy <= ry / 2)
+        {
+          penY  = 1 - 2 * pow(dy / ry, 2);
+        }
+        else
+        {
+          penY  = 2 * pow((dy - ry) / ry, 2);
+        }
+
+        if (dx <= rx / 2)
+        {
+          penX  = 1 - 2 * pow(dx / rx, 2);
+        }
+        else
+        {
+          penX  = 2 * pow((dx - rx) / rx, 2);
+        }
+
+        userData->binPenalties[k][j].sumLength += penX * penY;// * (*userData->clusters)[i].area;
+      }
+    }
+  }
+
+  // totalPenalty all the penalties
+  for (int i = 0; i < userData->nBinRows; ++i)
+  {
+    for (int j = 0; j < userData->nBinCols; ++j)
+    {
+      totalPenalty += userData->binPenalties[i][j].sumLength;
+    }
+  }
+
+  // calculate scaling coefficient
+  if (totalPenalty != 0)
+    userData->penAlpha = userData->totalCellArea / totalPenalty;
+  else
+    userData->penAlpha = 1;
+
+  // calculate result penalty and return
+  totalPenalty = 0.0;
+  for (int i = 0; i < userData->nBinRows; ++i)
+  {
+    for (int j = 0; j < userData->nBinCols; ++j)
+    {
+      userData->binPenalties[i][j].sumLength *= userData->penAlpha;
+      totalPenalty += pow(userData->binPenalties[i][j].sumLength - userData->meanBinArea, 2);
+    }
+  }
+  return totalPenalty;
+#endif
+
+#if 0
   AppCtx* userData = (AppCtx*)data;
   //double penVal;
   //Bin **binPenalties;
@@ -1247,6 +1351,7 @@ double MultilevelFramework :: CalcPenalty(PetscScalar *x, void* data)
   
   //cout << "The penalty = " << sum << endl;
   return sum;
+#endif
 }
 
 void MultilevelFramework :: CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data)
@@ -1461,7 +1566,7 @@ double MultilevelFramework :: GetDiscrepancy(PetscScalar *x, void* data)
     clustersAreasInBins[i] = 0;
   }
 
-  for (int i = 0; i < user->numOfClusters; ++i)
+  for (int i = 0; i < user->nClusters; ++i)
   {
     col = static_cast<int>(x[2*i+0] / user->binWidth);
     row = static_cast<int>(x[2*i+1] / user->binHeight);
