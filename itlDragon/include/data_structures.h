@@ -27,9 +27,10 @@ struct Node
 // stores pin's information
 struct Pin
 {
-  int  cellIdx;    // index of cell
+  int    cellIdx;    // index of cell
   double xOffset;    // horizontal pin's offset by the center of a cell
   double yOffset;    // vertical pin's offset by the center of a cell
+  char   type;       // the type of the pin (I, O or B)
 };
 
 // stores net information

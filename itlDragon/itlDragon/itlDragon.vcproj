@@ -5,9 +5,6 @@
 	Name="itlDragon"
 	ProjectGUID="{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}"
 	RootNamespace="itlDragon"
-	SccProjectName="&quot;$/itlDragon placer&quot;, LQAAAAAA"
-	SccLocalPath=".."
-	SccProvider="MSSCCI:Microsoft Visual SourceSafe"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
