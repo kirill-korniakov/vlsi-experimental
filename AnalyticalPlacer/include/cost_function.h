@@ -1,6 +1,6 @@
 /*  
  * cost_function.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Aleksey Bader, Nina Kurina
  * email: bader@newmail.ru
  * email: ninku@mail.ru

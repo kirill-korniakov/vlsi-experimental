@@ -1,6 +1,33 @@
 #include <iostream>
 #include "..\include\errors.h"
 
+using namespace std;
+
+#if 0
+bool doLog = true;
+#else
+bool doLog = false;
+#endif
+
+void Trace(std::string message, bool isVisible)
+{
+  if (doLog && isVisible)
+    cout << "-- " << message.c_str() << endl;
+}
+
+void LogEnter(string message, bool isVisible)
+{
+  if (doLog && isVisible)
+    cout << ">> " << message.c_str() << endl;
+}
+
+void LogExit(string message, bool isVisible)
+{
+  if (doLog && isVisible)
+    cout << "<< " << message.c_str() << endl;
+}
+
+
 //void CheckCode(MULTIPLACER_ERROR errorCode)
 //{
 //  if (errorCode == OK) return;

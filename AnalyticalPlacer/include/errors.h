@@ -1,11 +1,13 @@
 /* errors.h
- * this is a part of itlDragon
- * Copyright (C) 2005-2006, ITLab, Kirill Kornyakov
- * email: kirillkornyakov@yandex.ru
- */
- 
+* this is a part of itlAnalyticalPlacer
+* Copyright (C) 2005-2006, ITLab, Kirill Kornyakov
+* email: kirillkornyakov@yandex.ru
+*/
+
 #ifndef _ERRORS_H_
 #define _ERRORS_H_
+
+#include <iostream>
 
 typedef int MULTIPLACER_ERROR;
 
@@ -53,5 +55,9 @@ const MULTIPLACER_ERROR ROW_LENGTH_EXCESS     = 815;
 
 // output checking: 9xx
 const MULTIPLACER_ERROR EMPTY_DATA_STRUCTURES = 901;
+
+void Trace(std::string message, bool isVisible = true);
+void LogEnter(std::string message, bool isVisible = true);
+void LogExit(std::string message, bool isVisible = true);
 
 #endif

@@ -1,6 +1,6 @@
 /*  
  * detailed_placement.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Zhivoderov
  * email: zhivoderov.a@gmail.com
  */

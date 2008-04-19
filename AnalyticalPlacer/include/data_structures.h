@@ -1,5 +1,5 @@
 /* data_structures.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Aleksey Bader, Kirill Kornyakov
  * email: bader@newmail.ru
  * email: kirillkornyakov@yandex.ru
@@ -8,29 +8,136 @@
 #ifndef _DATA_STRUCTURES_H_
 #define _DATA_STRUCTURES_H_
 
+#pragma warning (disable : 4996)
+
 #include <vector>
 #include <iostream>
 #include <windows.h>
 #include <time.h>
+#include <string>
+#include <map>
+#include <list>
 
 using namespace std;
 
-//#undef cout
+//------- LEF parser structures -------------------------------------
+struct PinInfo
+{
+    enum direction {INPUT = 0, OUTPUT = 1, INOUT = 2};
+    std::string Name;
+    bool isSpecial;
+    direction dir;
+    double Resistance;  // OHMS
+    double Capacitance; // pF
+    double OriginX;     // nm
+    double OriginY;     // nm
+};
 
+struct MacroInfo
+{
+    std::string Name;
+    double OriginX;   //nm
+    double OriginY;   //nm
+    double SizeX;     //nm
+    double SizeY;     //nm
+    std::map<std::string,PinInfo*> Pins;
+};
+
+struct RoutingLayerInfo
+{
+    enum direction {horizontal = 0, vertical = 1, diag45 = 2, diag135=3};
+
+    std::string Name;
+    direction dir;
+    double RPerDist; // OHMS/nm
+    double CPerDist; // pF/nm
+    double EdgeCap;  // pF/nm
+    double Width;    // nm
+    double Pitch;    // nm
+};
+
+struct DataBaseUnitsMapping
+{
+    double Distance;    // nm/DBU
+    double Capacitance; // PICOFARADS/DBU
+    double Resistance;  // OHMS/DBU
+
+    DataBaseUnitsMapping()
+    {
+        Distance = (1.0 / 100.0) * 1000.0;
+        Capacitance = 1.0 / 1.0e6;
+        Resistance = 1.0 / 1.0e4;
+    }
+};
+
+struct LEFParserData
+{
+    DataBaseUnitsMapping* gUnits;
+    std::list<RoutingLayerInfo*> Layers;
+    std::map<std::string,MacroInfo*>* CellTypes;
+    MacroInfo* CurrentMacro;
+    MacroInfo* SinglePins;
+};
+//-------End of LEF parser structures -------------------------------
+
+#include <windows.h>
+#include <time.h>
 // stores cell's information 
 struct Node
 {
   int width;      // width of cell
   int height;     // height of cell
+  MacroInfo *type;
 };
 
+struct STAINER_ELMORE_NODE;
 // stores pin's information
 struct Pin
 {
-  int  cellIdx;    // index of cell
-  double xOffset;    // horizontal pin's offset by the center of a cell
-  double yOffset;    // vertical pin's offset by the center of a cell
+  int      cellIdx;    // index of cell
+  double   xOffset;    // horizontal pin's offset by the center of a cell
+  double   yOffset;    // vertical pin's offset by the center of a cell
+  char     chtype;     // the type of the pin (I, O or B)
+  PinInfo* type;
+  STAINER_ELMORE_NODE* routeInfo;
 };
+
+//------- Tree Node Structure (FBI data struct)----------------------
+typedef struct STAINER_TREE_NODE 
+{
+  //int index;      // index of the node
+  double x;         // x coordinate
+  double y;         // y coordinate
+  int    type;      // 0 source node, 1 internal node, 2 sink node
+  double cap;       // node capacitance
+  double time;      // required arrival time at the node
+  struct STAINER_TREE_NODE *left;
+  struct STAINER_TREE_NODE *right;
+}StNode;
+
+//FBI node types
+#define NODE_TYPE_INPUT    2
+#define NODE_TYPE_SINK     2
+#define NODE_TYPE_OUTPUT   0
+#define NODE_TYPE_SOURCE   0
+#define NODE_TYPE_INTERNAL 1
+
+typedef struct STAINER_ELMORE_NODE: public StNode
+{
+    Pin* origin;
+    double ExtractedR;
+    double ExtractedC;
+    double ObservedC;
+    double ArrivalTime;
+}StNodeEx;
+
+typedef struct STAINER_ROUTING_TREE
+{
+    double wl;        // wire length
+    double srcRes;    // driver resistance
+    StNodeEx *nodes;  // A-tree
+} RoutingTree;
+//------- Tree Node Structure End -----------------------------------
 
 // stores net information
 struct Net
@@ -38,10 +145,14 @@ struct Net
   Pin*   arrPins;     // array of pins
   int  numOfPins;     // number of pins in net
   double currWL;      // current half-perimeter of bounding rectangular
+  RoutingTree* tree;  // routing tree (rectilinear A-tree)
+  char* name;         // individual net name
+
+  Net(): arrPins(0), numOfPins(0),currWL(0),tree(0), name(0){}
 };
 
 // stores information about cell's location
-struct Place        
+struct Place
 {
   double xCoord;     // x coordinate of a cell
   double yCoord;     // y coordinate of a cell
@@ -49,7 +160,7 @@ struct Place
 };
 
 // stores row's information
-struct Row          
+struct Row
 { 
   int  coordinate;  // y coordinate of a row
   int  height;      // height of a row
@@ -70,12 +181,13 @@ struct Weight
 // stores bin's data (size, cluster of cells)
 struct Bin        
 {
-  vector<int> nodes;    // indexes of nodes in this bin
-  vector<int> nets;     // indexes of nets  in this bin
-  vector<int> cwts;     // array of nodes' weights (widths)
-  vector<int> hedges;   // array of nodes in hyperedges
-  vector<int> indexes;  // positions in hedges from which hyperedges starts
+  std::vector<int> nodes;    // indexes of nodes in this bin
+  std::vector<int> nets;     // indexes of nets  in this bin
+  std::vector<int> cwts;     // array of nodes' weights (widths)
+  std::vector<int> hedges;   // array of nodes in hyperedges
+  std::vector<int> indexes;  // positions in hedges from which hyperedges starts
   double sumLength;     // summary length of nodes in this bin
+  double sumPotential;  // summary potential of cells which affect this cluster
   double xCoord;        // x and y coordinates of the bin
   double yCoord;        
   bool isOnMacroBlock;
@@ -101,7 +213,11 @@ typedef Bin* pBin;
 
 struct str
 {
-  char name[20];      // name of cell
+  char* name;      // name of cell
+
+  str() {name = new char[20];name[0]=0;}
+  str(const char* _name) {name = new char[strlen(_name)+1]; strcpy(name, _name);}
+  ~str(){delete[]name;}
 };
 
 struct Circuit
@@ -114,8 +230,8 @@ struct Circuit
 
   double  height;
   double  width;
-  int     shiftX;
-  int     shiftY;
+  double     shiftX; //!was int
+  double     shiftY; //!was int
 
   Row*    rows;
   Weight* weights;
@@ -132,8 +248,16 @@ struct Circuit
   Place*  placement;
 
   str*    tableOfNames;
-  vector<int>* tableOfConnections;
-  vector<double>* rowTerminalBorders;
+  std::vector<int>* tableOfConnections;
+  std::vector<double>* rowTerminalBorders;
+
+  LEFParserData* tech;
+  str designName;
+  int defConvertFactor;
+  RoutingLayerInfo* hLayer;
+  RoutingLayerInfo* vLayer;
+
+  Circuit() {tech = 0; hLayer=vLayer=0;}
 };
 
 // bin's position in the array of bins

@@ -1,6 +1,6 @@
 /* 
  * parser.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Aleksey Bader, Zhivoderov
  * email: bader@newmail.ru
  * email: zhivoderov.a@gmail.com
@@ -19,7 +19,7 @@
 #include "..\include\global.h"
 #include "..\include\errors.h"
 #include <time.h>
-using namespace std;
+//using namespace std;
 
 struct strExtend
 {
@@ -37,7 +37,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[]);
 void CfgParse(char* fileName);
 
 MULTIPLACER_ERROR ValidateKeys();
-//void SetDefaultKeysValues();
+void SetDefaultKeysValues();
 
 int ParseAux(const char* fileName, Circuit& circuit);
 int ParseNodes(const char* fileName, Circuit& circuit);
@@ -46,4 +46,6 @@ int ParsePl(const char* fileName, Circuit& circuit);
 int ParseWts(const char* fileName, Circuit& circuit);
 int ParseNets(const char* fileName, Circuit& circuit);
 
+int ParseLEFDEF(const char* lefname, const char* defname, Circuit& circuit);
+int ExportDEF(const char* defname, Circuit& circuit);
 #endif

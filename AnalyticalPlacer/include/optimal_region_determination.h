@@ -1,6 +1,6 @@
 /*  
  * optimal_region_determination.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2006, ITLab, Zhivoderov
  * email: zhivoderov.a@gmail.com
  */

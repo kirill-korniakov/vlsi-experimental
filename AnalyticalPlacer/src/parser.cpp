@@ -1,11 +1,11 @@
 /* 
- * parser.cpp
- * this is a part of itlDragon
- * Copyright (C) 2005, ITLab, Aleksey Bader, Zhivoderov
- * email: bader@newmail.ru
- * email: zhivoderov.a@gmail.com
- * last modified 30 March 2006
- */
+* parser.cpp
+* this is a part of itlAnalyticalPlacer
+* Copyright (C) 2005, ITLab, Aleksey Bader, Zhivoderov
+* email: bader@newmail.ru
+* email: zhivoderov.a@gmail.com
+* last modified 30 March 2006
+*/
 
 #include "..\include\parser.h"
 #include <iostream>
@@ -16,18 +16,13 @@ str* table;
 strExtend* newTable;
 static int numOfNT;
 
-/*
-  Deletes spaces, tabulation, carriage return and line feed from the 
-  beginning of a stream.
-*/
-
 int findName(str* table, char* name)
 {
   int i;
   for(i = 0; i < numOfNT; ++i)
   {
-  if (!strcmp(table[i].name,name))
-    return i;
+    if (!strcmp(table[i].name,name))
+      return i;
   }
   return -1;
 }
@@ -98,48 +93,48 @@ void delFSpaces(ifstream& cin)
   char curr = cin.peek();
   while((curr == ' ') || (curr == '\t'))
   {
-  cin.get();
-  curr = cin.peek();
+    cin.get();
+    curr = cin.peek();
   }
   if (curr == '\n')
   {
-  cin.get();
-  delFSpaces(cin);
+    cin.get();
+    delFSpaces(cin);
   }
   if (curr == '\r')
   {
-  cin.get();
-  delFSpaces(cin);
+    cin.get();
+    delFSpaces(cin);
   }
 }
 
 /*
-  Deletes comments from the beginning of a stream.
+Deletes comments from the beginning of a stream.
 */
 void delComments(ifstream& cin)
 {
   char curr = cin.peek();
   while(curr == '#')
   {
-  while(curr != '\n') curr = cin.get();
-  curr = cin.peek();
+    while(curr != '\n') curr = cin.get();
+    curr = cin.peek();
   }
 }
 
 /*
-  Deletes comments from the beginning of a stream.
+Deletes comments from the beginning of a stream.
 */
 void delCommentsAndSpaces(ifstream& cin)
 {
   bool found = false;   // have found something distinct from the comment
-        // or a space
+  // or a space
   while (!found)
   {
-  delFSpaces(cin);
-  delComments(cin);
-  if ((cin.peek() != '#') && (cin.peek() != ' ') && 
-    (cin.peek() != '\n') && (cin.peek() != '\r'))
-    found = true;
+    delFSpaces(cin);
+    delComments(cin);
+    if ((cin.peek() != '#') && (cin.peek() != ' ') && 
+      (cin.peek() != '\n') && (cin.peek() != '\r'))
+      found = true;
   }
 }
 
@@ -155,85 +150,107 @@ int ParseAux(const char* fileName, Circuit& circuit)
   const char *auxFileDirEnd=strrchr(fileName,'\\');
   if (auxFileDirEnd)
   {
-   strncpy(dirName,fileName,auxFileDirEnd-fileName+1);
-   dirName[auxFileDirEnd-fileName+1]=0;
+    strncpy(dirName,fileName,auxFileDirEnd-fileName+1);
+    dirName[auxFileDirEnd-fileName+1]=0;
   }
   else strcpy(dirName,"");
-  ifstream auxFile(fileName);
+  std::ifstream auxFile(fileName);
   char * newNets   = 0;
   char * newNodes  = 0;
   char * newWts  = 0;
   char * newPl   = 0;
   char * newScl   = 0;
+  char * newLEF   = 0;
+  char * newDEF   = 0;
   char word1[100], word2;
 
-  if (auxFile) // while all ok - the file exists
+  if (auxFile || (gOptions.lefName && gOptions.defName)) // while all ok - the file exists
   {
-  cout << "parsing aux file...\n";
-  char curr = auxFile.peek();
-  delCommentsAndSpaces(auxFile);
-  auxFile >> word1;
-  delCommentsAndSpaces(auxFile);
-  auxFile >> word2;
-  if (word2 != ':')
-  {
-    cout << "Bad format aux file!";
-    return 1;
-  }
-  delCommentsAndSpaces(auxFile);
-  int i;
-  char fileNames[fileNum][100];
-  char tempStr[100];
-  for (i = 0; i < fileNum; ++i)
-  {
-    auxFile >> tempStr;
-    sprintf(fileNames[i],dirName);
-    strcat(fileNames[i],tempStr);
+    cout << "parsing aux file...\n";
+    char curr = auxFile.peek();
     delCommentsAndSpaces(auxFile);
-  }
-  for(int j=0; j < fileNum; ++j)
-  {
-    if (strstr(fileNames[j],".nets")) newNets =fileNames[j];
-    else if (strstr(fileNames[j],".NETS")) newNets =fileNames[j];
-    else if (strstr(fileNames[j],".nodes"))newNodes=fileNames[j];
-    else if (strstr(fileNames[j],".NODES"))newNodes=fileNames[j];
-    else if (strstr(fileNames[j],".wts"))  newWts  =fileNames[j];
-    else if (strstr(fileNames[j],".WTS"))  newWts  =fileNames[j];
-    else if (strstr(fileNames[j],".pl"))   newPl =fileNames[j];
-    else if (strstr(fileNames[j],".PL"))   newPl =fileNames[j];
-    else if (strstr(fileNames[j],".scl"))  newScl =fileNames[j];
-    else if (strstr(fileNames[j],".SCL"))  newScl =fileNames[j];
-  }
-  int res = 0;
+    auxFile >> word1;
+    delCommentsAndSpaces(auxFile);
+    auxFile >> word2;
+    if (word2 != ':')
+    {
+      cout << "Bad format aux file!";
+      return 1;
+    }
+    delCommentsAndSpaces(auxFile);
+    int i;
+    char fileNames[fileNum][100];
+    char tempStr[100];
+    for (i = 0; i < fileNum; ++i)
+    {
+      auxFile >> tempStr;
+      sprintf(fileNames[i],dirName);
+      strcat(fileNames[i],tempStr);
+      delCommentsAndSpaces(auxFile);
+    }
+    for(int j=0; j < fileNum; ++j)
+    {
+      if (strstr(fileNames[j],".nets")) newNets =fileNames[j];
+      else if (strstr(fileNames[j],".NETS")) newNets =fileNames[j];
+      else if (strstr(fileNames[j],".nodes"))newNodes=fileNames[j];
+      else if (strstr(fileNames[j],".NODES"))newNodes=fileNames[j];
+      else if (strstr(fileNames[j],".wts"))  newWts  =fileNames[j];
+      else if (strstr(fileNames[j],".WTS"))  newWts  =fileNames[j];
+      else if (strstr(fileNames[j],".pl"))   newPl =fileNames[j];
+      else if (strstr(fileNames[j],".PL"))   newPl =fileNames[j];
+      else if (strstr(fileNames[j],".scl"))  newScl =fileNames[j];
+      else if (strstr(fileNames[j],".SCL"))  newScl =fileNames[j];
+      else if (strstr(fileNames[j],".lef"))  newLEF =fileNames[j];
+      else if (strstr(fileNames[j],".LEF"))  newLEF =fileNames[j];
+      else if (strstr(fileNames[j],".def"))  newDEF =fileNames[j];
+      else if (strstr(fileNames[j],".DEF"))  newDEF =fileNames[j];
+    }
+    int res = 0;
 
-  if (newNodes)
-  {
-    res += ParseNodes(newNodes, circuit);
-  }
-  int numOfNaT = circuit.nNodes + circuit.nTerminals;
-  if (newNets)
-  {
-    res += ParseNets(newNets, circuit);
-  }
-  if (newWts)
-  {
-    res += ParseWts(newWts, circuit);
-  }
-  if (newPl)
-  {
-    if (gOptions.plName[0] != '\0')
-      newPl = gOptions.plName;
-    res += ParsePl(newPl, circuit);
-  }
-  if (newScl)
-  {
-    res += ParseScl(newScl, circuit);
-  }
-  if (res)
-  {
-    cout << "The execution of programm was stopped.\n";
-    return 1;
-  }
+    if (newLEF && newDEF)
+    {
+      gOptions.isLEFDEFinput = true;
+      if (gOptions.lefName[0] != '\0')
+      {
+        newLEF = gOptions.lefName;
+      }
+      if (gOptions.defName[0] != '\0')
+      {
+        newDEF = gOptions.defName;
+      }
+      ParseLEFDEF(newLEF, newDEF, circuit);
+    }
+    else
+    {
+      if (newNodes)
+      {
+        res += ParseNodes(newNodes, circuit);
+      }
+      //int numOfNaT = circuit.nNodes + circuit.nTerminals;
+      if (newNets)
+      {
+        res += ParseNets(newNets, circuit);
+      }
+      if (newWts)
+      {
+        res += ParseWts(newWts, circuit);
+      }
+      if (newPl)
+      {
+        if (gOptions.plName[0] != '\0')
+          newPl = gOptions.plName;
+        res += ParsePl(newPl, circuit);
+      }
+      if (newScl)
+      {
+        res += ParseScl(newScl, circuit);
+      }
+      if (res)
+      {
+        cout << "The execution of programm was stopped.\n";
+        return 1;
+      }
+    }
   }
   else
   {
@@ -242,7 +259,6 @@ int ParseAux(const char* fileName, Circuit& circuit)
   }
   return 0;
 }
-
 
 int ParseNodes(const char* fileName, Circuit& circuit)
 {
@@ -322,28 +338,28 @@ int ParseNodes(const char* fileName, Circuit& circuit)
   numOfNT = circuit.nNodes+circuit.nTerminals;
   for(i = 1; i < numOfNT; ++i)
   {
-  strcpy(tmp_name,curr);
-  nodesFile >> tmp_width;
-  delFSpaces(nodesFile);
-  nodesFile >> tmp_height;
-  delCommentsAndSpaces(nodesFile);
-  nodesFile >> curr;
-  if (!strcmp(curr,"terminal"))
-  {
-    circuit.terminals[termCount].height = static_cast<int>(tmp_height);
-    circuit.terminals[termCount].width = static_cast<int>(tmp_width);
-    strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tmp_name);
-    ++termCount;
+    strcpy(tmp_name,curr);
+    nodesFile >> tmp_width;
+    delFSpaces(nodesFile);
+    nodesFile >> tmp_height;
     delCommentsAndSpaces(nodesFile);
     nodesFile >> curr;
-  }
-  else
-  {
-    circuit.nodes[nodesCount].height = static_cast<int>(tmp_height);
-    circuit.nodes[nodesCount].width = static_cast<int>(tmp_width);
-    strcpy(circuit.tableOfNames[nodesCount].name, tmp_name);
-    ++nodesCount;
-  }
+    if (!strcmp(curr,"terminal"))
+    {
+      circuit.terminals[termCount].height = static_cast<int>(tmp_height);
+      circuit.terminals[termCount].width = static_cast<int>(tmp_width);
+      strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tmp_name);
+      ++termCount;
+      delCommentsAndSpaces(nodesFile);
+      nodesFile >> curr;
+    }
+    else
+    {
+      circuit.nodes[nodesCount].height = static_cast<int>(tmp_height);
+      circuit.nodes[nodesCount].width = static_cast<int>(tmp_width);
+      strcpy(circuit.tableOfNames[nodesCount].name, tmp_name);
+      ++nodesCount;
+    }
 
   }
   //cout << "finish parsing nodes file\n";
@@ -370,65 +386,65 @@ int ParseScl(const char* fileName, Circuit& circuit)
   sclFile = fopen(fileName, "r");
   if (sclFile)
   {
-  fgets(currString, 128, sclFile);
-  sscanf(currString, "%s %f", tempString, &tempVal);
-  if (strcmp(tempString, "UCLA") == 0)
-  {
-    while (!feof(sclFile))
-    {
-    currString[0] = '\0';
     fgets(currString, 128, sclFile);
-    if (currString[0] == '#') continue;
-    paramCount = sscanf(currString, "%s : %d", tempString, &value);
-    if (paramCount == -1) continue;
-    if (_stricmp(tempString, "NumRows") == 0)
+    sscanf(currString, "%s %f", tempString, &tempVal);
+    if (strcmp(tempString, "UCLA") == 0)
     {
-      circuit.nRows = value;
-      circuit.rows = new Row[circuit.nRows];
-      continue;
-    }
-    for (int i = 0; i < circuit.nRows; ++i)
-    {
-      if (i != 0) fgets(currString, 128, sclFile);
-      if (_stricmp(currString, "CoreRow Horizontal\n") == 0)
+      while (!feof(sclFile))
       {
-      while (1)
-      {
+        currString[0] = '\0';
         fgets(currString, 128, sclFile);
-        if (_stricmp(currString, "End\n") == 0) break;
+        if (currString[0] == '#') continue;
         paramCount = sscanf(currString, "%s : %d", tempString, &value);
         if (paramCount == -1) continue;
-        if (paramCount == 1) 
-        sscanf(currString, "%s : %s", tempString, atempString);
-        if (_stricmp(tempString, "SubrowOrigin") != 0)
+        if (_stricmp(tempString, "NumRows") == 0)
         {
-         if (_stricmp(tempString, "Coordinate") == 0)
-           circuit.rows[i].coordinate = value;
-         if (_stricmp(tempString, "Height") == 0)
-           circuit.rows[i].height = value;
-         if (_stricmp(tempString, "Sitewidth") == 0)
-           circuit.rows[i].siteWidth = value;
-         if (_stricmp(tempString, "Sitespacing") == 0)
-           circuit.rows[i].siteSpacing = value;
-         if (_stricmp(tempString, "Siteorient") == 0)
-           strcpy(circuit.rows[i].siteorient, atempString);
-         if (_stricmp(tempString, "Sitesymmetry") == 0)
-           strcpy(circuit.rows[i].sitesymm, atempString); 
+          circuit.nRows = value;
+          circuit.rows = new Row[circuit.nRows];
+          continue;
         }
-        else
+        for (int i = 0; i < circuit.nRows; ++i)
         {
-        sscanf(currString, "%s : %d %s : %d", tempString, &value, atempString, &value2);
-        circuit.rows[i].subrowOrigin = value;
-        circuit.rows[i].numSites = value2;
+          if (i != 0) fgets(currString, 128, sclFile);
+          if (_stricmp(currString, "CoreRow Horizontal\n") == 0)
+          {
+            while (1)
+            {
+              fgets(currString, 128, sclFile);
+              if (_stricmp(currString, "End\n") == 0) break;
+              paramCount = sscanf(currString, "%s : %d", tempString, &value);
+              if (paramCount == -1) continue;
+              if (paramCount == 1) 
+                sscanf(currString, "%s : %s", tempString, atempString);
+              if (_stricmp(tempString, "SubrowOrigin") != 0)
+              {
+                if (_stricmp(tempString, "Coordinate") == 0)
+                  circuit.rows[i].coordinate = value;
+                if (_stricmp(tempString, "Height") == 0)
+                  circuit.rows[i].height = value;
+                if (_stricmp(tempString, "Sitewidth") == 0)
+                  circuit.rows[i].siteWidth = value;
+                if (_stricmp(tempString, "Sitespacing") == 0)
+                  circuit.rows[i].siteSpacing = value;
+                if (_stricmp(tempString, "Siteorient") == 0)
+                  strcpy(circuit.rows[i].siteorient, atempString);
+                if (_stricmp(tempString, "Sitesymmetry") == 0)
+                  strcpy(circuit.rows[i].sitesymm, atempString); 
+              }
+              else
+              {
+                sscanf(currString, "%s : %d %s : %d", tempString, &value, atempString, &value2);
+                circuit.rows[i].subrowOrigin = value;
+                circuit.rows[i].numSites = value2;
+              }
+            }
+          }
+          else i--;
+          paramCount = -1;
         }
       }
-      }
-      else i--;
-      paramCount = -1;
     }
-    }
-  }
-  fclose(sclFile);
+    fclose(sclFile);
   }
   //cout << "finish parsing scl file\n";
   return 0;
@@ -514,7 +530,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       gOptions.doDirectedBinSwapping = false;
       gOptions.doCellAnnealing       = false;
       gOptions.doOverlapRemoving     = false;
-      resultFileName = "itlDragon_DP results.txt";
+      resultFileName = "itlAnalyticalPlacer_DP results.txt";
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
         strcpy(gOptions.plName, argv[i+1]);
@@ -540,7 +556,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
     else if (stricmp( argv[i], "-test") == 0)
     {
       gOptions.doTest   = true;
-	    gOptions.doDumpGP = true;
+      gOptions.doDumpGP = true;
       continue;
     }
     else if (stricmp( argv[i], "-dumpGP") == 0)
@@ -555,13 +571,31 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       continue;
     }
     else if (stricmp( argv[i], "-onlyConvertToRouter") == 0)
-    {//Usage: itlDragon.exe -f placement.aux -onlyConvertToRouter <Outputname> <TileSize> <VertCapacity> <HorizCapacity>
+    {//Usage: itlAnalyticalPlacer.exe -f placement.aux -onlyConvertToRouter <Outputname> <TileSize> <VertCapacity> <HorizCapacity>
       gOptions.doConvertToRouter = true;
       strcpy(gOptions.GRFileName, argv[i+1]);
       gOptions.GRTileSize = atoi(argv[i+2]);
       gOptions.GRVertCapacity = atoi(argv[i+3]);
       gOptions.GRHorizCapacity = atoi(argv[i+4]);
       i+=4;
+      continue;
+    }
+    else if (stricmp( argv[i], "-def") == 0)
+    {
+      if (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        strcpy(gOptions.defName, argv[i+1]);
+        ++i;
+      }
+      continue;
+    }
+    else if (stricmp( argv[i], "-lef") == 0)
+    {
+      if (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        strcpy(gOptions.lefName, argv[i+1]);
+        ++i;
+      }
       continue;
     }
   }
@@ -573,79 +607,79 @@ void CfgParse(char* fileName)
   FILE* configFile;
   if (fileName == 0)
   {
-  cout << "Parser error: null pointer on config file";
-  return;
+    cout << "Parser error: null pointer on config file";
+    return;
   }
   char string[255], *pVar;
   int row_counter = -1, params_counter = 0;
   configFile = fopen(fileName, "r");
   if (configFile)
   {
-  fgets(string, 255, configFile);
-  if (string[0] == '[')
-  {
-    cout << "Parser error: no benchmark name in config file";
-    return;
-  }
-  else
-  {
-    //sscanf(string, "%s/n", string);
-    string[strlen(string) - 1] = '\0';
-    strcpy(gOptions.benchmarkName, string);
-  }   
-  while (!feof(configFile))
-  {
-    strcpy(string, "");
     fgets(string, 255, configFile);
-    pVar = NULL;
-    pVar = strchr(string, ',');
-    if (pVar) pVar[0] = '.';
-    pVar = NULL;
     if (string[0] == '[')
     {
-    row_counter++;
-    params_counter = 0;
-    pVar = strchr(string, ']');
-    if (pVar)
+      cout << "Parser error: no benchmark name in config file";
+      return;
+    }
+    else
     {
-      //while ((pVar[0] == ' ') || (pVar[0] == '\t')) pVar++;
-      if (pVar[1] == '-')
-      switch (row_counter){
+      //sscanf(string, "%s/n", string);
+      string[strlen(string) - 1] = '\0';
+      strcpy(gOptions.benchmarkName, string);
+    }   
+    while (!feof(configFile))
+    {
+      strcpy(string, "");
+      fgets(string, 255, configFile);
+      pVar = NULL;
+      pVar = strchr(string, ',');
+      if (pVar) pVar[0] = '.';
+      pVar = NULL;
+      if (string[0] == '[')
+      {
+        row_counter++;
+        params_counter = 0;
+        pVar = strchr(string, ']');
+        if (pVar)
+        {
+          //while ((pVar[0] == ' ') || (pVar[0] == '\t')) pVar++;
+          if (pVar[1] == '-')
+            switch (row_counter){
         case 0: gOptions.doGlobalPlacement = false; break;
         case 1: gOptions.doBinSwapping = false; break;
         case 2: gOptions.doDirectedBinSwapping= false; break;
         case 3: gOptions.doCellAnnealing = false; break;
         case 4: gOptions.doDetailedPlacement = false; break;
         default: break;
+          }
+          else if (pVar[1] == '+')
+            switch (row_counter)
+          {
+            case 0: gOptions.doGlobalPlacement = true; break;
+            case 1: gOptions.doBinSwapping = true; break;
+            case 2: gOptions.doDirectedBinSwapping= true; break;
+            case 3: gOptions.doCellAnnealing = true; break;
+            case 4: gOptions.doDetailedPlacement = true; break;
+            default: break;
+          }
+        }
+        continue;
       }
-      else if (pVar[1] == '+')
-      switch (row_counter)
+      pVar = strchr(string, '=');
+      if (pVar)
       {
-        case 0: gOptions.doGlobalPlacement = true; break;
-        case 1: gOptions.doBinSwapping = true; break;
-        case 2: gOptions.doDirectedBinSwapping= true; break;
-        case 3: gOptions.doCellAnnealing = true; break;
-        case 4: gOptions.doDetailedPlacement = true; break;
-        default: break;
+        pVar++;
+        while ((pVar[0] == ' ') || (pVar[0] == '\t')) pVar++;
+        if (pVar[0] != '\n')
+          gOptions.innerParameters[row_counter][params_counter] = atof(pVar);
       }
+      params_counter++;
     }
-    continue;
-    }
-    pVar = strchr(string, '=');
-    if (pVar)
-    {
-    pVar++;
-    while ((pVar[0] == ' ') || (pVar[0] == '\t')) pVar++;
-    if (pVar[0] != '\n')
-      gOptions.innerParameters[row_counter][params_counter] = atof(pVar);
-    }
-    params_counter++;
-  }
-  fclose(configFile);
+    fclose(configFile);
   }
   else
   {
-  cout << "Parser error opening config file\n";
+    cout << "Parser error opening config file\n";
   }
 }
 
@@ -662,34 +696,37 @@ int ParsePl(const char* fileName, Circuit& circuit)
   int idx;
   //char orient;
   float tempVal;
+  if (numOfNT == 0)
+    numOfNT = circuit.nNodes + circuit.nTerminals;
   plFile = fopen(fileName, "r");
   if (plFile)
   {
-  fgets(currString, 128, plFile);
-  sscanf(currString, "%s %f", tempString, &tempVal);
-  if (strcmp(tempString, "UCLA") == 0)
-  {
-    circuit.placement = new Place[numOfNT];
-    while (!feof(plFile) && (counter < numOfNT))
-    {
     fgets(currString, 128, plFile);
-    if (currString[0] == '#') continue;
-    //if (strchr(currString, ':') == NULL) return 1;
-    paramCount = sscanf(currString, "%s %f %f", tempString, &x, &y);
-    if (paramCount == -1) continue;
-    idx = findNameBS(newTable, 0, numOfNT, tempString);
-    idx = newTable[idx].cellIdx;
-    //idx = findName(table, tempString);
-    circuit.placement[idx].xCoord = x;
-    circuit.placement[idx].yCoord = y;
-    /*circuit.placement[counter].xCoord = x;
-    circuit.placement[counter].yCoord = y;*/
-    strcpy(circuit.placement[counter].orient, "N");
-    counter++;
+    sscanf(currString, "%s %f", tempString, &tempVal);
+    if (strcmp(tempString, "UCLA") == 0)
+    {
+      if (circuit.placement == NULL)
+        circuit.placement = new Place[numOfNT];
+      while (!feof(plFile) && (counter < numOfNT))
+      {
+        fgets(currString, 128, plFile);
+        if (currString[0] == '#') continue;
+        //if (strchr(currString, ':') == NULL) return 1;
+        paramCount = sscanf(currString, "%s %f %f", tempString, &x, &y);
+        if (paramCount == -1) continue;
+        idx = findNameBS(newTable, 0, numOfNT, tempString);
+        idx = newTable[idx].cellIdx;
+        //idx = findName(table, tempString);
+        circuit.placement[idx].xCoord = x;
+        circuit.placement[idx].yCoord = y;
+        /*circuit.placement[counter].xCoord = x;
+        circuit.placement[counter].yCoord = y;*/
+        strcpy(circuit.placement[counter].orient, "N");
+        counter++;
+      }
     }
-  }
-  delete []newTable;
-  fclose(plFile);
+    delete []newTable;
+    fclose(plFile);
   }
   else
   {
@@ -757,73 +794,73 @@ int ParseNets(const char* fileName, Circuit& circuit)
   netFile = fopen(fileName, "r");
   if (netFile)
   {
-  fgets(currString, 128, netFile);
-  sscanf(currString, "%s %f", tempString, &tempVal);
-  if (strcmp(tempString, "UCLA") == 0)
-  {
-    newTable = new strExtend[numOfNT];
-    for (int i = 0; i < numOfNT; ++i)
-    {
-    strcpy( newTable[i].name, circuit.tableOfNames[i].name );
-    newTable[i].cellIdx = i; 
-    }
-    QSortStrExtend(newTable, numOfNT - 1);
-    /*for (int i = 0; i < numOfNT; ++i)
-    {
-    cout << newTable[i].name << "\t" << newTable[i].cellIdx << "\n";
-    }*/
-    while (!feof(netFile))
-    {
-    strcpy(currString, "#");
     fgets(currString, 128, netFile);
-    if (currString[0] == '#') continue;
-    //if (strchr(currString, ':') == NULL) return 1;
-    paramCount = sscanf(currString, "%s : %d", tempString, &value);
-    if (paramCount == -1) continue;
-    if (_stricmp(tempString, "NumNets") == 0)
+    sscanf(currString, "%s %f", tempString, &tempVal);
+    if (strcmp(tempString, "UCLA") == 0)
     {
-      firstParams++;
-      circuit.nNets = value;
-      circuit.nets = new Net[circuit.nNets];
-    }
-    if (_stricmp(tempString, "NumPins") == 0)
-    {
-      firstParams++;
-      circuit.nPins = value;
-    }
-    if (firstParams == 2)
-    {
-      if (_stricmp(tempString, "NetDegree") == 0)
+      newTable = new strExtend[numOfNT];
+      for (int i = 0; i < numOfNT; ++i)
       {
-      pVal = strchr(currString, ':');
-      sscanf(pVal, ": %d", &value);
-      circuit.nets[netsCounter].numOfPins = value;
-      circuit.nets[netsCounter].arrPins = new Pin[value];
-      int prevIdx = 0;
-      for (int j = 0; j < circuit.nets[netsCounter].numOfPins; ++j)
+        strcpy( newTable[i].name, circuit.tableOfNames[i].name );
+        newTable[i].cellIdx = i; 
+      }
+      QSortStrExtend(newTable, numOfNT - 1);
+      /*for (int i = 0; i < numOfNT; ++i)
       {
-        xOffset = 0;
-        yOffset = 0;
+      cout << newTable[i].name << "\t" << newTable[i].cellIdx << "\n";
+      }*/
+      while (!feof(netFile))
+      {
+        strcpy(currString, "#");
         fgets(currString, 128, netFile);
-        paramCount = sscanf(currString, "%s %s : %f %f", tempString, atempString, &xOffset, &yOffset);
-        cellIdx = findNameBS(newTable, 0, numOfNT, tempString);
-        circuit.nets[netsCounter].arrPins[j].cellIdx = newTable[cellIdx].cellIdx;
-        /*cellIdx = findNameBS(table, 0, numOfNT, tempString);
-        (*nets)[netsCounter].arrPins[j].cellIdx = cellIdx;*/
-        //(*nets)[netsCounter].arrPins[j].cellIdx = findName(table, tempString);
-        //prevIdx = (*nets)[netsCounter].arrPins[j].cellIdx;
-        circuit.nets[netsCounter].arrPins[j].xOffset = xOffset;
-        circuit.nets[netsCounter].arrPins[j].yOffset = yOffset;
+        if (currString[0] == '#') continue;
+        //if (strchr(currString, ':') == NULL) return 1;
+        paramCount = sscanf(currString, "%s : %d", tempString, &value);
+        if (paramCount == -1) continue;
+        if (_stricmp(tempString, "NumNets") == 0)
+        {
+          firstParams++;
+          circuit.nNets = value;
+          circuit.nets = new Net[circuit.nNets];
+        }
+        if (_stricmp(tempString, "NumPins") == 0)
+        {
+          firstParams++;
+          circuit.nPins = value;
+        }
+        if (firstParams == 2)
+        {
+          if (_stricmp(tempString, "NetDegree") == 0)
+          {
+            pVal = strchr(currString, ':');
+            sscanf(pVal, ": %d", &value);
+            circuit.nets[netsCounter].numOfPins = value;
+            circuit.nets[netsCounter].arrPins = new Pin[value];
+            int prevIdx = 0;
+            for (int j = 0; j < circuit.nets[netsCounter].numOfPins; ++j)
+            {
+              xOffset = 0;
+              yOffset = 0;
+              fgets(currString, 128, netFile);
+              paramCount = sscanf(currString, "%s %s : %f %f", tempString, atempString, &xOffset, &yOffset);
+              cellIdx = findNameBS(newTable, 0, numOfNT, tempString);
+              circuit.nets[netsCounter].arrPins[j].cellIdx = newTable[cellIdx].cellIdx;
+              /*cellIdx = findNameBS(table, 0, numOfNT, tempString);
+              (*nets)[netsCounter].arrPins[j].cellIdx = cellIdx;*/
+              //(*nets)[netsCounter].arrPins[j].cellIdx = findName(table, tempString);
+              //prevIdx = (*nets)[netsCounter].arrPins[j].cellIdx;
+              circuit.nets[netsCounter].arrPins[j].xOffset = xOffset;
+              circuit.nets[netsCounter].arrPins[j].yOffset = yOffset;
+            }
+            netsCounter++;
+            if (netsCounter == circuit.nNets) break;
+          }
+        }
+        paramCount = -1;
       }
-      netsCounter++;
-      if (netsCounter == circuit.nNets) break;
-      }
+      //delete []newTable;
     }
-    paramCount = -1;
-    }
-    //delete []newTable;
-  }
-  fclose(netFile);
+    fclose(netFile);
   }
   //cout << "finish parsing net file\n";
   return 0;
@@ -831,6 +868,5 @@ int ParseNets(const char* fileName, Circuit& circuit)
 
 MULTIPLACER_ERROR ValidateKeys()
 {
-  
   return OK;
 }

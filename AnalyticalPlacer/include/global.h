@@ -1,6 +1,6 @@
 /* 
  * global.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005-2006, ITLab, Kornyakov, Kurina, Zhivoderov
  * email: kirillkornyakov@yandex.ru
  * email: zhivoderov.a@gmail.com
@@ -37,7 +37,10 @@ struct Options
   
   char benchmarkName[256];
   char plName[256];
+  char lefName[256];
+  char defName[256];
   char configName[256];
+  bool isLEFDEFinput;
 
   bool doDumpGP;
   bool onlyGP;
@@ -117,9 +120,10 @@ class Tccout
 {
   public:
     FILE *logFile;
+    char logFileName[128];
     void Start()
     {
-      logFile = fopen( "itlDragon.log", "a+" );
+      logFile = fopen(logFileName, "a+");
       char cmdString[512];
       char buffer[256];
       time_t ltime;
@@ -135,9 +139,11 @@ class Tccout
 ---------------------------------------------*/
       if (gOptions.doLog)
       {
-        logFile = fopen("itlDragon.log", "a+");
+        logFile = fopen(logFileName, "a+");
         fputs("\n\n---------------------------------------------\n", logFile);
-        fputs("# Log file name:  itlDragon.log\n", logFile);
+        fputs("# Log file name:  ", logFile);
+        fputs(logFileName, logFile);
+        fputs("\n", logFile);
         fputs("# Command line:   ", logFile);
         fputs(cmdString, logFile);
         sprintf(buffer, "\n# Date:           %s", ctime(&ltime));
@@ -148,7 +154,7 @@ class Tccout
     }
     Tccout()
     {
-      
+      strcpy(logFileName, "itlAnalyticalPlacer.log");
     }
     ~Tccout(){ /*fclose( logFile );*/ }
     Tccout& operator<< (const char *s)
@@ -157,7 +163,7 @@ class Tccout
       //printf( s );
       if (gOptions.doLog)
       {
-        logFile = fopen("itlDragon.log", "a+");
+        logFile = fopen(logFileName, "a+");
         fputs(s, logFile);
         fclose(logFile);
       }
@@ -170,7 +176,7 @@ class Tccout
       if (gOptions.doLog)
       {
         char s[32];
-        logFile = fopen("itlDragon.log", "a+");
+        logFile = fopen(logFileName, "a+");
         sprintf(s, "%d", a);
         fputs(s, logFile);
         fclose(logFile);
@@ -184,7 +190,7 @@ class Tccout
       if (gOptions.doLog)
       {
         char s[32];
-        logFile = fopen("itlDragon.log", "a+");
+        logFile = fopen(logFileName, "a+");
         sprintf(s, "%f", a);
         fputs(s, logFile);
         fclose(logFile);

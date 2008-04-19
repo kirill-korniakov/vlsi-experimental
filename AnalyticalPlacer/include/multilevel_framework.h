@@ -1,6 +1,6 @@
 /*  
  * multilevel_framework.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2007, ITLab, Zhivoderov Artem
  * email: zhivoderov.a@gmail.com
  */
@@ -19,6 +19,7 @@
 #define sign(x) ((x > 0) ? 1 : ((x < 0) ? -1 : 0))
 #define MARK_NEIGHBORS_INVALID true
 #define DONT_MARK_NEIGHBORS_INVALID false
+#define USE_BORDER_PENALTY
 
 using namespace std;
 
@@ -34,6 +35,7 @@ namespace MultilevelFramework
     double xCoord;         // его координаты
     double yCoord;
     double area;           // занимаемая площадь (= сумма площадей всех нодов из cellIdxs)
+    double scalingCoefficient; 
     bool   isValid;        // применяется в алгоритме кластеризации. если true, то перещитывать score для данного кластера
                            // не нужно, в противном случае score пересчитывается, и элемент помещается в очередь (Heap)
                            // для кластеризации на то
@@ -70,7 +72,7 @@ namespace MultilevelFramework
     int secondClusterIdx;
     size_t size;  // end index of clusters in "vector<int> cellIdxs" of the result cluster
   };
-  
+
   typedef list<ClusteredNodes> ClusteringInfoAtEachLevel;
 
   // перечень существующих соединений между кластерами
@@ -81,8 +83,34 @@ namespace MultilevelFramework
   
   typedef list<ClusteringInfoAtEachLevel>::reverse_iterator ClusteringLogIterator;
 
+  // User-defined application context - contains data needed by the 
+  // application-provided call-back routines that evaluate the function and gradient
+  typedef struct {
+    Circuit*          circuit;
+    vector<Cluster>*  clusters;
+    NetList*          netList;
+    int               nClusters;
+    double            alpha;
+    PetscInt*         lookUpTable;
+    vector<ConnectionsList>* currTableOfConnections;
+    double            binHeight;
+    double            binWidth;
+    int               nBinRows;
+    int               nBinCols;
+    double            mu0;
+    double            mu;
+    double            totalCellArea;
+    double            meanBinArea;
+    double            penAlpha;
+    Bin               **binPenalties; // todo: check if we really need bin array, why not simple double**??
+    double**          clusterPotentialOverBins;
+    double            potentialRadiusX;
+    double            potentialRadiusY;
+    double            weight;        // вес для симметричной записи критерия
+  } AppCtx;
+
   typedef MULTIPLACER_ERROR (*affinityFunc)(const int& firstClusterIdx, const int& secondClusterIdx,
-                                            vector<Cluster>& clusters, NetList& netList, 
+                                            vector<Cluster>& clusters, NetList& netList, int* netListSizes,
                                             vector<ConnectionsList>& currTableOfConnections,
                                             double* netAreas, double& result);
   
@@ -91,10 +119,20 @@ namespace MultilevelFramework
   MULTIPLACER_ERROR Clusterize(Circuit& circuit, vector<Cluster>& clusters, NetList& netList, list<NetList>& netLevels,
                                affinityFunc Affinity, list<ClusteringInfoAtEachLevel>& clusteringLog, int& currNClustrers);
 
-  void InitializeDataStructures(Circuit& circuit, vector<Cluster>& clusters, NetList& netList, const int& nNodes);
+  void InitializeDataStructures(Circuit& circuit, vector<Cluster>& clusters, 
+                                NetList& netList, const int& nNodes, int& nClusters);
 
   MULTIPLACER_ERROR Relaxation(Circuit& circuit, vector<Cluster>& clusters, NetList& netList,
-                               vector<ConnectionsList>& currTableOfConnections);
+                               vector<ConnectionsList>& currTableOfConnections, 
+                               int& nInnerIters, int& nOuterIters);
+
+  int ReadClustersCoords(Vec x, int nClusters, int* idxs, PetscScalar* initValues,
+                         vector<Cluster> &clusters);
+
+  void InitializeOptimizationProblemParameters(AppCtx &user, Circuit& circuit, 
+    vector<Cluster>& clusters, NetList& netList, int nClusters, PetscInt** lookUpTable, 
+    vector<ConnectionsList>& currTableOfConnections);
+  void DeinitializeOptimizationProblemParameters(AppCtx &user);
   
   MULTIPLACER_ERROR Interpolation(Circuit& circuit, vector<Cluster>& clusters, 
                                   vector<ConnectionsList>& currTableOfConnections, NetList& netList);
@@ -109,18 +147,20 @@ namespace MultilevelFramework
                                   vector<ConnectionsList>& currTableOfConnections,
                                   double* netAreas);
   MULTIPLACER_ERROR AffinityInterp(const int& firstClusterIdx, const int& secondClusterIdx,
-                                   vector<Cluster>& clusters, NetList& netList, 
+                                   vector<Cluster>& clusters, NetList& netList, int* netListSizes,
                                    vector<ConnectionsList>& currTableOfConnections,
                                    double* netAreas, double& result);
   MULTIPLACER_ERROR Affinity(const int& firstClusterIdx, const int& secondClusterIdx, 
-                             vector<Cluster>& clusters, NetList& netList, 
+                             vector<Cluster>& clusters, NetList& netList, int* netListSizes,
                              vector<ConnectionsList>& currTableOfConnections, double* netAreas, double& result);
   // affinity function that considers spacial proximity
   MULTIPLACER_ERROR AffinitySP(const int& firstClusterIdx, const int& secondClusterIdx, 
-                               vector<Cluster>& clusters, NetList& netList, 
+                               vector<Cluster>& clusters, NetList& netList, int* netListSizes,
                                vector<ConnectionsList>& currTableOfConnections, double* netAreas, double& result);
-  MULTIPLACER_ERROR CalculateScore(const int& currClusterIdx, vector<ConnectionsList>& currTableOfConnections,
-                                   NetList& netList, double* netAreas, vector<Cluster>& clusters,
+  MULTIPLACER_ERROR CalculateScore(const int& currClusterIdx, 
+                                   vector<ConnectionsList>& currTableOfConnections,
+                                   NetList& netList, int* netListSizes, double* netAreas, 
+                                   vector<Cluster>& clusters,
                                    double& score, int& bestNeighborIdx, bool isToMark,
                                    affinityFunc Affinity, int nNodes);
   MULTIPLACER_ERROR InsertInHeap(list<ClusterData>& clustersDataList);
@@ -132,12 +172,22 @@ namespace MultilevelFramework
   void CalcLogSumExpForClustersGrad(PetscScalar *coordinates, PetscScalar *grad, void* data);
   double TestObjectiveFunc(PetscScalar *coordinates, void* data);
   void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
-  void CalcBinGrid(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters,
-                   double& binHeight, double& binWidth);
+
+  void CalcBinGrid(Circuit& circuit, vector<Cluster>& clusters, const int& nClusters,
+    int& nBinRows, int& nBinCols,
+    double& binWidth, double& binHeight);
+
   double CalcPenalty(PetscScalar *x, void* data);
+
+  void DetermineBordersOfClusterPotential(int &min_col, int &max_col, int &min_row, int &max_row,
+                                          int i, PetscScalar * x, AppCtx* userData);
+
   void CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data);
+
+  void CalcBellShapedFuncAndDerivative(AppCtx* userData, int solutionIdx, int clusterIdx, int colIdx, int rowIdx, PetscScalar * x, 
+                                       double &potX, double &gradX, double &potY, double &gradY);
   void CalcMu0(PetscScalar *x, void* data);
   double GetDiscrepancy(PetscScalar *x, void* data);
+  void MakeClustersFromBins(Circuit& circuit, vector<Cluster>& clusters, NetList& netList);
 }
-
 #endif

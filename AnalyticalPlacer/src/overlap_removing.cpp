@@ -1,6 +1,6 @@
 /*  
  * overlap_removing.cpp
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Kornyakov, Zhivoderov
  * email: kirillkornyakov@yandex.ru
  * email: zhivoderov.a@gmail.com

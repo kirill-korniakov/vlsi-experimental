@@ -1,6 +1,6 @@
 /* 
  * random_numbers_generation.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, 2006 ITLab, Kornyakov
  * email: kirillkornyakov@yandex.ru
  */

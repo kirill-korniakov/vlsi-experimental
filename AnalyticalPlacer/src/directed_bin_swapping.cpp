@@ -1,6 +1,6 @@
 /*  
  * directed_bin_swapping.cpp
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2006, ITLab, Kirill Kornyakov
  * email: kirillkornyakov@yandex.ru
  */

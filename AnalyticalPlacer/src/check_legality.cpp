@@ -325,7 +325,7 @@ MULTIPLACER_ERROR CheckOverlaps(const Circuit& circuit, int rowIdxToCheck)
     cellWidthInSites = circuit.nodes[i].width/siteWidth;
     rowIdx  = static_cast<int>(floor(circuit.placement[i].yCoord / rowHeight));
     siteIdx = static_cast<int>((circuit.placement[i].xCoord - 0.5*circuit.nodes[i].width - rowOrigin) / siteWidth);
-    if ((rowIdx < 0)||(siteIdx < 0)||(rowIdx >= circuit.nRows)||(siteIdx >= numSites)||(rowIdx != rowIdxToCheck))
+    if ((rowIdx < 0)||(siteIdx < 0)||(rowIdx >= circuit.nRows)||(siteIdx > numSites - cellWidthInSites)||(rowIdx != rowIdxToCheck))
     {
       continue;
     }

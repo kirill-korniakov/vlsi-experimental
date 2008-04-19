@@ -1,11 +1,11 @@
 /* 
- * global.cpp
- * this is a part of itlDragon
- * Copyright (C) 2005-2006, ITLab, Kornyakov, Kurina, Zhivoderov
- * email: kirillkornyakov@yandex.ru
- * email: zhivoderov.a@gmail.com
- * email: nina.kurina@gmail.com
- */
+* global.cpp
+* this is a part of itlAnalyticalPlacer
+* Copyright (C) 2005-2006, ITLab, Kornyakov, Kurina, Zhivoderov
+* email: kirillkornyakov@yandex.ru
+* email: zhivoderov.a@gmail.com
+* email: nina.kurina@gmail.com
+*/
 
 #include "..\include\global.h"
 #include "..\include\random_numbers_generation.h"
@@ -13,7 +13,7 @@
 
 Options gOptions;
 
-const char* resultFileName = "itlDragon results.txt";
+const char* resultFileName = "itlAnalyticalPlacer results.txt";
 
 Tccout ccout;
 
@@ -48,19 +48,23 @@ MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit)
 {
   MULTIPLACER_ERROR errorCode = OK;
 
-  cout << "itlDragon started to parse \"" << gOptions.benchmarkName << "\"\n";
+  circuit.placement = NULL;
+
+  cout << "itlAnalyticalPlacer started to parse \"" << gOptions.benchmarkName << "\"\n";
   errorCode = ParseAux(gOptions.benchmarkName, circuit);
   if (errorCode != OK) return errorCode;
   cout << "Files parsed successfully.\n";
 
-  // calculating sizes of circuit
-  circuit.height = circuit.nRows * circuit.rows[0].height;
-  circuit.width  = circuit.rows[0].siteWidth * circuit.rows[circuit.nRows/2].numSites;
-  
+  if(!gOptions.isLEFDEFinput)
+  {
+    // calculating sizes of circuit
+    circuit.height = circuit.nRows * circuit.rows[0].height;
+    circuit.width  = circuit.rows[0].siteWidth * circuit.rows[circuit.nRows/2].numSites;
+  }
   circuit.shiftX = static_cast<int>(circuit.rows[circuit.nRows/2].subrowOrigin);
   circuit.shiftY = circuit.rows[0].coordinate;
-  
-  circuit.rowTerminalBorders = new vector<double>[circuit.nRows];
+
+  circuit.rowTerminalBorders = new std::vector<double>[circuit.nRows];
 
   MakeTableOfConnections(circuit);
 
@@ -71,7 +75,7 @@ void PrintNetsInfo(Circuit& circuit)
 {
   int max = circuit.nNodes + circuit.nTerminals;
   int min = 1;
-  
+
   for (int i = 0; i < circuit.nNets; ++i)
   {
     if (max < circuit.nets[i].numOfPins)
@@ -108,7 +112,8 @@ void PrintNetsInfo(Circuit& circuit)
 
 void SetDefaultKeysValues()
 {
-  gOptions.doGlobalPlacement  = true;
+  gOptions.isLEFDEFinput         = false;
+  gOptions.doGlobalPlacement     = true;
   gOptions.doBinSwapping         = true;
   gOptions.doDirectedBinSwapping = true;
   gOptions.doCellAnnealing       = true;
@@ -125,12 +130,6 @@ void SetDefaultKeysValues()
   gOptions.benchmarkName[0] = '\0';
   gOptions.plName[0] = '\0';
   gOptions.configName[0] = '\0';
-
-  gOptions.doConvertToRouter     = false;
-  gOptions.GRFileName[0]         = '\0';
-  gOptions.GRTileSize            = 0;
-  gOptions.GRVertCapacity        = 0;
-  gOptions.GRHorizCapacity       = 0;
 }
 
 void CheckCode(MULTIPLACER_ERROR errorCode)
@@ -167,16 +166,16 @@ void PrintErrorMessage(char* errorMsg, int errorCode)
     char stageName[128];
     switch (firstDigit)
     {
-      case 0: strcpy( stageName, "parsing"); break;
-      case 1: strcpy( stageName, "global placement"); break;
-      case 2: strcpy( stageName, "bin-swapping"); break;
-      case 3: strcpy( stageName, "adjustment step"); break;
-      case 4: strcpy( stageName, "directed bin-swapping"); break;
-      case 5: strcpy( stageName, "cell annealing"); break;
-      case 6: strcpy( stageName, "overlap_removing"); break;
-      case 7: strcpy( stageName, "detailed placement"); break;
-      case 8: strcpy( stageName, "legality cheking"); break;
-      case 9: strcpy( stageName, "output"); break;
+    case 0: strcpy( stageName, "parsing"); break;
+    case 1: strcpy( stageName, "global placement"); break;
+    case 2: strcpy( stageName, "bin-swapping"); break;
+    case 3: strcpy( stageName, "adjustment step"); break;
+    case 4: strcpy( stageName, "directed bin-swapping"); break;
+    case 5: strcpy( stageName, "cell annealing"); break;
+    case 6: strcpy( stageName, "overlap_removing"); break;
+    case 7: strcpy( stageName, "detailed placement"); break;
+    case 8: strcpy( stageName, "legality cheking"); break;
+    case 9: strcpy( stageName, "output"); break;
     }
     strcpy( errorMsg, "Program aborted because of error during ");
     strcat( errorMsg, stageName );
@@ -195,13 +194,13 @@ MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics)
   MULTIPLACER_ERROR errorCode = OK;
 
   ccout.Start();
-  
+
   // initialize VSL stream for random numbers
   InitializeStream(5574564);
   srand(14580);
-  //InitializeStream();
-  //srand(clock());
-  
+  /*InitializeStream();
+  srand(clock());*/
+
   InitializeStatistics(statistics);
   errorCode = InitializeCircuit(circuit);
   if (errorCode != OK) return errorCode;
@@ -209,7 +208,7 @@ MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics)
   for (int i = 0; i < NUM_STAGES; ++i)
     for (int j = 0; j < MAX_NUM_PARAMS; ++j)
       gOptions.innerParameters[i][j] = -1.0;  
-  
+
   return OK;
 }
 
@@ -222,7 +221,7 @@ void FreeMemory(Circuit circuit)
   if (circuit.terminals){ delete []circuit.terminals; }
   if (circuit.weights)  { delete []circuit.weights;   }
   if (circuit.placement){ delete []circuit.placement; }
-  
+
   // delete bins
   if(circuit.arrOfBins)
   {
@@ -244,7 +243,7 @@ void Exit()
 
 void MakeTableOfConnections(Circuit& circuit)
 {
-  circuit.tableOfConnections = new vector<int>[circuit.nNodes + circuit.nTerminals];
+  circuit.tableOfConnections = new std::vector<int>[circuit.nNodes + circuit.nTerminals];
   for (int i = 0; i < circuit.nNets; ++i)
   {
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)

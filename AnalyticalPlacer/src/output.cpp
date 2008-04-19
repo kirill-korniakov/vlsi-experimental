@@ -1,6 +1,6 @@
 /*  
  * output.cpp
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Zhivoderov
  * email: zhivoderov.a@gmail.com
  */
@@ -86,134 +86,188 @@ void PrintResultString(int argc, char* argv[], Statistics& statistics, MULTIPLAC
 }
 
 void PrintToPL(const char* fileName, Circuit& circuit, Statistics& statistics,
-     double shiftX, double shiftY)
+               double shiftX, double shiftY,
+               int nBinRows, int nBinCols)
 {
-  if (fileName == 0)   
-  {
-    printf("Error: null pointer of pl file\n");
-    return;
-  }
   time_t ltime;
   time( &ltime );
   FILE *f;
   char buffer[256];
   char newFileName[256];
   char *pVal;
+
   strcpy(newFileName, fileName);
-  if (circuit.nNodes && circuit.nTerminals && circuit.placement)
+  pVal = strrchr(newFileName, '\\');
+  if (pVal) strcpy(newFileName, ++pVal);
+  pVal = strrchr(newFileName, '.');
+  if (pVal) pVal[0] = '\0';
+  strcat(newFileName, " itlAPlacer ");
+  strcat(newFileName, ctime( &ltime ));
+  pVal = strrchr(newFileName, '\n');
+  if (pVal) pVal[0] = '\0';
+  if (gOptions.isLEFDEFinput)
   {
-    ReshiftCoords(circuit);
-    /*for (int i = 0; i < circuit.nNodes; ++i)
-    {
-      circuit.placement[i].xCoord -= 0.5*nodes[i].width  - shiftX;
-      circuit.placement[i].yCoord -= 0.5*nodes[i].height - shiftY;
-    }
-    for (int i = 0; i < circuit.nTerminals; ++i)
-    {
-      circuit.placement[i + circuit.nNodes].xCoord -= 0.5*terminals[i].width  - shiftX;
-      circuit.placement[i + circuit.nNodes].yCoord -= 0.5*terminals[i].height - shiftY;
-    }*/
-    pVal = strrchr(newFileName, '\\');
-    if (pVal) strcpy(newFileName, ++pVal);
-    pVal = strrchr(newFileName, '.');
-    if (pVal) pVal[0] = '\0';
-    strcat(newFileName, " itlDragon ");
-    strcat(newFileName, ctime( &ltime ));
-    pVal = strrchr(newFileName, '\n');
-    if (pVal) pVal[0] = '\0';
+    strcat(newFileName, ".def");
+  } 
+  else
+  {
     strcat(newFileName, ".pl");
-    while (1)
+  }
+  while (1)
+  {
+    pVal = strchr(newFileName, ' ');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+  while (1)
+  {
+    pVal = strchr(newFileName, ':');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+
+  if (gOptions.isLEFDEFinput)
+  {
+    if (fileName == 0)   
     {
-      pVal = strchr(newFileName, ' ');
-      if (pVal) pVal[0] = '_';
-      else break;
+      printf("Error: null pointer of def file\n");
+      return;
     }
-    while (1)
+
+    ExportDEF(newFileName, circuit);
+  }
+  else
+  {
+    if (fileName == 0)   
     {
-      pVal = strchr(newFileName, ':');
-      if (pVal) pVal[0] = '_';
-      else break;
+      printf("Error: null pointer of pl file\n");
+      return;
     }
-    f = fopen( newFileName , "w");
-    sprintf(buffer, "UCLA pl 1.0\n");
-    fputs( buffer, f);
-    sprintf(buffer, "# ITLab\n# Created : %s", ctime( &ltime ));
-    fputs( buffer, f);
-    sprintf(buffer, "# Work time: %.3f\n", statistics.totalWT);
-    fputs( buffer, f);
-    sprintf(buffer, "# Wire length: %.3f\n\n", statistics.currentWL);
-    fputs( buffer, f);
-    for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+
+    if (circuit.nNodes && circuit.nTerminals && circuit.placement)
     {
-      sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
+      ReshiftCoords(circuit);
+      /*for (int i = 0; i < circuit.nNodes; ++i)
+      {
+        circuit.placement[i].xCoord -= 0.5*nodes[i].width  - shiftX;
+        circuit.placement[i].yCoord -= 0.5*nodes[i].height - shiftY;
+      }
+      for (int i = 0; i < circuit.nTerminals; ++i)
+      {
+        circuit.placement[i + circuit.nNodes].xCoord -= 0.5*terminals[i].width  - shiftX;
+        circuit.placement[i + circuit.nNodes].yCoord -= 0.5*terminals[i].height - shiftY;
+      }*/
+      cout << "Dumping placement to \"" << newFileName << "\"" << endl;
+      f = fopen(newFileName, "w");
+      sprintf(buffer, "UCLA pl 1.0\n");
       fputs( buffer, f);
+      sprintf(buffer, "# ITLab\n# Created : %s", ctime( &ltime ));
+      fputs( buffer, f);
+      sprintf(buffer, "# Work time: %.3f\n", statistics.totalWT);
+      fputs( buffer, f);
+      sprintf(buffer, "# Wire length: %.3f\n", statistics.currentWL);
+      fputs( buffer, f);
+      sprintf(buffer, "#_Bin grid: %d x %d\n\n", nBinRows, nBinCols);
+      fputs( buffer, f);
+      for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+      {
+        sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
+        fputs( buffer, f);
+      }
+      fclose(f);
+      ShiftCoords(circuit);
+      /*for (int i = 0; i < circuit.nNodes; ++i)
+      {
+        circuit.placement[i].xCoord += 0.5*nodes[i].width  - shiftX;
+        circuit.placement[i].yCoord += 0.5*nodes[i].height - shiftY;
+      }
+      for (int i = 0; i < circuit.nTerminals; ++i)
+      {
+        circuit.placement[i + circuit.nNodes].xCoord += 0.5*terminals[i].width  - shiftX;
+        circuit.placement[i + circuit.nNodes].yCoord += 0.5*terminals[i].height - shiftY;
+      }*/
     }
-    fclose(f);
-    ShiftCoords(circuit);
-    /*for (int i = 0; i < circuit.nNodes; ++i)
-    {
-      circuit.placement[i].xCoord += 0.5*nodes[i].width  - shiftX;
-      circuit.placement[i].yCoord += 0.5*nodes[i].height - shiftY;
-    }
-    for (int i = 0; i < circuit.nTerminals; ++i)
-    {
-      circuit.placement[i + circuit.nNodes].xCoord += 0.5*terminals[i].width  - shiftX;
-      circuit.placement[i + circuit.nNodes].yCoord += 0.5*terminals[i].height - shiftY;
-    }*/
   }
 }
 
 void PrintToPL(const char* fileName, Circuit& circuit,
-               double shiftX, double shiftY)
+               double shiftX, double shiftY, int nBinRows, int nBinCols)
 {
-  if (fileName == 0)   
-  {
-    printf("Error: null pointer of pl file\n");
-    return;
-  }
   time_t ltime;
   time( &ltime );
   FILE *f;
   char buffer[256];
   char newFileName[256];
   char *pVal;
+
   strcpy(newFileName, fileName);
-  if (circuit.nNodes && circuit.nTerminals && circuit.placement)
+  pVal = strrchr(newFileName, '\\');
+  if (pVal) strcpy(newFileName, ++pVal);
+  pVal = strrchr(newFileName, '.');
+  if (pVal) pVal[0] = '\0';
+  strcat(newFileName, " itlAPlacer ");
+  strcat(newFileName, ctime( &ltime ));
+  pVal = strrchr(newFileName, '\n');
+  if (pVal) pVal[0] = '\0';
+  if (gOptions.isLEFDEFinput)
   {
-    ReshiftCoords(circuit);
-    pVal = strrchr(newFileName, '\\');
-    if (pVal) strcpy(newFileName, ++pVal);
-    pVal = strrchr(newFileName, '.');
-    if (pVal) pVal[0] = '\0';
-    strcat(newFileName, " itlDragon ");
-    strcat(newFileName, ctime( &ltime ));
-    pVal = strrchr(newFileName, '\n');
-    if (pVal) pVal[0] = '\0';
+    strcat(newFileName, ".def");
+  } 
+  else
+  {
     strcat(newFileName, ".pl");
-    while (1)
+  }
+  while (1)
+  {
+    pVal = strchr(newFileName, ' ');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+  while (1)
+  {
+    pVal = strchr(newFileName, ':');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+
+  if (gOptions.isLEFDEFinput)
+  {
+    if (fileName == 0)   
     {
-      pVal = strchr(newFileName, ' ');
-      if (pVal) pVal[0] = '_';
-      else break;
+      printf("Error: null pointer of def file\n");
+      return;
     }
-    while (1)
+
+    ExportDEF(newFileName, circuit);
+  }
+  else
+  {
+    if (fileName == 0)   
     {
-      pVal = strchr(newFileName, ':');
-      if (pVal) pVal[0] = '_';
-      else break;
+      printf("Error: null pointer of pl file\n");
+      return;
     }
-    f = fopen( newFileName , "w");
-    sprintf(buffer, "UCLA pl 1.0\n");
-    fputs( buffer, f);
-    sprintf(buffer, "# ITLab\n# Created : %s", ctime( &ltime ));
-    fputs( buffer, f);
-    for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+
+    if (circuit.nNodes && circuit.nTerminals && circuit.placement)
     {
-      sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
+      ReshiftCoords(circuit);
+      
+      cout << "Dumping placement to \"" << newFileName << "\"" << endl;
+      f = fopen(newFileName, "w");
+      sprintf(buffer, "UCLA pl 1.0\n");
       fputs( buffer, f);
+      sprintf(buffer, "# ITLab\n# Created : %s", ctime( &ltime ));
+      fputs( buffer, f);
+      sprintf(buffer, "#_Bin grid: %d x %d\n\n", nBinRows, nBinCols);
+      fputs( buffer, f);
+      for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+      {
+        sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
+        fputs( buffer, f);
+      }
+      fclose(f);
+      ShiftCoords(circuit);
     }
-    fclose(f);
-    ShiftCoords(circuit);
   }
 }
 
@@ -287,7 +341,7 @@ void PrintToTmpPL(Circuit& circuit, double shiftX, double shiftY)
   } 
 }
 
-void PrintPLT(const char* fileName, Circuit& circuit, Statistics& statistics)
+void PrintPLT(const char* fileName, Circuit& circuit)
 {
   if (fileName == 0)   
   {
@@ -339,8 +393,8 @@ MULTIPLACER_ERROR ShiftCoords(Circuit& circuit)
 {
   if (circuit.nNodes && circuit.nTerminals && circuit.placement)
   {
-    int shiftX = circuit.shiftX;
-    int shiftY = circuit.shiftY;
+    double shiftX = circuit.shiftX;
+    double shiftY = circuit.shiftY;
     
     for (int i = 0; i < circuit.nNodes; ++i)
     {
@@ -356,7 +410,7 @@ MULTIPLACER_ERROR ShiftCoords(Circuit& circuit)
     for (int i = 0; i < circuit.nRows; ++i)
     {
       circuit.rows[i].subrowOrigin -= shiftX;
-      circuit.rows[i].coordinate   -= shiftY;
+      circuit.rows[i].coordinate   -= (int)shiftY;
     }
     return OK;
   }
@@ -367,8 +421,8 @@ MULTIPLACER_ERROR ReshiftCoords(Circuit& circuit)
 {
   if (circuit.nNodes && circuit.nTerminals && circuit.placement)
   {
-    int shiftX = circuit.shiftX;
-    int shiftY = circuit.shiftY;
+    double shiftX = circuit.shiftX;
+    double shiftY = circuit.shiftY;
     
     for (int i = 0; i < circuit.nNodes; ++i)
     {
@@ -383,7 +437,7 @@ MULTIPLACER_ERROR ReshiftCoords(Circuit& circuit)
     for (int i = 0; i < circuit.nRows; ++i)
     {
       circuit.rows[i].subrowOrigin += shiftX;
-      circuit.rows[i].coordinate   += shiftY;
+      circuit.rows[i].coordinate   += (int)shiftY;
     }
     return OK;
   }
@@ -462,12 +516,12 @@ void CreateHTMLReport(double wireLength, double workTime, MULTIPLACER_ERROR erro
       fputs("<html>\n", testResFileHTM);
       fputs("    <head>\n", testResFileHTM);
       fputs("        <title>\n", testResFileHTM);
-      fputs("        itlDragon test report\n", testResFileHTM);
+      fputs("        itlAnalyticalPlacer test report\n", testResFileHTM);
       fputs("        </title>\n", testResFileHTM);
       fputs("    </head>\n", testResFileHTM);
       fputs("    <body>\n", testResFileHTM);
       fputs("    <h1>\n", testResFileHTM);
-      fputs("    itlDragon test report\n", testResFileHTM);
+      fputs("    itlAnalyticalPlacer test report\n", testResFileHTM);
       fputs("    </h1>\n", testResFileHTM);
       fputs("        <p>\n", testResFileHTM);
       

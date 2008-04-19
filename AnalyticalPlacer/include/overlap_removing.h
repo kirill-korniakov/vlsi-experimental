@@ -1,6 +1,6 @@
 /*  
  * overlap_removing.h
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Kornyakov
  * email: kirillkornyakov@yandex.ru
  */

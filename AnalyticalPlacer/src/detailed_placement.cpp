@@ -1,6 +1,6 @@
 /*  
  * detailed_placement.cpp
- * this is a part of itlDragon
+ * this is a part of itlAnalyticalPlacer
  * Copyright (C) 2005, ITLab, Zhivoderov
  * email: zhivoderov.a@gmail.com
  */
@@ -35,7 +35,7 @@ RowElement* bufForChange;
 RowElement* bufForChange2;
 
 const int DFLT_SIZE_OF_CHAIN = 5; // parameter for GlobalMultiSwap
-const int  NUM_OF_ROWS_IN_LEGALIZATION = 50; // parameter for Legalize(...)
+
 int DetailedPlacement(Circuit& circuit, Statistics& statistics)
 {
   //int pivotVert;     //the row of the base element
@@ -122,7 +122,8 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
   bestWL = oldWL = statistics.currentWL;
   cout << "[\n" ;
   cout << "Initial WL: " << bestWL << "\n";
-  
+  cout << "iter #\tWL before\tWL after\tReduction\n";
+
   double wlBeforeIteration = 0.0;
   double wlAfterIteration  = 0.0;
   wlDecreaseGS = 0.0;
@@ -142,8 +143,8 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     rngLITotalTime += rngFinishTime - rngStartTime;
     
     wlBeforeIteration = cf_recalc_all( 0, circuit.nNets, circuit.nets, circuit.placement);
-    cout << "iteration #" << iterCount++ << "\t";
-    cout << "WL before: " << wlBeforeIteration << "\t";
+    cout << iterCount++ << "\t";
+    cout << wlBeforeIteration << "\t";
     wlBeforeStage = wlBeforeIteration;
     
     ///********************* G L O B A L   S W A P *******************///
@@ -200,7 +201,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     wlBeforeStage = bestWL;
     timeStart     = clock();
     //*************************************************************//
-   
+
     //**************** V E R T I C A L   S E A R C H **************//
     //cout << "\nVERTICAL SEARCH\n";
     for (int i = 0; i < 3; ++i)
@@ -291,8 +292,8 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
       delete []greedy_array[j];
     }
     //cout << "4\n";    
-    cout << "WL after: " << wlAfterIteration << "\t";
-    cout << "Reduction: " << (1 - wlAfterIteration / wlBeforeIteration)*100 << "%\n";
+    cout << wlAfterIteration << "\t";
+    cout << (1 - wlAfterIteration / wlBeforeIteration)*100 << "%\n";
     PrintToTmpPL(circuit, statistics);
   } while ((1 - wlAfterIteration / wlBeforeIteration) > stoppingCriteriaValue);
   
@@ -1794,6 +1795,8 @@ int  Factorial (unsigned int a)
 
 MULTIPLACER_ERROR Legalize(Circuit& circuit)
 {
+  const int NUM_OF_ROWS_IN_LEGALIZATION = circuit.nRows; // parameter for Legalization
+
   // Array of cells sorted by their x-coord
   RowElement *sortedCells;
   double *rightBordersOfRows;
@@ -1834,13 +1837,12 @@ MULTIPLACER_ERROR Legalize(Circuit& circuit)
     sortedCells[i].xCoord  = circuit.placement[i].xCoord;
   }
   QuickSortRowElement(sortedCells, circuit.nNodes - 1);
-  
   for (i = 0; i < circuit.nNodes; ++i)
   {
     currCell  = sortedCells[i].cellIdx;
-    currX     = circuit.placement[currCell].xCoord;
-    currY     = circuit.placement[currCell].yCoord;
     halfWidth = 0.5 * circuit.nodes[currCell].width;
+    currX     = circuit.placement[currCell].xCoord - fmod(circuit.placement[currCell].xCoord - halfWidth, siteWidth);
+    currY     = circuit.placement[currCell].yCoord;
     currRowIdx  = static_cast<int>( floor(currY / siteHeight) );
     firstRowIdx = max(currRowIdx - NUM_OF_ROWS_IN_LEGALIZATION, 0);
     lastRowIdx  = min(currRowIdx + NUM_OF_ROWS_IN_LEGALIZATION, circuit.nRows - 1);
@@ -1868,7 +1870,7 @@ MULTIPLACER_ERROR Legalize(Circuit& circuit)
     rightBordersOfRows[newRowIdx] = bestX + halfWidth;
     rowLengths[newRowIdx] += 2 * halfWidth;
   }
-  
+
   RowElement *currRow;
   int numOfCellsInRow;
   for (i = 0; i < circuit.nRows; ++i)
@@ -1890,7 +1892,7 @@ MULTIPLACER_ERROR Legalize(Circuit& circuit)
         if (circuit.rows[i].coordinate == circuit.placement[k].yCoord - 0.5 * circuit.nodes[k].height)
         {
           currRow[numOfCellsInRow].xCoord =
-            circuit.placement[k].xCoord;
+            circuit.placement[k].xCoord + 0.5 * circuit.nodes[k].width;
           currRow[numOfCellsInRow++].cellIdx = k;
         }
       }
@@ -1899,18 +1901,23 @@ MULTIPLACER_ERROR Legalize(Circuit& circuit)
       
       for (j = numOfCellsInRow - 1; j > 0; --j)
       {
-        if (currRow[j].xCoord   - 0.5 * circuit.nodes[currRow[j].cellIdx].width <
-            currRow[j-1].xCoord + 0.5 * circuit.nodes[currRow[j-1].cellIdx].width)
+        if (currRow[j].xCoord - circuit.nodes[currRow[j].cellIdx].width < currRow[j-1].xCoord)
         {
-          currRow[j-1].xCoord = currRow[j].xCoord - 0.5 * circuit.nodes[currRow[j].cellIdx].width
-                                                  - 0.5 * circuit.nodes[currRow[j-1].cellIdx].width;
-          circuit.placement[currRow[j-1].cellIdx].xCoord = currRow[j-1].xCoord;
+          currRow[j-1].xCoord = currRow[j].xCoord - circuit.nodes[currRow[j].cellIdx].width;
+          circuit.placement[currRow[j-1].cellIdx].xCoord = currRow[j-1].xCoord - 
+            0.5 * circuit.nodes[currRow[j-1].cellIdx].width;
         }
         else
           break;
       }
       delete[] currRow;
     }
+  }
+
+  for (int k = 0; k < circuit.nNodes; ++k)
+  {
+    if (circuit.placement[k].xCoord - circuit.nodes[k].width / 2 < 0)
+      break;
   }
   
   delete[] rowLengths;
