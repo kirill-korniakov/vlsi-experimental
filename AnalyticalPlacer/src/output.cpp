@@ -169,8 +169,10 @@ void PrintToPL(const char* fileName, Circuit& circuit, Statistics& statistics,
       fputs( buffer, f);
       sprintf(buffer, "#_Bin grid: %d x %d\n\n", nBinRows, nBinCols);
       fputs( buffer, f);
-      for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+      int shift_ = (int)(circuit.terminals - circuit.nodes);
+      for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
       {
+        if(i == circuit.nNodes) i = shift_;
         sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
         fputs( buffer, f);
       }
@@ -260,8 +262,10 @@ void PrintToPL(const char* fileName, Circuit& circuit,
       fputs( buffer, f);
       sprintf(buffer, "#_Bin grid: %d x %d\n\n", nBinRows, nBinCols);
       fputs( buffer, f);
-      for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+      int shift_ = (int)(circuit.terminals - circuit.nodes);
+      for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
       {
+        if(i == circuit.nNodes) i = shift_;
         sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, circuit.placement[i].yCoord, circuit.placement[i].orient);
         fputs( buffer, f);
       }
@@ -294,8 +298,10 @@ void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, doubl
     fputs( buffer, f);
     sprintf(buffer, "# Wire length: %.3f\n\n", statistics.currentWL);
     fputs( buffer, f);
-    for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+    int shift_ = (int)(circuit.terminals - circuit.nodes);
+    for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
     {
+      if(i == circuit.nNodes) i = shift_;
       sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord,
                                                   circuit.placement[i].yCoord,  circuit.placement[i].orient);
       fputs( buffer, f);
@@ -329,8 +335,10 @@ void PrintToTmpPL(Circuit& circuit, double shiftX, double shiftY)
     fputs( buffer, f);
     sprintf(buffer, "# Wire length: \n\n");
     fputs( buffer, f);
-    for (int i = 0; i < circuit.nNodes + circuit.nTerminals; ++i)
+    int shift_ = (int)(circuit.terminals - circuit.nodes);
+    for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
     {
+      if(i == circuit.nNodes) i = shift_;
       sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, 
                                                   circuit.placement[i].yCoord,  circuit.placement[i].orient);
       fputs( buffer, f);
@@ -370,17 +378,18 @@ void PrintPLT(const char* fileName, Circuit& circuit)
     fputs( "\n", f);
   }
   fputs( "EOF\n", f);
+  int shift_ = (int)(circuit.terminals - circuit.nodes);
   for (int i = 0; i < circuit.nTerminals; ++i)
   {
-    sprintf(buffer, "%15f %15f\n", circuit.placement[circuit.nNodes + i].xCoord, circuit.placement[circuit.nNodes + i].yCoord);
+    sprintf(buffer, "%15f %15f\n", circuit.placement[shift_ + i].xCoord, circuit.placement[shift_ + i].yCoord);
     fputs( buffer, f);
-    sprintf(buffer, "%15f %15f\n", circuit.placement[circuit.nNodes + i].xCoord, circuit.placement[circuit.nNodes + i].yCoord + circuit.terminals[i].height);
+    sprintf(buffer, "%15f %15f\n", circuit.placement[shift_ + i].xCoord, circuit.placement[shift_ + i].yCoord + circuit.terminals[i].height);
     fputs( buffer, f);
-    sprintf(buffer, "%15f %15f\n", circuit.placement[circuit.nNodes + i].xCoord + circuit.terminals[i].width, circuit.placement[circuit.nNodes + i].yCoord + circuit.terminals[i].height);
+    sprintf(buffer, "%15f %15f\n", circuit.placement[shift_ + i].xCoord + circuit.terminals[i].width, circuit.placement[shift_ + i].yCoord + circuit.terminals[i].height);
     fputs( buffer, f);
-    sprintf(buffer, "%15f %15f\n", circuit.placement[circuit.nNodes + i].xCoord + circuit.terminals[i].width, circuit.placement[circuit.nNodes + i].yCoord);
+    sprintf(buffer, "%15f %15f\n", circuit.placement[shift_ + i].xCoord + circuit.terminals[i].width, circuit.placement[shift_ + i].yCoord);
     fputs( buffer, f);
-    sprintf(buffer, "%15f %15f\n", circuit.placement[circuit.nNodes + i].xCoord, circuit.placement[circuit.nNodes + i].yCoord);
+    sprintf(buffer, "%15f %15f\n", circuit.placement[shift_ + i].xCoord, circuit.placement[shift_ + i].yCoord);
     fputs( buffer, f);
     fputs( "\n", f);
   }
@@ -401,10 +410,11 @@ MULTIPLACER_ERROR ShiftCoords(Circuit& circuit)
       circuit.placement[i].xCoord += 0.5*circuit.nodes[i].width  - shiftX;
       circuit.placement[i].yCoord += 0.5*circuit.nodes[i].height - shiftY;
     }
+    int shift_ = (int)(circuit.terminals - circuit.nodes);
     for (int i = 0; i < circuit.nTerminals; ++i)
     {
-      circuit.placement[i + circuit.nNodes].xCoord += 0.5*circuit.terminals[i].width  - shiftX;
-      circuit.placement[i + circuit.nNodes].yCoord += 0.5*circuit.terminals[i].height - shiftY;
+      circuit.placement[i + shift_].xCoord += 0.5*circuit.terminals[i].width  - shiftX;
+      circuit.placement[i + shift_].yCoord += 0.5*circuit.terminals[i].height - shiftY;
     }
     
     for (int i = 0; i < circuit.nRows; ++i)
@@ -429,10 +439,11 @@ MULTIPLACER_ERROR ReshiftCoords(Circuit& circuit)
       circuit.placement[i].xCoord -= 0.5*circuit.nodes[i].width  - shiftX;
       circuit.placement[i].yCoord -= 0.5*circuit.nodes[i].height - shiftY;
     }
+    int shift_ = (int)(circuit.terminals - circuit.nodes);
     for (int i = 0; i < circuit.nTerminals; ++i)
     {
-      circuit.placement[i + circuit.nNodes].xCoord -= 0.5*circuit.terminals[i].width  - shiftX;
-      circuit.placement[i + circuit.nNodes].yCoord -= 0.5*circuit.terminals[i].height - shiftY;
+      circuit.placement[i + shift_].xCoord -= 0.5*circuit.terminals[i].width  - shiftX;
+      circuit.placement[i + shift_].yCoord -= 0.5*circuit.terminals[i].height - shiftY;
     }  
     for (int i = 0; i < circuit.nRows; ++i)
     {

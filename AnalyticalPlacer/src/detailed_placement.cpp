@@ -82,14 +82,15 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
         numOfCellsInRow[j]++;
       }
   }
-  for (int i = circuit.nNodes; i < circuit.nNodes + circuit.nTerminals; ++i)
+  int shift_ = (int)(circuit.terminals-circuit.nodes);
+  for (int i = 0; i < circuit.nTerminals; ++i)
   {
-    rowIdx = static_cast<int>((circuit.placement[i].yCoord - 
-               0.5 * circuit.terminals[i - circuit.nNodes].height) / siteHeight);
+    rowIdx = static_cast<int>((circuit.placement[i+shift_].yCoord - 
+               0.5 * circuit.terminals[i].height) / siteHeight);
     
     if (rowIdx < 0 || rowIdx >= circuit.nRows) continue;
     
-    for (int j = rowIdx; j < rowIdx + circuit.terminals[i - circuit.nNodes].height / siteHeight; ++j)
+    for (int j = rowIdx; j < rowIdx + circuit.terminals[i].height / siteHeight; ++j)
     {
       numOfCellsInRow[j]++;
     }
@@ -172,9 +173,9 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     {
       if (circuit.terminals[i].height / siteHeight > 1)
       {
-        currRow  = static_cast<int>((circuit.placement[i + circuit.nNodes].yCoord - 
+        currRow  = static_cast<int>((circuit.placement[i + shift_].yCoord - 
                      0.5 * circuit.terminals[i].height) / siteHeight);
-        currSite = static_cast<int>((circuit.placement[i + circuit.nNodes].xCoord - 
+        currSite = static_cast<int>((circuit.placement[i + shift_].xCoord - 
                      0.5 * circuit.terminals[i].width) / siteWidth);
                      
         for (int j = currRow; j < currRow + circuit.terminals[i].height / siteHeight; ++j)
@@ -233,19 +234,19 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
           greedy_array[j][numOfCellsInRow[j]++].cellIdx = k;
         }
     }
-    for (int i = circuit.nNodes; i < circuit.nNodes + circuit.nTerminals; ++i)
+    for (int i = 0; i < circuit.nTerminals; ++i)
     {
-      rowIdx = static_cast<int>((circuit.placement[i].yCoord - 
-                 0.5 * circuit.terminals[i - circuit.nNodes].height) / siteHeight);
+      rowIdx = static_cast<int>((circuit.placement[i+shift_].yCoord - 
+                 0.5 * circuit.terminals[i].height) / siteHeight);
       
       if (rowIdx < 0 || rowIdx >= circuit.nRows) continue;
       
-      for (int j = rowIdx; j < rowIdx + circuit.terminals[i - circuit.nNodes].height / siteHeight; ++j)
+      for (int j = rowIdx; j < rowIdx + circuit.terminals[i].height / siteHeight; ++j)
       {
         //cout << "i = " << i;
         //Filling greedy_array
         greedy_array[j][numOfCellsInRow[j]].xCoord =
-          circuit.placement[i].xCoord;
+          circuit.placement[i+shift_].xCoord;
         //and numOfCellsInRow
         greedy_array[j][numOfCellsInRow[j]++].cellIdx = -1;
       }

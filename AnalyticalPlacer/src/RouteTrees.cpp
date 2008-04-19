@@ -1,5 +1,5 @@
-#include "..\include\RouteTrees.h"
-#include "..\include\FastAccess.h"
+#include "../include/RouteTrees.h"
+#include "../include/FastAccess.h"
 #include <stack>
 
 namespace __FLUTE
@@ -112,6 +112,7 @@ struct sp_node_info
     int dest;
 };
 
+//adds chield node. Inserts internal node if necessary.
 void AddNode(StNodeEx* src, StNodeEx* dest)
 {
     if(src->x == dest->x)
@@ -145,7 +146,7 @@ void AddNode(StNodeEx* src, StNodeEx* dest)
     }
 }
 
-void MakeRouteTree(Circuit &c, Net& net)
+void FLUTERoute(Circuit &c, Net& net)
 {
     double source_x = -1e128;
     double source_y = -1e128;
@@ -217,6 +218,7 @@ void MakeRouteTree(Circuit &c, Net& net)
     else
         net.tree = new RoutingTree();
     net.tree->wl = fltree.length;
+    net.tree->RoutingType = FLUTE_TREE;
 
     int src_ind = -1;
     memset(__edges,0,sizeof(__edge_info)*__size2);
@@ -362,4 +364,95 @@ void PrintTree(RoutingTree* tree, FILE* output)
                 depth--;
         }
     }
+}
+
+double HPWL(Circuit& c, Net& net)
+{
+    double top = c.placement[net.arrPins[0].cellIdx].yCoord;
+    double bottom = top;
+    double left = c.placement[net.arrPins[0].cellIdx].xCoord;
+    double right = left;
+    for(int i = 1; i < net.numOfPins; i++)
+    {
+        double x = c.placement[net.arrPins[i].cellIdx].xCoord;
+        double y = c.placement[net.arrPins[i].cellIdx].yCoord;
+        if(x < left) left = x;
+        else if(x > right) right = x;
+        if(y < bottom) bottom = y;
+        else if(y > top) top = y;
+    }
+    return (top - bottom) + (right - left);
+}
+
+void HPWLRoute(Circuit &c, Net& net)
+{
+    if(net.tree)
+    {
+        if(net.tree->RoutingType != HPWL_STUB)
+            ReleaseNodesTree(net.tree->nodes);
+        else
+        {
+            for(int i = 0; i < net.numOfPins; i++)
+            {
+                net.arrPins[i].routeInfo->x = c.placement[net.arrPins[i].cellIdx].xCoord;
+                net.arrPins[i].routeInfo->y = c.placement[net.arrPins[i].cellIdx].yCoord;
+            }
+            net.tree->wl = HPWL(c, net);
+            return;
+        }
+    }
+    else
+        net.tree = new RoutingTree();
+    net.tree->wl = HPWL(c, net);
+    net.tree->RoutingType = HPWL_STUB;
+    net.tree->nodes = 0;
+    net.tree->srcRes = HASREALSOURCE(net) ? net.arrPins[net.sourceIdx].type->Resistance : 0.0;
+
+    for(int i = 0; i < net.numOfPins; i++)
+    {
+        StNodeEx* node = CreateNodeEx();
+        node->cap = net.arrPins[i].type->Capacitance;
+        node->left = net.tree->nodes;
+        node->origin = net.arrPins + i;
+        net.arrPins[i].routeInfo = node;
+        node->right = 0;
+        node->type = net.arrPins[i].chtype == 'O' ? NODE_TYPE_SOURCE : NODE_TYPE_SINK;
+        node->x = c.placement[net.arrPins[i].cellIdx].xCoord;
+        node->y = c.placement[net.arrPins[i].cellIdx].yCoord;
+        net.tree->nodes = node;
+    }
+}
+
+void AdaptiveRoute(Circuit &c, Net& net)
+{
+    if(net.numOfPins > MAXD)
+        HPWLRoute(c,net);
+    else
+        FLUTERoute(c,net);
+}
+
+double TotalWL(Circuit& c)
+{
+    double ret1 = 0;
+    double ret2 = 0;
+    double ret3 = 0;
+    double ret4 = 0;
+    int fin = (c.nNets >> 2) << 2;
+    Net* nets = c.nets;
+    for(int i = 0; i < fin; i+=4)
+    {
+        ret1 += nets[i+0].tree->wl;
+        ret2+= nets[i+1].tree->wl;
+        ret3 += nets[i+2].tree->wl;
+        ret4 += nets[i+3].tree->wl;
+    }
+    for(int j = fin; j < c.nNets; j++)
+        ret1 += nets[j].tree->wl;
+    return ret1+ret2+ret3+ret4;
+}
+
+void AdapriveRouteCircuit(Circuit &c)
+{
+    for(int i = 0; i < c.nNets; i++)
+        AdaptiveRoute(c,c.nets[i]);
 }

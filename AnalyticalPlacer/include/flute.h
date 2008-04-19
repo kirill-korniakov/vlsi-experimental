@@ -1,6 +1,6 @@
 #define POWVFILE "POWV9.dat"    // LUT for POWV (Wirelength Vector)
 #define POSTFILE "POST9.dat"    // LUT for POST (Steiner Tree)
-#define MAXD 500
+#define MAXD 150
 //#define MAXD 150    // max. degree of a net that can be handled
                     // Setting MAXD to more than 150 is not recommended
 #define D 9         // LUT is used for d <= D, D <= 9

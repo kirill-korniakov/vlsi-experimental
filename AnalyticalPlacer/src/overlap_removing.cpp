@@ -50,13 +50,14 @@ void FillArrOfSites(Circuit& circuit)
   }
   int currRow  = 0;
   int currSite = 0;
+  int shift_ = (int)(circuit.terminals - circuit.nodes);
   for (int i = 0; i < circuit.nTerminals; ++i)
   {
     //if (circuit.terminals[i].height / siteHeight > 1)
     {
-      currRow  = static_cast<int>((circuit.placement[i + circuit.nNodes].yCoord - 
+      currRow  = static_cast<int>((circuit.placement[i + shift_].yCoord - 
                    0.5 * circuit.terminals[i].height) / siteHeight);
-      currSite = static_cast<int>((circuit.placement[i + circuit.nNodes].xCoord - 
+      currSite = static_cast<int>((circuit.placement[i + shift_].xCoord - 
                    0.5 * circuit.terminals[i].width) / siteWidth);
                    
       for (int j = currRow; j < currRow + circuit.terminals[i].height / siteHeight; ++j)
@@ -126,11 +127,12 @@ MULTIPLACER_ERROR OverlapRemoving(Circuit& circuit)
         availableRowLengths[rowIdx + j] -= circuit.nodes[i].width;
     }
   }
+  int shift_ = (int)(circuit.terminals - circuit.nodes);
   for (int i = 0; i < circuit.nTerminals; ++i)
   {
     if (circuit.terminals[i].height / binHeight > 1)
     {
-      rowIdx = static_cast<int>((circuit.placement[i + circuit.nNodes].yCoord - 
+      rowIdx = static_cast<int>((circuit.placement[i + shift_].yCoord - 
                 0.5 * circuit.terminals[i].height) / binHeight);
       
       if (rowIdx < 0 || rowIdx >= circuit.nBinRows) continue;
@@ -437,11 +439,12 @@ MULTIPLACER_ERROR EqualizeRowLengths(Circuit& circuit)
         desiredRowLength[rowIdx + j] -= circuit.nodes[i].width;
     }
   }
+  int shift_ = (int)(circuit.terminals - circuit.nodes);
   for (int i = 0; i < circuit.nTerminals; ++i)
   {
     if (circuit.terminals[i].height / binHeight > 1)
     {
-      rowIdx = static_cast<int>((circuit.placement[i + circuit.nNodes].yCoord - 
+      rowIdx = static_cast<int>((circuit.placement[i + shift_].yCoord - 
                 0.5 * circuit.terminals[i].height) / binHeight);
       
       if (rowIdx < 0 || rowIdx >= circuit.nBinRows) continue;

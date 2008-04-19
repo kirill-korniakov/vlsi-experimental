@@ -57,9 +57,10 @@ void ExtractRows(Circuit &circuit)
 void StandardizeCells(Circuit& circuit)
 {
   int h = circuit.rows[0].height;
-
-  for(int i = 0; i < circuit.nNodes + circuit.nTerminals; i++)
+  int shift_ = (int)(circuit.terminals - circuit.nodes);
+  for(int i = 0; i < shift_ + circuit.nTerminals; i++)
   {
+    if(i == circuit.nNodes) i = shift_;
     if(circuit.nodes[i].width == 0.0) continue;
     circuit.nodes[i].width = (circuit.nodes[i].width * circuit.nodes[i].height) / h;
     circuit.nodes[i].height = h;
@@ -84,8 +85,13 @@ void ShiftCoordinates(Circuit& circuit, bool tocenter)
 
 int ParseLEFDEF(const char *lefname, const char* defname, Circuit& circuit)
 {
+  new ((void*)(&circuit)) Circuit();
   cout << "parsing " << lefname << endl;
-  circuit.tech = ParseLEF(lefname);
+  if((circuit.tech = ParseLEF(lefname)) == 0)
+  {
+    cout << "LEF parcer fails." << endl;
+    exit(1);
+  }
 
   FindMainLayers(circuit);
 
@@ -99,7 +105,7 @@ int ParseLEFDEF(const char *lefname, const char* defname, Circuit& circuit)
 
   StandardizeCells(circuit);
 
-  ShiftCoordinates(circuit, true);
+  //ShiftCoordinates(circuit, true);
 
   return 0;
 }

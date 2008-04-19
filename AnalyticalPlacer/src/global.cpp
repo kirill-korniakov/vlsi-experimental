@@ -218,7 +218,6 @@ void FreeMemory(Circuit circuit)
   if (circuit.rows)     { delete []circuit.rows;      }
   if (circuit.nets)     { delete []circuit.nets;      }
   if (circuit.nodes)    { delete []circuit.nodes;     }
-  if (circuit.terminals){ delete []circuit.terminals; }
   if (circuit.weights)  { delete []circuit.weights;   }
   if (circuit.placement){ delete []circuit.placement; }
 
@@ -243,7 +242,12 @@ void Exit()
 
 void MakeTableOfConnections(Circuit& circuit)
 {
-  circuit.tableOfConnections = new std::vector<int>[circuit.nNodes + circuit.nTerminals];
+  int size = 0;
+  if(gOptions.isLEFDEFinput)
+	  size = (int)(circuit.terminals-circuit.nodes) + circuit.nTerminals;
+  else
+	  size = circuit.nNodes + circuit.nTerminals;
+  circuit.tableOfConnections = new std::vector<int>[size];
   for (int i = 0; i < circuit.nNets; ++i)
   {
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)

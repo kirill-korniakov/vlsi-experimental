@@ -8,3 +8,6 @@ Benchmarks have to be given in a bookshelf format [http://vlsicad.ucsd.edu/GSRC/
 Now we have created a Win32 console applications which should be used in the following way:
 
 Whole standard-cell placer:
+
+mpiexec -np 1 $(TargetFileName) -f ibm01\ibm01.aux -tao_monitor
+mpiexec -np 1 $(TargetFileName) -f dma\dma.aux -tao_monitor

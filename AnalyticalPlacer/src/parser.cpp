@@ -269,6 +269,7 @@ int ParseNodes(const char* fileName, Circuit& circuit)
   }
   cout << "parsing nodes file...\n";
   ifstream nodesFile(fileName);
+  //TODO: check file existance
   delCommentsAndSpaces(nodesFile);
   char curr[100];
   char temp;
@@ -297,18 +298,20 @@ int ParseNodes(const char* fileName, Circuit& circuit)
     if (!strcmp(curr,"NumNodes"))
     {
       circuit.nNodes = num;
-      circuit.tableOfNames = new str[circuit.nNodes];
+      //circuit.tableOfNames = new str[circuit.nNodes];
     }
     if (!strcmp(curr,"NumTerminals"))
     {
       circuit.nTerminals = num;
-      circuit.terminals = new Node[circuit.nTerminals];
+      //circuit.terminals = new Node[circuit.nTerminals];
     }
     delCommentsAndSpaces(nodesFile);
     nodesFile >> curr;
   }
   circuit.nNodes -= circuit.nTerminals;
-  circuit.nodes = new Node[circuit.nNodes];
+  circuit.tableOfNames = new str[circuit.nNodes+circuit.nTerminals];
+  circuit.nodes = new Node[circuit.nNodes+circuit.nTerminals];
+  circuit.terminals = circuit.nodes+circuit.nTerminals;
   int termCount = 0, nodesCount = 0;
   char tmp_name[20];
   float tmp_width, tmp_height;

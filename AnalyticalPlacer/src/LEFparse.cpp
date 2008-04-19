@@ -3,12 +3,12 @@
 #pragma warning (disable : 4996)
 #endif
 
-#include "..\include\data_structures.h"
-#include "..\include\global.h"
+#include "../include/data_structures.h"
+#include "../include/global.h"
 #include <stdio.h>
 #include <malloc.h>
 
-#include "..\include\LEF\\lefrReader.hpp"
+#include "../include/LEF/lefrReader.hpp"
 
 void checkType(lefrCallbackType_e c)
 {
@@ -234,15 +234,12 @@ LEFParserData* ParseLEF(const char* filename)
     FILE* f;
     if ((f = fopen(filename,"r")) == 0)
     {
-        cout << "Couldn't open input file " << filename << endl;
+        cout << "Couldn't open input file " <<  filename << endl;
         return 0;
     }
 
     if (lefrRead(f, filename, (void*)userData))
-    {
         cout << "LEF Reader returns bad status." << endl;
-        Exit();
-    }
 
     lefrReleaseNResetMemory();
     userData->CurrentMacro = 0;

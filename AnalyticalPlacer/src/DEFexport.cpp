@@ -3,14 +3,13 @@
 #pragma warning (disable : 4996)
 #endif
 
-#include "..\include\data_structures.h"
-#include "..\include\global.h"
-#include "..\include\output.h"
+#include "../include/data_structures.h"
+#include "../include/global.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <ctime>
-#include "..\include\DEF\defwWriter.hpp"
-#include "..\include\DEF\defwWriterCalls.hpp"
+#include "../include/DEF/defwWriter.hpp"
+#include "../include/DEF/defwWriterCalls.hpp"
 
 struct DEFexportData
 {
@@ -151,6 +150,7 @@ int componentCB(defwCallbackType_e c, defiUserData ud)
             0);
         CHECK_STATUS(status);
     }
+	i = (int)(data->circuit->terminals - data->circuit->nodes);
     int j = 0;
     for(; j < data->PinsStart; j++)
     {
@@ -195,9 +195,10 @@ int pinCB(defwCallbackType_e c, defiUserData ud)
     status = defwStartPins(data->circuit->nTerminals - data->PinsStart);
     CHECK_STATUS(status);
 
+	int offset = (int)(data->circuit->terminals - data->circuit->nodes);
     for(int j = data->PinsStart; j < data->circuit->nTerminals; j++)
     {
-        PinInfo * info = data->circuit->tech->SinglePins->Pins[data->circuit->tableOfNames[data->circuit->nNodes + j].name];
+        PinInfo * info = data->circuit->tech->SinglePins->Pins[data->circuit->tableOfNames[offset + j].name];
         const char *dir = info->dir == PinInfo::INPUT ? "INPUT" 
             : (info->dir == PinInfo::OUTPUT ? "OUTPUT" : "INOUT");
         status = defwPin(
@@ -228,6 +229,7 @@ int netCB(defwCallbackType_e c, defiUserData ud)
     int status;
     checkType_defw(c);
     DEFexportData *data = (DEFexportData*)ud;
+	int offset = (int)(data->circuit->terminals - data->circuit->nodes);
 
     status = defwStartNets(data->circuit->nNets);
     CHECK_STATUS(status);
@@ -241,7 +243,7 @@ int netCB(defwCallbackType_e c, defiUserData ud)
         for(int j = 0; j < data->circuit->nets[i].numOfPins; j++)
         {
             int idx = data->circuit->nets[i].arrPins[j].cellIdx;
-            const char *cellname = idx > data->circuit->nNodes + data->PinsStart
+            const char *cellname = idx > offset + data->PinsStart
                 ? "PIN" : data->circuit->tableOfNames[idx].name;
             status = defwNetConnection(
                 cellname,
@@ -290,13 +292,8 @@ int ExportDEF(const char* defname, Circuit& circuit)
     defwSetUnitsCbk(unitsCB);
 
     ShiftCoordinates(circuit,false);
-    
-    ReshiftCoords(circuit);
     status = defwWrite(fout, defname, (void*)(&userData));
-    ShiftCoords(circuit);
-
     ShiftCoordinates(circuit,true);
-    
     CHECK_STATUS(status);
 
     fclose(fout);
