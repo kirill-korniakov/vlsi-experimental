@@ -1,0 +1,8 @@
+#buffer 1100000.7 360000.400000 3600000.00000   
+buffer 11.7 36.400000 360.00000   
+# buffer input cap (fF), buffer intrinsic delay(ps), output resistance(ohm)
+# first buffer is indexed as buffer type 1, and second one is indexed as type 2, 
+# etc.
+buffer 23.4 36.400000 180.00000
+#buffer 0.00024 0.0000400 0.0000100
+

@@ -1,0 +1,1056 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="resources/xsl/GenericTable.xsl_"?>
+<ReducedData Name="RM" CornerName="typical_conditional.lib" LibFile="liberty_typical_conditional.lib.xml">
+<Navigation>
+<Parent Name="Table of Contents" Link="CornerList.xml"/>
+<Previous Name="RC" Link="Recovery_typical_conditional.lib.xml"/>
+</Navigation>
+<Table Strength="1" Transition="rise" Id="0">
+<LUT id="DFFRS_X1" Template="Removal" gid="0x2c5af948">
+<Line>
+<Element Value="734.309000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="814.952000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="887.129000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="996.780000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1158.198000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="817.658000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="899.047000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="971.689000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1081.769000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1243.331000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="975.809000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1057.295000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1129.986000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1240.076000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1401.116000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1313.750000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1394.720000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1466.440000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1574.693000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1733.178000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1886.248000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="1964.574000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="2034.438000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="2139.852000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+<Element Value="2293.897000">
+<Src LUT="0x2ed934b8"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="DFFR_X1" Template="Removal" gid="0x2d7e56f8">
+<Line>
+<Element Value="1198.675000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1285.351000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1374.531000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1531.808000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1774.157000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1269.659000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1356.958000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1446.474000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1603.922000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1846.519000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1416.361000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1503.642000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1593.789000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1751.262000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1993.766000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1759.568000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1847.311000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="1937.487000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2095.058000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2337.234000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+</Line>
+<Line>
+<Element Value="2421.253000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2508.747000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2598.362000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2754.038000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+<Element Value="2992.802000">
+<Src LUT="0x2edb0d10"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="DFFS_X1" Template="Removal" gid="0x2c45a0e8">
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edc3508"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFRS_X1" Template="Removal" gid="0x2e76e3a0">
+<Line>
+<Element Value="1228.442000">
+<Src LUT="0x2f030b80"/>
+</Element>
+<Element Value="1317.498000">
+<Src LUT="0x2f030b80"/>
+</Element>
+<Element Value="1411.215000">
+<Src LUT="0x2f030b80"/>
+</Element>
+<Element Value="1590.461000">
+<Src LUT="0x2f030b80"/>
+</Element>
+<Element Value="1879.668000">
+<Src LUT="0x2f030b80"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1299.884000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1387.948000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1480.120000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1654.945000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1936.285000">
+<Src LUT="0x2f031e28"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1445.670000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1534.054000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1626.500000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1801.332000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2082.912000">
+<Src LUT="0x2f031e28"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1787.618000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1875.988000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="1968.679000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2143.578000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2424.520000">
+<Src LUT="0x2f031e28"/>
+</Element>
+</Line>
+<Line>
+<Element Value="2439.915000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2528.174000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2620.443000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="2793.856000">
+<Src LUT="0x2f031e28"/>
+</Element>
+<Element Value="3070.789000">
+<Src LUT="0x2f031e28"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFR_X1" Template="Removal" gid="0x2e77b6d8">
+<Line>
+<Element Value="928.710000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1018.006000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1111.787000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1295.886000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1604.049000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="817.543000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="907.257000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1001.713000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1185.723000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1494.029000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="750.953000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="840.944000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="935.352000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1119.552000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1427.897000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="667.805000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="757.808000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="852.514000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1037.042000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1345.476000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="588.977000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="679.071000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="773.992000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="958.689000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+<Element Value="1267.175000">
+<Src LUT="0x2f04e9f8"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFS_X1" Template="Removal" gid="0x2e788058">
+<Line>
+<Element Value="745.757000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="832.529000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="919.023000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1063.182000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1282.803000">
+<Src LUT="0x2f063c60"/>
+</Element>
+</Line>
+<Line>
+<Element Value="844.906000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="932.003000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1019.120000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1163.549000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1383.186000">
+<Src LUT="0x2f063c60"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1009.011000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1096.495000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1183.843000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1328.294000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1547.791000">
+<Src LUT="0x2f063c60"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1350.043000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1437.389000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1524.153000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1666.844000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="1883.448000">
+<Src LUT="0x2f063c60"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1924.029000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="2010.596000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="2095.656000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="2235.581000">
+<Src LUT="0x2f063c60"/>
+</Element>
+<Element Value="2447.639000">
+<Src LUT="0x2f063c60"/>
+</Element>
+</Line>
+</LUT>
+</Table>
+<Table Strength="2" Transition="rise" Id="1">
+<LUT id="DFFRS_X2" Template="Removal" gid="0x1ba7cbe0">
+<Line>
+<Element Value="734.309000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="814.952000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="887.129000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="996.780000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1158.198000">
+<Src LUT="0x2eda3048"/>
+</Element>
+</Line>
+<Line>
+<Element Value="817.658000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="899.047000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="971.689000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1081.769000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1243.331000">
+<Src LUT="0x2eda3048"/>
+</Element>
+</Line>
+<Line>
+<Element Value="975.809000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1057.295000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1129.986000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1240.076000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1401.116000">
+<Src LUT="0x2eda3048"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1313.750000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1394.720000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1466.440000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1574.693000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1733.178000">
+<Src LUT="0x2eda3048"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1886.248000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="1964.574000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="2034.438000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="2139.852000">
+<Src LUT="0x2eda3048"/>
+</Element>
+<Element Value="2293.897000">
+<Src LUT="0x2eda3048"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="DFFR_X2" Template="Removal" gid="0x2d62fda8">
+<Line>
+<Element Value="1198.675000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1285.351000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1374.531000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1531.808000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1774.157000">
+<Src LUT="0x2edba158"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1269.659000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1356.958000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1446.474000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1603.922000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1846.519000">
+<Src LUT="0x2edba158"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1416.361000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1503.642000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1593.789000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1751.262000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1993.766000">
+<Src LUT="0x2edba158"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1759.454000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1847.311000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="1937.487000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2094.939000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2337.234000">
+<Src LUT="0x2edba158"/>
+</Element>
+</Line>
+<Line>
+<Element Value="2421.139000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2508.747000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2598.246000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2753.919000">
+<Src LUT="0x2edba158"/>
+</Element>
+<Element Value="2992.802000">
+<Src LUT="0x2edba158"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="DFFS_X2" Template="Removal" gid="0x2c4cf908">
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+</Line>
+<Line>
+<Element Value="-15006.300000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15156.500000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15313.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-15626.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+<Element Value="-16252.000000">
+<Src LUT="0x2edcc8d0"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFRS_X2" Template="Removal" gid="0x2e7751a0">
+<Line>
+<Element Value="1142.117000">
+<Src LUT="0x2f03fec8"/>
+</Element>
+<Element Value="1230.888000">
+<Src LUT="0x2f03fec8"/>
+</Element>
+<Element Value="1324.646000">
+<Src LUT="0x2f03fec8"/>
+</Element>
+<Element Value="1505.581000">
+<Src LUT="0x2f03fec8"/>
+</Element>
+<Element Value="1801.186000">
+<Src LUT="0x2f03fec8"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1184.480000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1272.776000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1365.162000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1542.408000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1830.525000">
+<Src LUT="0x2f041198"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1332.785000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1421.195000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1514.113000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1691.179000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1979.384000">
+<Src LUT="0x2f041198"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1675.877000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1764.286000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="1856.993000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2034.021000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2320.868000">
+<Src LUT="0x2f041198"/>
+</Element>
+</Line>
+<Line>
+<Element Value="2297.033000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2385.250000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2477.797000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2652.946000">
+<Src LUT="0x2f041198"/>
+</Element>
+<Element Value="2935.769000">
+<Src LUT="0x2f041198"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFR_X2" Template="Removal" gid="0x2e781ba8">
+<Line>
+<Element Value="934.893000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1024.134000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1118.213000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1301.846000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1608.761000">
+<Src LUT="0x2f058c20"/>
+</Element>
+</Line>
+<Line>
+<Element Value="823.726000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="913.386000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1007.905000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1191.564000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1498.740000">
+<Src LUT="0x2f058c20"/>
+</Element>
+</Line>
+<Line>
+<Element Value="756.907000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="846.957000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="941.310000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1125.274000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1432.485000">
+<Src LUT="0x2f058c20"/>
+</Element>
+</Line>
+<Line>
+<Element Value="673.529000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="763.589000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="858.355000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1042.525000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1349.815000">
+<Src LUT="0x2f058c20"/>
+</Element>
+</Line>
+<Line>
+<Element Value="594.243000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="684.506000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="779.483000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="963.815000">
+<Src LUT="0x2f058c20"/>
+</Element>
+<Element Value="1271.142000">
+<Src LUT="0x2f058c20"/>
+</Element>
+</Line>
+</LUT>
+<LUT id="SDFFS_X2" Template="Removal" gid="0x2e78e530">
+<Line>
+<Element Value="702.252000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="788.588000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="874.629000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1016.569000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1232.341000">
+<Src LUT="0x2f06de40"/>
+</Element>
+</Line>
+<Line>
+<Element Value="803.461000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="890.259000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="976.712000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1118.963000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1334.832000">
+<Src LUT="0x2f06de40"/>
+</Element>
+</Line>
+<Line>
+<Element Value="968.596000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1055.907000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1142.603000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1284.662000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1500.181000">
+<Src LUT="0x2f06de40"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1304.591000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1391.598000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1477.539000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1617.967000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1830.134000">
+<Src LUT="0x2f06de40"/>
+</Element>
+</Line>
+<Line>
+<Element Value="1866.098000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="1952.085000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="2036.541000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="2173.709000">
+<Src LUT="0x2f06de40"/>
+</Element>
+<Element Value="2381.431000">
+<Src LUT="0x2f06de40"/>
+</Element>
+</Line>
+</LUT>
+</Table>
+</ReducedData>

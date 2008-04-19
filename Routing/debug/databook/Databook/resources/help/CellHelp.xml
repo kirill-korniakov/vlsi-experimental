@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../xsl/Help.xsl"?>
+<!--
+	    Copyright (C) 2006, Nangate Inc.
+	    All rights reserved.                           
+	
+		Copyright Notice:
+
+			This document contains confidential and proprietary information.
+			Reproduction or usage of this document, in part or whole, by any means,
+			electrical, mechanical, optical, chemical or otherwise is prohibited,
+			without written permission from Nangate Inc.
+
+			The information contained herein is protected by Danish and international  
+			copyright laws.                                                            
+		
+		Author: 
+			Joao Daniel Togni
+-->
+<help>
+	<title>Cell Help</title>
+	<desc>Help description</desc>
+	
+	<help>
+		<title>General Cell Characteristics</title>
+		<desc>cell chars description</desc>
+		
+		<help>
+			<title>Strength</title>
+			<desc>strenght descr</desc>
+			<liberty>lib prop</liberty>
+		</help>
+	</help>
+</help>

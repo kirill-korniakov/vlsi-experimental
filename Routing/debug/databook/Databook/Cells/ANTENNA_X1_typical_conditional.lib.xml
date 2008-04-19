@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../resources/xsl/Cell.xsl_"?>
+<Cell Name="ANTENNA_X1" CornerName="typical_conditional.lib" LibFile="liberty_typical_conditional.lib.xml">
+<Schematic></Schematic>
+<Navigation>
+<Parent Name="Table of Contents" Link="../CornerList.xml"/>
+<Previous Name="AND4_X4" Link="AND4_X4_typical_conditional.lib.xml"/>
+<Next Name="AOI211_X1" Link="AOI211_X1_typical_conditional.lib.xml"/>
+</Navigation>
+<GenChars>
+<Strength>
+1</Strength>
+<Type>
+Physical</Type>
+<Input>
+A</Input>
+</GenChars>
+<Name>
+"ANTENNA_X1"</Name>
+<area>
+0.532000</area>
+<dont_touch>
+true</dont_touch>
+<dont_use>
+true</dont_use>
+<fall_power conv2lib="no">
+<LUT id="fall_power" Template="Hidden_Power_Data" gid="0x2cabdbf0">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power conv2lib="no">
+<LUT id="rise_power" Template="Hidden_Power_Data" gid="0x2be58d40">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</rise_power>
+<Pins>
+<Pin Name="A">
+<Name>
+"A"</Name>
+<capacitance factor="0.001">
+0.049000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.049000</fall_capacitance>
+<fall_power conv2lib="no">
+<LUT id="fall_power" Template="Hidden_Power_Data" gid="0x2bfd15d0">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</fall_power>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.049000</rise_capacitance>
+<rise_power conv2lib="no">
+<LUT id="rise_power" Template="Hidden_Power_Data" gid="0x2c600868">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</rise_power>
+<InternalPowerList>
+<InternalPowerEntry RelatedPin="" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Hidden_Power_Data" gid="0x2ec29550">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="-0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Hidden_Power_Data" gid="0x2ec295d8">
+<Line>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="0.000000"/>
+<Element Value="-0.000000"/>
+<Element Value="0.000000"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+</InternalPowerList>
+</Pin>
+</Pins>
+</Cell>

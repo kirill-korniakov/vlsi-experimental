@@ -1,0 +1,59 @@
+<!--
+	    Copyright (C) 2006, Nangate Inc.
+	    All rights reserved.                           
+	
+		Copyright Notice:
+
+			This document contains confidential and proprietary information.
+			Reproduction or usage of this document, in part or whole, by any means,
+			electrical, mechanical, optical, chemical or otherwise is prohibited,
+			without written permission from Nangate Inc.
+
+			The information contained herein is protected by Danish and international  
+			copyright laws.                                                            
+		
+		Author: 
+			Joao Daniel Togni
+-->
+<html>
+    <head>
+        <title>Nangate Sales &amp; Support</title>
+    </head>
+    <body>
+        <p class="Caption">Nangate Inc.</p>
+        <p class="bold">Menlo Park - California</p>
+        <p class="bold">1370 Willow Road, 2nd Floor, Menlo Park,
+            CA 94025, USA</p>
+        <p><span class="bold">Phone:</span> +1 (650) 215 1178</p>
+        <p><span class="bold">Fax:</span> +1 (650) 326-8047 </p>
+		
+        <p class="Caption">Nangate A/S</p>
+        <p class="bold">Herlev - Denmark</p>
+        <p class="bold">Smedeholm 10, 2tv, DK-2730 Herlev,
+            Denmark</p>
+        <p><span class="bold">Phone:</span> (+45) 4452 1400</p>
+		<p><span class="bold">Fax:</span> (+45) 4453 1490</p>
+		
+        <p class="SubCaption">Sales</p>
+        <p><span class="bold">Email:</span> sales@nangate.com</p>
+
+        <p class="SubCaption">Support</p>
+        <p><span class="bold">Email:</span> support@nangate.com</p>
+
+		<p class="SubCaption"></p>
+        <p><span class="bold">Trademark: </span>
+			Nangate Library Characterizer is a trademark of Nangate Inc.
+        </p>
+		<p class="SubCaption"></p>
+        <p><span class="bold">Disclaimer: </span>
+			Except as may be explicitly stated in a written license agreement 
+			between Nangate and the customer, Nangate disclaims warranty 
+			as to the completeness, accuracy or usefulness of the information 
+			contained in this document. Nangate does not warrant that use of 
+			information in this document will not infringe any third-party 
+			rights. Nangate does not assume any liability for damages or costs 
+			of any kind that may result from use of information provided in 
+			this document.
+		</p>
+    </body>
+</html>

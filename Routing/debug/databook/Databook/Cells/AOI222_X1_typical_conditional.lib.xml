@@ -1,0 +1,5952 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../resources/xsl/Cell.xsl_"?>
+<Cell Name="AOI222_X1" CornerName="typical_conditional.lib" LibFile="liberty_typical_conditional.lib.xml">
+<Schematic>images/AOI222_X1.png</Schematic>
+<Navigation>
+<Parent Name="Table of Contents" Link="../CornerList.xml"/>
+<Previous Name="AOI221_X4" Link="AOI221_X4_typical_conditional.lib.xml"/>
+<Next Name="AOI222_X2" Link="AOI222_X2_typical_conditional.lib.xml"/>
+</Navigation>
+<GenChars>
+<Strength>
+1</Strength>
+<Type>
+Combinational</Type>
+<Input>
+A1</Input>
+<Input>
+A2</Input>
+<Input>
+B1</Input>
+<Input>
+B2</Input>
+<Input>
+C1</Input>
+<Input>
+C2</Input>
+<Output>
+ZN</Output>
+</GenChars>
+<Name>
+"AOI222_X1"</Name>
+<area>
+2.128000</area>
+<cell_fall conv2lib="no">
+<LUT id="cell_fall" Template="Timing_X1_summary_1" gid="0x2c8fc428" factor="0.001">
+<LinApprox>
+<Line cAng="26.1681" cLin="88.9536"/>
+<Line cAng="26.1496" cLin="92.0961"/>
+<Line cAng="26.1381" cLin="98.5863"/>
+<Line cAng="26.1174" cLin="110.723"/>
+<Line cAng="25.908" cLin="136.72"/>
+<Line cAng="25.2963" cLin="194.736"/>
+<Line cAng="25.6103" cLin="303.234"/>
+<Line cAng="33.4953" cLin="465.328"/>
+<Line cAng="49.2572" cLin="697.475"/>
+<Line cAng="74.993" cLin="1011.85"/>
+</LinApprox>
+<Line>
+<Element Value="92.844000"/>
+<Element Value="94.229000"/>
+<Element Value="101.411000"/>
+<Element Value="115.636000"/>
+<Element Value="143.229000"/>
+<Element Value="196.065000"/>
+<Element Value="296.642000"/>
+</Line>
+<Line>
+<Element Value="96.075000"/>
+<Element Value="97.406000"/>
+<Element Value="104.495000"/>
+<Element Value="118.713000"/>
+<Element Value="146.296000"/>
+<Element Value="199.110000"/>
+<Element Value="299.663000"/>
+</Line>
+<Line>
+<Element Value="102.509000"/>
+<Element Value="103.911000"/>
+<Element Value="111.011000"/>
+<Element Value="125.207000"/>
+<Element Value="152.760000"/>
+<Element Value="205.545000"/>
+<Element Value="306.064000"/>
+</Line>
+<Line>
+<Element Value="114.609000"/>
+<Element Value="116.019000"/>
+<Element Value="123.193000"/>
+<Element Value="137.349000"/>
+<Element Value="164.844000"/>
+<Element Value="217.574000"/>
+<Element Value="318.045000"/>
+</Line>
+<Line>
+<Element Value="140.874000"/>
+<Element Value="142.227000"/>
+<Element Value="149.145000"/>
+<Element Value="162.960000"/>
+<Element Value="190.036000"/>
+<Element Value="242.397000"/>
+<Element Value="342.634000"/>
+</Line>
+<Line>
+<Element Value="199.516000"/>
+<Element Value="200.753000"/>
+<Element Value="207.101000"/>
+<Element Value="219.963000"/>
+<Element Value="245.809000"/>
+<Element Value="296.995000"/>
+<Element Value="396.493000"/>
+</Line>
+<Line>
+<Element Value="305.223000"/>
+<Element Value="306.869000"/>
+<Element Value="315.081000"/>
+<Element Value="330.693000"/>
+<Element Value="359.092000"/>
+<Element Value="408.752000"/>
+<Element Value="505.412000"/>
+</Line>
+<Line>
+<Element Value="465.077000"/>
+<Element Value="467.430000"/>
+<Element Value="479.160000"/>
+<Element Value="501.425000"/>
+<Element Value="541.888000"/>
+<Element Value="611.576000"/>
+<Element Value="724.992000"/>
+</Line>
+<Line>
+<Element Value="696.895000"/>
+<Element Value="700.365000"/>
+<Element Value="717.704000"/>
+<Element Value="750.575000"/>
+<Element Value="810.347000"/>
+<Element Value="913.088000"/>
+<Element Value="1079.000000"/>
+</Line>
+<Line>
+<Element Value="1010.839000"/>
+<Element Value="1016.123000"/>
+<Element Value="1042.529000"/>
+<Element Value="1092.659000"/>
+<Element Value="1183.893000"/>
+<Element Value="1340.630000"/>
+<Element Value="1592.432000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_leakage_power factor="1000">
+1.118226</cell_leakage_power>
+<cell_rise conv2lib="no">
+<LUT id="cell_rise" Template="Timing_X1_summary_1" gid="0x2baea840" factor="0.001">
+<LinApprox>
+<Line cAng="205.441" cLin="1281.53"/>
+<Line cAng="205.465" cLin="1279.56"/>
+<Line cAng="205.533" cLin="1281.51"/>
+<Line cAng="205.638" cLin="1290.68"/>
+<Line cAng="205.753" cLin="1314.51"/>
+<Line cAng="205.806" cLin="1368.06"/>
+<Line cAng="205.764" cLin="1477.91"/>
+<Line cAng="205.678" cLin="1682.27"/>
+<Line cAng="205.603" cLin="2060.02"/>
+<Line cAng="207.877" cLin="2741.14"/>
+</LinApprox>
+<Line>
+<Element Value="1323.005000"/>
+<Element Value="1332.664000"/>
+<Element Value="1383.872000"/>
+<Element Value="1486.815000"/>
+<Element Value="1692.608000"/>
+<Element Value="2103.693000"/>
+<Element Value="2924.859000"/>
+</Line>
+<Line>
+<Element Value="1321.054000"/>
+<Element Value="1330.734000"/>
+<Element Value="1381.893000"/>
+<Element Value="1484.824000"/>
+<Element Value="1690.676000"/>
+<Element Value="2101.822000"/>
+<Element Value="2923.075000"/>
+</Line>
+<Line>
+<Element Value="1322.930000"/>
+<Element Value="1332.652000"/>
+<Element Value="1383.856000"/>
+<Element Value="1486.879000"/>
+<Element Value="1692.854000"/>
+<Element Value="2104.144000"/>
+<Element Value="2925.498000"/>
+</Line>
+<Line>
+<Element Value="1332.030000"/>
+<Element Value="1341.799000"/>
+<Element Value="1393.063000"/>
+<Element Value="1496.199000"/>
+<Element Value="1702.342000"/>
+<Element Value="2113.848000"/>
+<Element Value="2935.432000"/>
+</Line>
+<Line>
+<Element Value="1355.779000"/>
+<Element Value="1365.580000"/>
+<Element Value="1416.967000"/>
+<Element Value="1520.187000"/>
+<Element Value="1726.478000"/>
+<Element Value="2138.221000"/>
+<Element Value="2960.114000"/>
+</Line>
+<Line>
+<Element Value="1409.335000"/>
+<Element Value="1419.156000"/>
+<Element Value="1470.572000"/>
+<Element Value="1573.788000"/>
+<Element Value="1780.096000"/>
+<Element Value="2191.947000"/>
+<Element Value="3014.103000"/>
+</Line>
+<Line>
+<Element Value="1519.207000"/>
+<Element Value="1529.037000"/>
+<Element Value="1580.454000"/>
+<Element Value="1683.605000"/>
+<Element Value="1889.802000"/>
+<Element Value="2301.535000"/>
+<Element Value="3123.693000"/>
+</Line>
+<Line>
+<Element Value="1723.563000"/>
+<Element Value="1733.392000"/>
+<Element Value="1784.789000"/>
+<Element Value="1887.877000"/>
+<Element Value="2093.954000"/>
+<Element Value="2505.487000"/>
+<Element Value="3327.397000"/>
+</Line>
+<Line>
+<Element Value="2101.298000"/>
+<Element Value="2111.124000"/>
+<Element Value="2162.515000"/>
+<Element Value="2265.568000"/>
+<Element Value="2471.558000"/>
+<Element Value="2882.920000"/>
+<Element Value="3704.558000"/>
+</Line>
+<Line>
+<Element Value="2777.659000"/>
+<Element Value="2788.232000"/>
+<Element Value="2843.256000"/>
+<Element Value="2952.157000"/>
+<Element Value="3164.785000"/>
+<Element Value="3578.040000"/>
+<Element Value="4399.488000"/>
+</Line>
+</LUT>
+</cell_rise>
+<cell_rise_fall_ratio conv2lib="no">
+<LUT id="cell_rise_fall_ratio" Template="Timing_X1_summary_1" gid="0x2c527820" factor="0.001">
+<Line>
+<Element Value="14.249763"/>
+<Element Value="14.142822"/>
+<Element Value="13.646173"/>
+<Element Value="12.857717"/>
+<Element Value="11.817495"/>
+<Element Value="10.729569"/>
+<Element Value="9.859895"/>
+</Line>
+<Line>
+<Element Value="13.750237"/>
+<Element Value="13.661725"/>
+<Element Value="13.224489"/>
+<Element Value="12.507678"/>
+<Element Value="11.556543"/>
+<Element Value="10.556085"/>
+<Element Value="9.754541"/>
+</Line>
+<Line>
+<Element Value="12.905501"/>
+<Element Value="12.824937"/>
+<Element Value="12.465936"/>
+<Element Value="11.875366"/>
+<Element Value="11.081788"/>
+<Element Value="10.236902"/>
+<Element Value="9.558452"/>
+</Line>
+<Line>
+<Element Value="11.622386"/>
+<Element Value="11.565338"/>
+<Element Value="11.307972"/>
+<Element Value="10.893410"/>
+<Element Value="10.326988"/>
+<Element Value="9.715536"/>
+<Element Value="9.229612"/>
+</Line>
+<Line>
+<Element Value="9.624054"/>
+<Element Value="9.601412"/>
+<Element Value="9.500600"/>
+<Element Value="9.328590"/>
+<Element Value="9.085005"/>
+<Element Value="8.821153"/>
+<Element Value="8.639289"/>
+</Line>
+<Line>
+<Element Value="7.063769"/>
+<Element Value="7.069165"/>
+<Element Value="7.100748"/>
+<Element Value="7.154785"/>
+<Element Value="7.241785"/>
+<Element Value="7.380417"/>
+<Element Value="7.601907"/>
+</Line>
+<Line>
+<Element Value="4.977367"/>
+<Element Value="4.982703"/>
+<Element Value="5.016024"/>
+<Element Value="5.091142"/>
+<Element Value="5.262724"/>
+<Element Value="5.630639"/>
+<Element Value="6.180488"/>
+</Line>
+<Line>
+<Element Value="3.705973"/>
+<Element Value="3.708346"/>
+<Element Value="3.724829"/>
+<Element Value="3.765024"/>
+<Element Value="3.864182"/>
+<Element Value="4.096771"/>
+<Element Value="4.589564"/>
+</Line>
+<Line>
+<Element Value="3.015229"/>
+<Element Value="3.014320"/>
+<Element Value="3.013102"/>
+<Element Value="3.018443"/>
+<Element Value="3.050000"/>
+<Element Value="3.157330"/>
+<Element Value="3.433325"/>
+</Line>
+<Line>
+<Element Value="2.747875"/>
+<Element Value="2.743991"/>
+<Element Value="2.727268"/>
+<Element Value="2.701810"/>
+<Element Value="2.673202"/>
+<Element Value="2.668924"/>
+<Element Value="2.762748"/>
+</Line>
+</LUT>
+</cell_rise_fall_ratio>
+<cell_rise_fall_trans_ratio conv2lib="no">
+<LUT id="cell_rise_fall_trans_ratio" Template="Timing_X1_summary_1" gid="0x2c6a9f40" factor="0.001">
+<Line>
+<Element Value="8.348454"/>
+<Element Value="8.339994"/>
+<Element Value="8.320023"/>
+<Element Value="8.309589"/>
+<Element Value="8.339158"/>
+<Element Value="8.455052"/>
+<Element Value="8.636510"/>
+</Line>
+<Line>
+<Element Value="8.349936"/>
+<Element Value="8.341625"/>
+<Element Value="8.323831"/>
+<Element Value="8.310176"/>
+<Element Value="8.338179"/>
+<Element Value="8.454353"/>
+<Element Value="8.638528"/>
+</Line>
+<Line>
+<Element Value="8.357755"/>
+<Element Value="8.352431"/>
+<Element Value="8.332478"/>
+<Element Value="8.317494"/>
+<Element Value="8.343384"/>
+<Element Value="8.456545"/>
+<Element Value="8.641921"/>
+</Line>
+<Line>
+<Element Value="8.364877"/>
+<Element Value="8.359985"/>
+<Element Value="8.341997"/>
+<Element Value="8.333534"/>
+<Element Value="8.356594"/>
+<Element Value="8.463311"/>
+<Element Value="8.647254"/>
+</Line>
+<Line>
+<Element Value="8.067683"/>
+<Element Value="8.074067"/>
+<Element Value="8.120222"/>
+<Element Value="8.205245"/>
+<Element Value="8.328128"/>
+<Element Value="8.472648"/>
+<Element Value="8.657212"/>
+</Line>
+<Line>
+<Element Value="6.956780"/>
+<Element Value="6.983852"/>
+<Element Value="7.130055"/>
+<Element Value="7.380151"/>
+<Element Value="7.744769"/>
+<Element Value="8.188191"/>
+<Element Value="8.603516"/>
+</Line>
+<Line>
+<Element Value="5.089291"/>
+<Element Value="5.128570"/>
+<Element Value="5.334007"/>
+<Element Value="5.709526"/>
+<Element Value="6.330879"/>
+<Element Value="7.182826"/>
+<Element Value="8.078470"/>
+</Line>
+<Line>
+<Element Value="3.351918"/>
+<Element Value="3.382608"/>
+<Element Value="3.536679"/>
+<Element Value="3.835451"/>
+<Element Value="4.385521"/>
+<Element Value="5.337550"/>
+<Element Value="6.692946"/>
+</Line>
+<Line>
+<Element Value="2.312394"/>
+<Element Value="2.330821"/>
+<Element Value="2.422772"/>
+<Element Value="2.599450"/>
+<Element Value="2.935066"/>
+<Element Value="3.558257"/>
+<Element Value="4.668548"/>
+</Line>
+<Line>
+<Element Value="1.812407"/>
+<Element Value="1.824382"/>
+<Element Value="1.882763"/>
+<Element Value="1.989277"/>
+<Element Value="2.181880"/>
+<Element Value="2.530941"/>
+<Element Value="3.180966"/>
+</Line>
+</LUT>
+</cell_rise_fall_trans_ratio>
+<fall_power conv2lib="no">
+<LUT id="fall_power" Template="Power_X1" gid="0x2c518010">
+<Line>
+<Element Value="0.000300"/>
+<Element Value="0.000300"/>
+<Element Value="0.000299"/>
+<Element Value="0.000299"/>
+<Element Value="0.000300"/>
+<Element Value="0.000301"/>
+<Element Value="0.000302"/>
+</Line>
+<Line>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000296"/>
+<Element Value="0.000297"/>
+</Line>
+<Line>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000290"/>
+<Element Value="0.000291"/>
+</Line>
+<Line>
+<Element Value="0.000284"/>
+<Element Value="0.000283"/>
+<Element Value="0.000283"/>
+<Element Value="0.000283"/>
+<Element Value="0.000284"/>
+<Element Value="0.000285"/>
+<Element Value="0.000285"/>
+</Line>
+<Line>
+<Element Value="0.000278"/>
+<Element Value="0.000278"/>
+<Element Value="0.000277"/>
+<Element Value="0.000277"/>
+<Element Value="0.000278"/>
+<Element Value="0.000279"/>
+<Element Value="0.000280"/>
+</Line>
+<Line>
+<Element Value="0.000272"/>
+<Element Value="0.000271"/>
+<Element Value="0.000271"/>
+<Element Value="0.000272"/>
+<Element Value="0.000273"/>
+<Element Value="0.000274"/>
+<Element Value="0.000276"/>
+</Line>
+<Line>
+<Element Value="0.000264"/>
+<Element Value="0.000264"/>
+<Element Value="0.000264"/>
+<Element Value="0.000265"/>
+<Element Value="0.000266"/>
+<Element Value="0.000268"/>
+<Element Value="0.000271"/>
+</Line>
+<Line>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000260"/>
+<Element Value="0.000262"/>
+<Element Value="0.000265"/>
+</Line>
+<Line>
+<Element Value="0.000262"/>
+<Element Value="0.000261"/>
+<Element Value="0.000261"/>
+<Element Value="0.000260"/>
+<Element Value="0.000260"/>
+<Element Value="0.000261"/>
+<Element Value="0.000262"/>
+</Line>
+<Line>
+<Element Value="0.000295"/>
+<Element Value="0.000294"/>
+<Element Value="0.000293"/>
+<Element Value="0.000290"/>
+<Element Value="0.000286"/>
+<Element Value="0.000280"/>
+<Element Value="0.000275"/>
+</Line>
+</LUT>
+</fall_power>
+<fall_transition conv2lib="no">
+<LUT id="fall_transition" Template="Timing_X1_summary_1" gid="0x2bf843a0" factor="0.001">
+<LinApprox>
+<Line cAng="44.4667" cLin="154.757"/>
+<Line cAng="44.4586" cLin="154.128"/>
+<Line cAng="44.4577" cLin="153.368"/>
+<Line cAng="44.44" cLin="152.574"/>
+<Line cAng="43.6108" cLin="156.673"/>
+<Line cAng="40.6008" cLin="181.907"/>
+<Line cAng="35.8019" cLin="251.051"/>
+<Line cAng="32.9074" cLin="390.282"/>
+<Line cAng="39.5215" cLin="624.722"/>
+<Line cAng="53.9886" cLin="1033.15"/>
+</LinApprox>
+<Line>
+<Element Value="162.159000"/>
+<Element Value="164.550000"/>
+<Element Value="176.478000"/>
+<Element Value="199.936000"/>
+<Element Value="245.779000"/>
+<Element Value="334.678000"/>
+<Element Value="508.963000"/>
+</Line>
+<Line>
+<Element Value="161.521000"/>
+<Element Value="163.908000"/>
+<Element Value="175.783000"/>
+<Element Value="199.303000"/>
+<Element Value="245.184000"/>
+<Element Value="334.082000"/>
+<Element Value="508.227000"/>
+</Line>
+<Line>
+<Element Value="160.783000"/>
+<Element Value="163.110000"/>
+<Element Value="175.010000"/>
+<Element Value="198.530000"/>
+<Element Value="244.426000"/>
+<Element Value="333.389000"/>
+<Element Value="507.427000"/>
+</Line>
+<Line>
+<Element Value="160.087000"/>
+<Element Value="162.404000"/>
+<Element Value="174.247000"/>
+<Element Value="197.575000"/>
+<Element Value="243.456000"/>
+<Element Value="332.535000"/>
+<Element Value="506.531000"/>
+</Line>
+<Line>
+<Element Value="165.433000"/>
+<Element Value="167.605000"/>
+<Element Value="178.453000"/>
+<Element Value="200.107000"/>
+<Element Value="243.725000"/>
+<Element Value="331.600000"/>
+<Element Value="505.382000"/>
+</Line>
+<Line>
+<Element Value="191.233000"/>
+<Element Value="193.155000"/>
+<Element Value="202.629000"/>
+<Element Value="221.883000"/>
+<Element Value="261.500000"/>
+<Element Value="342.551000"/>
+<Element Value="507.983000"/>
+</Line>
+<Line>
+<Element Value="260.574000"/>
+<Element Value="262.207000"/>
+<Element Value="270.063000"/>
+<Element Value="286.053000"/>
+<Element Value="319.207000"/>
+<Element Value="389.868000"/>
+<Element Value="540.426000"/>
+</Line>
+<Line>
+<Element Value="394.396000"/>
+<Element Value="396.322000"/>
+<Element Value="406.129000"/>
+<Element Value="424.725000"/>
+<Element Value="459.822000"/>
+<Element Value="523.827000"/>
+<Element Value="651.629000"/>
+</Line>
+<Line>
+<Element Value="626.209000"/>
+<Element Value="628.812000"/>
+<Element Value="641.885000"/>
+<Element Value="666.788000"/>
+<Element Value="712.585000"/>
+<Element Value="793.728000"/>
+<Element Value="933.415000"/>
+</Line>
+<Line>
+<Element Value="1032.352000"/>
+<Element Value="1036.196000"/>
+<Element Value="1055.518000"/>
+<Element Value="1091.809000"/>
+<Element Value="1157.079000"/>
+<Element Value="1268.588000"/>
+<Element Value="1451.661000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_average_fall conv2lib="no">
+<LUT id="fo4_average_fall" Template="Timing_X1_FO4" gid="0x2c5048c8" factor="0.001">
+<Line>
+<Element Value="128.879470"/>
+<Element Value="131.924090"/>
+<Element Value="138.445137"/>
+<Element Value="151.199493"/>
+<Element Value="176.706220"/>
+<Element Value="228.242366"/>
+<Element Value="326.791346"/>
+<Element Value="486.094219"/>
+<Element Value="723.629254"/>
+<Element Value="1050.820009"/>
+</Line>
+</LUT>
+</fo4_average_fall>
+<fo4_average_rise conv2lib="no">
+<LUT id="fo4_average_rise" Template="Timing_X1_FO4" gid="0x2c7348d0" factor="0.001">
+<Line>
+<Element Value="1344.580991"/>
+<Element Value="1343.766148"/>
+<Element Value="1346.340199"/>
+<Element Value="1355.392287"/>
+<Element Value="1377.806410"/>
+<Element Value="1427.640919"/>
+<Element Value="1531.582069"/>
+<Element Value="1736.920215"/>
+<Element Value="2136.795433"/>
+<Element Value="2862.430795"/>
+</Line>
+</LUT>
+</fo4_average_rise>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c6e96c8" factor="0.001">
+<Line>
+<Element Value="161.744080"/>
+<Element Value="164.830680"/>
+<Element Value="171.329960"/>
+<Element Value="183.429360"/>
+<Element Value="207.337520"/>
+<Element Value="255.523200"/>
+<Element Value="356.587714"/>
+<Element Value="532.201390"/>
+<Element Value="792.415400"/>
+<Element Value="1170.907032"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c571a10" factor="0.001">
+<Line>
+<Element Value="1727.139140"/>
+<Element Value="1725.212264"/>
+<Element Value="1727.415640"/>
+<Element Value="1736.908504"/>
+<Element Value="1761.064412"/>
+<Element Value="1814.691484"/>
+<Element Value="1924.387572"/>
+<Element Value="2128.522772"/>
+<Element Value="2513.855040"/>
+<Element Value="3247.742640"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_power conv2lib="no">
+<LUT id="rise_power" Template="Power_X1" gid="0x2be531e0">
+<Line>
+<Element Value="0.002770"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002770"/>
+</Line>
+<Line>
+<Element Value="0.002762"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002762"/>
+</Line>
+<Line>
+<Element Value="0.002754"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002754"/>
+<Element Value="0.002756"/>
+</Line>
+<Line>
+<Element Value="0.002745"/>
+<Element Value="0.002744"/>
+<Element Value="0.002743"/>
+<Element Value="0.002744"/>
+<Element Value="0.002744"/>
+<Element Value="0.002746"/>
+<Element Value="0.002749"/>
+</Line>
+<Line>
+<Element Value="0.002734"/>
+<Element Value="0.002734"/>
+<Element Value="0.002733"/>
+<Element Value="0.002734"/>
+<Element Value="0.002735"/>
+<Element Value="0.002737"/>
+<Element Value="0.002740"/>
+</Line>
+<Line>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002725"/>
+<Element Value="0.002727"/>
+<Element Value="0.002731"/>
+</Line>
+<Line>
+<Element Value="0.002717"/>
+<Element Value="0.002716"/>
+<Element Value="0.002715"/>
+<Element Value="0.002715"/>
+<Element Value="0.002716"/>
+<Element Value="0.002717"/>
+<Element Value="0.002721"/>
+</Line>
+<Line>
+<Element Value="0.002711"/>
+<Element Value="0.002711"/>
+<Element Value="0.002710"/>
+<Element Value="0.002710"/>
+<Element Value="0.002709"/>
+<Element Value="0.002710"/>
+<Element Value="0.002711"/>
+</Line>
+<Line>
+<Element Value="0.002712"/>
+<Element Value="0.002711"/>
+<Element Value="0.002710"/>
+<Element Value="0.002710"/>
+<Element Value="0.002709"/>
+<Element Value="0.002707"/>
+<Element Value="0.002706"/>
+</Line>
+<Line>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002723"/>
+<Element Value="0.002721"/>
+<Element Value="0.002718"/>
+<Element Value="0.002714"/>
+<Element Value="0.002709"/>
+</Line>
+</LUT>
+</rise_power>
+<rise_transition conv2lib="no">
+<LUT id="rise_transition" Template="Timing_X1_summary_1" gid="0x2c5d5048" factor="0.001">
+<LinApprox>
+<Line cAng="390.052" cLin="1272.78"/>
+<Line cAng="390.02" cLin="1267.68"/>
+<Line cAng="389.982" cLin="1262.75"/>
+<Line cAng="389.933" cLin="1258.05"/>
+<Line cAng="389.873" cLin="1253.56"/>
+<Line cAng="389.811" cLin="1249.24"/>
+<Line cAng="389.757" cLin="1245.01"/>
+<Line cAng="389.711" cLin="1240.84"/>
+<Line cAng="372.303" cLin="1362.48"/>
+<Line cAng="351.119" cLin="1810.48"/>
+</LinApprox>
+<Line>
+<Element Value="1353.777000"/>
+<Element Value="1372.346000"/>
+<Element Value="1468.301000"/>
+<Element Value="1661.386000"/>
+<Element Value="2049.590000"/>
+<Element Value="2829.720000"/>
+<Element Value="4395.664000"/>
+</Line>
+<Line>
+<Element Value="1348.690000"/>
+<Element Value="1367.259000"/>
+<Element Value="1463.188000"/>
+<Element Value="1656.243000"/>
+<Element Value="2044.388000"/>
+<Element Value="2824.447000"/>
+<Element Value="4390.333000"/>
+</Line>
+<Line>
+<Element Value="1343.785000"/>
+<Element Value="1362.365000"/>
+<Element Value="1458.267000"/>
+<Element Value="1651.272000"/>
+<Element Value="2039.340000"/>
+<Element Value="2819.319000"/>
+<Element Value="4385.144000"/>
+</Line>
+<Line>
+<Element Value="1339.108000"/>
+<Element Value="1357.695000"/>
+<Element Value="1453.568000"/>
+<Element Value="1646.498000"/>
+<Element Value="2034.463000"/>
+<Element Value="2814.347000"/>
+<Element Value="4380.102000"/>
+</Line>
+<Line>
+<Element Value="1334.661000"/>
+<Element Value="1353.254000"/>
+<Element Value="1449.078000"/>
+<Element Value="1641.927000"/>
+<Element Value="2029.773000"/>
+<Element Value="2809.530000"/>
+<Element Value="4375.199000"/>
+</Line>
+<Line>
+<Element Value="1330.366000"/>
+<Element Value="1348.966000"/>
+<Element Value="1444.756000"/>
+<Element Value="1637.530000"/>
+<Element Value="2025.257000"/>
+<Element Value="2804.873000"/>
+<Element Value="4370.440000"/>
+</Line>
+<Line>
+<Element Value="1326.137000"/>
+<Element Value="1344.747000"/>
+<Element Value="1440.518000"/>
+<Element Value="1633.227000"/>
+<Element Value="2020.861000"/>
+<Element Value="2800.354000"/>
+<Element Value="4365.815000"/>
+</Line>
+<Line>
+<Element Value="1321.983000"/>
+<Element Value="1340.602000"/>
+<Element Value="1436.348000"/>
+<Element Value="1629.012000"/>
+<Element Value="2016.559000"/>
+<Element Value="2795.953000"/>
+<Element Value="4361.318000"/>
+</Line>
+<Line>
+<Element Value="1448.042000"/>
+<Element Value="1465.648000"/>
+<Element Value="1555.141000"/>
+<Element Value="1733.282000"/>
+<Element Value="2091.484000"/>
+<Element Value="2824.288000"/>
+<Element Value="4357.693000"/>
+</Line>
+<Line>
+<Element Value="1871.042000"/>
+<Element Value="1890.417000"/>
+<Element Value="1987.290000"/>
+<Element Value="2171.911000"/>
+<Element Value="2524.608000"/>
+<Element Value="3210.722000"/>
+<Element Value="4617.685000"/>
+</Line>
+</LUT>
+</rise_transition>
+<LeakagePowerList>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.315024</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.301408</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.301407</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.287796</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.728653</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.782732</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.715042</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.151729</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.728652</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.715041</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+0.775956</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.147145</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.142279</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.151764</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.147179</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2">
+<value factor="1000">
+1.500225</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.301407</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.287795</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.287795</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.274188</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.715040</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.151732</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.701432</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.520710</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.715038</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+0.701430</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.144959</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.516124</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.128669</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.520766</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.516178</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2">
+<value factor="1000">
+1.869233</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; !C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+0.728650</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+0.715041</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+0.715040</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+0.701432</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.142280</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.151761</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.128671</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.520762</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; !B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.142274</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.128670</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.144988</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.516178</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.555899</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.520797</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.516211</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2">
+<value factor="1000">
+1.869258</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; B2 &amp; !C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+0.773913</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.145312</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.144863</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.516298</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.145343</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.497853</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.516356</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.868089</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; !B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.144897</value>
+<when>
+"!A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.516355</value>
+<when>
+"A1 &amp; !A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.497608</value>
+<when>
+"!A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.869287</value>
+<when>
+"A1 &amp; !A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.516389</value>
+<when>
+"!A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.868113</value>
+<when>
+"A1 &amp; A2 &amp; !B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="!A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+1.869314</value>
+<when>
+"!A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+<LeakagePower When="A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2">
+<value factor="1000">
+2.234049</value>
+<when>
+"A1 &amp; A2 &amp; B1 &amp; B2 &amp; C1 &amp; C2"</when>
+</LeakagePower>
+</LeakagePowerList>
+<Pins>
+<Pin Name="A1">
+<Name>
+"A1"</Name>
+<capacitance factor="0.001">
+0.382000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.379000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.386000</rise_capacitance>
+</Pin>
+<Pin Name="A2">
+<Name>
+"A2"</Name>
+<capacitance factor="0.001">
+0.399000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.392000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.406000</rise_capacitance>
+</Pin>
+<Pin Name="B1">
+<Name>
+"B1"</Name>
+<capacitance factor="0.001">
+0.579000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.576000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.582000</rise_capacitance>
+</Pin>
+<Pin Name="B2">
+<Name>
+"B2"</Name>
+<capacitance factor="0.001">
+0.740000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.734000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.747000</rise_capacitance>
+</Pin>
+<Pin Name="C1">
+<Name>
+"C1"</Name>
+<capacitance factor="0.001">
+0.425000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.423000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.428000</rise_capacitance>
+</Pin>
+<Pin Name="C2">
+<Name>
+"C2"</Name>
+<capacitance factor="0.001">
+0.542000</capacitance>
+<direction>
+"input"</direction>
+<fall_capacitance factor="0.001">
+0.536000</fall_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_capacitance factor="0.001">
+0.548000</rise_capacitance>
+</Pin>
+<Pin Name="ZN">
+<function>
+"!(((A1 &amp; A2) | (B1 &amp; B2)) | (C1 &amp; C2))"</function>
+<Name>
+"ZN"</Name>
+<cell_fall conv2lib="no">
+<LUT id="cell_fall" Template="Timing_X1_summary_1" gid="0x2c57c2e8" factor="0.001">
+<LinApprox>
+<Line cAng="26.1681" cLin="88.9536"/>
+<Line cAng="26.1496" cLin="92.0961"/>
+<Line cAng="26.1381" cLin="98.5863"/>
+<Line cAng="26.1174" cLin="110.723"/>
+<Line cAng="25.908" cLin="136.72"/>
+<Line cAng="25.2963" cLin="194.736"/>
+<Line cAng="25.6103" cLin="303.234"/>
+<Line cAng="33.4953" cLin="465.328"/>
+<Line cAng="49.2572" cLin="697.475"/>
+<Line cAng="74.993" cLin="1011.85"/>
+</LinApprox>
+<Line>
+<Element Value="92.844000"/>
+<Element Value="94.229000"/>
+<Element Value="101.411000"/>
+<Element Value="115.636000"/>
+<Element Value="143.229000"/>
+<Element Value="196.065000"/>
+<Element Value="296.642000"/>
+</Line>
+<Line>
+<Element Value="96.075000"/>
+<Element Value="97.406000"/>
+<Element Value="104.495000"/>
+<Element Value="118.713000"/>
+<Element Value="146.296000"/>
+<Element Value="199.110000"/>
+<Element Value="299.663000"/>
+</Line>
+<Line>
+<Element Value="102.509000"/>
+<Element Value="103.911000"/>
+<Element Value="111.011000"/>
+<Element Value="125.207000"/>
+<Element Value="152.760000"/>
+<Element Value="205.545000"/>
+<Element Value="306.064000"/>
+</Line>
+<Line>
+<Element Value="114.609000"/>
+<Element Value="116.019000"/>
+<Element Value="123.193000"/>
+<Element Value="137.349000"/>
+<Element Value="164.844000"/>
+<Element Value="217.574000"/>
+<Element Value="318.045000"/>
+</Line>
+<Line>
+<Element Value="140.874000"/>
+<Element Value="142.227000"/>
+<Element Value="149.145000"/>
+<Element Value="162.960000"/>
+<Element Value="190.036000"/>
+<Element Value="242.397000"/>
+<Element Value="342.634000"/>
+</Line>
+<Line>
+<Element Value="199.516000"/>
+<Element Value="200.753000"/>
+<Element Value="207.101000"/>
+<Element Value="219.963000"/>
+<Element Value="245.809000"/>
+<Element Value="296.995000"/>
+<Element Value="396.493000"/>
+</Line>
+<Line>
+<Element Value="305.223000"/>
+<Element Value="306.869000"/>
+<Element Value="315.081000"/>
+<Element Value="330.693000"/>
+<Element Value="359.092000"/>
+<Element Value="408.752000"/>
+<Element Value="505.412000"/>
+</Line>
+<Line>
+<Element Value="465.077000"/>
+<Element Value="467.430000"/>
+<Element Value="479.160000"/>
+<Element Value="501.425000"/>
+<Element Value="541.888000"/>
+<Element Value="611.576000"/>
+<Element Value="724.992000"/>
+</Line>
+<Line>
+<Element Value="696.895000"/>
+<Element Value="700.365000"/>
+<Element Value="717.704000"/>
+<Element Value="750.575000"/>
+<Element Value="810.347000"/>
+<Element Value="913.088000"/>
+<Element Value="1079.000000"/>
+</Line>
+<Line>
+<Element Value="1010.839000"/>
+<Element Value="1016.123000"/>
+<Element Value="1042.529000"/>
+<Element Value="1092.659000"/>
+<Element Value="1183.893000"/>
+<Element Value="1340.630000"/>
+<Element Value="1592.432000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise conv2lib="no">
+<LUT id="cell_rise" Template="Timing_X1_summary_1" gid="0x2c8975e8" factor="0.001">
+<LinApprox>
+<Line cAng="205.441" cLin="1281.53"/>
+<Line cAng="205.465" cLin="1279.56"/>
+<Line cAng="205.533" cLin="1281.51"/>
+<Line cAng="205.638" cLin="1290.68"/>
+<Line cAng="205.753" cLin="1314.51"/>
+<Line cAng="205.806" cLin="1368.06"/>
+<Line cAng="205.764" cLin="1477.91"/>
+<Line cAng="205.678" cLin="1682.27"/>
+<Line cAng="205.603" cLin="2060.02"/>
+<Line cAng="207.877" cLin="2741.14"/>
+</LinApprox>
+<Line>
+<Element Value="1323.005000"/>
+<Element Value="1332.664000"/>
+<Element Value="1383.872000"/>
+<Element Value="1486.815000"/>
+<Element Value="1692.608000"/>
+<Element Value="2103.693000"/>
+<Element Value="2924.859000"/>
+</Line>
+<Line>
+<Element Value="1321.054000"/>
+<Element Value="1330.734000"/>
+<Element Value="1381.893000"/>
+<Element Value="1484.824000"/>
+<Element Value="1690.676000"/>
+<Element Value="2101.822000"/>
+<Element Value="2923.075000"/>
+</Line>
+<Line>
+<Element Value="1322.930000"/>
+<Element Value="1332.652000"/>
+<Element Value="1383.856000"/>
+<Element Value="1486.879000"/>
+<Element Value="1692.854000"/>
+<Element Value="2104.144000"/>
+<Element Value="2925.498000"/>
+</Line>
+<Line>
+<Element Value="1332.030000"/>
+<Element Value="1341.799000"/>
+<Element Value="1393.063000"/>
+<Element Value="1496.199000"/>
+<Element Value="1702.342000"/>
+<Element Value="2113.848000"/>
+<Element Value="2935.432000"/>
+</Line>
+<Line>
+<Element Value="1355.779000"/>
+<Element Value="1365.580000"/>
+<Element Value="1416.967000"/>
+<Element Value="1520.187000"/>
+<Element Value="1726.478000"/>
+<Element Value="2138.221000"/>
+<Element Value="2960.114000"/>
+</Line>
+<Line>
+<Element Value="1409.335000"/>
+<Element Value="1419.156000"/>
+<Element Value="1470.572000"/>
+<Element Value="1573.788000"/>
+<Element Value="1780.096000"/>
+<Element Value="2191.947000"/>
+<Element Value="3014.103000"/>
+</Line>
+<Line>
+<Element Value="1519.207000"/>
+<Element Value="1529.037000"/>
+<Element Value="1580.454000"/>
+<Element Value="1683.605000"/>
+<Element Value="1889.802000"/>
+<Element Value="2301.535000"/>
+<Element Value="3123.693000"/>
+</Line>
+<Line>
+<Element Value="1723.563000"/>
+<Element Value="1733.392000"/>
+<Element Value="1784.789000"/>
+<Element Value="1887.877000"/>
+<Element Value="2093.954000"/>
+<Element Value="2505.487000"/>
+<Element Value="3327.397000"/>
+</Line>
+<Line>
+<Element Value="2101.298000"/>
+<Element Value="2111.124000"/>
+<Element Value="2162.515000"/>
+<Element Value="2265.568000"/>
+<Element Value="2471.558000"/>
+<Element Value="2882.920000"/>
+<Element Value="3704.558000"/>
+</Line>
+<Line>
+<Element Value="2777.659000"/>
+<Element Value="2788.232000"/>
+<Element Value="2843.256000"/>
+<Element Value="2952.157000"/>
+<Element Value="3164.785000"/>
+<Element Value="3578.040000"/>
+<Element Value="4399.488000"/>
+</Line>
+</LUT>
+</cell_rise>
+<direction>
+"output"</direction>
+<fall_power conv2lib="no">
+<LUT id="fall_power" Template="Power_X1" gid="0x2c11a3c0">
+<Line>
+<Element Value="0.000300"/>
+<Element Value="0.000300"/>
+<Element Value="0.000299"/>
+<Element Value="0.000299"/>
+<Element Value="0.000300"/>
+<Element Value="0.000301"/>
+<Element Value="0.000302"/>
+</Line>
+<Line>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000296"/>
+<Element Value="0.000297"/>
+</Line>
+<Line>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000290"/>
+<Element Value="0.000291"/>
+</Line>
+<Line>
+<Element Value="0.000284"/>
+<Element Value="0.000283"/>
+<Element Value="0.000283"/>
+<Element Value="0.000283"/>
+<Element Value="0.000284"/>
+<Element Value="0.000285"/>
+<Element Value="0.000285"/>
+</Line>
+<Line>
+<Element Value="0.000278"/>
+<Element Value="0.000278"/>
+<Element Value="0.000277"/>
+<Element Value="0.000277"/>
+<Element Value="0.000278"/>
+<Element Value="0.000279"/>
+<Element Value="0.000280"/>
+</Line>
+<Line>
+<Element Value="0.000272"/>
+<Element Value="0.000271"/>
+<Element Value="0.000271"/>
+<Element Value="0.000272"/>
+<Element Value="0.000273"/>
+<Element Value="0.000274"/>
+<Element Value="0.000276"/>
+</Line>
+<Line>
+<Element Value="0.000264"/>
+<Element Value="0.000264"/>
+<Element Value="0.000264"/>
+<Element Value="0.000265"/>
+<Element Value="0.000266"/>
+<Element Value="0.000268"/>
+<Element Value="0.000271"/>
+</Line>
+<Line>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000258"/>
+<Element Value="0.000260"/>
+<Element Value="0.000262"/>
+<Element Value="0.000265"/>
+</Line>
+<Line>
+<Element Value="0.000262"/>
+<Element Value="0.000261"/>
+<Element Value="0.000261"/>
+<Element Value="0.000260"/>
+<Element Value="0.000260"/>
+<Element Value="0.000261"/>
+<Element Value="0.000262"/>
+</Line>
+<Line>
+<Element Value="0.000295"/>
+<Element Value="0.000294"/>
+<Element Value="0.000293"/>
+<Element Value="0.000290"/>
+<Element Value="0.000286"/>
+<Element Value="0.000280"/>
+<Element Value="0.000275"/>
+</Line>
+</LUT>
+</fall_power>
+<fall_transition conv2lib="no">
+<LUT id="fall_transition" Template="Timing_X1_summary_1" gid="0x2c5072e0" factor="0.001">
+<LinApprox>
+<Line cAng="44.4667" cLin="154.757"/>
+<Line cAng="44.4586" cLin="154.128"/>
+<Line cAng="44.4577" cLin="153.368"/>
+<Line cAng="44.44" cLin="152.574"/>
+<Line cAng="43.6108" cLin="156.673"/>
+<Line cAng="40.6008" cLin="181.907"/>
+<Line cAng="35.8019" cLin="251.051"/>
+<Line cAng="32.9074" cLin="390.282"/>
+<Line cAng="39.5215" cLin="624.722"/>
+<Line cAng="53.9886" cLin="1033.15"/>
+</LinApprox>
+<Line>
+<Element Value="162.159000"/>
+<Element Value="164.550000"/>
+<Element Value="176.478000"/>
+<Element Value="199.936000"/>
+<Element Value="245.779000"/>
+<Element Value="334.678000"/>
+<Element Value="508.963000"/>
+</Line>
+<Line>
+<Element Value="161.521000"/>
+<Element Value="163.908000"/>
+<Element Value="175.783000"/>
+<Element Value="199.303000"/>
+<Element Value="245.184000"/>
+<Element Value="334.082000"/>
+<Element Value="508.227000"/>
+</Line>
+<Line>
+<Element Value="160.783000"/>
+<Element Value="163.110000"/>
+<Element Value="175.010000"/>
+<Element Value="198.530000"/>
+<Element Value="244.426000"/>
+<Element Value="333.389000"/>
+<Element Value="507.427000"/>
+</Line>
+<Line>
+<Element Value="160.087000"/>
+<Element Value="162.404000"/>
+<Element Value="174.247000"/>
+<Element Value="197.575000"/>
+<Element Value="243.456000"/>
+<Element Value="332.535000"/>
+<Element Value="506.531000"/>
+</Line>
+<Line>
+<Element Value="165.433000"/>
+<Element Value="167.605000"/>
+<Element Value="178.453000"/>
+<Element Value="200.107000"/>
+<Element Value="243.725000"/>
+<Element Value="331.600000"/>
+<Element Value="505.382000"/>
+</Line>
+<Line>
+<Element Value="191.233000"/>
+<Element Value="193.155000"/>
+<Element Value="202.629000"/>
+<Element Value="221.883000"/>
+<Element Value="261.500000"/>
+<Element Value="342.551000"/>
+<Element Value="507.983000"/>
+</Line>
+<Line>
+<Element Value="260.574000"/>
+<Element Value="262.207000"/>
+<Element Value="270.063000"/>
+<Element Value="286.053000"/>
+<Element Value="319.207000"/>
+<Element Value="389.868000"/>
+<Element Value="540.426000"/>
+</Line>
+<Line>
+<Element Value="394.396000"/>
+<Element Value="396.322000"/>
+<Element Value="406.129000"/>
+<Element Value="424.725000"/>
+<Element Value="459.822000"/>
+<Element Value="523.827000"/>
+<Element Value="651.629000"/>
+</Line>
+<Line>
+<Element Value="626.209000"/>
+<Element Value="628.812000"/>
+<Element Value="641.885000"/>
+<Element Value="666.788000"/>
+<Element Value="712.585000"/>
+<Element Value="793.728000"/>
+<Element Value="933.415000"/>
+</Line>
+<Line>
+<Element Value="1032.352000"/>
+<Element Value="1036.196000"/>
+<Element Value="1055.518000"/>
+<Element Value="1091.809000"/>
+<Element Value="1157.079000"/>
+<Element Value="1268.588000"/>
+<Element Value="1451.661000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_average_fall conv2lib="no">
+<LUT id="fo4_average_fall" Template="Timing_X1_FO4" gid="0x2c7328c8" factor="0.001">
+<Line>
+<Element Value="128.879470"/>
+<Element Value="131.924090"/>
+<Element Value="138.445137"/>
+<Element Value="151.199493"/>
+<Element Value="176.706220"/>
+<Element Value="228.242366"/>
+<Element Value="326.791346"/>
+<Element Value="486.094219"/>
+<Element Value="723.629254"/>
+<Element Value="1050.820009"/>
+</Line>
+</LUT>
+</fo4_average_fall>
+<fo4_average_rise conv2lib="no">
+<LUT id="fo4_average_rise" Template="Timing_X1_FO4" gid="0x2c504870" factor="0.001">
+<Line>
+<Element Value="1344.580991"/>
+<Element Value="1343.766148"/>
+<Element Value="1346.340199"/>
+<Element Value="1355.392287"/>
+<Element Value="1377.806410"/>
+<Element Value="1427.640919"/>
+<Element Value="1531.582069"/>
+<Element Value="1736.920215"/>
+<Element Value="2136.795433"/>
+<Element Value="2862.430795"/>
+</Line>
+</LUT>
+</fo4_average_rise>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c6e9668" factor="0.001">
+<Line>
+<Element Value="161.744080"/>
+<Element Value="164.830680"/>
+<Element Value="171.329960"/>
+<Element Value="183.429360"/>
+<Element Value="207.337520"/>
+<Element Value="255.523200"/>
+<Element Value="356.587714"/>
+<Element Value="532.201390"/>
+<Element Value="792.415400"/>
+<Element Value="1170.907032"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c732a00" factor="0.001">
+<Line>
+<Element Value="1727.139140"/>
+<Element Value="1725.212264"/>
+<Element Value="1727.415640"/>
+<Element Value="1736.908504"/>
+<Element Value="1761.064412"/>
+<Element Value="1814.691484"/>
+<Element Value="1924.387572"/>
+<Element Value="2128.522772"/>
+<Element Value="2513.855040"/>
+<Element Value="3247.742640"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<max_capacitance factor="0.001">
+8</max_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+<rise_power conv2lib="no">
+<LUT id="rise_power" Template="Power_X1" gid="0xeeacba8">
+<Line>
+<Element Value="0.002770"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002769"/>
+<Element Value="0.002770"/>
+</Line>
+<Line>
+<Element Value="0.002762"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002761"/>
+<Element Value="0.002762"/>
+</Line>
+<Line>
+<Element Value="0.002754"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002753"/>
+<Element Value="0.002754"/>
+<Element Value="0.002756"/>
+</Line>
+<Line>
+<Element Value="0.002745"/>
+<Element Value="0.002744"/>
+<Element Value="0.002743"/>
+<Element Value="0.002744"/>
+<Element Value="0.002744"/>
+<Element Value="0.002746"/>
+<Element Value="0.002749"/>
+</Line>
+<Line>
+<Element Value="0.002734"/>
+<Element Value="0.002734"/>
+<Element Value="0.002733"/>
+<Element Value="0.002734"/>
+<Element Value="0.002735"/>
+<Element Value="0.002737"/>
+<Element Value="0.002740"/>
+</Line>
+<Line>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002725"/>
+<Element Value="0.002727"/>
+<Element Value="0.002731"/>
+</Line>
+<Line>
+<Element Value="0.002717"/>
+<Element Value="0.002716"/>
+<Element Value="0.002715"/>
+<Element Value="0.002715"/>
+<Element Value="0.002716"/>
+<Element Value="0.002717"/>
+<Element Value="0.002721"/>
+</Line>
+<Line>
+<Element Value="0.002711"/>
+<Element Value="0.002711"/>
+<Element Value="0.002710"/>
+<Element Value="0.002710"/>
+<Element Value="0.002709"/>
+<Element Value="0.002710"/>
+<Element Value="0.002711"/>
+</Line>
+<Line>
+<Element Value="0.002712"/>
+<Element Value="0.002711"/>
+<Element Value="0.002710"/>
+<Element Value="0.002710"/>
+<Element Value="0.002709"/>
+<Element Value="0.002707"/>
+<Element Value="0.002706"/>
+</Line>
+<Line>
+<Element Value="0.002724"/>
+<Element Value="0.002724"/>
+<Element Value="0.002723"/>
+<Element Value="0.002721"/>
+<Element Value="0.002718"/>
+<Element Value="0.002714"/>
+<Element Value="0.002709"/>
+</Line>
+</LUT>
+</rise_power>
+<rise_transition conv2lib="no">
+<LUT id="rise_transition" Template="Timing_X1_summary_1" gid="0x2c5b69f0" factor="0.001">
+<LinApprox>
+<Line cAng="390.052" cLin="1272.78"/>
+<Line cAng="390.02" cLin="1267.68"/>
+<Line cAng="389.982" cLin="1262.75"/>
+<Line cAng="389.933" cLin="1258.05"/>
+<Line cAng="389.873" cLin="1253.56"/>
+<Line cAng="389.811" cLin="1249.24"/>
+<Line cAng="389.757" cLin="1245.01"/>
+<Line cAng="389.711" cLin="1240.84"/>
+<Line cAng="372.303" cLin="1362.48"/>
+<Line cAng="351.119" cLin="1810.48"/>
+</LinApprox>
+<Line>
+<Element Value="1353.777000"/>
+<Element Value="1372.346000"/>
+<Element Value="1468.301000"/>
+<Element Value="1661.386000"/>
+<Element Value="2049.590000"/>
+<Element Value="2829.720000"/>
+<Element Value="4395.664000"/>
+</Line>
+<Line>
+<Element Value="1348.690000"/>
+<Element Value="1367.259000"/>
+<Element Value="1463.188000"/>
+<Element Value="1656.243000"/>
+<Element Value="2044.388000"/>
+<Element Value="2824.447000"/>
+<Element Value="4390.333000"/>
+</Line>
+<Line>
+<Element Value="1343.785000"/>
+<Element Value="1362.365000"/>
+<Element Value="1458.267000"/>
+<Element Value="1651.272000"/>
+<Element Value="2039.340000"/>
+<Element Value="2819.319000"/>
+<Element Value="4385.144000"/>
+</Line>
+<Line>
+<Element Value="1339.108000"/>
+<Element Value="1357.695000"/>
+<Element Value="1453.568000"/>
+<Element Value="1646.498000"/>
+<Element Value="2034.463000"/>
+<Element Value="2814.347000"/>
+<Element Value="4380.102000"/>
+</Line>
+<Line>
+<Element Value="1334.661000"/>
+<Element Value="1353.254000"/>
+<Element Value="1449.078000"/>
+<Element Value="1641.927000"/>
+<Element Value="2029.773000"/>
+<Element Value="2809.530000"/>
+<Element Value="4375.199000"/>
+</Line>
+<Line>
+<Element Value="1330.366000"/>
+<Element Value="1348.966000"/>
+<Element Value="1444.756000"/>
+<Element Value="1637.530000"/>
+<Element Value="2025.257000"/>
+<Element Value="2804.873000"/>
+<Element Value="4370.440000"/>
+</Line>
+<Line>
+<Element Value="1326.137000"/>
+<Element Value="1344.747000"/>
+<Element Value="1440.518000"/>
+<Element Value="1633.227000"/>
+<Element Value="2020.861000"/>
+<Element Value="2800.354000"/>
+<Element Value="4365.815000"/>
+</Line>
+<Line>
+<Element Value="1321.983000"/>
+<Element Value="1340.602000"/>
+<Element Value="1436.348000"/>
+<Element Value="1629.012000"/>
+<Element Value="2016.559000"/>
+<Element Value="2795.953000"/>
+<Element Value="4361.318000"/>
+</Line>
+<Line>
+<Element Value="1448.042000"/>
+<Element Value="1465.648000"/>
+<Element Value="1555.141000"/>
+<Element Value="1733.282000"/>
+<Element Value="2091.484000"/>
+<Element Value="2824.288000"/>
+<Element Value="4357.693000"/>
+</Line>
+<Line>
+<Element Value="1871.042000"/>
+<Element Value="1890.417000"/>
+<Element Value="1987.290000"/>
+<Element Value="2171.911000"/>
+<Element Value="2524.608000"/>
+<Element Value="3210.722000"/>
+<Element Value="4617.685000"/>
+</Line>
+</LUT>
+</rise_transition>
+<InternalPowerList>
+<InternalPowerEntry RelatedPin="A1" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ed04c48">
+<Line>
+<Element Value="0.000191"/>
+<Element Value="0.000191"/>
+<Element Value="0.000191"/>
+<Element Value="0.000191"/>
+<Element Value="0.000190"/>
+<Element Value="0.000190"/>
+<Element Value="0.000189"/>
+</Line>
+<Line>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+<Element Value="0.000187"/>
+<Element Value="0.000186"/>
+</Line>
+<Line>
+<Element Value="0.000185"/>
+<Element Value="0.000185"/>
+<Element Value="0.000185"/>
+<Element Value="0.000185"/>
+<Element Value="0.000185"/>
+<Element Value="0.000184"/>
+<Element Value="0.000184"/>
+</Line>
+<Line>
+<Element Value="0.000181"/>
+<Element Value="0.000181"/>
+<Element Value="0.000181"/>
+<Element Value="0.000181"/>
+<Element Value="0.000182"/>
+<Element Value="0.000182"/>
+<Element Value="0.000181"/>
+</Line>
+<Line>
+<Element Value="0.000176"/>
+<Element Value="0.000176"/>
+<Element Value="0.000177"/>
+<Element Value="0.000177"/>
+<Element Value="0.000178"/>
+<Element Value="0.000179"/>
+<Element Value="0.000179"/>
+</Line>
+<Line>
+<Element Value="0.000171"/>
+<Element Value="0.000171"/>
+<Element Value="0.000171"/>
+<Element Value="0.000173"/>
+<Element Value="0.000174"/>
+<Element Value="0.000176"/>
+<Element Value="0.000178"/>
+</Line>
+<Line>
+<Element Value="0.000164"/>
+<Element Value="0.000164"/>
+<Element Value="0.000165"/>
+<Element Value="0.000167"/>
+<Element Value="0.000169"/>
+<Element Value="0.000172"/>
+<Element Value="0.000175"/>
+</Line>
+<Line>
+<Element Value="0.000162"/>
+<Element Value="0.000162"/>
+<Element Value="0.000162"/>
+<Element Value="0.000163"/>
+<Element Value="0.000165"/>
+<Element Value="0.000168"/>
+<Element Value="0.000172"/>
+</Line>
+<Line>
+<Element Value="0.000175"/>
+<Element Value="0.000174"/>
+<Element Value="0.000173"/>
+<Element Value="0.000172"/>
+<Element Value="0.000171"/>
+<Element Value="0.000170"/>
+<Element Value="0.000171"/>
+</Line>
+<Line>
+<Element Value="0.000227"/>
+<Element Value="0.000226"/>
+<Element Value="0.000223"/>
+<Element Value="0.000218"/>
+<Element Value="0.000210"/>
+<Element Value="0.000200"/>
+<Element Value="0.000190"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed04a58">
+<Line>
+<Element Value="0.001538"/>
+<Element Value="0.001538"/>
+<Element Value="0.001538"/>
+<Element Value="0.001537"/>
+<Element Value="0.001537"/>
+<Element Value="0.001537"/>
+<Element Value="0.001537"/>
+</Line>
+<Line>
+<Element Value="0.001531"/>
+<Element Value="0.001530"/>
+<Element Value="0.001530"/>
+<Element Value="0.001530"/>
+<Element Value="0.001530"/>
+<Element Value="0.001530"/>
+<Element Value="0.001531"/>
+</Line>
+<Line>
+<Element Value="0.001522"/>
+<Element Value="0.001522"/>
+<Element Value="0.001522"/>
+<Element Value="0.001522"/>
+<Element Value="0.001523"/>
+<Element Value="0.001524"/>
+<Element Value="0.001525"/>
+</Line>
+<Line>
+<Element Value="0.001512"/>
+<Element Value="0.001511"/>
+<Element Value="0.001511"/>
+<Element Value="0.001512"/>
+<Element Value="0.001513"/>
+<Element Value="0.001515"/>
+<Element Value="0.001518"/>
+</Line>
+<Line>
+<Element Value="0.001500"/>
+<Element Value="0.001499"/>
+<Element Value="0.001499"/>
+<Element Value="0.001500"/>
+<Element Value="0.001502"/>
+<Element Value="0.001505"/>
+<Element Value="0.001509"/>
+</Line>
+<Line>
+<Element Value="0.001489"/>
+<Element Value="0.001489"/>
+<Element Value="0.001489"/>
+<Element Value="0.001489"/>
+<Element Value="0.001491"/>
+<Element Value="0.001494"/>
+<Element Value="0.001499"/>
+</Line>
+<Line>
+<Element Value="0.001483"/>
+<Element Value="0.001483"/>
+<Element Value="0.001482"/>
+<Element Value="0.001482"/>
+<Element Value="0.001483"/>
+<Element Value="0.001484"/>
+<Element Value="0.001488"/>
+</Line>
+<Line>
+<Element Value="0.001486"/>
+<Element Value="0.001485"/>
+<Element Value="0.001484"/>
+<Element Value="0.001483"/>
+<Element Value="0.001482"/>
+<Element Value="0.001481"/>
+<Element Value="0.001481"/>
+</Line>
+<Line>
+<Element Value="0.001505"/>
+<Element Value="0.001504"/>
+<Element Value="0.001502"/>
+<Element Value="0.001500"/>
+<Element Value="0.001497"/>
+<Element Value="0.001492"/>
+<Element Value="0.001486"/>
+</Line>
+<Line>
+<Element Value="0.001561"/>
+<Element Value="0.001560"/>
+<Element Value="0.001557"/>
+<Element Value="0.001553"/>
+<Element Value="0.001545"/>
+<Element Value="0.001534"/>
+<Element Value="0.001518"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+<InternalPowerEntry RelatedPin="A2" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ed02c28">
+<Line>
+<Element Value="0.000189"/>
+<Element Value="0.000190"/>
+<Element Value="0.000189"/>
+<Element Value="0.000189"/>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+<Element Value="0.000188"/>
+</Line>
+<Line>
+<Element Value="0.000186"/>
+<Element Value="0.000186"/>
+<Element Value="0.000187"/>
+<Element Value="0.000186"/>
+<Element Value="0.000186"/>
+<Element Value="0.000186"/>
+<Element Value="0.000185"/>
+</Line>
+<Line>
+<Element Value="0.000181"/>
+<Element Value="0.000181"/>
+<Element Value="0.000182"/>
+<Element Value="0.000182"/>
+<Element Value="0.000182"/>
+<Element Value="0.000182"/>
+<Element Value="0.000182"/>
+</Line>
+<Line>
+<Element Value="0.000177"/>
+<Element Value="0.000177"/>
+<Element Value="0.000177"/>
+<Element Value="0.000177"/>
+<Element Value="0.000178"/>
+<Element Value="0.000178"/>
+<Element Value="0.000178"/>
+</Line>
+<Line>
+<Element Value="0.000173"/>
+<Element Value="0.000173"/>
+<Element Value="0.000173"/>
+<Element Value="0.000173"/>
+<Element Value="0.000174"/>
+<Element Value="0.000175"/>
+<Element Value="0.000175"/>
+</Line>
+<Line>
+<Element Value="0.000168"/>
+<Element Value="0.000168"/>
+<Element Value="0.000168"/>
+<Element Value="0.000169"/>
+<Element Value="0.000170"/>
+<Element Value="0.000172"/>
+<Element Value="0.000173"/>
+</Line>
+<Line>
+<Element Value="0.000161"/>
+<Element Value="0.000161"/>
+<Element Value="0.000162"/>
+<Element Value="0.000163"/>
+<Element Value="0.000165"/>
+<Element Value="0.000168"/>
+<Element Value="0.000170"/>
+</Line>
+<Line>
+<Element Value="0.000156"/>
+<Element Value="0.000156"/>
+<Element Value="0.000157"/>
+<Element Value="0.000158"/>
+<Element Value="0.000160"/>
+<Element Value="0.000163"/>
+<Element Value="0.000166"/>
+</Line>
+<Line>
+<Element Value="0.000161"/>
+<Element Value="0.000161"/>
+<Element Value="0.000160"/>
+<Element Value="0.000160"/>
+<Element Value="0.000160"/>
+<Element Value="0.000162"/>
+<Element Value="0.000164"/>
+</Line>
+<Line>
+<Element Value="0.000198"/>
+<Element Value="0.000198"/>
+<Element Value="0.000195"/>
+<Element Value="0.000192"/>
+<Element Value="0.000187"/>
+<Element Value="0.000181"/>
+<Element Value="0.000175"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed05410">
+<Line>
+<Element Value="0.001626"/>
+<Element Value="0.001625"/>
+<Element Value="0.001625"/>
+<Element Value="0.001624"/>
+<Element Value="0.001624"/>
+<Element Value="0.001624"/>
+<Element Value="0.001627"/>
+</Line>
+<Line>
+<Element Value="0.001617"/>
+<Element Value="0.001616"/>
+<Element Value="0.001616"/>
+<Element Value="0.001616"/>
+<Element Value="0.001616"/>
+<Element Value="0.001617"/>
+<Element Value="0.001618"/>
+</Line>
+<Line>
+<Element Value="0.001609"/>
+<Element Value="0.001608"/>
+<Element Value="0.001607"/>
+<Element Value="0.001607"/>
+<Element Value="0.001608"/>
+<Element Value="0.001609"/>
+<Element Value="0.001611"/>
+</Line>
+<Line>
+<Element Value="0.001599"/>
+<Element Value="0.001598"/>
+<Element Value="0.001598"/>
+<Element Value="0.001598"/>
+<Element Value="0.001599"/>
+<Element Value="0.001601"/>
+<Element Value="0.001603"/>
+</Line>
+<Line>
+<Element Value="0.001589"/>
+<Element Value="0.001589"/>
+<Element Value="0.001588"/>
+<Element Value="0.001589"/>
+<Element Value="0.001590"/>
+<Element Value="0.001592"/>
+<Element Value="0.001595"/>
+</Line>
+<Line>
+<Element Value="0.001580"/>
+<Element Value="0.001580"/>
+<Element Value="0.001579"/>
+<Element Value="0.001580"/>
+<Element Value="0.001581"/>
+<Element Value="0.001583"/>
+<Element Value="0.001587"/>
+</Line>
+<Line>
+<Element Value="0.001575"/>
+<Element Value="0.001574"/>
+<Element Value="0.001573"/>
+<Element Value="0.001573"/>
+<Element Value="0.001574"/>
+<Element Value="0.001575"/>
+<Element Value="0.001578"/>
+</Line>
+<Line>
+<Element Value="0.001576"/>
+<Element Value="0.001576"/>
+<Element Value="0.001575"/>
+<Element Value="0.001574"/>
+<Element Value="0.001573"/>
+<Element Value="0.001572"/>
+<Element Value="0.001573"/>
+</Line>
+<Line>
+<Element Value="0.001595"/>
+<Element Value="0.001594"/>
+<Element Value="0.001592"/>
+<Element Value="0.001590"/>
+<Element Value="0.001587"/>
+<Element Value="0.001583"/>
+<Element Value="0.001578"/>
+</Line>
+<Line>
+<Element Value="0.001650"/>
+<Element Value="0.001649"/>
+<Element Value="0.001646"/>
+<Element Value="0.001642"/>
+<Element Value="0.001635"/>
+<Element Value="0.001625"/>
+<Element Value="0.001611"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+<InternalPowerEntry RelatedPin="B1" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ed01288">
+<Line>
+<Element Value="0.000327"/>
+<Element Value="0.000327"/>
+<Element Value="0.000327"/>
+<Element Value="0.000327"/>
+<Element Value="0.000327"/>
+<Element Value="0.000328"/>
+<Element Value="0.000329"/>
+</Line>
+<Line>
+<Element Value="0.000322"/>
+<Element Value="0.000322"/>
+<Element Value="0.000322"/>
+<Element Value="0.000322"/>
+<Element Value="0.000322"/>
+<Element Value="0.000323"/>
+<Element Value="0.000324"/>
+</Line>
+<Line>
+<Element Value="0.000317"/>
+<Element Value="0.000317"/>
+<Element Value="0.000317"/>
+<Element Value="0.000317"/>
+<Element Value="0.000317"/>
+<Element Value="0.000318"/>
+<Element Value="0.000319"/>
+</Line>
+<Line>
+<Element Value="0.000313"/>
+<Element Value="0.000313"/>
+<Element Value="0.000313"/>
+<Element Value="0.000312"/>
+<Element Value="0.000313"/>
+<Element Value="0.000313"/>
+<Element Value="0.000314"/>
+</Line>
+<Line>
+<Element Value="0.000308"/>
+<Element Value="0.000308"/>
+<Element Value="0.000307"/>
+<Element Value="0.000307"/>
+<Element Value="0.000308"/>
+<Element Value="0.000308"/>
+<Element Value="0.000310"/>
+</Line>
+<Line>
+<Element Value="0.000302"/>
+<Element Value="0.000302"/>
+<Element Value="0.000301"/>
+<Element Value="0.000302"/>
+<Element Value="0.000302"/>
+<Element Value="0.000303"/>
+<Element Value="0.000305"/>
+</Line>
+<Line>
+<Element Value="0.000294"/>
+<Element Value="0.000293"/>
+<Element Value="0.000294"/>
+<Element Value="0.000294"/>
+<Element Value="0.000295"/>
+<Element Value="0.000297"/>
+<Element Value="0.000299"/>
+</Line>
+<Line>
+<Element Value="0.000286"/>
+<Element Value="0.000286"/>
+<Element Value="0.000286"/>
+<Element Value="0.000287"/>
+<Element Value="0.000288"/>
+<Element Value="0.000290"/>
+<Element Value="0.000293"/>
+</Line>
+<Line>
+<Element Value="0.000290"/>
+<Element Value="0.000290"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000289"/>
+<Element Value="0.000290"/>
+</Line>
+<Line>
+<Element Value="0.000326"/>
+<Element Value="0.000325"/>
+<Element Value="0.000324"/>
+<Element Value="0.000321"/>
+<Element Value="0.000317"/>
+<Element Value="0.000312"/>
+<Element Value="0.000306"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed05a38">
+<Line>
+<Element Value="0.002959"/>
+<Element Value="0.002958"/>
+<Element Value="0.002958"/>
+<Element Value="0.002957"/>
+<Element Value="0.002957"/>
+<Element Value="0.002957"/>
+<Element Value="0.002958"/>
+</Line>
+<Line>
+<Element Value="0.002952"/>
+<Element Value="0.002951"/>
+<Element Value="0.002951"/>
+<Element Value="0.002950"/>
+<Element Value="0.002950"/>
+<Element Value="0.002951"/>
+<Element Value="0.002952"/>
+</Line>
+<Line>
+<Element Value="0.002943"/>
+<Element Value="0.002943"/>
+<Element Value="0.002943"/>
+<Element Value="0.002943"/>
+<Element Value="0.002943"/>
+<Element Value="0.002944"/>
+<Element Value="0.002946"/>
+</Line>
+<Line>
+<Element Value="0.002934"/>
+<Element Value="0.002933"/>
+<Element Value="0.002933"/>
+<Element Value="0.002933"/>
+<Element Value="0.002935"/>
+<Element Value="0.002936"/>
+<Element Value="0.002939"/>
+</Line>
+<Line>
+<Element Value="0.002923"/>
+<Element Value="0.002922"/>
+<Element Value="0.002922"/>
+<Element Value="0.002923"/>
+<Element Value="0.002924"/>
+<Element Value="0.002927"/>
+<Element Value="0.002930"/>
+</Line>
+<Line>
+<Element Value="0.002912"/>
+<Element Value="0.002912"/>
+<Element Value="0.002912"/>
+<Element Value="0.002912"/>
+<Element Value="0.002913"/>
+<Element Value="0.002916"/>
+<Element Value="0.002920"/>
+</Line>
+<Line>
+<Element Value="0.002904"/>
+<Element Value="0.002903"/>
+<Element Value="0.002903"/>
+<Element Value="0.002903"/>
+<Element Value="0.002903"/>
+<Element Value="0.002905"/>
+<Element Value="0.002909"/>
+</Line>
+<Line>
+<Element Value="0.002895"/>
+<Element Value="0.002895"/>
+<Element Value="0.002895"/>
+<Element Value="0.002894"/>
+<Element Value="0.002894"/>
+<Element Value="0.002895"/>
+<Element Value="0.002898"/>
+</Line>
+<Line>
+<Element Value="0.002887"/>
+<Element Value="0.002886"/>
+<Element Value="0.002886"/>
+<Element Value="0.002886"/>
+<Element Value="0.002886"/>
+<Element Value="0.002886"/>
+<Element Value="0.002887"/>
+</Line>
+<Line>
+<Element Value="0.002878"/>
+<Element Value="0.002878"/>
+<Element Value="0.002877"/>
+<Element Value="0.002877"/>
+<Element Value="0.002877"/>
+<Element Value="0.002876"/>
+<Element Value="0.002876"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+<InternalPowerEntry RelatedPin="B2" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ed05d68">
+<Line>
+<Element Value="0.000372"/>
+<Element Value="0.000372"/>
+<Element Value="0.000372"/>
+<Element Value="0.000372"/>
+<Element Value="0.000372"/>
+<Element Value="0.000373"/>
+<Element Value="0.000374"/>
+</Line>
+<Line>
+<Element Value="0.000366"/>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000368"/>
+<Element Value="0.000369"/>
+</Line>
+<Line>
+<Element Value="0.000360"/>
+<Element Value="0.000360"/>
+<Element Value="0.000361"/>
+<Element Value="0.000361"/>
+<Element Value="0.000361"/>
+<Element Value="0.000362"/>
+<Element Value="0.000363"/>
+</Line>
+<Line>
+<Element Value="0.000355"/>
+<Element Value="0.000354"/>
+<Element Value="0.000354"/>
+<Element Value="0.000354"/>
+<Element Value="0.000354"/>
+<Element Value="0.000355"/>
+<Element Value="0.000356"/>
+</Line>
+<Line>
+<Element Value="0.000350"/>
+<Element Value="0.000349"/>
+<Element Value="0.000349"/>
+<Element Value="0.000349"/>
+<Element Value="0.000349"/>
+<Element Value="0.000350"/>
+<Element Value="0.000351"/>
+</Line>
+<Line>
+<Element Value="0.000344"/>
+<Element Value="0.000343"/>
+<Element Value="0.000343"/>
+<Element Value="0.000343"/>
+<Element Value="0.000344"/>
+<Element Value="0.000344"/>
+<Element Value="0.000346"/>
+</Line>
+<Line>
+<Element Value="0.000337"/>
+<Element Value="0.000336"/>
+<Element Value="0.000336"/>
+<Element Value="0.000336"/>
+<Element Value="0.000337"/>
+<Element Value="0.000338"/>
+<Element Value="0.000340"/>
+</Line>
+<Line>
+<Element Value="0.000329"/>
+<Element Value="0.000329"/>
+<Element Value="0.000329"/>
+<Element Value="0.000329"/>
+<Element Value="0.000330"/>
+<Element Value="0.000332"/>
+<Element Value="0.000334"/>
+</Line>
+<Line>
+<Element Value="0.000329"/>
+<Element Value="0.000328"/>
+<Element Value="0.000328"/>
+<Element Value="0.000328"/>
+<Element Value="0.000328"/>
+<Element Value="0.000329"/>
+<Element Value="0.000330"/>
+</Line>
+<Line>
+<Element Value="0.000352"/>
+<Element Value="0.000351"/>
+<Element Value="0.000350"/>
+<Element Value="0.000348"/>
+<Element Value="0.000346"/>
+<Element Value="0.000343"/>
+<Element Value="0.000340"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed06030">
+<Line>
+<Element Value="0.002998"/>
+<Element Value="0.002997"/>
+<Element Value="0.002997"/>
+<Element Value="0.002996"/>
+<Element Value="0.002996"/>
+<Element Value="0.002996"/>
+<Element Value="0.002998"/>
+</Line>
+<Line>
+<Element Value="0.002990"/>
+<Element Value="0.002989"/>
+<Element Value="0.002988"/>
+<Element Value="0.002988"/>
+<Element Value="0.002988"/>
+<Element Value="0.002988"/>
+<Element Value="0.002990"/>
+</Line>
+<Line>
+<Element Value="0.002982"/>
+<Element Value="0.002981"/>
+<Element Value="0.002980"/>
+<Element Value="0.002980"/>
+<Element Value="0.002980"/>
+<Element Value="0.002981"/>
+<Element Value="0.002983"/>
+</Line>
+<Line>
+<Element Value="0.002973"/>
+<Element Value="0.002973"/>
+<Element Value="0.002972"/>
+<Element Value="0.002972"/>
+<Element Value="0.002972"/>
+<Element Value="0.002973"/>
+<Element Value="0.002975"/>
+</Line>
+<Line>
+<Element Value="0.002965"/>
+<Element Value="0.002964"/>
+<Element Value="0.002963"/>
+<Element Value="0.002963"/>
+<Element Value="0.002964"/>
+<Element Value="0.002965"/>
+<Element Value="0.002968"/>
+</Line>
+<Line>
+<Element Value="0.002956"/>
+<Element Value="0.002955"/>
+<Element Value="0.002955"/>
+<Element Value="0.002955"/>
+<Element Value="0.002955"/>
+<Element Value="0.002957"/>
+<Element Value="0.002959"/>
+</Line>
+<Line>
+<Element Value="0.002947"/>
+<Element Value="0.002947"/>
+<Element Value="0.002946"/>
+<Element Value="0.002946"/>
+<Element Value="0.002946"/>
+<Element Value="0.002948"/>
+<Element Value="0.002950"/>
+</Line>
+<Line>
+<Element Value="0.002939"/>
+<Element Value="0.002938"/>
+<Element Value="0.002938"/>
+<Element Value="0.002938"/>
+<Element Value="0.002938"/>
+<Element Value="0.002938"/>
+<Element Value="0.002940"/>
+</Line>
+<Line>
+<Element Value="0.002930"/>
+<Element Value="0.002929"/>
+<Element Value="0.002929"/>
+<Element Value="0.002928"/>
+<Element Value="0.002928"/>
+<Element Value="0.002928"/>
+<Element Value="0.002929"/>
+</Line>
+<Line>
+<Element Value="0.002921"/>
+<Element Value="0.002920"/>
+<Element Value="0.002920"/>
+<Element Value="0.002919"/>
+<Element Value="0.002919"/>
+<Element Value="0.002919"/>
+<Element Value="0.002918"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+<InternalPowerEntry RelatedPin="C1" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ecff8e8">
+<Line>
+<Element Value="0.000345"/>
+<Element Value="0.000344"/>
+<Element Value="0.000344"/>
+<Element Value="0.000344"/>
+<Element Value="0.000345"/>
+<Element Value="0.000347"/>
+<Element Value="0.000350"/>
+</Line>
+<Line>
+<Element Value="0.000338"/>
+<Element Value="0.000338"/>
+<Element Value="0.000338"/>
+<Element Value="0.000338"/>
+<Element Value="0.000338"/>
+<Element Value="0.000340"/>
+<Element Value="0.000343"/>
+</Line>
+<Line>
+<Element Value="0.000331"/>
+<Element Value="0.000331"/>
+<Element Value="0.000330"/>
+<Element Value="0.000331"/>
+<Element Value="0.000331"/>
+<Element Value="0.000333"/>
+<Element Value="0.000336"/>
+</Line>
+<Line>
+<Element Value="0.000324"/>
+<Element Value="0.000324"/>
+<Element Value="0.000324"/>
+<Element Value="0.000324"/>
+<Element Value="0.000324"/>
+<Element Value="0.000326"/>
+<Element Value="0.000328"/>
+</Line>
+<Line>
+<Element Value="0.000317"/>
+<Element Value="0.000317"/>
+<Element Value="0.000316"/>
+<Element Value="0.000316"/>
+<Element Value="0.000317"/>
+<Element Value="0.000319"/>
+<Element Value="0.000321"/>
+</Line>
+<Line>
+<Element Value="0.000310"/>
+<Element Value="0.000309"/>
+<Element Value="0.000309"/>
+<Element Value="0.000309"/>
+<Element Value="0.000310"/>
+<Element Value="0.000312"/>
+<Element Value="0.000314"/>
+</Line>
+<Line>
+<Element Value="0.000301"/>
+<Element Value="0.000300"/>
+<Element Value="0.000300"/>
+<Element Value="0.000301"/>
+<Element Value="0.000302"/>
+<Element Value="0.000304"/>
+<Element Value="0.000307"/>
+</Line>
+<Line>
+<Element Value="0.000293"/>
+<Element Value="0.000293"/>
+<Element Value="0.000293"/>
+<Element Value="0.000293"/>
+<Element Value="0.000294"/>
+<Element Value="0.000297"/>
+<Element Value="0.000300"/>
+</Line>
+<Line>
+<Element Value="0.000295"/>
+<Element Value="0.000295"/>
+<Element Value="0.000294"/>
+<Element Value="0.000294"/>
+<Element Value="0.000294"/>
+<Element Value="0.000294"/>
+<Element Value="0.000296"/>
+</Line>
+<Line>
+<Element Value="0.000326"/>
+<Element Value="0.000325"/>
+<Element Value="0.000324"/>
+<Element Value="0.000322"/>
+<Element Value="0.000319"/>
+<Element Value="0.000314"/>
+<Element Value="0.000310"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed06680">
+<Line>
+<Element Value="0.003723"/>
+<Element Value="0.003723"/>
+<Element Value="0.003722"/>
+<Element Value="0.003722"/>
+<Element Value="0.003722"/>
+<Element Value="0.003722"/>
+<Element Value="0.003723"/>
+</Line>
+<Line>
+<Element Value="0.003716"/>
+<Element Value="0.003715"/>
+<Element Value="0.003715"/>
+<Element Value="0.003714"/>
+<Element Value="0.003714"/>
+<Element Value="0.003715"/>
+<Element Value="0.003716"/>
+</Line>
+<Line>
+<Element Value="0.003708"/>
+<Element Value="0.003707"/>
+<Element Value="0.003706"/>
+<Element Value="0.003706"/>
+<Element Value="0.003707"/>
+<Element Value="0.003707"/>
+<Element Value="0.003710"/>
+</Line>
+<Line>
+<Element Value="0.003698"/>
+<Element Value="0.003697"/>
+<Element Value="0.003697"/>
+<Element Value="0.003697"/>
+<Element Value="0.003698"/>
+<Element Value="0.003700"/>
+<Element Value="0.003703"/>
+</Line>
+<Line>
+<Element Value="0.003686"/>
+<Element Value="0.003686"/>
+<Element Value="0.003686"/>
+<Element Value="0.003686"/>
+<Element Value="0.003688"/>
+<Element Value="0.003690"/>
+<Element Value="0.003694"/>
+</Line>
+<Line>
+<Element Value="0.003675"/>
+<Element Value="0.003675"/>
+<Element Value="0.003675"/>
+<Element Value="0.003675"/>
+<Element Value="0.003676"/>
+<Element Value="0.003679"/>
+<Element Value="0.003684"/>
+</Line>
+<Line>
+<Element Value="0.003666"/>
+<Element Value="0.003665"/>
+<Element Value="0.003665"/>
+<Element Value="0.003665"/>
+<Element Value="0.003666"/>
+<Element Value="0.003667"/>
+<Element Value="0.003671"/>
+</Line>
+<Line>
+<Element Value="0.003657"/>
+<Element Value="0.003657"/>
+<Element Value="0.003656"/>
+<Element Value="0.003656"/>
+<Element Value="0.003656"/>
+<Element Value="0.003657"/>
+<Element Value="0.003660"/>
+</Line>
+<Line>
+<Element Value="0.003649"/>
+<Element Value="0.003649"/>
+<Element Value="0.003648"/>
+<Element Value="0.003648"/>
+<Element Value="0.003648"/>
+<Element Value="0.003648"/>
+<Element Value="0.003649"/>
+</Line>
+<Line>
+<Element Value="0.003640"/>
+<Element Value="0.003640"/>
+<Element Value="0.003639"/>
+<Element Value="0.003639"/>
+<Element Value="0.003639"/>
+<Element Value="0.003638"/>
+<Element Value="0.003638"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+<InternalPowerEntry RelatedPin="C2" When="" PowerLevel="" EqOrOpp="" RiseTog="" FallTog="">
+<fall_power>
+<LUT id="fall_power" Template="Power_X1" gid="0x2ed069c8">
+<Line>
+<Element Value="0.000375"/>
+<Element Value="0.000375"/>
+<Element Value="0.000374"/>
+<Element Value="0.000374"/>
+<Element Value="0.000375"/>
+<Element Value="0.000377"/>
+<Element Value="0.000380"/>
+</Line>
+<Line>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000367"/>
+<Element Value="0.000368"/>
+<Element Value="0.000370"/>
+<Element Value="0.000373"/>
+</Line>
+<Line>
+<Element Value="0.000359"/>
+<Element Value="0.000358"/>
+<Element Value="0.000359"/>
+<Element Value="0.000359"/>
+<Element Value="0.000360"/>
+<Element Value="0.000361"/>
+<Element Value="0.000364"/>
+</Line>
+<Line>
+<Element Value="0.000351"/>
+<Element Value="0.000350"/>
+<Element Value="0.000350"/>
+<Element Value="0.000350"/>
+<Element Value="0.000351"/>
+<Element Value="0.000353"/>
+<Element Value="0.000355"/>
+</Line>
+<Line>
+<Element Value="0.000344"/>
+<Element Value="0.000343"/>
+<Element Value="0.000343"/>
+<Element Value="0.000343"/>
+<Element Value="0.000343"/>
+<Element Value="0.000345"/>
+<Element Value="0.000347"/>
+</Line>
+<Line>
+<Element Value="0.000337"/>
+<Element Value="0.000336"/>
+<Element Value="0.000336"/>
+<Element Value="0.000336"/>
+<Element Value="0.000336"/>
+<Element Value="0.000338"/>
+<Element Value="0.000340"/>
+</Line>
+<Line>
+<Element Value="0.000329"/>
+<Element Value="0.000329"/>
+<Element Value="0.000328"/>
+<Element Value="0.000328"/>
+<Element Value="0.000329"/>
+<Element Value="0.000331"/>
+<Element Value="0.000333"/>
+</Line>
+<Line>
+<Element Value="0.000322"/>
+<Element Value="0.000322"/>
+<Element Value="0.000321"/>
+<Element Value="0.000321"/>
+<Element Value="0.000322"/>
+<Element Value="0.000324"/>
+<Element Value="0.000327"/>
+</Line>
+<Line>
+<Element Value="0.000321"/>
+<Element Value="0.000320"/>
+<Element Value="0.000320"/>
+<Element Value="0.000320"/>
+<Element Value="0.000320"/>
+<Element Value="0.000320"/>
+<Element Value="0.000322"/>
+</Line>
+<Line>
+<Element Value="0.000340"/>
+<Element Value="0.000340"/>
+<Element Value="0.000339"/>
+<Element Value="0.000337"/>
+<Element Value="0.000335"/>
+<Element Value="0.000333"/>
+<Element Value="0.000331"/>
+</Line>
+</LUT>
+</fall_power>
+<rise_power>
+<LUT id="rise_power" Template="Power_X1" gid="0x2ed06c90">
+<Line>
+<Element Value="0.003777"/>
+<Element Value="0.003776"/>
+<Element Value="0.003776"/>
+<Element Value="0.003775"/>
+<Element Value="0.003775"/>
+<Element Value="0.003775"/>
+<Element Value="0.003777"/>
+</Line>
+<Line>
+<Element Value="0.003768"/>
+<Element Value="0.003767"/>
+<Element Value="0.003767"/>
+<Element Value="0.003766"/>
+<Element Value="0.003766"/>
+<Element Value="0.003766"/>
+<Element Value="0.003768"/>
+</Line>
+<Line>
+<Element Value="0.003760"/>
+<Element Value="0.003759"/>
+<Element Value="0.003758"/>
+<Element Value="0.003758"/>
+<Element Value="0.003758"/>
+<Element Value="0.003759"/>
+<Element Value="0.003761"/>
+</Line>
+<Line>
+<Element Value="0.003752"/>
+<Element Value="0.003751"/>
+<Element Value="0.003750"/>
+<Element Value="0.003750"/>
+<Element Value="0.003750"/>
+<Element Value="0.003751"/>
+<Element Value="0.003753"/>
+</Line>
+<Line>
+<Element Value="0.003742"/>
+<Element Value="0.003742"/>
+<Element Value="0.003741"/>
+<Element Value="0.003741"/>
+<Element Value="0.003742"/>
+<Element Value="0.003743"/>
+<Element Value="0.003746"/>
+</Line>
+<Line>
+<Element Value="0.003733"/>
+<Element Value="0.003732"/>
+<Element Value="0.003732"/>
+<Element Value="0.003732"/>
+<Element Value="0.003732"/>
+<Element Value="0.003734"/>
+<Element Value="0.003737"/>
+</Line>
+<Line>
+<Element Value="0.003724"/>
+<Element Value="0.003723"/>
+<Element Value="0.003723"/>
+<Element Value="0.003722"/>
+<Element Value="0.003723"/>
+<Element Value="0.003724"/>
+<Element Value="0.003727"/>
+</Line>
+<Line>
+<Element Value="0.003715"/>
+<Element Value="0.003714"/>
+<Element Value="0.003714"/>
+<Element Value="0.003713"/>
+<Element Value="0.003713"/>
+<Element Value="0.003714"/>
+<Element Value="0.003716"/>
+</Line>
+<Line>
+<Element Value="0.003706"/>
+<Element Value="0.003706"/>
+<Element Value="0.003705"/>
+<Element Value="0.003705"/>
+<Element Value="0.003705"/>
+<Element Value="0.003705"/>
+<Element Value="0.003706"/>
+</Line>
+<Line>
+<Element Value="0.003697"/>
+<Element Value="0.003696"/>
+<Element Value="0.003696"/>
+<Element Value="0.003695"/>
+<Element Value="0.003695"/>
+<Element Value="0.003695"/>
+<Element Value="0.003695"/>
+</Line>
+</LUT>
+</rise_power>
+</InternalPowerEntry>
+</InternalPowerList>
+<TimingList>
+<TimingEntry RelatedPin="A1" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ecfb238" factor="0.001">
+<LinApprox>
+<Line cAng="22.6978" cLin="57.9172"/>
+<Line cAng="22.6944" cLin="60.9705"/>
+<Line cAng="22.6971" cLin="67.5287"/>
+<Line cAng="22.7067" cLin="80.867"/>
+<Line cAng="22.7099" cLin="107.727"/>
+<Line cAng="23.0358" cLin="159.729"/>
+<Line cAng="27.336" cLin="239.935"/>
+<Line cAng="40.1868" cLin="348.613"/>
+<Line cAng="62.4974" cLin="488.445"/>
+<Line cAng="99.7892" cLin="641.111"/>
+</LinApprox>
+<Line>
+<Element Value="62.497000"/>
+<Element Value="63.599000"/>
+<Element Value="69.258000"/>
+<Element Value="80.600000"/>
+<Element Value="103.290000"/>
+<Element Value="148.691000"/>
+<Element Value="239.515000"/>
+</Line>
+<Line>
+<Element Value="65.587000"/>
+<Element Value="66.687000"/>
+<Element Value="72.281000"/>
+<Element Value="83.618000"/>
+<Element Value="106.319000"/>
+<Element Value="151.725000"/>
+<Element Value="242.552000"/>
+</Line>
+<Line>
+<Element Value="72.167000"/>
+<Element Value="73.244000"/>
+<Element Value="78.829000"/>
+<Element Value="90.173000"/>
+<Element Value="112.877000"/>
+<Element Value="158.296000"/>
+<Element Value="249.133000"/>
+</Line>
+<Line>
+<Element Value="85.476000"/>
+<Element Value="86.571000"/>
+<Element Value="92.181000"/>
+<Element Value="103.540000"/>
+<Element Value="126.251000"/>
+<Element Value="171.685000"/>
+<Element Value="262.536000"/>
+</Line>
+<Line>
+<Element Value="112.313000"/>
+<Element Value="113.416000"/>
+<Element Value="119.062000"/>
+<Element Value="130.414000"/>
+<Element Value="153.128000"/>
+<Element Value="198.562000"/>
+<Element Value="289.415000"/>
+</Line>
+<Line>
+<Element Value="162.983000"/>
+<Element Value="164.370000"/>
+<Element Value="171.222000"/>
+<Element Value="184.029000"/>
+<Element Value="207.148000"/>
+<Element Value="252.494000"/>
+<Element Value="343.281000"/>
+</Line>
+<Line>
+<Element Value="238.707000"/>
+<Element Value="240.816000"/>
+<Element Value="251.153000"/>
+<Element Value="270.277000"/>
+<Element Value="303.837000"/>
+<Element Value="359.360000"/>
+<Element Value="451.406000"/>
+</Line>
+<Line>
+<Element Value="344.694000"/>
+<Element Value="348.003000"/>
+<Element Value="364.154000"/>
+<Element Value="393.808000"/>
+<Element Value="445.230000"/>
+<Element Value="528.727000"/>
+<Element Value="656.653000"/>
+</Line>
+<Line>
+<Element Value="480.827000"/>
+<Element Value="486.149000"/>
+<Element Value="512.057000"/>
+<Element Value="559.386000"/>
+<Element Value="640.767000"/>
+<Element Value="770.939000"/>
+<Element Value="965.826000"/>
+</Line>
+<Line>
+<Element Value="627.554000"/>
+<Element Value="636.188000"/>
+<Element Value="678.197000"/>
+<Element Value="754.864000"/>
+<Element Value="886.268000"/>
+<Element Value="1094.709000"/>
+<Element Value="1401.636000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ecfb950" factor="0.001">
+<LinApprox>
+<Line cAng="205.193" cLin="395.599"/>
+<Line cAng="205.293" cLin="395.931"/>
+<Line cAng="205.478" cLin="398.81"/>
+<Line cAng="205.732" cLin="407.371"/>
+<Line cAng="205.924" cLin="428.764"/>
+<Line cAng="205.79" cLin="477.458"/>
+<Line cAng="205.017" cLin="580.797"/>
+<Line cAng="202.553" cLin="794.778"/>
+<Line cAng="197.875" cLin="1224.99"/>
+<Line cAng="220.37" cLin="1894.08"/>
+</LinApprox>
+<Line>
+<Element Value="438.173000"/>
+<Element Value="447.965000"/>
+<Element Value="497.975000"/>
+<Element Value="599.495000"/>
+<Element Value="804.652000"/>
+<Element Value="1215.996000"/>
+<Element Value="2037.773000"/>
+</Line>
+<Line>
+<Element Value="438.574000"/>
+<Element Value="448.222000"/>
+<Element Value="498.297000"/>
+<Element Value="599.909000"/>
+<Element Value="805.240000"/>
+<Element Value="1216.877000"/>
+<Element Value="2038.817000"/>
+</Line>
+<Line>
+<Element Value="441.381000"/>
+<Element Value="451.081000"/>
+<Element Value="501.204000"/>
+<Element Value="602.997000"/>
+<Element Value="808.641000"/>
+<Element Value="1220.696000"/>
+<Element Value="2043.047000"/>
+</Line>
+<Line>
+<Element Value="449.938000"/>
+<Element Value="459.649000"/>
+<Element Value="509.819000"/>
+<Element Value="611.789000"/>
+<Element Value="817.825000"/>
+<Element Value="1230.489000"/>
+<Element Value="2053.512000"/>
+</Line>
+<Line>
+<Element Value="471.528000"/>
+<Element Value="481.218000"/>
+<Element Value="531.296000"/>
+<Element Value="633.217000"/>
+<Element Value="839.434000"/>
+<Element Value="1252.648000"/>
+<Element Value="2076.499000"/>
+</Line>
+<Line>
+<Element Value="520.776000"/>
+<Element Value="530.377000"/>
+<Element Value="580.037000"/>
+<Element Value="681.389000"/>
+<Element Value="887.130000"/>
+<Element Value="1300.262000"/>
+<Element Value="2124.586000"/>
+</Line>
+<Line>
+<Element Value="625.319000"/>
+<Element Value="634.672000"/>
+<Element Value="683.221000"/>
+<Element Value="783.054000"/>
+<Element Value="987.287000"/>
+<Element Value="1399.229000"/>
+<Element Value="2222.818000"/>
+</Line>
+<Line>
+<Element Value="843.844000"/>
+<Element Value="852.256000"/>
+<Element Value="896.650000"/>
+<Element Value="990.926000"/>
+<Element Value="1190.345000"/>
+<Element Value="1599.455000"/>
+<Element Value="2420.686000"/>
+</Line>
+<Line>
+<Element Value="1268.071000"/>
+<Element Value="1278.366000"/>
+<Element Value="1329.822000"/>
+<Element Value="1427.638000"/>
+<Element Value="1608.273000"/>
+<Element Value="2001.370000"/>
+<Element Value="2817.494000"/>
+</Line>
+<Line>
+<Element Value="1901.422000"/>
+<Element Value="1916.275000"/>
+<Element Value="1990.446000"/>
+<Element Value="2131.015000"/>
+<Element Value="2386.842000"/>
+<Element Value="2829.778000"/>
+<Element Value="3617.659000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ecfb3b8" factor="0.001">
+<LinApprox>
+<Line cAng="41.3552" cLin="109.65"/>
+<Line cAng="41.356" cLin="109.126"/>
+<Line cAng="41.3616" cLin="108.552"/>
+<Line cAng="41.2164" cLin="108.926"/>
+<Line cAng="39.9834" cLin="116.926"/>
+<Line cAng="36.8786" cLin="146.554"/>
+<Line cAng="32.4537" cLin="220.964"/>
+<Line cAng="31.6581" cLin="358.955"/>
+<Line cAng="38.7652" cLin="597.867"/>
+<Line cAng="53.3098" cLin="1015.22"/>
+</LinApprox>
+<Line>
+<Element Value="118.020000"/>
+<Element Value="120.034000"/>
+<Element Value="130.359000"/>
+<Element Value="150.985000"/>
+<Element Value="192.242000"/>
+<Element Value="274.944000"/>
+<Element Value="440.581000"/>
+</Line>
+<Line>
+<Element Value="117.470000"/>
+<Element Value="119.494000"/>
+<Element Value="129.875000"/>
+<Element Value="150.456000"/>
+<Element Value="191.727000"/>
+<Element Value="274.430000"/>
+<Element Value="440.058000"/>
+</Line>
+<Line>
+<Element Value="116.927000"/>
+<Element Value="118.953000"/>
+<Element Value="129.260000"/>
+<Element Value="149.843000"/>
+<Element Value="191.174000"/>
+<Element Value="273.906000"/>
+<Element Value="439.519000"/>
+</Line>
+<Line>
+<Element Value="117.652000"/>
+<Element Value="119.608000"/>
+<Element Value="129.679000"/>
+<Element Value="149.860000"/>
+<Element Value="190.667000"/>
+<Element Value="273.381000"/>
+<Element Value="439.038000"/>
+</Line>
+<Line>
+<Element Value="126.478000"/>
+<Element Value="128.256000"/>
+<Element Value="137.554000"/>
+<Element Value="156.295000"/>
+<Element Value="194.750000"/>
+<Element Value="274.335000"/>
+<Element Value="438.547000"/>
+</Line>
+<Line>
+<Element Value="156.580000"/>
+<Element Value="158.115000"/>
+<Element Value="166.157000"/>
+<Element Value="182.338000"/>
+<Element Value="216.630000"/>
+<Element Value="289.620000"/>
+<Element Value="444.652000"/>
+</Line>
+<Line>
+<Element Value="229.296000"/>
+<Element Value="230.843000"/>
+<Element Value="238.732000"/>
+<Element Value="253.681000"/>
+<Element Value="282.771000"/>
+<Element Value="345.065000"/>
+<Element Value="483.995000"/>
+</Line>
+<Line>
+<Element Value="362.305000"/>
+<Element Value="364.166000"/>
+<Element Value="373.730000"/>
+<Element Value="391.960000"/>
+<Element Value="426.479000"/>
+<Element Value="489.950000"/>
+<Element Value="609.044000"/>
+</Line>
+<Line>
+<Element Value="599.625000"/>
+<Element Value="602.146000"/>
+<Element Value="614.870000"/>
+<Element Value="639.029000"/>
+<Element Value="683.612000"/>
+<Element Value="763.049000"/>
+<Element Value="901.042000"/>
+</Line>
+<Line>
+<Element Value="1013.190000"/>
+<Element Value="1017.189000"/>
+<Element Value="1037.122000"/>
+<Element Value="1074.012000"/>
+<Element Value="1139.118000"/>
+<Element Value="1248.569000"/>
+<Element Value="1427.599000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c6a9fb8" factor="0.001">
+<Line>
+<Element Value="92.580320"/>
+<Element Value="95.604128"/>
+<Element Value="102.160712"/>
+<Element Value="115.531408"/>
+<Element Value="142.406992"/>
+<Element Value="196.235832"/>
+<Element Value="287.996680"/>
+<Element Value="420.958816"/>
+<Element Value="602.355168"/>
+<Element Value="824.245312"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c622fb0" factor="0.001">
+<Line>
+<Element Value="707.817896"/>
+<Element Value="708.323768"/>
+<Element Value="711.577032"/>
+<Element Value="720.576008"/>
+<Element Value="742.099576"/>
+<Element Value="790.020248"/>
+<Element Value="890.889024"/>
+<Element Value="1096.219232"/>
+<Element Value="1523.013280"/>
+<Element Value="2266.091656"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ecfc5e0" factor="0.001">
+<LinApprox>
+<Line cAng="405.665" cLin="1082.37"/>
+<Line cAng="405.734" cLin="1077.32"/>
+<Line cAng="405.905" cLin="1071.51"/>
+<Line cAng="406.211" cLin="1064.54"/>
+<Line cAng="406.72" cLin="1055.5"/>
+<Line cAng="407.287" cLin="1043.56"/>
+<Line cAng="403.892" cLin="1049.49"/>
+<Line cAng="390.229" cLin="1119.53"/>
+<Line cAng="368.45" cLin="1327.95"/>
+<Line cAng="350.426" cLin="1776.17"/>
+</LinApprox>
+<Line>
+<Element Value="1158.619000"/>
+<Element Value="1178.899000"/>
+<Element Value="1282.386000"/>
+<Element Value="1489.203000"/>
+<Element Value="1900.927000"/>
+<Element Value="2716.391000"/>
+<Element Value="4320.502000"/>
+</Line>
+<Line>
+<Element Value="1153.492000"/>
+<Element Value="1173.748000"/>
+<Element Value="1277.366000"/>
+<Element Value="1484.294000"/>
+<Element Value="1896.144000"/>
+<Element Value="2711.767000"/>
+<Element Value="4315.907000"/>
+</Line>
+<Line>
+<Element Value="1147.558000"/>
+<Element Value="1167.862000"/>
+<Element Value="1271.585000"/>
+<Element Value="1478.726000"/>
+<Element Value="1890.885000"/>
+<Element Value="2706.864000"/>
+<Element Value="4311.302000"/>
+</Line>
+<Line>
+<Element Value="1140.489000"/>
+<Element Value="1160.821000"/>
+<Element Value="1264.680000"/>
+<Element Value="1472.109000"/>
+<Element Value="1884.770000"/>
+<Element Value="2701.435000"/>
+<Element Value="4306.576000"/>
+</Line>
+<Line>
+<Element Value="1131.434000"/>
+<Element Value="1151.803000"/>
+<Element Value="1255.811000"/>
+<Element Value="1463.594000"/>
+<Element Value="1876.900000"/>
+<Element Value="2694.742000"/>
+<Element Value="4301.415000"/>
+</Line>
+<Line>
+<Element Value="1121.180000"/>
+<Element Value="1141.292000"/>
+<Element Value="1244.150000"/>
+<Element Value="1450.663000"/>
+<Element Value="1864.568000"/>
+<Element Value="2684.564000"/>
+<Element Value="4294.771000"/>
+</Line>
+<Line>
+<Element Value="1133.442000"/>
+<Element Value="1152.824000"/>
+<Element Value="1251.950000"/>
+<Element Value="1451.300000"/>
+<Element Value="1852.882000"/>
+<Element Value="2663.587000"/>
+<Element Value="4282.539000"/>
+</Line>
+<Line>
+<Element Value="1205.925000"/>
+<Element Value="1224.260000"/>
+<Element Value="1317.983000"/>
+<Element Value="1506.783000"/>
+<Element Value="1888.808000"/>
+<Element Value="2665.978000"/>
+<Element Value="4251.116000"/>
+</Line>
+<Line>
+<Element Value="1410.357000"/>
+<Element Value="1428.057000"/>
+<Element Value="1517.643000"/>
+<Element Value="1695.337000"/>
+<Element Value="2051.572000"/>
+<Element Value="2780.769000"/>
+<Element Value="4288.676000"/>
+</Line>
+<Line>
+<Element Value="1834.585000"/>
+<Element Value="1854.236000"/>
+<Element Value="1952.180000"/>
+<Element Value="2139.198000"/>
+<Element Value="2490.725000"/>
+<Element Value="3175.018000"/>
+<Element Value="4576.544000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+<TimingEntry RelatedPin="A2" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ecfcc68" factor="0.001">
+<LinApprox>
+<Line cAng="22.6918" cLin="61.3034"/>
+<Line cAng="22.6841" cLin="64.4834"/>
+<Line cAng="22.6907" cLin="70.9854"/>
+<Line cAng="22.7075" cLin="83.0384"/>
+<Line cAng="22.7307" cLin="106.818"/>
+<Line cAng="23.0781" cLin="152.588"/>
+<Line cAng="25.9463" cLin="228.88"/>
+<Line cAng="34.809" cLin="343.325"/>
+<Line cAng="53.6399" cLin="498.271"/>
+<Line cAng="89.1505" cLin="677.471"/>
+</LinApprox>
+<Line>
+<Element Value="65.904000"/>
+<Element Value="66.984000"/>
+<Element Value="72.639000"/>
+<Element Value="83.973000"/>
+<Element Value="106.652000"/>
+<Element Value="152.045000"/>
+<Element Value="242.861000"/>
+</Line>
+<Line>
+<Element Value="69.173000"/>
+<Element Value="70.198000"/>
+<Element Value="75.763000"/>
+<Element Value="87.096000"/>
+<Element Value="109.784000"/>
+<Element Value="155.181000"/>
+<Element Value="246.000000"/>
+</Line>
+<Line>
+<Element Value="75.618000"/>
+<Element Value="76.711000"/>
+<Element Value="82.284000"/>
+<Element Value="93.625000"/>
+<Element Value="116.314000"/>
+<Element Value="161.718000"/>
+<Element Value="252.545000"/>
+</Line>
+<Line>
+<Element Value="87.607000"/>
+<Element Value="88.714000"/>
+<Element Value="94.390000"/>
+<Element Value="105.730000"/>
+<Element Value="128.443000"/>
+<Element Value="173.865000"/>
+<Element Value="264.704000"/>
+</Line>
+<Line>
+<Element Value="111.369000"/>
+<Element Value="112.484000"/>
+<Element Value="118.168000"/>
+<Element Value="129.551000"/>
+<Element Value="152.295000"/>
+<Element Value="197.766000"/>
+<Element Value="288.648000"/>
+</Line>
+<Line>
+<Element Value="156.248000"/>
+<Element Value="157.530000"/>
+<Element Value="163.972000"/>
+<Element Value="176.418000"/>
+<Element Value="199.937000"/>
+<Element Value="245.553000"/>
+<Element Value="336.554000"/>
+</Line>
+<Line>
+<Element Value="230.023000"/>
+<Element Value="231.769000"/>
+<Element Value="240.409000"/>
+<Element Value="256.689000"/>
+<Element Value="286.267000"/>
+<Element Value="338.732000"/>
+<Element Value="432.114000"/>
+</Line>
+<Line>
+<Element Value="341.126000"/>
+<Element Value="343.888000"/>
+<Element Value="357.433000"/>
+<Element Value="382.280000"/>
+<Element Value="425.390000"/>
+<Element Value="496.451000"/>
+<Element Value="611.912000"/>
+</Line>
+<Line>
+<Element Value="490.799000"/>
+<Element Value="495.480000"/>
+<Element Value="518.305000"/>
+<Element Value="559.757000"/>
+<Element Value="630.294000"/>
+<Element Value="741.591000"/>
+<Element Value="907.229000"/>
+</Line>
+<Line>
+<Element Value="662.681000"/>
+<Element Value="670.697000"/>
+<Element Value="709.698000"/>
+<Element Value="780.405000"/>
+<Element Value="900.135000"/>
+<Element Value="1086.481000"/>
+<Element Value="1354.154000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ecfd2f0" factor="0.001">
+<LinApprox>
+<Line cAng="205.282" cLin="436.188"/>
+<Line cAng="205.317" cLin="435.833"/>
+<Line cAng="205.4" cLin="438.856"/>
+<Line cAng="205.529" cLin="448.367"/>
+<Line cAng="205.649" cLin="471.079"/>
+<Line cAng="205.58" cLin="520.679"/>
+<Line cAng="205.073" cLin="623.684"/>
+<Line cAng="203.214" cLin="834.625"/>
+<Line cAng="197.977" cLin="1267.31"/>
+<Line cAng="217.569" cLin="1955.14"/>
+</LinApprox>
+<Line>
+<Element Value="478.561000"/>
+<Element Value="488.221000"/>
+<Element Value="538.620000"/>
+<Element Value="640.399000"/>
+<Element Value="845.785000"/>
+<Element Value="1257.087000"/>
+<Element Value="2078.892000"/>
+</Line>
+<Line>
+<Element Value="478.198000"/>
+<Element Value="487.893000"/>
+<Element Value="538.170000"/>
+<Element Value="640.089000"/>
+<Element Value="845.520000"/>
+<Element Value="1257.022000"/>
+<Element Value="2078.741000"/>
+</Line>
+<Line>
+<Element Value="481.220000"/>
+<Element Value="490.893000"/>
+<Element Value="541.198000"/>
+<Element Value="643.200000"/>
+<Element Value="848.764000"/>
+<Element Value="1260.476000"/>
+<Element Value="2082.367000"/>
+</Line>
+<Line>
+<Element Value="490.702000"/>
+<Element Value="500.409000"/>
+<Element Value="550.737000"/>
+<Element Value="652.832000"/>
+<Element Value="858.615000"/>
+<Element Value="1270.627000"/>
+<Element Value="2092.838000"/>
+</Line>
+<Line>
+<Element Value="513.490000"/>
+<Element Value="523.199000"/>
+<Element Value="573.520000"/>
+<Element Value="675.602000"/>
+<Element Value="881.499000"/>
+<Element Value="1293.808000"/>
+<Element Value="2116.530000"/>
+</Line>
+<Line>
+<Element Value="563.393000"/>
+<Element Value="573.057000"/>
+<Element Value="623.150000"/>
+<Element Value="724.910000"/>
+<Element Value="930.563000"/>
+<Element Value="1342.854000"/>
+<Element Value="2165.829000"/>
+</Line>
+<Line>
+<Element Value="667.241000"/>
+<Element Value="676.731000"/>
+<Element Value="726.048000"/>
+<Element Value="826.764000"/>
+<Element Value="1031.427000"/>
+<Element Value="1442.985000"/>
+<Element Value="2265.501000"/>
+</Line>
+<Line>
+<Element Value="881.668000"/>
+<Element Value="890.423000"/>
+<Element Value="936.522000"/>
+<Element Value="1033.046000"/>
+<Element Value="1234.134000"/>
+<Element Value="1643.546000"/>
+<Element Value="2464.302000"/>
+</Line>
+<Line>
+<Element Value="1312.637000"/>
+<Element Value="1322.537000"/>
+<Element Value="1372.370000"/>
+<Element Value="1467.509000"/>
+<Element Value="1647.780000"/>
+<Element Value="2044.883000"/>
+<Element Value="2861.185000"/>
+</Line>
+<Line>
+<Element Value="1965.546000"/>
+<Element Value="1979.809000"/>
+<Element Value="2051.521000"/>
+<Element Value="2187.988000"/>
+<Element Value="2437.706000"/>
+<Element Value="2872.945000"/>
+<Element Value="3660.690000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ecfd938" factor="0.001">
+<LinApprox>
+<Line cAng="41.3559" cLin="109.645"/>
+<Line cAng="41.3568" cLin="109.118"/>
+<Line cAng="41.3609" cLin="108.568"/>
+<Line cAng="41.3046" cLin="108.395"/>
+<Line cAng="40.6584" cLin="112.426"/>
+<Line cAng="38.7918" cLin="130.141"/>
+<Line cAng="35.2306" cLin="182.22"/>
+<Line cAng="32.64" cLin="292.264"/>
+<Line cAng="34.2388" cLin="502.973"/>
+<Line cAng="41.7003" cLin="891.547"/>
+</LinApprox>
+<Line>
+<Element Value="118.007000"/>
+<Element Value="120.027000"/>
+<Element Value="130.366000"/>
+<Element Value="150.978000"/>
+<Element Value="192.235000"/>
+<Element Value="274.948000"/>
+<Element Value="440.579000"/>
+</Line>
+<Line>
+<Element Value="117.470000"/>
+<Element Value="119.481000"/>
+<Element Value="129.860000"/>
+<Element Value="150.455000"/>
+<Element Value="191.724000"/>
+<Element Value="274.424000"/>
+<Element Value="440.057000"/>
+</Line>
+<Line>
+<Element Value="116.931000"/>
+<Element Value="118.943000"/>
+<Element Value="129.283000"/>
+<Element Value="149.913000"/>
+<Element Value="191.184000"/>
+<Element Value="273.886000"/>
+<Element Value="439.540000"/>
+</Line>
+<Line>
+<Element Value="116.919000"/>
+<Element Value="118.907000"/>
+<Element Value="129.167000"/>
+<Element Value="149.470000"/>
+<Element Value="190.680000"/>
+<Element Value="273.401000"/>
+<Element Value="439.027000"/>
+</Line>
+<Line>
+<Element Value="121.260000"/>
+<Element Value="123.200000"/>
+<Element Value="133.144000"/>
+<Element Value="152.819000"/>
+<Element Value="192.701000"/>
+<Element Value="273.805000"/>
+<Element Value="438.553000"/>
+</Line>
+<Line>
+<Element Value="139.499000"/>
+<Element Value="141.227000"/>
+<Element Value="150.302000"/>
+<Element Value="168.257000"/>
+<Element Value="205.455000"/>
+<Element Value="282.648000"/>
+<Element Value="442.325000"/>
+</Line>
+<Line>
+<Element Value="190.962000"/>
+<Element Value="192.642000"/>
+<Element Value="201.082000"/>
+<Element Value="217.413000"/>
+<Element Value="249.916000"/>
+<Element Value="318.583000"/>
+<Element Value="466.870000"/>
+</Line>
+<Line>
+<Element Value="298.052000"/>
+<Element Value="299.763000"/>
+<Element Value="308.567000"/>
+<Element Value="325.398000"/>
+<Element Value="358.510000"/>
+<Element Value="423.270000"/>
+<Element Value="552.899000"/>
+</Line>
+<Line>
+<Element Value="506.869000"/>
+<Element Value="508.912000"/>
+<Element Value="519.127000"/>
+<Element Value="538.638000"/>
+<Element Value="575.448000"/>
+<Element Value="644.082000"/>
+<Element Value="773.845000"/>
+</Line>
+<Line>
+<Element Value="891.488000"/>
+<Element Value="894.494000"/>
+<Element Value="909.405000"/>
+<Element Value="937.101000"/>
+<Element Value="986.361000"/>
+<Element Value="1070.962000"/>
+<Element Value="1216.138000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c8941c8" factor="0.001">
+<Line>
+<Element Value="97.489684"/>
+<Element Value="100.618048"/>
+<Element Value="107.147644"/>
+<Element Value="119.266948"/>
+<Element Value="143.106424"/>
+<Element Value="190.435324"/>
+<Element Value="274.317488"/>
+<Element Value="407.973560"/>
+<Element Value="601.797052"/>
+<Element Value="851.764080"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c6e9720" factor="0.001">
+<Line>
+<Element Value="762.809056"/>
+<Element Value="762.525876"/>
+<Element Value="765.716144"/>
+<Element Value="775.478668"/>
+<Element Value="798.316612"/>
+<Element Value="847.479188"/>
+<Element Value="948.743148"/>
+<Element Value="1152.894448"/>
+<Element Value="1574.950516"/>
+<Element Value="2336.819928"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ecfdf80" factor="0.001">
+<LinApprox>
+<Line cAng="405.694" cLin="1137.31"/>
+<Line cAng="405.763" cLin="1131.5"/>
+<Line cAng="405.878" cLin="1125.4"/>
+<Line cAng="406.08" cLin="1118.61"/>
+<Line cAng="406.468" cLin="1110.05"/>
+<Line cAng="407.092" cLin="1097.74"/>
+<Line cAng="404.276" cLin="1099.91"/>
+<Line cAng="391.348" cLin="1163.51"/>
+<Line cAng="369.817" cLin="1365.1"/>
+<Line cAng="351.119" cLin="1810.48"/>
+</LinApprox>
+<Line>
+<Element Value="1213.835000"/>
+<Element Value="1233.920000"/>
+<Element Value="1337.326000"/>
+<Element Value="1544.019000"/>
+<Element Value="1955.775000"/>
+<Element Value="2771.366000"/>
+<Element Value="4375.780000"/>
+</Line>
+<Line>
+<Element Value="1207.904000"/>
+<Element Value="1228.057000"/>
+<Element Value="1331.524000"/>
+<Element Value="1538.354000"/>
+<Element Value="1950.196000"/>
+<Element Value="2765.943000"/>
+<Element Value="4370.423000"/>
+</Line>
+<Line>
+<Element Value="1201.746000"/>
+<Element Value="1221.907000"/>
+<Element Value="1325.452000"/>
+<Element Value="1532.404000"/>
+<Element Value="1944.436000"/>
+<Element Value="2760.442000"/>
+<Element Value="4365.148000"/>
+</Line>
+<Line>
+<Element Value="1194.896000"/>
+<Element Value="1215.094000"/>
+<Element Value="1318.713000"/>
+<Element Value="1525.856000"/>
+<Element Value="1938.198000"/>
+<Element Value="2754.659000"/>
+<Element Value="4359.856000"/>
+</Line>
+<Line>
+<Element Value="1186.316000"/>
+<Element Value="1206.545000"/>
+<Element Value="1310.283000"/>
+<Element Value="1517.696000"/>
+<Element Value="1930.557000"/>
+<Element Value="2747.875000"/>
+<Element Value="4354.251000"/>
+</Line>
+<Line>
+<Element Value="1175.148000"/>
+<Element Value="1195.202000"/>
+<Element Value="1298.159000"/>
+<Element Value="1504.907000"/>
+<Element Value="1918.646000"/>
+<Element Value="2737.882000"/>
+<Element Value="4347.317000"/>
+</Line>
+<Line>
+<Element Value="1183.389000"/>
+<Element Value="1202.763000"/>
+<Element Value="1302.208000"/>
+<Element Value="1502.214000"/>
+<Element Value="1904.881000"/>
+<Element Value="2717.004000"/>
+<Element Value="4335.140000"/>
+</Line>
+<Line>
+<Element Value="1249.634000"/>
+<Element Value="1268.002000"/>
+<Element Value="1362.213000"/>
+<Element Value="1552.029000"/>
+<Element Value="1935.863000"/>
+<Element Value="2715.519000"/>
+<Element Value="4303.342000"/>
+</Line>
+<Line>
+<Element Value="1448.042000"/>
+<Element Value="1465.648000"/>
+<Element Value="1555.141000"/>
+<Element Value="1733.282000"/>
+<Element Value="2091.484000"/>
+<Element Value="2824.288000"/>
+<Element Value="4336.393000"/>
+</Line>
+<Line>
+<Element Value="1871.042000"/>
+<Element Value="1890.417000"/>
+<Element Value="1987.290000"/>
+<Element Value="2171.911000"/>
+<Element Value="2524.608000"/>
+<Element Value="3210.722000"/>
+<Element Value="4617.685000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+<TimingEntry RelatedPin="B1" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ecfe5c8" factor="0.001">
+<LinApprox>
+<Line cAng="24.9411" cLin="82.8596"/>
+<Line cAng="24.9325" cLin="85.8907"/>
+<Line cAng="24.9206" cLin="92.486"/>
+<Line cAng="24.8942" cLin="105.992"/>
+<Line cAng="24.7889" cLin="133.454"/>
+<Line cAng="24.3577" cLin="190.053"/>
+<Line cAng="25.4536" cLin="292.478"/>
+<Line cAng="34.4423" cLin="441.68"/>
+<Line cAng="51.5349" cLin="650.784"/>
+<Line cAng="79.7172" cLin="923.804"/>
+</LinApprox>
+<Line>
+<Element Value="86.772000"/>
+<Element Value="88.070000"/>
+<Element Value="94.856000"/>
+<Element Value="108.250000"/>
+<Element Value="134.296000"/>
+<Element Value="184.479000"/>
+<Element Value="281.105000"/>
+</Line>
+<Line>
+<Element Value="89.824000"/>
+<Element Value="91.145000"/>
+<Element Value="97.860000"/>
+<Element Value="111.248000"/>
+<Element Value="137.287000"/>
+<Element Value="187.463000"/>
+<Element Value="284.082000"/>
+</Line>
+<Line>
+<Element Value="96.457000"/>
+<Element Value="97.745000"/>
+<Element Value="104.439000"/>
+<Element Value="117.819000"/>
+<Element Value="143.835000"/>
+<Element Value="193.993000"/>
+<Element Value="290.597000"/>
+</Line>
+<Line>
+<Element Value="109.973000"/>
+<Element Value="111.276000"/>
+<Element Value="117.956000"/>
+<Element Value="131.286000"/>
+<Element Value="157.241000"/>
+<Element Value="207.350000"/>
+<Element Value="303.924000"/>
+</Line>
+<Line>
+<Element Value="137.572000"/>
+<Element Value="138.857000"/>
+<Element Value="145.423000"/>
+<Element Value="158.542000"/>
+<Element Value="184.271000"/>
+<Element Value="234.206000"/>
+<Element Value="330.693000"/>
+</Line>
+<Line>
+<Element Value="194.707000"/>
+<Element Value="195.903000"/>
+<Element Value="202.001000"/>
+<Element Value="214.353000"/>
+<Element Value="239.154000"/>
+<Element Value="288.325000"/>
+<Element Value="384.432000"/>
+</Line>
+<Line>
+<Element Value="293.931000"/>
+<Element Value="295.610000"/>
+<Element Value="303.990000"/>
+<Element Value="319.882000"/>
+<Element Value="348.722000"/>
+<Element Value="398.505000"/>
+<Element Value="492.690000"/>
+</Line>
+<Line>
+<Element Value="441.073000"/>
+<Element Value="443.533000"/>
+<Element Value="455.784000"/>
+<Element Value="478.959000"/>
+<Element Value="520.872000"/>
+<Element Value="592.577000"/>
+<Element Value="708.316000"/>
+</Line>
+<Line>
+<Element Value="649.399000"/>
+<Element Value="653.134000"/>
+<Element Value="671.675000"/>
+<Element Value="706.697000"/>
+<Element Value="769.920000"/>
+<Element Value="877.511000"/>
+<Element Value="1049.131000"/>
+</Line>
+<Line>
+<Element Value="921.222000"/>
+<Element Value="927.028000"/>
+<Element Value="955.879000"/>
+<Element Value="1010.374000"/>
+<Element Value="1108.719000"/>
+<Element Value="1275.545000"/>
+<Element Value="1539.350000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ecfec90" factor="0.001">
+<LinApprox>
+<Line cAng="205.565" cLin="1076.7"/>
+<Line cAng="205.652" cLin="1075.79"/>
+<Line cAng="205.823" cLin="1077.56"/>
+<Line cAng="206.063" cLin="1085.12"/>
+<Line cAng="206.281" cLin="1105.51"/>
+<Line cAng="206.314" cLin="1152.95"/>
+<Line cAng="206.124" cLin="1254.62"/>
+<Line cAng="205.89" cLin="1462.31"/>
+<Line cAng="205.751" cLin="1860.15"/>
+<Line cAng="210.95" cLin="2564.79"/>
+</LinApprox>
+<Line>
+<Element Value="1117.804000"/>
+<Element Value="1127.689000"/>
+<Element Value="1179.172000"/>
+<Element Value="1282.295000"/>
+<Element Value="1488.300000"/>
+<Element Value="1899.542000"/>
+<Element Value="2720.836000"/>
+</Line>
+<Line>
+<Element Value="1116.859000"/>
+<Element Value="1126.740000"/>
+<Element Value="1178.265000"/>
+<Element Value="1281.506000"/>
+<Element Value="1487.668000"/>
+<Element Value="1899.089000"/>
+<Element Value="2720.545000"/>
+</Line>
+<Line>
+<Element Value="1118.498000"/>
+<Element Value="1128.440000"/>
+<Element Value="1180.075000"/>
+<Element Value="1283.514000"/>
+<Element Value="1489.966000"/>
+<Element Value="1901.737000"/>
+<Element Value="2723.537000"/>
+</Line>
+<Line>
+<Element Value="1125.964000"/>
+<Element Value="1135.943000"/>
+<Element Value="1187.704000"/>
+<Element Value="1291.379000"/>
+<Element Value="1498.208000"/>
+<Element Value="1910.496000"/>
+<Element Value="2732.855000"/>
+</Line>
+<Line>
+<Element Value="1146.357000"/>
+<Element Value="1156.360000"/>
+<Element Value="1208.179000"/>
+<Element Value="1311.973000"/>
+<Element Value="1519.066000"/>
+<Element Value="1931.856000"/>
+<Element Value="2754.928000"/>
+</Line>
+<Line>
+<Element Value="1193.951000"/>
+<Element Value="1203.953000"/>
+<Element Value="1255.710000"/>
+<Element Value="1359.378000"/>
+<Element Value="1566.355000"/>
+<Element Value="1979.227000"/>
+<Element Value="2802.796000"/>
+</Line>
+<Line>
+<Element Value="1295.723000"/>
+<Element Value="1305.717000"/>
+<Element Value="1357.374000"/>
+<Element Value="1460.821000"/>
+<Element Value="1667.417000"/>
+<Element Value="2079.812000"/>
+<Element Value="2903.149000"/>
+</Line>
+<Line>
+<Element Value="1503.384000"/>
+<Element Value="1513.377000"/>
+<Element Value="1564.978000"/>
+<Element Value="1668.283000"/>
+<Element Value="1874.590000"/>
+<Element Value="2286.451000"/>
+<Element Value="3109.030000"/>
+</Line>
+<Line>
+<Element Value="1901.122000"/>
+<Element Value="1911.128000"/>
+<Element Value="1962.762000"/>
+<Element Value="2066.057000"/>
+<Element Value="2272.238000"/>
+<Element Value="2683.770000"/>
+<Element Value="3505.727000"/>
+</Line>
+<Line>
+<Element Value="2596.440000"/>
+<Element Value="2607.936000"/>
+<Element Value="2666.703000"/>
+<Element Value="2781.669000"/>
+<Element Value="3002.435000"/>
+<Element Value="3420.401000"/>
+<Element Value="4242.591000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ecff2d8" factor="0.001">
+<LinApprox>
+<Line cAng="43.2776" cLin="146.707"/>
+<Line cAng="43.2864" cLin="145.953"/>
+<Line cAng="43.3053" cLin="145.106"/>
+<Line cAng="43.2273" cLin="144.634"/>
+<Line cAng="42.1894" cLin="150.312"/>
+<Line cAng="39.3678" cLin="174.658"/>
+<Line cAng="34.8297" cLin="242.392"/>
+<Line cAng="32.6675" cLin="378.094"/>
+<Line cAng="39.7385" cLin="609.806"/>
+<Line cAng="54.4187" cLin="1017.87"/>
+</LinApprox>
+<Line>
+<Element Value="154.340000"/>
+<Element Value="156.553000"/>
+<Element Value="167.943000"/>
+<Element Value="190.431000"/>
+<Element Value="234.665000"/>
+<Element Value="321.570000"/>
+<Element Value="491.727000"/>
+</Line>
+<Line>
+<Element Value="153.582000"/>
+<Element Value="155.879000"/>
+<Element Value="167.175000"/>
+<Element Value="189.583000"/>
+<Element Value="233.963000"/>
+<Element Value="320.869000"/>
+<Element Value="491.036000"/>
+</Line>
+<Line>
+<Element Value="152.698000"/>
+<Element Value="155.013000"/>
+<Element Value="166.301000"/>
+<Element Value="188.847000"/>
+<Element Value="233.189000"/>
+<Element Value="320.077000"/>
+<Element Value="490.334000"/>
+</Line>
+<Line>
+<Element Value="152.577000"/>
+<Element Value="154.855000"/>
+<Element Value="165.835000"/>
+<Element Value="188.034000"/>
+<Element Value="232.030000"/>
+<Element Value="319.103000"/>
+<Element Value="489.476000"/>
+</Line>
+<Line>
+<Element Value="159.150000"/>
+<Element Value="161.222000"/>
+<Element Value="171.535000"/>
+<Element Value="192.332000"/>
+<Element Value="234.112000"/>
+<Element Value="318.508000"/>
+<Element Value="488.244000"/>
+</Line>
+<Line>
+<Element Value="183.951000"/>
+<Element Value="185.817000"/>
+<Element Value="194.942000"/>
+<Element Value="213.391000"/>
+<Element Value="251.377000"/>
+<Element Value="329.817000"/>
+<Element Value="491.225000"/>
+</Line>
+<Line>
+<Element Value="251.649000"/>
+<Element Value="253.302000"/>
+<Element Value="261.016000"/>
+<Element Value="276.507000"/>
+<Element Value="308.626000"/>
+<Element Value="377.101000"/>
+<Element Value="524.079000"/>
+</Line>
+<Line>
+<Element Value="381.834000"/>
+<Element Value="383.763000"/>
+<Element Value="393.681000"/>
+<Element Value="412.362000"/>
+<Element Value="447.472000"/>
+<Element Value="511.589000"/>
+<Element Value="637.006000"/>
+</Line>
+<Line>
+<Element Value="611.181000"/>
+<Element Value="613.820000"/>
+<Element Value="627.049000"/>
+<Element Value="652.155000"/>
+<Element Value="698.311000"/>
+<Element Value="779.862000"/>
+<Element Value="920.093000"/>
+</Line>
+<Line>
+<Element Value="1016.639000"/>
+<Element Value="1020.573000"/>
+<Element Value="1040.301000"/>
+<Element Value="1077.237000"/>
+<Element Value="1143.342000"/>
+<Element Value="1255.678000"/>
+<Element Value="1439.326000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c588360" factor="0.001">
+<Line>
+<Element Value="142.224914"/>
+<Element Value="145.214808"/>
+<Element Value="151.759964"/>
+<Element Value="165.158222"/>
+<Element Value="192.160730"/>
+<Element Value="246.923018"/>
+<Element Value="356.587714"/>
+<Element Value="532.201390"/>
+<Element Value="786.919378"/>
+<Element Value="1135.077508"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c2ee400" factor="0.001">
+<Line>
+<Element Value="1553.276236"/>
+<Element Value="1552.672518"/>
+<Element Value="1555.025818"/>
+<Element Value="1563.349504"/>
+<Element Value="1584.286820"/>
+<Element Value="1631.588776"/>
+<Element Value="1732.575410"/>
+<Element Value="1939.664038"/>
+<Element Value="2337.260056"/>
+<Element Value="3068.473628"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ecff920" factor="0.001">
+<LinApprox>
+<Line cAng="389.641" cLin="1221.09"/>
+<Line cAng="389.619" cLin="1216.56"/>
+<Line cAng="389.564" cLin="1212.39"/>
+<Line cAng="389.47" cLin="1208.62"/>
+<Line cAng="389.349" cLin="1205.17"/>
+<Line cAng="389.234" cLin="1201.84"/>
+<Line cAng="389.157" cLin="1198.39"/>
+<Line cAng="389.121" cLin="1194.75"/>
+<Line cAng="387.054" cLin="1205.99"/>
+<Line cAng="373.128" cLin="1380.14"/>
+</LinApprox>
+<Line>
+<Element Value="1302.126000"/>
+<Element Value="1320.717000"/>
+<Element Value="1416.503000"/>
+<Element Value="1609.240000"/>
+<Element Value="1996.842000"/>
+<Element Value="2776.074000"/>
+<Element Value="4340.893000"/>
+</Line>
+<Line>
+<Element Value="1297.624000"/>
+<Element Value="1316.225000"/>
+<Element Value="1411.972000"/>
+<Element Value="1604.680000"/>
+<Element Value="1992.226000"/>
+<Element Value="2771.424000"/>
+<Element Value="4336.219000"/>
+</Line>
+<Line>
+<Element Value="1293.520000"/>
+<Element Value="1312.114000"/>
+<Element Value="1407.802000"/>
+<Element Value="1600.405000"/>
+<Element Value="1987.839000"/>
+<Element Value="2766.936000"/>
+<Element Value="4331.681000"/>
+</Line>
+<Line>
+<Element Value="1289.834000"/>
+<Element Value="1308.427000"/>
+<Element Value="1404.024000"/>
+<Element Value="1596.474000"/>
+<Element Value="1983.703000"/>
+<Element Value="2762.625000"/>
+<Element Value="4327.275000"/>
+</Line>
+<Line>
+<Element Value="1286.489000"/>
+<Element Value="1305.076000"/>
+<Element Value="1400.578000"/>
+<Element Value="1592.845000"/>
+<Element Value="1979.823000"/>
+<Element Value="2758.497000"/>
+<Element Value="4323.006000"/>
+</Line>
+<Line>
+<Element Value="1283.215000"/>
+<Element Value="1301.801000"/>
+<Element Value="1397.238000"/>
+<Element Value="1589.369000"/>
+<Element Value="1976.125000"/>
+<Element Value="2754.539000"/>
+<Element Value="4318.869000"/>
+</Line>
+<Line>
+<Element Value="1279.782000"/>
+<Element Value="1298.375000"/>
+<Element Value="1393.775000"/>
+<Element Value="1585.837000"/>
+<Element Value="1972.461000"/>
+<Element Value="2750.693000"/>
+<Element Value="4314.858000"/>
+</Line>
+<Line>
+<Element Value="1276.135000"/>
+<Element Value="1294.737000"/>
+<Element Value="1390.125000"/>
+<Element Value="1582.160000"/>
+<Element Value="1968.732000"/>
+<Element Value="2746.878000"/>
+<Element Value="4310.943000"/>
+</Line>
+<Line>
+<Element Value="1288.947000"/>
+<Element Value="1307.257000"/>
+<Element Value="1401.144000"/>
+<Element Value="1590.541000"/>
+<Element Value="1973.065000"/>
+<Element Value="2746.503000"/>
+<Element Value="4307.958000"/>
+</Line>
+<Line>
+<Element Value="1464.697000"/>
+<Element Value="1481.846000"/>
+<Element Value="1569.863000"/>
+<Element Value="1748.713000"/>
+<Element Value="2113.570000"/>
+<Element Value="2858.217000"/>
+<Element Value="4375.442000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+<TimingEntry RelatedPin="B2" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ecfff68" factor="0.001">
+<LinApprox>
+<Line cAng="24.9333" cLin="86.2561"/>
+<Line cAng="24.9202" cLin="89.4125"/>
+<Line cAng="24.9182" cLin="95.9124"/>
+<Line cAng="24.9133" cLin="108.028"/>
+<Line cAng="24.8579" cLin="132.218"/>
+<Line cAng="24.6196" cLin="181.585"/>
+<Line cAng="25.5651" cLin="271.811"/>
+<Line cAng="31.2094" cLin="417.133"/>
+<Line cAng="44.2037" cLin="635.282"/>
+<Line cAng="69.853" cLin="932.315"/>
+</LinApprox>
+<Line>
+<Element Value="90.182000"/>
+<Element Value="91.482000"/>
+<Element Value="98.243000"/>
+<Element Value="111.628000"/>
+<Element Value="137.662000"/>
+<Element Value="187.833000"/>
+<Element Value="284.449000"/>
+</Line>
+<Line>
+<Element Value="93.424000"/>
+<Element Value="94.680000"/>
+<Element Value="101.344000"/>
+<Element Value="114.722000"/>
+<Element Value="140.751000"/>
+<Element Value="190.917000"/>
+<Element Value="287.526000"/>
+</Line>
+<Line>
+<Element Value="99.872000"/>
+<Element Value="101.183000"/>
+<Element Value="107.865000"/>
+<Element Value="121.241000"/>
+<Element Value="147.257000"/>
+<Element Value="197.409000"/>
+<Element Value="294.005000"/>
+</Line>
+<Line>
+<Element Value="111.944000"/>
+<Element Value="113.271000"/>
+<Element Value="120.027000"/>
+<Element Value="133.377000"/>
+<Element Value="159.366000"/>
+<Element Value="209.498000"/>
+<Element Value="306.080000"/>
+</Line>
+<Line>
+<Element Value="136.226000"/>
+<Element Value="137.537000"/>
+<Element Value="144.207000"/>
+<Element Value="157.449000"/>
+<Element Value="183.314000"/>
+<Element Value="233.363000"/>
+<Element Value="329.912000"/>
+</Line>
+<Line>
+<Element Value="185.840000"/>
+<Element Value="187.130000"/>
+<Element Value="193.645000"/>
+<Element Value="206.417000"/>
+<Element Value="231.708000"/>
+<Element Value="281.323000"/>
+<Element Value="377.716000"/>
+</Line>
+<Line>
+<Element Value="274.328000"/>
+<Element Value="275.871000"/>
+<Element Value="283.604000"/>
+<Element Value="298.554000"/>
+<Element Value="326.610000"/>
+<Element Value="377.937000"/>
+<Element Value="473.533000"/>
+</Line>
+<Line>
+<Element Value="418.118000"/>
+<Element Value="420.204000"/>
+<Element Value="430.642000"/>
+<Element Value="450.498000"/>
+<Element Value="486.795000"/>
+<Element Value="550.685000"/>
+<Element Value="660.782000"/>
+</Line>
+<Line>
+<Element Value="634.027000"/>
+<Element Value="637.245000"/>
+<Element Value="653.251000"/>
+<Element Value="683.418000"/>
+<Element Value="737.610000"/>
+<Element Value="829.377000"/>
+<Element Value="977.094000"/>
+</Line>
+<Line>
+<Element Value="928.779000"/>
+<Element Value="933.990000"/>
+<Element Value="959.923000"/>
+<Element Value="1008.731000"/>
+<Element Value="1096.127000"/>
+<Element Value="1242.536000"/>
+<Element Value="1470.277000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ed00630" factor="0.001">
+<LinApprox>
+<Line cAng="205.499" cLin="1118.1"/>
+<Line cAng="205.52" cLin="1116.46"/>
+<Line cAng="205.588" cLin="1118.4"/>
+<Line cAng="205.69" cLin="1126.96"/>
+<Line cAng="205.803" cLin="1148.83"/>
+<Line cAng="205.854" cLin="1197.48"/>
+<Line cAng="205.813" cLin="1299.57"/>
+<Line cAng="205.732" cLin="1507.08"/>
+<Line cAng="205.669" cLin="1904.55"/>
+<Line cAng="210.056" cLin="2614.07"/>
+</LinApprox>
+<Line>
+<Element Value="1159.420000"/>
+<Element Value="1169.194000"/>
+<Element Value="1220.500000"/>
+<Element Value="1323.526000"/>
+<Element Value="1529.402000"/>
+<Element Value="1940.571000"/>
+<Element Value="2761.820000"/>
+</Line>
+<Line>
+<Element Value="1157.823000"/>
+<Element Value="1167.584000"/>
+<Element Value="1218.847000"/>
+<Element Value="1321.860000"/>
+<Element Value="1527.794000"/>
+<Element Value="1939.021000"/>
+<Element Value="2760.354000"/>
+</Line>
+<Line>
+<Element Value="1159.680000"/>
+<Element Value="1169.504000"/>
+<Element Value="1220.801000"/>
+<Element Value="1323.904000"/>
+<Element Value="1529.959000"/>
+<Element Value="1941.327000"/>
+<Element Value="2762.760000"/>
+</Line>
+<Line>
+<Element Value="1168.178000"/>
+<Element Value="1178.031000"/>
+<Element Value="1229.381000"/>
+<Element Value="1332.595000"/>
+<Element Value="1538.815000"/>
+<Element Value="1950.398000"/>
+<Element Value="2772.058000"/>
+</Line>
+<Line>
+<Element Value="1189.981000"/>
+<Element Value="1199.862000"/>
+<Element Value="1251.330000"/>
+<Element Value="1354.626000"/>
+<Element Value="1560.991000"/>
+<Element Value="1972.809000"/>
+<Element Value="2794.775000"/>
+</Line>
+<Line>
+<Element Value="1238.645000"/>
+<Element Value="1248.541000"/>
+<Element Value="1300.032000"/>
+<Element Value="1403.320000"/>
+<Element Value="1609.700000"/>
+<Element Value="2021.624000"/>
+<Element Value="2843.851000"/>
+</Line>
+<Line>
+<Element Value="1340.755000"/>
+<Element Value="1350.659000"/>
+<Element Value="1402.144000"/>
+<Element Value="1505.369000"/>
+<Element Value="1711.641000"/>
+<Element Value="2123.448000"/>
+<Element Value="2945.680000"/>
+</Line>
+<Line>
+<Element Value="1548.251000"/>
+<Element Value="1558.163000"/>
+<Element Value="1609.641000"/>
+<Element Value="1712.812000"/>
+<Element Value="1918.972000"/>
+<Element Value="2330.587000"/>
+<Element Value="3152.573000"/>
+</Line>
+<Line>
+<Element Value="1945.660000"/>
+<Element Value="1955.583000"/>
+<Element Value="2007.091000"/>
+<Element Value="2110.265000"/>
+<Element Value="2316.360000"/>
+<Element Value="2727.808000"/>
+<Element Value="3549.526000"/>
+</Line>
+<Line>
+<Element Value="2646.928000"/>
+<Element Value="2658.174000"/>
+<Element Value="2716.023000"/>
+<Element Value="2829.479000"/>
+<Element Value="3047.970000"/>
+<Element Value="3464.163000"/>
+<Element Value="4286.157000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ed00c78" factor="0.001">
+<LinApprox>
+<Line cAng="43.2841" cLin="146.611"/>
+<Line cAng="43.2918" cLin="145.874"/>
+<Line cAng="43.301" cLin="145.098"/>
+<Line cAng="43.2666" cLin="144.503"/>
+<Line cAng="42.6975" cLin="147.327"/>
+<Line cAng="40.9379" cLin="162.274"/>
+<Line cAng="37.3826" cLin="209.305"/>
+<Line cAng="34.2993" cLin="313.175"/>
+<Line cAng="36.3197" cLin="509.645"/>
+<Line cAng="44.397" cLin="877.773"/>
+</LinApprox>
+<Line>
+<Element Value="154.246000"/>
+<Element Value="156.451000"/>
+<Element Value="167.829000"/>
+<Element Value="190.359000"/>
+<Element Value="234.601000"/>
+<Element Value="321.488000"/>
+<Element Value="491.682000"/>
+</Line>
+<Line>
+<Element Value="153.524000"/>
+<Element Value="155.730000"/>
+<Element Value="167.121000"/>
+<Element Value="189.542000"/>
+<Element Value="233.892000"/>
+<Element Value="320.817000"/>
+<Element Value="490.995000"/>
+</Line>
+<Line>
+<Element Value="152.744000"/>
+<Element Value="154.946000"/>
+<Element Value="166.335000"/>
+<Element Value="188.836000"/>
+<Element Value="233.113000"/>
+<Element Value="320.061000"/>
+<Element Value="490.300000"/>
+</Line>
+<Line>
+<Element Value="152.280000"/>
+<Element Value="154.463000"/>
+<Element Value="165.792000"/>
+<Element Value="188.047000"/>
+<Element Value="232.292000"/>
+<Element Value="319.212000"/>
+<Element Value="489.536000"/>
+</Line>
+<Line>
+<Element Value="155.543000"/>
+<Element Value="157.658000"/>
+<Element Value="168.575000"/>
+<Element Value="190.175000"/>
+<Element Value="233.140000"/>
+<Element Value="318.709000"/>
+<Element Value="488.512000"/>
+</Line>
+<Line>
+<Element Value="171.025000"/>
+<Element Value="172.981000"/>
+<Element Value="183.034000"/>
+<Element Value="202.903000"/>
+<Element Value="243.369000"/>
+<Element Value="325.178000"/>
+<Element Value="490.388000"/>
+</Line>
+<Line>
+<Element Value="218.510000"/>
+<Element Value="220.251000"/>
+<Element Value="229.006000"/>
+<Element Value="246.108000"/>
+<Element Value="281.380000"/>
+<Element Value="355.519000"/>
+<Element Value="510.612000"/>
+</Line>
+<Line>
+<Element Value="319.187000"/>
+<Element Value="320.976000"/>
+<Element Value="330.248000"/>
+<Element Value="348.125000"/>
+<Element Value="382.966000"/>
+<Element Value="450.744000"/>
+<Element Value="587.055000"/>
+</Line>
+<Line>
+<Element Value="513.281000"/>
+<Element Value="515.483000"/>
+<Element Value="526.525000"/>
+<Element Value="547.653000"/>
+<Element Value="587.245000"/>
+<Element Value="660.279000"/>
+<Element Value="796.345000"/>
+</Line>
+<Line>
+<Element Value="877.889000"/>
+<Element Value="881.035000"/>
+<Element Value="896.687000"/>
+<Element Value="925.938000"/>
+<Element Value="978.566000"/>
+<Element Value="1069.201000"/>
+<Element Value="1223.228000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c588418" factor="0.001">
+<Line>
+<Element Value="161.744080"/>
+<Element Value="164.830680"/>
+<Element Value="171.329960"/>
+<Element Value="183.429360"/>
+<Element Value="207.337520"/>
+<Element Value="255.523200"/>
+<Element Value="351.246960"/>
+<Element Value="517.462200"/>
+<Element Value="781.658160"/>
+<Element Value="1166.403320"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c571980" factor="0.001">
+<Line>
+<Element Value="1726.763120"/>
+<Element Value="1725.182960"/>
+<Element Value="1727.415640"/>
+<Element Value="1736.374840"/>
+<Element Value="1758.663640"/>
+<Element Value="1807.423520"/>
+<Element Value="1909.308360"/>
+<Element Value="2116.547200"/>
+<Element Value="2513.855040"/>
+<Element Value="3247.742640"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ed012c0" factor="0.001">
+<LinApprox>
+<Line cAng="390.056" cLin="1272.75"/>
+<Line cAng="390.024" cLin="1267.65"/>
+<Line cAng="389.986" cLin="1262.72"/>
+<Line cAng="389.937" cLin="1258.02"/>
+<Line cAng="389.877" cLin="1253.53"/>
+<Line cAng="389.815" cLin="1249.21"/>
+<Line cAng="389.764" cLin="1244.95"/>
+<Line cAng="389.734" cLin="1240.67"/>
+<Line cAng="387.865" cLin="1249.92"/>
+<Line cAng="374.399" cLin="1418.04"/>
+</LinApprox>
+<Line>
+<Element Value="1353.752000"/>
+<Element Value="1372.315000"/>
+<Element Value="1468.274000"/>
+<Element Value="1661.364000"/>
+<Element Value="2049.577000"/>
+<Element Value="2829.710000"/>
+<Element Value="4395.662000"/>
+</Line>
+<Line>
+<Element Value="1348.657000"/>
+<Element Value="1367.230000"/>
+<Element Value="1463.159000"/>
+<Element Value="1656.223000"/>
+<Element Value="2044.374000"/>
+<Element Value="2824.440000"/>
+<Element Value="4390.330000"/>
+</Line>
+<Line>
+<Element Value="1343.756000"/>
+<Element Value="1362.333000"/>
+<Element Value="1458.237000"/>
+<Element Value="1651.244000"/>
+<Element Value="2039.322000"/>
+<Element Value="2819.311000"/>
+<Element Value="4385.144000"/>
+</Line>
+<Line>
+<Element Value="1339.073000"/>
+<Element Value="1357.661000"/>
+<Element Value="1453.538000"/>
+<Element Value="1646.476000"/>
+<Element Value="2034.451000"/>
+<Element Value="2814.338000"/>
+<Element Value="4380.099000"/>
+</Line>
+<Line>
+<Element Value="1334.625000"/>
+<Element Value="1353.218000"/>
+<Element Value="1449.047000"/>
+<Element Value="1641.902000"/>
+<Element Value="2029.754000"/>
+<Element Value="2809.523000"/>
+<Element Value="4375.197000"/>
+</Line>
+<Line>
+<Element Value="1330.326000"/>
+<Element Value="1348.929000"/>
+<Element Value="1444.719000"/>
+<Element Value="1637.503000"/>
+<Element Value="2025.237000"/>
+<Element Value="2804.864000"/>
+<Element Value="4370.437000"/>
+</Line>
+<Line>
+<Element Value="1326.076000"/>
+<Element Value="1344.688000"/>
+<Element Value="1440.461000"/>
+<Element Value="1633.187000"/>
+<Element Value="2020.828000"/>
+<Element Value="2800.342000"/>
+<Element Value="4365.810000"/>
+</Line>
+<Line>
+<Element Value="1321.788000"/>
+<Element Value="1340.411000"/>
+<Element Value="1436.179000"/>
+<Element Value="1628.876000"/>
+<Element Value="2016.468000"/>
+<Element Value="2795.910000"/>
+<Element Value="4361.307000"/>
+</Line>
+<Line>
+<Element Value="1332.458000"/>
+<Element Value="1350.827000"/>
+<Element Value="1445.236000"/>
+<Element Value="1635.542000"/>
+<Element Value="2019.449000"/>
+<Element Value="2794.663000"/>
+<Element Value="4357.693000"/>
+</Line>
+<Line>
+<Element Value="1501.793000"/>
+<Element Value="1519.096000"/>
+<Element Value="1608.052000"/>
+<Element Value="1788.465000"/>
+<Element Value="2155.455000"/>
+<Element Value="2902.606000"/>
+<Element Value="4422.448000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+<TimingEntry RelatedPin="C1" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ed01908" factor="0.001">
+<LinApprox>
+<Line cAng="26.1773" cLin="85.5447"/>
+<Line cAng="26.164" cLin="88.5578"/>
+<Line cAng="26.1401" cLin="95.1679"/>
+<Line cAng="26.0859" cLin="108.786"/>
+<Line cAng="25.908" cLin="136.72"/>
+<Line cAng="25.2963" cLin="194.736"/>
+<Line cAng="25.6103" cLin="303.234"/>
+<Line cAng="33.4953" cLin="465.328"/>
+<Line cAng="49.2572" cLin="697.475"/>
+<Line cAng="74.993" cLin="1011.85"/>
+</LinApprox>
+<Line>
+<Element Value="89.438000"/>
+<Element Value="90.797000"/>
+<Element Value="98.005000"/>
+<Element Value="112.245000"/>
+<Element Value="139.853000"/>
+<Element Value="192.707000"/>
+<Element Value="293.296000"/>
+</Line>
+<Line>
+<Element Value="92.455000"/>
+<Element Value="93.850000"/>
+<Element Value="100.998000"/>
+<Element Value="115.228000"/>
+<Element Value="142.823000"/>
+<Element Value="195.650000"/>
+<Element Value="296.217000"/>
+</Line>
+<Line>
+<Element Value="99.099000"/>
+<Element Value="100.479000"/>
+<Element Value="107.597000"/>
+<Element Value="121.795000"/>
+<Element Value="149.343000"/>
+<Element Value="202.135000"/>
+<Element Value="302.661000"/>
+</Line>
+<Line>
+<Element Value="112.753000"/>
+<Element Value="114.134000"/>
+<Element Value="121.223000"/>
+<Element Value="135.329000"/>
+<Element Value="162.770000"/>
+<Element Value="215.456000"/>
+<Element Value="315.905000"/>
+</Line>
+<Line>
+<Element Value="140.874000"/>
+<Element Value="142.227000"/>
+<Element Value="149.145000"/>
+<Element Value="162.960000"/>
+<Element Value="190.036000"/>
+<Element Value="242.397000"/>
+<Element Value="342.634000"/>
+</Line>
+<Line>
+<Element Value="199.516000"/>
+<Element Value="200.753000"/>
+<Element Value="207.101000"/>
+<Element Value="219.963000"/>
+<Element Value="245.809000"/>
+<Element Value="296.995000"/>
+<Element Value="396.493000"/>
+</Line>
+<Line>
+<Element Value="305.223000"/>
+<Element Value="306.869000"/>
+<Element Value="315.081000"/>
+<Element Value="330.693000"/>
+<Element Value="359.092000"/>
+<Element Value="408.752000"/>
+<Element Value="505.412000"/>
+</Line>
+<Line>
+<Element Value="465.077000"/>
+<Element Value="467.430000"/>
+<Element Value="479.160000"/>
+<Element Value="501.425000"/>
+<Element Value="541.888000"/>
+<Element Value="611.576000"/>
+<Element Value="724.992000"/>
+</Line>
+<Line>
+<Element Value="696.895000"/>
+<Element Value="700.365000"/>
+<Element Value="717.704000"/>
+<Element Value="750.575000"/>
+<Element Value="810.347000"/>
+<Element Value="913.088000"/>
+<Element Value="1079.000000"/>
+</Line>
+<Line>
+<Element Value="1010.839000"/>
+<Element Value="1016.123000"/>
+<Element Value="1042.529000"/>
+<Element Value="1092.659000"/>
+<Element Value="1183.893000"/>
+<Element Value="1340.630000"/>
+<Element Value="1592.432000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ed01fd0" factor="0.001">
+<LinApprox>
+<Line cAng="205.504" cLin="1240.07"/>
+<Line cAng="205.591" cLin="1238.85"/>
+<Line cAng="205.764" cLin="1240.62"/>
+<Line cAng="206.005" cLin="1248.81"/>
+<Line cAng="206.225" cLin="1271.15"/>
+<Line cAng="206.26" cLin="1323.5"/>
+<Line cAng="206.069" cLin="1432.94"/>
+<Line cAng="205.829" cLin="1637.47"/>
+<Line cAng="205.674" cLin="2015.63"/>
+<Line cAng="208.4" cLin="2694.19"/>
+</LinApprox>
+<Line>
+<Element Value="1281.309000"/>
+<Element Value="1291.112000"/>
+<Element Value="1342.504000"/>
+<Element Value="1445.540000"/>
+<Element Value="1651.455000"/>
+<Element Value="2062.603000"/>
+<Element Value="2883.790000"/>
+</Line>
+<Line>
+<Element Value="1280.054000"/>
+<Element Value="1289.843000"/>
+<Element Value="1341.271000"/>
+<Element Value="1444.427000"/>
+<Element Value="1650.502000"/>
+<Element Value="2061.831000"/>
+<Element Value="2883.183000"/>
+</Line>
+<Line>
+<Element Value="1281.694000"/>
+<Element Value="1291.545000"/>
+<Element Value="1343.091000"/>
+<Element Value="1446.448000"/>
+<Element Value="1652.814000"/>
+<Element Value="2064.495000"/>
+<Element Value="2886.193000"/>
+</Line>
+<Line>
+<Element Value="1289.779000"/>
+<Element Value="1299.675000"/>
+<Element Value="1351.350000"/>
+<Element Value="1454.944000"/>
+<Element Value="1661.690000"/>
+<Element Value="2073.890000"/>
+<Element Value="2896.149000"/>
+</Line>
+<Line>
+<Element Value="1312.123000"/>
+<Element Value="1322.045000"/>
+<Element Value="1373.783000"/>
+<Element Value="1477.499000"/>
+<Element Value="1684.511000"/>
+<Element Value="2097.214000"/>
+<Element Value="2920.188000"/>
+</Line>
+<Line>
+<Element Value="1364.613000"/>
+<Element Value="1374.539000"/>
+<Element Value="1426.221000"/>
+<Element Value="1529.813000"/>
+<Element Value="1736.712000"/>
+<Element Value="2149.500000"/>
+<Element Value="2972.973000"/>
+</Line>
+<Line>
+<Element Value="1474.151000"/>
+<Element Value="1484.071000"/>
+<Element Value="1535.659000"/>
+<Element Value="1639.027000"/>
+<Element Value="1845.544000"/>
+<Element Value="2257.852000"/>
+<Element Value="3081.092000"/>
+</Line>
+<Line>
+<Element Value="1678.673000"/>
+<Element Value="1688.583000"/>
+<Element Value="1740.102000"/>
+<Element Value="1843.321000"/>
+<Element Value="2049.539000"/>
+<Element Value="2461.306000"/>
+<Element Value="3283.778000"/>
+</Line>
+<Line>
+<Element Value="2056.777000"/>
+<Element Value="2066.683000"/>
+<Element Value="2118.183000"/>
+<Element Value="2221.340000"/>
+<Element Value="2427.399000"/>
+<Element Value="2838.831000"/>
+<Element Value="3660.685000"/>
+</Line>
+<Line>
+<Element Value="2729.923000"/>
+<Element Value="2740.672000"/>
+<Element Value="2796.269000"/>
+<Element Value="2906.099000"/>
+<Element Value="3120.184000"/>
+<Element Value="3534.296000"/>
+<Element Value="4355.855000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ed02618" factor="0.001">
+<LinApprox>
+<Line cAng="44.4667" cLin="154.757"/>
+<Line cAng="44.4586" cLin="154.128"/>
+<Line cAng="44.4702" cLin="153.29"/>
+<Line cAng="44.4731" cLin="152.244"/>
+<Line cAng="43.5565" cLin="156.674"/>
+<Line cAng="40.6008" cLin="181.907"/>
+<Line cAng="35.8019" cLin="251.051"/>
+<Line cAng="32.9074" cLin="390.282"/>
+<Line cAng="39.5215" cLin="624.722"/>
+<Line cAng="53.9886" cLin="1033.15"/>
+</LinApprox>
+<Line>
+<Element Value="162.159000"/>
+<Element Value="164.550000"/>
+<Element Value="176.478000"/>
+<Element Value="199.936000"/>
+<Element Value="245.779000"/>
+<Element Value="334.678000"/>
+<Element Value="508.963000"/>
+</Line>
+<Line>
+<Element Value="161.521000"/>
+<Element Value="163.908000"/>
+<Element Value="175.783000"/>
+<Element Value="199.303000"/>
+<Element Value="245.184000"/>
+<Element Value="334.082000"/>
+<Element Value="508.227000"/>
+</Line>
+<Line>
+<Element Value="160.639000"/>
+<Element Value="163.019000"/>
+<Element Value="174.968000"/>
+<Element Value="198.497000"/>
+<Element Value="244.392000"/>
+<Element Value="333.389000"/>
+<Element Value="507.427000"/>
+</Line>
+<Line>
+<Element Value="159.818000"/>
+<Element Value="162.142000"/>
+<Element Value="173.914000"/>
+<Element Value="197.217000"/>
+<Element Value="243.136000"/>
+<Element Value="332.341000"/>
+<Element Value="506.483000"/>
+</Line>
+<Line>
+<Element Value="165.433000"/>
+<Element Value="167.605000"/>
+<Element Value="178.453000"/>
+<Element Value="200.107000"/>
+<Element Value="243.725000"/>
+<Element Value="331.037000"/>
+<Element Value="505.087000"/>
+</Line>
+<Line>
+<Element Value="191.233000"/>
+<Element Value="193.155000"/>
+<Element Value="202.629000"/>
+<Element Value="221.883000"/>
+<Element Value="261.500000"/>
+<Element Value="342.551000"/>
+<Element Value="507.983000"/>
+</Line>
+<Line>
+<Element Value="260.574000"/>
+<Element Value="262.207000"/>
+<Element Value="270.063000"/>
+<Element Value="286.053000"/>
+<Element Value="319.207000"/>
+<Element Value="389.868000"/>
+<Element Value="540.426000"/>
+</Line>
+<Line>
+<Element Value="394.396000"/>
+<Element Value="396.322000"/>
+<Element Value="406.129000"/>
+<Element Value="424.725000"/>
+<Element Value="459.822000"/>
+<Element Value="523.827000"/>
+<Element Value="651.629000"/>
+</Line>
+<Line>
+<Element Value="626.209000"/>
+<Element Value="628.812000"/>
+<Element Value="641.885000"/>
+<Element Value="666.788000"/>
+<Element Value="712.585000"/>
+<Element Value="793.728000"/>
+<Element Value="933.415000"/>
+</Line>
+<Line>
+<Element Value="1032.352000"/>
+<Element Value="1036.196000"/>
+<Element Value="1055.518000"/>
+<Element Value="1091.809000"/>
+<Element Value="1157.079000"/>
+<Element Value="1268.588000"/>
+<Element Value="1451.661000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c622e40" factor="0.001">
+<Line>
+<Element Value="131.570600"/>
+<Element Value="134.544500"/>
+<Element Value="141.078600"/>
+<Element Value="154.537700"/>
+<Element Value="181.913200"/>
+<Element Value="238.055200"/>
+<Element Value="350.572300"/>
+<Element Value="529.749100"/>
+<Element Value="792.415400"/>
+<Element Value="1156.522800"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c571a68" factor="0.001">
+<Line>
+<Element Value="1589.680500"/>
+<Element Value="1588.679500"/>
+<Element Value="1590.904200"/>
+<Element Value="1599.666200"/>
+<Element Value="1622.407400"/>
+<Element Value="1674.642300"/>
+<Element Value="1783.588900"/>
+<Element Value="1987.673600"/>
+<Element Value="2365.581300"/>
+<Element Value="3055.958500"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ed02c60" factor="0.001">
+<LinApprox>
+<Line cAng="389.628" cLin="1221.07"/>
+<Line cAng="389.606" cLin="1216.54"/>
+<Line cAng="389.55" cLin="1212.37"/>
+<Line cAng="389.457" cLin="1208.6"/>
+<Line cAng="389.335" cLin="1205.15"/>
+<Line cAng="389.22" cLin="1201.82"/>
+<Line cAng="389.14" cLin="1198.39"/>
+<Line cAng="389.086" cLin="1194.88"/>
+<Line cAng="388.408" cLin="1196.05"/>
+<Line cAng="380.086" cLin="1296.02"/>
+</LinApprox>
+<Line>
+<Element Value="1302.104000"/>
+<Element Value="1320.697000"/>
+<Element Value="1416.471000"/>
+<Element Value="1609.208000"/>
+<Element Value="1996.787000"/>
+<Element Value="2775.997000"/>
+<Element Value="4340.769000"/>
+</Line>
+<Line>
+<Element Value="1297.602000"/>
+<Element Value="1316.201000"/>
+<Element Value="1411.947000"/>
+<Element Value="1604.637000"/>
+<Element Value="1992.172000"/>
+<Element Value="2771.342000"/>
+<Element Value="4336.095000"/>
+</Line>
+<Line>
+<Element Value="1293.498000"/>
+<Element Value="1312.093000"/>
+<Element Value="1407.777000"/>
+<Element Value="1600.376000"/>
+<Element Value="1987.787000"/>
+<Element Value="2766.857000"/>
+<Element Value="4331.555000"/>
+</Line>
+<Line>
+<Element Value="1289.813000"/>
+<Element Value="1308.405000"/>
+<Element Value="1404.002000"/>
+<Element Value="1596.437000"/>
+<Element Value="1983.649000"/>
+<Element Value="2762.545000"/>
+<Element Value="4327.152000"/>
+</Line>
+<Line>
+<Element Value="1286.470000"/>
+<Element Value="1305.053000"/>
+<Element Value="1400.555000"/>
+<Element Value="1592.810000"/>
+<Element Value="1979.770000"/>
+<Element Value="2758.418000"/>
+<Element Value="4322.881000"/>
+</Line>
+<Line>
+<Element Value="1283.201000"/>
+<Element Value="1301.789000"/>
+<Element Value="1397.216000"/>
+<Element Value="1589.334000"/>
+<Element Value="1976.074000"/>
+<Element Value="2754.461000"/>
+<Element Value="4318.745000"/>
+</Line>
+<Line>
+<Element Value="1279.790000"/>
+<Element Value="1298.380000"/>
+<Element Value="1393.774000"/>
+<Element Value="1585.814000"/>
+<Element Value="1972.420000"/>
+<Element Value="2750.620000"/>
+<Element Value="4314.734000"/>
+</Line>
+<Line>
+<Element Value="1276.294000"/>
+<Element Value="1294.889000"/>
+<Element Value="1390.253000"/>
+<Element Value="1582.247000"/>
+<Element Value="1968.760000"/>
+<Element Value="2746.837000"/>
+<Element Value="4310.830000"/>
+</Line>
+<Line>
+<Element Value="1278.049000"/>
+<Element Value="1296.536000"/>
+<Element Value="1391.320000"/>
+<Element Value="1582.382000"/>
+<Element Value="1967.580000"/>
+<Element Value="2744.272000"/>
+<Element Value="4307.316000"/>
+</Line>
+<Line>
+<Element Value="1379.329000"/>
+<Element Value="1397.075000"/>
+<Element Value="1488.115000"/>
+<Element Value="1672.619000"/>
+<Element Value="2047.045000"/>
+<Element Value="2806.418000"/>
+<Element Value="4343.898000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+<TimingEntry RelatedPin="C2" TimingSense="negative_unate" When="" SdfCond="" TimingType="" RelBusPins="">
+<cell_fall>
+<LUT id="cell_fall" Template="Timing_X1" gid="0x2ed032a8" factor="0.001">
+<LinApprox>
+<Line cAng="26.1681" cLin="88.9536"/>
+<Line cAng="26.1496" cLin="92.0961"/>
+<Line cAng="26.1381" cLin="98.5863"/>
+<Line cAng="26.1174" cLin="110.723"/>
+<Line cAng="26.0157" cLin="135.172"/>
+<Line cAng="25.6226" cLin="185.683"/>
+<Line cAng="26.0804" cLin="279.966"/>
+<Line cAng="30.9567" cLin="434.333"/>
+<Line cAng="42.4831" cLin="671.985"/>
+<Line cAng="65.486" cLin="1007.7"/>
+</LinApprox>
+<Line>
+<Element Value="92.844000"/>
+<Element Value="94.229000"/>
+<Element Value="101.411000"/>
+<Element Value="115.636000"/>
+<Element Value="143.229000"/>
+<Element Value="196.065000"/>
+<Element Value="296.642000"/>
+</Line>
+<Line>
+<Element Value="96.075000"/>
+<Element Value="97.406000"/>
+<Element Value="104.495000"/>
+<Element Value="118.713000"/>
+<Element Value="146.296000"/>
+<Element Value="199.110000"/>
+<Element Value="299.663000"/>
+</Line>
+<Line>
+<Element Value="102.509000"/>
+<Element Value="103.911000"/>
+<Element Value="111.011000"/>
+<Element Value="125.207000"/>
+<Element Value="152.760000"/>
+<Element Value="205.545000"/>
+<Element Value="306.064000"/>
+</Line>
+<Line>
+<Element Value="114.609000"/>
+<Element Value="116.019000"/>
+<Element Value="123.193000"/>
+<Element Value="137.349000"/>
+<Element Value="164.844000"/>
+<Element Value="217.574000"/>
+<Element Value="318.045000"/>
+</Line>
+<Line>
+<Element Value="139.184000"/>
+<Element Value="140.574000"/>
+<Element Value="147.628000"/>
+<Element Value="161.608000"/>
+<Element Value="188.898000"/>
+<Element Value="241.451000"/>
+<Element Value="341.812000"/>
+</Line>
+<Line>
+<Element Value="190.093000"/>
+<Element Value="191.425000"/>
+<Element Value="198.142000"/>
+<Element Value="211.464000"/>
+<Element Value="237.930000"/>
+<Element Value="289.735000"/>
+<Element Value="389.674000"/>
+</Line>
+<Line>
+<Element Value="282.717000"/>
+<Element Value="284.268000"/>
+<Element Value="292.089000"/>
+<Element Value="307.210000"/>
+<Element Value="335.646000"/>
+<Element Value="387.800000"/>
+<Element Value="486.017000"/>
+</Line>
+<Line>
+<Element Value="435.695000"/>
+<Element Value="437.715000"/>
+<Element Value="447.868000"/>
+<Element Value="467.241000"/>
+<Element Value="502.897000"/>
+<Element Value="566.269000"/>
+<Element Value="676.403000"/>
+</Line>
+<Line>
+<Element Value="671.585000"/>
+<Element Value="674.580000"/>
+<Element Value="689.542000"/>
+<Element Value="717.905000"/>
+<Element Value="769.234000"/>
+<Element Value="857.286000"/>
+<Element Value="1001.369000"/>
+</Line>
+<Line>
+<Element Value="1005.772000"/>
+<Element Value="1010.486000"/>
+<Element Value="1034.073000"/>
+<Element Value="1078.716000"/>
+<Element Value="1159.395000"/>
+<Element Value="1296.443000"/>
+<Element Value="1513.514000"/>
+</Line>
+</LUT>
+</cell_fall>
+<cell_rise>
+<LUT id="cell_rise" Template="Timing_X1" gid="0x2ed03970" factor="0.001">
+<LinApprox>
+<Line cAng="205.441" cLin="1281.53"/>
+<Line cAng="205.465" cLin="1279.56"/>
+<Line cAng="205.533" cLin="1281.51"/>
+<Line cAng="205.638" cLin="1290.68"/>
+<Line cAng="205.753" cLin="1314.51"/>
+<Line cAng="205.806" cLin="1368.06"/>
+<Line cAng="205.764" cLin="1477.91"/>
+<Line cAng="205.678" cLin="1682.27"/>
+<Line cAng="205.603" cLin="2060.02"/>
+<Line cAng="207.877" cLin="2741.14"/>
+</LinApprox>
+<Line>
+<Element Value="1323.005000"/>
+<Element Value="1332.664000"/>
+<Element Value="1383.872000"/>
+<Element Value="1486.815000"/>
+<Element Value="1692.608000"/>
+<Element Value="2103.693000"/>
+<Element Value="2924.859000"/>
+</Line>
+<Line>
+<Element Value="1321.054000"/>
+<Element Value="1330.734000"/>
+<Element Value="1381.893000"/>
+<Element Value="1484.824000"/>
+<Element Value="1690.676000"/>
+<Element Value="2101.822000"/>
+<Element Value="2923.075000"/>
+</Line>
+<Line>
+<Element Value="1322.930000"/>
+<Element Value="1332.652000"/>
+<Element Value="1383.856000"/>
+<Element Value="1486.879000"/>
+<Element Value="1692.854000"/>
+<Element Value="2104.144000"/>
+<Element Value="2925.498000"/>
+</Line>
+<Line>
+<Element Value="1332.030000"/>
+<Element Value="1341.799000"/>
+<Element Value="1393.063000"/>
+<Element Value="1496.199000"/>
+<Element Value="1702.342000"/>
+<Element Value="2113.848000"/>
+<Element Value="2935.432000"/>
+</Line>
+<Line>
+<Element Value="1355.779000"/>
+<Element Value="1365.580000"/>
+<Element Value="1416.967000"/>
+<Element Value="1520.187000"/>
+<Element Value="1726.478000"/>
+<Element Value="2138.221000"/>
+<Element Value="2960.114000"/>
+</Line>
+<Line>
+<Element Value="1409.335000"/>
+<Element Value="1419.156000"/>
+<Element Value="1470.572000"/>
+<Element Value="1573.788000"/>
+<Element Value="1780.096000"/>
+<Element Value="2191.947000"/>
+<Element Value="3014.103000"/>
+</Line>
+<Line>
+<Element Value="1519.207000"/>
+<Element Value="1529.037000"/>
+<Element Value="1580.454000"/>
+<Element Value="1683.605000"/>
+<Element Value="1889.802000"/>
+<Element Value="2301.535000"/>
+<Element Value="3123.693000"/>
+</Line>
+<Line>
+<Element Value="1723.563000"/>
+<Element Value="1733.392000"/>
+<Element Value="1784.789000"/>
+<Element Value="1887.877000"/>
+<Element Value="2093.954000"/>
+<Element Value="2505.487000"/>
+<Element Value="3327.397000"/>
+</Line>
+<Line>
+<Element Value="2101.298000"/>
+<Element Value="2111.124000"/>
+<Element Value="2162.515000"/>
+<Element Value="2265.568000"/>
+<Element Value="2471.558000"/>
+<Element Value="2882.920000"/>
+<Element Value="3704.558000"/>
+</Line>
+<Line>
+<Element Value="2777.659000"/>
+<Element Value="2788.232000"/>
+<Element Value="2843.256000"/>
+<Element Value="2952.157000"/>
+<Element Value="3164.785000"/>
+<Element Value="3578.040000"/>
+<Element Value="4399.488000"/>
+</Line>
+</LUT>
+</cell_rise>
+<fall_transition>
+<LUT id="fall_transition" Template="Timing_X1" gid="0x2ed03fb8" factor="0.001">
+<LinApprox>
+<Line cAng="44.4742" cLin="154.663"/>
+<Line cAng="44.4605" cLin="154.074"/>
+<Line cAng="44.4565" cLin="153.367"/>
+<Line cAng="44.44" cLin="152.574"/>
+<Line cAng="43.9711" cLin="154.519"/>
+<Line cAng="42.2485" cLin="168.968"/>
+<Line cAng="38.433" cLin="217.677"/>
+<Line cAng="34.8236" cLin="324.477"/>
+<Line cAng="36.5714" cLin="521.547"/>
+<Line cAng="44.5507" cLin="886.277"/>
+</LinApprox>
+<Line>
+<Element Value="162.071000"/>
+<Element Value="164.429000"/>
+<Element Value="176.408000"/>
+<Element Value="199.856000"/>
+<Element Value="245.701000"/>
+<Element Value="334.608000"/>
+<Element Value="508.930000"/>
+</Line>
+<Line>
+<Element Value="161.499000"/>
+<Element Value="163.831000"/>
+<Element Value="175.745000"/>
+<Element Value="199.247000"/>
+<Element Value="245.122000"/>
+<Element Value="334.024000"/>
+<Element Value="508.198000"/>
+</Line>
+<Line>
+<Element Value="160.783000"/>
+<Element Value="163.110000"/>
+<Element Value="175.010000"/>
+<Element Value="198.530000"/>
+<Element Value="244.426000"/>
+<Element Value="333.372000"/>
+<Element Value="507.422000"/>
+</Line>
+<Line>
+<Element Value="160.087000"/>
+<Element Value="162.404000"/>
+<Element Value="174.247000"/>
+<Element Value="197.575000"/>
+<Element Value="243.456000"/>
+<Element Value="332.535000"/>
+<Element Value="506.531000"/>
+</Line>
+<Line>
+<Element Value="162.422000"/>
+<Element Value="164.683000"/>
+<Element Value="176.205000"/>
+<Element Value="198.953000"/>
+<Element Value="243.724000"/>
+<Element Value="331.600000"/>
+<Element Value="505.382000"/>
+</Line>
+<Line>
+<Element Value="177.733000"/>
+<Element Value="179.739000"/>
+<Element Value="190.153000"/>
+<Element Value="211.014000"/>
+<Element Value="253.080000"/>
+<Element Value="337.764000"/>
+<Element Value="507.159000"/>
+</Line>
+<Line>
+<Element Value="227.125000"/>
+<Element Value="228.877000"/>
+<Element Value="237.772000"/>
+<Element Value="255.392000"/>
+<Element Value="291.923000"/>
+<Element Value="368.430000"/>
+<Element Value="527.227000"/>
+</Line>
+<Line>
+<Element Value="330.715000"/>
+<Element Value="332.511000"/>
+<Element Value="341.851000"/>
+<Element Value="359.937000"/>
+<Element Value="395.214000"/>
+<Element Value="463.811000"/>
+<Element Value="602.735000"/>
+</Line>
+<Line>
+<Element Value="525.336000"/>
+<Element Value="527.530000"/>
+<Element Value="538.582000"/>
+<Element Value="559.736000"/>
+<Element Value="599.508000"/>
+<Element Value="673.119000"/>
+<Element Value="810.334000"/>
+</Line>
+<Line>
+<Element Value="886.722000"/>
+<Element Value="889.831000"/>
+<Element Value="905.343000"/>
+<Element Value="934.437000"/>
+<Element Value="986.973000"/>
+<Element Value="1077.986000"/>
+<Element Value="1233.228000"/>
+</Line>
+</LUT>
+</fall_transition>
+<fo4_delay_fall conv2lib="no">
+<LUT id="fo4_delay_fall" Template="Timing_X1_FO4" gid="0x2c622ef8" factor="0.001">
+<Line>
+<Element Value="147.667224"/>
+<Element Value="150.732376"/>
+<Element Value="157.193940"/>
+<Element Value="169.273320"/>
+<Element Value="193.312452"/>
+<Element Value="242.281620"/>
+<Element Value="340.026936"/>
+<Element Value="508.220248"/>
+<Element Value="776.630368"/>
+<Element Value="1170.907032"/>
+</Line>
+</LUT>
+</fo4_delay_fall>
+<fo4_delay_rise conv2lib="no">
+<LUT id="fo4_delay_rise" Template="Timing_X1_FO4" gid="0x2c571af8" factor="0.001">
+<Line>
+<Element Value="1727.139140"/>
+<Element Value="1725.212264"/>
+<Element Value="1727.402360"/>
+<Element Value="1736.908504"/>
+<Element Value="1761.064412"/>
+<Element Value="1814.691484"/>
+<Element Value="1924.387572"/>
+<Element Value="2128.522772"/>
+<Element Value="2506.112408"/>
+<Element Value="3199.498420"/>
+</Line>
+</LUT>
+</fo4_delay_rise>
+<rise_transition>
+<LUT id="rise_transition" Template="Timing_X1" gid="0x2ed04600" factor="0.001">
+<LinApprox>
+<Line cAng="390.052" cLin="1272.78"/>
+<Line cAng="390.02" cLin="1267.68"/>
+<Line cAng="389.982" cLin="1262.75"/>
+<Line cAng="389.933" cLin="1258.05"/>
+<Line cAng="389.873" cLin="1253.56"/>
+<Line cAng="389.811" cLin="1249.24"/>
+<Line cAng="389.757" cLin="1245.01"/>
+<Line cAng="389.711" cLin="1240.84"/>
+<Line cAng="389.105" cLin="1240.93"/>
+<Line cAng="381.082" cLin="1336.97"/>
+</LinApprox>
+<Line>
+<Element Value="1353.777000"/>
+<Element Value="1372.346000"/>
+<Element Value="1468.301000"/>
+<Element Value="1661.386000"/>
+<Element Value="2049.590000"/>
+<Element Value="2829.720000"/>
+<Element Value="4395.664000"/>
+</Line>
+<Line>
+<Element Value="1348.690000"/>
+<Element Value="1367.259000"/>
+<Element Value="1463.188000"/>
+<Element Value="1656.243000"/>
+<Element Value="2044.388000"/>
+<Element Value="2824.447000"/>
+<Element Value="4390.333000"/>
+</Line>
+<Line>
+<Element Value="1343.785000"/>
+<Element Value="1362.365000"/>
+<Element Value="1458.267000"/>
+<Element Value="1651.272000"/>
+<Element Value="2039.340000"/>
+<Element Value="2819.319000"/>
+<Element Value="4385.144000"/>
+</Line>
+<Line>
+<Element Value="1339.108000"/>
+<Element Value="1357.695000"/>
+<Element Value="1453.568000"/>
+<Element Value="1646.498000"/>
+<Element Value="2034.463000"/>
+<Element Value="2814.347000"/>
+<Element Value="4380.102000"/>
+</Line>
+<Line>
+<Element Value="1334.661000"/>
+<Element Value="1353.254000"/>
+<Element Value="1449.078000"/>
+<Element Value="1641.927000"/>
+<Element Value="2029.773000"/>
+<Element Value="2809.530000"/>
+<Element Value="4375.199000"/>
+</Line>
+<Line>
+<Element Value="1330.366000"/>
+<Element Value="1348.966000"/>
+<Element Value="1444.756000"/>
+<Element Value="1637.530000"/>
+<Element Value="2025.257000"/>
+<Element Value="2804.873000"/>
+<Element Value="4370.440000"/>
+</Line>
+<Line>
+<Element Value="1326.137000"/>
+<Element Value="1344.747000"/>
+<Element Value="1440.518000"/>
+<Element Value="1633.227000"/>
+<Element Value="2020.861000"/>
+<Element Value="2800.354000"/>
+<Element Value="4365.815000"/>
+</Line>
+<Line>
+<Element Value="1321.983000"/>
+<Element Value="1340.602000"/>
+<Element Value="1436.348000"/>
+<Element Value="1629.012000"/>
+<Element Value="2016.559000"/>
+<Element Value="2795.953000"/>
+<Element Value="4361.318000"/>
+</Line>
+<Line>
+<Element Value="1322.558000"/>
+<Element Value="1341.098000"/>
+<Element Value="1436.365000"/>
+<Element Value="1628.203000"/>
+<Element Value="2014.583000"/>
+<Element Value="2792.723000"/>
+<Element Value="4357.216000"/>
+</Line>
+<Line>
+<Element Value="1419.642000"/>
+<Element Value="1437.507000"/>
+<Element Value="1529.309000"/>
+<Element Value="1715.043000"/>
+<Element Value="2091.123000"/>
+<Element Value="2852.451000"/>
+<Element Value="4391.996000"/>
+</Line>
+</LUT>
+</rise_transition>
+</TimingEntry>
+</TimingList>
+</Pin>
+</Pins>
+</Cell>

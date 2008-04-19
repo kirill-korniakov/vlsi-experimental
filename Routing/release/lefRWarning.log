@@ -1,0 +1,10 @@
+Warnings from file: FreePDK45_lib_v1.0.lef
+
+WARNING (LEFPARS-2057): MACRO CAPACITANCE is obsoleted in version 5.4 and later.
+The LEF parser will ignore this statement.
+To avoid this warning in the future, remove this statement from the LEF file with version 5.4 or later. File FreePDK45_lib_v1.0.lef at line 182
+Last token was <;>
+WARNING (LEFPARS-2058): MACRO RESISTANCE is obsoleted in version 5.4 and later.
+The LEF parser will ignore this statement.
+To avoid this warning in the future, remove this statement from the LEF file with version 5.4 or later. File FreePDK45_lib_v1.0.lef at line 183
+Last token was <;>

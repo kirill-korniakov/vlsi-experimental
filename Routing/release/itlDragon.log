@@ -1,0 +1,2755 @@
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   P
+# Date:           Tue Feb 12 22:55:02 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0.lef
+GSCLib_3.0.lef parsed successfully
+parsing design.def
+components parsing started...
+Unknown macro type detected: DCACHE_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: DCACHE_TAG_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: DRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_INST0_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_TAG0_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: IRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: IRAM_VALID_SRAM   SYHD130_8X32X1CM2
+nets parsing started...
+Bad node detected: IRAM_VALID_SRAM   CK
+Bad node detected: IRAM_DATA_SRAM   CK
+Bad node detected: ICACHE_TAG0_SRAM   CK
+Bad node detected: ICACHE_INST0_SRAM   CK
+Bad node detected: DRAM_DATA_SRAM   CK
+Bad node detected: DCACHE_TAG_SRAM   CK
+Bad node detected: DCACHE_DATA_SRAM   CK
+Bad node detected: DCACHE_DATA_SRAM   DO0
+Bad node detected: DCACHE_DATA_SRAM   DO1
+Bad node detected: DCACHE_DATA_SRAM   DO2
+Bad node detected: DCACHE_DATA_SRAM   DO3
+Bad node detected: DCACHE_DATA_SRAM   DO4
+Bad node detected: DCACHE_DATA_SRAM   DO5
+Bad node detected: DCACHE_DATA_SRAM   DO6
+Bad node detected: DCACHE_DATA_SRAM   DO7
+Bad node detected: DCACHE_DATA_SRAM   DO8
+Bad node detected: DCACHE_DATA_SRAM   DO9
+Bad node detected: DCACHE_DATA_SRAM   DO10
+Bad node detected: DCACHE_DATA_SRAM   DO11
+Bad node detected: DCACHE_DATA_SRAM   DO12
+Bad node detected: DCACHE_DATA_SRAM   DO13
+Bad node detected: DCACHE_DATA_SRAM   DO14
+Bad node detected: DCACHE_DATA_SRAM   DO15
+Bad node detected: DCACHE_DATA_SRAM   DO16
+Bad node detected: DCACHE_DATA_SRAM   DO17
+Bad node detected: DCACHE_DATA_SRAM   DO18
+Bad node detected: DCACHE_DATA_SRAM   DO19
+Bad node detected: DCACHE_DATA_SRAM   DO20
+Bad node detected: DCACHE_DATA_SRAM   DO21
+Bad node detected: DCACHE_DATA_SRAM   DO22
+Bad node detected: DCACHE_DATA_SRAM   DO23
+Bad node detected: DCACHE_DATA_SRAM   DO24
+Bad node detected: DCACHE_DATA_SRAM   DO25
+Bad node detected: DCACHE_DATA_SRAM   DO26
+Bad node detected: DCACHE_DATA_SRAM   DO27
+Bad node detected: DCACHE_DATA_SRAM   DO28
+Bad node detected: DCACHE_DATA_SRAM   DO29
+Bad node detected: DCACHE_DATA_SRAM   DO30
+Bad node detected: DCACHE_DATA_SRAM   DO31
+Bad node detected: DCACHE_TAG_SRAM   DO0
+Bad node detected: DCACHE_TAG_SRAM   DO1
+Bad node detected: DCACHE_TAG_SRAM   DO2
+Bad node detected: DCACHE_TAG_SRAM   DO3
+Bad node detected: DCACHE_TAG_SRAM   DO4
+Bad node detected: DCACHE_TAG_SRAM   DO5
+Bad node detected: DCACHE_TAG_SRAM   DO6
+Bad node detected: DCACHE_TAG_SRAM   DO7
+Bad node detected: DCACHE_TAG_SRAM   DO8
+Bad node detected: DCACHE_TAG_SRAM   DO9
+Bad node detected: DCACHE_TAG_SRAM   DO10
+Bad node detected: DCACHE_TAG_SRAM   DO11
+Bad node detected: DCACHE_TAG_SRAM   DO12
+Bad node detected: DCACHE_TAG_SRAM   DO13
+Bad node detected: DCACHE_TAG_SRAM   DO14
+Bad node detected: DCACHE_TAG_SRAM   DO15
+Bad node detected: DCACHE_TAG_SRAM   DO16
+Bad node detected: DCACHE_TAG_SRAM   DO17
+Bad node detected: DCACHE_TAG_SRAM   DO18
+Bad node detected: DCACHE_TAG_SRAM   DO19
+Bad node detected: DCACHE_TAG_SRAM   DO20
+Bad node detected: DCACHE_TAG_SRAM   DO21
+Bad node detected: DCACHE_DATA_SRAM   A0
+Bad node detected: DCACHE_DATA_SRAM   A1
+Bad node detected: DCACHE_DATA_SRAM   A2
+Bad node detected: DCACHE_DATA_SRAM   A3
+Bad node detected: DCACHE_DATA_SRAM   A4
+Bad node detected: DCACHE_DATA_SRAM   A5
+Bad node detected: DCACHE_DATA_SRAM   A6
+Bad node detected: DCACHE_DATA_SRAM   A7
+Bad node detected: DCACHE_DATA_SRAM   A8
+Bad node detected: DCACHE_DATA_SRAM   DI0
+Bad node detected: DCACHE_DATA_SRAM   DI1
+Bad node detected: DCACHE_DATA_SRAM   DI2
+Bad node detected: DCACHE_DATA_SRAM   DI3
+Bad node detected: DCACHE_DATA_SRAM   DI4
+Bad node detected: DCACHE_DATA_SRAM   DI5
+Bad node detected: DCACHE_DATA_SRAM   DI6
+Bad node detected: DCACHE_DATA_SRAM   DI7
+Bad node detected: DCACHE_DATA_SRAM   DI8
+Bad node detected: DCACHE_DATA_SRAM   DI9
+Bad node detected: DCACHE_DATA_SRAM   DI10
+Bad node detected: DCACHE_DATA_SRAM   DI11
+Bad node detected: DCACHE_DATA_SRAM   DI12
+Bad node detected: DCACHE_DATA_SRAM   DI13
+Bad node detected: DCACHE_DATA_SRAM   DI14
+Bad node detected: DCACHE_DATA_SRAM   DI15
+Bad node detected: DCACHE_DATA_SRAM   DI16
+Bad node detected: DCACHE_DATA_SRAM   DI17
+Bad node detected: DCACHE_DATA_SRAM   DI18
+Bad node detected: DCACHE_DATA_SRAM   DI19
+Bad node detected: DCACHE_DATA_SRAM   DI20
+Bad node detected: DCACHE_DATA_SRAM   DI21
+Bad node detected: DCACHE_DATA_SRAM   DI22
+Bad node detected: DCACHE_DATA_SRAM   DI23
+Bad node detected: DCACHE_DATA_SRAM   DI24
+Bad node detected: DCACHE_DATA_SRAM   DI25
+Bad node detected: DCACHE_DATA_SRAM   DI26
+Bad node detected: DCACHE_DATA_SRAM   DI27
+Bad node detected: DCACHE_DATA_SRAM   DI28
+Bad node detected: DCACHE_DATA_SRAM   DI29
+Bad node detected: DCACHE_DATA_SRAM   DI30
+Bad node detected: DCACHE_DATA_SRAM   DI31
+Bad node detected: DCACHE_TAG_SRAM   A0
+Bad node detected: DCACHE_TAG_SRAM   A1
+Bad node detected: DCACHE_TAG_SRAM   A2
+Bad node detected: DCACHE_TAG_SRAM   A3
+Bad node detected: DCACHE_TAG_SRAM   A4
+Bad node detected: DCACHE_TAG_SRAM   A5
+Bad node detected: DCACHE_TAG_SRAM   A6
+Bad node detected: DCACHE_TAG_SRAM   WEB
+Bad node detected: DCACHE_TAG_SRAM   DI0
+Bad node detected: DCACHE_TAG_SRAM   DI1
+Bad node detected: DCACHE_TAG_SRAM   DI2
+Bad node detected: DCACHE_TAG_SRAM   DI3
+Bad node detected: DCACHE_TAG_SRAM   DI4
+Bad node detected: DCACHE_TAG_SRAM   DI5
+Bad node detected: DCACHE_TAG_SRAM   DI6
+Bad node detected: DCACHE_TAG_SRAM   DI7
+Bad node detected: DCACHE_TAG_SRAM   DI8
+Bad node detected: DCACHE_TAG_SRAM   DI9
+Bad node detected: DCACHE_TAG_SRAM   DI10
+Bad node detected: DCACHE_TAG_SRAM   DI11
+Bad node detected: DCACHE_TAG_SRAM   DI12
+Bad node detected: DCACHE_TAG_SRAM   DI13
+Bad node detected: DCACHE_TAG_SRAM   DI14
+Bad node detected: DCACHE_TAG_SRAM   DI15
+Bad node detected: DCACHE_TAG_SRAM   DI16
+Bad node detected: DCACHE_TAG_SRAM   DI17
+Bad node detected: DCACHE_TAG_SRAM   DI18
+Bad node detected: DCACHE_TAG_SRAM   DI19
+Bad node detected: DCACHE_TAG_SRAM   DI20
+Bad node detected: DCACHE_TAG_SRAM   DI21
+Bad node detected: DRAM_DATA_SRAM   DO0
+Bad node detected: DRAM_DATA_SRAM   DO1
+Bad node detected: DRAM_DATA_SRAM   DO2
+Bad node detected: DRAM_DATA_SRAM   DO3
+Bad node detected: DRAM_DATA_SRAM   DO4
+Bad node detected: DRAM_DATA_SRAM   DO5
+Bad node detected: DRAM_DATA_SRAM   DO6
+Bad node detected: DRAM_DATA_SRAM   DO7
+Bad node detected: DRAM_DATA_SRAM   DO8
+Bad node detected: DRAM_DATA_SRAM   DO9
+Bad node detected: DRAM_DATA_SRAM   DO10
+Bad node detected: DRAM_DATA_SRAM   DO11
+Bad node detected: DRAM_DATA_SRAM   DO12
+Bad node detected: DRAM_DATA_SRAM   DO13
+Bad node detected: DRAM_DATA_SRAM   DO14
+Bad node detected: DRAM_DATA_SRAM   DO15
+Bad node detected: DRAM_DATA_SRAM   DO16
+Bad node detected: DRAM_DATA_SRAM   DO17
+Bad node detected: DRAM_DATA_SRAM   DO18
+Bad node detected: DRAM_DATA_SRAM   DO19
+Bad node detected: DRAM_DATA_SRAM   DO20
+Bad node detected: DRAM_DATA_SRAM   DO21
+Bad node detected: DRAM_DATA_SRAM   DO22
+Bad node detected: DRAM_DATA_SRAM   DO23
+Bad node detected: DRAM_DATA_SRAM   DO24
+Bad node detected: DRAM_DATA_SRAM   DO25
+Bad node detected: DRAM_DATA_SRAM   DO26
+Bad node detected: DRAM_DATA_SRAM   DO27
+Bad node detected: DRAM_DATA_SRAM   DO28
+Bad node detected: DRAM_DATA_SRAM   DO29
+Bad node detected: DRAM_DATA_SRAM   DO30
+Bad node detected: DRAM_DATA_SRAM   DO31
+Bad node detected: DRAM_DATA_SRAM   A0
+Bad node detected: DRAM_DATA_SRAM   A1
+Bad node detected: DRAM_DATA_SRAM   A2
+Bad node detected: DRAM_DATA_SRAM   A3
+Bad node detected: DRAM_DATA_SRAM   A4
+Bad node detected: DRAM_DATA_SRAM   A5
+Bad node detected: DRAM_DATA_SRAM   A6
+Bad node detected: DRAM_DATA_SRAM   A7
+Bad node detected: DRAM_DATA_SRAM   A8
+Bad node detected: DRAM_DATA_SRAM   DI0
+Bad node detected: DRAM_DATA_SRAM   DI1
+Bad node detected: DRAM_DATA_SRAM   DI2
+Bad node detected: DRAM_DATA_SRAM   DI3
+Bad node detected: DRAM_DATA_SRAM   DI4
+Bad node detected: DRAM_DATA_SRAM   DI5
+Bad node detected: DRAM_DATA_SRAM   DI6
+Bad node detected: DRAM_DATA_SRAM   DI7
+Bad node detected: DRAM_DATA_SRAM   DI8
+Bad node detected: DRAM_DATA_SRAM   DI9
+Bad node detected: DRAM_DATA_SRAM   DI10
+Bad node detected: DRAM_DATA_SRAM   DI11
+Bad node detected: DRAM_DATA_SRAM   DI12
+Bad node detected: DRAM_DATA_SRAM   DI13
+Bad node detected: DRAM_DATA_SRAM   DI14
+Bad node detected: DRAM_DATA_SRAM   DI15
+Bad node detected: DRAM_DATA_SRAM   DI16
+Bad node detected: DRAM_DATA_SRAM   DI17
+Bad node detected: DRAM_DATA_SRAM   DI18
+Bad node detected: DRAM_DATA_SRAM   DI19
+Bad node detected: DRAM_DATA_SRAM   DI20
+Bad node detected: DRAM_DATA_SRAM   DI21
+Bad node detected: DRAM_DATA_SRAM   DI22
+Bad node detected: DRAM_DATA_SRAM   DI23
+Bad node detected: DRAM_DATA_SRAM   DI24
+Bad node detected: DRAM_DATA_SRAM   DI25
+Bad node detected: DRAM_DATA_SRAM   DI26
+Bad node detected: DRAM_DATA_SRAM   DI27
+Bad node detected: DRAM_DATA_SRAM   DI28
+Bad node detected: DRAM_DATA_SRAM   DI29
+Bad node detected: DRAM_DATA_SRAM   DI30
+Bad node detected: DRAM_DATA_SRAM   DI31
+Bad node detected: ICACHE_INST0_SRAM   DO0
+Bad node detected: ICACHE_INST0_SRAM   DO1
+Bad node detected: ICACHE_INST0_SRAM   DO2
+Bad node detected: ICACHE_INST0_SRAM   DO3
+Bad node detected: ICACHE_INST0_SRAM   DO4
+Bad node detected: ICACHE_INST0_SRAM   DO5
+Bad node detected: ICACHE_INST0_SRAM   DO6
+Bad node detected: ICACHE_INST0_SRAM   DO7
+Bad node detected: ICACHE_INST0_SRAM   DO8
+Bad node detected: ICACHE_INST0_SRAM   DO9
+Bad node detected: ICACHE_INST0_SRAM   DO10
+Bad node detected: ICACHE_INST0_SRAM   DO11
+Bad node detected: ICACHE_INST0_SRAM   DO12
+Bad node detected: ICACHE_INST0_SRAM   DO13
+Bad node detected: ICACHE_INST0_SRAM   DO14
+Bad node detected: ICACHE_INST0_SRAM   DO15
+Bad node detected: ICACHE_INST0_SRAM   DO16
+Bad node detected: ICACHE_INST0_SRAM   DO17
+Bad node detected: ICACHE_INST0_SRAM   DO18
+Bad node detected: ICACHE_INST0_SRAM   DO19
+Bad node detected: ICACHE_INST0_SRAM   DO20
+Bad node detected: ICACHE_INST0_SRAM   DO21
+Bad node detected: ICACHE_INST0_SRAM   DO22
+Bad node detected: ICACHE_INST0_SRAM   DO23
+Bad node detected: ICACHE_INST0_SRAM   DO24
+Bad node detected: ICACHE_INST0_SRAM   DO25
+Bad node detected: ICACHE_INST0_SRAM   DO26
+Bad node detected: ICACHE_INST0_SRAM   DO27
+Bad node detected: ICACHE_INST0_SRAM   DO28
+Bad node detected: ICACHE_INST0_SRAM   DO29
+Bad node detected: ICACHE_INST0_SRAM   DO30
+Bad node detected: ICACHE_INST0_SRAM   DO31
+Bad node detected: ICACHE_TAG0_SRAM   DO0
+Bad node detected: ICACHE_TAG0_SRAM   DO1
+Bad node detected: ICACHE_TAG0_SRAM   DO2
+Bad node detected: ICACHE_TAG0_SRAM   DO3
+Bad node detected: ICACHE_TAG0_SRAM   DO4
+Bad node detected: ICACHE_TAG0_SRAM   DO5
+Bad node detected: ICACHE_TAG0_SRAM   DO6
+Bad node detected: ICACHE_TAG0_SRAM   DO7
+Bad node detected: ICACHE_TAG0_SRAM   DO8
+Bad node detected: ICACHE_TAG0_SRAM   DO9
+Bad node detected: ICACHE_TAG0_SRAM   DO10
+Bad node detected: ICACHE_TAG0_SRAM   DO11
+Bad node detected: ICACHE_TAG0_SRAM   DO12
+Bad node detected: ICACHE_TAG0_SRAM   DO13
+Bad node detected: ICACHE_TAG0_SRAM   DO14
+Bad node detected: ICACHE_TAG0_SRAM   DO15
+Bad node detected: ICACHE_TAG0_SRAM   DO16
+Bad node detected: ICACHE_TAG0_SRAM   DO17
+Bad node detected: ICACHE_TAG0_SRAM   DO18
+Bad node detected: ICACHE_TAG0_SRAM   DO19
+Bad node detected: ICACHE_TAG0_SRAM   DO20
+Bad node detected: ICACHE_TAG0_SRAM   DO21
+Bad node detected: ICACHE_INST0_SRAM   WEB
+Bad node detected: ICACHE_INST0_SRAM   A0
+Bad node detected: ICACHE_INST0_SRAM   A1
+Bad node detected: ICACHE_INST0_SRAM   A2
+Bad node detected: ICACHE_INST0_SRAM   A3
+Bad node detected: ICACHE_INST0_SRAM   A4
+Bad node detected: ICACHE_INST0_SRAM   A5
+Bad node detected: ICACHE_INST0_SRAM   A6
+Bad node detected: ICACHE_INST0_SRAM   A7
+Bad node detected: ICACHE_INST0_SRAM   A8
+Bad node detected: ICACHE_INST0_SRAM   DI0
+Bad node detected: ICACHE_INST0_SRAM   DI1
+Bad node detected: ICACHE_INST0_SRAM   DI2
+Bad node detected: ICACHE_INST0_SRAM   DI3
+Bad node detected: ICACHE_INST0_SRAM   DI4
+Bad node detected: ICACHE_INST0_SRAM   DI5
+Bad node detected: ICACHE_INST0_SRAM   DI6
+Bad node detected: ICACHE_INST0_SRAM   DI7
+Bad node detected: ICACHE_INST0_SRAM   DI8
+Bad node detected: ICACHE_INST0_SRAM   DI9
+Bad node detected: ICACHE_INST0_SRAM   DI10
+Bad node detected: ICACHE_INST0_SRAM   DI11
+Bad node detected: ICACHE_INST0_SRAM   DI12
+Bad node detected: ICACHE_INST0_SRAM   DI13
+Bad node detected: ICACHE_INST0_SRAM   DI14
+Bad node detected: ICACHE_INST0_SRAM   DI15
+Bad node detected: ICACHE_INST0_SRAM   DI16
+Bad node detected: ICACHE_INST0_SRAM   DI17
+Bad node detected: ICACHE_INST0_SRAM   DI18
+Bad node detected: ICACHE_INST0_SRAM   DI19
+Bad node detected: ICACHE_INST0_SRAM   DI20
+Bad node detected: ICACHE_INST0_SRAM   DI21
+Bad node detected: ICACHE_INST0_SRAM   DI22
+Bad node detected: ICACHE_INST0_SRAM   DI23
+Bad node detected: ICACHE_INST0_SRAM   DI24
+Bad node detected: ICACHE_INST0_SRAM   DI25
+Bad node detected: ICACHE_INST0_SRAM   DI26
+Bad node detected: ICACHE_INST0_SRAM   DI27
+Bad node detected: ICACHE_INST0_SRAM   DI28
+Bad node detected: ICACHE_INST0_SRAM   DI29
+Bad node detected: ICACHE_INST0_SRAM   DI30
+Bad node detected: ICACHE_INST0_SRAM   DI31
+Bad node detected: ICACHE_TAG0_SRAM   WEB
+Bad node detected: ICACHE_TAG0_SRAM   A0
+Bad node detected: ICACHE_TAG0_SRAM   A1
+Bad node detected: ICACHE_TAG0_SRAM   A2
+Bad node detected: ICACHE_TAG0_SRAM   A3
+Bad node detected: ICACHE_TAG0_SRAM   A4
+Bad node detected: ICACHE_TAG0_SRAM   A5
+Bad node detected: ICACHE_TAG0_SRAM   A6
+Bad node detected: ICACHE_TAG0_SRAM   DI0
+Bad node detected: ICACHE_TAG0_SRAM   DI1
+Bad node detected: ICACHE_TAG0_SRAM   DI2
+Bad node detected: ICACHE_TAG0_SRAM   DI3
+Bad node detected: ICACHE_TAG0_SRAM   DI4
+Bad node detected: ICACHE_TAG0_SRAM   DI5
+Bad node detected: ICACHE_TAG0_SRAM   DI6
+Bad node detected: ICACHE_TAG0_SRAM   DI7
+Bad node detected: ICACHE_TAG0_SRAM   DI8
+Bad node detected: ICACHE_TAG0_SRAM   DI9
+Bad node detected: ICACHE_TAG0_SRAM   DI10
+Bad node detected: ICACHE_TAG0_SRAM   DI11
+Bad node detected: ICACHE_TAG0_SRAM   DI12
+Bad node detected: ICACHE_TAG0_SRAM   DI13
+Bad node detected: ICACHE_TAG0_SRAM   DI14
+Bad node detected: ICACHE_TAG0_SRAM   DI15
+Bad node detected: ICACHE_TAG0_SRAM   DI16
+Bad node detected: ICACHE_TAG0_SRAM   DI17
+Bad node detected: ICACHE_TAG0_SRAM   DI18
+Bad node detected: ICACHE_TAG0_SRAM   DI19
+Bad node detected: ICACHE_TAG0_SRAM   DI20
+Bad node detected: ICACHE_TAG0_SRAM   DI21
+Bad node detected: IRAM_DATA_SRAM   DO0
+Bad node detected: IRAM_DATA_SRAM   DO1
+Bad node detected: IRAM_DATA_SRAM   DO2
+Bad node detected: IRAM_DATA_SRAM   DO3
+Bad node detected: IRAM_DATA_SRAM   DO4
+Bad node detected: IRAM_DATA_SRAM   DO5
+Bad node detected: IRAM_DATA_SRAM   DO6
+Bad node detected: IRAM_DATA_SRAM   DO7
+Bad node detected: IRAM_DATA_SRAM   DO8
+Bad node detected: IRAM_DATA_SRAM   DO9
+Bad node detected: IRAM_DATA_SRAM   DO10
+Bad node detected: IRAM_DATA_SRAM   DO11
+Bad node detected: IRAM_DATA_SRAM   DO12
+Bad node detected: IRAM_DATA_SRAM   DO13
+Bad node detected: IRAM_DATA_SRAM   DO14
+Bad node detected: IRAM_DATA_SRAM   DO15
+Bad node detected: IRAM_DATA_SRAM   DO16
+Bad node detected: IRAM_DATA_SRAM   DO17
+Bad node detected: IRAM_DATA_SRAM   DO18
+Bad node detected: IRAM_DATA_SRAM   DO19
+Bad node detected: IRAM_DATA_SRAM   DO20
+Bad node detected: IRAM_DATA_SRAM   DO21
+Bad node detected: IRAM_DATA_SRAM   DO22
+Bad node detected: IRAM_DATA_SRAM   DO23
+Bad node detected: IRAM_DATA_SRAM   DO24
+Bad node detected: IRAM_DATA_SRAM   DO25
+Bad node detected: IRAM_DATA_SRAM   DO26
+Bad node detected: IRAM_DATA_SRAM   DO27
+Bad node detected: IRAM_DATA_SRAM   DO28
+Bad node detected: IRAM_DATA_SRAM   DO29
+Bad node detected: IRAM_DATA_SRAM   DO30
+Bad node detected: IRAM_DATA_SRAM   DO31
+Bad node detected: IRAM_VALID_SRAM   DO0
+Bad node detected: IRAM_VALID_SRAM   DO1
+Bad node detected: IRAM_VALID_SRAM   DO2
+Bad node detected: IRAM_VALID_SRAM   DO3
+Bad node detected: IRAM_VALID_SRAM   DO4
+Bad node detected: IRAM_VALID_SRAM   DO5
+Bad node detected: IRAM_VALID_SRAM   DO6
+Bad node detected: IRAM_VALID_SRAM   DO7
+Bad node detected: IRAM_VALID_SRAM   DO8
+Bad node detected: IRAM_VALID_SRAM   DO9
+Bad node detected: IRAM_VALID_SRAM   DO10
+Bad node detected: IRAM_VALID_SRAM   DO11
+Bad node detected: IRAM_VALID_SRAM   DO12
+Bad node detected: IRAM_VALID_SRAM   DO13
+Bad node detected: IRAM_VALID_SRAM   DO14
+Bad node detected: IRAM_VALID_SRAM   DO15
+Bad node detected: IRAM_VALID_SRAM   DO16
+Bad node detected: IRAM_VALID_SRAM   DO17
+Bad node detected: IRAM_VALID_SRAM   DO18
+Bad node detected: IRAM_VALID_SRAM   DO19
+Bad node detected: IRAM_VALID_SRAM   DO20
+Bad node detected: IRAM_VALID_SRAM   DO21
+Bad node detected: IRAM_VALID_SRAM   DO22
+Bad node detected: IRAM_VALID_SRAM   DO23
+Bad node detected: IRAM_VALID_SRAM   DO24
+Bad node detected: IRAM_VALID_SRAM   DO25
+Bad node detected: IRAM_VALID_SRAM   DO26
+Bad node detected: IRAM_VALID_SRAM   DO27
+Bad node detected: IRAM_VALID_SRAM   DO28
+Bad node detected: IRAM_VALID_SRAM   DO29
+Bad node detected: IRAM_VALID_SRAM   DO30
+Bad node detected: IRAM_VALID_SRAM   DO31
+Bad node detected: IRAM_DATA_SRAM   A0
+Bad node detected: IRAM_DATA_SRAM   A1
+Bad node detected: IRAM_DATA_SRAM   A2
+Bad node detected: IRAM_DATA_SRAM   A3
+Bad node detected: IRAM_DATA_SRAM   A4
+Bad node detected: IRAM_DATA_SRAM   A5
+Bad node detected: IRAM_DATA_SRAM   A6
+Bad node detected: IRAM_DATA_SRAM   A7
+Bad node detected: IRAM_DATA_SRAM   A8
+Bad node detected: IRAM_DATA_SRAM   WEB
+Bad node detected: IRAM_DATA_SRAM   DI0
+Bad node detected: IRAM_DATA_SRAM   DI1
+Bad node detected: IRAM_DATA_SRAM   DI2
+Bad node detected: IRAM_DATA_SRAM   DI3
+Bad node detected: IRAM_DATA_SRAM   DI4
+Bad node detected: IRAM_DATA_SRAM   DI5
+Bad node detected: IRAM_DATA_SRAM   DI6
+Bad node detected: IRAM_DATA_SRAM   DI7
+Bad node detected: IRAM_DATA_SRAM   DI8
+Bad node detected: IRAM_DATA_SRAM   DI9
+Bad node detected: IRAM_DATA_SRAM   DI10
+Bad node detected: IRAM_DATA_SRAM   DI11
+Bad node detected: IRAM_DATA_SRAM   DI12
+Bad node detected: IRAM_DATA_SRAM   DI13
+Bad node detected: IRAM_DATA_SRAM   DI14
+Bad node detected: IRAM_DATA_SRAM   DI15
+Bad node detected: IRAM_DATA_SRAM   DI16
+Bad node detected: IRAM_DATA_SRAM   DI17
+Bad node detected: IRAM_DATA_SRAM   DI18
+Bad node detected: IRAM_DATA_SRAM   DI19
+Bad node detected: IRAM_DATA_SRAM   DI20
+Bad node detected: IRAM_DATA_SRAM   DI21
+Bad node detected: IRAM_DATA_SRAM   DI22
+Bad node detected: IRAM_DATA_SRAM   DI23
+Bad node detected: IRAM_DATA_SRAM   DI24
+Bad node detected: IRAM_DATA_SRAM   DI25
+Bad node detected: IRAM_DATA_SRAM   DI26
+Bad node detected: IRAM_DATA_SRAM   DI27
+Bad node detected: IRAM_DATA_SRAM   DI28
+Bad node detected: IRAM_DATA_SRAM   DI29
+Bad node detected: IRAM_DATA_SRAM   DI30
+Bad node detected: IRAM_DATA_SRAM   DI31
+Bad node detected: IRAM_VALID_SRAM   A0
+Bad node detected: IRAM_VALID_SRAM   A1
+Bad node detected: IRAM_VALID_SRAM   WEB
+Bad node detected: IRAM_VALID_SRAM   DI0
+Bad node detected: IRAM_VALID_SRAM   DI1
+Bad node detected: IRAM_VALID_SRAM   DI2
+Bad node detected: IRAM_VALID_SRAM   DI3
+Bad node detected: IRAM_VALID_SRAM   DI4
+Bad node detected: IRAM_VALID_SRAM   DI5
+Bad node detected: IRAM_VALID_SRAM   DI6
+Bad node detected: IRAM_VALID_SRAM   DI7
+Bad node detected: IRAM_VALID_SRAM   DI8
+Bad node detected: IRAM_VALID_SRAM   DI9
+Bad node detected: IRAM_VALID_SRAM   DI10
+Bad node detected: IRAM_VALID_SRAM   DI11
+Bad node detected: IRAM_VALID_SRAM   DI12
+Bad node detected: IRAM_VALID_SRAM   DI13
+Bad node detected: IRAM_VALID_SRAM   DI14
+Bad node detected: IRAM_VALID_SRAM   DI15
+Bad node detected: IRAM_VALID_SRAM   DI16
+Bad node detected: IRAM_VALID_SRAM   DI17
+Bad node detected: IRAM_VALID_SRAM   DI18
+Bad node detected: IRAM_VALID_SRAM   DI19
+Bad node detected: IRAM_VALID_SRAM   DI20
+Bad node detected: IRAM_VALID_SRAM   DI21
+Bad node detected: IRAM_VALID_SRAM   DI22
+Bad node detected: IRAM_VALID_SRAM   DI23
+Bad node detected: IRAM_VALID_SRAM   DI24
+Bad node detected: IRAM_VALID_SRAM   DI25
+Bad node detected: IRAM_VALID_SRAM   DI26
+Bad node detected: IRAM_VALID_SRAM   DI27
+Bad node detected: IRAM_VALID_SRAM   DI28
+Bad node detected: IRAM_VALID_SRAM   DI29
+Bad node detected: IRAM_VALID_SRAM   DI30
+Bad node detected: IRAM_VALID_SRAM   DI31
+Bad node detected: DCACHE_DATA_SRAM   WEB
+Bad node detected: DRAM_DATA_SRAM   WEB
+Bad node detected: IRAM_VALID_SRAM   A2
+Bad node detected: IRAM_VALID_SRAM   CSB
+Bad node detected: IRAM_DATA_SRAM   CSB
+Bad node detected: ICACHE_TAG0_SRAM   CSB
+Bad node detected: ICACHE_INST0_SRAM   CSB
+Bad node detected: DRAM_DATA_SRAM   CSB
+Bad node detected: DCACHE_TAG_SRAM   CSB
+Bad node detected: DCACHE_DATA_SRAM   CSB
+Files parsed successfully.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Fri Feb 29 21:28:35 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design2.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:43:35 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design2.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:43:53 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design2.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:44:00 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design2.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:45:24 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design2.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:47:02 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:47:26 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:47:40 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:48:09 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:50:04 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:50:19 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 21:59:44 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 22:00:19 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 22:00:23 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Sat Mar 01 22:02:45 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+Files parsed successfully.
+Net 2    SYSCLK SKIPPED with 6684 pins.
+Net 60016    tie1 SKIPPED with 1267 pins.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   P
+# Date:           Wed Mar 12 00:08:42 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...
+parsing FreePDK45_lib_v1.0.lef
+LEF Reader returns bad status.
+FreePDK45_lib_v1.0.lef parsed successfully
+parsing design.def
+components parsing started...
+Unknown macro type detected: DCACHE_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: DCACHE_TAG_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: DRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_INST0_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_TAG0_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: IRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: IRAM_VALID_SRAM   SYHD130_8X32X1CM2
+Unknown macro type detected: g146320   INVX1
+Unknown macro type detected: g146318   INVX1
+Unknown macro type detected: g146347   INVX1
+Unknown macro type detected: g146346   INVX1
+Unknown macro type detected: g146333   INVX1
+Unknown macro type detected: g146324   INVX1
+Unknown macro type detected: g146325   INVX1
+Unknown macro type detected: g146326   INVX1
+Unknown macro type detected: g146327   INVX1
+Unknown macro type detected: g146336   INVX1
+Unknown macro type detected: g146328   INVX1
+Unknown macro type detected: g146329   INVX1
+Unknown macro type detected: g146330   INVX1
+Unknown macro type detected: g146331   INVX1
+Unknown macro type detected: g146323   INVX1
+Unknown macro type detected: g146345   INVX1
+Unknown macro type detected: g146322   INVX1
+Unknown macro type detected: g146321   INVX1
+Unknown macro type detected: g146351   INVX1
+Unknown macro type detected: g146349   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[49\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[48\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[47\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[46\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[45\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[44\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[43\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[42\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[41\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[40\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[39\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[38\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[37\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[36\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[35\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[34\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[33\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[32\]   DFFSRX1
+Unknown macro type detected: g2   AOI21X1
+Unknown macro type detected: g20   AOI21X1
+Unknown macro type detected: g21   AOI21X1
+Unknown macro type detected: g22   AOI21X1
+Unknown macro type detected: g23   AOI21X1
+Unknown macro type detected: g24   AOI21X1
+Unknown macro type detected: g25   AOI21X1
+Unknown macro type detected: g26   AOI21X1
+Unknown macro type detected: g27   AOI21X1
+Unknown macro type detected: g28   AOI21X1
+Unknown macro type detected: g29   AOI21X1
+Unknown macro type detected: g30   AOI21X1
+Unknown macro type detected: g31   AOI21X1
+Unknown macro type detected: g32   AOI21X1
+Unknown macro type detected: g33   AOI21X1
+Unknown macro type detected: g34   AOI21X1
+Unknown macro type detected: g35   AOI21X1
+Unknown macro type detected: g36   AOI21X1
+Unknown macro type detected: g37   AOI22X1
+Unknown macro type detected: g41   AOI21X1
+Unknown macro type detected: g44   AOI22X1
+Unknown macro type detected: g43   NOR2X1
+Unknown macro type detected: g45   AOI21X1
+Unknown macro type detected: g46   AOI21X1
+Unknown macro type detected: g47   AOI21X1
+Unknown macro type detected: g48   AOI21X1
+Unknown macro type detected: g49   AOI21X1
+Unknown macro type detected: g50   AOI21X1
+Unknown macro type detected: g51   AOI21X1
+Unknown macro type detected: g52   AOI21X1
+Unknown macro type detected: g53   NOR2X1
+Unknown macro type detected: g54   NOR2X1
+Unknown macro type detected: g55   AOI21X1
+Unknown macro type detected: g57   AOI21X1
+Unknown macro type detected: g58   AOI21X1
+Unknown macro type detected: g59   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[15\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[31\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[31\]   DFFX1
+Unknown macro type detected: g42   AOI21X1
+Unknown macro type detected: g56   NAND2X1
+Unknown macro type detected: g90   AOI21X1
+Unknown macro type detected: g91   AOI21X1
+Unknown macro type detected: g92   AOI21X1
+Unknown macro type detected: g94   AOI21X1
+Unknown macro type detected: g95   AOI21X1
+Unknown macro type detected: g96   AOI21X1
+Unknown macro type detected: g97   AOI21X1
+Unknown macro type detected: g98   AOI21X1
+Unknown macro type detected: g99   AOI21X1
+Unknown macro type detected: g100   AOI21X1
+Unknown macro type detected: g101   AOI21X1
+Unknown macro type detected: g102   AOI21X1
+Unknown macro type detected: g103   AOI21X1
+Unknown macro type detected: g104   AOI21X1
+Unknown macro type detected: g105   AOI21X1
+Unknown macro type detected: g157   NAND2X1
+Unknown macro type detected: g158   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[31\]   DFFX1
+Unknown macro type detected: g106   AOI21X1
+Unknown macro type detected: g107   AOI21X1
+Unknown macro type detected: g108   NAND2X1
+Unknown macro type detected: g156   AOI21X1
+Unknown macro type detected: g181   NAND2X1
+Unknown macro type detected: g182   NAND2X1
+Unknown macro type detected: g184   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[13\]   DFFX1
+Unknown macro type detected: g93   NAND2X1
+Unknown macro type detected: g139   NAND2X1
+Unknown macro type detected: g141   NAND2X1
+Unknown macro type detected: g177   NAND2X1
+Unknown macro type detected: g179   NAND2X1
+Unknown macro type detected: g178   NAND2X1
+Unknown macro type detected: g183   NAND2X1
+Unknown macro type detected: g185   NAND2X1
+Unknown macro type detected: g187   NAND2X1
+Unknown macro type detected: g190   NAND2X1
+Unknown macro type detected: g192   NAND2X1
+Unknown macro type detected: g194   NAND2X1
+Unknown macro type detected: g196   NAND2X1
+Unknown macro type detected: g198   NAND2X1
+Unknown macro type detected: g200   NAND2X1
+Unknown macro type detected: g202   NAND2X1
+Unknown macro type detected: g206   NAND2X1
+Unknown macro type detected: g208   NAND2X1
+Unknown macro type detected: g209   NAND2X1
+Unknown macro type detected: g212   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[12\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[28\]   DFFX1
+Unknown macro type detected: g134   AOI21X1
+Unknown macro type detected: g180   NAND2X1
+Unknown macro type detected: g186   NAND2X1
+Unknown macro type detected: g188   NAND2X1
+Unknown macro type detected: g189   NAND2X1
+Unknown macro type detected: g191   NAND2X1
+Unknown macro type detected: g193   NAND2X1
+Unknown macro type detected: g195   NAND2X1
+Unknown macro type detected: g197   NAND2X1
+Unknown macro type detected: g199   NAND2X1
+Unknown macro type detected: g201   NAND2X1
+Unknown macro type detected: g203   NAND2X1
+Unknown macro type detected: g204   NAND2X1
+Unknown macro type detected: g207   NAND2X1
+Unknown macro type detected: g205   NAND2X1
+Unknown macro type detected: g210   NAND2X1
+Unknown macro type detected: g211   NAND2X1
+Unknown macro type detected: g227   NAND2X1
+Unknown macro type detected: g253   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[28\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[16\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_CarryPartial_R_reg   DFFX1
+Unknown macro type detected: g135   AOI21X1
+Unknown macro type detected: g143   AOI21X1
+Unknown macro type detected: g159   XOR2X1
+Unknown macro type detected: g228   NAND3X1
+Unknown macro type detected: g254   INVX2
+Unknown macro type detected: g255   INVX2
+Unknown macro type detected: g278   AOI22X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[14\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[11\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[29\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[27\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[28\]   DFFX1
+Unknown macro type detected: g214   AOI21X1
+Unknown macro type detected: g250   NOR2X1
+Unknown macro type detected: g252   BUFX3
+Unknown macro type detected: g273   NAND2X1
+Unknown macro type detected: g274   OAI21X1
+Unknown macro type detected: g275   OAI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[29\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[27\]   DFFSRX1
+Unknown macro type detected: g232   INVX1
+Unknown macro type detected: g125   NOR2X1
+Unknown macro type detected: g136   AOI21X1
+Unknown macro type detected: g142   AOI21X1
+Unknown macro type detected: g144   AOI21X1
+Unknown macro type detected: g251   NAND2X1
+Unknown macro type detected: g261   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[30\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[29\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[27\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[17\]   DFFX1
+Unknown macro type detected: g215   AOI21X1
+Unknown macro type detected: g229   AOI21X1
+Unknown macro type detected: g246   NAND2X1
+Unknown macro type detected: g277   AOI22X1
+Unknown macro type detected: g305   NAND2X1
+Unknown macro type detected: g307   NAND2X1
+Unknown macro type detected: g308   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[30\]   DFFSRX1
+Unknown macro type detected: g230   AOI21X1
+Unknown macro type detected: g231   AOI21X1
+Unknown macro type detected: g259   AOI21X1
+Unknown macro type detected: g260   AOI21X1
+Unknown macro type detected: g310   NAND2X1
+Unknown macro type detected: g312   OAI21X1
+Unknown macro type detected: g332   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[8\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[1\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[0\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[24\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[16\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[30\]   DFFX1
+Unknown macro type detected: g213   AOI21X1
+Unknown macro type detected: g247   NAND2X1
+Unknown macro type detected: g276   AOI22X1
+Unknown macro type detected: g279   AOI22X1
+Unknown macro type detected: g309   AND2X1
+Unknown macro type detected: g313   OAI21X1
+Unknown macro type detected: g333   NAND2X1
+Unknown macro type detected: g355   AOI22X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[24\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[16\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[7\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[5\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[4\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[3\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[2\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[9\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[6\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[10\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[26\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[25\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[23\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[22\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[21\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[20\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[19\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[18\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[17\]   DFFX1
+Unknown macro type detected: g127   AOI21X1
+Unknown macro type detected: g138   AOI21X1
+Unknown macro type detected: g140   AOI21X1
+Unknown macro type detected: g147   AOI21X1
+Unknown macro type detected: g155   AOI21X1
+Unknown macro type detected: g258   AOI21X1
+Unknown macro type detected: g294   NAND2X1
+Unknown macro type detected: g325   NAND2X1
+Unknown macro type detected: g346   AOI21X1
+Unknown macro type detected: g352   OAI21X1
+Unknown macro type detected: g349   OAI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[25\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[23\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[22\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[21\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[20\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[26\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[18\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[17\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[19\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[24\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[16\]   DFFX1
+Unknown macro type detected: g126   AOI21X1
+Unknown macro type detected: g128   AOI21X1
+Unknown macro type detected: g129   AOI21X1
+Unknown macro type detected: g130   AOI21X1
+Unknown macro type detected: g131   AOI21X1
+Unknown macro type detected: g133   AOI21X1
+Unknown macro type detected: g132   AOI21X1
+Unknown macro type detected: g137   AOI21X1
+Unknown macro type detected: g145   AOI21X1
+Unknown macro type detected: g146   AOI21X1
+Unknown macro type detected: g148   AOI21X1
+Unknown macro type detected: g149   AOI21X1
+Unknown macro type detected: g151   AOI21X1
+Unknown macro type detected: g150   AOI21X1
+Unknown macro type detected: g152   AOI21X1
+Unknown macro type detected: g153   AOI21X1
+Unknown macro type detected: g154   AOI21X1
+Unknown macro type detected: g218   AOI21X1
+Unknown macro type detected: g225   AOI21X1
+Unknown macro type detected: g293   NAND2X1
+Unknown macro type detected: g311   OAI21X1
+Unknown macro type detected: g314   OAI21X1
+Unknown macro type detected: g354   AOI22X1
+Unknown macro type detected: g356   AOI22X1
+Unknown macro type detected: g369   AOI22X1
+Unknown macro type detected: g401   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[26\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[25\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[23\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[22\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[21\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[20\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[19\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[18\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[17\]   DFFX1
+Unknown macro type detected: g216   AOI21X1
+Unknown macro type detected: g217   AOI21X1
+Unknown macro type detected: g219   AOI21X1
+Unknown macro type detected: g220   AOI21X1
+Unknown macro type detected: g222   AOI21X1
+Unknown macro type detected: g223   AOI21X1
+Unknown macro type detected: g221   AOI21X1
+Unknown macro type detected: g224   AOI21X1
+Unknown macro type detected: g226   AOI21X1
+Unknown macro type detected: g263   AOI21X1
+Unknown macro type detected: g272   AOI21X1
+Unknown macro type detected: g306   NAND2X1
+Unknown macro type detected: g329   OAI21X1
+Unknown macro type detected: g335   OAI21X1
+Unknown macro type detected: g351   OAI21X1
+Unknown macro type detected: g357   OAI21X1
+Unknown macro type detected: g399   AND2X1
+Unknown macro type detected: g402   NAND2X1
+Unknown macro type detected: g236   AND2X1
+Unknown macro type detected: g238   NAND2X1
+Unknown macro type detected: g245   NAND2X1
+Unknown macro type detected: g249   NAND2X1
+Unknown macro type detected: g262   AOI21X1
+Unknown macro type detected: g264   AOI21X1
+Unknown macro type detected: g265   AOI21X1
+Unknown macro type detected: g266   AOI21X1
+Unknown macro type detected: g267   AOI21X1
+Unknown macro type detected: g268   AOI21X1
+Unknown macro type detected: g269   AOI21X1
+Unknown macro type detected: g270   AOI21X1
+Unknown macro type detected: g271   AOI21X1
+Unknown macro type detected: g282   AOI22X1
+Unknown macro type detected: g290   AOI22X1
+Unknown macro type detected: g334   AOI22X1
+Unknown macro type detected: g350   MX2X1
+Unknown macro type detected: g353   AOI22X1
+Unknown macro type detected: g383   AOI22X1
+Unknown macro type detected: g416   INVX1
+Unknown macro type detected: g463   INVX1
+Unknown macro type detected: g234   AND2X1
+Unknown macro type detected: g235   AND2X1
+Unknown macro type detected: g237   NAND2X1
+Unknown macro type detected: g239   NAND2X1
+Unknown macro type detected: g240   NAND2X1
+Unknown macro type detected: g241   NAND2X1
+Unknown macro type detected: g242   NAND2X1
+Unknown macro type detected: g244   NAND2X1
+Unknown macro type detected: g243   NAND2X1
+Unknown macro type detected: g248   NAND2X1
+Unknown macro type detected: g280   AOI22X1
+Unknown macro type detected: g283   AOI22X1
+Unknown macro type detected: g284   AOI22X1
+Unknown macro type detected: g285   AOI22X1
+Unknown macro type detected: g286   AOI22X1
+Unknown macro type detected: g287   AOI22X1
+Unknown macro type detected: g288   AOI22X1
+Unknown macro type detected: g289   AOI22X1
+Unknown macro type detected: g281   AOI22X1
+Unknown macro type detected: g297   NAND2X1
+Unknown macro type detected: g304   NAND2X1
+Unknown macro type detected: g348   OAI21X1
+Unknown macro type detected: g417   OR2X1
+Unknown macro type detected: g426   INVX1
+Unknown macro type detected: g421   INVX1
+Unknown macro type detected: g292   OAI21X1
+Unknown macro type detected: g295   NAND2X1
+Unknown macro type detected: g296   NAND2X1
+Unknown macro type detected: g298   NAND2X1
+Unknown macro type detected: g300   NAND2X1
+Unknown macro type detected: g301   NAND2X1
+Unknown macro type detected: g302   NAND2X1
+Unknown macro type detected: g303   NAND2X1
+Unknown macro type detected: g299   NAND2X1
+Unknown macro type detected: g317   OAI21X1
+Unknown macro type detected: g324   OAI21X1
+Unknown macro type detected: g326   NAND2X1
+Unknown macro type detected: g372   AOI22X1
+Unknown macro type detected: g380   AOI22X1
+Unknown macro type detected: g423   AOI21X1
+Unknown macro type detected: g427   INVX1
+Unknown macro type detected: g315   OAI21X1
+Unknown macro type detected: g316   OAI21X1
+Unknown macro type detected: g318   OAI21X1
+Unknown macro type detected: g319   OAI21X1
+Unknown macro type detected: g320   OAI21X1
+Unknown macro type detected: g321   OAI21X1
+Unknown macro type detected: g322   OAI21X1
+Unknown macro type detected: g323   OAI21X1
+Unknown macro type detected: g338   OAI21X1
+Unknown macro type detected: g345   OAI21X1
+Unknown macro type detected: g360   OAI21X1
+Unknown macro type detected: g368   OAI21X1
+Unknown macro type detected: g370   AOI22X1
+Unknown macro type detected: g371   AOI22X1
+Unknown macro type detected: g373   AOI22X1
+Unknown macro type detected: g375   AOI22X1
+Unknown macro type detected: g376   AOI22X1
+Unknown macro type detected: g377   AOI22X1
+Unknown macro type detected: g378   AOI22X1
+Unknown macro type detected: g379   AOI22X1
+Unknown macro type detected: g374   AOI22X1
+Unknown macro type detected: g411   INVX1
+Unknown macro type detected: g428   MX2X1
+Unknown macro type detected: g472   NOR2X1
+Unknown macro type detected: g330   OAI21X1
+Unknown macro type detected: g336   OAI21X1
+Unknown macro type detected: g337   OAI21X1
+Unknown macro type detected: g343   OAI21X1
+Unknown macro type detected: g344   OAI21X1
+Unknown macro type detected: g341   OAI21X1
+Unknown macro type detected: g342   OAI21X1
+Unknown macro type detected: g347   AOI21X1
+Unknown macro type detected: g340   OAI21X1
+Unknown macro type detected: g339   OAI21X1
+Unknown macro type detected: g358   OAI21X1
+Unknown macro type detected: g359   OAI21X1
+Unknown macro type detected: g361   OAI21X1
+Unknown macro type detected: g362   OAI21X1
+Unknown macro type detected: g364   OAI21X1
+Unknown macro type detected: g365   OAI21X1
+Unknown macro type detected: g367   OAI21X1
+Unknown macro type detected: g366   OAI21X1
+Unknown macro type detected: g363   OAI21X1
+Unknown macro type detected: g386   AOI22X1
+Unknown macro type detected: g393   AOI22X1
+Unknown macro type detected: g414   NOR2X1
+Unknown macro type detected: g471   AOI21X1
+Unknown macro type detected: g384   AOI22X1
+Unknown macro type detected: g385   AOI22X1
+Unknown macro type detected: g387   AOI22X1
+Unknown macro type detected: g388   AOI22X1
+Unknown macro type detected: g389   AOI22X1
+Unknown macro type detected: g390   AOI22X1
+Unknown macro type detected: g391   AOI22X1
+Unknown macro type detected: g392   AOI22X1
+Unknown macro type detected: g435   INVX1
+Unknown macro type detected: g495   AOI21X1
+Unknown macro type detected: g400   AND2X1
+Unknown macro type detected: g432   INVX1
+Unknown macro type detected: g436   INVX1
+Unknown macro type detected: g438   INVX1
+Unknown macro type detected: g444   INVX1
+Unknown macro type detected: g447   INVX1
+Unknown macro type detected: g460   INVX1
+Unknown macro type detected: g441   INVX1
+Unknown macro type detected: g470   NOR2X1
+Unknown macro type detected: g508   MX2X1
+Unknown macro type detected: g528   NOR2X1
+Unknown macro type detected: g430   INVX1
+Unknown macro type detected: g433   INVX1
+Unknown macro type detected: g437   MX2X1
+Unknown macro type detected: g439   INVX1
+Unknown macro type detected: g442   INVX1
+Unknown macro type detected: g445   INVX1
+Unknown macro type detected: g448   INVX1
+Unknown macro type detected: g451   INVX1
+Unknown macro type detected: g454   INVX1
+Unknown macro type detected: g457   INVX1
+Unknown macro type detected: g461   MX2X1
+Unknown macro type detected: g529   NAND2X1
+Unknown macro type detected: g542   AOI21X1
+Unknown macro type detected: g543   AOI21X1
+Unknown macro type detected: g431   MX2X1
+Unknown macro type detected: g434   MX2X1
+Unknown macro type detected: g440   MX2X1
+Unknown macro type detected: g443   MX2X1
+Unknown macro type detected: g446   MX2X1
+Unknown macro type detected: g449   MX2X1
+Unknown macro type detected: g452   MX2X1
+Unknown macro type detected: g455   MX2X1
+Unknown macro type detected: g458   MX2X1
+Unknown macro type detected: g494   MX2X1
+Unknown macro type detected: g598   XOR2X1
+Unknown macro type detected: g599   MX2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[15\]   DFFX1
+Unknown macro type detected: g597   XOR2X1
+Unknown macro type detected: g627   XOR2X1
+Unknown macro type detected: g628   XOR2X1
+Unknown macro type detected: g625   XOR2X1
+Unknown macro type detected: g403   AOI21X1
+Unknown macro type detected: g511   MX2X1
+Unknown macro type detected: g519   OAI21X1
+Unknown macro type detected: g541   AOI21X1
+Unknown macro type detected: g623   AOI21X1
+Unknown macro type detected: g649   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[14\]   DFFX1
+Unknown macro type detected: g425   AOI22X1
+Unknown macro type detected: g509   MX2X1
+Unknown macro type detected: g510   MX2X1
+Unknown macro type detected: g512   MX2X1
+Unknown macro type detected: g513   MX2X1
+Unknown macro type detected: g515   MX2X1
+Unknown macro type detected: g516   MX2X1
+Unknown macro type detected: g517   MX2X1
+Unknown macro type detected: g518   OAI21X1
+Unknown macro type detected: g514   MX2X1
+Unknown macro type detected: g605   AND2X1
+Unknown macro type detected: g632   NOR2X1
+Unknown macro type detected: g631   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[15\]   DFFX1
+Unknown macro type detected: g328   AOI21X1
+Unknown macro type detected: g404   AND2X1
+Unknown macro type detected: g474   NAND2X1
+Unknown macro type detected: g533   NAND2X1
+Unknown macro type detected: g633   NOR2X1
+Unknown macro type detected: g640   NOR2X1
+Unknown macro type detected: g659   INVX1
+Unknown macro type detected: g661   INVX1
+Unknown macro type detected: g663   NOR2X1
+Unknown macro type detected: g670   NAND2X1
+Unknown macro type detected: g672   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[15\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[13\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[12\]   DFFX1
+Unknown macro type detected: g405   AOI22X1
+Unknown macro type detected: g478   AOI21X1
+Unknown macro type detected: g479   AOI22X1
+Unknown macro type detected: g524   NAND2X1
+Unknown macro type detected: g532   NAND2X1
+Unknown macro type detected: g629   XOR2X1
+Unknown macro type detected: g642   AOI21X1
+Unknown macro type detected: g643   AOI21X1
+Unknown macro type detected: g660   NAND2X1
+Unknown macro type detected: g662   NAND2X1
+Unknown macro type detected: g653   XOR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[14\]   DFFX1
+Unknown macro type detected: g410   NAND2X1
+Unknown macro type detected: g418   AOI21X1
+Unknown macro type detected: g476   AOI21X1
+Unknown macro type detected: g480   AND2X1
+Unknown macro type detected: g490   OAI21X1
+Unknown macro type detected: g493   AOI21X1
+Unknown macro type detected: g503   AND2X1
+Unknown macro type detected: g569   CLKBUFX1
+Unknown macro type detected: g570   INVX1
+Unknown macro type detected: g572   INVX1
+Unknown macro type detected: g688   XOR2X1
+Unknown macro type detected: g702   OR2X1
+Unknown macro type detected: g711   NAND2X1
+Unknown macro type detected: g712   NAND2X1
+Unknown macro type detected: g722   XOR2X1
+Unknown macro type detected: g723   XOR2X1
+Unknown macro type detected: g724   XOR2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[14\]   DFFSRX1
+Unknown macro type detected: g420   AOI21X1
+Unknown macro type detected: g424   AOI22X1
+Unknown macro type detected: g482   AOI22X1
+Unknown macro type detected: g505   AOI22X1
+Unknown macro type detected: g560   INVX2
+Unknown macro type detected: g568   INVX4
+Unknown macro type detected: g669   OR2X1
+Unknown macro type detected: g710   NOR3X1
+Unknown macro type detected: g737   OR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[13\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[12\]   DFFX1
+Unknown macro type detected: g469   OAI21X1
+Unknown macro type detected: g475   AOI21X1
+Unknown macro type detected: g491   NAND2X1
+Unknown macro type detected: g527   NOR2X1
+Unknown macro type detected: g530   NAND2X1
+Unknown macro type detected: g544   AOI22X1
+Unknown macro type detected: g547   MX2X1
+Unknown macro type detected: g550   AOI22X1
+Unknown macro type detected: g575   INVX2
+Unknown macro type detected: g654   XOR2X1
+Unknown macro type detected: g667   INVX1
+Unknown macro type detected: g686   XOR2X1
+Unknown macro type detected: g687   XOR2X1
+Unknown macro type detected: g689   XOR2X1
+Unknown macro type detected: g706   INVX1
+Unknown macro type detected: g735   AND2X1
+Unknown macro type detected: g740   NOR2X1
+Unknown macro type detected: g742   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[13\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[12\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[10\]   DFFX1
+Unknown macro type detected: g497   AOI21X1
+Unknown macro type detected: g500   AOI22X1
+Unknown macro type detected: g539   AOI21X1
+Unknown macro type detected: g545   AOI22X1
+Unknown macro type detected: g567   NAND2X2
+Unknown macro type detected: g576   INVX1
+Unknown macro type detected: g581   NAND2X1
+Unknown macro type detected: g668   NAND2X1
+Unknown macro type detected: g665   NAND3X1
+Unknown macro type detected: g701   AND2X1
+Unknown macro type detected: g700   NOR2X1
+Unknown macro type detected: g704   AND2X1
+Unknown macro type detected: g705   NAND2X1
+Unknown macro type detected: g703   NOR2X1
+Unknown macro type detected: g707   NAND2X1
+Unknown macro type detected: g739   AND2X1
+Unknown macro type detected: g764   INVX1
+Unknown macro type detected: g767   INVX1
+Unknown macro type detected: g771   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[9\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[11\]   DFFX1
+Unknown macro type detected: g419   AOI21X1
+Unknown macro type detected: g481   AND2X1
+Unknown macro type detected: g499   AOI22X1
+Unknown macro type detected: g502   MX2X1
+Unknown macro type detected: g507   AOI22X1
+Unknown macro type detected: g523   OAI21X1
+Unknown macro type detected: g535   AOI21X1
+Unknown macro type detected: g577   NAND2X1
+Unknown macro type detected: g578   OAI21X1
+Unknown macro type detected: g582   AOI21X1
+Unknown macro type detected: g757   XOR2X1
+Unknown macro type detected: g766   NAND2X1
+Unknown macro type detected: g758   XOR2X1
+Unknown macro type detected: g769   NAND2X1
+Unknown macro type detected: g770   AND2X1
+Unknown macro type detected: g777   NAND2X1
+Unknown macro type detected: g477   AOI21X1
+Unknown macro type detected: g483   AOI22X1
+Unknown macro type detected: g504   AND2X1
+Unknown macro type detected: g534   NAND2X1
+Unknown macro type detected: g613   INVX1
+Unknown macro type detected: g624   MX2X1
+Unknown macro type detected: g641   AOI21X1
+Unknown macro type detected: g679   AND2X1
+Unknown macro type detected: g728   NOR2X1
+Unknown macro type detected: g729   NOR2X1
+Unknown macro type detected: g741   AND2X1
+Unknown macro type detected: g752   INVX1
+Unknown macro type detected: g772   AND2X1
+Unknown macro type detected: g809   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[5\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[10\]   DFFX1
+Unknown macro type detected: g725   ADDHX1
+Unknown macro type detected: g492   NAND2X1
+Unknown macro type detected: g506   AOI22X1
+Unknown macro type detected: g585   AOI22X1
+Unknown macro type detected: g588   MX2X1
+Unknown macro type detected: g594   AOI22X1
+Unknown macro type detected: g615   AOI22X1
+Unknown macro type detected: g619   MX2X1
+Unknown macro type detected: g621   AOI22X1
+Unknown macro type detected: g680   AOI22X1
+Unknown macro type detected: g754   MX2X1
+Unknown macro type detected: g803   NOR3X1
+Unknown macro type detected: g820   NAND2X2
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[10\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[8\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[9\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[11\]   DFFX1
+Unknown macro type detected: g498   AOI21X1
+Unknown macro type detected: g501   AOI22X1
+Unknown macro type detected: g531   NAND2X1
+Unknown macro type detected: g596   MX2X1
+Unknown macro type detected: g608   NAND2X1
+Unknown macro type detected: g638   NAND2X1
+Unknown macro type detected: g708   NAND2X1
+Unknown macro type detected: g713   AOI21X1
+Unknown macro type detected: g745   AND2X1
+Unknown macro type detected: g776   AND2X1
+Unknown macro type detected: g779   AND2X1
+Unknown macro type detected: g786   NAND4X1
+Unknown macro type detected: g799   INVX1
+Unknown macro type detected: g792   NAND3X1
+Unknown macro type detected: g797   INVX1
+Unknown macro type detected: g812   INVX1
+Unknown macro type detected: g834   OR2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[9\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[11\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[7\]   DFFX1
+Unknown macro type detected: g525   OAI21X1
+Unknown macro type detected: g536   AOI21X1
+Unknown macro type detected: g537   AOI21X1
+Unknown macro type detected: g540   AOI21X1
+Unknown macro type detected: g546   AOI22X1
+Unknown macro type detected: g590   AND2X1
+Unknown macro type detected: g685   OAI21X1
+Unknown macro type detected: g690   XOR2X1
+Unknown macro type detected: g715   AOI21X1
+Unknown macro type detected: g716   AOI22X1
+Unknown macro type detected: g747   AOI22X1
+Unknown macro type detected: g798   OR2X1
+Unknown macro type detected: g800   OR2X1
+Unknown macro type detected: g813   NAND4X1
+Unknown macro type detected: g824   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[6\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[5\]   DFFX1
+Unknown macro type detected: g538   AOI21X1
+Unknown macro type detected: g579   OAI21X1
+Unknown macro type detected: g583   AOI21X1
+Unknown macro type detected: g591   AND2X1
+Unknown macro type detected: g592   AOI22X1
+Unknown macro type detected: g650   MX2X1
+Unknown macro type detected: g683   MX2X1
+Unknown macro type detected: g693   MX2X1
+Unknown macro type detected: g730   OAI21X1
+Unknown macro type detected: g731   AOI21X1
+Unknown macro type detected: g773   NAND2X1
+Unknown macro type detected: g802   NAND4X1
+Unknown macro type detected: g818   MX2X1
+Unknown macro type detected: g825   NAND2X1
+Unknown macro type detected: g829   NAND3X1
+Unknown macro type detected: g835   INVX1
+Unknown macro type detected: g852   NAND2X1
+Unknown macro type detected: g871   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[5\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[8\]   DFFX1
+Unknown macro type detected: g822   ADDHX1
+Unknown macro type detected: g496   AOI21X1
+Unknown macro type detected: g548   AND2X1
+Unknown macro type detected: g586   AOI22X1
+Unknown macro type detected: g589   MX2X1
+Unknown macro type detected: g593   AOI22X1
+Unknown macro type detected: g595   AOI22X1
+Unknown macro type detected: g606   NAND2X1
+Unknown macro type detected: g652   OAI21X1
+Unknown macro type detected: g699   NAND2X1
+Unknown macro type detected: g780   AOI21X1
+Unknown macro type detected: g783   AOI22X1
+Unknown macro type detected: g836   AND2X1
+Unknown macro type detected: g841   NAND4X1
+Unknown macro type detected: g849   INVX1
+Unknown macro type detected: g863   NAND2X1
+Unknown macro type detected: g877   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[8\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[7\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[6\]   DFFX1
+Unknown macro type detected: g549   AOI22X1
+Unknown macro type detected: g607   NAND2X1
+Unknown macro type detected: g609   NAND2X1
+Unknown macro type detected: g612   AOI21X1
+Unknown macro type detected: g616   AOI22X1
+Unknown macro type detected: g617   AOI22X1
+Unknown macro type detected: g620   MX2X1
+Unknown macro type detected: g622   AOI22X1
+Unknown macro type detected: g782   AOI22X1
+Unknown macro type detected: g785   MX2X1
+Unknown macro type detected: g787   AOI22X1
+Unknown macro type detected: g793   OAI21X1
+Unknown macro type detected: g796   AOI21X1
+Unknown macro type detected: g850   MX2X1
+Unknown macro type detected: g862   OR2X1
+Unknown macro type detected: g865   NAND2X1
+Unknown macro type detected: g878   AOI21X1
+Unknown macro type detected: g882   INVX1
+Unknown macro type detected: g895   INVX1
+Unknown macro type detected: g949   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[7\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[4\]   DFFX1
+Unknown macro type detected: g580   NAND2X1
+Unknown macro type detected: g611   AOI21X1
+Unknown macro type detected: g618   AOI22X1
+Unknown macro type detected: g634   OAI21X1
+Unknown macro type detected: g636   AOI21X1
+Unknown macro type detected: g639   NAND2X1
+Unknown macro type detected: g666   NAND2X1
+Unknown macro type detected: g720   OAI21X1
+Unknown macro type detected: g732   NAND3X1
+Unknown macro type detected: g733   NAND4X1
+Unknown macro type detected: g755   XOR2X1
+Unknown macro type detected: g795   NAND2X1
+Unknown macro type detected: g856   OR2X1
+Unknown macro type detected: g864   NAND3X1
+Unknown macro type detected: g866   NAND2X1
+Unknown macro type detected: g883   MX2X1
+Unknown macro type detected: g896   OAI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[6\]   DFFSRX1
+Unknown macro type detected: g759   ADDHX1
+Unknown macro type detected: g584   AOI21X1
+Unknown macro type detected: g587   AOI22X1
+Unknown macro type detected: g610   AOI21X1
+Unknown macro type detected: g635   OAI21X1
+Unknown macro type detected: g637   AOI21X1
+Unknown macro type detected: g646   AND2X1
+Unknown macro type detected: g651   MX2X1
+Unknown macro type detected: g837   AOI22X1
+Unknown macro type detected: g839   MX2X1
+Unknown macro type detected: g844   AOI22X1
+Unknown macro type detected: g894   OAI21X1
+Unknown macro type detected: g907   INVX1
+Unknown macro type detected: g922   INVX1
+Unknown macro type detected: g898   NAND3X1
+Unknown macro type detected: g915   NAND4X1
+Unknown macro type detected: g926   XOR2X1
+Unknown macro type detected: g953   INVX1
+Unknown macro type detected: g963   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[1\]   DFFX1
+Unknown macro type detected: g929   ADDHX1
+Unknown macro type detected: g603   OAI21X1
+Unknown macro type detected: g604   AOI21X1
+Unknown macro type detected: g647   AOI22X1
+Unknown macro type detected: g674   AOI22X1
+Unknown macro type detected: g677   MX2X1
+Unknown macro type detected: g681   AOI22X1
+Unknown macro type detected: g684   MX2X1
+Unknown macro type detected: g709   NAND4X1
+Unknown macro type detected: g736   NAND2X1
+Unknown macro type detected: g846   MX2X1
+Unknown macro type detected: g861   NAND2X1
+Unknown macro type detected: g903   AOI21X1
+Unknown macro type detected: g906   NAND2X1
+Unknown macro type detected: g908   AOI21X1
+Unknown macro type detected: g923   MX2X1
+Unknown macro type detected: g935   AOI22X1
+Unknown macro type detected: g954   MX2X1
+Unknown macro type detected: g962   NAND2X1
+Unknown macro type detected: g1015   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[3\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[2\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[0\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[4\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[4\]   DFFSRX1
+Unknown macro type detected: g671   NAND2X1
+Unknown macro type detected: g675   AOI22X1
+Unknown macro type detected: g678   MX2X1
+Unknown macro type detected: g682   AOI22X1
+Unknown macro type detected: g691   INVX1
+Unknown macro type detected: g696   NAND2X1
+Unknown macro type detected: g718   XOR2X1
+Unknown macro type detected: g804   INVX1
+Unknown macro type detected: g805   INVX1
+Unknown macro type detected: g807   NOR2X1
+Unknown macro type detected: g912   NAND2X1
+Unknown macro type detected: g913   AOI21X1
+Unknown macro type detected: g939   AOI21X1
+Unknown macro type detected: g945   AND2X1
+Unknown macro type detected: g934   NAND3X1
+Unknown macro type detected: g971   AOI21X1
+Unknown macro type detected: g988   XOR2X1
+Unknown macro type detected: g992   NOR2X1
+Unknown macro type detected: g1000   NOR2X1
+Unknown macro type detected: g1001   NAND2X1
+Unknown macro type detected: g644   AOI22X1
+Unknown macro type detected: g645   MX2X1
+Unknown macro type detected: g648   AOI22X1
+Unknown macro type detected: g673   AOI21X1
+Unknown macro type detected: g676   AOI22X1
+Unknown macro type detected: g697   NAND2X1
+Unknown macro type detected: g714   AOI21X1
+Unknown macro type detected: g721   OAI21X1
+Unknown macro type detected: g734   NOR2X1
+Unknown macro type detected: g746   AND2X1
+Unknown macro type detected: g778   NAND4X1
+Unknown macro type detected: g806   NAND3X1
+Unknown macro type detected: g810   AOI21X1
+Unknown macro type detected: g831   INVX1
+Unknown macro type detected: g842   AND2X1
+Unknown macro type detected: g853   NAND2X2
+Unknown macro type detected: g911   NOR2X1
+Unknown macro type detected: g916   OAI22X1
+Unknown macro type detected: g946   AOI22X1
+Unknown macro type detected: g969   INVX1
+Unknown macro type detected: g989   OAI21X1
+Unknown macro type detected: g999   NAND2X1
+Unknown macro type detected: g1034   INVX1
+Unknown macro type detected: g1042   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[1\]   DFFX1
+Unknown macro type detected: g1097   AOI21X1
+Unknown macro type detected: g1160   AND2X1
+Unknown macro type detected: g692   ADDFX1
+Unknown macro type detected: g664   NAND2X1
+Unknown macro type detected: g695   OAI21X1
+Unknown macro type detected: g698   AOI21X1
+Unknown macro type detected: g748   AOI22X1
+Unknown macro type detected: g750   MX2X1
+Unknown macro type detected: g756   XOR2X1
+Unknown macro type detected: g821   XOR2X1
+Unknown macro type detected: g832   NAND2X1
+Unknown macro type detected: g843   AOI22X1
+Unknown macro type detected: g904   AOI21X1
+Unknown macro type detected: g918   XOR2X1
+Unknown macro type detected: g933   AND2X1
+Unknown macro type detected: g966   NAND2X1
+Unknown macro type detected: g970   NAND2X1
+Unknown macro type detected: g975   NAND3X1
+Unknown macro type detected: g980   INVX1
+Unknown macro type detected: g990   INVX1
+Unknown macro type detected: g1002   NAND2X1
+Unknown macro type detected: g1017   INVX1
+Unknown macro type detected: g1026   NAND2X1
+Unknown macro type detected: g1035   NOR2X1
+Unknown macro type detected: g1037   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[1\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[3\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[2\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[0\]   DFFX1
+Unknown macro type detected: g1090   INVX1
+Unknown macro type detected: g1131   INVX1
+Unknown macro type detected: g1161   AOI22X1
+Unknown macro type detected: g738   NAND2X1
+Unknown macro type detected: g751   MX2X1
+Unknown macro type detected: g774   NAND2X1
+Unknown macro type detected: g789   XOR2X1
+Unknown macro type detected: g790   INVX1
+Unknown macro type detected: g808   NOR2X1
+Unknown macro type detected: g830   NOR2X1
+Unknown macro type detected: g868   NAND2X1
+Unknown macro type detected: g869   NAND2X1
+Unknown macro type detected: g943   AOI21X1
+Unknown macro type detected: g974   AOI21X1
+Unknown macro type detected: g977   AOI22X1
+Unknown macro type detected: g981   MX2X1
+Unknown macro type detected: g991   NAND2X1
+Unknown macro type detected: g1012   NAND2X1
+Unknown macro type detected: g1018   XOR2X1
+Unknown macro type detected: g1024   INVX1
+Unknown macro type detected: g1038   NAND3X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[3\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[2\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[0\]   DFFSRX1
+Unknown macro type detected: g1060   INVX1
+Unknown macro type detected: g1075   INVX1
+Unknown macro type detected: g1078   INVX1
+Unknown macro type detected: g1091   AOI21X1
+Unknown macro type detected: g1132   NAND2X1
+Unknown macro type detected: g1209   NAND2X1
+Unknown macro type detected: g717   MX2X1
+Unknown macro type detected: g743   AOI22X1
+Unknown macro type detected: g744   MX2X1
+Unknown macro type detected: g749   AOI22X1
+Unknown macro type detected: g781   AOI21X1
+Unknown macro type detected: g784   AOI22X1
+Unknown macro type detected: g826   AND2X1
+Unknown macro type detected: g870   NAND2X1
+Unknown macro type detected: g873   AOI21X1
+Unknown macro type detected: g876   AOI22X1
+Unknown macro type detected: g886   INVX1
+Unknown macro type detected: g888   NAND2X1
+Unknown macro type detected: g958   NAND2X1
+Unknown macro type detected: g959   NOR2X1
+Unknown macro type detected: g979   AOI22X1
+Unknown macro type detected: g993   OAI21X1
+Unknown macro type detected: g996   NAND3X1
+Unknown macro type detected: g997   NAND2X1
+Unknown macro type detected: g1008   AOI21X1
+Unknown macro type detected: g1022   NAND2X1
+Unknown macro type detected: g1025   NAND2X1
+Unknown macro type detected: g1032   INVX1
+Unknown macro type detected: g1064   OAI21X1
+Unknown macro type detected: g1071   NOR2X1
+Unknown macro type detected: g1076   NOR2X1
+Unknown macro type detected: g1079   NAND2X1
+Unknown macro type detected: g1080   NOR2X1
+Unknown macro type detected: g1217   AOI21X1
+Unknown macro type detected: g1222   AOI22X1
+Unknown macro type detected: g1041   NAND3X1
+Unknown macro type detected: g763   NAND2X1
+Unknown macro type detected: g775   NAND4X1
+Unknown macro type detected: g794   OAI21X1
+Unknown macro type detected: g801   AOI21X1
+Unknown macro type detected: g811   NOR2X1
+Unknown macro type detected: g815   XOR2X1
+Unknown macro type detected: g833   NAND2X1
+Unknown macro type detected: g872   NAND2X1
+Unknown macro type detected: g874   INVX1
+Unknown macro type detected: g887   MX2X1
+Unknown macro type detected: g891   INVX1
+Unknown macro type detected: g897   OAI21X1
+Unknown macro type detected: g902   AOI21X1
+Unknown macro type detected: g909   INVX1
+Unknown macro type detected: g957   NOR2X1
+Unknown macro type detected: g960   NOR2X1
+Unknown macro type detected: g961   NOR2X1
+Unknown macro type detected: g1033   NAND2X1
+Unknown macro type detected: g1063   XOR2X1
+Unknown macro type detected: g1115   INVX1
+Unknown macro type detected: g1127   INVX1
+Unknown macro type detected: g1231   OAI21X1
+Unknown macro type detected: g1268   AOI21X1
+Unknown macro type detected: g1054   MX2X1
+Unknown macro type detected: g816   XOR2X1
+Unknown macro type detected: g875   NAND2X1
+Unknown macro type detected: g889   CLKBUFX1
+Unknown macro type detected: g892   XOR2X1
+Unknown macro type detected: g893   XOR2X1
+Unknown macro type detected: g900   NAND2X1
+Unknown macro type detected: g910   NOR3X1
+Unknown macro type detected: g927   CLKBUFX1
+Unknown macro type detected: g1031   NAND3X1
+Unknown macro type detected: g1057   AOI22X1
+Unknown macro type detected: g1053   AOI22X1
+Unknown macro type detected: g1073   NOR2X1
+Unknown macro type detected: g1074   NAND2X1
+Unknown macro type detected: g1077   NAND2X1
+Unknown macro type detected: g1094   INVX1
+Unknown macro type detected: g1093   AOI21X1
+Unknown macro type detected: g1111   INVX1
+Unknown macro type detected: g1117   NAND2X1
+Unknown macro type detected: g1121   NAND2X1
+Unknown macro type detected: g1122   INVX1
+Unknown macro type detected: g1128   NAND2X1
+Unknown macro type detected: g1125   NAND2X1
+Unknown macro type detected: g1126   NOR2X1
+Unknown macro type detected: g1190   INVX1
+Unknown macro type detected: g788   XOR2X1
+Unknown macro type detected: g814   MX2X1
+Unknown macro type detected: g827   NAND2X1
+Unknown macro type detected: g838   AOI22X1
+Unknown macro type detected: g840   MX2X1
+Unknown macro type detected: g845   AOI22X1
+Unknown macro type detected: g890   MX2X1
+Unknown macro type detected: g899   NAND2X1
+Unknown macro type detected: g901   NAND2X1
+Unknown macro type detected: g928   MX2X1
+Unknown macro type detected: g942   AOI22X1
+Unknown macro type detected: g944   MX2X1
+Unknown macro type detected: g947   AOI22X1
+Unknown macro type detected: g978   AOI22X1
+Unknown macro type detected: g994   INVX1
+Unknown macro type detected: g998   NAND2X1
+Unknown macro type detected: g1009   INVX1
+Unknown macro type detected: g1011   NAND3X1
+Unknown macro type detected: g1013   NAND2X1
+Unknown macro type detected: g1087   NAND2X1
+Unknown macro type detected: g1095   NAND2X1
+Unknown macro type detected: g1112   NAND2X1
+Unknown macro type detected: g1114   NAND2X1
+Unknown macro type detected: g1123   NOR3X1
+Unknown macro type detected: g1148   INVX1
+Unknown macro type detected: g1150   INVX1
+Unknown macro type detected: g1199   NOR2X1
+Unknown macro type detected: g1191   NAND2X1
+Unknown macro type detected: g1195   INVX1
+Unknown macro type detected: g1214   INVX1
+Unknown macro type detected: g1339   AOI22X1
+Unknown macro type detected: g1341   MX2X1
+Unknown macro type detected: g1342   AOI22X1
+Unknown macro type detected: g1584   AOI22X1
+Unknown macro type detected: g857   INVX1
+Unknown macro type detected: g858   INVX1
+Unknown macro type detected: g867   NAND2X1
+Unknown macro type detected: g914   NAND2X1
+Unknown macro type detected: g936   NAND4X1
+Unknown macro type detected: g937   INVX1
+Unknown macro type detected: g967   NAND2X1
+Unknown macro type detected: g995   AND2X1
+Unknown macro type detected: g1010   AND2X1
+Unknown macro type detected: g1028   INVX1
+Unknown macro type detected: g1070   NAND3X1
+Unknown macro type detected: g1092   AOI21X1
+Unknown macro type detected: g1096   AOI21X1
+Unknown macro type detected: g1118   INVX1
+Unknown macro type detected: g1135   AND2X1
+Unknown macro type detected: g1149   OAI21X1
+Unknown macro type detected: g1152   INVX1
+Unknown macro type detected: g1151   NAND2X1
+Unknown macro type detected: g1182   INVX1
+Unknown macro type detected: g1185   NAND2X1
+Unknown macro type detected: g1196   NAND2X1
+Unknown macro type detected: g1172   INVX1
+Unknown macro type detected: g1215   NAND2X1
+Unknown macro type detected: g1257   INVX1
+Unknown macro type detected: g1381   NAND2X1
+Unknown macro type detected: g1402   NAND3X1
+Unknown macro type detected: g1509   AOI22X1
+Unknown macro type detected: g1633   NAND2X1
+Unknown macro type detected: g1634   NAND2X1
+Unknown macro type detected: g1676   NAND2X1
+Unknown macro type detected: g859   NAND2X1
+Unknown macro type detected: g860   AND2X1
+Unknown macro type detected: g938   NAND3X1
+Unknown macro type detected: g964   OAI21X1
+Unknown macro type detected: g976   NAND3X1
+Unknown macro type detected: g985   INVX2
+Unknown macro type detected: g1021   NAND2X1
+Unknown macro type detected: g1029   NOR2X1
+Unknown macro type detected: g1039   INVX1
+Unknown macro type detected: g1050   AND2X1
+Unknown macro type detected: g1113   NAND2X1
+Unknown macro type detected: g1119   NAND2X1
+Unknown macro type detected: g1120   NAND2X1
+Unknown macro type detected: g1124   NAND2X1
+Unknown macro type detected: g1129   INVX1
+Unknown macro type detected: g1133   INVX1
+Unknown macro type detected: g1153   OAI21X1
+Unknown macro type detected: g1162   MX2X1
+Unknown macro type detected: g1173   NOR2X1
+Unknown macro type detected: g1183   NOR2X1
+Unknown macro type detected: g1170   NAND2X1
+Unknown macro type detected: g1197   INVX1
+Unknown macro type detected: g1212   INVX1
+Unknown macro type detected: g1254   INVX1
+Unknown macro type detected: g1258   NAND2X1
+Unknown macro type detected: g1261   NAND2X1
+Unknown macro type detected: g1550   AND2X1
+Unknown macro type detected: g955   ADDFX1
+Unknown macro type detected: g828   NOR2X1
+Unknown macro type detected: g917   MX2X1
+Unknown macro type detected: g919   XOR2X1
+Unknown macro type detected: g940   NAND3X1
+Unknown macro type detected: g941   NAND2X1
+Unknown macro type detected: g965   OR2X1
+Unknown macro type detected: g987   MX2X1
+Unknown macro type detected: g1016   MX2X1
+Unknown macro type detected: g1040   NAND2X1
+Unknown macro type detected: g1047   OR2X1
+Unknown macro type detected: g1046   NAND2X1
+Unknown macro type detected: g1101   CLKBUFX1
+Unknown macro type detected: g1130   OAI22X1
+Unknown macro type detected: g1134   NAND2X1
+Unknown macro type detected: g1194   NAND2X1
+Unknown macro type detected: g1198   NAND2X1
+Unknown macro type detected: g1213   NAND2X1
+Unknown macro type detected: g1255   NAND2X1
+Unknown macro type detected: g1256   NAND2X1
+Unknown macro type detected: g1251   INVX1
+Unknown macro type detected: g1259   INVX1
+Unknown macro type detected: g1279   INVX1
+Unknown macro type detected: g1305   INVX1
+Unknown macro type detected: g1455   XOR2X1
+Unknown macro type detected: g1678   AOI22X1
+Unknown macro type detected: g1762   XOR2X1
+Unknown macro type detected: g905   NOR2X1
+Unknown macro type detected: g1003   NAND2X1
+Unknown macro type detected: g1005   INVX1
+Unknown macro type detected: g1068   INVX1
+Unknown macro type detected: g1089   NOR2X1
+Unknown macro type detected: g1100   NAND4X1
+Unknown macro type detected: g1102   NAND2X1
+Unknown macro type detected: g1104   INVX1
+Unknown macro type detected: g1178   NAND2X1
+Unknown macro type detected: g1180   INVX1
+Unknown macro type detected: g1193   NAND2X1
+Unknown macro type detected: g1235   NAND2X1
+Unknown macro type detected: g1236   AND2X1
+Unknown macro type detected: g1239   INVX1
+Unknown macro type detected: g1252   NOR2X1
+Unknown macro type detected: g1260   NAND2X1
+Unknown macro type detected: g1280   NAND2X1
+Unknown macro type detected: g1293   INVX1
+Unknown macro type detected: g1298   NAND2X1
+Unknown macro type detected: g1303   INVX1
+Unknown macro type detected: g1306   NAND2X1
+Unknown macro type detected: g1679   AOI22X1
+Unknown macro type detected: g1680   NAND3X1
+Unknown macro type detected: g1744   NAND2X1
+Unknown macro type detected: g1722   NAND2X1
+Unknown macro type detected: g932   NAND2X1
+Unknown macro type detected: g972   NAND3X1
+Unknown macro type detected: g1004   NOR2X1
+Unknown macro type detected: g1006   AND2X1
+Unknown macro type detected: g1007   AND2X1
+Unknown macro type detected: g1014   AOI21X1
+Unknown macro type detected: g1044   NAND2X1
+Unknown macro type detected: g1049   NAND2X1
+Unknown macro type detected: g1069   NAND2X1
+Unknown macro type detected: g1072   OR2X1
+Unknown macro type detected: g1099   AOI21X1
+Unknown macro type detected: g1105   MX2X1
+Unknown macro type detected: g1163   INVX1
+Unknown macro type detected: g1181   NAND2X1
+Unknown macro type detected: g1184   NAND2X1
+Unknown macro type detected: g1187   INVX1
+Unknown macro type detected: g1192   NOR2X1
+Unknown macro type detected: g1240   NAND2X1
+Unknown macro type detected: g1243   INVX1
+Unknown macro type detected: g1245   NOR2X1
+Unknown macro type detected: g1249   NAND2X1
+Unknown macro type detected: g1294   NAND2X1
+Unknown macro type detected: g1300   INVX1
+Unknown macro type detected: g1304   NAND2X1
+Unknown macro type detected: g1541   INVX4
+Unknown macro type detected: g1723   NAND2X1
+Unknown macro type detected: g1745   NAND2X1
+Unknown macro type detected: g1907   AOI22X1
+Unknown macro type detected: g931   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[0\]   DFFX1
+Unknown macro type detected: g1048   NAND2X1
+Unknown macro type detected: g1051   NAND3X1
+Unknown macro type detected: g1052   NAND2X1
+Unknown macro type detected: g1056   NAND4X1
+Unknown macro type detected: g1065   NAND2X1
+Unknown macro type detected: g1084   NAND2X1
+Unknown macro type detected: g1109   NAND2X1
+Unknown macro type detected: g1164   MX2X1
+Unknown macro type detected: g1166   INVX1
+Unknown macro type detected: g1186   NAND2X1
+Unknown macro type detected: g1188   NOR2X1
+Unknown macro type detected: g1224   INVX1
+Unknown macro type detected: g1244   NAND2X1
+Unknown macro type detected: g1247   INVX1
+Unknown macro type detected: g1250   NAND2X1
+Unknown macro type detected: g1274   INVX1
+Unknown macro type detected: g1301   NAND2X1
+Unknown macro type detected: g1332   AOI21X1
+Unknown macro type detected: g1333   AOI22X1
+Unknown macro type detected: g1326   INVX1
+Unknown macro type detected: g1328   NAND2X1
+Unknown macro type detected: g1340   AOI21X1
+Unknown macro type detected: g1347   XOR2X1
+Unknown macro type detected: g1370   NAND2X1
+Unknown macro type detected: g1540   INVX1
+Unknown macro type detected: g1900   NAND3X1
+Unknown macro type detected: g1831   XOR2X1
+Unknown macro type detected: g1957   NAND2X1
+Unknown macro type detected: g1967   NAND2X1
+Unknown macro type detected: g1019   XOR2X1
+Unknown macro type detected: g1045   NAND3X1
+Unknown macro type detected: g1085   NOR2X1
+Unknown macro type detected: g1086   NOR2X1
+Unknown macro type detected: g1106   XOR2X1
+Unknown macro type detected: g1110   NAND2X1
+Unknown macro type detected: g1144   INVX1
+Unknown macro type detected: g1159   AOI21X1
+Unknown macro type detected: g1167   MX2X1
+Unknown macro type detected: g1177   AOI21X1
+Unknown macro type detected: g1206   NOR2X1
+Unknown macro type detected: g1225   INVX1
+Unknown macro type detected: g1228   INVX1
+Unknown macro type detected: g1248   NAND2X1
+Unknown macro type detected: g1275   NAND2X1
+Unknown macro type detected: g1283   INVX1
+Unknown macro type detected: g1296   INVX1
+Unknown macro type detected: g1327   AOI21X1
+Unknown macro type detected: g1334   INVX1
+Unknown macro type detected: g1351   INVX1
+Unknown macro type detected: g1353   INVX1
+Unknown macro type detected: g1405   INVX1
+Unknown macro type detected: g1407   INVX1
+Unknown macro type detected: g1832   XOR2X1
+Unknown macro type detected: g1826   AOI21X1
+Unknown macro type detected: g1908   AOI22X1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[26\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[25\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[17\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[14\]   DFFX1
+Unknown macro type detected: g1043   OAI21X1
+Unknown macro type detected: g1066   INVX1
+Unknown macro type detected: g1081   NAND2X1
+Unknown macro type detected: g1082   NAND3X1
+Unknown macro type detected: g1083   NAND2X1
+Unknown macro type detected: g1088   NAND2X1
+Unknown macro type detected: g1145   NAND3X1
+Unknown macro type detected: g1146   NOR2X1
+Unknown macro type detected: g1142   INVX1
+Unknown macro type detected: g1147   AOI21X1
+Unknown macro type detected: g1203   NAND2X1
+Unknown macro type detected: g1210   AOI21X1
+Unknown macro type detected: g1218   INVX1
+Unknown macro type detected: g1226   MX2X1
+Unknown macro type detected: g1229   MX2X1
+Unknown macro type detected: g1267   NOR2X1
+Unknown macro type detected: g1276   INVX1
+Unknown macro type detected: g1281   AOI21X1
+Unknown macro type detected: g1291   INVX1
+Unknown macro type detected: g1297   NAND2X1
+Unknown macro type detected: g1314   INVX1
+Unknown macro type detected: g1324   INVX1
+Unknown macro type detected: g1335   NAND2X1
+Unknown macro type detected: g1336   INVX1
+Unknown macro type detected: g1352   NAND2X2
+Unknown macro type detected: g1354   NOR2X1
+Unknown macro type detected: g1365   NOR2X1
+Unknown macro type detected: g1368   NAND2X1
+Unknown macro type detected: g1395   NAND2X1
+Unknown macro type detected: g1403   AOI21X1
+Unknown macro type detected: g1406   NAND2X1
+Unknown macro type detected: g1408   AOI21X1
+Unknown macro type detected: g1423   AOI21X1
+Unknown macro type detected: g1446   INVX1
+Unknown macro type detected: g1458   XOR2X1
+Unknown macro type detected: g1513   NAND2X1
+Unknown macro type detected: g1799   NAND3X1
+Unknown macro type detected: g1958   NAND2X1
+Unknown macro type detected: g1968   NAND2X1
+Unknown macro type detected: g2055   XOR2X1
+Unknown macro type detected: g2343   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[10\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[18\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[27\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[3\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[8\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[7\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[6\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[5\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[4\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[30\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[2\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[9\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[31\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[24\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[22\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[21\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[20\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[1\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[19\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[15\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[13\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[12\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[11\]   DFFX1
+Unknown macro type detected: g1067   NAND2X1
+Unknown macro type detected: g1143   NAND2X1
+Unknown macro type detected: g1168   XOR2X1
+Unknown macro type detected: g1207   INVX1
+Unknown macro type detected: g1211   NAND2X1
+Unknown macro type detected: g1234   AOI21X1
+Unknown macro type detected: g1265   INVX1
+Unknown macro type detected: g1270   NAND3X1
+Unknown macro type detected: g1277   AOI21X1
+Unknown macro type detected: g1273   AOI21X1
+Unknown macro type detected: g1292   NAND2X1
+Unknown macro type detected: g1315   NAND2X1
+Unknown macro type detected: g1323   NAND2X1
+Unknown macro type detected: g1325   NAND2X1
+Unknown macro type detected: g1337   AOI21X1
+Unknown macro type detected: g1388   AOI21X1
+Unknown macro type detected: g1440   NOR2X1
+Unknown macro type detected: g1447   AOI21X1
+Unknown macro type detected: g1453   INVX1
+Unknown macro type detected: g1460   INVX1
+Unknown macro type detected: g1546   AOI21X1
+Unknown macro type detected: g1856   OR2X1
+Unknown macro type detected: g1935   NAND3X1
+Unknown macro type detected: g2052   NAND4X1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[16\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[23\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[29\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_mdiv1_DEND_R_reg\[28\]   DFFX1
+Unknown macro type detected: g1107   INVX1
+Unknown macro type detected: g1136   NOR2X1
+Unknown macro type detected: g1208   NOR2X1
+Unknown macro type detected: g1216   AOI21X1
+Unknown macro type detected: g1230   NAND2X1
+Unknown macro type detected: g1263   INVX1
+Unknown macro type detected: g1266   NAND2X1
+Unknown macro type detected: g1271   NAND3X1
+Unknown macro type detected: g1282   INVX1
+Unknown macro type detected: g1284   INVX1
+Unknown macro type detected: g1302   AOI21X1
+Unknown macro type detected: g1312   INVX1
+Unknown macro type detected: g1343   INVX1
+Unknown macro type detected: g1386   NAND2X1
+Unknown macro type detected: g1387   OR2X1
+Unknown macro type detected: g1390   NAND2X1
+Unknown macro type detected: g1391   INVX1
+Unknown macro type detected: g1396   INVX1
+Unknown macro type detected: g1424   NAND2X1
+Unknown macro type detected: g1425   NOR2X1
+Unknown macro type detected: g1439   NAND2X1
+Unknown macro type detected: g1444   INVX1
+Unknown macro type detected: g1441   NAND2X1
+Unknown macro type detected: g1443   NAND2X1
+Unknown macro type detected: g1448   AOI21X1
+Unknown macro type detected: g1449   AOI21X1
+Unknown macro type detected: g1454   NAND2X1
+Unknown macro type detected: g1500   INVX1
+Unknown macro type detected: g1478   NAND2X1
+Unknown macro type detected: g1572   NAND2X1
+Unknown macro type detected: g1573   NAND2X1
+Unknown macro type detected: g1685   XOR2X1
+Unknown macro type detected: g1930   INVX1
+Unknown macro type detected: g1963   NOR2X1
+Unknown macro type detected: g1980   AOI22X1
+Unknown macro type detected: g1981   AOI22X1
+Unknown macro type detected: g2056   XOR2X1
+Unknown macro type detected: g2414   NOR2X1
+Unknown macro type detected: g2438   NOR2X1
+Unknown macro type detected: g2445   NOR2X1
+Unknown macro type detected: g2444   NOR2X1
+Unknown macro type detected: g2517   AOI21X1
+Unknown macro type detected: g1464   INVX1
+Unknown macro type detected: g1137   INVX1
+Unknown macro type detected: g1154   INVX1
+Unknown macro type detected: g1204   INVX1
+Unknown macro type detected: g1221   AOI21X1
+Unknown macro type detected: g1264   NAND2X1
+Unknown macro type detected: g1272   NAND2X1
+Unknown macro type detected: g1285   INVX1
+Unknown macro type detected: g1287   INVX1
+Unknown macro type detected: g1313   NAND2X1
+Unknown macro type detected: g1317   INVX1
+Unknown macro type detected: g1319   NAND3X1
+Unknown macro type detected: g1322   AOI21X1
+Unknown macro type detected: g1348   OAI21X1
+Unknown macro type detected: g1366   NAND2X1
+Unknown macro type detected: g1367   NAND2X1
+Unknown macro type detected: g1369   AOI21X1
+Unknown macro type detected: g1385   OR2X1
+Unknown macro type detected: g1384   NAND2X1
+Unknown macro type detected: g1389   NAND2X1
+Unknown macro type detected: g1392   AOI21X1
+Unknown macro type detected: g1393   AOI21X1
+Unknown macro type detected: g1397   AOI21X1
+Unknown macro type detected: g1445   AOI21X1
+Unknown macro type detected: g1492   INVX1
+Unknown macro type detected: g1501   AOI21X1
+Unknown macro type detected: g1514   NAND2X1
+Unknown macro type detected: g1516   INVX1
+Unknown macro type detected: g1571   NAND2X1
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   P
+# Date:           Wed Mar 12 00:10:08 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...
+parsing FreePDK45_lib_v1.0.lef
+LEF Reader returns bad status.
+FreePDK45_lib_v1.0.lef parsed successfully
+parsing design.def
+components parsing started...
+Unknown macro type detected: DCACHE_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: DCACHE_TAG_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: DRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_INST0_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: ICACHE_TAG0_SRAM   SYHD130_128X22X1CM8
+Unknown macro type detected: IRAM_DATA_SRAM   SYHD130_512X32X1CM8
+Unknown macro type detected: IRAM_VALID_SRAM   SYHD130_8X32X1CM2
+Unknown macro type detected: g146320   INVX1
+Unknown macro type detected: g146318   INVX1
+Unknown macro type detected: g146347   INVX1
+Unknown macro type detected: g146346   INVX1
+Unknown macro type detected: g146333   INVX1
+Unknown macro type detected: g146324   INVX1
+Unknown macro type detected: g146325   INVX1
+Unknown macro type detected: g146326   INVX1
+Unknown macro type detected: g146327   INVX1
+Unknown macro type detected: g146336   INVX1
+Unknown macro type detected: g146328   INVX1
+Unknown macro type detected: g146329   INVX1
+Unknown macro type detected: g146330   INVX1
+Unknown macro type detected: g146331   INVX1
+Unknown macro type detected: g146323   INVX1
+Unknown macro type detected: g146345   INVX1
+Unknown macro type detected: g146322   INVX1
+Unknown macro type detected: g146321   INVX1
+Unknown macro type detected: g146351   INVX1
+Unknown macro type detected: g146349   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[49\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[48\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[47\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[46\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[45\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[44\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[43\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[42\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[41\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[40\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[39\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[38\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[37\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[36\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[35\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[34\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[33\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[32\]   DFFSRX1
+Unknown macro type detected: g2   AOI21X1
+Unknown macro type detected: g20   AOI21X1
+Unknown macro type detected: g21   AOI21X1
+Unknown macro type detected: g22   AOI21X1
+Unknown macro type detected: g23   AOI21X1
+Unknown macro type detected: g24   AOI21X1
+Unknown macro type detected: g25   AOI21X1
+Unknown macro type detected: g26   AOI21X1
+Unknown macro type detected: g27   AOI21X1
+Unknown macro type detected: g28   AOI21X1
+Unknown macro type detected: g29   AOI21X1
+Unknown macro type detected: g30   AOI21X1
+Unknown macro type detected: g31   AOI21X1
+Unknown macro type detected: g32   AOI21X1
+Unknown macro type detected: g33   AOI21X1
+Unknown macro type detected: g34   AOI21X1
+Unknown macro type detected: g35   AOI21X1
+Unknown macro type detected: g36   AOI21X1
+Unknown macro type detected: g37   AOI22X1
+Unknown macro type detected: g41   AOI21X1
+Unknown macro type detected: g44   AOI22X1
+Unknown macro type detected: g43   NOR2X1
+Unknown macro type detected: g45   AOI21X1
+Unknown macro type detected: g46   AOI21X1
+Unknown macro type detected: g47   AOI21X1
+Unknown macro type detected: g48   AOI21X1
+Unknown macro type detected: g49   AOI21X1
+Unknown macro type detected: g50   AOI21X1
+Unknown macro type detected: g51   AOI21X1
+Unknown macro type detected: g52   AOI21X1
+Unknown macro type detected: g53   NOR2X1
+Unknown macro type detected: g54   NOR2X1
+Unknown macro type detected: g55   AOI21X1
+Unknown macro type detected: g57   AOI21X1
+Unknown macro type detected: g58   AOI21X1
+Unknown macro type detected: g59   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[15\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[31\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[31\]   DFFX1
+Unknown macro type detected: g42   AOI21X1
+Unknown macro type detected: g56   NAND2X1
+Unknown macro type detected: g90   AOI21X1
+Unknown macro type detected: g91   AOI21X1
+Unknown macro type detected: g92   AOI21X1
+Unknown macro type detected: g94   AOI21X1
+Unknown macro type detected: g95   AOI21X1
+Unknown macro type detected: g96   AOI21X1
+Unknown macro type detected: g97   AOI21X1
+Unknown macro type detected: g98   AOI21X1
+Unknown macro type detected: g99   AOI21X1
+Unknown macro type detected: g100   AOI21X1
+Unknown macro type detected: g101   AOI21X1
+Unknown macro type detected: g102   AOI21X1
+Unknown macro type detected: g103   AOI21X1
+Unknown macro type detected: g104   AOI21X1
+Unknown macro type detected: g105   AOI21X1
+Unknown macro type detected: g157   NAND2X1
+Unknown macro type detected: g158   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[31\]   DFFX1
+Unknown macro type detected: g106   AOI21X1
+Unknown macro type detected: g107   AOI21X1
+Unknown macro type detected: g108   NAND2X1
+Unknown macro type detected: g156   AOI21X1
+Unknown macro type detected: g181   NAND2X1
+Unknown macro type detected: g182   NAND2X1
+Unknown macro type detected: g184   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[13\]   DFFX1
+Unknown macro type detected: g93   NAND2X1
+Unknown macro type detected: g139   NAND2X1
+Unknown macro type detected: g141   NAND2X1
+Unknown macro type detected: g177   NAND2X1
+Unknown macro type detected: g179   NAND2X1
+Unknown macro type detected: g178   NAND2X1
+Unknown macro type detected: g183   NAND2X1
+Unknown macro type detected: g185   NAND2X1
+Unknown macro type detected: g187   NAND2X1
+Unknown macro type detected: g190   NAND2X1
+Unknown macro type detected: g192   NAND2X1
+Unknown macro type detected: g194   NAND2X1
+Unknown macro type detected: g196   NAND2X1
+Unknown macro type detected: g198   NAND2X1
+Unknown macro type detected: g200   NAND2X1
+Unknown macro type detected: g202   NAND2X1
+Unknown macro type detected: g206   NAND2X1
+Unknown macro type detected: g208   NAND2X1
+Unknown macro type detected: g209   NAND2X1
+Unknown macro type detected: g212   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[12\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[28\]   DFFX1
+Unknown macro type detected: g134   AOI21X1
+Unknown macro type detected: g180   NAND2X1
+Unknown macro type detected: g186   NAND2X1
+Unknown macro type detected: g188   NAND2X1
+Unknown macro type detected: g189   NAND2X1
+Unknown macro type detected: g191   NAND2X1
+Unknown macro type detected: g193   NAND2X1
+Unknown macro type detected: g195   NAND2X1
+Unknown macro type detected: g197   NAND2X1
+Unknown macro type detected: g199   NAND2X1
+Unknown macro type detected: g201   NAND2X1
+Unknown macro type detected: g203   NAND2X1
+Unknown macro type detected: g204   NAND2X1
+Unknown macro type detected: g207   NAND2X1
+Unknown macro type detected: g205   NAND2X1
+Unknown macro type detected: g210   NAND2X1
+Unknown macro type detected: g211   NAND2X1
+Unknown macro type detected: g227   NAND2X1
+Unknown macro type detected: g253   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[28\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[16\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_CarryPartial_R_reg   DFFX1
+Unknown macro type detected: g135   AOI21X1
+Unknown macro type detected: g143   AOI21X1
+Unknown macro type detected: g159   XOR2X1
+Unknown macro type detected: g228   NAND3X1
+Unknown macro type detected: g254   INVX2
+Unknown macro type detected: g255   INVX2
+Unknown macro type detected: g278   AOI22X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[14\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[11\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[29\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[27\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[28\]   DFFX1
+Unknown macro type detected: g214   AOI21X1
+Unknown macro type detected: g250   NOR2X1
+Unknown macro type detected: g252   BUFX3
+Unknown macro type detected: g273   NAND2X1
+Unknown macro type detected: g274   OAI21X1
+Unknown macro type detected: g275   OAI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[29\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[27\]   DFFSRX1
+Unknown macro type detected: g232   INVX1
+Unknown macro type detected: g125   NOR2X1
+Unknown macro type detected: g136   AOI21X1
+Unknown macro type detected: g142   AOI21X1
+Unknown macro type detected: g144   AOI21X1
+Unknown macro type detected: g251   NAND2X1
+Unknown macro type detected: g261   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[30\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[29\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[27\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[17\]   DFFX1
+Unknown macro type detected: g215   AOI21X1
+Unknown macro type detected: g229   AOI21X1
+Unknown macro type detected: g246   NAND2X1
+Unknown macro type detected: g277   AOI22X1
+Unknown macro type detected: g305   NAND2X1
+Unknown macro type detected: g307   NAND2X1
+Unknown macro type detected: g308   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[30\]   DFFSRX1
+Unknown macro type detected: g230   AOI21X1
+Unknown macro type detected: g231   AOI21X1
+Unknown macro type detected: g259   AOI21X1
+Unknown macro type detected: g260   AOI21X1
+Unknown macro type detected: g310   NAND2X1
+Unknown macro type detected: g312   OAI21X1
+Unknown macro type detected: g332   INVX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[8\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[1\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[0\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[24\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[16\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[30\]   DFFX1
+Unknown macro type detected: g213   AOI21X1
+Unknown macro type detected: g247   NAND2X1
+Unknown macro type detected: g276   AOI22X1
+Unknown macro type detected: g279   AOI22X1
+Unknown macro type detected: g309   AND2X1
+Unknown macro type detected: g313   OAI21X1
+Unknown macro type detected: g333   NAND2X1
+Unknown macro type detected: g355   AOI22X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[24\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[16\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[7\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[5\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[4\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[3\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[2\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[9\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[6\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MHOLD_R_reg\[10\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[26\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[25\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[23\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[22\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[21\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[20\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[19\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[18\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[17\]   DFFX1
+Unknown macro type detected: g127   AOI21X1
+Unknown macro type detected: g138   AOI21X1
+Unknown macro type detected: g140   AOI21X1
+Unknown macro type detected: g147   AOI21X1
+Unknown macro type detected: g155   AOI21X1
+Unknown macro type detected: g258   AOI21X1
+Unknown macro type detected: g294   NAND2X1
+Unknown macro type detected: g325   NAND2X1
+Unknown macro type detected: g346   AOI21X1
+Unknown macro type detected: g352   OAI21X1
+Unknown macro type detected: g349   OAI21X1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[25\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[23\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[22\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[21\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[20\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[26\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[18\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[17\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macu0_MPPA_A_R_reg\[19\]   DFFSRX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[24\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[16\]   DFFX1
+Unknown macro type detected: g126   AOI21X1
+Unknown macro type detected: g128   AOI21X1
+Unknown macro type detected: g129   AOI21X1
+Unknown macro type detected: g130   AOI21X1
+Unknown macro type detected: g131   AOI21X1
+Unknown macro type detected: g133   AOI21X1
+Unknown macro type detected: g132   AOI21X1
+Unknown macro type detected: g137   AOI21X1
+Unknown macro type detected: g145   AOI21X1
+Unknown macro type detected: g146   AOI21X1
+Unknown macro type detected: g148   AOI21X1
+Unknown macro type detected: g149   AOI21X1
+Unknown macro type detected: g151   AOI21X1
+Unknown macro type detected: g150   AOI21X1
+Unknown macro type detected: g152   AOI21X1
+Unknown macro type detected: g153   AOI21X1
+Unknown macro type detected: g154   AOI21X1
+Unknown macro type detected: g218   AOI21X1
+Unknown macro type detected: g225   AOI21X1
+Unknown macro type detected: g293   NAND2X1
+Unknown macro type detected: g311   OAI21X1
+Unknown macro type detected: g314   OAI21X1
+Unknown macro type detected: g354   AOI22X1
+Unknown macro type detected: g356   AOI22X1
+Unknown macro type detected: g369   AOI22X1
+Unknown macro type detected: g401   NAND2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[26\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[25\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[23\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[22\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[21\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[20\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[19\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[18\]   DFFX1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[17\]   DFFX1
+Unknown macro type detected: g216   AOI21X1
+Unknown macro type detected: g217   AOI21X1
+Unknown macro type detected: g219   AOI21X1
+Unknown macro type detected: g220   AOI21X1
+Unknown macro type detected: g222   AOI21X1
+Unknown macro type detected: g223   AOI21X1
+Unknown macro type detected: g221   AOI21X1
+Unknown macro type detected: g224   AOI21X1
+Unknown macro type detected: g226   AOI21X1
+Unknown macro type detected: g263   AOI21X1
+Unknown macro type detected: g272   AOI21X1
+Unknown macro type detected: g306   NAND2X1
+Unknown macro type detected: g329   OAI21X1
+Unknown macro type detected: g335   OAI21X1
+Unknown macro type detected: g351   OAI21X1
+Unknown macro type detected: g357   OAI21X1
+Unknown macro type detected: g399   AND2X1
+Unknown macro type detected: g402   NAND2X1
+Unknown macro type detected: g236   AND2X1
+Unknown macro type detected: g238   NAND2X1
+Unknown macro type detected: g245   NAND2X1
+Unknown macro type detected: g249   NAND2X1
+Unknown macro type detected: g262   AOI21X1
+Unknown macro type detected: g264   AOI21X1
+Unknown macro type detected: g265   AOI21X1
+Unknown macro type detected: g266   AOI21X1
+Unknown macro type detected: g267   AOI21X1
+Unknown macro type detected: g268   AOI21X1
+Unknown macro type detected: g269   AOI21X1
+Unknown macro type detected: g270   AOI21X1
+Unknown macro type detected: g271   AOI21X1
+Unknown macro type detected: g282   AOI22X1
+Unknown macro type detected: g290   AOI22X1
+Unknown macro type detected: g334   AOI22X1
+Unknown macro type detected: g350   MX2X1
+Unknown macro type detected: g353   AOI22X1
+Unknown macro type detected: g383   AOI22X1
+Unknown macro type detected: g416   INVX1
+Unknown macro type detected: g463   INVX1
+Unknown macro type detected: g234   AND2X1
+Unknown macro type detected: g235   AND2X1
+Unknown macro type detected: g237   NAND2X1
+Unknown macro type detected: g239   NAND2X1
+Unknown macro type detected: g240   NAND2X1
+Unknown macro type detected: g241   NAND2X1
+Unknown macro type detected: g242   NAND2X1
+Unknown macro type detected: g244   NAND2X1
+Unknown macro type detected: g243   NAND2X1
+Unknown macro type detected: g248   NAND2X1
+Unknown macro type detected: g280   AOI22X1
+Unknown macro type detected: g283   AOI22X1
+Unknown macro type detected: g284   AOI22X1
+Unknown macro type detected: g285   AOI22X1
+Unknown macro type detected: g286   AOI22X1
+Unknown macro type detected: g287   AOI22X1
+Unknown macro type detected: g288   AOI22X1
+Unknown macro type detected: g289   AOI22X1
+Unknown macro type detected: g281   AOI22X1
+Unknown macro type detected: g297   NAND2X1
+Unknown macro type detected: g304   NAND2X1
+Unknown macro type detected: g348   OAI21X1
+Unknown macro type detected: g417   OR2X1
+Unknown macro type detected: g426   INVX1
+Unknown macro type detected: g421   INVX1
+Unknown macro type detected: g292   OAI21X1
+Unknown macro type detected: g295   NAND2X1
+Unknown macro type detected: g296   NAND2X1
+Unknown macro type detected: g298   NAND2X1
+Unknown macro type detected: g300   NAND2X1
+Unknown macro type detected: g301   NAND2X1
+Unknown macro type detected: g302   NAND2X1
+Unknown macro type detected: g303   NAND2X1
+Unknown macro type detected: g299   NAND2X1
+Unknown macro type detected: g317   OAI21X1
+Unknown macro type detected: g324   OAI21X1
+Unknown macro type detected: g326   NAND2X1
+Unknown macro type detected: g372   AOI22X1
+Unknown macro type detected: g380   AOI22X1
+Unknown macro type detected: g423   AOI21X1
+Unknown macro type detected: g427   INVX1
+Unknown macro type detected: g315   OAI21X1
+Unknown macro type detected: g316   OAI21X1
+Unknown macro type detected: g318   OAI21X1
+Unknown macro type detected: g319   OAI21X1
+Unknown macro type detected: g320   OAI21X1
+Unknown macro type detected: g321   OAI21X1
+Unknown macro type detected: g322   OAI21X1
+Unknown macro type detected: g323   OAI21X1
+Unknown macro type detected: g338   OAI21X1
+Unknown macro type detected: g345   OAI21X1
+Unknown macro type detected: g360   OAI21X1
+Unknown macro type detected: g368   OAI21X1
+Unknown macro type detected: g370   AOI22X1
+Unknown macro type detected: g371   AOI22X1
+Unknown macro type detected: g373   AOI22X1
+Unknown macro type detected: g375   AOI22X1
+Unknown macro type detected: g376   AOI22X1
+Unknown macro type detected: g377   AOI22X1
+Unknown macro type detected: g378   AOI22X1
+Unknown macro type detected: g379   AOI22X1
+Unknown macro type detected: g374   AOI22X1
+Unknown macro type detected: g411   INVX1
+Unknown macro type detected: g428   MX2X1
+Unknown macro type detected: g472   NOR2X1
+Unknown macro type detected: g330   OAI21X1
+Unknown macro type detected: g336   OAI21X1
+Unknown macro type detected: g337   OAI21X1
+Unknown macro type detected: g343   OAI21X1
+Unknown macro type detected: g344   OAI21X1
+Unknown macro type detected: g341   OAI21X1
+Unknown macro type detected: g342   OAI21X1
+Unknown macro type detected: g347   AOI21X1
+Unknown macro type detected: g340   OAI21X1
+Unknown macro type detected: g339   OAI21X1
+Unknown macro type detected: g358   OAI21X1
+Unknown macro type detected: g359   OAI21X1
+Unknown macro type detected: g361   OAI21X1
+Unknown macro type detected: g362   OAI21X1
+Unknown macro type detected: g364   OAI21X1
+Unknown macro type detected: g365   OAI21X1
+Unknown macro type detected: g367   OAI21X1
+Unknown macro type detected: g366   OAI21X1
+Unknown macro type detected: g363   OAI21X1
+Unknown macro type detected: g386   AOI22X1
+Unknown macro type detected: g393   AOI22X1
+Unknown macro type detected: g414   NOR2X1
+Unknown macro type detected: g471   AOI21X1
+Unknown macro type detected: g384   AOI22X1
+Unknown macro type detected: g385   AOI22X1
+Unknown macro type detected: g387   AOI22X1
+Unknown macro type detected: g388   AOI22X1
+Unknown macro type detected: g389   AOI22X1
+Unknown macro type detected: g390   AOI22X1
+Unknown macro type detected: g391   AOI22X1
+Unknown macro type detected: g392   AOI22X1
+Unknown macro type detected: g435   INVX1
+Unknown macro type detected: g495   AOI21X1
+Unknown macro type detected: g400   AND2X1
+Unknown macro type detected: g432   INVX1
+Unknown macro type detected: g436   INVX1
+Unknown macro type detected: g438   INVX1
+Unknown macro type detected: g444   INVX1
+Unknown macro type detected: g447   INVX1
+Unknown macro type detected: g460   INVX1
+Unknown macro type detected: g441   INVX1
+Unknown macro type detected: g470   NOR2X1
+Unknown macro type detected: g508   MX2X1
+Unknown macro type detected: g528   NOR2X1
+Unknown macro type detected: g430   INVX1
+Unknown macro type detected: g433   INVX1
+Unknown macro type detected: g437   MX2X1
+Unknown macro type detected: g439   INVX1
+Unknown macro type detected: g442   INVX1
+Unknown macro type detected: g445   INVX1
+Unknown macro type detected: g448   INVX1
+Unknown macro type detected: g451   INVX1
+Unknown macro type detected: g454   INVX1
+Unknown macro type detected: g457   INVX1
+Unknown macro type detected: g461   MX2X1
+Unknown macro type detected: g529   NAND2X1
+Unknown macro type detected: g542   AOI21X1
+Unknown macro type detected: g543   AOI21X1
+Unknown macro type detected: g431   MX2X1
+Unknown macro type detected: g434   MX2X1
+Unknown macro type detected: g440   MX2X1
+Unknown macro type detected: g443   MX2X1
+Unknown macro type detected: g446   MX2X1
+Unknown macro type detected: g449   MX2X1
+Unknown macro type detected: g452   MX2X1
+Unknown macro type detected: g455   MX2X1
+Unknown macro type detected: g458   MX2X1
+Unknown macro type detected: g494   MX2X1
+Unknown macro type detected: g598   XOR2X1
+Unknown macro type detected: g599   MX2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[15\]   DFFX1
+Unknown macro type detected: g597   XOR2X1
+Unknown macro type detected: g627   XOR2X1
+Unknown macro type detected: g628   XOR2X1
+Unknown macro type detected: g625   XOR2X1
+Unknown macro type detected: g403   AOI21X1
+Unknown macro type detected: g511   MX2X1
+Unknown macro type detected: g519   OAI21X1
+Unknown macro type detected: g541   AOI21X1
+Unknown macro type detected: g623   AOI21X1
+Unknown macro type detected: g649   AOI21X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileL_R_reg[0]\[14\]   DFFX1
+Unknown macro type detected: g425   AOI22X1
+Unknown macro type detected: g509   MX2X1
+Unknown macro type detected: g510   MX2X1
+Unknown macro type detected: g512   MX2X1
+Unknown macro type detected: g513   MX2X1
+Unknown macro type detected: g515   MX2X1
+Unknown macro type detected: g516   MX2X1
+Unknown macro type detected: g517   MX2X1
+Unknown macro type detected: g518   OAI21X1
+Unknown macro type detected: g514   MX2X1
+Unknown macro type detected: g605   AND2X1
+Unknown macro type detected: g632   NOR2X1
+Unknown macro type detected: g631   NOR2X1
+Unknown macro type detected: lx1_CE0_macd_macfile_AccFileH_R_reg[0]\[15\]   DFFX1
+Unknown macro type detected: g328   AOI21X1
+Unknown macro type detected: g404   AND2X1
+Unknown macro type detected: g474   NAND2X1
+Unknown macro type detected: g533   NAND2X1
+Unknown macro type detected: g633   NOR2X1
+Unknown macro type detected: g640
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Wed Mar 12 00:13:02 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test.aux"
+parsing aux file...
+parsing GSCLib_3.0_phis.lef
+GSCLib_3.0_phis.lef parsed successfully
+parsing design3.def
+components parsing started...
+nets parsing started...
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Wed Mar 12 00:14:12 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...
+parsing FreePDK45_lib_v1.0.lef
+LEF Reader returns bad status.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Wed Mar 12 00:16:08 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...
+parsing FreePDK45_lib_v1.0.lef
+LEF Reader returns bad status.
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Wed Mar 12 00:16:33 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...
+parsing FreePDK45_lib_v1.0.lef
+
+
+---------------------------------------------
+# Log file name:  itlDragon.log
+# Command line:   "
+# Date:           Wed Mar 12 00:17:44 2008
+
+---------------------------------------------
+
+itlDragon started to parse "test2.aux"
+parsing aux file...

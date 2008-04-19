@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config doctype="HTML" style="Html">
+  <!-- use 'Html' or 'PDF' in style -->
+  <!-- use 'PDF' in DocType to generate PDF, otherwise will be html -->
+  <cell genSummary="no" genTruthTable="no"/>
+
+  <mapping>
+    <entry key="AbsDeviation" value="Absolute_Deviation"/>
+    <entry key="RelDeviation" value="Relative_Deviation"/>
+    <entry key="NoCorner"  value="NoCorner_"/>
+
+    <!-- Title (visualization) -->
+    <entry key="DP_Title"   value="Dynamic Power Consumption"/>
+    <entry key="HT_Title"   value="Hold Time"/>
+    <entry key="MS_Title"   value="Setup/Hold Metastability Window"/>
+    <entry key="OS_Title"   value="Output Slopes"/>
+    <entry key="PD_Title"   value="Propagation Delay"/>
+    <entry key="FO4D_Title" value="Fanout 4 Delay"/>
+    <entry key="RC_Title"   value="Recovery Time"/>
+    <entry key="RM_Title"   value="Removal Time"/>
+    <entry key="RRMS_Title" value="Recovery/Removal Metastability Window"/>
+    <entry key="SP_Title"   value="Static Power Consumption"/>
+    <entry key="ST_Title"   value="Setup Time"/>
+    <entry key="CAP_Title"  value="Gate Capacitance"/>
+
+    <!-- Tag (base filename, internal tags) -->
+    <entry key="DP_Tag"      value="DynamicPowerConsumption"/>
+    <entry key="FP_Tag"      value="PowerFall"/>
+    <entry key="HT_Tag"      value="Hold"/>
+    <entry key="MS_Tag"      value="SetupHoldMetastability"/>
+    <entry key="OS_Tag"      value="OutputSlope"/>
+    <entry key="OSRatio_Tag" value="OutputSlopeRatio"/>
+    <entry key="PD_Tag"      value="PropagationDelay"/>
+    <entry key="PDRatio_Tag" value="PropagationDelayRatio"/>
+    <entry key="FO4D_Tag"    value="FO4Delay"/>
+    <entry key="PWR_Tag"     value="Power"/>
+    <entry key="RC_Tag"      value="Recovery"/>
+    <entry key="RM_Tag"      value="Removal"/>
+    <entry key="RP_Tag"      value="PowerRise"/>
+    <entry key="RRMS_Tag"    value="RecoveryRemovalMetastability"/>
+    <entry key="SP_Tag"      value="StaticPowerConsumption"/>
+    <entry key="ST_Tag"      value="Setup"/>
+    <entry key="CAP_Tag"     value="Capacitance"/>
+
+    <TableHeader>
+      <entry key='"constrained_pin_transition"'   value="Data Slope"/>
+      <entry key='"input_net_transition"'         value="Input Slope"/>
+      <entry key='"input_transition_time"'        value="Input Slope"/>
+      <entry key='"related_pin_transition"'       value="Clock Slope"/>
+      <entry key='"total_output_net_capacitance"' value="Load Capacitance"/>
+    </TableHeader>
+
+    <summary>
+      <entry key="FOOS_Title"    value="Output Slope First Order Approximation"/>
+      <entry key="FOPD_Title"    value="Propagation Delay First Order Approximation"/>
+      <entry key="FP_Title"      value="Fall Power"/>
+      <entry key="OS_Title"      value="Output Slope"/>
+      <entry key="OSRatio_Title" value="Output Slope Ratio"/>
+      <entry key="PD_Title"      value="Propagation Delay"/>
+      <entry key="PDRatio_Title" value="Propagation Delay Ratio"/>
+      <entry key="FO4D_Title"    value="Fanout 4 Delay"/>
+      <entry key="PWR_Title"     value="Power"/>
+      <entry key="RP_Title"      value="Rise Power"/>
+      <entry key="MS_Title"      value="Setup/Hold Metastability Window"/>
+      <entry key="RRMS_Title"    value="Recovery/Removal Metastability Window"/>
+      <entry key="ST_Title"      value="Setup Time"/>
+      <entry key="HT_Title"      value="Hold Time"/>
+      <entry key="RC_Title"      value="Recovery Time"/>
+      <entry key="RM_Title"      value="Removal Time"/>
+      <entry key="CAP_Title"     value="Gate Capacitance"/>
+    </summary>
+
+    <profiling_plots>
+      <!-- Sufixes -->
+      <entry key="single"    value="Single Value"/>
+      <entry key="arcBased"  value="Arc Based"/>
+      <entry key="cellBased" value="Cell Based"/>
+      
+      <!-- Timing -->
+      <entry key="cell_fall"         value="Propagation Delay Fall"/>
+      <entry key="cell_rise"         value="Propagation Delay Rise"/>
+      <entry key="fall_transition"   value="Output Slope Fall"/>
+      <entry key="out_sl"            value="Output Slope"/>
+      <entry key="propagation_delay" value="Propagation Delay"/>
+      <entry key="rise_transition"   value="Output Slope Rise"/>
+      
+      <!-- Power -->
+      <entry key="fall_power_1d" value="Fall Power"/>
+      <entry key="rise_power_1d" value="Rise Power"/>
+      <entry key="power_1d"      value="Dynamic Power"/>
+      <entry key="power"         value="Dynamic Power"/>
+      
+      <!-- Others -->
+      <entry key="cell"               value="Cell Level"/>
+      <entry key="area"               value="Area"/>
+      <entry key="cell_leakage_power" value="Leakage Power"/>
+      
+      <!-- Multi-plots -->
+      <entry key="ang_coef"      value="Load Dependent Coefficient"/>
+      <entry key="Avg_Dev"       value="Average Deviation"/>
+      <entry key="lin_coef"      value="Intrinsic Delay"/>
+      <entry key="by_is"         value="Point to Point by Input Slope"/>
+      <entry key="by_ol"         value="Point to Point by Load Capacitance"/>
+      <entry key="Average_Power" value="Average Power"/>
+      <entry key="Worst_Dev"     value="Worst Deviation"/>
+      <entry key="Worst_Power"   value="Worst Power"/>
+      <entry key="Average_Propagation_Delay" value="Average Propagation Delay"/>
+      <entry key="Worst_Propagation_Delay"   value="Worst Propagation Delay"/>
+    </profiling_plots>
+
+    <plot>
+      <timing>
+        <entry key="DP"      value="Dynamic Power"/>
+        <entry key="HT"      value="Hold Time"/>
+        <entry key="MS"      value="Setup/Hold Metastability Window"/>
+        <entry key="OS"      value="Ouput Slope"/>
+        <entry key="OSRatio" value="Ouput Slope Ratio"/>
+        <entry key="PD"      value="Propagation Delay"/>
+        <entry key="PDRatio" value="Propagation Delay Ratio"/>
+        <entry key="RC"      value="Recovery Time"/>
+        <entry key="RM"      value="Removal Time"/>
+        <entry key="RRMS"    value="Recovery/Removal Metastability Window"/>
+        <entry key="ST"      value="Setup Time"/>
+      </timing>
+      <summary>
+        <entry key="FOOS"    value="Ouput Slopes"/>
+        <entry key="FOPD"    value="Propagation Delay"/>
+        <entry key="FP"      value="Fall Power"/>
+        <entry key="HT"      value="Hold Time"/>
+        <entry key="MS"      value="Setup/Hold Metastability Window"/>
+        <entry key="OS"      value="Ouput Slopes"/>
+        <entry key="OSRatio" value="Ouput Slope Ratio"/>
+        <entry key="PD"      value="Propagation Delay"/>
+        <entry key="PDRatio" value="Propagation Delay Ratio"/>
+        <entry key="FO4D"    value="Fanout 4 Delay"/>
+        <entry key="PWR"     value="Power"/>
+        <entry key="RP"      value="Rise Power"/>
+        <entry key="RRMS"    value="Recovery/Removal Metastability Window"/>
+        <entry key="ST"      value="Setup Time"/>
+        <entry key="RC"      value="Recovery Time"/>
+        <entry key="RM"      value="Removal Time"/>
+      </summary>
+    </plot>
+    
+    <table>
+      <entry key="CC"   value="CellChars"/>
+      <entry key="GC"   value="GateCapacitance"/>
+      <entry key="HT"   value="HoldTime"/>
+      <entry key="MPW"  value="MinPulseWidth"/>
+      <entry key="MS"   value="Metastability"/>
+      <entry key="OS"   value="OutputSlope"/>
+      <entry key="PC"   value="PowerConsumption"/>
+      <entry key="PD"   value="PropagationDelay"/>
+      <entry key="RC"   value="Recovery"/>
+      <entry key="RM"   value="Removal"/>
+      <entry key="RRMS" value="RRMetastability"/>
+      <entry key="ST"   value="SetupTime"/>
+      <entry key="TT"   value="TruthTable"/>
+    </table>
+  </mapping>
+
+  <unit_conv use="yes">
+    <yotta>Y</yotta> <!-- 10^+24 -->
+    <zetta>Z</zetta> <!-- 10^+21 -->
+    <exa>E</exa>     <!-- 10^+18 -->
+    <peta>P</peta>   <!-- 10^+15 -->
+    <tera>T</tera>   <!-- 10^+12 -->
+    <giga>G</giga>   <!-- 10^+ 9 -->
+    <mega>M</mega>   <!-- 10^+ 6 -->
+    <kilo>k</kilo>   <!-- 10^+ 3 -->
+<!--<hecto>h</hecto> <!-  10^+ 2 -->
+<!--<deka>da</deka>  <!-  10^+ 1 -->
+<!--<deci>d</deci>   <!-  10^- 1 -->
+<!--<centi>c</centi> <!-  10^- 2 -->
+    <mili>m</mili>   <!-- 10^- 3 -->
+    <micro>u</micro> <!-- 10^- 6 -->
+    <nano>n</nano>   <!-- 10^- 9 -->
+    <pico>p</pico>   <!-- 10^-12 -->
+    <femto>f</femto> <!-- 10^-15 -->
+    <atto>a</atto>   <!-- 10^-18 -->
+    <zepto>z</zepto> <!-- 10^-21 -->
+    <yocto>y</yocto> <!-- 10^-24 -->
+  </unit_conv>
+
+  <units type="normal">
+    <timing_summary>
+      <fall_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </fall_power>
+      <rise_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </rise_power>
+      <power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </power>
+      <output_slopes>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slopes>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </output_slope_ratio>
+      <propagation_delay_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </propagation_delay_ratio>
+      <fo4_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </fo4_delay>
+      <fo_output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_output_slope>
+      <fo_propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_propagation_delay>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+    </timing_summary>
+    <cell>
+      <power_consumption label="[pW]" src="n" tgt="p"/>
+      <dynamic_power_consumption>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </dynamic_power_consumption>
+      <gate_capacitance label="[fF]"/>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slope>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+      <min_pulse_width label="[ns]" src="p" tgt="n"/>
+    </cell>
+    <voltage src="m" pattern="0.00"/>
+    <temperature pattern="0.0"/>
+  </units>
+
+  <units type="deviation_abs">
+    <timing_summary>
+      <fall_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </fall_power>
+      <rise_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </rise_power>
+      <power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </power>
+      <output_slopes>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slopes>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </output_slope_ratio>
+      <propagation_delay_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </propagation_delay_ratio>
+      <fo4_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </fo4_delay>
+      <!--
+      <fo_output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+        <out  label="[ns]"/>
+      </fo_output_slope>
+      <fo_propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+        <out  label="[ns]"/>
+      </fo_propagation_delay>
+      -->
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+      <capacitance>
+        <out  label="[fF]"/>
+      </capacitance>
+    </timing_summary>
+    <cell>
+      <power_consumption label="[pW]" src="n" tgt="p"/>
+      <dynamic_power_consumption>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>        
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </dynamic_power_consumption>
+      <gate_capacitance label="[fF]"/>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slope>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+      <min_pulse_width label="[ns]" src="p" tgt="n"/>
+    </cell>
+    <voltage src="m" pattern="0.00"/>
+    <temperature pattern="0.0"/>
+  </units>
+
+  <units type="deviation">
+    <timing_summary>
+      <fall_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </fall_power>
+      <rise_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </rise_power>
+      <power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </power>
+      <output_slopes>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </output_slopes>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </propagation_delay>
+      <output_slope_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </output_slope_ratio>
+      <propagation_delay_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </propagation_delay_ratio>
+      <fo4_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </fo4_delay>
+      <!--
+      <fo_output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+        <out  label="[%]"/>
+      </fo_output_slope>
+      <fo_propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+        <out  label="[%]"/>
+      </fo_propagation_delay>
+      -->
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </rr_metastability>
+      <capacitance>
+        <out  label="[%]"/>
+      </capacitance>
+    </timing_summary>
+    <cell>
+      <power_consumption label="[%]"/>
+      <dynamic_power_consumption>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </dynamic_power_consumption>
+      <gate_capacitance label="[%]"/>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </propagation_delay>
+      <output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[%]"/>
+      </output_slope>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[%]"/>
+      </rr_metastability>
+      <min_pulse_width label="[%]"/>
+    </cell>
+    <voltage pattern="0.00"/>
+    <temperature pattern="0.0"/>
+  </units>
+  
+  <units type="best">
+    <timing_summary>
+      <fall_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </fall_power>
+      <rise_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </rise_power>
+      <power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </power>
+      <output_slopes>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slopes>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </output_slope_ratio>
+      <propagation_delay_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </propagation_delay_ratio>
+      <fo4_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </fo4_delay>
+      <fo_output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_output_slope>
+      <fo_propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_propagation_delay>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+    </timing_summary>
+    <cell>
+      <power_consumption label="[pW]" src="n" tgt="p"/>
+      <dynamic_power_consumption>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </dynamic_power_consumption>
+      <gate_capacitance label="[fF]"/>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slope>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+      <min_pulse_width label="[ns]" src="p" tgt="n"/>
+    </cell>
+    <voltage src="m" pattern="0.00"/>
+    <temperature pattern="0.0"/>
+  </units>
+  
+  <units type="worst">
+    <timing_summary>
+      <fall_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </fall_power>
+      <rise_power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </rise_power>
+      <power>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </power>
+      <output_slopes>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slopes>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </output_slope_ratio>
+      <propagation_delay_ratio>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[rise/fall]"/>
+      </propagation_delay_ratio>
+      <fo4_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </fo4_delay>
+      <fo_output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_output_slope>
+      <fo_propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <ang  />
+        <lin  tgt="k"/>
+      <out  label="[ns]"/>
+      </fo_propagation_delay>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+    </timing_summary>
+    <cell>
+      <power_consumption label="[pW]" src="n" tgt="p"/>
+      <dynamic_power_consumption>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[fW/GHz]" src="p" tgt="f"/>
+      </dynamic_power_consumption>
+      <gate_capacitance label="[fF]"/>
+      <propagation_delay>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </propagation_delay>
+      <output_slope>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[pF]" src="f" tgt="p"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </output_slope>
+      <setup_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </setup_time>
+      <hold_time>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </hold_time>
+      <metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </metastability>
+      <recovery>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </recovery>
+      <removal>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </removal>
+      <rr_metastability>
+        <var1 label="[ns]" src="p" tgt="n"/>
+        <var2 label="[ns]" src="p" tgt="n"/>
+        <out  label="[ns]" src="p" tgt="n"/>
+      </rr_metastability>
+      <min_pulse_width label="[ns]" src="p" tgt="n"/>
+    </cell>
+    <voltage src="m" pattern="0.00"/>
+    <temperature pattern="0.0"/>
+  </units>
+  
+  <pdf>
+    <page_type>simpleA4</page_type>
+    <th_bk_color>#9AC0E1</th_bk_color>
+    <title_color>#4A7091</title_color>
+    <toc1_color>#2A5071</toc1_color>
+    <toc2_color>#3A6081</toc2_color>
+    <toc3_color>#437289</toc3_color>
+    <toc4_color>#4A7091</toc4_color>
+    <text_color>#000000</text_color>
+    <table_border_color>#999999</table_border_color>
+    <table_header_width>35mm</table_header_width>
+  </pdf>
+
+</config>

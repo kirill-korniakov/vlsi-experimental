@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="resources/xsl/TOC.xsl_"?>
+<CornerList>
+<Logo>Logo.png</Logo>
+<Date>Saturday Feb 23 01:52 2008</Date>
+<LibraryName/>
+<Corner Name="typical_conditional.lib" File="liberty_typical_conditional.lib.xml" Id="0x2bc77248" Type="normal" Temperature="25" Voltage="800" Date="Sat 23 Feb 2008, 01:50:21" LibName="FreePDK45_lib_v1.0"/>
+</CornerList>

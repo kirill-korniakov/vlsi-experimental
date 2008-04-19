@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../resources/xsl/Cell.xsl_"?>
+<Cell Name="LOGIC0_X1" CornerName="typical_conditional.lib" LibFile="liberty_typical_conditional.lib.xml">
+<Schematic></Schematic>
+<Navigation>
+<Parent Name="Table of Contents" Link="../CornerList.xml"/>
+<Previous Name="INV_X8" Link="INV_X8_typical_conditional.lib.xml"/>
+<Next Name="LOGIC1_X1" Link="LOGIC1_X1_typical_conditional.lib.xml"/>
+</Navigation>
+<GenChars>
+<Strength>
+1</Strength>
+<Type>
+Constant</Type>
+<Output>
+Z</Output>
+</GenChars>
+<Name>
+"LOGIC0_X1"</Name>
+<area>
+0.532000</area>
+<dont_touch>
+true</dont_touch>
+<dont_use>
+true</dont_use>
+<Pins>
+<Pin Name="Z">
+<function>
+"0"</function>
+<Name>
+"Z"</Name>
+<direction>
+"output"</direction>
+<max_capacitance factor="0.001">
+8</max_capacitance>
+<max_transition factor="0.001">
+5000</max_transition>
+</Pin>
+</Pins>
+</Cell>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="../resources/xsl/Cell.xsl_"?>
+<Cell Name="FILLCELL_X1" CornerName="typical_conditional.lib" LibFile="liberty_typical_conditional.lib.xml">
+<Schematic></Schematic>
+<Navigation>
+<Parent Name="Table of Contents" Link="../CornerList.xml"/>
+<Previous Name="DLL_X2" Link="DLL_X2_typical_conditional.lib.xml"/>
+<Next Name="FILLCELL_X16" Link="FILLCELL_X16_typical_conditional.lib.xml"/>
+</Navigation>
+<GenChars>
+<Strength>
+1</Strength>
+<Type>
+Physical</Type>
+</GenChars>
+<Name>
+"FILLCELL_X1"</Name>
+<area>
+0.266000</area>
+<dont_touch>
+true</dont_touch>
+<dont_use>
+true</dont_use>
+</Cell>
