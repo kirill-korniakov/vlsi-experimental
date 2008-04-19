@@ -1,6 +1,0 @@
-Warnings from file: design3.def
-
-WARNING (DEFPARS-7012): VERSION is a required statement on DEF file.
-Without VERSION defined, the DEF file is technically illegal.
-Refer the LEF/DEF Language Reference manual on how to define this statement. File design3.def at line 202674
-Last token was <DESIGN>
