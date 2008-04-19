@@ -7,7 +7,7 @@
 #include "FBI/fbi.h"
 
 void main(int argc, char* argv[])
-{//parser.exe -f <filename>.aux
+{
   Circuit    circuit;
   Statistics statistics;
 
