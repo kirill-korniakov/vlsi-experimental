@@ -268,7 +268,8 @@ int CalcMaxAffectedArea(double potentialSize, double binSize)
 void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, Circuit& circuit, 
                                                                   vector<Cluster>& clusters, NetList& netList, 
                                                                   int nClusters, PetscInt** lookUpTable, 
-                                                                  vector<ConnectionsList>& currTableOfConnections)
+                                                                  vector<ConnectionsList>& currTableOfConnections,
+                                                                  double* netWeights)
 {
   LogEnter("MultilevelFramework::InitializeOptimizationProblemParameters");
   user.circuit = &circuit;
@@ -331,6 +332,14 @@ void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, 
   }
   user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
   
+  netWeights = new double[user.netList->size()];
+  for (int i = 0; i < static_cast<int>(user.netList->size()); ++i)
+  {
+    netWeights[i] = 10.0;
+  }
+
+  user.netWeights = netWeights;
+
   LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");
 }
 
@@ -432,10 +441,11 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   PetscScalar *solution;
   double discrepancy;
   double currentWL;
+  double* netWeights = NULL;
   
   /* Initialize optimization problem parameters */
   InitializeOptimizationProblemParameters(user, circuit, clusters, netList, nClusters, 
-                                          &lookUpTable, currTableOfConnections);
+                                          &lookUpTable, currTableOfConnections, netWeights);
 
   /* Allocate vectors for the solution and gradient */
   info = VecCreateSeq(PETSC_COMM_SELF, nClusters * 2, &x); CHKERRQ(info);
@@ -576,6 +586,7 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   delete[] lookUpTable;
   delete[] initValues;
   delete[] idxs;
+  delete[] netWeights;
 
   DeinitializeOptimizationProblemParameters(user);
   Trace("todo: after deinit", 1);
@@ -1169,7 +1180,7 @@ double MultilevelFramework::LogSumExpForClusters(PetscScalar *coordinates, void*
       logsum4 += exp(-y / alpha);
     }
 
-    sum += log(logsum1) + log(logsum2) + log(logsum3) + log(logsum4);
+    sum += userData->netWeights[i] * (log(logsum1) + log(logsum2) + log(logsum3) + log(logsum4));
   }
   
   //PetscPrintf(PETSC_COMM_SELF,"\nExit LogSumExp func\n");
@@ -1233,10 +1244,12 @@ void MultilevelFramework::CalcLogSumExpForClustersGrad(PetscScalar *coordinates,
         sum3 += exp(+y / alpha);
         sum4 += exp(-y / alpha);
       }
-      grad[2*i+0] += exp(+coordinates[2*i+0] / alpha) / sum1 - 
-                     exp(-coordinates[2*i+0] / alpha) / sum2;
-      grad[2*i+1] += exp(+coordinates[2*i+1] / alpha) / sum3 - 
-                     exp(-coordinates[2*i+1] / alpha) / sum4;
+      grad[2*i+0] += (exp(+coordinates[2*i+0] / alpha) / sum1 - 
+                      exp(-coordinates[2*i+0] / alpha) / sum2) * 
+                      userData->netWeights[netIdx];
+      grad[2*i+1] += (exp(+coordinates[2*i+1] / alpha) / sum3 - 
+                      exp(-coordinates[2*i+1] / alpha) / sum4) * 
+                      userData->netWeights[netIdx];
     }
   }
   LogExit("MultilevelFramework::CalcLogSumExpForClustersGrad");
