@@ -22,6 +22,7 @@
 #define USE_BORDER_PENALTY
 
 using namespace std;
+//using namespace stlport;
 
 namespace MultilevelFramework
 {
@@ -107,6 +108,7 @@ namespace MultilevelFramework
     double            potentialRadiusX;
     double            potentialRadiusY;
     double            weight;        // вес для симметричной записи критерия
+    double*           netWeights;
   } AppCtx;
 
   typedef MULTIPLACER_ERROR (*affinityFunc)(const int& firstClusterIdx, const int& secondClusterIdx,
@@ -131,7 +133,7 @@ namespace MultilevelFramework
 
   void InitializeOptimizationProblemParameters(AppCtx &user, Circuit& circuit, 
     vector<Cluster>& clusters, NetList& netList, int nClusters, PetscInt** lookUpTable, 
-    vector<ConnectionsList>& currTableOfConnections);
+    vector<ConnectionsList>& currTableOfConnections, double* netWeights);
   void DeinitializeOptimizationProblemParameters(AppCtx &user);
   
   MULTIPLACER_ERROR Interpolation(Circuit& circuit, vector<Cluster>& clusters, 
