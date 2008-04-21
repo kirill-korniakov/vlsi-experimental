@@ -245,83 +245,84 @@ void PrintPrev(Circuit& c, int nodeID)
 
 void MakeTimingLists(Circuit& c)
 {
-    int* netDegrees = new int[c.nNets];
-    int* netDegrees_2 = new int[c.nNets];
-    int* nodeDegrees = new int[c.nNodes + c.nTerminals];
-    for(int q = 0; q < c.nNodes + c.nTerminals; q++)
-        nodeDegrees[q] = 0;
-    for(int i = 0; i < c.nNets; i++)
+  int* netDegrees = new int[c.nNets];
+  int* netDegrees_2 = new int[c.nNets];
+  int* nodeDegrees = new int[c.nNodes + c.nTerminals];
+  /*for(int q = 0; q < c.nNodes + c.nTerminals; q++)
+  nodeDegrees[q] = 0;*/
+  for(int i = 0; i < c.nNets; i++)
+  {
+    //cout << i << endl;
+    netDegrees[i] = 0;
+    for(int l = 0; l < c.nets[i].numOfPins; l++)
+      if(c.nets[i].arrPins[l].chtype != 'O')
+        netDegrees[i]++;
+    if(HASREALSOURCE(c.nets[i]))
+      nodeDegrees[c.nets[i].arrPins[c.nets[i].sourceIdx].cellIdx]++;
+  }
+  for(int p = 0; p < c.nNets; p++)
+    netDegrees_2[p] = netDegrees[p];
+
+  Net __top;
+  Net* current = &__top;
+
+  //propagate by required order
+  //inverced list - is arrival order
+  std::queue<int> readyNodes;
+  std::queue<int> readyNets;
+
+  for(int k = 0; k < c.nPrimaryOutputs; k++)
+    readyNodes.push(c.primaryOutputs[k]);
+
+  while(!readyNodes.empty() || !readyNets.empty())
+  {
+    while(!readyNodes.empty())
     {
-        netDegrees[i] = 0;
-        for(int l = 0; l < c.nets[i].numOfPins; l++)
-            if(c.nets[i].arrPins[l].chtype != 'O')
-                netDegrees[i]++;
-        if(HASREALSOURCE(c.nets[i]))
-            nodeDegrees[c.nets[i].arrPins[c.nets[i].sourceIdx].cellIdx]++;
+      int nodeIndex = readyNodes.front();
+      readyNodes.pop();
+      //cout << c.tableOfNames[nodeIndex].name << " - " << nodeIndex << endl;
+      for(size_t j = 0; j < c.tableOfConnections[nodeIndex].size(); j++)
+      {
+        int netID = c.tableOfConnections[nodeIndex][j];
+        if(c.nets[netID].arrPins[c.nets[netID].sourceIdx].cellIdx != nodeIndex)
+          if(!(netDegrees[netID]-=1))
+            readyNets.push(netID);
+      }
     }
-    for(int p = 0; p < c.nNets; p++)
-        netDegrees_2[p] = netDegrees[p];
-
-    Net __top;
-    Net* current = &__top;
-
-    //propagate by required order
-    //inverced list - is arrival order
-    std::queue<int> readyNodes;
-    std::queue<int> readyNets;
-
-    for(int k = 0; k < c.nPrimaryOutputs; k++)
-        readyNodes.push(c.primaryOutputs[k]);
-
-    while(!readyNodes.empty() || !readyNets.empty())
+    while(!readyNets.empty())
     {
-        while(!readyNodes.empty())
-        {
-            int nodeIndex = readyNodes.front();
-            readyNodes.pop();
-            //cout << c.tableOfNames[nodeIndex].name << " - " << nodeIndex << endl;
-            for(size_t j = 0; j < c.tableOfConnections[nodeIndex].size(); j++)
-            {
-                int netID = c.tableOfConnections[nodeIndex][j];
-                if(c.nets[netID].arrPins[c.nets[netID].sourceIdx].cellIdx != nodeIndex)
-                    if(!(netDegrees[netID]-=1))
-                        readyNets.push(netID);
-            }
-        }
-        while(!readyNets.empty())
-        {
-            int netIndex = readyNets.front();
-            readyNets.pop();
-            if(HASREALSOURCE(c.nets[netIndex]))
-            {//completely ignore nets without real source
-                if(!(nodeDegrees[c.nets[netIndex].arrPins[c.nets[netIndex].sourceIdx].cellIdx]-=1))
-                    readyNodes.push(c.nets[netIndex].arrPins[c.nets[netIndex].sourceIdx].cellIdx);
+      int netIndex = readyNets.front();
+      readyNets.pop();
+      if(HASREALSOURCE(c.nets[netIndex]))
+      {//completely ignore nets without real source
+        if(!(nodeDegrees[c.nets[netIndex].arrPins[c.nets[netIndex].sourceIdx].cellIdx]-=1))
+          readyNodes.push(c.nets[netIndex].arrPins[c.nets[netIndex].sourceIdx].cellIdx);
 
-                current->requiredOrder = c.nets + netIndex;
-                current->requiredOrder->arrivalOrder = current;
-                current = current->requiredOrder;
-            }
-        }
-        if(readyNodes.empty())
+        current->requiredOrder = c.nets + netIndex;
+        current->requiredOrder->arrivalOrder = current;
+        current = current->requiredOrder;
+      }
+    }
+    if(readyNodes.empty())
+    {
+      for(int j = 0; j < c.nNets; j++)
+        if(netDegrees[j] > 0 && netDegrees[j] < netDegrees_2[j])
         {
-            for(int j = 0; j < c.nNets; j++)
-                if(netDegrees[j] > 0 && netDegrees[j] < netDegrees_2[j])
-                {
-                    netDegrees[j] = 0;
-                    readyNets.push(j);
-                    break;
-                }
+          netDegrees[j] = 0;
+          readyNets.push(j);
+          break;
         }
     }
+  }
 
-    c.firstRequired = __top.requiredOrder;
-    c.firstArrival = current;
-    c.firstArrival->requiredOrder = 0;
-    c.firstRequired->arrivalOrder = 0;
+  c.firstRequired = __top.requiredOrder;
+  c.firstArrival = current;
+  c.firstArrival->requiredOrder = 0;
+  c.firstRequired->arrivalOrder = 0;
 
-    delete[] netDegrees;
-    delete[] nodeDegrees;
-    delete[] netDegrees_2;
+  delete[] netDegrees;
+  delete[] nodeDegrees;
+  delete[] netDegrees_2;
 }
 
 void PropagateArrivalTime(Circuit& circuit, bool reanalize, bool reroute)

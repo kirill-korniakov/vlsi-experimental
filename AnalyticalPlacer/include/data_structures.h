@@ -65,7 +65,7 @@ struct PinInfo
  */
 struct MacroInfo
 {
-    std::string Name; /// simbolic name of macro type
+    std::string Name; /// symbolic name of macro type
 
     // Origin specifies how to find the origin of the macro to align with a placement 
     //point. For example, if the ORIGIN is 0, -1, then macro geometry at 0, 1 are 
@@ -252,7 +252,7 @@ struct Node
   int height;      /// Height of cell
 
   // fields come from lef/def format
-  MacroInfo *type; /// Poiner to technology macro type information.
+  MacroInfo *type; /// Pointer to technology macro type information.
 
   Node()
   {

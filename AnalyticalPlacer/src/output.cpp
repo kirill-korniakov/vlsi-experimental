@@ -301,7 +301,7 @@ void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, doubl
     int shift_ = (int)(circuit.terminals - circuit.nodes);
     for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
     {
-      if(i == circuit.nNodes) i = shift_;
+      if (i == circuit.nNodes) i = shift_;
       sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord,
                                                   circuit.placement[i].yCoord,  circuit.placement[i].orient);
       fputs( buffer, f);

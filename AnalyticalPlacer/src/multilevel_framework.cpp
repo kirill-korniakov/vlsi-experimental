@@ -332,15 +332,42 @@ void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, 
   }
   user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
   
-  netWeights = new double[user.netList->size()];
-  for (int i = 0; i < static_cast<int>(user.netList->size()); ++i)
+  ComputeNetWeights(circuit, clusters, netList, netWeights);
+  user.netWeights = netWeights;
+
+  LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");
+}
+
+void MultilevelFramework::ComputeNetWeights(Circuit& circuit, vector<Cluster>& clusters, 
+                                            NetList& netList, double* netWeights)
+{
+  MakeTimingLists(circuit);
+  cout << "initialize success" << endl;
+  PropagateArrivalTime(circuit,true,true);
+  cout << "arrival times calculated" << endl;
+  PrintCircuitArrivals(circuit);
+  PropagateRequiredTime(circuit,false,false);
+  cout << "required times calculated" << endl;
+
+  double* nodesSlack = new double[circuit.nNodes];
+  double maxNodeSlack = -1e10;
+
+  for (int i = 0; i < circuit.nNodes; ++i)
+  {
+    nodesSlack[i] = circuit.placement[i].arrivalTime - circuit.placement[i].requiredTime;
+    if (maxNodeSlack < nodesSlack[i])
+    {
+      maxNodeSlack = nodesSlack[i];
+    }
+  }
+
+  netWeights = new double[netList.size()];
+  for (int i = 0; i < static_cast<int>(netList.size()); ++i)
   {
     netWeights[i] = 10.0;
   }
 
-  user.netWeights = netWeights;
-
-  LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");
+  delete[] nodesSlack;
 }
 
 // todo: check if all the memory released

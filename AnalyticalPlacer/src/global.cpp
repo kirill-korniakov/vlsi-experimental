@@ -251,6 +251,10 @@ void MakeTableOfConnections(Circuit& circuit)
   for (int i = 0; i < circuit.nNets; ++i)
   {
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
+    {
+      cout << j << endl;
+      cout << circuit.nets[i].arrPins[j].cellIdx << endl;
       circuit.tableOfConnections[circuit.nets[i].arrPins[j].cellIdx].push_back(i);
+    }
   }
 }

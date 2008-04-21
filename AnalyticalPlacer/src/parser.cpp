@@ -311,7 +311,7 @@ int ParseNodes(const char* fileName, Circuit& circuit)
   circuit.nNodes -= circuit.nTerminals;
   circuit.tableOfNames = new str[circuit.nNodes+circuit.nTerminals];
   circuit.nodes = new Node[circuit.nNodes+circuit.nTerminals];
-  circuit.terminals = circuit.nodes+circuit.nTerminals;
+  circuit.terminals = circuit.nodes+circuit.nNodes;
   int termCount = 0, nodesCount = 0;
   char tmp_name[20];
   float tmp_width, tmp_height;

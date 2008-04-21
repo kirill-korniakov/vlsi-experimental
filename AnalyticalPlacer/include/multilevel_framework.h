@@ -11,6 +11,7 @@
 #include "..\include\errors.h"
 #include "..\include\global.h"
 #include "..\include\random_numbers_generation.h"
+#include "..\include\itlTiming.h"
 #include "tao.h"
 #include <vector>
 #include <list>
@@ -191,5 +192,6 @@ namespace MultilevelFramework
   void CalcMu0(PetscScalar *x, void* data);
   double GetDiscrepancy(PetscScalar *x, void* data);
   void MakeClustersFromBins(Circuit& circuit, vector<Cluster>& clusters, NetList& netList);
+  void ComputeNetWeights(Circuit& circuit, vector<Cluster>& clusters, NetList& netList, double* netWeights);
 }
 #endif
