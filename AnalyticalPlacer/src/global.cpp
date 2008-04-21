@@ -248,13 +248,11 @@ void MakeTableOfConnections(Circuit& circuit)
   else
 	  size = circuit.nNodes + circuit.nTerminals;
   circuit.tableOfConnections = new std::vector<int>[size];
+
   for (int i = 0; i < circuit.nNets; ++i)
   {
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
-    {
-      cout << j << endl;
-      cout << circuit.nets[i].arrPins[j].cellIdx << endl;
       circuit.tableOfConnections[circuit.nets[i].arrPins[j].cellIdx].push_back(i);
-    }
   }
+
 }

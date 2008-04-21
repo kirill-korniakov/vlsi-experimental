@@ -133,134 +133,134 @@ int componentCB(defrCallbackType_e c, defiComponent *comp, defiUserData ud)
 
 int netStartCB(defrCallbackType_e c, int number, defiUserData ud)
 {
-  checkType_def(c);
-  cout << "nets parsing started..." << endl;
-  DEFParserData* data = (DEFParserData*)ud;
-  data->circuit->nNets = number;
-  data->current_index = 0;
-  data->circuit->nets = new Net[number * 2 + BUF_COUNT_RESERVE];
-  data->circuit->nPins = 0;
+    checkType_def(c);
+    cout << "nets parsing started..." << endl;
+    DEFParserData* data = (DEFParserData*)ud;
+    data->circuit->nNets = number;
+    data->current_index = 0;
+    data->circuit->nets = new Net[number * 2 + BUF_COUNT_RESERVE];
+    data->circuit->nPins = 0;
 
-  int pins = (int)data->circuit->tech->SinglePins->Pins.size();
-  int allnodes = data->circuit->nNodes + pins - data->nskipped;
-  int plnodes = data->circuit->nNodes - data->circuit->nTerminals - data->nskipped;
+    int pins = (int)data->circuit->tech->SinglePins->Pins.size();
+    int allnodes = data->circuit->nNodes + pins - data->nskipped;
+    int plnodes = data->circuit->nNodes - data->circuit->nTerminals - data->nskipped;
 
-  int node_space = allnodes * 2 + BUF_COUNT_RESERVE;
-  int first_terminal = node_space - data->circuit->nTerminals - pins;
+	int node_space = allnodes * 2 + BUF_COUNT_RESERVE+1;
+	int first_terminal = node_space - data->circuit->nTerminals - pins;
 
-  Node* nodes = new Node[node_space];
-  {
-    memcpy(nodes, data->circuit->nodes, sizeof(Node) * plnodes);
-    memcpy(nodes + first_terminal, data->circuit->nodes + plnodes + data->nskipped, 
-      sizeof(Node) * data->circuit->nTerminals);
-    delete[] data->circuit->nodes;
-    data->circuit->nodes = nodes;
-    data->circuit->terminals = nodes + first_terminal;
-  }
-  Place* place = new Place[node_space];
-  {
-    memcpy(place, data->circuit->placement, sizeof(Place) * plnodes);
-    memcpy(place + first_terminal, data->circuit->placement + plnodes + data->nskipped,
-      sizeof(Place) * data->circuit->nTerminals);
-    delete[] data->circuit->placement;
-    data->circuit->placement = place;
-  }
-  str* names = (str*) new char[sizeof(str) * node_space];
-  {
-    memcpy(names, data->circuit->tableOfNames, sizeof(str) * plnodes);
-    memcpy(names + first_terminal, data->circuit->tableOfNames + plnodes + data->nskipped,
-      sizeof(str) * data->circuit->nTerminals);
-    delete[] (char*)data->circuit->tableOfNames;
-    data->circuit->tableOfNames = names;
-  }
-  //data->circuit->nNodes -= data->nskipped;
-  int terminal_index = first_terminal + data->circuit->nTerminals;
-  for(std::map<std::string,PinInfo*>::iterator iter = data->circuit->tech->SinglePins->Pins.begin();
-    iter != data->circuit->tech->SinglePins->Pins.end(); ++iter, terminal_index++)
-  {
-    nodes[terminal_index].height = 0;
-    nodes[terminal_index].width = 0;
-    nodes[terminal_index].type = data->circuit->tech->SinglePins;
-    place[terminal_index].xCoord = iter->second->OriginX;
-    place[terminal_index].yCoord = iter->second->OriginY;
-    strcpy(place[terminal_index].orient, "N");
-    new ((void*)(names + terminal_index)) str(iter->first.c_str());
-  }//data->circuit->nNodes == allnodes;
-  data->circuit->nTerminals += pins;
-  data->circuit->nNodes = plnodes;
-  data->indexes = new int[allnodes];
-  int i = 0;
-  for(; i < plnodes; i++)
-    data->indexes[i] = i;
-  for(int j = first_terminal; j < node_space; j++,i++)
-    data->indexes[i] = j;
-
-  int Index,Index1, ContrIndex,ContrIndex1,N;
-  int Y;
-  long int Stack[32][2];// = ((0,0));
-  for (int i = 1; i < 32; i++) Stack[i][0] = Stack[i][1] = -1;
-  Stack[0][0] = 0; Stack[0][1] = allnodes -1;
-  N = 0;
-  while (N >= 0)
-  {
-    Index1 = Index = Stack[N][0];
-    ContrIndex1 = ContrIndex = Stack[N][1];
-    Y = data->indexes[Index];
-    while (Index != ContrIndex)
+    Node* nodes = new Node[node_space];
     {
-      if (strcmp(data->circuit->tableOfNames[Y].name,
-        data->circuit->tableOfNames[data->indexes[ContrIndex]].name) > 0)//(Y>data[ContrIndex])
-      {
-        data->indexes[Index] = data->indexes[ContrIndex];
-        data->indexes[ContrIndex] = Y;
-        goto Sort7L1;
-      }
+        memcpy(nodes, data->circuit->nodes, sizeof(Node) * plnodes);
+        memcpy(nodes + first_terminal, data->circuit->nodes + plnodes + data->nskipped, 
+            sizeof(Node) * data->circuit->nTerminals);
+        delete[] data->circuit->nodes;
+        data->circuit->nodes = nodes;
+        data->circuit->terminals = nodes + first_terminal;
+    }
+    Place* place = new Place[node_space];
+    {
+        memcpy(place, data->circuit->placement, sizeof(Place) * plnodes);
+        memcpy(place + first_terminal, data->circuit->placement + plnodes + data->nskipped,
+            sizeof(Place) * data->circuit->nTerminals);
+        delete[] data->circuit->placement;
+        data->circuit->placement = place;
+    }
+    str* names = (str*) new char[sizeof(str) * node_space];
+    {
+        memcpy(names, data->circuit->tableOfNames, sizeof(str) * plnodes);
+        memcpy(names + first_terminal, data->circuit->tableOfNames + plnodes + data->nskipped,
+            sizeof(str) * data->circuit->nTerminals);
+        delete[] (char*)data->circuit->tableOfNames;
+        data->circuit->tableOfNames = names;
+    }
+    //data->circuit->nNodes -= data->nskipped;
+	int terminal_index = first_terminal + data->circuit->nTerminals;
+    for(std::map<std::string,PinInfo*>::iterator iter = data->circuit->tech->SinglePins->Pins.begin();
+		iter != data->circuit->tech->SinglePins->Pins.end(); ++iter, terminal_index++)
+    {
+        nodes[terminal_index].height = 0;
+        nodes[terminal_index].width = 0;
+        nodes[terminal_index].type = data->circuit->tech->SinglePins;
+        place[terminal_index].xCoord = iter->second->OriginX;
+        place[terminal_index].yCoord = iter->second->OriginY;
+        strcpy(place[terminal_index].orient, "N");
+        new ((void*)(names + terminal_index)) str(iter->first.c_str());
+    }//data->circuit->nNodes == allnodes;
+    data->circuit->nTerminals += pins;
+	data->circuit->nNodes = plnodes;
+    data->indexes = new int[allnodes];
+	int i = 0;
+    for(; i < plnodes; i++)
+        data->indexes[i] = i;
+	for(int j = first_terminal; j < node_space; j++,i++)
+        data->indexes[i] = j;
+
+    int Index,Index1, ContrIndex,ContrIndex1,N;
+    int Y;
+    long int Stack[32][2];// = ((0,0));
+    for (int i = 1; i < 32; i++) Stack[i][0] = Stack[i][1] = -1;
+    Stack[0][0] = 0; Stack[0][1] = allnodes -1;
+    N = 0;
+    while (N >= 0)
+    {
+        Index1 = Index = Stack[N][0];
+        ContrIndex1 = ContrIndex = Stack[N][1];
+        Y = data->indexes[Index];
+        while (Index != ContrIndex)
+        {
+            if (strcmp(data->circuit->tableOfNames[Y].name,
+                data->circuit->tableOfNames[data->indexes[ContrIndex]].name) > 0)//(Y>data[ContrIndex])
+            {
+                data->indexes[Index] = data->indexes[ContrIndex];
+                data->indexes[ContrIndex] = Y;
+                goto Sort7L1;
+            }
 Sort7L2:    ContrIndex--;
-    }
-    while (Index != ContrIndex)
-    {
-      if (strcmp(data->circuit->tableOfNames[data->indexes[Index]].name,
-        data->circuit->tableOfNames[Y].name) > 0)//(data[Index]>Y)
-      {
-        data->indexes[ContrIndex] = data->indexes[Index];
-        data->indexes[Index] = Y;
-        goto Sort7L2;
-      }
+        }
+        while (Index != ContrIndex)
+        {
+            if (strcmp(data->circuit->tableOfNames[data->indexes[Index]].name,
+                data->circuit->tableOfNames[Y].name) > 0)//(data[Index]>Y)
+            {
+                data->indexes[ContrIndex] = data->indexes[Index];
+                data->indexes[Index] = Y;
+                goto Sort7L2;
+            }
 Sort7L1:    Index++;
+        }
+        if ((2 * Index - Index1 - ContrIndex1 - 2) > 0)
+        {
+            if (Index1 < Index - 1)
+            {
+                Stack[N][1] = Index - 1;
+                N++;
+            }
+            if (Index + 1 < ContrIndex1)
+            {
+                Stack[N][0] = Index + 1;
+                Stack[N][1] = ContrIndex1;
+                N++;
+            }
+        }
+        else
+        {
+            if (Index + 1 < ContrIndex1)
+            {
+                Stack[N][0] = Index + 1;
+                Stack[N][1] = ContrIndex1;
+                N++;
+            }
+            if (Index1 < Index - 1)
+            {
+                Stack[N][0] = Index1;
+                Stack[N][1] = Index - 1;
+                N++;
+            }
+        }
+        N--;
     }
-    if ((2 * Index - Index1 - ContrIndex1 - 2) > 0)
-    {
-      if (Index1 < Index - 1)
-      {
-        Stack[N][1] = Index - 1;
-        N++;
-      }
-      if (Index + 1 < ContrIndex1)
-      {
-        Stack[N][0] = Index + 1;
-        Stack[N][1] = ContrIndex1;
-        N++;
-      }
-    }
-    else
-    {
-      if (Index + 1 < ContrIndex1)
-      {
-        Stack[N][0] = Index + 1;
-        Stack[N][1] = ContrIndex1;
-        N++;
-      }
-      if (Index1 < Index - 1)
-      {
-        Stack[N][0] = Index1;
-        Stack[N][1] = Index - 1;
-        N++;
-      }
-    }
-    N--;
-  }
 
-  return PARSE_OK;
+    return PARSE_OK;
 }
 
 int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
@@ -383,18 +383,18 @@ int pinCB(defrCallbackType_e c, defiPin *pin, defiUserData ud)
         if(strcmp(pin->direction(),"INPUT") == 0)
         {
             res->dir = PinInfo::OUTPUT;//PinInfo::INPUT;
-            data->circuit->nPrimaryOutputs++;
+            data->circuit->nPrimaryInputs++;
         }
         else if(strcmp(pin->direction(),"OUTPUT") == 0)
         {
             res->dir = PinInfo::INPUT;//PinInfo::OUTPUT;
-            data->circuit->nPrimaryInputs++;
+            data->circuit->nPrimaryOutputs++;
         }
         else if(strcmp(pin->direction(),"INOUT") == 0)
         {
             cout << "Warning: INOUT primary - " << pin->pinName() << endl;
             res->dir = PinInfo::INOUT;
-            data->circuit->nPrimaryOutputs++;
+            data->circuit->nPrimaryInputs++;
         }
         else
             res->dir = PinInfo::OUTPUT;

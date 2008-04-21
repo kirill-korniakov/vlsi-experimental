@@ -210,6 +210,7 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;..\include\tao-1.9\src\petsctao\include&quot;;&quot;..\include\tao-1.9&quot;;&quot;..\include\tao-1.9\include&quot;;&quot;..\include\petsc-2.3.3-p6\include&quot;;&quot;..\include\petsc-2.3.3-p6\bmake\win32_ms&quot;;&quot;C:\Program Files\Intel\MKL\8.0\include&quot;;&quot;C:\Program Files\MPICH2\include&quot;"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE; _CRT_NONSTDC_NO_DEPRECATE;cout ccout"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -286,6 +287,14 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
