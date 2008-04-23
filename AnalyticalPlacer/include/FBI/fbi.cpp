@@ -1,5 +1,7 @@
-#include "def.h"
-#include "../data_structures.h"
+#include "fbi.h"
+
+#include <sys/timeb.h>
+
 
 #define WIRE_SEGMENTS 8
 
@@ -10,8 +12,8 @@ int highSlack=0;
 
 //------------FBI global data------------
 /* nodes and edges of the routing tree */
-FBI_Node *nodes;
-Edge *edges;
+//FBI_Node *nodes;
+//Edge *edges;
 /* wire_unit_res, wire_unit_cap, driver_resistance */
 double r0, c0, rd; 
 /* buffer_res, cap and delay */
@@ -19,7 +21,7 @@ double rb[MAXBUFFERTYPE], cb[MAXBUFFERTYPE], tb[MAXBUFFERTYPE];
 /* driver location */
 double dx, dy; 
 /* number of sinks, internal nodes, total nodes, total edges, buffer types */
-int n_sinks, n_candidates, n_nodes, n_edges, n_buffertype;
+int n_sinks =0, n_candidates =0, n_nodes=0, n_edges=0, n_buffertype=0;
 
 /* give out the final location of buffer of van algorithm */
 Comp *final_location_van; double van_answer;  
@@ -30,19 +32,42 @@ Comp *final_location_shili; double shili_answer;
 double reduce_solution, total_solution, m_used, m_reduced, max_space; 
 //------------end FBI global data------------
 
+char*  filename = NULL;
+FBI_Node*  nodes = NULL;	
+Edge*  edges = NULL;
+
 int debug;
 FILE *fp;
 RTnode *NIL;
-char* filename;
+//char* filename;
 
 double dtime;
 clock_t cl;
+
+Circuit* myCircuit;
+FBI_Node *myTree;
+RoutingTree *myCTree;
+
+//---BufInfo
+
+typedef struct
+{
+	PinInfo* in;
+	PinInfo* out;
+
+	MacroInfo *info;
+} FBIBufInfo;
+
+FBIBufInfo bufInfo[MAXBUFFERTYPE];
+
+//---end BufInfo
 
 void TraceTree(int parent, StNode *stNode)
 {
   if(stNode->type==2)
   {
     nodes[n_nodes].index=n_sinks+1;
+    nodes[n_nodes].indexCirc = ((StNodeEx*)stNode)->origin->cellIdx;
     nodes[n_nodes].x=stNode->x;
     nodes[n_nodes].y=stNode->y;
     nodes[n_nodes].type = SINK;
@@ -56,7 +81,8 @@ void TraceTree(int parent, StNode *stNode)
   else
     if(stNode->type==1)
     {
-      nodes[n_nodes].index=n_nodes+20000; //Могуть быть траблы.
+      nodes[n_nodes].index=n_nodes + 20000; //Могуть быть траблы.
+      nodes[n_nodes].indexCirc = -1;
       nodes[n_nodes].x=stNode->x;
       nodes[n_nodes].y=stNode->y;
       nodes[n_nodes].type = FBI_IN;
@@ -91,6 +117,7 @@ FBI_Node* MakeTree(StNode *stNode)
   nodes[n_nodes].y=stNode->y;
 
   nodes[n_nodes].index = 0;
+  nodes[n_nodes].indexCirc = ((StNodeEx*)stNode)->origin->cellIdx;
   dx = nodes[n_nodes].x;
   dy = nodes[n_nodes].y;				   
   nodes[n_nodes].cap = 0.0;	 //stNode->cap
@@ -114,7 +141,304 @@ FBI_Node* MakeTree(StNode *stNode)
   return t;
 }
 
-void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree)
+FBI_Node* FindNode(int index, FBI_Node *ntree)
+{
+  if(ntree->index == index)
+    return ntree;
+
+  FBI_Node *tem;
+
+  if(ntree->left)
+  {
+    tem = FindNode(index, ntree->left);
+    if(tem)
+      return tem;
+  }
+
+  if(ntree->right)
+  {
+    tem = FindNode(index, ntree->right);
+    if(tem)
+      return tem;
+  }
+
+  return NULL;
+}
+
+void GetCells(FBI_Node *node, std::vector<int> *vec)
+{
+  if (node->index < 20000)
+    vec->push_back(node->indexCirc);
+
+  if(node->left)
+    GetCells(node->left, vec);
+
+  if(node->right)
+    GetCells(node->right, vec);
+}
+
+
+FBIBufInfo GetBufferInfo(std::string bufName, Circuit *circuit)
+{
+	FBIBufInfo bufInfo;
+
+	if (circuit)
+	{
+		bufInfo.info = circuit->tech->CellTypes->find(bufName)->second;
+
+		bufInfo.in = NULL;
+		bufInfo.out = NULL;
+
+		for(std::map<std::string,PinInfo*>::iterator i = bufInfo.info->Pins.begin();
+			i != bufInfo.info->Pins.end(); ++i)
+			if(!i->second->isSpecial)
+			{
+				if(i->second->dir == PinInfo::INPUT)
+					bufInfo.in = i->second;
+				else
+					if(i->second->dir == PinInfo::OUTPUT)
+						bufInfo.out = i->second;
+			}
+	}
+	
+	return bufInfo;		
+}
+
+void UpdateCircuit(RLnode *rl, FBI_Node *ntree, int netIndex)
+{
+  Node* node = myCircuit->nodes;
+  Net* net = myCircuit->nets;
+  Place * pl = myCircuit->placement;
+  str*  names = myCircuit->tableOfNames;
+  std::vector<int>* conn = myCircuit->tableOfConnections;
+
+//  int nNodes = myCircuit->nNodes;
+//  int nNets = myCircuit->nNets;
+  int nTerminals = myCircuit->nTerminals;
+
+  if(rl)
+    do
+    {
+      if(rl->com)
+        if(rl->com->buffertype>=0)
+        {
+    		  int bufType = rl->com->buffertype;
+          FBI_Node *fbiNode = FindNode(rl->com->y, ntree);
+
+          std::vector<int> vecNodeR;
+          std::vector<int> vecNodeAll;
+          std::vector<int> vecNodeL;
+
+          //Get all nodes in net
+          GetCells(fbiNode, &vecNodeR);
+
+          //Get "right" nodes in net
+          GetCells(ntree, &vecNodeAll);
+
+          //Construct "left" nodes in net (all nodes - "right" nodes)
+          for(int i=0; i<vecNodeAll.size(); i++)
+          {
+            bool exist = false;
+            for (int j=0; j<vecNodeR.size(); j++)
+              if(vecNodeR[j] == vecNodeAll[i])
+              {
+                exist = true;
+                break;
+              }
+
+            if(!exist)
+              vecNodeL.push_back(vecNodeAll[i]);
+          }
+
+          int pinSrcIndex = net[netIndex].sourceIdx;
+          int cellSrcIndex = -1;
+
+          if (pinSrcIndex >= 0)
+          {
+            cellSrcIndex = net[netIndex].arrPins[pinSrcIndex].cellIdx;
+          }
+          else
+            cellSrcIndex = pinSrcIndex;
+
+		      for(int z = 0; z < vecNodeR.size(); z++)
+			      if(cellSrcIndex == vecNodeR[z])
+			      {
+				       std::vector<int> tmp_ = vecNodeR;
+				       vecNodeR = vecNodeL;
+				       vecNodeL = tmp_;
+				       break;
+			      }
+
+		      node[myCircuit->nNodes].width = bufInfo[bufType].info->SizeX;
+          node[myCircuit->nNodes].height = bufInfo[bufType].info->SizeY;
+          node[myCircuit->nNodes].type =  bufInfo[bufType].info;
+
+          pl[myCircuit->nNodes].xCoord = fbiNode->x;
+          pl[myCircuit->nNodes].yCoord = fbiNode->y;
+          memcpy(pl[myCircuit->nNodes].orient, "N", 2);
+
+          char s[100];
+          struct _timeb timebuffer;
+          _ftime64_s( &timebuffer );
+
+          sprintf(s, "myBuffer%i_%I64u%i", myCircuit->nBuffers, timebuffer.time, timebuffer.millitm);
+          //names[myCircuit->nNodes] = *(new str(s));
+		      new ((void*)(&names[myCircuit->nNodes])) str(s);
+
+          std::vector<int> bufConnections;
+          bufConnections.push_back(netIndex);
+          bufConnections.push_back(myCircuit->nNets);
+
+          conn[myCircuit->nNodes] = bufConnections;
+
+          for(int i=0; i<vecNodeR.size(); i++)
+          {
+            //int qqq=vecR[i];
+            vector<int> &v = conn[vecNodeR[i]];
+            for (int j=0; j<v.size(); j++)
+            {
+                if( v[j] == netIndex)
+                {
+                  v[j] = myCircuit->nNets;
+                  break;
+                }
+            }
+          }
+
+          Pin *pinVecAll = new Pin[net[netIndex].numOfPins];
+          Pin *pinVecL = new Pin[net[netIndex].numOfPins];
+          Pin *pinVecR = new Pin[net[netIndex].numOfPins];
+
+          int numL = 0, numR = 0;
+
+          for(int i=0; i<net[netIndex].numOfPins; i++)
+            pinVecAll[i] = net[netIndex].arrPins[i];
+
+          for(int i=0; i<net[netIndex].numOfPins; i++)
+            for(int j=0; j<vecNodeL.size(); j++)
+            {
+              if(pinVecAll[i].cellIdx == vecNodeL[j])
+              {
+                pinVecL[numL] = pinVecAll[i];
+                numL++;
+                break;
+              }
+            }
+
+			pinVecL[numL].type = bufInfo[bufType].in;
+			pinVecL[numL].cellIdx = myCircuit->nNodes;
+			pinVecL[numL].chtype = 'I';
+			pinVecL[numL].routeInfo = NULL;
+			pinVecL[numL].xOffset = pl[myCircuit->nNodes].xCoord;
+			pinVecL[numL].yOffset = pl[myCircuit->nNodes].yCoord;
+
+          numL++;
+
+          for(int i=0; i<net[netIndex].numOfPins; i++)
+            for(int j=0; j<vecNodeR.size(); j++)
+            {
+              if(pinVecAll[i].cellIdx == vecNodeR[j])
+              {
+                pinVecR[numR] = pinVecAll[i];
+                numR++;
+                break;
+              }
+            }
+
+			pinVecR[numR].type = bufInfo[bufType].out;
+			pinVecR[numR].cellIdx = myCircuit->nNodes;
+			pinVecR[numR].chtype = 'O';
+			pinVecR[numR].routeInfo = NULL;
+			pinVecR[numR].xOffset = pl[myCircuit->nNodes].xCoord;
+			pinVecR[numR].yOffset = pl[myCircuit->nNodes].yCoord;
+          numR++;
+
+		  delete[] pinVecAll;
+
+		  Net &netIn = myCircuit->nets[netIndex], 
+			  &netOut = myCircuit->nets[myCircuit->nNets];
+
+          netOut.arrPins = pinVecR;
+          netOut.numOfPins=numR;
+		  netOut.currWL = myCircuit->nets[netIndex].currWL / 2; //Bug
+		  netOut.sourceIdx = numR-1; 
+
+		  char *qqq=new char[100];
+		  sprintf(qqq, "%s_%i_r", net[netIndex].name, myCircuit->nBuffers);
+		  netOut.name = qqq;
+
+		  netOut.arrivalOrder = NULL; //ReCalculate
+		  netOut.requiredOrder = NULL; //ReCalculate
+
+		  netOut.tree = NULL;
+
+		  //delete[] (char*)(netIn.arrPins);
+		  netIn.arrPins = pinVecL;
+          netIn.numOfPins=numL;
+		  netIn.currWL = myCircuit->nets[netIndex].currWL / 2; //Bug
+
+      bool exist = false;
+      int pinLIndex = -1;
+
+      for (int i=0; i<numL; i++)
+        if(pinVecL[i].cellIdx == cellSrcIndex)
+        {
+          pinLIndex = i;
+          exist = true;
+          break;
+        }
+
+      if(pinSrcIndex == NO_SOURCE)
+        pinLIndex = NO_SOURCE;
+      else
+        if(!exist)
+          pinLIndex = UKNOWN_INDEX;
+
+		  netIn.sourceIdx = pinLIndex; 
+
+		  qqq=new char[100];
+		  sprintf(qqq, "%s_%i_l", net[netIndex].name, myCircuit->nBuffers);
+		  delete[] netIn.name;
+          netIn.name = qqq;
+
+		  netIn.arrivalOrder = NULL; //ReCalculate
+		  netIn.requiredOrder = NULL; //ReCalculate
+
+          myCircuit->nNodes++;
+		  myCircuit->nNets++;
+		  myCircuit->nBuffers++;
+
+		  AdaptiveRoute(*myCircuit,myCircuit->nets[netIndex]); //In the end
+		  AdaptiveRoute(*myCircuit,myCircuit->nets[myCircuit->nNets - 1]); //In the end
+
+      bufcount++;
+		}
+      rl = rl->next;
+
+      break; //Test on one buffer
+    }
+    while(rl->next);
+
+}
+
+void InitFBI(Circuit *circuit)
+{
+  filename=(char *)malloc( STRSIZE*sizeof(char) );
+  nodes = (FBI_Node *)malloc( MAXNODE*sizeof(FBI_Node) );	
+  edges = (Edge *)malloc( MAXEDGE*sizeof(Edge) );
+
+	for(int i=0; i<MAXBUFFERTYPE; i++)
+		bufInfo[i] = GetBufferInfo("BUFX1", circuit);
+}
+
+void FinalizeFBI()
+{
+  free( nodes );
+  free( edges );
+  free( filename );
+}
+
+void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree,int netIndex, Circuit &circuit)
 {
   /* Van Ginneken list */
   RLnode *rl;
@@ -128,9 +452,17 @@ void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree)
   double sys, *k;
   double dtime = 0.0;
 
-  filename=(char *)malloc( STRSIZE*sizeof(char) );
-  nodes = (FBI_Node *)malloc( MAXNODE*sizeof(FBI_Node) );	
-  edges = (Edge *)malloc( MAXEDGE*sizeof(Edge) );
+  myCircuit = &circuit;
+  myCTree = tree;
+
+  n_candidates=0, n_buffertype=0;
+
+  //filename=(char *)malloc( STRSIZE*sizeof(char) );
+  //nodes = (FBI_Node *)malloc( MAXNODE*sizeof(FBI_Node) );	
+  //edges = (Edge *)malloc( MAXEDGE*sizeof(Edge) );
+  memset(filename, 0, STRSIZE*sizeof(char));
+  memset(nodes, 0, n_nodes*sizeof(FBI_Node));
+  memset(edges, 0, n_edges*sizeof(Edge));
 
   fp = stdin;
   debug = 0; 
@@ -145,12 +477,16 @@ void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree)
   InputLib(flib); //Get data for buffers (res, cap and delay)
   fclose(flib);
 
+
+
   r0=wre;
   c0=wcap;
   rd=tree->srcRes;
 
   //StNode *stNode=tree->nodes;
   ntree=MakeTree(tree->nodes);
+
+  myTree=ntree;
 
   if ( c == 1 ) {
     final_location_van = (Comp *)malloc(sizeof(Comp));
@@ -194,10 +530,16 @@ void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree)
   if (c == 1) {
     //printf("%10.10g\n", van_answer);
     printbuffer( final_location_van, &number_of_buffers );
-    tnslack+=van_answer;
+    tnslack += van_answer;
 
-    if(van_answer>-1.0) lowSlack++;
-    else highSlack++;
+    if(van_answer > -100.0) lowSlack++;
+    else 
+    {
+      highSlack++;
+      printf("%i: %f\n", highSlack, van_answer);
+    }
+
+    UpdateCircuit(rl, ntree, netIndex);
 
     list_delete( rl );
   } else {
@@ -209,16 +551,16 @@ void InsertBuffers(char *lib, double wcap, double wre, RoutingTree *tree)
     }
   }
 
-  bufcount+=number_of_buffers;
+  //bufcount+=number_of_buffers;
 
   if( t ) {
     printf("Maximum memory usage is %fM bytes \n", (float)max_space/(1024*1024));
     printf("Algorithm time is : %f seconds\n", sys);
   }
 
-  free( nodes );
-  free( edges );
-  free( filename );
+  //free( nodes );
+  //free( edges );
+  //free( filename );
 
   if( c == 2 ) {
     free ( NIL );

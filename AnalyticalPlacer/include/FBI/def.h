@@ -24,6 +24,8 @@
 /* Tree FBI_Node Structure */
 typedef struct NODE 
 {
+  int indexCirc; //ITLab 
+
   int index;      /* index of the node */
   double x;       /* x coordinate */
   double y;       /* y coordinate */
