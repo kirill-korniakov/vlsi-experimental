@@ -11,6 +11,8 @@
 #include "..\include\data_structures.h"
 #include <vector>
 
+using namespace DataStructures;
+
 int GetOptimalX(int* nodesIdx, int numOfNodes,
               Place* placement,
               const int numOfNets, Net* const nets, 

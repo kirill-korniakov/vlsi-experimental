@@ -11,7 +11,7 @@
 #include <algorithm>
 #include "math.h"
 
-using namespace MultilevelFramework;
+//using namespace MultilevelFramework;
 
 // all functions calculate wirelength for current placement  
 

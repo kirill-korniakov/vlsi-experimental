@@ -873,3 +873,64 @@ MULTIPLACER_ERROR ValidateKeys()
 {
   return OK;
 }
+
+int ReparsePl(const char* fileName, str* table, int numOfNT, Place* placement,
+               int &nBinRows, int &nBinCols)
+{
+  nBinRows = 1;
+  nBinCols = 1;
+
+  FILE *plFile;
+  char currString[128];
+  char tempString[128];
+  float x;
+  float y;
+  int counter = 0;
+  int paramCount = -1;
+  int idx;
+  float tempVal;
+  do
+  {
+    plFile = fopen(fileName, "r");
+  } while (plFile == NULL);
+  if (plFile)
+  {
+    fgets(currString, 128, plFile);
+    sscanf(currString, "%s %f", tempString, &tempVal);
+    if (strcmp(tempString, "UCLA") == 0)
+    {
+      while (!feof(plFile) && (counter < numOfNT))
+      {
+        fgets(currString, 128, plFile);
+        if (currString[0] == '#' && currString[1] != '_') continue;
+        else
+          if (currString[1] == '_')
+          {
+            char* pStr;
+            int nCols;
+            int nRows;
+            pStr = currString + 11;
+            sscanf(pStr, "%d x %d\n", &nRows, &nCols);
+            nBinRows = nRows;
+            nBinCols = nCols;
+            continue;
+          }
+          //if (strchr(currString, ':') == NULL) return 1;
+          paramCount = sscanf(currString, "%s %f %f", tempString, &x, &y);
+          if (paramCount == -1) continue;
+          idx = findNameBS(newTable, 0, numOfNT, tempString);
+          //int tmp = idx;
+          idx = newTable[idx].cellIdx;
+          placement[idx].xCoord = x;
+          placement[idx].yCoord = y;
+          /*placement[counter].xCoord = x;
+          placement[counter].yCoord = y;*/
+          strcpy(placement[idx].orient, "N");
+          counter++;
+      }
+    }
+    fclose(plFile);
+  }
+  //cout << "finish parsing pl file\n";
+  return 0;
+}

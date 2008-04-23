@@ -2,6 +2,7 @@
 #define _ROUTETREES_H_
 
 #include "data_structures.h"
+using namespace DataStructures;
 
 //creating and deleting routing points
 StNodeEx* CreateNodeEx();

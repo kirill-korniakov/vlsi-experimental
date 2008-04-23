@@ -11,9 +11,10 @@
 #define _COST_FUNCTION_H_
 
 #include "..\include\data_structures.h"
-#include "..\include\multilevel_framework.h"
 
 #define UPDATE_NETS_WLS true
+
+using namespace DataStructures;
 
 /// this function calculates wirelength for current placement,
 /// it recalculates half-perimeter of bounding rectangular for each net

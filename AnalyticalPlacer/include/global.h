@@ -25,6 +25,8 @@
 #define NUM_STAGES     7
 #define MAX_NUM_PARAMS 15
 
+using namespace DataStructures;
+
 struct Options
 {
   bool doGlobalPlacement;

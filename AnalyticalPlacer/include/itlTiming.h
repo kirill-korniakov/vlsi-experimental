@@ -2,7 +2,7 @@
 #define _ITLTIMING_H_
 
 #include "data_structures.h"
-
+using namespace DataStructures;
 //Elmore delays calculating
 void CalculateDalays(Circuit& circuit, Net& Net);
 void HPWLTiming(Circuit& circuit, Net& net);
