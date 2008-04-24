@@ -146,84 +146,6 @@ void CalculateDalays(Circuit& circuit, Net& Net)
             HPWLTiming(circuit,Net);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//true if node with "nodeIndex" index contains source of net with "netIndex" index 
-//bool IsSource(Circuit& c, int nodeIndex, int netIndex)
-//{
-//    if(c.nets[netIndex].sourceIdx >= 0)
-//        return c.nets[netIndex].arrPins[c.nets[netIndex].sourceIdx].cellIdx == nodeIndex;
-//    for(int i = 0; i < c.nets[netIndex].numOfPins; i++)
-//        if(c.nets[netIndex].arrPins[i].chtype == 'O')
-//        {
-//            c.nets[netIndex].sourceIdx = i;
-//            if(c.nets[netIndex].arrPins[i].cellIdx == nodeIndex)
-//                return true;
-//            else
-//                return false;//don't support multiple sources
-//        }
-//    if(c.nets[netIndex].arrPins[0].cellIdx == nodeIndex)
-//    {
-//        c.nets[netIndex].sourceIdx = 0;
-//        return true;
-//    }
-//    return false;
-//}
-//
-//void Initialize(Circuit& circuit)
-//{
-//    
-//
-//    //calculate number of input dependencies for each node
-//    int totalElements = circuit.nNodes+circuit.nTerminals;
-//    int* waitedNetsCount = new int[totalElements];
-//    for(int q = 0; q < totalElements; q++) 
-//    {
-//        waitedNetsCount[q] = 0;
-//        for(size_t t = 0; t < circuit.tableOfConnections[q].size(); t++)
-//            if(!IsSource(circuit,q,circuit.tableOfConnections[q][t]))
-//                waitedNetsCount[q]++;
-//    }
-//
-//    Net __top;
-//    Net* current = &__top;
-//
-//    //perform queues for determining net order
-//    std::queue<int> readyNets;
-//    std::queue<int> readyNodes;
-//    for(int a1 = 0; a1 < circuit.nPrimaryInputs; a1++)
-//        readyNodes.push(circuit.primaryInputs[a1]);
-//
-//    while(!readyNodes.empty())
-//    {
-//        while(!readyNodes.empty())
-//        {
-//            int nodeIndex = readyNodes.front();
-//            readyNodes.pop();
-//            for(size_t k = 0; k < circuit.tableOfConnections[nodeIndex].size(); k++)
-//                if(IsSource(circuit,nodeIndex,circuit.tableOfConnections[nodeIndex][k]))
-//                    readyNets.push(circuit.tableOfConnections[nodeIndex][k]);
-//        }
-//        while(!readyNets.empty())
-//        {
-//            int netIndex = readyNets.front();
-//            readyNets.pop();
-//            current = current->arrivalOrder = circuit.nets + netIndex;
-//            bool hasRealSource = false;
-//            for(int k = 1; k < current->numOfPins; k++)
-//                if(current->arrPins[k].chtype == 'O')
-//                    hasRealSource = true;
-//                else
-//                    if(!(waitedNetsCount[current->arrPins[k].cellIdx]-=1))
-//                        readyNodes.push(current->arrPins[k].cellIdx);
-//            if(hasRealSource)
-//                if(!(waitedNetsCount[current->arrPins[0].cellIdx]-=1))
-//                        readyNodes.push(current->arrPins[0].cellIdx);
-//        }
-//    }
-//    circuit.firstArrival = __top.arrivalOrder;
-//    delete[] waitedNetsCount;
-//}
-
 void PrintPrev(Circuit& c, int nodeID)
 {
     cout << "---------" << endl;
@@ -247,8 +169,8 @@ void MakeTimingLists(Circuit& c)
 {
     int* netDegrees = new int[c.nNets];
     int* netDegrees_2 = new int[c.nNets];
-    int* nodeDegrees = new int[c.nNodes + c.nTerminals];
-    for(int q = 0; q < c.nNodes + c.nTerminals; q++)
+    int* nodeDegrees = new int[c.Shift_ + c.nTerminals];
+    for(int q = 0; q < c.Shift_ + c.nTerminals; q++)
         nodeDegrees[q] = 0;
     for(int i = 0; i < c.nNets; i++)
     {

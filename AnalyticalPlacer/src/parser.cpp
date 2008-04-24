@@ -309,6 +309,7 @@ int ParseNodes(const char* fileName, Circuit& circuit)
     nodesFile >> curr;
   }
   circuit.nNodes -= circuit.nTerminals;
+  circuit.Shift_ = circuit.nNodes;
   circuit.tableOfNames = new str[circuit.nNodes+circuit.nTerminals];
   circuit.nodes = new Node[circuit.nNodes+circuit.nTerminals];
   circuit.terminals = circuit.nodes+circuit.nNodes;

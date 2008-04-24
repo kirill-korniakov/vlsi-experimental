@@ -147,6 +147,7 @@ int netStartCB(defrCallbackType_e c, int number, defiUserData ud)
 
 	int node_space = allnodes * 2 + BUF_COUNT_RESERVE+1;
 	int first_terminal = node_space - data->circuit->nTerminals - pins;
+  data->circuit->Shift_ = first_terminal;
 
     Node* nodes = new Node[node_space];
     {

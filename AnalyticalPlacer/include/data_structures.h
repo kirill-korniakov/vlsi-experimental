@@ -499,6 +499,7 @@ namespace DataStructures
     int*   primaryOutputs;   /// Indexes of primary outputs. WARNING: indexes calculated from beginning of nodes array.
     Net*   firstArrival;     /// Entry point for arrival time calculation.
     Net*   firstRequired;    /// Entry point for required time calculation.
+    int    Shift_;
 
     Circuit() 
     {
@@ -517,7 +518,7 @@ namespace DataStructures
         firstArrival = 0,        firstRequired = 0,     tableOfNames = 0,
         tableOfConnections = 0,  rowTerminalBorders = 0;
 
-        nBuffers = 0;
+        nBuffers = 0;            Shift_ = 0;
     }
   };
 
