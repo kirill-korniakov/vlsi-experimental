@@ -154,7 +154,8 @@ int ParseAux(const char* fileName, Circuit& circuit)
     dirName[auxFileDirEnd-fileName+1]=0;
   }
   else strcpy(dirName,"");
-  std::ifstream auxFile(fileName);
+  //std::ifstream auxFile(fileName);
+  FILE * auxFile   = fopen(fileName, "r");
   char * newNets   = 0;
   char * newNodes  = 0;
   char * newWts  = 0;
@@ -162,48 +163,50 @@ int ParseAux(const char* fileName, Circuit& circuit)
   char * newScl   = 0;
   char * newLEF   = 0;
   char * newDEF   = 0;
-  char word1[100], word2;
+  //char word1[100], word2;
+  char string[128];
 
   if (auxFile || (gOptions.lefName && gOptions.defName)) // while all ok - the file exists
   {
     cout << "parsing aux file...\n";
-    char curr = auxFile.peek();
-    delCommentsAndSpaces(auxFile);
-    auxFile >> word1;
-    delCommentsAndSpaces(auxFile);
-    auxFile >> word2;
-    if (word2 != ':')
+    fgets(string, 256, auxFile);
+    char* curr = NULL;
+    curr = strchr(string, ':');
+    if (!curr)
     {
       cout << "Bad format aux file!";
-      return 1;
     }
-    delCommentsAndSpaces(auxFile);
+    while (curr[1] == ' ') curr++;
+    curr++;
+    //String = curr;
     int i;
-    char fileNames[fileNum][100];
-    char tempStr[100];
-    for (i = 0; i < fileNum; ++i)
+    int paramCount = 0;
+    char fileNames[fileNum][256];
+    char Names[fileNum][256];
+    //char tempStr[256];
+    paramCount = sscanf(curr, "%s %s %s %s %s", Names[0], Names[1], Names[2], Names[3], Names[4]);
+    for (i = 0; i < min(fileNum, paramCount); ++i)
     {
-      auxFile >> tempStr;
-      sprintf(fileNames[i],dirName);
-      strcat(fileNames[i],tempStr);
-      delCommentsAndSpaces(auxFile);
+      sprintf(fileNames[i], dirName);
+      strcat(fileNames[i], Names[i]);
     }
-    for(int j=0; j < fileNum; ++j)
+    char *lastDot = NULL;
+    for(int j=0; j < min(fileNum, paramCount); ++j)
     {
-      if (strstr(fileNames[j],".nets")) newNets =fileNames[j];
-      else if (strstr(fileNames[j],".NETS")) newNets =fileNames[j];
-      else if (strstr(fileNames[j],".nodes"))newNodes=fileNames[j];
-      else if (strstr(fileNames[j],".NODES"))newNodes=fileNames[j];
-      else if (strstr(fileNames[j],".wts"))  newWts  =fileNames[j];
-      else if (strstr(fileNames[j],".WTS"))  newWts  =fileNames[j];
-      else if (strstr(fileNames[j],".pl"))   newPl =fileNames[j];
-      else if (strstr(fileNames[j],".PL"))   newPl =fileNames[j];
-      else if (strstr(fileNames[j],".scl"))  newScl =fileNames[j];
-      else if (strstr(fileNames[j],".SCL"))  newScl =fileNames[j];
-      else if (strstr(fileNames[j],".lef"))  newLEF =fileNames[j];
-      else if (strstr(fileNames[j],".LEF"))  newLEF =fileNames[j];
-      else if (strstr(fileNames[j],".def"))  newDEF =fileNames[j];
-      else if (strstr(fileNames[j],".DEF"))  newDEF =fileNames[j];
+      if (strstr(fileNames[j],".nets")) newNets      = fileNames[j];
+      else if (strstr(fileNames[j],".NETS")) newNets = fileNames[j];
+      else if (strstr(fileNames[j],".nodes"))newNodes= fileNames[j];
+      else if (strstr(fileNames[j],".NODES"))newNodes= fileNames[j];
+      else if (strstr(fileNames[j],".wts"))  newWts  = fileNames[j];
+      else if (strstr(fileNames[j],".WTS"))  newWts  = fileNames[j];
+      else if (strstr(fileNames[j],".pl"))   newPl   = fileNames[j];
+      else if (strstr(fileNames[j],".PL"))   newPl   = fileNames[j];
+      else if (strstr(fileNames[j],".scl"))  newScl  = fileNames[j];
+      else if (strstr(fileNames[j],".SCL"))  newScl  = fileNames[j];
+      else if (strstr(fileNames[j],".lef"))  newLEF  = fileNames[j];
+      else if (strstr(fileNames[j],".LEF"))  newLEF  = fileNames[j];
+      else if (strstr(fileNames[j],".def"))  newDEF  = fileNames[j];
+      else if (strstr(fileNames[j],".DEF"))  newDEF  = fileNames[j];
     }
     int res = 0;
 
@@ -219,6 +222,7 @@ int ParseAux(const char* fileName, Circuit& circuit)
         newDEF = gOptions.defName;
       }
       ParseLEFDEF(newLEF, newDEF, circuit);
+      ParseNetWeights(gOptions.netWeightsName, circuit);
     }
     else
     {
@@ -260,6 +264,40 @@ int ParseAux(const char* fileName, Circuit& circuit)
   return 0;
 }
 
+int ParseNetWeights(char* fileName, Circuit& circuit)
+{
+  if (fileName == 0)
+  {
+    cout << "Parser message: null pointer on net-weights file. Net-weights are not considered";
+    return 1;
+  }
+
+  FILE *netWeightsFile;
+  char currString[32];
+  char tempString[32];
+  
+  netWeightsFile = fopen(fileName, "r");
+  if (netWeightsFile)
+  {
+    circuit.netWeights = new double[circuit.nNets];
+
+    for (int i = 0; i < circuit.nNets && !feof(netWeightsFile); ++i)
+    {
+      fgets(currString, 32, netWeightsFile);
+      sscanf(currString, "%f", tempString, &circuit.netWeights[i]);
+    }
+
+    fclose(netWeightsFile);
+  }
+  else
+  {
+    cout << "Couldn't open net-weights file \"" << fileName << "\"" << endl;
+    return 2;
+  }
+
+  return 0;
+}
+
 int ParseNodes(const char* fileName, Circuit& circuit)
 {
   if (fileName == 0)
@@ -268,103 +306,78 @@ int ParseNodes(const char* fileName, Circuit& circuit)
     return 1;
   }
   cout << "parsing nodes file...\n";
-  ifstream nodesFile(fileName);
-  //TODO: check file existance
-  delCommentsAndSpaces(nodesFile);
-  char curr[100];
-  char temp;
-  nodesFile >> curr;
-  if (!strcmp(curr,"UCLA"))
+  FILE *nodesFile;
+  char currString[128];
+  char tempString[128];
+  char atempString[128];
+  //char* pVal;
+  int value;
+  int value2;
+  int paramCount = -1;
+  int termCount = 0;
+  int nodesCount = 0;
+  circuit.nNodes = 0;
+  circuit.nTerminals = 0;
+  int firstParams = 0;
+  float tempVal;
+  nodesFile = fopen(fileName, "r");
+  if (nodesFile)
   {
-    temp = nodesFile.get();
-    while(temp != '\n')
+    fgets(currString, 128, nodesFile);
+    sscanf(currString, "%s %f", tempString, &tempVal);
+    if (strcmp(tempString, "UCLA") == 0)
     {
-      temp = nodesFile.get();
-    }
-  }
-  delCommentsAndSpaces(nodesFile);
-  nodesFile >> curr;
-  while (!(strcmp(curr,"NumNodes")) || !(strcmp(curr,"NumTerminals")))
-  {
-    delCommentsAndSpaces(nodesFile);
-    nodesFile >> temp;
-    if (temp != ':')
-    {
-      cout << "Bad nodes file.\n";
-      return 1;
-    }
-    int num;
-    nodesFile >> num;
-    if (!strcmp(curr,"NumNodes"))
-    {
-      circuit.nNodes = num;
-      //circuit.tableOfNames = new str[circuit.nNodes];
-    }
-    if (!strcmp(curr,"NumTerminals"))
-    {
-      circuit.nTerminals = num;
-      //circuit.terminals = new Node[circuit.nTerminals];
-    }
-    delCommentsAndSpaces(nodesFile);
-    nodesFile >> curr;
-  }
-  circuit.nNodes -= circuit.nTerminals;
-  circuit.Shift_ = circuit.nNodes;
-  circuit.tableOfNames = new str[circuit.nNodes+circuit.nTerminals];
-  circuit.nodes = new Node[circuit.nNodes+circuit.nTerminals];
-  circuit.terminals = circuit.nodes+circuit.nNodes;
-  int termCount = 0, nodesCount = 0;
-  char tmp_name[20];
-  float tmp_width, tmp_height;
-  strcpy(tmp_name,curr);
-  nodesFile >> tmp_width;
-  delFSpaces(nodesFile);
-  nodesFile >> tmp_height;
-  delCommentsAndSpaces(nodesFile);
-  nodesFile >> curr;
-  if (!strcmp(curr,"terminal"))
-  {
-    circuit.terminals[termCount].height = static_cast<int>(tmp_height);
-    circuit.terminals[termCount].width = static_cast<int>(tmp_width);
-    strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tmp_name);
-    ++termCount;
-    delCommentsAndSpaces(nodesFile);
-    nodesFile >> curr;
-  }
-  else
-  {
-    circuit.nodes[nodesCount].height = static_cast<int>(tmp_height);
-    circuit.nodes[nodesCount].width = static_cast<int>(tmp_width);
-    strcpy(circuit.tableOfNames[nodesCount].name, tmp_name);
-    ++nodesCount;
-  }
-  int i;
-  numOfNT = circuit.nNodes+circuit.nTerminals;
-  for(i = 1; i < numOfNT; ++i)
-  {
-    strcpy(tmp_name,curr);
-    nodesFile >> tmp_width;
-    delFSpaces(nodesFile);
-    nodesFile >> tmp_height;
-    delCommentsAndSpaces(nodesFile);
-    nodesFile >> curr;
-    if (!strcmp(curr,"terminal"))
-    {
-      circuit.terminals[termCount].height = static_cast<int>(tmp_height);
-      circuit.terminals[termCount].width = static_cast<int>(tmp_width);
-      strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tmp_name);
-      ++termCount;
-      delCommentsAndSpaces(nodesFile);
-      nodesFile >> curr;
-    }
-    else
-    {
-      circuit.nodes[nodesCount].height = static_cast<int>(tmp_height);
-      circuit.nodes[nodesCount].width = static_cast<int>(tmp_width);
-      strcpy(circuit.tableOfNames[nodesCount].name, tmp_name);
-      ++nodesCount;
-    }
+      while (circuit.nNodes == 0 || circuit.nTerminals == 0)
+      {
+        currString[0] = '\0';
+        fgets(currString, 128, nodesFile);
+        if (currString[0] == '#') continue;
+        paramCount = sscanf(currString, "%s : %d", tempString, &value);
+        if (paramCount == -1) continue;
+        if (stricmp(tempString, "NumNodes") == 0)
+        {
+          circuit.nNodes = value;
+          firstParams++;
+          continue;
+        }
+        if (stricmp(tempString, "NumTerminals") == 0)
+        {
+          circuit.nTerminals = value;
+          firstParams++;
+          continue;
+        }
+      }
+      circuit.nNodes -= circuit.nTerminals;
+      circuit.Shift_ = circuit.nNodes;
+      circuit.tableOfNames = new str[circuit.nNodes+circuit.nTerminals];
+      circuit.nodes = new Node[circuit.nNodes+circuit.nTerminals];
+      circuit.terminals = circuit.nodes+circuit.nNodes;
+      numOfNT = circuit.nNodes+circuit.nTerminals;
 
+      if (firstParams == 2)
+      {
+        for (int i = 0; i < circuit.nNodes + circuit.nTerminals; i++)
+        {
+          fgets(currString, 128, nodesFile);
+          paramCount = sscanf(currString, "%s %d %d %s", tempString, &value, &value2, atempString);
+          if (paramCount == 3)
+          {
+            circuit.nodes[nodesCount].width    = value ;
+            circuit.nodes[nodesCount].height   = value2 ;
+            strcpy(circuit.tableOfNames[nodesCount].name, tempString);
+            nodesCount++;
+          }
+          else
+          {
+            circuit.terminals[termCount].width  = value;
+            circuit.terminals[termCount].height = value2;
+            strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tempString);
+            termCount++;
+          }
+        }
+      }
+    }
+    fclose(nodesFile);
   }
   //cout << "finish parsing nodes file\n";
   return 0;
@@ -598,6 +611,15 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
         strcpy(gOptions.lefName, argv[i+1]);
+        ++i;
+      }
+      continue;
+    }
+    else if (stricmp( argv[i], "-nw") == 0)
+    {
+      if (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        strcpy(gOptions.netWeightsName, argv[i+1]);
         ++i;
       }
       continue;
@@ -873,65 +895,4 @@ int ParseNets(const char* fileName, Circuit& circuit)
 MULTIPLACER_ERROR ValidateKeys()
 {
   return OK;
-}
-
-int ReparsePl(const char* fileName, str* table, int numOfNT, Place* placement,
-               int &nBinRows, int &nBinCols)
-{
-  nBinRows = 1;
-  nBinCols = 1;
-
-  FILE *plFile;
-  char currString[128];
-  char tempString[128];
-  float x;
-  float y;
-  int counter = 0;
-  int paramCount = -1;
-  int idx;
-  float tempVal;
-  do
-  {
-    plFile = fopen(fileName, "r");
-  } while (plFile == NULL);
-  if (plFile)
-  {
-    fgets(currString, 128, plFile);
-    sscanf(currString, "%s %f", tempString, &tempVal);
-    if (strcmp(tempString, "UCLA") == 0)
-    {
-      while (!feof(plFile) && (counter < numOfNT))
-      {
-        fgets(currString, 128, plFile);
-        if (currString[0] == '#' && currString[1] != '_') continue;
-        else
-          if (currString[1] == '_')
-          {
-            char* pStr;
-            int nCols;
-            int nRows;
-            pStr = currString + 11;
-            sscanf(pStr, "%d x %d\n", &nRows, &nCols);
-            nBinRows = nRows;
-            nBinCols = nCols;
-            continue;
-          }
-          //if (strchr(currString, ':') == NULL) return 1;
-          paramCount = sscanf(currString, "%s %f %f", tempString, &x, &y);
-          if (paramCount == -1) continue;
-          idx = findNameBS(newTable, 0, numOfNT, tempString);
-          //int tmp = idx;
-          idx = newTable[idx].cellIdx;
-          placement[idx].xCoord = x;
-          placement[idx].yCoord = y;
-          /*placement[counter].xCoord = x;
-          placement[counter].yCoord = y;*/
-          strcpy(placement[idx].orient, "N");
-          counter++;
-      }
-    }
-    fclose(plFile);
-  }
-  //cout << "finish parsing pl file\n";
-  return 0;
 }

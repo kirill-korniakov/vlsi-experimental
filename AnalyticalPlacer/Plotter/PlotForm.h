@@ -41,7 +41,7 @@ namespace Plotter {
 				delete components;
 			}
 		}
-  private: System::Windows::Forms::PictureBox^  pbPlotter;
+  public: System::Windows::Forms::PictureBox^  pbPlotter;
   protected: 
 
 	private:
@@ -71,6 +71,7 @@ namespace Plotter {
       this->pbPlotter->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
       this->pbPlotter->TabIndex = 0;
       this->pbPlotter->TabStop = false;
+      this->pbPlotter->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &PlotForm::pbPlotter_Paint);
       // 
       // PlotForm
       // 
@@ -90,6 +91,13 @@ namespace Plotter {
            {
              this->Visible = false;
              e->Cancel  = true;
+           }
+  private: System::Void pbPlotter_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e)
+           {
+             /*Graphics^ grfx = e->Graphics;
+             Pen^ pen = gcnew Pen(Color::Blue);
+             Brush^ br = gcnew SolidBrush(Color::Blue);
+             grfx->FillRectangle(br, 0, 0, 200, 200);*/
            }
   };
 }

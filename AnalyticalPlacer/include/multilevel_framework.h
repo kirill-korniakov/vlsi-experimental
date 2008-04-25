@@ -75,10 +75,25 @@ namespace MultilevelFramework
     size_t size;  // end index of clusters in "vector<int> cellIdxs" of the result cluster
   };
 
+  struct NetWithWeight 
+  {
+    vector<int> clusterIdxs;
+    double      weight;
+    NetWithWeight()
+    {
+      weight = 0.0;
+    }
+    //size_t size()
+    //{
+    //  return clusterIdxs.size();
+    //}
+  };
+
   typedef list<ClusteredNodes> ClusteringInfoAtEachLevel;
 
   // перечень существующих соединений между кластерами
   typedef vector<vector<int>> NetList;
+  //typedef vector<NetWithWeight> NetList;
   
   // перечень индексов соединений, в которые входит текущий кластер
   typedef vector<int> ConnectionsList;

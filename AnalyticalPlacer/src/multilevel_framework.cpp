@@ -80,6 +80,14 @@ void PrintTerminationReason(TaoTerminateReason reason)
   PetscPrintf(MPI_COMM_WORLD, "\n");
 }
 
+void UpdateNetWeights(double* netWeights, NetList& netList)
+{
+  int netListSize = static_cast<int>(netList.size());
+  for (int i = 0; i < netListSize; ++i)
+  {
+  }
+}
+
 void MultilevelFramework::Merge(vector<int>& a, vector<int>& b, int result[])
 {
   long size1 = static_cast<int>(a.size());
@@ -332,43 +340,12 @@ void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, 
   }
   user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
   
-  ComputeNetWeights(circuit, clusters, netList, netWeights);
-  user.netWeights = netWeights;
+  /*ComputeNetWeights(circuit, clusters, netList, netWeights);
+  user.netWeights = netWeights;*/
 
   LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");
 }
 
-void MultilevelFramework::ComputeNetWeights(Circuit& circuit, vector<Cluster>& clusters, 
-                                            NetList& netList, double* netWeights)
-{
-  MakeTimingLists(circuit);
-  cout << "initialize success" << endl;
-  PropagateArrivalTime(circuit,true,true);
-  cout << "arrival times calculated" << endl;
-  PrintCircuitArrivals(circuit);
-  PropagateRequiredTime(circuit,false,false);
-  cout << "required times calculated" << endl;
-
-  double* nodesSlack = new double[circuit.nNodes];
-  double maxNodeSlack = -1e10;
-
-  for (int i = 0; i < circuit.nNodes; ++i)
-  {
-    nodesSlack[i] = circuit.placement[i].arrivalTime - circuit.placement[i].requiredTime;
-    if (maxNodeSlack < nodesSlack[i])
-    {
-      maxNodeSlack = nodesSlack[i];
-    }
-  }
-
-  netWeights = new double[netList.size()];
-  for (int i = 0; i < static_cast<int>(netList.size()); ++i)
-  {
-    netWeights[i] = 10.0;
-  }
-
-  delete[] nodesSlack;
-}
 
 // todo: check if all the memory released
 void MultilevelFramework::DeinitializeOptimizationProblemParameters(AppCtx &user)
@@ -806,15 +783,16 @@ MULTIPLACER_ERROR MultilevelFramework::Clusterize(Circuit& circuit, vector<Clust
       if (clusters[i].isFake == true)
         ++numOfFakes;
     }
-
-    delete[] netListSizes;
     
+    delete[] netListSizes;
+
     // update netList again
     NetList::iterator netListIterator;
     sort(netList.begin(), netList.end(), PredicateNetListLess);
-    /*netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
-    netList.resize(netListIterator - netList.begin());*/
-    
+    UpdateNetWeights(circuit.netWeights, netList);
+    netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
+    netList.resize(netListIterator - netList.begin());
+
     netListIterator = netList.begin();
     while (netListIterator->size() < 2) ++netListIterator;
     netList.erase(netList.begin(), netListIterator);

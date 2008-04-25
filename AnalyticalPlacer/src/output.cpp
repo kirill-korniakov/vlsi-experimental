@@ -673,3 +673,35 @@ void PrintNetsToRouterFormat(Circuit& circuit)
   }
   out.close();
 }
+
+void DumpNetWeights(char* fileName, Circuit& circuit)
+{
+  if (fileName == 0)
+  {
+    cout << "null pointer on dumping net-weights file. Skipping net-weights dump\n";
+    return;
+  }
+
+  if (!gOptions.isLEFDEFinput)
+  {
+    cout << "Skipping dumping net-weights step\n";
+    return;
+  }
+
+  FILE *netWeightsFile;
+  char currString[32];
+
+  netWeightsFile = fopen(fileName, "w");
+  if (netWeightsFile && circuit.netWeights != NULL)
+  {
+    cout << "Dumping net-weights to " << fileName << endl;
+
+    for (int i = 0; i < circuit.nNets; ++i)
+    {
+      sprintf(currString, "%f", circuit.netWeights[i]);
+      fputs(currString, netWeightsFile);
+    }
+
+    fclose(netWeightsFile);
+  }
+}

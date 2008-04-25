@@ -52,6 +52,7 @@ MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit)
 
   cout << "itlAnalyticalPlacer started to parse \"" << gOptions.benchmarkName << "\"\n";
   errorCode = ParseAux(gOptions.benchmarkName, circuit);
+  //errorCode = ParseAux("C:\\Documents and Settings\\Живодеров Артем\\Рабочий стол\\trunk\\AnalyticalPlacer\\WorkDir\\ibm01\\ibm01.aux", circuit);
   if (errorCode != OK) return errorCode;
   cout << "Files parsed successfully.\n";
 
@@ -127,9 +128,10 @@ void SetDefaultKeysValues()
   gOptions.doDumpGP              = false;
   gOptions.onlyGP                = false;
 
-  gOptions.benchmarkName[0] = '\0';
-  gOptions.plName[0] = '\0';
-  gOptions.configName[0] = '\0';
+  gOptions.benchmarkName[0]  = '\0';
+  gOptions.plName[0]         = '\0';
+  gOptions.configName[0]     = '\0';
+  gOptions.netWeightsName[0] = '\0';
 }
 
 void CheckCode(MULTIPLACER_ERROR errorCode)

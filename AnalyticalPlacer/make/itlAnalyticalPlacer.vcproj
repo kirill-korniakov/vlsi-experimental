@@ -332,6 +332,14 @@
 				<File
 					RelativePath="..\src\directed_bin_swapping.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\global_placement.cpp"

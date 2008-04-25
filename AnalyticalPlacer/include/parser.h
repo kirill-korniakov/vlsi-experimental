@@ -45,8 +45,9 @@ int ParseScl(const char* fileName, Circuit& circuit);
 int ParsePl(const char* fileName, Circuit& circuit);
 int ParseWts(const char* fileName, Circuit& circuit);
 int ParseNets(const char* fileName, Circuit& circuit);
-int ReparsePl(const char* fileName, str* table, int numOfNT, Place* placement,
-               int &nBinRows, int &nBinCols);
+int ParseNetWeights(char* fileName, Circuit& circuit);
+//int ReparsePl(const char* fileName, str* table, int numOfNT, Place* placement,
+//               int nBinRows, int nBinCols);
 
 int ParseLEFDEF(const char* lefname, const char* defname, Circuit& circuit);
 int ExportDEF(const char* defname, Circuit& circuit);

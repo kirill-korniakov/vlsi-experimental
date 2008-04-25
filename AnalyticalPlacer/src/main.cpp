@@ -168,6 +168,9 @@ int main(int argc, char* argv[])
 
   statistics.currentWL = cf_recalc_all(0, circuit.nNets, circuit.nets, circuit.placement);
 
+  ComputeNetWeights(circuit);
+  DumpNetWeights(gOptions.benchmarkName, circuit);
+
   // checking the legality of resulting placement
   errorCode = CheckLegalityOfPlacement(circuit);
   CheckCode(errorCode);

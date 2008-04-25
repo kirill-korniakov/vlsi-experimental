@@ -42,7 +42,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   MakeClustersFromBins(circuit, clusters, netList);
   currNClusters = circuit.nBinCols * circuit.nBinRows;
 #else
-  Clusterize(circuit, clusters, netList, netLevels, Affinity, clusteringLog, currNClusters);
+  //Clusterize(circuit, clusters, netList, netLevels, Affinity, clusteringLog, currNClusters);
 #endif
   CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
   // set initial placement

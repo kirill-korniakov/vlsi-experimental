@@ -25,4 +25,6 @@ void PrintPrev(Circuit& c, int nodeID);
 void PrintArrivalOrder(Circuit& circuit);
 void PrintRequiredOrder(Circuit& circuit);
 
+void ComputeNetWeights(Circuit& circuit);
+
 #endif // _ITLTIMING_H_

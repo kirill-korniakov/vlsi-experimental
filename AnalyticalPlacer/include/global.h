@@ -42,6 +42,7 @@ struct Options
   char lefName[256];
   char defName[256];
   char configName[256];
+  char netWeightsName[256];
   bool isLEFDEFinput;
 
   bool doDumpGP;
@@ -98,6 +99,7 @@ struct Statistics
 };
 
 void InitializeStatistics(Statistics& statistics);
+MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit);
 
 extern const char* resultFileName;
 

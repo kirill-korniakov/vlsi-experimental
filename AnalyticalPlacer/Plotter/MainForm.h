@@ -1,9 +1,16 @@
 #pragma once
+#pragma managed(push,off)
+
 #include "..\include\parser.h"
-#include "PlotForm.h"
 //#include "..\include\output.h"
 //#include "..\include\errors.h"
-//#include "..\include\global.h"
+#include "..\include\global.h"
+
+Circuit    circuit;
+
+#pragma managed(pop)
+
+#include "PlotForm.h"
 
 namespace Plotter {
 
@@ -13,9 +20,6 @@ namespace Plotter {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
-
-  extern str* table;
-  extern strExtend* newTable;
 
 	/// <summary>
 	/// Summary for MainForm
@@ -29,7 +33,7 @@ namespace Plotter {
 	public ref class MainForm : public System::Windows::Forms::Form
 	{
 	public:
-		MainForm(void)
+		MainForm()
 		{
       pf = gcnew PlotForm();
       pf->Visible = false;
@@ -54,6 +58,7 @@ namespace Plotter {
       InitializeComponent();
       ((Bitmap^)(btnBrowseBench->Image))->MakeTransparent(/*Color::FromArgb(255,255,0,255)*/);
       ((Bitmap^)(btnBrowsePL->Image))->MakeTransparent(/*Color::FromArgb(255,255,0,255)*/);
+      simpleSound = gcnew Media::SoundPlayer("c:\\Windows\\Media\\chimes.wav");
 		}
   private: System::Windows::Forms::Button^  btnExit;
   private: System::Windows::Forms::Button^  btnBrowsePL;
@@ -77,10 +82,79 @@ namespace Plotter {
     int circuitHeight;
     int oldFileLen;
     int newFileLen;
+
+    int imHeight;
+    int imWidth;
+    int imHeightShift;
+  private: System::Windows::Forms::CheckBox^  chbSlideShow;
+  private: System::Windows::Forms::Label^  label1;
+  public: 
     int logFilePos;
     void PlotPlacement()
     {
+      imHeight = pf->pbPlotter->Height;
+      imWidth  = pf->pbPlotter->Width;
+      imHeightShift  = 50;
+      imHeight -= imHeightShift;             // for text output
+      Graphics^ grfx = pf->pbPlotter->CreateGraphics();
+      //pf->pbPlotter->Brush->Color = clWhite;
+      grfx->DrawRectangle(gcnew Pen(Color::Blue), 1,1,500,500);
+      
+      ///*PlotForm->Image->Width,
+      //PlotForm->Image->Height ) );*/
+      //PlotCells( numOfNodes, numOfNodes + numOfTerminals, clBlack, true );
+      //if (chbCmp->Checked == false)
+      //  PlotCells( 0, numOfNodes, clBlue );
+      //else
+      //  PlotCells( 0, numOfNodes, clBlue, true, true );
+      //PlotBinGrid();
+      ////LabelMacros(0, numOfNodes + numOfTerminals);
+      ////PlotCells( numOfNodes, numOfNodes + numOfTerminals, clBlack, true );
 
+      //AnsiString String;
+      //const int textShift = imWidth / 6;
+      //const int textDistance = imWidth / 2;
+      //char str[512];
+      //char* p;
+
+      //strcpy( str, cbBenchmark->Text.c_str() );
+      //p = strrchr( str, '\\' );
+      //if (p != NULL)
+      //{
+      //  String = "Benchmark:  " + AnsiString( ++p );
+      //}
+      //else
+      //{
+      //  String = "Benchmark:  " + AnsiString( str );
+      //}
+      //PlotForm->Image->Canvas->Brush->Color = clWhite;
+      //PlotForm->Image->Canvas->TextOutA( 10 + textShift, 0, String );
+
+      //String = "# of nodes:  "     + AnsiString(numOfNodes);
+      //PlotForm->Image->Canvas->TextOutA( 10 + textShift, 14, String );
+
+      //strcpy( str, plFileName.c_str() );
+      //p = strrchr( str, '\\' );
+      //if (p != NULL)
+      //{
+      //  String = "pl file:  " + AnsiString( ++p );
+      //}
+      //else
+      //{
+      //  String = "pl file:  " + plFileName;
+      //}
+      //PlotForm->Image->Canvas->TextOutA( textDistance + textShift, 0, String );
+
+      //String = "# of terminals:  " + AnsiString(numOfTerminals);
+      //PlotForm->Image->Canvas->TextOutA( textDistance + textShift, 14, String );
+
+      //String = "# of rows:  " + AnsiString(numOfRows);
+      //PlotForm->Image->Canvas->TextOutA( 10 + textShift, 28, String );
+
+      //String = "# of nets:  "    + AnsiString(numOfNets);
+      ////String = "  Number of pins:  "    + AnsiString(numOfPins);
+      //PlotForm->Image->Canvas->TextOutA( textDistance + textShift, 28, String );
+      delete grfx;
     }
     void PlotCells( int first, int last, Color color, bool isSolid, bool isGradient )
     {
@@ -103,6 +177,9 @@ namespace Plotter {
     Place* placement  ;
     str* tableOfNames ;
     pBin **arrOfBins  ;
+    Media::SoundPlayer^ simpleSound;
+
+    //Circuit circuit;
 	protected:
 		/// <summary>
 		/// Clean up any resources being used.
@@ -148,6 +225,8 @@ namespace Plotter {
       this->btnBrowsePL = (gcnew System::Windows::Forms::Button());
       this->openAuxDialog = (gcnew System::Windows::Forms::OpenFileDialog());
       this->openPLDialog = (gcnew System::Windows::Forms::OpenFileDialog());
+      this->chbSlideShow = (gcnew System::Windows::Forms::CheckBox());
+      this->label1 = (gcnew System::Windows::Forms::Label());
       this->SuspendLayout();
       // 
       // cbBenchmark
@@ -157,6 +236,8 @@ namespace Plotter {
       this->cbBenchmark->Name = L"cbBenchmark";
       this->cbBenchmark->Size = System::Drawing::Size(552, 21);
       this->cbBenchmark->TabIndex = 0;
+      this->cbBenchmark->Text = L"C:\\Documents and Settings\\Живодеров Артем\\Рабочий стол\\trunk\\AnalyticalPlacer\\Wor" 
+        L"kDir\\ibm01\\ibm01.aux";
       // 
       // btnBrowseBench
       // 
@@ -222,11 +303,32 @@ namespace Plotter {
       this->openPLDialog->FileName = L"temp.pl";
       this->openPLDialog->Filter = L"Placement files(*.pl)|*.pl";
       // 
+      // chbSlideShow
+      // 
+      this->chbSlideShow->AutoSize = true;
+      this->chbSlideShow->Location = System::Drawing::Point(13, 134);
+      this->chbSlideShow->Name = L"chbSlideShow";
+      this->chbSlideShow->Size = System::Drawing::Size(106, 17);
+      this->chbSlideShow->TabIndex = 7;
+      this->chbSlideShow->Text = L"Create slideshow";
+      this->chbSlideShow->UseVisualStyleBackColor = true;
+      // 
+      // label1
+      // 
+      this->label1->AutoSize = true;
+      this->label1->Location = System::Drawing::Point(283, 202);
+      this->label1->Name = L"label1";
+      this->label1->Size = System::Drawing::Size(35, 13);
+      this->label1->TabIndex = 8;
+      this->label1->Text = L"label1";
+      // 
       // MainForm
       // 
       this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
       this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
       this->ClientSize = System::Drawing::Size(815, 706);
+      this->Controls->Add(this->label1);
+      this->Controls->Add(this->chbSlideShow);
       this->Controls->Add(this->btnBrowsePL);
       this->Controls->Add(this->btnExit);
       this->Controls->Add(this->btnPlot);
@@ -235,13 +337,85 @@ namespace Plotter {
       this->Controls->Add(this->cbBenchmark);
       this->Name = L"MainForm";
       this->Text = L"Plotter";
+      this->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainForm::MainForm_Paint);
       this->ResumeLayout(false);
+      this->PerformLayout();
 
     }
 #pragma endregion
-  private: System::Void btnPlot_Click(System::Object^  sender, System::EventArgs^  e) 
+  private: 
+    System::Void btnPlot_Click(System::Object^  sender, System::EventArgs^  e) 
            {
+             Circuit circuit;
+             //InitializeCircuit(circuit);
+             HINSTANCE h;
+
+             // Объявление указателя на функцию, вызываемой из DLL
+             // Обратите внимание – имена объявляемой функции и
+             // функции, вызываемой из DLL, могут и не совпадать,
+             // т.к. за выбор вызываемой функции отвечает
+             // GetProcAddress
+             MULTIPLACER_ERROR (*DllFunc) (Circuit& circuit);
+             int (*ParseAux) (const char* fileName, Circuit& circuit);
+
+             // Загружаем MyFirstDLL
+             h=LoadLibrary(L"itlParser.dll");
+
+             // Контроль ошибок – если загрузка прошла успешно,
+             // функция вернет что-то отличное от нуля
+             if (!h)
+             {
+               printf("Ошибка - не могу найти itlParser.dll\n");
+               return;
+             }
+
+             // Вызовом GetProcAddress получаем адрес функции Demo
+             // и присваиваем его указателю DllFunc с явным 
+             // приведением типов. Это необходимо т.к.
+             // GetProcAddress возвращает бестиповой far-указатель
+             DllFunc=(MULTIPLACER_ERROR (*) (Circuit& circuit))
+               GetProcAddress(h,"InitializeCircuit");
+             ParseAux = (int (*) (const char* fileName, Circuit& circuit))
+               GetProcAddress(h,"ParseAux");
+
+             // Контроль ошибок – если вызов функции GetProcAddress
+             // завершился успешно, она вернет ненулевой указатель
+             if (!ParseAux)
+             {
+               printf("Ошибка! В MyFirstDLL "
+                 "отсутствует ф-ция   Demo\n");
+               return;
+             }
+             /*String^ tmpStr = cbBenchmark->Text;
+             tmpStr->Replace(L"\\", L"\\\\");*/
+
+             char* auxFileNameChar = (char*) System::Runtime::InteropServices::Marshal::
+               StringToHGlobalAnsi(cbBenchmark->Text).ToPointer();
+             /*char* tmp = new char[strlen(auxFileNameChar) + 3];
+             char* pVal = tmp + 1;
+             strcpy(pVal, auxFileNameChar);
+             tmp[0] = '\"';
+             tmp[strlen(auxFileNameChar) + 1] = '\"';
+             tmp[strlen(auxFileNameChar) + 2] = '\0';*/
+             
+             //strcpy(tmp, "ibm01\\ibm01.aux");
+
+             //ParseAux("ibm01\\ibm01.aux", circuit);
+             //FILE * auxFile   = fopen(auxFileNameChar, "r");
+             //fgets(tmp, 20, auxFile);
+
+             int error = ParseAux(auxFileNameChar, circuit);
+             //ParseAux("D:\\Temp\\dma\\dma.aux", circuit);
+             //ParseAux("C:\\Documents and Settings\\Живодеров Артем\\Рабочий стол\\trunk\\AnalyticalPlacer\\WorkDir\\ibm01\\ibm01.aux", circuit);
+             label1->Text = (String^)(circuit.placement[0].xCoord).ToString();
+             //DllFunc(circuit);
+
+             // Выгрузка динамической библиотеки из памяти
+             FreeLibrary(h);
+
              pf->Show();
+             PlotPlacement();
+             
              //pf->Size = pf->MaximumSize;
            }
 private: System::Void btnExit_Click(System::Object^  sender, System::EventArgs^  e)
@@ -255,12 +429,12 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
              cbBenchmark->Text = openAuxDialog->FileName;
            }
          }
-
 private: 
-
-#pragma managed(push, off)
   System::Void button2_Click(System::Object^  sender, System::EventArgs^  e)
          {
+           String^ tmpStr;
+           Circuit circuit;
+           //InitializeCircuit(circuit);
            if (openPLDialog->ShowDialog() == ::DialogResult::OK)
            {
              char* plFileNameChar = (char*) System::Runtime::InteropServices::Marshal::
@@ -269,15 +443,15 @@ private:
              for (int i = 0; i < openPLDialog->FileNames->Length; i++)
              {
                plFileName = openPLDialog->FileNames[i];
-               char tmpStr[512];
+               //char tmpStr[512];
                //tmpStr = PtrToStringChars(plFileName);               
                if (i == 0) btnPlot->PerformClick();
                if (placement)
                {
                  if (i != 0)
-                   ReparsePl(plFileNameChar, table, numOfNodes + numOfTerminals, placement, nBinRows, nBinCols);
+                   //ReparsePl(plFileNameChar, table, numOfNodes + numOfTerminals, placement);
                  openPLDialog->Tag = 1;
-                 if (chbCmp->Checked)
+                 /*if (chbCmp->Checked)
                  {
                    int tmpX;
                    int tmpY;
@@ -289,24 +463,26 @@ private:
                      tmpY = tmpY << 8;
                      cellColors[i] += tmpY;
                    }
-                 }
+                 }*/
                  if (i != 0 && chbSlideShow->Checked == true)
                    PlotPlacement();
-                 if (/*OpenPLDialog->Files->Count > 1 && */chbSlideShow->Checked == true)
+                 if (chbSlideShow->Checked == true)
                  {
-                   tmpStr = OpenPLDialog->Files->Strings[i];
-                   tmpStr.SetLength(tmpStr.Length() - 2);
+                   tmpStr = openPLDialog->FileNames[i];
+                   tmpStr->Remove(tmpStr->Length - 2, 2);
                    tmpStr += "jpeg";
-                   jpegImage->Assign(PlotForm->Image->Picture->Bitmap);
-                   jpegImage->SaveToFile(tmpStr);
+                   /*jpegImage->Assign(PlotForm->Image->Picture->Bitmap);
+                   jpegImage->SaveToFile(tmpStr);*/
                  }
                  btnPlot->Tag = 1;
                }
              }
-             System::Runtime::InteropServices::Marshal::FreeHGlobal(plFileNameChar);
+             //System::Runtime::InteropServices::Marshal::FreeHGlobal(plFileNameChar);
            }
          }
-  #pragma managed(pop) 
+private: System::Void MainForm_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e)
+         {
+           //simpleSound->Play();
+         }
 };
 }
-
