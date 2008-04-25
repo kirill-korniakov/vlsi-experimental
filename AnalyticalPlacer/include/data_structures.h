@@ -501,6 +501,8 @@ namespace DataStructures
     Net*   firstRequired;    /// Entry point for required time calculation.
     int    Shift_;
 
+    double*   netWeights;
+
     Circuit() 
     {
         nNodes = 0,              nTerminals = 0,        nNets = 0,
@@ -519,6 +521,8 @@ namespace DataStructures
         tableOfConnections = 0,  rowTerminalBorders = 0;
 
         nBuffers = 0;            Shift_ = 0;
+
+        netWeights = NULL;
     }
   };
 
