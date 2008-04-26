@@ -374,19 +374,19 @@ void ComputeNetWeights(Circuit& circuit)
     return;
   }
   MakeTimingLists(circuit);
-  cout << "initialize success" << endl;
+  //cout << "initialize success" << endl;
   PropagateArrivalTime(circuit,true,true);
-  cout << "arrival times calculated" << endl;
+  //cout << "arrival times calculated" << endl;
   PrintCircuitArrivals(circuit);
   PropagateRequiredTime(circuit,false,false);
-  cout << "required times calculated" << endl;
+  //cout << "required times calculated" << endl;
 
-  double* nodesSlack = new double[circuit.nNodes];
+  double* nodesSlack = new double[circuit.Shift_ + circuit.nTerminals];
   double sumNodesSlack; // сумма слэков нодов в одном нете
   double maxNodeSlack = -1e10;
   int nodeIdx;
 
-  for (int i = 0; i < circuit.nNodes; ++i)
+  for (int i = 0; i < circuit.Shift_ + circuit.nTerminals; ++i)
   {
     nodesSlack[i] = circuit.placement[i].arrivalTime - circuit.placement[i].requiredTime;
     if (maxNodeSlack < nodesSlack[i])
@@ -403,6 +403,7 @@ void ComputeNetWeights(Circuit& circuit)
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
     {
       nodeIdx = circuit.nets[i].arrPins[j].cellIdx;
+      //if (nodeIdx >= circuit.Shift_)
       sumNodesSlack += nodesSlack[nodeIdx];
     }
 

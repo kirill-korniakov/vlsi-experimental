@@ -149,7 +149,7 @@ namespace MultilevelFramework
 
   void InitializeOptimizationProblemParameters(AppCtx &user, Circuit& circuit, 
     vector<Cluster>& clusters, NetList& netList, int nClusters, PetscInt** lookUpTable, 
-    vector<ConnectionsList>& currTableOfConnections, double* netWeights);
+    vector<ConnectionsList>& currTableOfConnections);
   void DeinitializeOptimizationProblemParameters(AppCtx &user);
   
   MULTIPLACER_ERROR Interpolation(Circuit& circuit, vector<Cluster>& clusters, 

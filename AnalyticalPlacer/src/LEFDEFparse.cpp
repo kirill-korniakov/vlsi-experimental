@@ -105,6 +105,12 @@ int ParseLEFDEF(const char *lefname, const char* defname, Circuit& circuit)
 
   StandardizeCells(circuit);
 
+  circuit.netWeights = new double[circuit.nNets];
+  for (int i = 0; i < circuit.nNets ; ++i)
+  {
+  	circuit.netWeights[i] = 1.0;
+  }
+
   //ShiftCoordinates(circuit, true);
 
   return 0;

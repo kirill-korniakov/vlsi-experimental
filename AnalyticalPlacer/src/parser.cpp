@@ -279,8 +279,6 @@ int ParseNetWeights(char* fileName, Circuit& circuit)
   netWeightsFile = fopen(fileName, "r");
   if (netWeightsFile)
   {
-    circuit.netWeights = new double[circuit.nNets];
-
     for (int i = 0; i < circuit.nNets && !feof(netWeightsFile); ++i)
     {
       fgets(currString, 32, netWeightsFile);

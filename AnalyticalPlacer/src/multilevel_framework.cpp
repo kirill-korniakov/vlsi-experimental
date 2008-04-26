@@ -276,8 +276,7 @@ int CalcMaxAffectedArea(double potentialSize, double binSize)
 void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, Circuit& circuit, 
                                                                   vector<Cluster>& clusters, NetList& netList, 
                                                                   int nClusters, PetscInt** lookUpTable, 
-                                                                  vector<ConnectionsList>& currTableOfConnections,
-                                                                  double* netWeights)
+                                                                  vector<ConnectionsList>& currTableOfConnections)
 {
   LogEnter("MultilevelFramework::InitializeOptimizationProblemParameters");
   user.circuit = &circuit;
@@ -340,8 +339,8 @@ void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, 
   }
   user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
   
-  /*ComputeNetWeights(circuit, clusters, netList, netWeights);
-  user.netWeights = netWeights;*/
+  /*ComputeNetWeights(circuit, clusters, netList, netWeights);*/
+  user.netWeights = circuit.netWeights;
 
   LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");
 }
@@ -449,7 +448,7 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   
   /* Initialize optimization problem parameters */
   InitializeOptimizationProblemParameters(user, circuit, clusters, netList, nClusters, 
-                                          &lookUpTable, currTableOfConnections, netWeights);
+                                          &lookUpTable, currTableOfConnections);
 
   /* Allocate vectors for the solution and gradient */
   info = VecCreateSeq(PETSC_COMM_SELF, nClusters * 2, &x); CHKERRQ(info);
@@ -789,9 +788,8 @@ MULTIPLACER_ERROR MultilevelFramework::Clusterize(Circuit& circuit, vector<Clust
     // update netList again
     NetList::iterator netListIterator;
     sort(netList.begin(), netList.end(), PredicateNetListLess);
-    UpdateNetWeights(circuit.netWeights, netList);
-    netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
-    netList.resize(netListIterator - netList.begin());
+    /*netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
+    netList.resize(netListIterator - netList.begin());*/
 
     netListIterator = netList.begin();
     while (netListIterator->size() < 2) ++netListIterator;
@@ -1505,8 +1503,10 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
   //double sum = 0.0;
   for (int i = 0; i < userData->nBinRows; ++i)
   {
+    //cout << "\ni = " << i << endl;
     for (int j = 0; j < userData->nBinCols; ++j)
     {
+      //cout << "j = " << j << "\t";
       totalPenalty += pow(userData->binPenalties[i][j].sumPotential - userData->meanBinArea, 2);
       //sum += userData->binPenalties[i][j].sumPotential;
       //cout << "SP["<<i<<"]["<<j<<"]=" << userData->binPenalties[i][j].sumPotential << "\t";

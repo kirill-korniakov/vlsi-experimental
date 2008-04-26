@@ -698,7 +698,7 @@ void DumpNetWeights(char* fileName, Circuit& circuit)
 
     for (int i = 0; i < circuit.nNets; ++i)
     {
-      sprintf(currString, "%f", circuit.netWeights[i]);
+      sprintf(currString, "%f\n", circuit.netWeights[i]);
       fputs(currString, netWeightsFile);
     }
 

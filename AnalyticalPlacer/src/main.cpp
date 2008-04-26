@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
   clock_t finish = 0;
   double oldWL = 0.0;
   double newWL = 0.0;
+  char ts[256];
 
   CMDParse(argc, argv);
 
@@ -80,11 +81,10 @@ int main(int argc, char* argv[])
     cout << "File " << gOptions.GRFileName << " written successful" << endl;
     Exit();
   }
-
+  
   PrintToTmpPL(circuit, statistics);
   
   startTime = clock();
-
   //*************** G L O B A L   P L A C E M E N T ********************//
   if (!gOptions.doGlobalPlacement)  
   { 
@@ -153,12 +153,12 @@ int main(int argc, char* argv[])
     
     CheckCode(errorCode);
     
-    char ts[256];
     strcpy(ts, gOptions.benchmarkName);
     statistics.currentWL = cf_recalc_all(0, circuit.nNets, circuit.nets, circuit.placement);
     //if (gOptions.doOverlapRemoving) // otherwise executed with key -dp
     {
       PrintToPL(strcat(ts, "_BEFORE_DP.pl"), circuit, statistics);
+      strcpy(ts, gOptions.benchmarkName);
     }
 
     errorCode =  DetailedPlacement( circuit, statistics);
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
   statistics.currentWL = cf_recalc_all(0, circuit.nNets, circuit.nets, circuit.placement);
 
   ComputeNetWeights(circuit);
-  DumpNetWeights(gOptions.benchmarkName, circuit);
+  DumpNetWeights(strcat(ts, ".nwts"), circuit);
 
   // checking the legality of resulting placement
   errorCode = CheckLegalityOfPlacement(circuit);
