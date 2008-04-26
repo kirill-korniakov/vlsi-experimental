@@ -274,15 +274,16 @@ int ParseNetWeights(char* fileName, Circuit& circuit)
 
   FILE *netWeightsFile;
   char currString[32];
-  char tempString[32];
-  
+  float tempVal;
+
   netWeightsFile = fopen(fileName, "r");
   if (netWeightsFile)
   {
     for (int i = 0; i < circuit.nNets && !feof(netWeightsFile); ++i)
     {
       fgets(currString, 32, netWeightsFile);
-      sscanf(currString, "%f", tempString, &circuit.netWeights[i]);
+      sscanf(currString, "%f", &tempVal);
+      circuit.netWeights[i] = tempVal;
     }
 
     fclose(netWeightsFile);

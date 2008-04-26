@@ -18,7 +18,7 @@ void PrecalculateNetListSizes(NetList& netList, int* netListSizes)
   int netListSize = static_cast<int>(netList.size());
   for (int i = 0; i < netListSize; i++)
   {
-    netListSizes[i] = static_cast<int>(netList[i].size());
+    netListSizes[i] = static_cast<int>(netList[i].clusterIdxs.size());
   }
 }
 
@@ -122,10 +122,10 @@ bool PredicateClusterDataGreater(ClusterData elem1, ClusterData elem2)
   return elem1.score > elem2.score;
 }
 
-bool PredicateNetListLess(vector<int> elem1, vector<int> elem2)
+bool PredicateNetListLess(NetWithWeight elem1, NetWithWeight elem2)
 {
-  int size1 = static_cast<int>(elem1.size());
-  int size2 = static_cast<int>(elem2.size());
+  int size1 = static_cast<int>(elem1.clusterIdxs.size());
+  int size2 = static_cast<int>(elem2.clusterIdxs.size());
   
   if (size1 < size2)
     return true;
@@ -135,27 +135,36 @@ bool PredicateNetListLess(vector<int> elem1, vector<int> elem2)
   
   for (int i = 0; i < size2; ++i)
   {
-    if (elem1[i] < elem2[i])
+    if (elem1.clusterIdxs[i] < elem2.clusterIdxs[i])
       return true;
     else
-      if (elem1[i] > elem2[i])
+      if (elem1.clusterIdxs[i] > elem2.clusterIdxs[i])
         return false;
   }
+
+  // сортировка по весам в обратном порядке
+  // при применении функции unique автоматически будет выбран первый нет
+  // при таком способе сортировки у этого нета будет максимальный вес
+  if (elem1.weight > elem2.weight)
+    return true;
+  else
+    if (elem1.weight < elem2.weight)
+      return false;
   
   return false;
 }
 
-bool IsEqualNetListBinaryPredicate(vector<int> elem1, vector<int> elem2)
+bool IsEqualNetListBinaryPredicate(NetWithWeight elem1, NetWithWeight elem2)
 {
-  int size1 = static_cast<int>(elem1.size());
-  int size2 = static_cast<int>(elem2.size());
+  int size1 = static_cast<int>(elem1.clusterIdxs.size());
+  int size2 = static_cast<int>(elem2.clusterIdxs.size());
   
   if (size1 != size2)
     return false;
   
   for (int i = 0; i < size2; ++i)
   {
-    if (elem1[i] != elem2[i])
+    if (elem1.clusterIdxs[i] != elem2.clusterIdxs[i])
       return false;
   }
   
@@ -237,9 +246,9 @@ MULTIPLACER_ERROR MultilevelFramework::Interpolation(Circuit& circuit, vector<Cl
     for (int j = 0; j < static_cast<int>(currTableOfConnections[currClusterIdx].size()); ++j)
     {
       netIdx = currTableOfConnections[currClusterIdx][j];
-      for (int k = 0; k < static_cast<int>(netList[netIdx].size()); ++k)
+      for (int k = 0; k < static_cast<int>(netList[netIdx].clusterIdxs.size()); ++k)
       {
-        neighborIdx = netList[netIdx][k];
+        neighborIdx = netList[netIdx].clusterIdxs[k];
         if (!IsNotTerminal(neighborIdx) || isCPoint[neighborIdx] == false)
           continue;
         // remember all placed (fixed) neighbors of current cluster
@@ -788,11 +797,11 @@ MULTIPLACER_ERROR MultilevelFramework::Clusterize(Circuit& circuit, vector<Clust
     // update netList again
     NetList::iterator netListIterator;
     sort(netList.begin(), netList.end(), PredicateNetListLess);
-    /*netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
-    netList.resize(netListIterator - netList.begin());*/
+    netListIterator = unique(netList.begin(), netList.end(), IsEqualNetListBinaryPredicate);
+    netList.resize(netListIterator - netList.begin());
 
     netListIterator = netList.begin();
-    while (netListIterator->size() < 2) ++netListIterator;
+    while (netListIterator->clusterIdxs.size() < 2) ++netListIterator;
     netList.erase(netList.begin(), netListIterator);
     
     netLevels.push_back(netList);
@@ -872,12 +881,13 @@ void MultilevelFramework::InitializeDataStructures(Circuit& circuit, vector<Clus
     {
       cellIdx = circuit.nets[i].arrPins[j].cellIdx;
       //if (IsNotTerminal(cellIdx))
-      netList[i].push_back(cellIdx);
+      netList[i].clusterIdxs.push_back(cellIdx);
     }
+    netList[i].weight = circuit.netWeights[i];
   }
   for (int i = 0; i < static_cast<int>(netList.size()); ++i)
   {
-    if (netList[i].size() == 1)
+    if (netList[i].clusterIdxs.size() == 1)
     {
       netList[i] = netList.back();
       netList.pop_back();
@@ -937,16 +947,16 @@ MULTIPLACER_ERROR MultilevelFramework::MergeClusters(const int& firstClusterIdx,
   for (int j = 0; j < static_cast<int>(currTableOfConnections[secondClusterIdx].size()); ++j)
   {
     netIdx = currTableOfConnections[secondClusterIdx][j];
-    if (netList[netIdx].size() == 0)
+    if (netList[netIdx].clusterIdxs.size() == 0)
       continue;
-    Iter = find(netList[netIdx].begin(), netList[netIdx].end(), secondClusterIdx);
+    Iter = find(netList[netIdx].clusterIdxs.begin(), netList[netIdx].clusterIdxs.end(), secondClusterIdx);
     (*Iter) = firstClusterIdx;
-    sort(netList[netIdx].begin(), netList[netIdx].end());
-    Iter = unique(netList[netIdx].begin(), netList[netIdx].end());
-    netList[netIdx].resize(Iter - netList[netIdx].begin());
-    if (netList[netIdx].size() == 2 && (netList[netIdx][0] - netList[netIdx][1] == 0))
+    sort(netList[netIdx].clusterIdxs.begin(), netList[netIdx].clusterIdxs.end());
+    Iter = unique(netList[netIdx].clusterIdxs.begin(), netList[netIdx].clusterIdxs.end());
+    netList[netIdx].clusterIdxs.resize(Iter - netList[netIdx].clusterIdxs.begin());
+    if (netList[netIdx].clusterIdxs.size() == 2 && (netList[netIdx].clusterIdxs[0] - netList[netIdx].clusterIdxs[1] == 0))
     {
-      netList[netIdx].clear();
+      netList[netIdx].clusterIdxs.clear();
       netAreas[netIdx] = 0;
     }
   }
@@ -992,14 +1002,14 @@ MULTIPLACER_ERROR MultilevelFramework::AffinityInterp(const int& firstClusterIdx
   Merge(currTableOfConnections[firstClusterIdx], currTableOfConnections[secondClusterIdx], tmpIdxsInt);
   for (int i = 0; i < theSize - 1; ++i)
   {
-    if (tmpIdxsInt[i] == tmpIdxsInt[i+1] && netList[tmpIdxsInt[i]].size() > 1)
+    if (tmpIdxsInt[i] == tmpIdxsInt[i+1] && netList[tmpIdxsInt[i]].clusterIdxs.size() > 1)
       commonNetsIdxs.push_back(tmpIdxsInt[++i]);
   }
   
   for (int i = 0; i < static_cast<int>(commonNetsIdxs.size()); ++i)
   {
     netIdx = commonNetsIdxs[i];
-    result += 1 / ((netList[netIdx].size() - 1));
+    result += 1 / ((netList[netIdx].clusterIdxs.size() - 1));
   }
   
   delete[] tmpIdxsInt;
@@ -1022,9 +1032,9 @@ MULTIPLACER_ERROR MultilevelFramework::CalculateScore(const int& currClusterIdx,
   for (int j = 0; j < static_cast<int>(currTableOfConnections[currClusterIdx].size()); ++j)
   {
     netIdx = currTableOfConnections[currClusterIdx][j];
-    for (int k = 0; k < static_cast<int>(netList[netIdx].size()); ++k)
+    for (int k = 0; k < static_cast<int>(netList[netIdx].clusterIdxs.size()); ++k)
     {
-      neighborIdx = netList[netIdx][k];
+      neighborIdx = netList[netIdx].clusterIdxs[k];
       if (neighborIdx == currClusterIdx || !IsNotTerminal(currClusterIdx) || !IsNotTerminal(neighborIdx))
         continue;
       Affinity(currClusterIdx, neighborIdx, clusters, netList, netListSizes, 
@@ -1053,9 +1063,9 @@ void MultilevelFramework::CreateTableOfConnections(vector<Cluster>& clusters, ve
   currTableOfConnections.resize(clusters.size());
   for (int i = 0; i < static_cast<int>(netList.size()); ++i)
   {
-    for (int j = 0; j < static_cast<int>(netList[i].size()); ++j)
+    for (int j = 0; j < static_cast<int>(netList[i].clusterIdxs.size()); ++j)
     {
-      cellIdx = netList[i][j];
+      cellIdx = netList[i].clusterIdxs[j];
       if (IsNotTerminal(cellIdx))
       {
         if (clusters[cellIdx].isFake == true)
@@ -1122,14 +1132,15 @@ MULTIPLACER_ERROR MultilevelFramework::AffinitySP(const int& firstClusterIdx, co
   Merge(currTableOfConnections[firstClusterIdx], currTableOfConnections[secondClusterIdx], tmpIdxsInt);
   for (int i = 0; i < theSize - 1; ++i)
   {
-    if (tmpIdxsInt[i] == tmpIdxsInt[i+1] && netList[tmpIdxsInt[i]].size() > 1)
+    if (tmpIdxsInt[i] == tmpIdxsInt[i+1] && netList[tmpIdxsInt[i]].clusterIdxs.size() > 1)
       commonNetsIdxs.push_back(tmpIdxsInt[++i]);
   }
   
   for (int i = 0; i < static_cast<int>(commonNetsIdxs.size()); ++i)
   {
     netIdx = commonNetsIdxs[i];
-    result += 1 / ((netList[netIdx].size() - 1) * clusters[firstClusterIdx].area * clusters[secondClusterIdx].area * dist(firstClusterIdx, secondClusterIdx, clusters));
+    result += 1 / ((netList[netIdx].clusterIdxs.size() - 1) * clusters[firstClusterIdx].area * 
+              clusters[secondClusterIdx].area * dist(firstClusterIdx, secondClusterIdx, clusters));
   }
   
   delete[] tmpIdxsInt;
@@ -1162,9 +1173,9 @@ double MultilevelFramework::LogSumExpForClusters(PetscScalar *coordinates, void*
     logsum3 = 0.0;
     logsum4 = 0.0;
     //PetscPrintf(PETSC_COMM_SELF,"\n%d\n", i);
-    for (int j = 0; j < static_cast<int>((*userData->netList)[i].size()); ++j)
+    for (int j = 0; j < static_cast<int>((*userData->netList)[i].clusterIdxs.size()); ++j)
     {
-      realClusterIdx = (*userData->netList)[i][j];
+      realClusterIdx = (*userData->netList)[i].clusterIdxs[j];
       if (IsNotTerminal(realClusterIdx))
       {
         clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
@@ -1226,10 +1237,10 @@ void MultilevelFramework::CalcLogSumExpForClustersGrad(PetscScalar *coordinates,
       netIdx = (*userData->currTableOfConnections)[clusterIdx][j];
       //PetscPrintf(PETSC_COMM_SELF,"\nnetIdx = %d\t", netIdx);
       //PetscPrintf(PETSC_COMM_SELF,"netSize = %d\n", (*userData->netList)[netIdx].size());
-      for (int k = 0; k < static_cast<int>((*userData->netList)[netIdx].size()); ++k)
+      for (int k = 0; k < static_cast<int>((*userData->netList)[netIdx].clusterIdxs.size()); ++k)
       {
         //PetscPrintf(PETSC_COMM_SELF,"\nk = %d\t", k);
-        realClusterIdx = (*userData->netList)[netIdx][k];
+        realClusterIdx = (*userData->netList)[netIdx].clusterIdxs[k];
         //PetscPrintf(PETSC_COMM_SELF,"realClusterIdx = %d\n", realClusterIdx);
         if (IsNotTerminal(realClusterIdx))
         {
@@ -1268,9 +1279,9 @@ double MultilevelFramework::TestObjectiveFunc(PetscScalar *coordinates, void* da
 
   for (int i = 0; i < static_cast<int>(userData->netList->size()); ++i)
   {
-    for (int j = 0; j < static_cast<int>((*userData->netList)[i].size()); ++j)
+    for (int j = 0; j < static_cast<int>((*userData->netList)[i].clusterIdxs.size()); ++j)
     {
-      realClusterIdx = (*userData->netList)[i][j];
+      realClusterIdx = (*userData->netList)[i].clusterIdxs[j];
       clusterIdxInCoordinatesArray = (userData->lookUpTable)[realClusterIdx];
       
       sum += pow((coordinates[clusterIdxInCoordinatesArray] - userData->circuit->height / 2), 2);
