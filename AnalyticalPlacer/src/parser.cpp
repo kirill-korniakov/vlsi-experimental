@@ -847,6 +847,12 @@ int ParseNets(const char* fileName, Circuit& circuit)
           firstParams++;
           circuit.nNets = value;
           circuit.nets = new Net[circuit.nNets];
+
+          circuit.netWeights = new double[circuit.nNets];
+          for (int i = 0; i < circuit.nNets ; ++i)
+          {
+            circuit.netWeights[i] = 1.0;
+          }
         }
         if (_stricmp(tempString, "NumPins") == 0)
         {

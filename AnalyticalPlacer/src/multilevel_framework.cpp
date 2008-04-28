@@ -872,19 +872,27 @@ void MultilevelFramework::InitializeDataStructures(Circuit& circuit, vector<Clus
     clusters[i].cellIdxs.push_back(i);
     clusters[i].area = circuit.nodes[i].width * circuit.nodes[i].height;
   }
+  
   for (int i = 0; i < circuit.nNets; ++i)
   {
     if (circuit.nets[i].numOfPins > 10000)
       continue;
-
+    
     for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
     {
       cellIdx = circuit.nets[i].arrPins[j].cellIdx;
       //if (IsNotTerminal(cellIdx))
       netList[i].clusterIdxs.push_back(cellIdx);
     }
-    netList[i].weight = circuit.netWeights[i];
   }
+  if (gOptions.isLEFDEFinput)
+  {
+    for (int i = 0; i < circuit.nNets; ++i)
+    {
+      netList[i].weight = circuit.netWeights[i];
+    }
+  }
+
   for (int i = 0; i < static_cast<int>(netList.size()); ++i)
   {
     if (netList[i].clusterIdxs.size() == 1)
