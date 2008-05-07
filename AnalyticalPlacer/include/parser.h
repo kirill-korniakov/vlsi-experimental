@@ -19,12 +19,42 @@
 #include "..\include\global.h"
 #include "..\include\errors.h"
 #include <time.h>
-//using namespace std;
+
+using namespace DataStructures;
 
 struct strExtend
 {
-  char name[20];
+  char* name;      /// Name of cell.
   int  cellIdx;
+
+  strExtend() {name = new char[DEFAULT_NAME_LENGTH]; name[0]=0;}
+  strExtend(const char* _name)
+  {
+    delete[]name;
+    name = new char[strlen(_name)+1];
+    strcpy(name, _name);
+  }
+  ~strExtend(){delete[]name;}
+  
+  void operator=(const char* right)
+  {
+    if (strlen(right) < DEFAULT_NAME_LENGTH)
+    {
+      strcpy(name, right);
+    }
+    else
+    {
+      delete[]name;
+      name = new char[strlen(right)+1];
+      strcpy(name, right);
+    }
+  }
+
+  void operator=(const strExtend& right)
+  {
+    *this = right.name;
+    cellIdx = right.cellIdx;
+  }
 };
 
 int findName(str* table, char* name);

@@ -28,13 +28,14 @@ void MultilevelFramework::SetInitialState(vector<Cluster>& clusters, Circuit& ci
   GetFloatRandomNumbers(rndCoords, nClusters * 2, -1.0, 1.0);
 
   int idx = 0;
-  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
+  int clustersSize = static_cast<int>(clusters.size());
+  for (int i = 0; i < clustersSize; ++i)
   {
     if (clusters[i].isFake == false)
     {
       clusters[i].xCoord = circuit.width  / 2/* + 0.2*circuit.width  * rndCoords[2*idx+0]*/;
       clusters[i].yCoord = circuit.height / 2/* + 0.2*circuit.height * rndCoords[2*idx+1]*/;
-      idx++;
+      /*idx++;*/
     }
   }
 
@@ -78,14 +79,6 @@ void PrintTerminationReason(TaoTerminateReason reason)
   PetscPrintf(MPI_COMM_WORLD,"reason = %d ", reason);
   PetscPrintf(MPI_COMM_WORLD, message);
   PetscPrintf(MPI_COMM_WORLD, "\n");
-}
-
-void UpdateNetWeights(double* netWeights, NetList& netList)
-{
-  int netListSize = static_cast<int>(netList.size());
-  for (int i = 0; i < netListSize; ++i)
-  {
-  }
 }
 
 void MultilevelFramework::Merge(vector<int>& a, vector<int>& b, int result[])
@@ -424,16 +417,17 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
 {
   LogEnter("MultilevelFramework::Relaxation");
   int nClusters = static_cast<int>(clusters.size());
+  int clustersSize = static_cast<int>(clusters.size());
 
-  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
+  for (int i = 0; i < clustersSize; ++i)
   {
     if (clusters[i].isFake == true)
       --nClusters;
   }
 
-  PetscInt *lookUpTable = new PetscInt[clusters.size()]; //todo: move this memory work from function
+  PetscInt *lookUpTable = new PetscInt[clustersSize]; //todo: move this memory work from function
   int j = 0;  
-  for(int i=0; i < static_cast<int>(clusters.size());i++)
+  for(int i=0; i < clustersSize;i++)
   {
     if (clusters[i].isFake == false)
     {
@@ -469,9 +463,9 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   info = TaoApplicationCreate(PETSC_COMM_SELF,&taoapp); CHKERRQ(info);
 
   /* Set solution vec and an initial guess */
-  int idx = 0;  
+  int idx = 0;
   PetscScalar* initValues = new PetscScalar[2 * nClusters];
-  for (int i = 0; i < static_cast<int>(clusters.size()); ++i)
+  for (int i = 0; i < clustersSize; ++i)
   {
     if (clusters[i].isFake == false)
     {
@@ -1171,17 +1165,20 @@ double MultilevelFramework::LogSumExpForClusters(PetscScalar *coordinates, void*
   int nNodes = userData->circuit->nNodes;
   int realClusterIdx;
   int clusterIdxInCoordinatesArray;
+  int netListSize = static_cast<int>(userData->netList->size());
+  int clusterIdxsSize;
 
   //PetscPrintf(PETSC_COMM_SELF,"\nEnter LogSumExp func\n");
 
-  for (int i = 0; i < static_cast<int>(userData->netList->size()); ++i)
+  for (int i = 0; i < netListSize; ++i)
   {
     logsum1 = 0.0;
     logsum2 = 0.0;
     logsum3 = 0.0;
     logsum4 = 0.0;
     //PetscPrintf(PETSC_COMM_SELF,"\n%d\n", i);
-    for (int j = 0; j < static_cast<int>((*userData->netList)[i].clusterIdxs.size()); ++j)
+    clusterIdxsSize = static_cast<int>((*userData->netList)[i].clusterIdxs.size());
+    for (int j = 0; j < clusterIdxsSize; ++j)
     {
       realClusterIdx = (*userData->netList)[i].clusterIdxs[j];
       if (IsNotTerminal(realClusterIdx))
@@ -1481,21 +1478,9 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
 
         //printf("%.18f\t%.18f\n", potX, potY);
         userData->clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = potX*potY;
-        //cout << "stored user data\n";
-        currClusterTotalPotential += userData->clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col];        
-        //cout << "currClusterTotalPotential updated\n";
+        currClusterTotalPotential += userData->clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col];
       }
     }// loop over affected bins
-
-//     cout << "currClusterTotalPotential = " << currClusterTotalPotential << endl; 
-//     for (int k = min_row; k <= max_row; ++k)
-//     {
-//       for (int j = min_col; j <= max_col; ++j)
-//       {
-//         cout << userData->clusterPotentialOverBins[k-min_row][j-min_col] << "\t";
-//       }
-//       cout << endl;
-//     }
 
     // scale the potential
     //cout << "currClusterTotalPotential = " << currClusterTotalPotential << endl;
@@ -1536,33 +1521,6 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
   /*cout << "totalCellArea = " << userData->totalCellArea << endl;
   cout << "sumPotential  = " << sum << endl;*/
 
-  //fixme: try to move clusters into bound
-  //float bigPenalty = (float)(totalPenalty / 100.0);
-  //for (int i = 0; i < userData->nClusters; ++i)
-  //{
-  //  // x-penalty
-  //  double scconst = 0.01;
-  //  if (x[2*i+0] < 0)
-  //  {
-  //    //totalPenalty += bigPenalty;
-  //    //totalPenalty += pow(-x[2*i+0], 1);
-  //    totalPenalty += -x[2*i+0]*scconst;
-  //  }
-  //  else if (x[2*i+0] > userData->circuit->width)
-  //  {
-  //    totalPenalty += (x[2*i+0] - userData->circuit->width)*scconst;
-  //  }
-  //  // y-penalty
-  //  if (x[2*i+1] < 0)
-  //  {
-  //    //totalPenalty += bigPenalty;
-  //    totalPenalty += -x[2*i+1]*scconst;
-  //  }
-  //  else if (x[2*i+1] > userData->circuit->height)
-  //  {
-  //    totalPenalty += (x[2*i+1] - userData->circuit->height)*scconst;
-  //  }
-  //}
 #ifdef USE_BORDER_PENALTY
   double halfWidth;
   double halfHeight;
@@ -1739,7 +1697,9 @@ void MultilevelFramework::CalcMu0(PetscScalar *x, void* data)
   cout << "sumDenominator\t" << sumDenominator << endl;
 #else
   AppCtx* user = (AppCtx*)data;
+  
   user->mu0 = CalcPenalty(x, data) / LogSumExpForClusters(x, data);
+
   double interestingConstant = 1.0f/16.0f; //this coefficient greatly affect quality of placement
                                     //because it determines initial distribution of cells
                                     //over bins. We have to choose small value to keep good HPWL                  

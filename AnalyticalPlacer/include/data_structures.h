@@ -26,6 +26,8 @@ using namespace std;
 
 namespace DataStructures
 {
+  const int DEFAULT_NAME_LENGTH = 20;
+
   /* -------------------------------------------------------------------
    * ------- LEF parser structures -------------------------------------
    * -------------------------------------------------------------------*/
@@ -432,9 +434,28 @@ namespace DataStructures
   {
     char* name;      /// Name of cell.
 
-    str() {name = new char[20];name[0]=0;}
+    str() {name = new char[30];name[0]=0;}
     str(const char* _name) {name = new char[strlen(_name)+1]; strcpy(name, _name);}
     ~str(){delete[]name;}
+
+    void operator=(const char* right)
+    {
+      if (strlen(right) < DEFAULT_NAME_LENGTH)
+      {
+        strcpy(name, right);
+      }
+      else
+      {
+        delete[]name;
+        name = new char[strlen(right)+1];
+        strcpy(name, right);
+      }
+    }
+
+    void operator=(const str& right)
+    {
+      *this = right.name;
+    }
 
     /// TRICKY: if you need write to this structure string more 
     ///than 20 characters long, you may use following code:

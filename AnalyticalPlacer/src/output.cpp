@@ -304,7 +304,7 @@ void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, doubl
       if(i == circuit.nNodes) i = shift_;
       sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord,
                                                   circuit.placement[i].yCoord,  circuit.placement[i].orient);
-      fputs( buffer, f);
+      fputs(buffer, f);
     }
     fclose(f);
 
@@ -338,7 +338,7 @@ void PrintToTmpPL(Circuit& circuit, double shiftX, double shiftY)
     int shift_ = (int)(circuit.terminals - circuit.nodes);
     for (int i = 0; i < shift_ + circuit.nTerminals; ++i)
     {
-      if(i == circuit.nNodes) i = shift_;
+      if (i == circuit.nNodes) i = shift_;
       sprintf(buffer, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, 
                                                   circuit.placement[i].yCoord,  circuit.placement[i].orient);
       fputs( buffer, f);
@@ -703,5 +703,276 @@ void DumpNetWeights(char* fileName, Circuit& circuit)
     }
 
     fclose(netWeightsFile);
+  }
+}
+
+void LEFDEF2Bookshelf(char* baseName, Circuit& circuit)
+{
+  if (gOptions.isLEFDEFinput)
+  {
+    size_t len = strlen(baseName);
+    char* newAux = new char[len + 5];
+    char* newPl = new char[len + 4];
+    char* newNodes = new char[len + 7];
+    char* newScl = new char[len + 5];
+    char* newNets = new char[len + 6];
+    char* newWts = new char[len + 5];
+
+    strcpy(newAux, baseName);
+    strcat(newAux, ".aux");
+    strcpy(newPl, baseName);
+    strcat(newPl, ".pl");
+    strcpy(newNodes, baseName);
+    strcat(newNodes, ".nodes");
+    strcpy(newScl, baseName);
+    strcat(newScl, ".scl");
+    strcpy(newNets, baseName);
+    strcat(newNets, ".nets");
+    strcpy(newWts, baseName);
+    strcat(newWts, ".wts");
+
+    CreateAux(newAux, newPl, newNodes, newScl, newNets, newWts, circuit);
+    CreatePl(newPl, circuit);
+    CreateNodes(newNodes, circuit);
+    CreateScl(newScl, circuit);
+    CreateNets(newNets, circuit);
+    CreateWts(newWts, circuit);
+
+    delete[] newAux;
+    delete[] newPl;
+    delete[] newNodes;
+    delete[] newScl;
+    delete[] newNets;
+    delete[] newWts;
+  }
+}
+
+void CreateAux(char* newAux, char* newPl, char* newNodes, char* newScl, char* newNets, char* newWts, Circuit& circuit)
+{
+  FILE *auxFile;
+  char string[128];
+
+  auxFile = fopen(newAux, "w");
+  
+  if (auxFile)
+  {
+    sprintf(string, "RowBasedPlacement : %s %s %s %s %s", newPl, newNodes, newScl, newNets, newWts);
+    fputs(string, auxFile);
+    
+    fclose(auxFile);
+  }
+}
+
+void CreatePl(char* fileName, Circuit& circuit)
+{
+  FILE *plFile;
+  char string[128];
+  time_t ltime;
+  time(&ltime);
+
+  plFile = fopen(fileName, "w");
+
+  if (plFile)
+  {
+    ReshiftCoords(circuit);
+
+    sprintf(string, "UCLA pl 1.0\n");
+    fputs(string, plFile);
+    sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
+    fputs(string, plFile);
+    
+    int shift_ = (int)(circuit.terminals - circuit.nodes);
+    
+    for (int i = 0; i < circuit.nNodes; ++i)
+    {
+      sprintf(string, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, 
+              circuit.placement[i].yCoord,  circuit.placement[i].orient);
+      fputs(string, plFile);
+    }
+
+    for (int i = circuit.Shift_; i < circuit.Shift_ + circuit.nTerminals; ++i)
+    {
+      sprintf(string, "%8s %10.3f %10.3f : %s\n", circuit.tableOfNames[i].name, circuit.placement[i].xCoord, 
+        circuit.placement[i].yCoord,  circuit.placement[i].orient);
+      fputs(string, plFile);
+    }
+    
+    ShiftCoords(circuit);
+
+    fclose(plFile);
+  }
+}
+
+void CreateNodes(char* fileName, Circuit& circuit)
+{
+  FILE *nodesFile;
+  char string[128];
+  time_t ltime;
+  time(&ltime);
+
+  nodesFile = fopen(fileName, "w");
+
+  if (nodesFile)
+  {
+    sprintf(string, "UCLA nodes 1.0\n");
+    fputs(string, nodesFile);
+    sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
+    fputs(string, nodesFile);
+    sprintf(string, "NumNodes : %d\n", circuit.nNodes + circuit.nTerminals);
+    fputs(string, nodesFile);
+    sprintf(string, "NumTerminals : %d\n\n", circuit.nTerminals);
+    fputs(string, nodesFile);
+
+    for (int i = 0; i < circuit.nNodes; ++i)
+    {
+      sprintf(string, "%8s %d %d\n", circuit.tableOfNames[i].name, circuit.nodes[i].width, circuit.nodes[i].height);
+      fputs(string, nodesFile);
+    }
+
+    for (int i = circuit.Shift_; i < circuit.Shift_ + circuit.nTerminals; ++i)
+    {
+      sprintf(string, "%8s %d %d terminal\n", circuit.tableOfNames[i].name, circuit.nodes[i].width, circuit.nodes[i].height);
+      fputs(string, nodesFile);
+    }
+
+    fclose(nodesFile);
+  }
+}
+
+void CreateScl(char* fileName, Circuit& circuit)
+{
+  FILE *sclFile;
+  char string[128];
+  time_t ltime;
+  time(&ltime);
+
+  sclFile = fopen(fileName, "w");
+
+  if (sclFile)
+  {
+    sprintf(string, "UCLA scl 1.0\n");
+    fputs(string, sclFile);
+    sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
+    fputs(string, sclFile);
+    sprintf(string, "NumRows : %d\n\n", circuit.nRows);
+    fputs(string, sclFile);
+
+    for (int i = 0; i < circuit.nRows; ++i)
+    {
+      fputs("CoreRow Horizontal\n", sclFile);
+      
+      sprintf(string, " Coordinate    : %d\n", circuit.rows[i].coordinate + (int)circuit.shiftY);
+      fputs(string, sclFile);
+      sprintf(string, " Height        : %d\n", circuit.rows[i].height);
+      fputs(string, sclFile);
+      sprintf(string, " Sitewidth     : %d\n", circuit.rows[i].siteWidth);
+      fputs(string, sclFile);
+      sprintf(string, " Sitespacing   : %d\n", circuit.rows[i].siteSpacing);
+      fputs(string, sclFile);
+      sprintf(string, " Siteorient    : %s\n", circuit.rows[i].siteorient);
+      fputs(string, sclFile);
+      sprintf(string, " Sitesymmetry  : %s\n", circuit.rows[i].sitesymm);
+      fputs(string, sclFile);
+      sprintf(string, " SubrowOrigin  : %f", circuit.rows[i].subrowOrigin + circuit.shiftX);
+      fputs(string, sclFile);
+      sprintf(string, " Numsites  : %d\n", circuit.rows[i].numSites);
+      fputs(string, sclFile);
+
+      fputs("End\n", sclFile);
+    }
+
+    fclose(sclFile);
+  }
+}
+
+void CreateNets(char* fileName, Circuit& circuit)
+{
+  FILE *netsFile;
+  char string[128];
+  time_t ltime;
+  time(&ltime);
+  int cellIdx;
+
+  netsFile = fopen(fileName, "w");
+
+  if (netsFile)
+  {
+    sprintf(string, "UCLA nets 1.0\n");
+    fputs(string, netsFile);
+    sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
+    fputs(string, netsFile);
+    sprintf(string, "NumNets  : %d\n", circuit.nNets);
+    fputs(string, netsFile);
+    sprintf(string, "NumPins : %d\n\n", circuit.nPins);
+    fputs(string, netsFile);
+
+    for (int i = 0; i < circuit.nNets; ++i)
+    {
+      sprintf(string, "NetDegree : %d\n", circuit.nets[i].numOfPins);
+      fputs(string, netsFile);
+      
+      for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
+      {
+        cellIdx = circuit.nets[i].arrPins[j].cellIdx;
+        /*if (cellIdx >= circuit.nNodes)
+        {
+          cellIdx -= circuit.Shift_ - circuit.nNodes;
+        }*/
+        sprintf(string, "\t%15s\t%c : %f %f\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype,
+                circuit.nets[i].arrPins[j].xOffset, circuit.nets[i].arrPins[j].yOffset);
+        fputs(string, netsFile);
+      }
+    }
+
+    fclose(netsFile);
+  }
+}
+
+void CreateWts(char* fileName, Circuit& circuit)
+{
+  FILE *wtsFile;
+  char string[128];
+  time_t ltime;
+  time(&ltime);
+
+  wtsFile = fopen(fileName, "w");
+
+  if (wtsFile)
+  {
+    sprintf(string, "UCLA wts 1.0\n");
+    fputs(string, wtsFile);
+    sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
+    fputs(string, wtsFile);
+
+    if (circuit.weights)
+    {
+      for (int i = 0; i < circuit.nNodes; ++i)
+      {
+        sprintf(string, "%8s %f\n", circuit.tableOfNames[i].name, circuit.weights[i].wts);
+        fputs(string, wtsFile);
+      }
+
+      for (int i = circuit.Shift_; i < circuit.Shift_ + circuit.nTerminals; ++i)
+      {
+        sprintf(string, "%8s %f\n", circuit.tableOfNames[i].name, circuit.weights[i].wts);
+        fputs(string, wtsFile);
+      }
+    }
+    else
+    {
+      for (int i = 0; i < circuit.nNodes; ++i)
+      {
+        sprintf(string, "%8s %f\n", circuit.tableOfNames[i].name, 1.0);
+        fputs(string, wtsFile);
+      }
+
+      for (int i = circuit.Shift_; i < circuit.Shift_ + circuit.nTerminals; ++i)
+      {
+        sprintf(string, "%8s %f\n", circuit.tableOfNames[i].name, 1.0);
+        fputs(string, wtsFile);
+      }
+    }
+
+    fclose(wtsFile);
   }
 }

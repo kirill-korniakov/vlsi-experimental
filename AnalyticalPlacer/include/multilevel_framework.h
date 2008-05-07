@@ -38,7 +38,7 @@ namespace MultilevelFramework
     double yCoord;
     double area;           // занимаемая площадь (= сумма площадей всех нодов из cellIdxs)
     double scalingCoefficient; 
-    bool   isValid;        // применяется в алгоритме кластеризации. если true, то перещитывать score для данного кластера
+    bool   isValid;        // применяется в алгоритме кластеризации. если true, то пересчитывать score для данного кластера
                            // не нужно, в противном случае score пересчитывается, и элемент помещается в очередь (Heap)
                            // для кластеризации на то
                            // место, к-му соответствует его новый score. для этого используется ф-ия InsertInHeap
@@ -187,9 +187,12 @@ namespace MultilevelFramework
                                 NetList& netList, const int& nNodes);
 
   double LogSumExpForClusters(PetscScalar *coordinates, void* data);
-  void CalcLogSumExpForClustersGrad(PetscScalar *coordinates, PetscScalar *grad, void* data);
+
+  void   CalcLogSumExpForClustersGrad(PetscScalar *coordinates, PetscScalar *grad, void* data);
+  
   double TestObjectiveFunc(PetscScalar *coordinates, void* data);
-  void SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
+  
+  void   SetInitialState(vector<Cluster>& clusters, Circuit& circuit, const int& numOfClusters);
 
   void CalcBinGrid(Circuit& circuit, vector<Cluster>& clusters, const int& nClusters,
     int& nBinRows, int& nBinCols,

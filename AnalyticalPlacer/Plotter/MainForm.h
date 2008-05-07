@@ -405,7 +405,7 @@ namespace Plotter {
              //fgets(tmp, 20, auxFile);
 
              int error = ParseAux(auxFileNameChar, circuit);
-             //ParseAux("D:\\Temp\\dma\\dma.aux", circuit);
+             ParseAux("D:\\Temp\\dma\\dma.aux", circuit);
              //ParseAux("C:\\Documents and Settings\\Живодеров Артем\\Рабочий стол\\trunk\\AnalyticalPlacer\\WorkDir\\ibm01\\ibm01.aux", circuit);
              label1->Text = (String^)(circuit.placement[0].xCoord).ToString();
              //DllFunc(circuit);

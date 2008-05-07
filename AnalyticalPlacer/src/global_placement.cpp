@@ -36,7 +36,7 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   // initial data structures filling  
   InitializeDataStructures(circuit, clusters, netList, circuit.nNodes, currNClusters);
   netLevels.push_back(netList);
-  
+
   // First V-cycle
 #ifdef RECURSIVE_BISECTION
   MakeClustersFromBins(circuit, clusters, netList);
@@ -46,13 +46,16 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
 #endif
   CreateTableOfConnections(clusters, currTableOfConnections, netList, circuit.nNodes);
   // set initial placement
+
+  currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
+
   SetInitialState(clusters, circuit, currNClusters);
   UpdateCoords(circuit, clusters);
   currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   cout << "initial state WL = " << currentWL << endl;
 
   int nLevels = static_cast<int>(netLevels.size());
-  int nOuterIters = 20;//static_cast<int>(4 * pow(2.0, nLevels));
+  int nOuterIters = static_cast<int>(4 * pow(2.0, nLevels));
   int nInnerIters = static_cast<int>(128 / pow(2.0, nLevels));
 
   PrintToPL("before relaxation", circuit);

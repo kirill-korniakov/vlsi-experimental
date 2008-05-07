@@ -56,7 +56,7 @@ MULTIPLACER_ERROR InitializeCircuit(Circuit& circuit)
   if (errorCode != OK) return errorCode;
   cout << "Files parsed successfully.\n";
 
-  if(!gOptions.isLEFDEFinput)
+  //if(!gOptions.isLEFDEFinput)
   {
     // calculating sizes of circuit
     circuit.height = circuit.nRows * circuit.rows[0].height;

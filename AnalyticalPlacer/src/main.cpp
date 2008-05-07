@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   }
   
   PrintToTmpPL(circuit, statistics);
-  
+  LEFDEF2Bookshelf("dmaBS", circuit);
   startTime = clock();
   //*************** G L O B A L   P L A C E M E N T ********************//
   if (!gOptions.doGlobalPlacement)  

@@ -27,6 +27,17 @@ int findName(str* table, char* name)
   return -1;
 }
 
+int findName(strExtend* table, char* name)
+{
+  int i;
+  for(i = 0; i < numOfNT; ++i)
+  {
+    if (!strcmp(table[i].name,name))
+      return i;
+  }
+  return -1;
+}
+
 int findNameBS(str* A, int Lb, int Ub, char* Key)
 {  
   int M = 0;
@@ -62,30 +73,35 @@ void QSortStrExtend(strExtend* a, long N)
   int rand0 = rand() % N;
   //GetIntegerRandomNumbers( &rand0, 1, 0, N);
 
-  p.cellIdx = a[rand0].cellIdx;
-  strcpy(p.name, a[rand0].name);
+  /*p.cellIdx = a[rand0].cellIdx;
+  strcpy(p.name, a[rand0].name);*/
+  p = a[rand0];
 
   do
   {
-    while ( strcmp(a[i].name, p.name) < 0 ) i++;
-    while ( strcmp(a[j].name, p.name) > 0 ) j--;
+    while (strcmp(a[i].name, p.name) < 0) i++;
+    while (strcmp(a[j].name, p.name) > 0) j--;
 
     if (i <= j)
     {
-      strcpy(temp.name, a[i].name);
+      /*strcpy(temp.name, a[i].name);
       strcpy(a[i].name, a[j].name);
       strcpy(a[j].name, temp.name);
 
       temp.cellIdx = a[i].cellIdx; 
       a[i].cellIdx = a[j].cellIdx; 
-      a[j].cellIdx = temp.cellIdx;
+      a[j].cellIdx = temp.cellIdx;*/
+      
+      temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
 
       i++; j--;
     }
   } while ( i<=j );
 
-  if ( j > 0 ) QSortStrExtend(a, j);
-  if ( N > i ) QSortStrExtend(a+i, N-i);
+  if (j > 0) QSortStrExtend(a, j);
+  if (N > i) QSortStrExtend(a+i, N-i);
 }
 
 void delFSpaces(ifstream& cin)
@@ -363,16 +379,28 @@ int ParseNodes(const char* fileName, Circuit& circuit)
           {
             circuit.nodes[nodesCount].width    = value ;
             circuit.nodes[nodesCount].height   = value2 ;
-            strcpy(circuit.tableOfNames[nodesCount].name, tempString);
+            circuit.tableOfNames[nodesCount]   = tempString;
+            //if (strlen(tempString) < DEFAULT_NAME_LENGTH)
+            //{
+            //  strcpy(circuit.tableOfNames[nodesCount].name, tempString);
+            //} 
+            //else
+            //{
+            //  //circuit.tableOfNames[nodesCount] = new str(tempString);
+            //  new ((void*)(&(circuit.tableOfNames[nodesCount]))) str(tempString);
+            //}
             nodesCount++;
           }
           else
-          {
-            circuit.terminals[termCount].width  = value;
-            circuit.terminals[termCount].height = value2;
-            strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tempString);
-            termCount++;
-          }
+            if (paramCount == 4)
+            {
+              circuit.terminals[termCount].width  = value;
+              circuit.terminals[termCount].height = value2;
+              strcpy(circuit.tableOfNames[circuit.nNodes+termCount].name, tempString);
+              termCount++;
+            }
+            else
+              --i;
         }
       }
     }
@@ -449,7 +477,7 @@ int ParseScl(const char* fileName, Circuit& circuit)
               }
               else
               {
-                sscanf(currString, "%s : %d %s : %d", tempString, &value, atempString, &value2);
+                sscanf(currString, "%s : %f %s : %d", tempString, &value, atempString, &value2);
                 circuit.rows[i].subrowOrigin = value;
                 circuit.rows[i].numSites = value2;
               }
@@ -741,7 +769,7 @@ int ParsePl(const char* fileName, Circuit& circuit)
         if (paramCount == -1) continue;
         idx = findNameBS(newTable, 0, numOfNT, tempString);
         idx = newTable[idx].cellIdx;
-        //idx = findName(table, tempString);
+        //idx = findName(newTable, tempString);
         circuit.placement[idx].xCoord = x;
         circuit.placement[idx].yCoord = y;
         /*circuit.placement[counter].xCoord = x;
@@ -826,7 +854,8 @@ int ParseNets(const char* fileName, Circuit& circuit)
       newTable = new strExtend[numOfNT];
       for (int i = 0; i < numOfNT; ++i)
       {
-        strcpy( newTable[i].name, circuit.tableOfNames[i].name );
+        //strcpy(newTable[i].name, circuit.tableOfNames[i].name);
+        newTable[i] = circuit.tableOfNames[i].name;
         newTable[i].cellIdx = i; 
       }
       QSortStrExtend(newTable, numOfNT - 1);
