@@ -46,20 +46,6 @@ int main(int argc, char* argv[])
   errorCode = Initialization(circuit, statistics);
   CheckCode(errorCode);
 
-  PetscInitialize(&argc,&argv,(char *)0,help);
-  TaoInitialize(&argc,&argv,(char *)0,help);
-
-  int info;       // used to check for functions returning nonzeros
-  int size,rank;  // number of processes running
-  info = MPI_Comm_size(PETSC_COMM_WORLD,&size); CHKERRQ(info);
-  info = MPI_Comm_rank(PETSC_COMM_WORLD,&rank); CHKERRQ(info);
-
-  if (size >1) {
-    if (rank == 0)
-      PetscPrintf(PETSC_COMM_SELF,"This application is intended for single processor use!\n");
-    SETERRQ(1,"Incorrect number of processors");
-  }
-
   // we shift point of origin to the bottom left corner of placement area
   ShiftCoords(circuit);
   statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
@@ -82,8 +68,29 @@ int main(int argc, char* argv[])
     Exit();
   }
   
+  if (gOptions.isLEFDEFinput && gOptions.convert2BookshelfName[0] != '\0')
+  {
+    LEFDEF2Bookshelf(gOptions.convert2BookshelfName, circuit);
+    cout << "Writing bookshelf from LEFDEF to " << gOptions.convert2BookshelfName << endl;
+    Exit();
+  }
+
   PrintToTmpPL(circuit, statistics);
-  LEFDEF2Bookshelf("dmaBS", circuit);
+
+  PetscInitialize(&argc,&argv,(char *)0,help);
+  TaoInitialize(&argc,&argv,(char *)0,help);
+  
+  int info;       // used to check for functions returning nonzeros
+  int size,rank;  // number of processes running
+  info = MPI_Comm_size(PETSC_COMM_WORLD,&size); CHKERRQ(info);
+  info = MPI_Comm_rank(PETSC_COMM_WORLD,&rank); CHKERRQ(info);
+
+  if (size >1) {
+    if (rank == 0)
+      PetscPrintf(PETSC_COMM_SELF,"This application is intended for single processor use!\n");
+    SETERRQ(1,"Incorrect number of processors");
+  }
+
   startTime = clock();
   //*************** G L O B A L   P L A C E M E N T ********************//
   if (!gOptions.doGlobalPlacement)  

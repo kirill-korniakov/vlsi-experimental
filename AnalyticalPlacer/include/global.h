@@ -43,6 +43,7 @@ struct Options
   char defName[256];
   char configName[256];
   char netWeightsName[256];
+  char convert2BookshelfName[256];
   bool isLEFDEFinput;
 
   bool doDumpGP;

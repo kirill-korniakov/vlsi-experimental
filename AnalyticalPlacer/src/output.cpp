@@ -761,6 +761,8 @@ void CreateAux(char* newAux, char* newPl, char* newNodes, char* newScl, char* ne
     
     fclose(auxFile);
   }
+  else
+    cout << "Couldn't open aux file\n";
 }
 
 void CreatePl(char* fileName, Circuit& circuit)

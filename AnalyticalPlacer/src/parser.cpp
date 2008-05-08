@@ -651,6 +651,15 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
+    else if (stricmp( argv[i], "-convert2bs") == 0)
+    {
+      if (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        strcpy(gOptions.convert2BookshelfName, argv[i+1]);
+        ++i;
+      }
+      continue;
+    }
   }
   return OK;
 }
