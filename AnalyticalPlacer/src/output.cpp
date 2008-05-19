@@ -820,14 +820,14 @@ void CreateNodes(char* fileName, Circuit& circuit)
     fputs(string, nodesFile);
     sprintf(string, "# ITLab\n# Created : %s\n", ctime(&ltime));
     fputs(string, nodesFile);
-    sprintf(string, "NumNodes : %d\n", circuit.nNodes + circuit.nTerminals);
+    sprintf(string, "NumNodes :     %d\n", circuit.nNodes + circuit.nTerminals);
     fputs(string, nodesFile);
-    sprintf(string, "NumTerminals : %d\n\n", circuit.nTerminals);
+    sprintf(string, "NumTerminals : %d\n", circuit.nTerminals);
     fputs(string, nodesFile);
 
     for (int i = 0; i < circuit.nNodes; ++i)
     {
-      sprintf(string, "%8s %d %d\n", circuit.tableOfNames[i].name, circuit.nodes[i].width, circuit.nodes[i].height);
+      sprintf(string, "%8s %d %d \n", circuit.tableOfNames[i].name, circuit.nodes[i].width, circuit.nodes[i].height);
       fputs(string, nodesFile);
     }
 
@@ -876,7 +876,7 @@ void CreateScl(char* fileName, Circuit& circuit)
       fputs(string, sclFile);
       sprintf(string, " Sitesymmetry  : %s\n", circuit.rows[i].sitesymm);
       fputs(string, sclFile);
-      sprintf(string, " SubrowOrigin  : %f", circuit.rows[i].subrowOrigin + circuit.shiftX);
+      sprintf(string, " SubrowOrigin  : %d", (int)(circuit.rows[i].subrowOrigin + circuit.shiftX));
       fputs(string, sclFile);
       sprintf(string, " Numsites  : %d\n", circuit.rows[i].numSites);
       fputs(string, sclFile);
@@ -921,15 +921,15 @@ void CreateNets(char* fileName, Circuit& circuit)
         {
           cellIdx -= circuit.Shift_ - circuit.nNodes;
         }*/
-        if (circuit.nets[i].arrPins[j].xOffset == 0 && circuit.nets[i].arrPins[j].yOffset == 0)
+        //if (circuit.nets[i].arrPins[j].xOffset == 0 && circuit.nets[i].arrPins[j].yOffset == 0)
         {
           sprintf(string, "\t%15s\t%c\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype);
         } 
-        else
+        /*else
         {
           sprintf(string, "\t%15s\t%c : %f %f\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype,
                   circuit.nets[i].arrPins[j].xOffset, circuit.nets[i].arrPins[j].yOffset);
-        }
+        }*/
         fputs(string, netsFile);
       }
     }
