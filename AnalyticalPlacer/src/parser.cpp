@@ -914,6 +914,7 @@ int ParseNets(const char* fileName, Circuit& circuit)
               paramCount = sscanf(currString, "%s %s : %f %f", tempString, atempString, &xOffset, &yOffset);
               cellIdx = findNameBS(newTable, 0, numOfNT, tempString);
               circuit.nets[netsCounter].arrPins[j].cellIdx = newTable[cellIdx].cellIdx;
+              circuit.nets[netsCounter].arrPins[j].chtype  = atempString[0];
               /*cellIdx = findNameBS(table, 0, numOfNT, tempString);
               (*nets)[netsCounter].arrPins[j].cellIdx = cellIdx;*/
               //(*nets)[netsCounter].arrPins[j].cellIdx = findName(table, tempString);

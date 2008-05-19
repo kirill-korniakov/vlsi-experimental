@@ -362,8 +362,8 @@ namespace DataStructures
     int  siteWidth;      /// Defaults value of siteSpacing.
     int  siteSpacing;    /// The distance between the beginnings
                          ///of neighboring sites in subrow.
-    char   siteorient[2];/// 
-    char   sitesymm[2];  /// 
+    char   siteorient[3];/// 
+    char   sitesymm[3];  /// 
     double subrowOrigin; /// 
     int    numSites;     /// Number of sites in a row
 
@@ -371,8 +371,8 @@ namespace DataStructures
     {
         coordinate = 0;     height = 0;
         siteWidth = 0;      siteSpacing = 0;
-        siteorient[0] = 0;  siteorient[1] = 0;
-        sitesymm[0] = 0;    sitesymm[1] = 0;
+        siteorient[0] = 0;  siteorient[2] = 0;
+        sitesymm[0] = 0;    sitesymm[2] = 0;
         numSites = 0;
         subrowOrigin = 0.0;
     }

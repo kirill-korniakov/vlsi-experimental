@@ -833,7 +833,8 @@ void CreateNodes(char* fileName, Circuit& circuit)
 
     for (int i = circuit.Shift_; i < circuit.Shift_ + circuit.nTerminals; ++i)
     {
-      sprintf(string, "%8s %d %d terminal\n", circuit.tableOfNames[i].name, circuit.nodes[i].width, circuit.nodes[i].height);
+      sprintf(string, "%8s %d %d terminal\n", circuit.tableOfNames[i].name, 
+              max(circuit.nodes[i].width, 1), max(circuit.nodes[i].height, 1));
       fputs(string, nodesFile);
     }
 
@@ -920,8 +921,15 @@ void CreateNets(char* fileName, Circuit& circuit)
         {
           cellIdx -= circuit.Shift_ - circuit.nNodes;
         }*/
-        sprintf(string, "\t%15s\t%c : %f %f\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype,
-                circuit.nets[i].arrPins[j].xOffset, circuit.nets[i].arrPins[j].yOffset);
+        if (circuit.nets[i].arrPins[j].xOffset == 0 && circuit.nets[i].arrPins[j].yOffset == 0)
+        {
+          sprintf(string, "\t%15s\t%c\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype);
+        } 
+        else
+        {
+          sprintf(string, "\t%15s\t%c : %f %f\n", circuit.tableOfNames[cellIdx].name, circuit.nets[i].arrPins[j].chtype,
+                  circuit.nets[i].arrPins[j].xOffset, circuit.nets[i].arrPins[j].yOffset);
+        }
         fputs(string, netsFile);
       }
     }
