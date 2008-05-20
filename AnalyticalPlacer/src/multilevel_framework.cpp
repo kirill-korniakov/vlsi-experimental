@@ -513,7 +513,7 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
 
   double targetDisc = 2.0;
-
+  
   /* Get the mu value */
   VecGetArray(x, &solution);
   CalcMu0(solution, &user);
@@ -522,7 +522,7 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   //PetscPrintf(MPI_COMM_WORLD, "mu = %.16f\n", user.mu);
   
   VecRestoreArray(x, &solution);
-
+  discrepancy = GetDiscrepancy(solution, &user);
   int iter = 0;
   do
   {
@@ -1727,13 +1727,14 @@ double MultilevelFramework::GetDiscrepancy(PetscScalar *x, void* data)
   double upperRatio;  // доли, на которые делится бинами данный кластер (от 0 до 1)
   double area;        // current cluster area
   int solutionIdx;
+  int clustersSize = static_cast<int>(user->clusters->size());
 
   for (int i = 0; i < user->nBinRows * user->nBinCols; ++i)
   {
     clustersAreasInBins[i] = 0;
   }
 
-  for (int i = 0; i < static_cast<int>(user->clusters->size()); ++i)
+  for (int i = 0; i < clustersSize; ++i)
   {
     if ((*user->clusters)[i].isFake == true)
     {
@@ -1743,10 +1744,10 @@ double MultilevelFramework::GetDiscrepancy(PetscScalar *x, void* data)
     solutionIdx = user->lookUpTable[i];
     area = (*user->clusters)[i].area;
     dimension = sqrt(area) / 2;
-    min_col = static_cast<int>(dtoi((x[2*solutionIdx+0]-dimension) / user->binWidth));
-    max_col = static_cast<int>(dtoi((x[2*solutionIdx+0]+dimension) / user->binWidth));
-    min_row = static_cast<int>(dtoi((x[2*solutionIdx+1]-dimension) / user->binHeight));    
-    max_row = static_cast<int>(dtoi((x[2*solutionIdx+1]+dimension) / user->binHeight));
+    min_col = static_cast<int>((x[2*solutionIdx+0]-dimension) / user->binWidth);
+    max_col = static_cast<int>((x[2*solutionIdx+0]+dimension) / user->binWidth);
+    min_row = static_cast<int>((x[2*solutionIdx+1]-dimension) / user->binHeight);    
+    max_row = static_cast<int>((x[2*solutionIdx+1]+dimension) / user->binHeight);
 
     min_col = min(max(0, min_col), user->nBinCols-1);
     min_row = min(max(0, min_row), user->nBinRows-1);
@@ -1772,6 +1773,10 @@ double MultilevelFramework::GetDiscrepancy(PetscScalar *x, void* data)
       lowerRatio = 0.0;
     }
     upperRatio = 1 - lowerRatio;
+
+    if (leftRatio < 0 || leftRatio > 1 || rihgtRatio < 0 || rihgtRatio > 1 ||
+        lowerRatio < 0 || lowerRatio > 1 || upperRatio < 0 || upperRatio > 1) 
+      break;
 
     clustersAreasInBins[min_row * user->nBinCols + min_col] += area * leftRatio * lowerRatio;
     clustersAreasInBins[min_row * user->nBinCols + max_col] += area * rihgtRatio * lowerRatio;
