@@ -353,10 +353,6 @@
 					RelativePath="..\src\optimal_region_determination.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\src\overlap_removing.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="aux"
@@ -703,10 +699,6 @@
 				</File>
 				<File
 					RelativePath="..\include\optimal_region_determination.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\overlap_removing.h"
 					>
 				</File>
 			</Filter>

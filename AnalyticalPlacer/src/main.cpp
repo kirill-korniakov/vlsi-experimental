@@ -12,7 +12,7 @@
 #include <algorithm>
 #include "..\include\parser.h"
 #include "..\include\global_placement.h"
-#include "..\include\overlap_removing.h"
+//#include "..\include\overlap_removing.h"
 #include "..\include\detailed_placement.h"
 #include "..\include\output.h"
 #include "..\include\random_numbers_generation.h"

@@ -15,12 +15,10 @@ using namespace std;
 extern __int64 rngLITotalTime;
 extern __int64 rdtsc();
 
-extern str* tableOfNames;
-extern Node* terminals;
+//extern str* tableOfNames;
 
 int HOR_SEARCH_QUANT = 4;
 int HOR_SEARCH_QUANT_FACTORIAL;
-//double HOR_SEARCH_PROBABILITY = 0.7; //probability of horizontal search
 
 int siteWidth;
 int siteHeight;
@@ -38,13 +36,9 @@ const int DFLT_SIZE_OF_CHAIN = 5; // parameter for GlobalMultiSwap
 
 int DetailedPlacement(Circuit& circuit, Statistics& statistics)
 {
-  //int pivotVert;     //the row of the base element
-  //int pivotHoriz;    //the position of the base element in the row pivotVert
-  ////double prob;
   double bestWL;
   double oldWL;
   int rowIdx;
-  //double statistics.currentWL;
   double stoppingCriteriaValue;
   double wlDecreaseGS;
   double wlDecreaseVS;
@@ -67,8 +61,8 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
   RowElement **greedy_array;        //the main array of cells
 
   numOfCellsInRow = new int[circuit.nRows];
-  arrOfSites    = new int*[circuit.nRows];
-  greedy_array  = new RowElement*[circuit.nRows];
+  arrOfSites      = new int*[circuit.nRows];
+  greedy_array    = new RowElement*[circuit.nRows];
   for (int j = 0; j < circuit.nRows; ++j)
   {
     numOfCellsInRow[j] = 0;
@@ -95,8 +89,6 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
       numOfCellsInRow[j]++;
     }
   }
-  //Forming arrOfSites
-  int currSite = 0;
   
   //*******************END OF CONVERTION***********************************//
   
@@ -159,6 +151,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
       }
     }
     int currRow;
+    int currSite;
     //Filling sites with cell indexes if they are occupied
     for (int i = 0; i < circuit.nNodes; ++i)
     {
@@ -191,7 +184,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
       }
     }
     //cout << "\nGLOBAL SWAP";
-    for (int cellIdx = 0; cellIdx < circuit.nNodes; cellIdx++)
+    for (int cellIdx = 0; cellIdx < circuit.nNodes; ++cellIdx)
     {
       //cout << "cellIdx = " << cellIdx << endl;
       bestWL = GlobalSwap(cellIdx, numOfCellsInRow, arrOfSites, circuit, statistics);
@@ -206,7 +199,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     //**************** V E R T I C A L   S E A R C H **************//
     //cout << "\nVERTICAL SEARCH\n";
     for (int i = 0; i < 3; ++i)
-      for (int cellIdx = 0; cellIdx < circuit.nNodes; cellIdx++)
+      for (int cellIdx = 0; cellIdx < circuit.nNodes; ++cellIdx)
       {
         bestWL = VerticalSearch(cellIdx, numOfCellsInRow, arrOfSites, circuit, statistics);
       }
@@ -224,7 +217,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     }
     for (int k = 0; k < circuit.nNodes; ++k)
     {
-      for (int j = circuit.nRows - 1; j >= 0 ; j--)
+      for (int j = circuit.nRows - 1; j >= 0 ; --j)
         if (circuit.rows[j].coordinate == circuit.placement[k].yCoord - 0.5 * circuit.nodes[k].height)
         {
           //Filling greedy_array
@@ -273,7 +266,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     {
       for (int i = 0; i < circuit.nRows; ++i)
       {
-        for (int j = numOfCellsInRow[i] - 1; j >= HOR_SEARCH_QUANT - 1; j--)
+        for (int j = numOfCellsInRow[i] - 1; j >= HOR_SEARCH_QUANT - 1; --j)
         {
           bestWL = HorizontalSearch(LEFT, greedy_array, numOfCellsInRow, i, j, circuit, statistics, arrOfSites);
         }
@@ -446,7 +439,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
 }
 
 double HorizontalSearch(HorSearchDir direction, RowElement** greedy_array, int* numOfCellsInRow, int row, 
-        int number, Circuit& circuit, Statistics& statistics, int** arrOfSites)
+                        int number, Circuit& circuit, Statistics& statistics, int** arrOfSites)
 {
   //cout << "*";
   double leftBorder, rightBorder, spaceAverage = 0.0, space;
@@ -1738,10 +1731,10 @@ void QuickSortRowElement(RowElement* a, long N)
 void InsertSortRowElement(RowElement* a, long DataCount)
 {
   RowElement temp;
-  for(int i = 1, j; i < DataCount ; i++)
+  for(int i = 1, j; i < DataCount; i++)
   {
     temp = a[i];
-    for (j = i - 1; j > -1; j--)
+    for (j = i - 1; j > -1; --j)
       if(a[j].xCoord > temp.xCoord)
       {
         a[j+1] = a[j];
@@ -1751,7 +1744,7 @@ void InsertSortRowElement(RowElement* a, long DataCount)
   }
 }
 
-void NextPermutation (unsigned int array[], unsigned int len)
+void NextPermutation(unsigned int array[], unsigned int len)
  
 {
   unsigned int k = len - 2;
@@ -1786,7 +1779,7 @@ void NextPermutation (unsigned int array[], unsigned int len)
 
   }
 }
-int  Factorial (unsigned int a)
+int Factorial(unsigned int a)
 {
   int temp = 1;
   for (unsigned int i = 1; i <= a; ++i)
@@ -1915,11 +1908,11 @@ MULTIPLACER_ERROR Legalize(Circuit& circuit)
     }
   }
 
-  for (int k = 0; k < circuit.nNodes; ++k)
+  /*for (int k = 0; k < circuit.nNodes; ++k)
   {
     if (circuit.placement[k].xCoord - circuit.nodes[k].width / 2 < 0)
       break;
-  }
+  }*/
   
   delete[] rowLengths;
   delete[] sortedCells;

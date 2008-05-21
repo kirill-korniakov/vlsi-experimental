@@ -522,7 +522,7 @@ MULTIPLACER_ERROR MultilevelFramework::Relaxation(Circuit& circuit, vector<Clust
   //PetscPrintf(MPI_COMM_WORLD, "mu = %.16f\n", user.mu);
   
   VecRestoreArray(x, &solution);
-  discrepancy = GetDiscrepancy(solution, &user);
+  
   int iter = 0;
   do
   {
@@ -1774,9 +1774,9 @@ double MultilevelFramework::GetDiscrepancy(PetscScalar *x, void* data)
     }
     upperRatio = 1 - lowerRatio;
 
-    if (leftRatio < 0 || leftRatio > 1 || rihgtRatio < 0 || rihgtRatio > 1 ||
+    /*if (leftRatio < 0 || leftRatio > 1 || rihgtRatio < 0 || rihgtRatio > 1 ||
         lowerRatio < 0 || lowerRatio > 1 || upperRatio < 0 || upperRatio > 1) 
-      break;
+      break;*/
 
     clustersAreasInBins[min_row * user->nBinCols + min_col] += area * leftRatio * lowerRatio;
     clustersAreasInBins[min_row * user->nBinCols + max_col] += area * rihgtRatio * lowerRatio;
