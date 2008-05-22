@@ -434,7 +434,7 @@ namespace DataStructures
   {
     char* name;      /// Name of cell.
 
-    str() {name = new char[30];name[0]=0;}
+    str() {name = new char[DEFAULT_NAME_LENGTH];name[0]=0;}
     str(const char* _name) {name = new char[strlen(_name)+1]; strcpy(name, _name);}
     ~str(){delete[]name;}
 

@@ -524,49 +524,6 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       ++i;
       continue;
     }
-    else if (stricmp( argv[i], "-noBS") == 0)
-    {
-      gOptions.doBinSwapping = false;
-      continue;
-    }
-    else if (stricmp( argv[i], "-noDBS") == 0)
-    {
-      gOptions.doDirectedBinSwapping = false;
-      continue;
-    }
-    else if (stricmp( argv[i], "-DBS") == 0)
-    {
-      gOptions.doGlobalPlacement = false;
-      if (i < argc - 1 && argv[i+1][0] != '-')
-      {
-        strcpy(gOptions.plName, argv[i+1]);
-        ++i;
-      }
-      continue;
-    }
-    else if (stricmp( argv[i], "-CA") == 0)
-    {
-      gOptions.doGlobalPlacement = false;
-      gOptions.doDirectedBinSwapping = false;
-      if (i < argc - 1 && argv[i+1][0] != '-')
-      {
-        strcpy(gOptions.plName, argv[i+1]);
-        ++i;
-      }
-      continue;
-    }
-    else if (stricmp( argv[i], "-OR") == 0)
-    {
-      gOptions.doGlobalPlacement = false;
-      gOptions.doDirectedBinSwapping = false;
-      gOptions.doCellAnnealing = false;
-      if (i < argc - 1 && argv[i+1][0] != '-')
-      {
-        strcpy(gOptions.plName, argv[i+1]);
-        ++i;
-      }
-      continue;
-    }
     else if (stricmp( argv[i], "-dp") == 0)
     {
       gOptions.doGlobalPlacement  = false;
@@ -589,7 +546,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
     }
     else if (stricmp( argv[i], "-check") == 0)
     {
-      gOptions.doCheckLegality       = true;
+      gOptions.doCheckLegality     = true;
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
         strcpy(gOptions.plName, argv[i+1]);

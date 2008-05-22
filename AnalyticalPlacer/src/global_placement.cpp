@@ -55,8 +55,8 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   cout << "initial state WL = " << currentWL << endl;
 
   int nLevels = static_cast<int>(netLevels.size());
-  int nOuterIters = static_cast<int>(4 * pow(2.0, nLevels));
-  int nInnerIters = static_cast<int>(128 / pow(2.0, nLevels));
+  int nOuterIters = 32;//static_cast<int>(4 * pow(2.0, nLevels));
+  int nInnerIters = 16;//static_cast<int>(128 / pow(2.0, nLevels));
 
   PrintToPL("before relaxation", circuit);
   Relaxation(circuit, clusters, netList, currTableOfConnections, nInnerIters, nOuterIters);
