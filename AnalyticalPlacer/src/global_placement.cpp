@@ -88,15 +88,15 @@ MULTIPLACER_ERROR GlobalPlacement(Circuit& circuit)
   }
   
   // Second V-cycle
-  //cout << "\nSecond V-cycle is beeing performed\n\n";
+  //cout << "\nSecond V-cycle is being performed\n\n";
   //netList = netLevels.front();
   //netLevels.resize(1);
   //clusteringLog.clear();
   //Clusterize(circuit, clusters, netList, netLevels, AffinitySP, clusteringLog, currNClusters);
   //UpdateCoords(circuit, clusters);
 
-  //nOuterIters = static_cast<int>(4 * pow(2.0, nLevels));
-  //nInnerIters = static_cast<int>(128 / pow(2.0, nLevels));
+  //nOuterIters = 32;//static_cast<int>(4 * pow(2.0, nLevels));
+  //nInnerIters = 16;//static_cast<int>(128 / pow(2.0, nLevels));
 
   //netLevelsIterator = netLevels.rbegin();
   //clusteringLogIterator = clusteringLog.rbegin();

@@ -89,7 +89,7 @@ int ParseLEFDEF(const char *lefname, const char* defname, Circuit& circuit)
   cout << "parsing " << lefname << endl;
   if((circuit.tech = ParseLEF(lefname)) == 0)
   {
-    cout << "LEF parcer fails." << endl;
+    cout << "LEF parser fails." << endl;
     exit(1);
   }
 

@@ -182,7 +182,7 @@ int ParseAux(const char* fileName, Circuit& circuit)
   //char word1[100], word2;
   char string[128];
 
-  if (auxFile || (gOptions.lefName && gOptions.defName)) // while all ok - the file exists
+  if (auxFile && (gOptions.lefName && gOptions.defName)) // while all ok - the file exists
   {
     cout << "parsing aux file...\n";
     fgets(string, 256, auxFile);
@@ -236,7 +236,7 @@ int ParseAux(const char* fileName, Circuit& circuit)
       if (gOptions.defName[0] != '\0')
       {
         newDEF = gOptions.defName;
-      }
+      }  
       ParseLEFDEF(newLEF, newDEF, circuit);
       ParseNetWeights(gOptions.netWeightsName, circuit);
     }
@@ -617,6 +617,15 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
+    else if (stricmp( argv[i], "-calcTiming") == 0)
+    {
+      if (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        strcpy(gOptions.calcTimingFileName, argv[i+1]);
+        ++i;
+      }
+      continue;
+    }
   }
   return OK;
 }
@@ -726,6 +735,23 @@ int ParsePl(const char* fileName, Circuit& circuit)
     {
       if (circuit.placement == NULL)
         circuit.placement = new Place[numOfNT];
+      
+      if (gOptions.isLEFDEFinput)
+      {
+        newTable = new strExtend[numOfNT];
+        for (int i = 0; i < circuit.nNodes; ++i)
+        {
+          newTable[i] = circuit.tableOfNames[i].name;
+          newTable[i].cellIdx = i; 
+        }
+        for (int i = circuit.Shift_; i < circuit.nTerminals + circuit.Shift_; ++i)
+        {
+          newTable[i - circuit.Shift_ + circuit.nNodes]         = circuit.tableOfNames[i].name;
+          newTable[i - circuit.Shift_ + circuit.nNodes].cellIdx = i - circuit.Shift_ + circuit.nNodes; 
+        }
+        QSortStrExtend(newTable, numOfNT - 1);
+      }
+
       while (!feof(plFile) && (counter < numOfNT))
       {
         fgets(currString, 128, plFile);

@@ -44,6 +44,7 @@ struct Options
   char configName[256];
   char netWeightsName[256];
   char convert2BookshelfName[256];
+  char calcTimingFileName[256];
   bool isLEFDEFinput;
 
   bool doDumpGP;

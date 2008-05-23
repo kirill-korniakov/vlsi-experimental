@@ -42,10 +42,27 @@ int main(int argc, char* argv[])
 
   CMDParse(argc, argv);
 
+  if (gOptions.calcTimingFileName[0] != '\0')
+  {
+    //if (gOptions.isLEFDEFinput)
+      //ParseDEF(gOptions.calcTimingFileName, circuit);
+      //else
+      if (gOptions.defName[0] != '\0')
+      {
+        //ParseLEFDEF(gOptions.lefName, gOptions.defName, circuit);
+        ParseAux(gOptions.benchmarkName, circuit);
+        ParsePl(gOptions.calcTimingFileName, circuit);
+        MakeTableOfConnections(circuit);
+      }
+
+      ComputeNetWeights(circuit);
+      exit(1);
+  }
+
   // initialize all data structures, parse benchmark and so on
   errorCode = Initialization(circuit, statistics);
   CheckCode(errorCode);
-
+  
   // we shift point of origin to the bottom left corner of placement area
   ShiftCoords(circuit);
   statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);

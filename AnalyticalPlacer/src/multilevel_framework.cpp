@@ -378,13 +378,17 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double *f, Vec
   info = VecGetArray(X, &x); CHKERRQ(info);
   info = VecGetArray(G, &g); CHKERRQ(info);
   
-  for (int i = 0; i < user->nClusters; ++i)
+  /*for (int i = 0; i < user->nClusters; ++i)
   {
     g[2*i+0] = 0;
     g[2*i+1] = 0;
-  }
+  }*/
 
   *f = LogSumExpForClusters(x, user) + user->mu * CalcPenalty(x, user);
+  
+  // нет смысла объединять подсчет самого штрафа и его градиента, т.к. для штрафа нужны суммарные потенциалы
+  // бинов, а они считаются на основе потенциалов всех кластеров. В общем в любом случае их приходится считать дважды
+  
   CalcLogSumExpForClustersGrad(x, g, user);
   CalcPenaltyGrad(x, g, user);
 
@@ -1358,6 +1362,38 @@ void MultilevelFramework::DetermineBordersOfClusterPotential(int &min_col, int &
   LogExit("MultilevelFramework::DetermineBordersOfClusterPotential", 0);
 }
 
+void MultilevelFramework::CalcBellShapedFunc(AppCtx* userData, int solutionIdx, int clusterIdx, int colIdx, int rowIdx,
+                                             PetscScalar * x, double &potX, double &potY)
+{
+  potX  = 0;
+  potY  = 0;
+  
+  double dx = x[2*solutionIdx+0] - userData->binPenalties[rowIdx][colIdx].xCoord;
+  double dy = x[2*solutionIdx+1] - userData->binPenalties[rowIdx][colIdx].yCoord;
+
+  // calculate x-potential
+  if (fabs(dx) <= userData->potentialRadiusX/2)
+  {
+    potX  = 1 - 2 * (dx / userData->potentialRadiusX) * (dx / userData->potentialRadiusX);
+  }
+  else
+  {
+    potX  = 2 * (fabs(dx) - userData->potentialRadiusX) * (fabs(dx) - userData->potentialRadiusX) /
+            userData->potentialRadiusX / userData->potentialRadiusX;
+  }
+
+  // calculate y-potential
+  if (fabs(dy) <= userData->potentialRadiusY/2)
+  {
+    potY  = 1 - 2 * (dy / userData->potentialRadiusY) * (dy / userData->potentialRadiusY);
+  }
+  else
+  {
+    potY  = 2 * (fabs(dy) - userData->potentialRadiusY) * (fabs(dy) - userData->potentialRadiusY) /
+            userData->potentialRadiusY / userData->potentialRadiusY;
+  }
+}
+
 void MultilevelFramework::CalcBellShapedFuncAndDerivative(AppCtx* userData, int solutionIdx, int clusterIdx, int colIdx, int rowIdx,
                                                           PetscScalar * x, double &potX, double &gradX, 
                                                           double &potY, double &gradY)
@@ -1373,6 +1409,9 @@ void MultilevelFramework::CalcBellShapedFuncAndDerivative(AppCtx* userData, int 
 
   double dx = x[2*solutionIdx+0] - userData->binPenalties[rowIdx][colIdx].xCoord;
   double dy = x[2*solutionIdx+1] - userData->binPenalties[rowIdx][colIdx].yCoord;
+  //double dimension = sqrt((*(userData->clusters))[clusterIdx].area);
+  //double a;
+  //double b;
 
   //cout << "dx" << dx << endl;
   //cout << "dy" << dy << endl;
@@ -1387,26 +1426,33 @@ void MultilevelFramework::CalcBellShapedFuncAndDerivative(AppCtx* userData, int 
   // calculate x-potential
   if (fabs(dx) <= userData->potentialRadiusX/2)
   {
-    potX  = 1 - 2 * pow(dx / userData->potentialRadiusX, 2);
+    potX  = 1 - 2 * (dx / userData->potentialRadiusX) * (dx / userData->potentialRadiusX);
     _potX = -4 * sign(dx) * fabs(dx) / userData->potentialRadiusX / userData->potentialRadiusX;
   }
   else
   {
-    potX  = 2 * pow((fabs(dx) - userData->potentialRadiusX) / userData->potentialRadiusX, 2);
+    potX  = 2 * (fabs(dx) - userData->potentialRadiusX) * (fabs(dx) - userData->potentialRadiusX) /
+            userData->potentialRadiusX / userData->potentialRadiusX;
     _potX = 4 * sign(dx) * (fabs(dx) - userData->potentialRadiusX) / userData->potentialRadiusX / userData->potentialRadiusX;
   }
 
   // calculate y-potential
   if (fabs(dy) <= userData->potentialRadiusY/2)
   {
-    potY  = 1 - 2 * pow(dy / userData->potentialRadiusY, 2);
+    potY  = 1 - 2 * (dy / userData->potentialRadiusY) * (dy / userData->potentialRadiusY);
     _potY = -4 * sign(dy) * fabs(dy) / userData->potentialRadiusY / userData->potentialRadiusY;
   }
   else
   {
-    potY  = 2 * pow((fabs(dy) - userData->potentialRadiusY) / userData->potentialRadiusY, 2);
+    potY  = 2 * (fabs(dy) - userData->potentialRadiusY) * (fabs(dy) - userData->potentialRadiusY) /
+            userData->potentialRadiusY / userData->potentialRadiusY;
     _potY = 4 * sign(dy) * (fabs(dy) - userData->potentialRadiusY) / userData->potentialRadiusY / userData->potentialRadiusY;
   }
+  
+  /*a = 4 * (dimension + userData->potentialRadiusX*userData->potentialRadiusX) /
+          ((dimension + 2*userData->potentialRadiusX*userData->potentialRadiusX)*
+          (dimension + userData->potentialRadiusX)*(dimension + userData->potentialRadiusX));
+  b = 4 / (dimension + 2*userData->potentialRadiusX*userData->potentialRadiusX);*/
 
   gradX = 2 * (userData->binPenalties[rowIdx][colIdx].sumPotential - userData->meanBinArea) *
     (*(userData->clusters))[clusterIdx].scalingCoefficient * _potX * potY;
@@ -1424,8 +1470,6 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
   double potY;
   // kornyakov todo: they are dummy here i've extracted method
   // plan to merge penalty and its gradient calculation
-  double gradX;
-  double gradY;
   int clusterIdx = 0;
 
   // each cell must have total potential equal to its area
@@ -1440,13 +1484,8 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
     for (int j = 0; j < userData->nBinCols; ++j)
     {
       userData->binPenalties[i][j].sumPotential = 0.0;
-      //cout << "userData->binPenalties[i][j].sumPotential = " 
-      //     << userData->binPenalties[i][j].sumPotential << "\n";
     }
   }
-
-  //cout << "userData->potentialRadiusY = " << userData->potentialRadiusY << endl;
-  //cout << "userData->potentialRadiusX = " << userData->potentialRadiusX << endl;
 
   // calculate every cluster's potential
   // we take every cluster and consider only bins 
@@ -1460,7 +1499,7 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
     currClusterTotalPotential = 0.0;
     (*(userData->clusters))[clusterIdx].scalingCoefficient = 1.0;
     int min_row, min_col, max_row, max_col; // area affected by cluster potential 
-    //cout << i << "\t" << x[2*i+0] << "\t" << x[2*i+1] << "\n";
+
     DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, i, x, userData);
 
     // loop over affected bins - now we just precalculate potential
@@ -1469,28 +1508,14 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
     {
       for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
       {
-        CalcBellShapedFuncAndDerivative(userData, i, clusterIdx, colIdx, rowIdx, x, 
-                                        potX, gradX, potY, gradY);
-        //cout << "rowIdx " << rowIdx << endl;
-        //cout << "colIdx " << colIdx << endl;
-        //cout << "min_row " << min_row << endl;
-        //cout << "min_col " << min_col << endl;
+        CalcBellShapedFunc(userData, i, clusterIdx, colIdx, rowIdx, x, potX, potY);
 
-        //printf("%.18f\t%.18f\n", potX, potY);
         userData->clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = potX*potY;
         currClusterTotalPotential += userData->clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col];
       }
     }// loop over affected bins
 
     // scale the potential
-    //cout << "currClusterTotalPotential = " << currClusterTotalPotential << endl;
-    if (currClusterTotalPotential <= 0.0)
-    {
-      //Trace("current cluster potential is less than 0!");
-      //cout << i << "\t" << x[2*i+0] << "\t" << x[2*i+1] << "\n";
-      (*(userData->clusters))[clusterIdx].scalingCoefficient = 0;
-    }
-    else
     {
       (*(userData->clusters))[clusterIdx].scalingCoefficient = (*(userData->clusters))[clusterIdx].area / currClusterTotalPotential;
     }
@@ -1504,22 +1529,14 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
 
   // calculate result penalty and return
   totalPenalty = 0.0;
-  //double sum = 0.0;
   for (int i = 0; i < userData->nBinRows; ++i)
   {
-    //cout << "\ni = " << i << endl;
     for (int j = 0; j < userData->nBinCols; ++j)
     {
-      //cout << "j = " << j << "\t";
-      totalPenalty += pow(userData->binPenalties[i][j].sumPotential - userData->meanBinArea, 2);
-      //sum += userData->binPenalties[i][j].sumPotential;
-      //cout << "SP["<<i<<"]["<<j<<"]=" << userData->binPenalties[i][j].sumPotential << "\t";
+      totalPenalty += (userData->binPenalties[i][j].sumPotential - userData->meanBinArea) *
+                      (userData->binPenalties[i][j].sumPotential - userData->meanBinArea);
     }
-    //cout << endl;
   }
-  //cout << endl << endl;
-  /*cout << "totalCellArea = " << userData->totalCellArea << endl;
-  cout << "sumPotential  = " << sum << endl;*/
 
 #ifdef USE_BORDER_PENALTY
   double halfWidth;
@@ -1547,7 +1564,6 @@ double MultilevelFramework::CalcPenalty(PetscScalar *x, void* data)
   return totalPenalty;
 }
 
-// todo: check if grad already nulled or we have to null it
 void MultilevelFramework::CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data)
 {
   LogEnter("MultilevelFramework::CalcPenaltyGrad");
@@ -1564,7 +1580,7 @@ void MultilevelFramework::CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, voi
     int min_row, min_col, max_row, max_col; // area affected by cluster potential 
 
     while ((*userData->clusters)[clusterIdx].isFake == true) ++clusterIdx;
-   
+
     DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, i, x, userData);
 
     for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
@@ -1572,42 +1588,14 @@ void MultilevelFramework::CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, voi
       for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
       {
         CalcBellShapedFuncAndDerivative(userData, i, clusterIdx, colIdx, rowIdx, x, 
-                                        potX, gradX, potY, gradY);
+          potX, gradX, potY, gradY);
 
-        //fixme: delete rand
         grad[2*i+0] += userData->mu*gradX;
         grad[2*i+1] += userData->mu*gradY;
-        //grad[2*i+0] += userData->mu*(rand()-RAND_MAX/2);
-        //grad[2*i+1] += userData->mu*(rand()-RAND_MAX/2);
       }
     }
   }
 
-  //fixme: gradient for border penalties
-  /*for (int i = 0; i < userData->nClusters; ++i)
-  {
-    double scconst = 0.01;
-    if (x[2*i+0] < 0)
-    {
-      totalPenalty += bigPenalty;
-      grad[2*i+0] -= 1*pow(-x[2*i+0], 0);
-      grad[2*i+0] += -scconst;
-    }
-    else if (x[2*i+0] > userData->circuit->width)
-    {
-      grad[2*i+0] += scconst;
-    }
-
-    if (x[2*i+1] < 0)
-    {
-      totalPenalty += bigPenalty;
-      grad[2*i+1] += -scconst;
-    }
-    else if (x[2*i+1] > userData->circuit->height)
-    {
-      grad[2*i+1] += scconst;
-    }
-  }*/
 #ifdef USE_BORDER_PENALTY
   double halfWidth;
   double halfHeight;
@@ -1623,12 +1611,12 @@ void MultilevelFramework::CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, voi
     if (x[2*solIdx+0] - halfWidth < 0 || x[2*solIdx+0] + halfWidth > userData->circuit->width)
     {
       grad[2*solIdx+0] += 3*pow(fabs(x[2*solIdx+0] - userData->circuit->width/2) + halfWidth - userData->circuit->width/2, 2) *
-                     sign(x[2*solIdx+0] - userData->circuit->width/2);
+        sign(x[2*solIdx+0] - userData->circuit->width/2);
     }
     if (x[2*solIdx+1] - halfHeight < 0 || x[2*solIdx+1] + halfHeight > userData->circuit->height)
     {
       grad[2*solIdx+1] += 3*pow(fabs(x[2*solIdx+1] - userData->circuit->height/2) + halfHeight - userData->circuit->height/2, 2) *
-                     sign(x[2*solIdx+1] - userData->circuit->height/2);
+        sign(x[2*solIdx+1] - userData->circuit->height/2);
     }
   }
 #endif
@@ -1697,8 +1685,11 @@ void MultilevelFramework::CalcMu0(PetscScalar *x, void* data)
   cout << "sumDenominator\t" << sumDenominator << endl;
 #else
   AppCtx* user = (AppCtx*)data;
+  //PetscScalar *g = new PetscScalar[user->nClusters];
+  //double mu0;
   
   user->mu0 = CalcPenalty(x, data) / LogSumExpForClusters(x, data);
+        //mu0 = CalcPenaltyAndGrad(x, g, data) / LogSumExpForClusters(x, data);
 
   double interestingConstant = 1.0f/16.0f; //this coefficient greatly affect quality of placement
                                     //because it determines initial distribution of cells

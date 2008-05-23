@@ -205,6 +205,9 @@ namespace MultilevelFramework
 
   void CalcPenaltyGrad(PetscScalar *x, PetscScalar *grad, void* data);
 
+  void CalcBellShapedFunc(AppCtx* userData, int solutionIdx, int clusterIdx, int colIdx, int rowIdx,
+                          PetscScalar * x, double &potX, double &potY);
+
   void CalcBellShapedFuncAndDerivative(AppCtx* userData, int solutionIdx, int clusterIdx, int colIdx, int rowIdx, PetscScalar * x, 
                                        double &potX, double &gradX, double &potY, double &gradY);
   void CalcMu0(PetscScalar *x, void* data);

@@ -76,6 +76,7 @@ int ParsePl(const char* fileName, Circuit& circuit);
 int ParseWts(const char* fileName, Circuit& circuit);
 int ParseNets(const char* fileName, Circuit& circuit);
 int ParseNetWeights(char* fileName, Circuit& circuit);
+int ParseDEF(const char* filename, Circuit& circuit);
 //int ReparsePl(const char* fileName, str* table, int numOfNT, Place* placement,
 //               int nBinRows, int nBinCols);
 

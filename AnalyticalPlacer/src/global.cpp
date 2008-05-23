@@ -128,10 +128,11 @@ void SetDefaultKeysValues()
   gOptions.doDumpGP              = false;
   gOptions.onlyGP                = false;
 
-  gOptions.benchmarkName[0]  = '\0';
-  gOptions.plName[0]         = '\0';
-  gOptions.configName[0]     = '\0';
-  gOptions.netWeightsName[0] = '\0';
+  gOptions.benchmarkName[0]      = '\0';
+  gOptions.plName[0]             = '\0';
+  gOptions.configName[0]         = '\0';
+  gOptions.netWeightsName[0]     = '\0';
+  gOptions.calcTimingFileName[0] = '\0';
 }
 
 void CheckCode(MULTIPLACER_ERROR errorCode)
