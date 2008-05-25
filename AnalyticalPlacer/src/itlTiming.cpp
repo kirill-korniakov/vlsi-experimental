@@ -306,7 +306,7 @@ void PrintCircuitArrivals(Circuit& circuit)
 {
     cout << "Arrival times on primary outputs:" << endl;
     for(int i = 0; i < circuit.nPrimaryOutputs; i++)
-        cout << circuit.tableOfNames[circuit.primaryOutputs[i]].name << "  "
+        cout << circuit.tableOfNames[circuit.primaryOutputs[i]].name << "\t"
         << circuit.placement[circuit.primaryOutputs[i]].arrivalTime << endl;
 }
 
@@ -314,7 +314,7 @@ void PrintCircuitRequireds(Circuit& circuit)
 {
     cout << "Required times on primary inputs:" << endl;
     for(int i = 0; i < circuit.nPrimaryInputs; i++)
-        cout << circuit.tableOfNames[circuit.primaryInputs[i]].name << "  "
+        cout << circuit.tableOfNames[circuit.primaryInputs[i]].name << "\t"
         << circuit.placement[circuit.primaryInputs[i]].requiredTime << endl;
 }
 

@@ -3,12 +3,12 @@
 #pragma warning (disable : 4996)
 #endif
 
-#include "../include/data_structures.h"
-#include "../include/global.h"
+#include "..\include\data_structures.h"
+#include "..\include\global.h"
 #include <stdio.h>
 #include <malloc.h>
 
-#include "../include/DEF/defrReader.hpp"
+#include "..\include\DEF\defrReader.hpp"
 
 struct DEFParserData
 {
@@ -25,7 +25,7 @@ std::map<std::string,PinInfo*> __netd_nets;
 int DEFParserSearchNode(const char* id, DEFParserData* data)
 {
     int first = 0;
-    int last = data->circuit->nNodes;
+	int last = data->circuit->nNodes+data->circuit->nTerminals;
     while (first <= last)
     {
        int mid = (first + last) / 2;  // compute mid point.
@@ -140,59 +140,69 @@ int netStartCB(defrCallbackType_e c, int number, defiUserData ud)
     DEFParserData* data = (DEFParserData*)ud;
     data->circuit->nNets = number;
     data->current_index = 0;
-    data->circuit->nets = new Net[number];
+    data->circuit->nets = new Net[number * 2 + BUF_COUNT_RESERVE];
     data->circuit->nPins = 0;
 
     int pins = (int)data->circuit->tech->SinglePins->Pins.size();
     int allnodes = data->circuit->nNodes + pins - data->nskipped;
     int plnodes = data->circuit->nNodes - data->circuit->nTerminals - data->nskipped;
-    Node* nodes = new Node[allnodes];
+
+	  int node_space = allnodes * 2 + BUF_COUNT_RESERVE+1;
+	  int first_terminal = node_space - data->circuit->nTerminals - pins;
+    data->circuit->Shift_ = first_terminal;
+
+    Node* nodes = new Node[node_space];
     {
         memcpy(nodes, data->circuit->nodes, sizeof(Node) * plnodes);
-        memcpy(nodes + plnodes, data->circuit->nodes + plnodes + data->nskipped, 
+        memcpy(nodes + first_terminal, data->circuit->nodes + plnodes + data->nskipped, 
             sizeof(Node) * data->circuit->nTerminals);
         delete[] data->circuit->nodes;
         data->circuit->nodes = nodes;
-        data->circuit->terminals = nodes + plnodes;
+        data->circuit->terminals = nodes + first_terminal;
     }
-    Place* place = new Place[allnodes];
+    Place* place = new Place[node_space];
     {
         memcpy(place, data->circuit->placement, sizeof(Place) * plnodes);
-        memcpy(place + plnodes, data->circuit->placement + plnodes + data->nskipped,
+        memcpy(place + first_terminal, data->circuit->placement + plnodes + data->nskipped,
             sizeof(Place) * data->circuit->nTerminals);
         delete[] data->circuit->placement;
         data->circuit->placement = place;
     }
-    str* names = (str*) new char[sizeof(str) * allnodes];
+    str* names = (str*) new char[sizeof(str) * node_space];
     {
         memcpy(names, data->circuit->tableOfNames, sizeof(str) * plnodes);
-        memcpy(names + plnodes, data->circuit->tableOfNames + plnodes + data->nskipped,
+        memcpy(names + first_terminal, data->circuit->tableOfNames + plnodes + data->nskipped,
             sizeof(str) * data->circuit->nTerminals);
         delete[] (char*)data->circuit->tableOfNames;
         data->circuit->tableOfNames = names;
     }
-    data->circuit->nNodes -= data->nskipped;
+    //data->circuit->nNodes -= data->nskipped;
+	int terminal_index = first_terminal + data->circuit->nTerminals;
     for(std::map<std::string,PinInfo*>::iterator iter = data->circuit->tech->SinglePins->Pins.begin();
-        data->circuit->nNodes < allnodes; ++iter, data->circuit->nNodes++)
+		iter != data->circuit->tech->SinglePins->Pins.end(); ++iter, terminal_index++)
     {
-        nodes[data->circuit->nNodes].height = 0;
-        nodes[data->circuit->nNodes].width = 0;
-        nodes[data->circuit->nNodes].type = data->circuit->tech->SinglePins;
-        place[data->circuit->nNodes].xCoord = iter->second->OriginX;
-        place[data->circuit->nNodes].yCoord = iter->second->OriginY;
-        strcpy(place[data->circuit->nNodes].orient, "N");
-        new ((void*)(names + data->circuit->nNodes)) str(iter->first.c_str());
+        nodes[terminal_index].height = 0;
+        nodes[terminal_index].width = 0;
+        nodes[terminal_index].type = data->circuit->tech->SinglePins;
+        place[terminal_index].xCoord = iter->second->OriginX;
+        place[terminal_index].yCoord = iter->second->OriginY;
+        strcpy(place[terminal_index].orient, "N");
+        new ((void*)(names + terminal_index)) str(iter->first.c_str());
     }//data->circuit->nNodes == allnodes;
     data->circuit->nTerminals += pins;
+	data->circuit->nNodes = plnodes;
     data->indexes = new int[allnodes];
-    for(int i = 0; i < allnodes; i++)
+	int i = 0;
+    for(; i < plnodes; i++)
         data->indexes[i] = i;
+	for(int j = first_terminal; j < node_space; j++,i++)
+        data->indexes[i] = j;
 
     int Index,Index1, ContrIndex,ContrIndex1,N;
     int Y;
     long int Stack[32][2];// = ((0,0));
     for (int i = 1; i < 32; i++) Stack[i][0] = Stack[i][1] = -1;
-    Stack[0][0] = 0; Stack[0][1] = data->circuit->nNodes -1;
+    Stack[0][0] = 0; Stack[0][1] = allnodes -1;
     N = 0;
     while (N >= 0)
     {
@@ -478,6 +488,7 @@ void IndexPrimaries(Circuit& circuit)
 
     int pi = 0;
     int po = 0;
+	int offset = (int)(circuit.terminals - circuit.nodes);
     //find primary inputs and outputs
     int i = circuit.nTerminals - circuit.nPrimaryInputs - circuit.nPrimaryOutputs;
     for(std::map<std::string,PinInfo*>::iterator iter = circuit.tech->SinglePins->Pins.begin();
@@ -485,20 +496,20 @@ void IndexPrimaries(Circuit& circuit)
     {
         switch(iter->second->dir)
         {
-        case PinInfo::INPUT:
-            circuit.primaryOutputs[po++] = circuit.nNodes + i;
-            break;
         case PinInfo::OUTPUT:
-            circuit.primaryInputs[pi++] = circuit.nNodes + i;
+            circuit.primaryInputs[pi++] = offset + i;
+            break;
+        case PinInfo::INPUT:
+            circuit.primaryOutputs[po++] = offset + i;
             break;
         case PinInfo::INOUT:
-            circuit.primaryInputs[pi++] = circuit.nNodes + i;
-            break;
+          circuit.primaryInputs[pi++] = offset + i;
+          break;
         default:
-            break;
+          break;
         }
-        circuit.placement[circuit.nNodes + i].arrivalTime = 
-            circuit.placement[circuit.nNodes + i].requiredTime = 0.0;
+        circuit.placement[offset + i].arrivalTime = 
+            circuit.placement[offset + i].requiredTime = 0.0;
     }
 }
 
@@ -541,7 +552,7 @@ int ParseDEF(const char* filename, Circuit& circuit)
     defrReleaseNResetMemory();
     __netd_nets.clear();
 
-    circuit.nNodes -= circuit.nTerminals;
+    //circuit.nNodes -= circuit.nTerminals;
     delete[] userData.indexes;
     FindSources(circuit);
     IndexPrimaries(circuit);

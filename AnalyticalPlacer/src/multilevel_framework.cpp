@@ -1367,9 +1367,16 @@ void MultilevelFramework::CalcBellShapedFunc(AppCtx* userData, int solutionIdx, 
 {
   potX  = 0;
   potY  = 0;
-  
+
   double dx = x[2*solutionIdx+0] - userData->binPenalties[rowIdx][colIdx].xCoord;
   double dy = x[2*solutionIdx+1] - userData->binPenalties[rowIdx][colIdx].yCoord;
+
+  if (fabs(dx) > userData->potentialRadiusX|| 
+    fabs(dy) > userData->potentialRadiusY)
+  {
+    LogExit("MultilevelFramework::CalcBellShapedFuncAndDerivative -- bin out of potential", 0);
+    return;
+  } // else this cluster affects this bin
 
   // calculate x-potential
   if (fabs(dx) <= userData->potentialRadiusX/2)
@@ -1379,7 +1386,7 @@ void MultilevelFramework::CalcBellShapedFunc(AppCtx* userData, int solutionIdx, 
   else
   {
     potX  = 2 * (fabs(dx) - userData->potentialRadiusX) * (fabs(dx) - userData->potentialRadiusX) /
-            userData->potentialRadiusX / userData->potentialRadiusX;
+      userData->potentialRadiusX / userData->potentialRadiusX;
   }
 
   // calculate y-potential
@@ -1390,7 +1397,7 @@ void MultilevelFramework::CalcBellShapedFunc(AppCtx* userData, int solutionIdx, 
   else
   {
     potY  = 2 * (fabs(dy) - userData->potentialRadiusY) * (fabs(dy) - userData->potentialRadiusY) /
-            userData->potentialRadiusY / userData->potentialRadiusY;
+      userData->potentialRadiusY / userData->potentialRadiusY;
   }
 }
 

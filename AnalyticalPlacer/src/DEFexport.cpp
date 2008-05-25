@@ -3,13 +3,13 @@
 #pragma warning (disable : 4996)
 #endif
 
-#include "../include/data_structures.h"
-#include "../include/global.h"
+#include "..\include\data_structures.h"
+#include "..\include\global.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <ctime>
-#include "../include/DEF/defwWriter.hpp"
-#include "../include/DEF/defwWriterCalls.hpp"
+#include "..\include\DEF\\defwWriter.hpp"
+#include "..\include\DEF\\defwWriterCalls.hpp"
 
 struct DEFexportData
 {
@@ -199,8 +199,8 @@ int pinCB(defwCallbackType_e c, defiUserData ud)
     for(int j = data->PinsStart; j < data->circuit->nTerminals; j++)
     {
         PinInfo * info = data->circuit->tech->SinglePins->Pins[data->circuit->tableOfNames[offset + j].name];
-        const char *dir = info->dir == PinInfo::INPUT ? "INPUT" 
-            : (info->dir == PinInfo::OUTPUT ? "OUTPUT" : "INOUT");
+        const char *dir = info->dir == PinInfo::INPUT ? "OUTPUT" 
+          : (info->dir == PinInfo::OUTPUT ? "INPUT" : "INOUT");
         status = defwPin(
             info->Name.c_str(),
             info->Name.c_str(),
