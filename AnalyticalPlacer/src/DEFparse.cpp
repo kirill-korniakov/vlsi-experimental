@@ -20,10 +20,12 @@ struct DEFParserData
     Circuit* circuit;
 };
 
+std::map<std::string,PinInfo*> __netd_nets;
+
 int DEFParserSearchNode(const char* id, DEFParserData* data)
 {
     int first = 0;
-	int last = data->circuit->nNodes+data->circuit->nTerminals;
+    int last = data->circuit->nNodes;
     while (first <= last)
     {
        int mid = (first + last) / 2;  // compute mid point.
@@ -138,69 +140,59 @@ int netStartCB(defrCallbackType_e c, int number, defiUserData ud)
     DEFParserData* data = (DEFParserData*)ud;
     data->circuit->nNets = number;
     data->current_index = 0;
-    data->circuit->nets = new Net[number * 2 + BUF_COUNT_RESERVE];
+    data->circuit->nets = new Net[number];
     data->circuit->nPins = 0;
 
     int pins = (int)data->circuit->tech->SinglePins->Pins.size();
     int allnodes = data->circuit->nNodes + pins - data->nskipped;
     int plnodes = data->circuit->nNodes - data->circuit->nTerminals - data->nskipped;
-
-	  int node_space = allnodes * 2 + BUF_COUNT_RESERVE+1;
-	  int first_terminal = node_space - data->circuit->nTerminals - pins;
-    data->circuit->Shift_ = first_terminal;
-
-    Node* nodes = new Node[node_space];
+    Node* nodes = new Node[allnodes];
     {
         memcpy(nodes, data->circuit->nodes, sizeof(Node) * plnodes);
-        memcpy(nodes + first_terminal, data->circuit->nodes + plnodes + data->nskipped, 
+        memcpy(nodes + plnodes, data->circuit->nodes + plnodes + data->nskipped, 
             sizeof(Node) * data->circuit->nTerminals);
         delete[] data->circuit->nodes;
         data->circuit->nodes = nodes;
-        data->circuit->terminals = nodes + first_terminal;
+        data->circuit->terminals = nodes + plnodes;
     }
-    Place* place = new Place[node_space];
+    Place* place = new Place[allnodes];
     {
         memcpy(place, data->circuit->placement, sizeof(Place) * plnodes);
-        memcpy(place + first_terminal, data->circuit->placement + plnodes + data->nskipped,
+        memcpy(place + plnodes, data->circuit->placement + plnodes + data->nskipped,
             sizeof(Place) * data->circuit->nTerminals);
         delete[] data->circuit->placement;
         data->circuit->placement = place;
     }
-    str* names = (str*) new char[sizeof(str) * node_space];
+    str* names = (str*) new char[sizeof(str) * allnodes];
     {
         memcpy(names, data->circuit->tableOfNames, sizeof(str) * plnodes);
-        memcpy(names + first_terminal, data->circuit->tableOfNames + plnodes + data->nskipped,
+        memcpy(names + plnodes, data->circuit->tableOfNames + plnodes + data->nskipped,
             sizeof(str) * data->circuit->nTerminals);
         delete[] (char*)data->circuit->tableOfNames;
         data->circuit->tableOfNames = names;
     }
-    //data->circuit->nNodes -= data->nskipped;
-	int terminal_index = first_terminal + data->circuit->nTerminals;
+    data->circuit->nNodes -= data->nskipped;
     for(std::map<std::string,PinInfo*>::iterator iter = data->circuit->tech->SinglePins->Pins.begin();
-		iter != data->circuit->tech->SinglePins->Pins.end(); ++iter, terminal_index++)
+        data->circuit->nNodes < allnodes; ++iter, data->circuit->nNodes++)
     {
-        nodes[terminal_index].height = 0;
-        nodes[terminal_index].width = 0;
-        nodes[terminal_index].type = data->circuit->tech->SinglePins;
-        place[terminal_index].xCoord = iter->second->OriginX;
-        place[terminal_index].yCoord = iter->second->OriginY;
-        strcpy(place[terminal_index].orient, "N");
-        new ((void*)(names + terminal_index)) str(iter->first.c_str());
+        nodes[data->circuit->nNodes].height = 0;
+        nodes[data->circuit->nNodes].width = 0;
+        nodes[data->circuit->nNodes].type = data->circuit->tech->SinglePins;
+        place[data->circuit->nNodes].xCoord = iter->second->OriginX;
+        place[data->circuit->nNodes].yCoord = iter->second->OriginY;
+        strcpy(place[data->circuit->nNodes].orient, "N");
+        new ((void*)(names + data->circuit->nNodes)) str(iter->first.c_str());
     }//data->circuit->nNodes == allnodes;
     data->circuit->nTerminals += pins;
-	data->circuit->nNodes = plnodes;
     data->indexes = new int[allnodes];
-	int i = 0;
-    for(; i < plnodes; i++)
+    for(int i = 0; i < allnodes; i++)
         data->indexes[i] = i;
-	for(int j = first_terminal; j < node_space; j++,i++)
-        data->indexes[i] = j;
 
     int Index,Index1, ContrIndex,ContrIndex1,N;
     int Y;
     long int Stack[32][2];// = ((0,0));
     for (int i = 1; i < 32; i++) Stack[i][0] = Stack[i][1] = -1;
-    Stack[0][0] = 0; Stack[0][1] = allnodes -1;
+    Stack[0][0] = 0; Stack[0][1] = data->circuit->nNodes -1;
     N = 0;
     while (N >= 0)
     {
@@ -268,26 +260,34 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
 {
     checkType_def(c);
     DEFParserData* data = (DEFParserData*)ud;
-    if(net->numConnections() < 2)
+ /*   if(net->numConnections() < 2)
     {
         data->circuit->nNets--;
         cout << "Net " << net->name() << " skipped." << endl;
         return PARSE_OK;
-    }
+    }*/
     data->circuit->nets[data->current_index].numOfPins = net->numConnections();
     data->circuit->nets[data->current_index].name = new char[strlen(net->name())+1];
     strcpy(data->circuit->nets[data->current_index].name, net->name());
     data->circuit->nPins += net->numConnections();
 
+    std::map<std::string,PinInfo*>::iterator __net = __netd_nets.find(net->name());
+    PinInfo* __net_pin = 0;
+    if(__net != __netd_nets.end())
+      __net_pin = __net->second;
     int numberOfSources = 0;
     Pin* arr
         = data->circuit->nets[data->current_index].arrPins
-        = new Pin[net->numConnections()];
+        = new Pin[net->numConnections()+1];
     for(int i = 0; i < net->numConnections(); i++)
     {
         int nodeindex;
+        bool _is_PIN = false;
         if(strcmp("PIN", net->instance(i)) != 0)
+        {
             nodeindex = DEFParserSearchNode(net->instance(i), data);
+            _is_PIN = true;
+        }
         else
             nodeindex = DEFParserSearchNode(net->pin(i), data);
         if(nodeindex < 0)
@@ -312,6 +312,8 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
             continue;
         }
         arr[i].type = pin_iter->second;
+        if(pin_iter->second == __net_pin)
+          __net_pin = 0;
 
         //filter pins on same element
         Pin* _p = data->circuit->nets[data->current_index].arrPins;
@@ -337,8 +339,8 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
         if(numberOfSources > 1)
             cout << "WARNING: net " << net->name() << " has more than one source (" << numberOfSources << ")" << endl;
 
-        arr[i].xOffset = arr[i].type->OriginX;
-        arr[i].yOffset = arr[i].type->OriginY;
+        arr[i].xOffset = _is_PIN ? 0 : arr[i].type->OriginX;
+        arr[i].yOffset = _is_PIN ? 0 : arr[i].type->OriginY;
         switch(arr[i].type->dir)
         {
         case PinInfo::INPUT:
@@ -355,6 +357,38 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
             arr[i].chtype = 'I';
         }
     }
+    
+    if(__net_pin != 0)
+    {//insert PIN
+      data->circuit->nPins++;
+      data->circuit->nets[data->current_index].numOfPins++;
+      int pos = net->numConnections();
+      int nodeindex = DEFParserSearchNode(__net_pin->Name.c_str(), data);
+      arr[pos].cellIdx = nodeindex;
+      arr[pos].type = __net_pin;
+      if(arr[pos].type->dir == PinInfo::OUTPUT)
+        numberOfSources++;
+      if(numberOfSources > 1)
+        cout << "WARNING: net " << net->name() << " has more than one source (" << numberOfSources << ")" << endl;
+      arr[pos].xOffset = 0;
+      arr[pos].yOffset = 0;
+      switch(arr[pos].type->dir)
+      {
+      case PinInfo::INPUT:
+          arr[pos].chtype = 'I';
+          break;
+      case PinInfo::OUTPUT:
+          arr[pos].chtype = 'O';
+          break;
+      case PinInfo::INOUT:
+          cout << "Warning: net " << net->name() << " has INOUT pin." << endl;
+          arr[pos].chtype = 'B';
+          break;
+      default:
+          arr[pos].chtype = 'I';
+      }
+    }
+
     if(data->circuit->nets[data->current_index].numOfPins < 2)
     {
         data->circuit->nNets--;
@@ -368,7 +402,6 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
     return PARSE_OK;
 }
 
-
 int pinCB(defrCallbackType_e c, defiPin *pin, defiUserData ud)
 {
     checkType_def(c);
@@ -379,6 +412,7 @@ int pinCB(defrCallbackType_e c, defiPin *pin, defiUserData ud)
     res->isSpecial = 0;
     res->OriginX = pin->placementX() * data->UnitsFactor;
     res->OriginY = pin->placementY() * data->UnitsFactor;
+    __netd_nets[pin->netName()] = res;
     if(pin->hasDirection())
     {
         if(strcmp(pin->direction(),"INPUT") == 0)
@@ -444,7 +478,6 @@ void IndexPrimaries(Circuit& circuit)
 
     int pi = 0;
     int po = 0;
-	int offset = (int)(circuit.terminals - circuit.nodes);
     //find primary inputs and outputs
     int i = circuit.nTerminals - circuit.nPrimaryInputs - circuit.nPrimaryOutputs;
     for(std::map<std::string,PinInfo*>::iterator iter = circuit.tech->SinglePins->Pins.begin();
@@ -452,20 +485,20 @@ void IndexPrimaries(Circuit& circuit)
     {
         switch(iter->second->dir)
         {
-        case PinInfo::OUTPUT:
-            circuit.primaryInputs[pi++] = offset + i;
-            break;
         case PinInfo::INPUT:
-            circuit.primaryOutputs[po++] = offset + i;
+            circuit.primaryOutputs[po++] = circuit.nNodes + i;
+            break;
+        case PinInfo::OUTPUT:
+            circuit.primaryInputs[pi++] = circuit.nNodes + i;
             break;
         case PinInfo::INOUT:
-            circuit.primaryOutputs[po++] = offset + i;
+            circuit.primaryInputs[pi++] = circuit.nNodes + i;
             break;
         default:
             break;
         }
-        circuit.placement[offset + i].arrivalTime = 
-            circuit.placement[offset + i].requiredTime = 0.0;
+        circuit.placement[circuit.nNodes + i].arrivalTime = 
+            circuit.placement[circuit.nNodes + i].requiredTime = 0.0;
     }
 }
 
@@ -506,8 +539,9 @@ int ParseDEF(const char* filename, Circuit& circuit)
        cout << "Reader returns bad status." << endl;
 
     defrReleaseNResetMemory();
+    __netd_nets.clear();
 
-    //circuit.nNodes -= circuit.nTerminals;
+    circuit.nNodes -= circuit.nTerminals;
     delete[] userData.indexes;
     FindSources(circuit);
     IndexPrimaries(circuit);
