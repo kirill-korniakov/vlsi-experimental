@@ -396,134 +396,926 @@
 				<File
 					RelativePath="..\include\DEF\def.tab.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\def_keywords.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiAlias.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiAssertion.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiBlockage.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiComponent.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiDebug.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiFill.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiFPC.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiGroup.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiIOTiming.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiMisc.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiNet.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiNonDefault.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiPartition.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiPath.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiPinCap.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiPinProp.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiProp.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiPropType.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiRegion.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiRowTrack.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiScanchain.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiSite.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiSlot.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiTimingDisable.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiUtil.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defiVia.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defrReader.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defwWriter.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\defwWriterCalls.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\FEF_malloc.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\DEF\FEF_stringhash.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -532,6 +1324,30 @@
 				<File
 					RelativePath="..\include\LEF\crypt.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\FEF_malloc.cpp"
@@ -543,6 +1359,7 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -552,6 +1369,7 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -561,6 +1379,7 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 				</File>
@@ -574,6 +1393,7 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -583,6 +1403,7 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -592,80 +1413,513 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)1.obj"
 							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							WarningLevel="0"
 						/>
 					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lef.tab.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lef_keywords.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiArray.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiCrossTalk.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiDebug.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiLayer.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiMacro.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiMisc.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiNonDefault.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiProp.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiPropType.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiTBExt.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiUnits.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiVia.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefiViaRule.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefrReader.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefwWriter.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\include\LEF\lefwWriterCalls.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release4VTune|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WarningLevel="0"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

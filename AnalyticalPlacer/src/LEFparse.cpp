@@ -37,6 +37,50 @@ void checkType(lefrCallbackType_e c)
 //  return ((char*)"BOGUS");
 //}
 
+void DetermineMacroType(MacroInfo& info)
+{
+  const char* fflops[]    = {"DFFSRX1","DFFX1","SDFFSRX1"};
+  const char* latches[]   = {"TLATSRX1","TLATX1"};
+  const char* buffers[]   = {"TBUFX4","TBUFX8","TBUFX1","TBUFX2","CLKBUFX2","CLKBUFX3","CLKBUFX1","BUFX3","BUFX1"};
+  const char* inverters[] = {"TINVX1","INVX8","INVX4","INVX2","INVX1"};
+
+  {//flip-flops
+    for(int i = 0; i < sizeof(fflops)/sizeof(char*); i++)
+      if(info.Name == fflops[i])
+      {
+        info.Type = MacroInfo::FlipFlop;
+        return;
+      }
+  }
+
+  {//latches
+    for(int i = 0; i < sizeof(latches)/sizeof(char*); i++)
+      if(info.Name == latches[i])
+      {
+        info.Type = MacroInfo::Latch;
+        return;
+      }
+  }
+
+  {//buffers
+    for(int i = 0; i < sizeof(buffers)/sizeof(char*); i++)
+      if(info.Name == buffers[i])
+      {
+        info.Type = MacroInfo::Buffer;
+        return;
+      }
+  }
+
+  {//inverters
+    for(int i = 0; i < sizeof(inverters)/sizeof(char*); i++)
+      if(info.Name == inverters[i])
+      {
+        info.Type = MacroInfo::Inverter;
+        return;
+      }
+  }
+}
+
 int layerCB(lefrCallbackType_e c, lefiLayer* layer, lefiUserData ud)
 {
     checkType(c);
@@ -115,6 +159,9 @@ int macroCB(lefrCallbackType_e c, lefiMacro* macro, lefiUserData ud)
         i->second->OriginX = CurrentMacro->SizeX / 2.0;
         i->second->OriginY = CurrentMacro->SizeY / 2.0;
     }
+
+    DetermineMacroType(*CurrentMacro);
+
     return PARSE_OK;
 }
 
@@ -249,6 +296,7 @@ LEFParserData* ParseLEF(const char* filename)
     userData->SinglePins->OriginY = 0;
     userData->SinglePins->SizeX = 0;
     userData->SinglePins->SizeY = 0;
+    userData->SinglePins->Type = MacroInfo::Primary;
     (*(userData->CellTypes))["PIN"] = userData->SinglePins;
 
     return userData;
