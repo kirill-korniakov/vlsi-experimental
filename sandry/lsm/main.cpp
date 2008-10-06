@@ -229,7 +229,7 @@ void Vmnk( double *index_1,double *index_2,
 			if( max<proverka) 
 				max=proverka;
 		};
-	cout<<"max pogreshnost="<<max;
+	//cout<<"max pogreshnost="<<max;
 
 	delete [] Y;
 	delete [] M;
