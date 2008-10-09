@@ -6,24 +6,20 @@
 */
 
 #include "iostream"
+
 using namespace std;
 void Vmnk( double *index_1,double *index_2,
 					double *values,
 					int n,int m,
 					double T, double R);
-int main()//вычисление  по методу наименьших квадратов
+
+int main()
 {
 	int o,n=7,m=7;//временные названия
-	double *index_1,
-		*index_2,
-		*values;
+	double *index_1 = new double [n];
+	double *index_2 = new double [m];
+	double *values = new double [n*m];
 	
-
-	index_1= new double [n];
-	index_2= new double [m];
-	values= new double [n*m];
-
-
 	//инициализация из примера
 	/*
 
@@ -106,8 +102,10 @@ int main()//вычисление  по методу наименьших квадратов
 	values[46]= 0.235268;
 	values[47]= 0.244518;
 	values[48]= 0.25432;
+
+	double T = 0.0, R = 0.0;
 	//формирование новой системы и её решение 
-	Vmnk(index_1,index_2,values,n,m,0,0);
+	Vmnk(index_1,index_2,values,n,m,T,R);
 
 
 	delete [] index_1;
@@ -116,101 +114,86 @@ int main()//вычисление  по методу наименьших квадратов
 	cin>>o;
 	return 0;
 };
+
 //вычисление методом наименьших квадратов
-void Vmnk( double *index_1,double *index_2,
-					double *values,
-					int n,int m,
-					double T, double R)
+//уравнение dT=Tintrinsic + R*Cload + a * skew
+//искомые переменные t, r, a;
+void Vmnk(const double *index_1,
+		  const double *index_2,
+		  const double *values,
+		  const int n, //length of index_1
+		  const int m, //length of index_2
+		  double& T,
+		  double& R)
 {
-	//исходное уравнение dT=Tintrinsic + R*Cload + a * skew
-	//поэтому искомые переменные t, r, a;
-	double t=0,
-		r=0,
-		a=0;
-	double *Y= new double [3];// Y = tansp(A) * values
-	Y[0]=0,
-		Y[1]=0,
-		Y[2]=0;
+	const int dim = 3;//task dimention
+	
+	double *A = new double [n * m * dim];
 
-	double *M= new double [3*3];//матрица новых значений M = transp(A)*A
-
-	for(int i = 0 ; i < 3 ; i++)
-		for(int j = 0 ; j < 3 ; j++)
-			M[j + i * 3] = 0;
-
-
-	double *A= new double [n*m*3];//иходная матрица A = [1,index_1,index_2] //n*m строк
-
-	//инициализация матриц
-
-	//исходная матрица
-	for(int i = 0 ; i < n ; i++)
-		for(int j = 0 ; j < m ; j++)
+	//иходная матрица A = [1,index_1,index_2] , (n*m строк)
+	for(int i1 = 0 ; i1 < n ; i1++)
+		for(int j1 = 0 ; j1 < m ; j1++)
 		{
-
-			A[j*3 + m * i*3 +0] = 1;
-			A[j*3 + m * i*3 + 1] = index_1[i];
-			A[j*3 + m * i*3 + 2] = index_2[j];
-			
+			A[(j1 + m * i1) * dim + 0] = 1;
+			A[(j1 + m * i1) * dim + 1] = index_1[i1];
+			A[(j1 + m * i1) * dim + 2] = index_2[j1];
 		};
 
-	//вычисление новой матрици
-	for (int i = 0 ; i < 3 ; i++)
-	{
-		for (int j = 0 ; j < 3 ; j++)
-		{
-			for (int k = 0 ; k < m * n ; k++)
-				M[i*3+j]+= A[k*3+i] * A[k*3+j];
-			
-		}
-	}
-
-	for(int i = 0 ; i < n ; i++)
-		for(int j = 0 ; j < m ; j++)
-			Y[0] = Y[0] + values[j + m * i];
-
-	for(int i = 0 ; i < n ; i++)
-		for(int j = 0 ; j < m ; j++)
-			Y[1] = Y[1] + index_1[i] * values[j + m * i];
-
-	for(int i = 0 ;i < n ;i++)
-		for(int j = 0 ; j < m ; j++)
-			Y[2] = Y[2] + index_2[j] * values[j + m * i];
+	double *M = new double [dim * dim];
 	
+	//M=0
+	for(int i3 = 0 ; i3 < dim * dim ; i3++)
+		M[i3] = 0.0;
 
-	//знаменатель detM=||M||
-	double detM= (M[0*3+1] * M[2*3+0] * M[1*3+2] -
-		M[0*3+1] * M[1*3+0] * M[2*3+2] + 
-		M[1*3+0] * M[2*3+1] *
-		M[0*3+2] + M[1*3+1] * M[0*3+0] * 
-		M[2*3+2] - M[2*3+0] *
-		M[1*3+1] * M[0*3+2] - M[2*3+1] * 
-		M[0*3+0] * M[1*3+2]);
+	//M = transp(A) * A
+	for (int i = 0 ; i < dim ; i++)
+		for (int j = 0 ; j < dim ; j++)
+			for (int k = 0 ; k < m * n ; k++)
+				M[i * dim + j] += A[k * dim + i] * A[k * dim + j];
+				
+	double *Y = new double [dim];
+	
+	//Y = 0
+	for(int i2 = 0; i2 < dim; i2++)
+		Y[i2] = 0.0;
 
-	//вычисление значений т р и а
+	//Y = transp(A) * values
+	for(int h = 0 ; h < dim ; h++)
+		for(int g = 0 ; g < m * n ; g++)
+			Y[h] += A[g * dim + h] * values[g];
 
-	a = (-M[0*3+1] * M[1*3+0] * Y[2] - 
-		M[2*3+1] * M[0*3+0] * Y[1] + 
-		M[1*3+0] * M[2*3+1] * 
-		Y[0] +	M[0*3+1] * M[2*3+0] * 
-		Y[1] + M[1*3+1] * M[0*3+0] * Y[2] -
-		M[2*3+0] * M[1*3+1] * Y[0]) / detM	;
+	//detM=||M||
+	double detM = (M[0*3+1] * M[2*3+0] * M[1*3+2] -
+				   M[0*3+1] * M[1*3+0] * M[2*3+2] +
+				   M[1*3+0] * M[2*3+1] * M[0*3+2] +
+				   M[1*3+1] * M[0*3+0] * M[2*3+2] -
+				   M[2*3+0] * M[1*3+1] * M[0*3+2] -
+				   M[2*3+1] * M[0*3+0] * M[1*3+2]);
+
+	//calculate T and R
+	T = (M[1*3+1] * Y[0] * M[2*3+2] - 
+		 M[1*3+1] * M[0*3+2] * Y[2] +
+		 M[0*3+2] * M[2*3+1] * Y[1] -
+		 Y[0] * M[2*3+1] * M[1*3+2] +
+		 M[0*3+1] * M[1*3+2] * Y[2] -
+		 M[0*3+1] * Y[1] * M[2*3+2]) / detM;
 
 
-	t = (M[1*3+1] * Y[0] * M[2*3+2] - 
-		M[1*3+1] * M[0*3+2] * Y[2] +
-		M[0*3+2] * M[2*3+1] * Y[1] - Y[0] * 
-		M[2*3+1] * M[1*3+2] +
-		M[0*3+1] * M[1*3+2] * Y[2] - 
-		M[0*3+1] * Y[1] * M[2*3+2]) /detM;
+	R = - (-Y[0] * M[2*3+0] * M[1*3+2] +
+			Y[0] * M[1*3+0] * M[2*3+2] +
+			M[0*3+0] * M[1*3+2] * Y[2] -
+			M[0*3+0] * Y[1] * M[2*3+2] -
+			M[0*3+2] * M[1*3+0] * Y[2] +
+			M[0*3+2] * M[2*3+0] * Y[1]) / detM;
+		
+	//a = (-M[0*3+1] * M[1*3+0] * Y[2] - 
+		//M[2*3+1] * M[0*3+0] * Y[1] + 
+		//M[1*3+0] * M[2*3+1] * 
+		//Y[0] +	M[0*3+1] * M[2*3+0] * 
+		//Y[1] + M[1*3+1] * M[0*3+0] * Y[2] -
+		//M[2*3+0] * M[1*3+1] * Y[0]) / detM	;
 
-
-	r = - ( - Y[0] * M[2*3+0] * M[1*3+2] + Y[0] * 
-		M[1*3+0] * M[2*3+2] + 
-		M[0*3+0] * M[1*3+2] * Y[2] - M[0*3+0] * 
-		Y[1] * M[2*3+2] -
-		M[0*3+2] * M[1*3+0] * Y[2] + M[0*3+2] * 
-		M[2*3+0] * Y[1]) / detM;
+/*  возможно проверка нужна будет и после встраивания в наш инструмент, но надо будет подумать в каком виде
 
 	//вывод в консоль нуждается в более точтом оформлении
 	cout<<"\t t="<<t<<"\n\t r="<<r<<"\n\t a="<<a<<"\n\t";
@@ -230,12 +213,10 @@ void Vmnk( double *index_1,double *index_2,
 				max=proverka;
 		};
 	//cout<<"max pogreshnost="<<max;
-
+*/
 	delete [] Y;
 	delete [] M;
 	delete [] A;
-	T=t;
-	R=r;
 }
 
 
