@@ -769,10 +769,23 @@ void CreatePl(char* fileName, Circuit& circuit)
 {
   FILE *plFile;
   char string[128];
+  char *newFileName = NULL;
   time_t ltime;
   time(&ltime);
 
-  plFile = fopen(fileName, "w");
+  if (strcmp(&fileName[strlen(fileName) - 3], ".pl") != 0)
+  {
+    newFileName = new char[strlen(fileName) + 4];
+    strcpy(newFileName, fileName);
+    strcat(newFileName, ".pl");
+  }
+  else
+  {
+    newFileName = new char[strlen(fileName) + 1];
+    strcpy(newFileName, fileName);
+  }
+
+  plFile = fopen(newFileName, "w");
 
   if (plFile)
   {
@@ -803,6 +816,8 @@ void CreatePl(char* fileName, Circuit& circuit)
 
     fclose(plFile);
   }
+
+  delete []newFileName;
 }
 
 void CreateNodes(char* fileName, Circuit& circuit)

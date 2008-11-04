@@ -4,6 +4,7 @@
 #include "../include/RouteTrees.h"
 #include <assert.h>
 #include "../include/global.h"
+#include <math.h>
 
 //#define EXTRACT_RC(circuit,src,dest,R,C) ExtractRCexact(circuit,src,dest,R,C);
 #define EXTRACT_RC(circuit,src,dest,R,C) ExtractRClumped(circuit,src,dest,R,C);
@@ -214,9 +215,10 @@ void MakeTimingLists(Circuit& c)
       for(size_t j = 0; j < c.tableOfConnections[nodeIndex].size(); j++)
       {
         int netID = c.tableOfConnections[nodeIndex][j];
-        if(c.nets[netID].arrPins[c.nets[netID].sourceIdx].cellIdx != nodeIndex)
-          if(!(netDegrees[netID]-=1))
-            readyNets.push(netID);
+        if(HASREALSOURCE(c.nets[netID]))
+          if(c.nets[netID].arrPins[c.nets[netID].sourceIdx].cellIdx != nodeIndex)
+            if(!(netDegrees[netID]-=1))
+              readyNets.push(netID);
       }
     }
     while(!readyNets.empty())
@@ -267,6 +269,7 @@ void PropagateArrivalTime(Circuit& circuit, bool reanalize, bool reroute)
 {
   const double minimalArrival = 0.0;
   const double pi_arrival_time = 0.0;
+  //int critPathCellIdx;
 
   for(int i = 0; i < circuit.nNodes; i++)
     circuit.placement[i].arrivalTime = minimalArrival;
@@ -282,14 +285,30 @@ void PropagateArrivalTime(Circuit& circuit, bool reanalize, bool reroute)
     double base = pi_arrival_time;
     if(HASREALSOURCE((*current)))
       base = GetArrivalTime(circuit, current->arrPins[current->sourceIdx].cellIdx);
+    int hMax = 0;
     for(int h = 0; h < current->numOfPins; h++)
     {
       if(h == current->sourceIdx) continue;
       double time = base + current->arrPins[h].routeInfo->NetPathDelay;
+      
       if(circuit.placement[current->arrPins[h].cellIdx].arrivalTime < time)
+      {
         circuit.placement[current->arrPins[h].cellIdx].arrivalTime = time;
+        //circuit.placement[current->arrPins[h].cellIdx].critNetIdx = current;
+        //hMax = h;
+        //critPathCellIdx = current->arrPins[h].cellIdx;
+      }
     }
+    //circuit.placement[current->arrPins[hMax].cellIdx].critNetIdx = current;
   }
+
+  /*for (int i = 0; i < circuit.nNodes; ++i)
+  {
+    if (circuit.placement[i].critNetIdx)
+    {
+      circuit.placement[i].critNetIdx->nCritPaths++;
+    }
+  }*/
 }
 
 inline double GetRequiredTime(Circuit& c, int node)
@@ -435,44 +454,105 @@ void ComputeNetWeights(Circuit& circuit)
     cout << "Skipping computing net-weights step\n";
     return;
   }
-  MakeTimingLists(circuit);
-  //cout << "initialize success" << endl;
-  PropagateArrivalTime(circuit,true,true);
-  //cout << "arrival times calculated" << endl;
-  PrintCircuitArrivals(circuit);
-  PropagateRequiredTime(circuit,false,false);
-  //cout << "required times calculated" << endl;
+  
+  FindCriticalPaths(circuit);
 
-  double* nodesSlack = new double[circuit.Shift_ + circuit.nTerminals];
-  double sumNodesSlack; // сумма слэков нодов в одном нете
-  double maxNodeSlack = -1e10;
-  int nodeIdx;
-
-  for (int i = 0; i < circuit.Shift_ + circuit.nTerminals; ++i)
+  std::vector<int>* tableOfCritPaths;  // what critical path is the current net included in
+  // the idea is the same as in tableOfConnections
+  tableOfCritPaths = new std::vector<int>[circuit.nNets];
+  for (int i = 0; i < circuit.nPrimaryOutputs; ++i)
   {
-    nodesSlack[i] = circuit.placement[i].arrivalTime - circuit.placement[i].requiredTime;
-    if (maxNodeSlack < nodesSlack[i])
+    for (int j = 0; j < circuit.criticalPaths[i].size(); ++j)
     {
-      maxNodeSlack = nodesSlack[i];
+      tableOfCritPaths[circuit.criticalPaths[i][j]].push_back(i);
     }
   }
 
+  /*for (int i = 0; i < circuit.nNets; ++i)
+  {
+    if (tableOfCritPaths[i].size() == 0)
+    {
+      continue;
+    }
+    cout << "netIdx = " << i << ", ";
+    for (int j = 0; j < tableOfCritPaths[i].size(); ++j)
+    {
+      cout << tableOfCritPaths[i][j] << "\t";
+    }
+    cout << endl;
+  }*/
+
+  double maxPathDelay = 0.0;
+
+  for (int i = 0; i < circuit.nPrimaryOutputs; ++i)
+  {
+  	if (maxPathDelay < circuit.placement[circuit.primaryOutputs[i]].arrivalTime)
+  	{
+      maxPathDelay = circuit.placement[circuit.primaryOutputs[i]].arrivalTime;
+  	}
+  }
+  
+  double u = 0.3;
+  double beta = 9;
+  double T = (1 - u) * maxPathDelay;
+  double sum = 0.0;
+  /*for (int i = 0; i < circuit.nNets; ++i)
+  {
+    sum = 0.0;
+    for (int j = 0; j < tableOfCritPaths[i].size(); ++j)
+    {
+      int poIdx = tableOfCritPaths[i][j];
+    	sum += D(T - circuit.placement[circuit.primaryOutputs[poIdx]].arrivalTime, T, beta) - 1;
+    }
+    circuit.netWeights[i] = 1.0 + sum;
+  }*/
   for (int i = 0; i < circuit.nNets; ++i)
   {
-    circuit.netWeights[i] = 1.0;
-    sumNodesSlack = 0.0;
-
-    for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
-    {
-      nodeIdx = circuit.nets[i].arrPins[j].cellIdx;
-      //if (nodeIdx >= circuit.Shift_)
-      sumNodesSlack += nodesSlack[nodeIdx];
-    }
-
-    circuit.netWeights[i] += sumNodesSlack / maxNodeSlack;
+    circuit.netWeights[i] = 1.0 + circuit.nets[i].nCritPaths;
   }
 
-  delete[] nodesSlack;
+  //double* nodesSlack = new double[circuit.Shift_ + circuit.nTerminals];
+  //double sumNodesSlack; // сумма слэков нодов в одном нете
+  //double maxNodeSlack = -1e10;
+  //int nodeIdx;
+
+  //for (int i = 0; i < circuit.Shift_ + circuit.nTerminals; ++i)
+  //{
+  //  nodesSlack[i] = circuit.placement[i].arrivalTime - circuit.placement[i].requiredTime;
+  //  if (maxNodeSlack < nodesSlack[i])
+  //  {
+  //    maxNodeSlack = nodesSlack[i];
+  //  }
+  //}
+
+  //for (int i = 0; i < circuit.nNets; ++i)
+  //{
+  //  circuit.netWeights[i] = 1.0;
+  //  sumNodesSlack = 0.0;
+
+  //  for (int j = 0; j < circuit.nets[i].numOfPins; ++j)
+  //  {
+  //    nodeIdx = circuit.nets[i].arrPins[j].cellIdx;
+  //    //if (nodeIdx >= circuit.Shift_)
+  //    sumNodesSlack += nodesSlack[nodeIdx];
+  //  }
+
+  //  circuit.netWeights[i] += sumNodesSlack / maxNodeSlack;
+  //}
+
+  //delete[] nodesSlack;
+}
+
+double D(double s, double T, double beta)
+{
+  if (s < 0)
+  {
+    return pow(1 - s / T, beta);
+  } 
+  else
+  {
+    return 1.0;
+  }
 }
 
 void ExportToGraphViz(Circuit& c, char* filename)
@@ -518,3 +598,106 @@ void ExportToGraphViz(Circuit& c, char* filename)
     fprintf(out,"}");
     fclose(out);
 }
+
+void FindCriticalPaths(Circuit& circuit)
+{
+  int currNetIdx;
+  int currNodeIdx;
+  double base  = 0.0;
+  double delay = 0.0;
+  bool isBeginningReached = false;
+
+  MakeTimingLists(circuit);
+  PropagateArrivalTime(circuit, true, true);
+  PrintCircuitArrivals(circuit);
+
+  circuit.criticalPaths = new std::vector<int>[circuit.nPrimaryOutputs];
+
+  for (int poIdx = 0; poIdx < circuit.nPrimaryOutputs; poIdx++)  // poIdx - primary output index
+  {
+    //cout << poIdx << "\t";
+    currNodeIdx = circuit.primaryOutputs[poIdx];
+    isBeginningReached = false;
+    while (!isBeginningReached)
+    {
+      int nNets = circuit.tableOfConnections[currNodeIdx].size();
+      
+      if (nNets == 0) // strange case but it does happen
+      {
+        break;
+      }
+      
+      for (int i = 0; i < nNets; ++i)
+      {
+        currNetIdx = circuit.tableOfConnections[currNodeIdx][i];
+
+        int nodeIdxInNet = -1;
+
+        for (int j = 0; j < circuit.nets[currNetIdx].numOfPins; ++j)
+        {
+          if (circuit.nets[currNetIdx].arrPins[j].cellIdx == currNodeIdx)
+          {
+            nodeIdxInNet = j;
+            break;
+          }
+        }
+
+        if (circuit.nets[currNetIdx].arrPins[nodeIdxInNet].chtype == 'O')
+        {
+          if (i == nNets - 1) // we've reached the beginning of the critical path
+          {
+            isBeginningReached = true;
+            break;
+          }
+          continue;
+        }
+
+        AdaptiveRoute(circuit, circuit.nets[currNetIdx]);
+        CalculateDalays(circuit, circuit.nets[currNetIdx]);
+      
+        base  = GetArrivalTime(circuit, circuit.nets[currNetIdx].arrPins[circuit.nets[currNetIdx].sourceIdx].cellIdx);
+        delay = circuit.nets[currNetIdx].arrPins[nodeIdxInNet].routeInfo->NetPathDelay;
+
+        if (base + delay == circuit.placement[currNodeIdx].arrivalTime)
+        {
+          currNodeIdx = circuit.nets[currNetIdx].arrPins[circuit.nets[currNetIdx].sourceIdx].cellIdx;
+          circuit.criticalPaths[poIdx].push_back(currNetIdx);
+          circuit.nets[currNetIdx].nCritPaths++;
+          break;
+        } 
+        else
+          continue;
+      }
+    }
+  }
+
+  /*cout << "These are the critical paths:\n" << endl;
+  for (int i = 0; i < circuit.nPrimaryOutputs; ++i)
+  {
+    for (int j = 0; j < circuit.criticalPaths[i].size(); ++j)
+    {
+    	cout << circuit.criticalPaths[i][j] << "\t"; 
+    }
+  	cout << endl;
+  }*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

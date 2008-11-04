@@ -56,6 +56,11 @@ int main(int argc, char* argv[])
       }
 
       ComputeNetWeights(circuit);
+      
+      /*for (int i = 0; i < circuit.nNets; ++i)
+      {
+        cout << circuit.nets[i].nCritPaths << "\t";
+      }*/
       exit(1);
   }
 
@@ -68,6 +73,15 @@ int main(int argc, char* argv[])
   statistics.currentWL = cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement);
   
   PrintCircuitInfo(circuit);
+
+  /*ComputeNetWeights(circuit);
+  strcpy(ts, gOptions.benchmarkName);
+  DumpNetWeights(strcat(ts, ".nwts"), circuit);*/
+
+  for (int i = 0; i < circuit.nNets; ++i)
+  {
+  	cout << circuit.nets[i].name << "\t" << circuit.nets[i].numOfPins << endl;
+  }
 
   if (gOptions.doCheckLegality)
   {// if itlAnalyticalPlacer is run with -check key
@@ -85,6 +99,20 @@ int main(int argc, char* argv[])
     Exit();
   }
   
+  if (gOptions.isConvertDEF2pl && gOptions.defNamesList.size() != 0)
+  {
+    for (list<char*>::iterator iterator = gOptions.defNamesList.begin(); 
+         iterator != gOptions.defNamesList.end(); ++iterator)
+    {
+      cout << "Writing bookshelf pl file from DEF " << *iterator << endl;
+      circuit.nPrimaryOutputs = 0;
+      circuit.nPrimaryInputs  = 0;
+      ParseDEF(*iterator, circuit);
+      CreatePl(*iterator, circuit);
+    }
+    Exit();
+  }
+
   if (gOptions.isLEFDEFinput && gOptions.convert2BookshelfName[0] != '\0')
   {
     LEFDEF2Bookshelf(gOptions.convert2BookshelfName, circuit);
@@ -94,19 +122,11 @@ int main(int argc, char* argv[])
 
   PrintToTmpPL(circuit, statistics);
 
-  PetscInitialize(&argc,&argv,(char *)0,help);
-  TaoInitialize(&argc,&argv,(char *)0,help);
-  
-  int info;       // used to check for functions returning nonzeros
-  int size,rank;  // number of processes running
-  info = MPI_Comm_size(PETSC_COMM_WORLD,&size); CHKERRQ(info);
-  info = MPI_Comm_rank(PETSC_COMM_WORLD,&rank); CHKERRQ(info);
-
-  if (size >1) {
+  /*if (size >1) {
     if (rank == 0)
       PetscPrintf(PETSC_COMM_SELF,"This application is intended for single processor use!\n");
     SETERRQ(1,"Incorrect number of processors");
-  }
+  }*/
 
   startTime = clock();
   //*************** G L O B A L   P L A C E M E N T ********************//
@@ -121,11 +141,25 @@ int main(int argc, char* argv[])
   else
   {
     cout << "itlAnalyticalPlacer started   G L O B A L   P L A C E M E N T\n";
+    
+    PetscInitialize(&argc,&argv,(char *)0,help);
+    TaoInitialize(&argc,&argv,(char *)0,help);
+
+    int info;       // used to check for functions returning nonzeros
+    int size,rank;  // number of processes running
+    info = MPI_Comm_size(PETSC_COMM_WORLD,&size); CHKERRQ(info);
+    info = MPI_Comm_rank(PETSC_COMM_WORLD,&rank); CHKERRQ(info);
+
 #ifdef RECURSIVE_BISECTION
     RecursiveBisection(circuit, statistics);
 #endif
     GlobalPlacement(circuit);
     cout << "G L O B A L   P L A C E M E N T   S U C C E E D\n";
+
+    /* Finalize TAO */
+    TaoFinalize();
+    PetscFinalize();
+
     PrintToTmpPL(circuit, statistics);
   }
 
@@ -216,10 +250,6 @@ int main(int argc, char* argv[])
   {
     CreateHTMLReport(statistics.currentWL, statistics.totalWT, errorCode);
   }
-  
-  /* Finalize TAO */
-  TaoFinalize();
-  PetscFinalize();
 
   Exit();
 

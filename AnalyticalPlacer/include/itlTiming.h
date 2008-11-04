@@ -29,6 +29,8 @@ void PrintArrivalOrder(Circuit& circuit);
 void PrintRequiredOrder(Circuit& circuit);
 void ExportToGraphViz(Circuit& c, char* filename);
 
+double D(double s, double T, double beta);
+void FindCriticalPaths(Circuit& circuit);
 void ComputeNetWeights(Circuit& circuit);
 
 #endif // _ITLTIMING_H_

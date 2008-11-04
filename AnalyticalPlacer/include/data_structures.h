@@ -286,7 +286,7 @@ namespace DataStructures
   {
     // common fields
     int      cellIdx;    /// Index of cell.
-    /// WARNING: Index of cell takes values from 0 to (nNets+nTerminals)
+    /// WARNING: Index of cell takes values from 0 to (nNodes+nTerminals)
     double   xOffset;    /// Horizontal pin's offset by the center of a cell.
     double   yOffset;    /// Vertical pin's offset by the center of a cell.
     char     chtype;     /// The type of the pin (I, O or B).
@@ -295,9 +295,9 @@ namespace DataStructures
     /// 'B' == INOUT
 
     // fields come from lef/def format
-    PinInfo* type;       /// Poiner to technology pin type information.
+    PinInfo* type;       /// Pointer to technology pin type information.
     StNodeEx* routeInfo; /// Pointer to routing point associated with this pin.
-    /// WARNING: This field avaible only if parent net is routed.
+    /// WARNING: This field is available only if parent net is routed.
 
     Pin()
     {
@@ -337,12 +337,14 @@ namespace DataStructures
     Net* requiredOrder; /// Pointer to next net in required time calculation
     RoutingTree* tree;  /// Routing tree (rectilinear A-tree)
 
+    int nCritPaths;     /// Number of critical paths passing through this edge
+
     Net()
     {
       arrPins = 0,      tree =0,        name = 0;
       arrivalOrder = 0, requiredOrder = 0;
       numOfPins = 0,    sourceIdx = UKNOWN_INDEX;
-      currWL = 0.0;
+      currWL = 0.0;     nCritPaths = 0;
     }
   };
 
@@ -361,11 +363,14 @@ namespace DataStructures
     double requiredTime; /// Required time for node.
     double arrivalTime;  /// Arrival time for node.
 
+    // pointer to net with the largest delay
+    Net* critNetIdx;
+
     Place()
     {
       xCoord = 0.0;       yCoord = 0.0;
       orient[0] = 'N',    orient[1] = 0,     orient[2] = 0;
-      requiredTime = 0.0; arrivalTime = 0.0;
+      requiredTime = 0.0; arrivalTime = 0.0; critNetIdx = NULL;
     }
   };
 
@@ -540,6 +545,9 @@ namespace DataStructures
     int    Shift_;
 
     double*   netWeights;
+    std::vector<int>* criticalPaths; /// each critical path is a consecution of indexes of nets arranging this path
+
+    //std::vector<int> pinIdxsInCriticalPath;
 
     Circuit() 
     {

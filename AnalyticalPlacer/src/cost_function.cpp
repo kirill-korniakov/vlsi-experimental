@@ -54,8 +54,46 @@ double cf_recalc_all(bool flag, const int numOfNets, Net* const nets,
   return totalWL;
 }
 
+double cf_recalc_all_with_net_weights(bool flag, const int numOfNets, Net* const nets, 
+                                      const Place* const placement, Circuit &c)
+{
+  int  i, j; // loop counters
+  int  idx;  // index of a cell
+  // borders of bounding rectangular
+  double lborder, rborder, tborder, bborder;
+  double temp;
+  double totalWL = 0; //total wirelength
+  // recalculating half-perimeter of bounding rectangular for each net
+  for (i = 0; i < numOfNets; ++i)
+  {
+    idx = nets[i].arrPins[0].cellIdx;
+    lborder = placement[idx].xCoord + nets[i].arrPins[0].xOffset,
+      rborder = placement[idx].xCoord + nets[i].arrPins[0].xOffset,
+      tborder = placement[idx].yCoord + nets[i].arrPins[0].yOffset,
+      bborder = placement[idx].yCoord + nets[i].arrPins[0].yOffset;
+    for (j = 1; j < nets[i].numOfPins; ++j)
+    {
+      idx  = nets[i].arrPins[j].cellIdx;
+      temp = placement[idx].xCoord + nets[i].arrPins[j].xOffset;
+      (temp < lborder) ? lborder = temp : (temp > rborder)? rborder = temp: true;
+      temp = placement[idx].yCoord + nets[i].arrPins[j].yOffset;
+      (temp < bborder) ? bborder = temp : (temp > tborder)? tborder = temp: true;
+    }
 
-double cf_recalc_some_nets( bool flag, const int numOfNets, Net* const nets,
+    if (flag)// we change nets[i].currWL
+    {    
+      nets[i].currWL = (rborder + tborder - lborder - bborder) * c.netWeights[i];
+      totalWL += nets[i].currWL;
+    }
+    else // we do not change nets[i].currWL
+    {
+      totalWL += (rborder + tborder - lborder - bborder) * c.netWeights[i];
+    }
+  } // for (i = 0; i < numOfNets; ++i)
+  return totalWL;
+}
+
+double cf_recalc_some_nets(bool flag, const int numOfNets, Net* const nets,
          double currentWL, const int* const netsIdx, 
          int numOfChangedNets, const Place* const placement)
 {
@@ -97,11 +135,11 @@ double cf_recalc_some_nets( bool flag, const int numOfNets, Net* const nets,
   return currentWL;
 }
 
-double rude_cf_recalc_some_nets( bool flag, Net* const nets,
-                                 double currentWL, 
-                                 const int* const netsIdx1, int numOfChangedNets1,
-                                 const int* const netsIdx2, int numOfChangedNets2,
-                                 const Place* const placement )
+double rude_cf_recalc_some_nets(bool flag, Net* const nets,
+                                double currentWL, 
+                                const int* const netsIdx1, int numOfChangedNets1,
+                                const int* const netsIdx2, int numOfChangedNets2,
+                                const Place* const placement)
 {
   int  i, j; // loop counters
   int  idx;  // index of a cell
@@ -174,10 +212,10 @@ double rude_cf_recalc_some_nets( bool flag, Net* const nets,
   return currentWL;
 }
 
-double rude_cf_recalc_some_nets( bool flag, Net* const nets,
-                                 double currentWL, 
-                                 const int* const netsIdx, int numOfChangedNets,
-                                 const Place* const placement )
+double rude_cf_recalc_some_nets(bool flag, Net* const nets,
+                                double currentWL, 
+                                const int* const netsIdx, int numOfChangedNets,
+                                const Place* const placement)
 {
   int  i, j; // loop counters
   int  idx;  // index of a cell
@@ -221,10 +259,10 @@ double rude_cf_recalc_some_nets( bool flag, Net* const nets,
 
 
 
-double cf_recalc_some_nodes( bool flag, const int numOfNets, Net* const nets,
-         double currentWL, const int* const nodesIdx, 
-         int numOfChangedNodes, vector<int>* tableOfConnections,
-         const Place* const placement)
+double cf_recalc_some_nodes(bool flag, const int numOfNets, Net* const nets,
+                            double currentWL, const int* const nodesIdx, 
+                            int numOfChangedNodes, vector<int>* tableOfConnections,
+                            const Place* const placement)
 
 {
   int k,t; // loop counters
@@ -285,10 +323,75 @@ double cf_recalc_some_nodes( bool flag, const int numOfNets, Net* const nets,
   return currentWL;
 }
 
-double cf_recalc_some_nodes1( bool flag, const int numOfNets, Net* const nets,
-         double currentWL, vector<int>* nodesIdx, 
-         int numOfChangedNodes, vector<int>* tableOfConnections,
-         const Place* const placement)
+double cf_recalc_some_nodes_with_net_weights(bool flag, const int numOfNets, Net* const nets,
+                                             double currentWL,
+                                             const int* const nodesIdx, // indexes of changed nodes 
+                                             int numOfChangedNodes, // number of changed nodes
+                                             vector<int>* tableOfConnections,
+                                             const Place* const placement,
+                                             Circuit &c)
+{
+  int k,t; // loop counters
+  // number of changed nets
+  int numOfChangedNets; 
+  // indexes of changed nets
+  vector<int> netsIdx;
+  int netIdx;
+  // getting indexes of nets connected with changed nodes using tableOfConnections
+  // duplicating allowed
+  for (k = 0; k < numOfChangedNodes; ++k)
+  { 
+    for (t = 0; t < static_cast<int>(tableOfConnections[nodesIdx[k]].size()); ++t)
+    {
+      netIdx = tableOfConnections[nodesIdx[k]][t];
+      if (netsIdx.end() == find(netsIdx.begin(), netsIdx.end(), netIdx) )
+        netsIdx.push_back(netIdx);  
+    }
+  }
+
+  numOfChangedNets = static_cast<int>( netsIdx.size() );
+
+  int  i, j; // loop counters
+  int  idx;  // index of a cell
+  // borders of bounding rectangular
+  double lborder, rborder, tborder, bborder;
+  double temp;
+  // recalculating half-perimeter of bounding rectangular for each of changed nets
+  for (i = 0; i < numOfChangedNets; ++i)
+  {
+    idx = nets[netsIdx[i]].arrPins[0].cellIdx;
+    lborder = placement[idx].xCoord + nets[netsIdx[i]].arrPins[0].xOffset,
+      rborder = placement[idx].xCoord + nets[netsIdx[i]].arrPins[0].xOffset,
+      tborder = placement[idx].yCoord + nets[netsIdx[i]].arrPins[0].yOffset,
+      bborder = placement[idx].yCoord + nets[netsIdx[i]].arrPins[0].yOffset;
+    for (j = 1; j < nets[netsIdx[i]].numOfPins; ++j)
+    {
+      idx  = nets[netsIdx[i]].arrPins[j].cellIdx;
+      temp = placement[idx].xCoord + nets[netsIdx[i]].arrPins[j].xOffset;
+      (temp < lborder) ? lborder = temp : (temp > rborder)? rborder = temp: true;
+      temp = placement[idx].yCoord + nets[netsIdx[i]].arrPins[j].yOffset;
+      (temp < bborder) ? bborder = temp : (temp > tborder)? tborder = temp: true;
+    }
+
+    if (flag)// we change nets[i].currWL
+    {
+      currentWL -= nets[netsIdx[i]].currWL;
+      nets[netsIdx[i]].currWL = (rborder + tborder - lborder - bborder) * c.netWeights[netsIdx[i]];
+      currentWL += nets[netsIdx[i]].currWL;
+    }
+    else // we do not change nets[i].currWL
+    {
+      currentWL -= nets[netsIdx[i]].currWL;
+      currentWL += (rborder + tborder - lborder - bborder) * c.netWeights[netsIdx[i]];
+    }
+  } // for (i = 0; i < numOfChangedNets; ++i)
+  return currentWL;
+}
+
+double cf_recalc_some_nodes1(bool flag, const int numOfNets, Net* const nets,
+                             double currentWL, vector<int>* nodesIdx, 
+                             int numOfChangedNodes, vector<int>* tableOfConnections,
+                             const Place* const placement)
 
 {
   int k,t; // loop counters
@@ -347,13 +450,13 @@ double cf_recalc_some_nodes1( bool flag, const int numOfNets, Net* const nets,
   } // for (i = 0; i < numOfChangedNets; ++i)
   return currentWL;
 }
- 
-double cf_recalc_some_nodes2( bool flag, const int numOfNets, Net* const nets,
-         double currentWL, 
-         vector<int> nodesIdx1, int numOfChangedNodes1,
-         vector<int> nodesIdx2, int numOfChangedNodes2,
-         vector<int>* tableOfConnections,
-         const Place* const placement)
+
+double cf_recalc_some_nodes2(bool flag, const int numOfNets, Net* const nets,
+                             double currentWL, 
+                             vector<int> nodesIdx1, int numOfChangedNodes1,
+                             vector<int> nodesIdx2, int numOfChangedNodes2,
+                             vector<int>* tableOfConnections,
+                             const Place* const placement)
 
 {
   int k,t; // loop counters

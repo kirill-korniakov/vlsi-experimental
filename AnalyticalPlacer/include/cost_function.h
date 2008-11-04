@@ -23,17 +23,20 @@ using namespace DataStructures;
 /// to change nets[i].currWL
 /// and to 1 if we want to change it
 
-double cf_recalc_all( bool flag, const int numOfNets, Net* const nets, 
-      const Place* const placement );
+double cf_recalc_all(bool flag, const int numOfNets, Net* const nets, 
+                     const Place* const placement);
+
+double cf_recalc_all_with_net_weights(bool flag, const int numOfNets, Net* const nets, 
+                                      const Place* const placement, Circuit &c);
 
 /// this function calculates wirelength for current placement,
 /// it recalculates half-perimeter of bounding rectangular for changed nets
 
-double cf_recalc_some_nets( bool flag, const int numOfNets, Net* const nets,
-        double currentWL, 
-        const int* const netsIdx,// indexes of changed nets 
-        int numOfChangedNets, // number of changed nets
-        const Place* const placement );
+double cf_recalc_some_nets(bool flag, const int numOfNets, Net* const nets,
+                           double currentWL, 
+                           const int* const netsIdx,// indexes of changed nets 
+                           int numOfChangedNets, // number of changed nets
+                           const Place* const placement);
 
 /*
 newWL = rude_cf_recalc_some_nets( 0, nets, currWL, 
@@ -41,34 +44,43 @@ newWL = rude_cf_recalc_some_nets( 0, nets, currWL,
                 &ArrOfBins[rnd3][rnd4]->nets.front(), static_cast<int>(ArrOfBins[rnd3][rnd4]->nets.size()), 
                 placement );
 */
-double rude_cf_recalc_some_nets( bool flag, Net* const nets,
-                                 double currentWL, 
-                                 const int* const netsIdx1, int numOfChangedNets1,
-                                 const int* const netsIdx2, int numOfChangedNets2,
-                                 const Place* const placement );
+double rude_cf_recalc_some_nets(bool flag, Net* const nets,
+                                double currentWL, 
+                                const int* const netsIdx1, int numOfChangedNets1,
+                                const int* const netsIdx2, int numOfChangedNets2,
+                                const Place* const placement);
 
-double rude_cf_recalc_some_nets( bool flag, Net* const nets,
-                                 double currentWL, 
-                                 const int* const netsIdx, int numOfChangedNets,
-                                 const Place* const placement );
+double rude_cf_recalc_some_nets(bool flag, Net* const nets,
+                                double currentWL, 
+                                const int* const netsIdx, int numOfChangedNets,
+                                const Place* const placement);
 
 /// this function calculates wirelength for current placement,
 /// it recalculates half-perimeter of bounding rectangular for nets
 /// connected with changed nodes
  
-double cf_recalc_some_nodes( bool flag, const int numOfNets, Net* const nets,
-         double currentWL,
-         const int* const nodesIdx, // indexes of changed nodes 
-         int numOfChangedNodes, // number of changed nodes
-         vector<int>* tableOfConnections,
-         const Place* const placement );
+double cf_recalc_some_nodes(bool flag, const int numOfNets, Net* const nets,
+                            double currentWL,
+                            const int* const nodesIdx, // indexes of changed nodes 
+                            int numOfChangedNodes, // number of changed nodes
+                            vector<int>* tableOfConnections,
+                            const Place* const placement);
 
-double cf_recalc_some_nodes1( bool flag, const int numOfNets, Net* const nets,
-         double currentWL,
-         vector<int>* nodesIdx, // indexes of changed nodes 
-         int numOfChangedNodes, // number of changed nodes
-         vector<int>* tableOfConnections,
-         const Place* const placement );
+double cf_recalc_some_nodes_with_net_weights(bool flag, const int numOfNets, Net* const nets,
+                                             double currentWL,
+                                             const int* const nodesIdx, // indexes of changed nodes 
+                                             int numOfChangedNodes, // number of changed nodes
+                                             vector<int>* tableOfConnections,
+                                             const Place* const placement,
+                                             Circuit &c);
+
+
+double cf_recalc_some_nodes1(bool flag, const int numOfNets, Net* const nets,
+                             double currentWL,
+                             vector<int>* nodesIdx, // indexes of changed nodes 
+                             int numOfChangedNodes, // number of changed nodes
+                             vector<int>* tableOfConnections,
+                             const Place* const placement);
 
 
 /// this function calculates wirelength for current placement,
@@ -77,11 +89,11 @@ double cf_recalc_some_nodes1( bool flag, const int numOfNets, Net* const nets,
 /// the function gets as the input two arrays of changed nodes;
 
 double cf_recalc_some_nodes2( bool flag, const int numOfNets, Net* const nets,
-         double currentWL,
-         vector<int> nodesIdx1, int numOfChangedNodes1,
-         vector<int> nodesIdx2, int numOfChangedNodes2,
-         vector<int>* tableOfConnections,
-         const Place* const placement );
+                             double currentWL,
+                             vector<int> nodesIdx1, int numOfChangedNodes1,
+                             vector<int> nodesIdx2, int numOfChangedNodes2,
+                             vector<int>* tableOfConnections,
+                             const Place* const placement );
 
 double LogSumExp(const int& numOfNets, Net* const nets, const Place* const placement, const double& alpha);
 

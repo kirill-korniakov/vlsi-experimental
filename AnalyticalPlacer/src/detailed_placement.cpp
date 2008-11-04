@@ -128,14 +128,14 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
   {
     rngStartTime = rdtsc();
     
-    GetIntegerRandomNumbers( randomRow, circuit.nNodes, 0, circuit.nRows);
-    GetFloatRandomNumbers( randomRowElement, circuit.nNodes, 0.0, 1.0);
-    GetFloatRandomNumbers( prob, circuit.nNodes, 0.0, 1.0);
+    GetIntegerRandomNumbers(randomRow, circuit.nNodes, 0, circuit.nRows);
+    GetFloatRandomNumbers(randomRowElement, circuit.nNodes, 0.0, 1.0);
+    GetFloatRandomNumbers(prob, circuit.nNodes, 0.0, 1.0);
     
     rngFinishTime   = rdtsc();
     rngLITotalTime += rngFinishTime - rngStartTime;
     
-    wlBeforeIteration = cf_recalc_all( 0, circuit.nNets, circuit.nets, circuit.placement);
+    wlBeforeIteration = cf_recalc_all_with_net_weights(0, circuit.nNets, circuit.nets, circuit.placement, circuit);
     cout << iterCount++ << "\t";
     cout << wlBeforeIteration << "\t";
     wlBeforeStage = wlBeforeIteration;
@@ -278,7 +278,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
     timeStart     = clock();
     //**************************************************************//
     
-    wlAfterIteration  = cf_recalc_all( 0, circuit.nNets, circuit.nets, circuit.placement);
+    wlAfterIteration  = cf_recalc_all_with_net_weights(0, circuit.nNets, circuit.nets, circuit.placement, circuit);
     
     //cout << "3\n";
     for (int j = 0; j < circuit.nRows; ++j)
@@ -411,7 +411,7 @@ int DetailedPlacement(Circuit& circuit, Statistics& statistics)
   cout << "Time duration of detailed placement phase: "
        << (double)(finish_time - start_time) / CLOCKS_PER_SEC << " sec.\n";
   //final test for possible mistakes(bestWL's value shouldn't change)
-  bestWL = cf_recalc_all( 1, circuit.nNets, circuit.nets, circuit.placement);
+  bestWL = cf_recalc_all_with_net_weights(1, circuit.nNets, circuit.nets, circuit.placement, circuit);
   cout << bestWL << "\n" << "\n";
   cout << "Time occupied by global swap:        " << (double)timeGS / CLOCKS_PER_SEC << " sec.\n";
   cout << "WL decrease gained by global swap:   " << 100 * wlDecreaseGS << "%\n\n";
@@ -559,8 +559,8 @@ double HorizontalSearch(HorSearchDir direction, RowElement** greedy_array, int* 
     circuit.placement[greedy_array[row][cellNumber].cellIdx ].xCoord = rightBorder -
         0.5 * circuit.nodes[greedy_array[row][cellNumber].cellIdx].width;
 
-    currWL = cf_recalc_some_nodes(1, circuit.nNets, circuit.nets, currWL, 
-      nodesIdx, HOR_SEARCH_QUANT, circuit.tableOfConnections, circuit.placement);
+    currWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, currWL, 
+      nodesIdx, HOR_SEARCH_QUANT, circuit.tableOfConnections, circuit.placement, circuit);
     if (currWL < bestWL)
     {
       bestWL = currWL;
@@ -620,8 +620,8 @@ double HorizontalSearch(HorSearchDir direction, RowElement** greedy_array, int* 
     for (int i = 0; i < HOR_SEARCH_QUANT; ++i)
       circuit.placement[ greedy_array[row][number + i].cellIdx ].xCoord = oldXCoord[i];
   }
-  currWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, currWL, 
-      nodesIdx, HOR_SEARCH_QUANT, circuit.tableOfConnections, circuit.placement);
+  currWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, currWL, 
+      nodesIdx, HOR_SEARCH_QUANT, circuit.tableOfConnections, circuit.placement, circuit);
   statistics.currentWL = bestWL;
   return bestWL;
 }
@@ -728,13 +728,13 @@ double VerticalSearch(int currCellIdx, int* numOfCellsInRow, int** arrOfSites, C
         oldY = circuit.placement[currCellIdx].yCoord;
         circuit.placement[currCellIdx].xCoord = maxFreeSpace_siteIdx * siteWidth + 0.5 * circuit.nodes[currCellIdx].width;
         circuit.placement[currCellIdx].yCoord = (newRowIdx + 0.5 ) * siteHeight;
-        benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL, 
-                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement);
+        benefit = oldWL - cf_recalc_some_nodes_with_net_weights( 0, circuit.nNets, circuit.nets, statistics.currentWL, 
+                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement, circuit);
         //3.1.1.2 IF benefit>0 apply changes and BREAK
         if (benefit > -1.0) 
         { 
-          statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL, 
-                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement);
+          statistics.currentWL = cf_recalc_some_nodes_with_net_weights( 1, circuit.nNets, circuit.nets, statistics.currentWL, 
+                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement, circuit);
           /*change arrOfSites*/
           for (t = maxFreeSpace_siteIdx; t < maxFreeSpace_siteIdx + currCellWidthInSites; ++t)
           {
@@ -848,13 +848,13 @@ double VerticalSearch(int currCellIdx, int* numOfCellsInRow, int** arrOfSites, C
         circuit.placement[currCellIdx].xCoord = firstFreeSiteIdx * siteWidth + 0.5 * circuit.nodes[currCellIdx].width;
         circuit.placement[currCellIdx].yCoord = circuit.placement[allPossibleIdx[0]].yCoord;
         allPossibleIdx[numOfCells] = currCellIdx;   //for  cf_recalc_some_nodes(...)
-        benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL,
-                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement);
+        benefit = oldWL - cf_recalc_some_nodes_with_net_weights(0, circuit.nNets, circuit.nets, statistics.currentWL,
+                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement, circuit);
         //3.1.2.3 IF benefit>0 apply changes and BREAK
         if (benefit > -1.0) 
         {   
-          statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL,
-                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement);
+          statistics.currentWL = cf_recalc_some_nodes_with_net_weights( 1, circuit.nNets, circuit.nets, statistics.currentWL,
+                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement, circuit);
           /*change arrOfSites*/
           for (t = firstFreeSiteIdx; t < firstFreeSiteIdx + currCellWidthInSites; ++t)
           {
@@ -993,13 +993,13 @@ double VerticalSearch(int currCellIdx, int* numOfCellsInRow, int** arrOfSites, C
           circuit.placement[trialCellIdx].yCoord = oldY;            
         
           // 3.2.3.3 Calculate the benefit (difference between oldWL and newWL)
-          benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL,
-                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement);
+          benefit = oldWL - cf_recalc_some_nodes_with_net_weights(0, circuit.nNets, circuit.nets, statistics.currentWL,
+                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement, circuit);
           // 3.2.3.4 IF (benefit>0) apply changes and BREAK
           if (benefit > 0.0)
           {
-            statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL,
-                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement);
+            statistics.currentWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, statistics.currentWL,
+                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement, circuit);
             // change arrOfSites
             //   calculate the left sites of the exchanged cells
             //   fill the corresponding number of sites with cell indexes  
@@ -1155,12 +1155,12 @@ double GlobalSwap(int currCellIdx, int* numOfCellsInRow, int** arrOfSites,
         oldY = circuit.placement[currCellIdx].yCoord;
         circuit.placement[currCellIdx].xCoord = maxFreeSpace_siteIdx * siteWidth + 0.5 * circuit.nodes[currCellIdx].width;
         circuit.placement[currCellIdx].yCoord = circuit.rows[optimalRowIdx + i].coordinate + 0.5 * siteHeight;
-        benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL, 
-                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement);
+        benefit = oldWL - cf_recalc_some_nodes_with_net_weights(0, circuit.nNets, circuit.nets, statistics.currentWL, 
+                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement, circuit);
         if (benefit > -1.0) 
         {   
-          statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL, 
-                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement);
+          statistics.currentWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, statistics.currentWL, 
+                  &currCellIdx, 1, circuit.tableOfConnections, circuit.placement, circuit);
           /*change arrOfSites*/
           for (t = maxFreeSpace_siteIdx; t < maxFreeSpace_siteIdx + currCellWidthInSites; ++t)
           {
@@ -1266,12 +1266,12 @@ double GlobalSwap(int currCellIdx, int* numOfCellsInRow, int** arrOfSites,
         circuit.placement[currCellIdx].xCoord = firstFreeSiteIdx * siteWidth + 0.5 * circuit.nodes[currCellIdx].width;
         circuit.placement[currCellIdx].yCoord = circuit.placement[allPossibleIdx[0]].yCoord;
         allPossibleIdx[numOfCells] = currCellIdx;   //for  cf_recalc_some_nodes(...)
-        benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL,
-                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement);
+        benefit = oldWL - cf_recalc_some_nodes_with_net_weights(0, circuit.nNets, circuit.nets, statistics.currentWL,
+                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement, circuit);
         if (benefit > -1.0) 
         {   
-          statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL,
-                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement);
+          statistics.currentWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, statistics.currentWL,
+                  allPossibleIdx, numOfCells + 1, circuit.tableOfConnections, circuit.placement, circuit);
           /*change arrOfSites*/
           for (t = firstFreeSiteIdx; t < firstFreeSiteIdx + currCellWidthInSites; ++t)
           {
@@ -1415,13 +1415,13 @@ double GlobalSwap(int currCellIdx, int* numOfCellsInRow, int** arrOfSites,
           circuit.placement[trialCellIdx].yCoord = oldY;            
         
           //2.2.3.3 Calculate the benefit (difference between oldWL and newWL)
-          benefit = oldWL - cf_recalc_some_nodes( 0, circuit.nNets, circuit.nets, statistics.currentWL,
-                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement);
+          benefit = oldWL - cf_recalc_some_nodes_with_net_weights(0, circuit.nNets, circuit.nets, statistics.currentWL,
+                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement, circuit);
           //2.2.3.4 IF (benefit>0) apply changes and BREAK
           if (benefit > -1.0)
           {
-            statistics.currentWL = cf_recalc_some_nodes( 1, circuit.nNets, circuit.nets, statistics.currentWL,
-                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement);
+            statistics.currentWL = cf_recalc_some_nodes_with_net_weights(1, circuit.nNets, circuit.nets, statistics.currentWL,
+                  nodesIdx, 2, circuit.tableOfConnections, circuit.placement, circuit);
             //         change arrOfSites
             //           fill the corresponding number of sites with cell indexes
             

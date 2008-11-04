@@ -189,7 +189,7 @@ void PrintErrorMessage(char* errorMsg, int errorCode)
   }
   else
     strcpy( errorMsg, "OK\n" );
-  //strcpy( errorMsg, "\nNo errors detected while programm execution\nDeleting memory...\n" );
+  //strcpy( errorMsg, "\nNo errors detected while program execution\nDeleting memory...\n" );
 }
 
 MULTIPLACER_ERROR Initialization(Circuit& circuit, Statistics& statistics)

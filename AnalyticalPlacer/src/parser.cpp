@@ -524,7 +524,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       ++i;
       continue;
     }
-    else if (stricmp( argv[i], "-dp") == 0)
+    else if (stricmp(argv[i], "-dp") == 0)
     {
       gOptions.doGlobalPlacement  = false;
       gOptions.doBinSwapping         = false;
@@ -539,12 +539,12 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-noDP") == 0)
+    else if (stricmp(argv[i], "-noDP") == 0)
     {
       gOptions.doDetailedPlacement = false;
       continue;
     }
-    else if (stricmp( argv[i], "-check") == 0)
+    else if (stricmp(argv[i], "-check") == 0)
     {
       gOptions.doCheckLegality     = true;
       if (i < argc - 1 && argv[i+1][0] != '-')
@@ -554,24 +554,24 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-test") == 0)
+    else if (stricmp(argv[i], "-test") == 0)
     {
       gOptions.doTest   = true;
       gOptions.doDumpGP = true;
       continue;
     }
-    else if (stricmp( argv[i], "-dumpGP") == 0)
+    else if (stricmp(argv[i], "-dumpGP") == 0)
     {
       gOptions.doDumpGP = true;
       continue;
     }
-    else if (stricmp( argv[i], "-onlyGP") == 0)
+    else if (stricmp(argv[i], "-onlyGP") == 0)
     {
       gOptions.doDumpGP = true;
       gOptions.onlyGP   = true;
       continue;
     }
-    else if (stricmp( argv[i], "-onlyConvertToRouter") == 0)
+    else if (stricmp(argv[i], "-onlyConvertToRouter") == 0)
     {//Usage: itlAnalyticalPlacer.exe -f placement.aux -onlyConvertToRouter <Outputname> <TileSize> <VertCapacity> <HorizCapacity>
       gOptions.doConvertToRouter = true;
       strcpy(gOptions.GRFileName, argv[i+1]);
@@ -581,7 +581,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       i+=4;
       continue;
     }
-    else if (stricmp( argv[i], "-def") == 0)
+    else if (stricmp(argv[i], "-def") == 0)
     {
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
@@ -590,7 +590,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-lef") == 0)
+    else if (stricmp(argv[i], "-lef") == 0)
     {
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
@@ -599,7 +599,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-nw") == 0)
+    else if (stricmp(argv[i], "-nw") == 0)
     {
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
@@ -608,7 +608,7 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-convert2bs") == 0)
+    else if (stricmp(argv[i], "-convert2bs") == 0)
     {
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
@@ -617,11 +617,21 @@ MULTIPLACER_ERROR CMDParse(int argc, char* argv[])
       }
       continue;
     }
-    else if (stricmp( argv[i], "-calcTiming") == 0)
+    else if (stricmp(argv[i], "-calcTiming") == 0)
     {
       if (i < argc - 1 && argv[i+1][0] != '-')
       {
         strcpy(gOptions.calcTimingFileName, argv[i+1]);
+        ++i;
+      }
+      continue;
+    }
+    else if (stricmp(argv[i], "-convertDEF2pl") == 0)
+    {
+      gOptions.isConvertDEF2pl = true;
+      while (i < argc - 1 && argv[i+1][0] != '-')
+      {
+        gOptions.defNamesList.push_back(argv[i+1]);
         ++i;
       }
       continue;

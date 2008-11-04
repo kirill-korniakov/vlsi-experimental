@@ -341,7 +341,7 @@ void MultilevelFramework::InitializeOptimizationProblemParameters(AppCtx &user, 
   }
   user.meanBinArea = user.totalCellArea / user.nBinCols / user.nBinRows;
   
-  /*ComputeNetWeights(circuit, clusters, netList, netWeights);*/
+  //ComputeNetWeights(circuit, clusters, netList, netWeights);
   user.netWeights = circuit.netWeights;
 
   LogExit("MultilevelFramework::InitializeOptimizationProblemParameters");

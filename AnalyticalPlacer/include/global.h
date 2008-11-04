@@ -46,6 +46,9 @@ struct Options
   char convert2BookshelfName[256];
   char calcTimingFileName[256];
   bool isLEFDEFinput;
+  
+  bool isConvertDEF2pl;
+  list<char*> defNamesList;
 
   bool doDumpGP;
   bool onlyGP;
@@ -129,8 +132,8 @@ class Tccout
     char logFileName[128];
     void Start()
     {
-      logFile = fopen(logFileName, "a+");
-      char cmdString[512];
+      //logFile = fopen(logFileName, "a+");
+      char cmdString[4096];
       char buffer[256];
       time_t ltime;
       time(&ltime);
@@ -153,9 +156,9 @@ class Tccout
         fputs("# Command line:   ", logFile);
         fputs(cmdString, logFile);
         sprintf(buffer, "\n# Date:           %s", ctime(&ltime));
-        fputs(buffer, logFile );
+        fputs(buffer, logFile);
         fputs("\n---------------------------------------------\n\n", logFile);
-        fclose(logFile );
+        fclose(logFile);
       }  
     }
     Tccout()
