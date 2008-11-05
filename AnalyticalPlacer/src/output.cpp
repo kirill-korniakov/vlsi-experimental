@@ -23,7 +23,7 @@ void PrintResultString(int argc, char* argv[], Statistics& statistics, MULTIPLAC
   FILE *resultFile, *configFile;
   char string[64], *pVar, vslString[256], resultString[1024];
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   resultFile = fopen(resultFileName, "a");
   configFile = fopen(gOptions.configName, "r");
   if (resultFile)
@@ -90,7 +90,7 @@ void PrintToPL(const char* fileName, Circuit& circuit, Statistics& statistics,
                int nBinRows, int nBinCols)
 {
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   FILE *f;
   char buffer[256];
   char newFileName[256];
@@ -196,7 +196,7 @@ void PrintToPL(const char* fileName, Circuit& circuit,
                double shiftX, double shiftY, int nBinRows, int nBinCols)
 {
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   FILE *f;
   char buffer[256];
   char newFileName[256];
@@ -278,7 +278,7 @@ void PrintToPL(const char* fileName, Circuit& circuit,
 void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, double shiftY)
 {
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   FILE *f;
   char buffer[256];
   char newFileName[256];
@@ -315,7 +315,7 @@ void PrintToTmpPL(Circuit& circuit, Statistics& statistics, double shiftX, doubl
 void PrintToTmpPL(Circuit& circuit, double shiftX, double shiftY)
 {
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   FILE *f;
   char buffer[256];
   char newFileName[256];
@@ -463,7 +463,7 @@ void CreateHTMLReport(double wireLength, double workTime, MULTIPLACER_ERROR erro
   char *pVar = NULL;
   int fileLen = 0;
   time_t ltime;
-  time( &ltime );
+  time(&ltime);
   /*testResFile = fopen("testReport.txt", "a");
   if (testResFile)
   {
@@ -674,20 +674,9 @@ void PrintNetsToRouterFormat(Circuit& circuit)
   out.close();
 }
 
-void DumpNetWeights(char* fileName, Circuit& circuit)
+
+void DumpNetWeightsToFile(char* fileName, Circuit& circuit)
 {
-  if (fileName == 0)
-  {
-    cout << "null pointer on dumping net-weights file. Skipping net-weights dump\n";
-    return;
-  }
-
-  if (!gOptions.isLEFDEFinput)
-  {
-    cout << "Skipping dumping net-weights step\n";
-    return;
-  }
-
   FILE *netWeightsFile;
   char currString[32];
 
@@ -704,6 +693,65 @@ void DumpNetWeights(char* fileName, Circuit& circuit)
 
     fclose(netWeightsFile);
   }
+}
+
+void DumpNetWeights(char* fileName, Circuit& circuit)
+{
+  if (fileName == 0)
+  {
+    cout << "null pointer on dumping net-weights file. Skipping net-weights dump\n";
+    return;
+  }
+
+  if (!gOptions.isLEFDEFinput)
+  {
+    cout << "Skipping dumping net-weights step\n";
+    return;
+  }
+  
+  time_t ltime;
+  time(&ltime);
+  char newFileName[256];
+  char pathName[256];
+  char *pVal;
+
+  strcpy(newFileName, fileName);
+  strcat(newFileName, ".nwts");
+  DumpNetWeightsToFile(newFileName, circuit);
+  
+  strcpy(newFileName, fileName);
+  pVal = strrchr(newFileName, '\\');
+  if (pVal)
+  {
+    pVal[0] = 0;
+    strcpy(pathName, newFileName);
+    strcat(pathName, "\\");
+    pVal[0] = '\\';
+    strcpy(newFileName, ++pVal);
+  }
+  pVal = strrchr(newFileName, '.');
+  if (pVal) pVal[0] = '\0';
+  strcat(newFileName, " itlAPlacer ");
+  strcat(newFileName, ctime(&ltime));
+  pVal = strrchr(newFileName, '\n');
+  if (pVal) pVal[0] = '\0';
+  while (1)
+  {
+    pVal = strchr(newFileName, ' ');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+  while (1)
+  {
+    pVal = strchr(newFileName, ':');
+    if (pVal) pVal[0] = '_';
+    else break;
+  }
+
+  strcat(pathName, strcat(newFileName, ".nwts"));
+
+  // Dump net weights to file with date
+  DumpNetWeightsToFile(pathName, circuit);
 }
 
 void LEFDEF2Bookshelf(char* baseName, Circuit& circuit)

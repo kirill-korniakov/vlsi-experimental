@@ -286,15 +286,7 @@
 				RelativePath="..\src\flute.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release4VTune|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool

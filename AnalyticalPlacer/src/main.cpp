@@ -74,14 +74,9 @@ int main(int argc, char* argv[])
   
   PrintCircuitInfo(circuit);
 
-  /*ComputeNetWeights(circuit);
+  ComputeNetWeights(circuit);
   strcpy(ts, gOptions.benchmarkName);
-  DumpNetWeights(strcat(ts, ".nwts"), circuit);*/
-
-  for (int i = 0; i < circuit.nNets; ++i)
-  {
-  	cout << circuit.nets[i].name << "\t" << circuit.nets[i].numOfPins << endl;
-  }
+  DumpNetWeights(ts, circuit);
 
   if (gOptions.doCheckLegality)
   {// if itlAnalyticalPlacer is run with -check key
@@ -227,7 +222,7 @@ int main(int argc, char* argv[])
   statistics.currentWL = cf_recalc_all(0, circuit.nNets, circuit.nets, circuit.placement);
 
   ComputeNetWeights(circuit);
-  DumpNetWeights(strcat(ts, ".nwts"), circuit);
+  DumpNetWeights(ts, circuit);
 
   // checking the legality of resulting placement
   errorCode = CheckLegalityOfPlacement(circuit);

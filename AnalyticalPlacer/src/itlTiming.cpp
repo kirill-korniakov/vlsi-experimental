@@ -462,7 +462,7 @@ void ComputeNetWeights(Circuit& circuit)
   tableOfCritPaths = new std::vector<int>[circuit.nNets];
   for (int i = 0; i < circuit.nPrimaryOutputs; ++i)
   {
-    for (int j = 0; j < circuit.criticalPaths[i].size(); ++j)
+    for (unsigned int j = 0; j < circuit.criticalPaths[i].size(); ++j)
     {
       tableOfCritPaths[circuit.criticalPaths[i][j]].push_back(i);
     }
@@ -620,7 +620,7 @@ void FindCriticalPaths(Circuit& circuit)
     isBeginningReached = false;
     while (!isBeginningReached)
     {
-      int nNets = circuit.tableOfConnections[currNodeIdx].size();
+      int nNets = static_cast<int>(circuit.tableOfConnections[currNodeIdx].size());
       
       if (nNets == 0) // strange case but it does happen
       {
