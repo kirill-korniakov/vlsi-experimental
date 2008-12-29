@@ -1,0 +1,6 @@
+abt01.aux
+RowsNum: 3;
+firstRow: 1;
+Row1: [1; 8]
+Row2: [1; 8]
+Row3: [1; 8]

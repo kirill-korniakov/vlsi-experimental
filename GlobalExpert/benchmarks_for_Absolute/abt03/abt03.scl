@@ -1,0 +1,53 @@
+UCLA scl 1.0
+# Created     : Sat Oct  4 16:28:33 2008
+# User        : alexanderbelyakov@itlab.unn.ru
+# Platform    : Windows XP 32 bit
+
+
+NumRows : 5
+
+CoreRow Horizontal
+ Coordinate   :          0
+ Height       :          1
+ Sitewidth    :          1
+ Sitespacing  :          1
+ Siteorient   :         N 
+ Sitesymmetry :         Y 
+ SubrowOrigin :          0 Numsites :       7
+End
+CoreRow Horizontal
+ Coordinate   :          1
+ Height       :          1
+ Sitewidth    :          1
+ Sitespacing  :          1
+ Siteorient   :         N 
+ Sitesymmetry :         Y 
+ SubrowOrigin :          0 Numsites :       7
+End
+CoreRow Horizontal
+ Coordinate   :          2
+ Height       :          1
+ Sitewidth    :          1
+ Sitespacing  :          1
+ Siteorient   :         N 
+ Sitesymmetry :         Y 
+ SubrowOrigin :          0 Numsites :       7
+End
+CoreRow Horizontal
+ Coordinate   :          3
+ Height       :          1
+ Sitewidth    :          1
+ Sitespacing  :          1
+ Siteorient   :         N 
+ Sitesymmetry :         Y 
+ SubrowOrigin :          0 Numsites :       7
+End
+CoreRow Horizontal
+ Coordinate   :          4
+ Height       :          1
+ Sitewidth    :          1
+ Sitespacing  :          1
+ Siteorient   :         N 
+ Sitesymmetry :         Y 
+ SubrowOrigin :          0 Numsites :       7
+End

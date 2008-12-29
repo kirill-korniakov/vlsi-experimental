@@ -1,0 +1,28 @@
+UCLA nodes 1.0
+# Created     : Sat Oct  4 16:28:33 2008
+# User        : alexanderbelyakov@itlab.unn.ru
+# Platform    : Windows XP 32 bit
+
+NumNodes :            21
+NumTerminals :        12
+        a0          1          1 
+        a1          1          1 
+        a2          1          1 
+        a3          1          1 
+        a4          1          1 
+        a5          1          1 
+        a6          1          1 
+        a7          1          1 
+        a8          1          1 
+        p1           1          1 terminal
+        p2           1          1 terminal
+        p3           1          1 terminal
+        p4           1          1 terminal
+        p5           1          1 terminal
+        p6           1          1 terminal
+        p7           1          1 terminal
+        p8           1          1 terminal
+        p9           1          1 terminal
+       p10           1          1 terminal
+       p11           1          1 terminal
+       p12           1          1 terminal

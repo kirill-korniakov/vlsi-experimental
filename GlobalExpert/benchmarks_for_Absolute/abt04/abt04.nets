@@ -1,0 +1,57 @@
+UCLA nets 1.0
+# Created     : Sat Oct  4 16:28:33 2008
+# User        : alexanderbelyakov@itlab.unn.ru
+# Platform    : Windows XP 32 bit
+
+NumNets : 16
+NumPins : 18
+NetDegree : 2 
+      p10  B 
+      a11  B 
+NetDegree : 2 
+      a21  B 
+      p20  B 
+NetDegree : 2 
+      a31  B 
+      p30  B 
+NetDegree : 2 
+      a34  B 
+      p35  B 
+NetDegree : 2 
+      a41  B 
+      p40  B 
+NetDegree : 2 
+      a43  B 
+      p44  B 
+NetDegree : 2 
+      p51  B 
+      a41  B 
+NetDegree : 2 
+      a42  B 
+      p52  B 
+NetDegree : 3 
+      a11  B 
+      a12  B 
+      a21  B 
+NetDegree : 2 
+      a21  B 
+      a33  B 
+NetDegree : 3 
+      a31  B 
+      a32  B 
+      a41  B
+NetDegree : 2 
+      a32  B 
+      a33  B 
+NetDegree : 2 
+      a33  B 
+      a34  B 
+NetDegree : 2 
+      a34  B 
+      a43  B 
+NetDegree : 2 
+      a41  B 
+      a42  B 
+NetDegree : 2 
+      a42  B 
+      a43  B 
