@@ -1,0 +1,81 @@
+package Solver version 0.0.3 {
+  /** 0 continue iterating
+     2 res <= atol 
+     3 res/res <= rtol 
+     4 xdiff <= trtol
+     5 f <= fmin
+     -2 its > maxits
+     -4 numerical problem
+     -5 nfunc > maxnfuncs
+     -6 line search failure
+     -7 trust region failure */
+  
+  enum TerminateReason {
+    CONTINUE_ITERATING = 0,
+    CONVERGED_ATOL = 2,  
+    CONVERGED_RTOL = 3,  
+    CONVERGED_TRTOL = 4, 
+    CONVERGED_MINF = 5,  
+    DIVERGED_MAXITS = -2, 
+    DIVERGED_NAN = -4,   
+    DIVERGED_MAXFCN = -5, 
+    DIVERGED_LS_FAILURE = -6, 
+    DIVERGED_TR_REDUCTION = -7 
+  };
+
+
+  interface ProjectState {
+    // Beginner
+    int Initialize(in array<string,1> argv);
+    int InitializeNoArgs();
+    int Finalize();
+  };
+    
+      
+  interface OptimizationSolver {
+
+    // Beginner
+
+    int Create(in string method);
+
+    int Destroy();
+
+    
+    int SetTolerances(in double fatol, in double frtol,
+			 in double catol, in double crtol);
+
+    int SolveApplication(in Optimize.OptimizationModel app);
+
+    int View();
+
+
+    // Intermediate
+    int GetIterationData(out int iterate, out double f, out double gnorm,
+			    out double cnorm, out double xdiff,
+			    out TerminateReason reason);
+
+    int GetMethod(out string type);
+    
+    int SetFunctionLowerBound(in double fmin);
+
+    int GetGradientTolerances(out double gatol, 
+				 out double grtol, out double gttol);
+    int SetGradientTolerances(in double gatol, 
+				 in double grtol, in double gttol);
+
+    int SetMaximumFunctionEvaluations(in int nfcn);
+    int SetMaximumIterates(in int maxits);
+
+    int SetMethod(in string type);
+
+
+    int SetLAFactory(in LinearAlgebra.Factory factory);
+
+    int SetFromOptions();
+
+
+    // Expert
+    int GetSolverHandle(out opaque handle);
+
+  };
+};

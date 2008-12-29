@@ -1,0 +1,1 @@
+benchmark: 	ibm01.aux	 wirelength: 	1681032	 worktime: 	442.160	 GO impr:	7.164230	-f	ibm01.aux	-tao_monitor	BS duration: 	0.000	 RNG in BS duration: 	0.00000	CA duration: 	0.000	 RNG in CA duration: 	0.00000	 RN count: 	0	LI duration: 	11.619	 RNG in LI duration: 	0.00072	Sat Sep 20 18:20:34 2008

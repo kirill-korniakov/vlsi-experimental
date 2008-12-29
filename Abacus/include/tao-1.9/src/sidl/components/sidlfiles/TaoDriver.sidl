@@ -1,0 +1,3 @@
+package TaoDriver version 0.0.2 {
+  class Component implements-all gov.cca.ports.GoPort, gov.cca.Component {};
+};

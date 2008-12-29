@@ -1,0 +1,4 @@
+package GA version 0.0.3 {
+  class Factory implements-all OptimizationPorts.LAFactoryPort, gov.cca.Component {};
+};
+  
