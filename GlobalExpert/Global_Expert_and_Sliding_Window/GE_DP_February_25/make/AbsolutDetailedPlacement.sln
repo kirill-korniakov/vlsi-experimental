@@ -1,0 +1,75 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_detailed_placement", "itlAnalyticalPlacer.vcproj", "{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IntegrationWithSolver", "IntegrationWithSolver.vcproj", "{0B9F3EA0-C691-4430-A60C-A8767E252974}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Intel MPI|Win32 = Debug Intel MPI|Win32
+		Debug MPICH1|Win32 = Debug MPICH1|Win32
+		Debug MPICH2|Win32 = Debug MPICH2|Win32
+		Debug MS MPI|Win32 = Debug MS MPI|Win32
+		Debug|Win32 = Debug|Win32
+		Release Intel MPI ia32 on em64t|Win32 = Release Intel MPI ia32 on em64t|Win32
+		Release Intel MPI|Win32 = Release Intel MPI|Win32
+		Release MPICH1|Win32 = Release MPICH1|Win32
+		Release MPICH2|Win32 = Release MPICH2|Win32
+		Release MS MPI|Win32 = Release MS MPI|Win32
+		Release|Win32 = Release|Win32
+		Release4VTune|Win32 = Release4VTune|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug Intel MPI|Win32.ActiveCfg = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug Intel MPI|Win32.Build.0 = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MPICH1|Win32.ActiveCfg = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MPICH1|Win32.Build.0 = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MPICH2|Win32.ActiveCfg = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MPICH2|Win32.Build.0 = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MS MPI|Win32.ActiveCfg = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug MS MPI|Win32.Build.0 = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Debug|Win32.Build.0 = Debug|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release Intel MPI ia32 on em64t|Win32.ActiveCfg = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release Intel MPI ia32 on em64t|Win32.Build.0 = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release Intel MPI|Win32.ActiveCfg = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release Intel MPI|Win32.Build.0 = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MPICH1|Win32.ActiveCfg = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MPICH1|Win32.Build.0 = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MPICH2|Win32.ActiveCfg = Release|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MPICH2|Win32.Build.0 = Release|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MS MPI|Win32.ActiveCfg = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release MS MPI|Win32.Build.0 = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release|Win32.ActiveCfg = Release|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release|Win32.Build.0 = Release|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release4VTune|Win32.ActiveCfg = Release4VTune|Win32
+		{EB6AF2EF-1483-4B1E-91A7-8D0B440AC624}.Release4VTune|Win32.Build.0 = Release4VTune|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug Intel MPI|Win32.ActiveCfg = Debug Intel MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug Intel MPI|Win32.Build.0 = Debug Intel MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MPICH1|Win32.ActiveCfg = Debug MPICH1|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MPICH1|Win32.Build.0 = Debug MPICH1|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MPICH2|Win32.ActiveCfg = Debug MPICH2|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MPICH2|Win32.Build.0 = Debug MPICH2|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MS MPI|Win32.ActiveCfg = Debug MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug MS MPI|Win32.Build.0 = Debug MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug|Win32.ActiveCfg = Debug MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Debug|Win32.Build.0 = Debug MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release Intel MPI ia32 on em64t|Win32.ActiveCfg = Release Intel MPI ia32 on em64t|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release Intel MPI ia32 on em64t|Win32.Build.0 = Release Intel MPI ia32 on em64t|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release Intel MPI|Win32.ActiveCfg = Release Intel MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release Intel MPI|Win32.Build.0 = Release Intel MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MPICH1|Win32.ActiveCfg = Release MPICH1|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MPICH1|Win32.Build.0 = Release MPICH1|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MPICH2|Win32.ActiveCfg = Release MPICH2|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MPICH2|Win32.Build.0 = Release MPICH2|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MS MPI|Win32.ActiveCfg = Release MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release MS MPI|Win32.Build.0 = Release MS MPI|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release|Win32.ActiveCfg = Release Intel MPI ia32 on em64t|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release|Win32.Build.0 = Release Intel MPI ia32 on em64t|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release4VTune|Win32.ActiveCfg = Release Intel MPI ia32 on em64t|Win32
+		{0B9F3EA0-C691-4430-A60C-A8767E252974}.Release4VTune|Win32.Build.0 = Release Intel MPI ia32 on em64t|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
