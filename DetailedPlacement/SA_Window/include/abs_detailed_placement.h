@@ -30,11 +30,11 @@ struct WindowElement
 
 struct RectangularWindowElement: public WindowElement
 {
-  int rowIdx;
-  double width;
-  double YCoord;
+    int rowIdx;
+    double width;
+    double YCoord;
 
-  double GetY() {return YCoord;}
+    double GetY() {return YCoord;}
 };
 
 void QuickSortRowElement(WindowElement* a, long N);
@@ -52,17 +52,17 @@ struct BasicWindow
 
 struct RectangularWindow: public BasicWindow
 {
-  RectangularWindowElement *elements;
+    RectangularWindowElement *elements;
 
-  RectangularWindow(int _nRows, int _first, double x_array[], int _num, const Circuit &circuit, int indexes[]);
-  ~RectangularWindow() { delete [] elements; }
+    RectangularWindow(int _nRows, int _first, double x_array[], int _num, const Circuit &circuit, int indexes[]);
+    ~RectangularWindow() { delete [] elements; }
 
-  void PlaceCells(Circuit &circuit);
-  double g1WindowBounds(const Circuit &circuit);
-  double g2Overlaps(const Circuit &circuit);
-  double CalcWL(Circuit &circuit);
-  double RecalcWl(Circuit &circuit, double currWL, const int changedNets[],
-                    int changedNetsCount);
+    void PlaceCells(Circuit &circuit);
+    double g1WindowBounds(const Circuit &circuit);
+    double g2Overlaps(const Circuit &circuit);
+    double CalcWL(Circuit &circuit);
+    double RecalcWl(Circuit &circuit, double currWL, const int changedNets[],
+        int changedNetsCount);
 };
 
 struct GeneralWindow: public BasicWindow
@@ -77,7 +77,7 @@ struct GeneralWindow: public BasicWindow
     double g2Overlaps(const Circuit &circuit);
     double CalcWL(const Circuit &circuit);
     double RecalcWl(Circuit &circuit, double currWL, const int changedNets[],
-                    int changedNetsCount);
+        int changedNetsCount);
 
     void PlaceCells(Circuit &circuit);
     ~GeneralWindow() {delete [] boundX; delete [] elements; }
@@ -87,9 +87,9 @@ struct GeneralWindow: public BasicWindow
 struct WindowWithOrderedCells: public GeneralWindow
 {
     double *spaces; //spaces between cells
-    
+
     WindowWithOrderedCells(int rows_num, int first, double x_array[], int elements_num, 
-                                                const Circuit &circuit, int indexes[]);
+        const Circuit &circuit, int indexes[]);
     void GetCoords(const Circuit &circuit); //get extended coords of cells from spaces
     double CalcBoundsPenalty(const Circuit &circuit); //similar to g1WindowBounds
     double CalcWireLenght(const Circuit &circuit); //similar to CalcWL

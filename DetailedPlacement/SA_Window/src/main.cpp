@@ -23,8 +23,8 @@
 //#include "..\include\abs_detailed_placement.h"
 #include "..\include\SA_Window.h"
 
-#define numOfCells 9
-#define numOfSteps 1
+#define numOfCells 20
+#define numOfSteps 4000
 #define numOfRows 3
 
 SAWindow *slidingWindow;
@@ -146,10 +146,10 @@ int Initialize() {
     _argv[0] = "detailed_placement";
     _argv[1] = "-f";
     int firstRow = 0;
-    _argv[2] = "abt01.aux";
+    _argv[2] = "ibm01.aux";
 
     char abtBoundsFile[] = "benchmark_info.txt";	
-    //int rows_num = 2; //ReadBounds(abtBoundsFile, x_array, _argv[2], firstRow);
+    //ReadBounds(abtBoundsFile, x_array, _argv[2], firstRow);
     MULTIPLACER_ERROR errorCode = OK;
     CMDParse(_argc, _argv);
 
@@ -209,6 +209,7 @@ int Initialize() {
     cout<<"WL before window: "<<cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement)<<endl;
     MakeWindows(circuit, numOfSteps, numOfCells, numOfRows);
     cout<<"WL after window: "<<cf_recalc_all(UPDATE_NETS_WLS, circuit.nNets, circuit.nets, circuit.placement)<<endl;
+    CheckLegalityOfPlacement(circuit);
     return 0;
 }
 
@@ -216,202 +217,6 @@ int main() {
     Initialize();
     system("PAUSE");    
     return 0;
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-////                                     //
-////          NIZHNY NOVGOROD STATE UNIVERSITY           //
-////                                     //
-////         Copyright (c) 1999-2006 by A. Sysoyev.          //
-////              All Rights Reserved.               //
-////                                     //
-////  File:    ${DLL_NAME}.cpp                       //
-////                                     //
-////  Purpose:   implementation of all involved functionals          //
-////                                     //
-////  Author(s): Vinogradov                          //
-////                                     //
-///////////////////////////////////////////////////////////////////////////////
-
-#define PREFIX_EXPORT extern "C" __declspec(dllexport)
-#define M_PI 3.1415926535897932384626433832795
-
-int DIMENSION = circuit.nNodes;
-bool first_time = true;
-
-#define MAX_PATH 260
-static char DllWorkingDir[MAX_PATH];
-static char ExternalWorkingDir[MAX_PATH];
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT int __cdecl getDimension()
-{
-    return DIMENSION;
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT bool __cdecl setDimension(int dimension)
-{
-    if (dimension > 1)
-    {
-        DIMENSION = dimension;
-        return true;
-    }
-    else
-        return false;
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT int __cdecl getNumberOfFunctions()
-{
-    return 3;
-}
-
-//----------------------------------------------------------------------------
-PREFIX_EXPORT int __cdecl getNumberOfConstraints()
-{
-    return 2;
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT bool __cdecl getOrderOfCriteria(int* order)
-{
-    if (order == NULL)
-        return false;
-    order[0] = 2; ///2
-    return true;
-}
-
-PREFIX_EXPORT bool __cdecl getOrderOfConstraints(int* order)
-{
-    if (order == NULL)
-        return false;
-    order[0] = 0;
-    order[1] = 1;
-    return true;
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT bool __cdecl getDomain(double* a, double* b)
-{
-    if (a != NULL && b != NULL)
-    {
-        for (int i = 0; i < DIMENSION; ++i)
-        {
-//            a[i] = 0; b[i] = slidingWindow->boundX[slidingWindow->nRows];
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT void __cdecl 
-getDescription(char* name, char* desc, int num_of_function)
-{
-    switch (num_of_function)
-    {
-    case 0:
-        if (name != NULL)
-            strcpy(name, "WindowBounds");
-        if (desc != NULL)
-            strcpy(desc, "constraint 1");
-        break;  
-    case 1:
-        if (name != NULL)
-            strcpy(name, "Overlaps");
-        if (desc != NULL)
-            strcpy(desc, "constraint 2");
-        break;
-    case 2:
-        if (name != NULL)
-            strcpy(name, "HPWL");
-        if (desc != NULL)
-            strcpy(desc, "criterion");
-        break;
-    }
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT double __cdecl function(const double * y, int num_of_function)
-{
-    _getcwd(ExternalWorkingDir, 256);
-    _chdir(DllWorkingDir);
-    double res = 0.0;   
-
-    for(int i = 0; i < slidingWindow->elementsNum; i++)
-    {
-        slidingWindow->elements[i].XCoord = y[i]; //elments[i].XCoord
-    }
-
-    switch (num_of_function) {
-  case 0: // constraint 1 - geometry
-      res = slidingWindow->g1WindowBounds(circuit); break;
-
-  case 1: // constraint 2 - overlaps
-      res = slidingWindow->g2Overlaps(circuit); break;
-
-  case 2: // criterion - HPWL
-      res = slidingWindow->CalcWL(circuit); break;
-
-  default:
-      res = 0; break;
-    }
-
-    //delete [] x_array;
-
-    _chdir(ExternalWorkingDir);
-    return res;
-}
-
-// ---------------------------------------------------------------------------
-PREFIX_EXPORT void _cdecl init_task_dll()
-{
-    _getcwd(ExternalWorkingDir, 256);
-    _chdir(DllWorkingDir);
-
-    if(first_time)
-    {
-        Initialize();
-        first_time = false;
-    }
-
-    _chdir(ExternalWorkingDir);
-}
-
-//----------------------------------------------------------------------------
-PREFIX_EXPORT void __cdecl setDllWorkingDir(const char* work_dir)
-{
-    strcpy(DllWorkingDir, work_dir);
-}
-
-//----------------------------------------------------------------------------
-PREFIX_EXPORT int __cdecl getNumberOfInputFiles()
-{
-    return 7;
-}
-
-//----------------------------------------------------------------------------
-PREFIX_EXPORT bool __cdecl getInputFiles(char** names)
-{
-    if (names == NULL)
-        return false;
-    strcpy(names[0], "abt03\\abt03.aux");
-    strcpy(names[1], "abt03\\abt03.nets");
-    strcpy(names[2], "abt03\\abt03.nodes");
-    strcpy(names[3], "abt03\\abt03.pl");
-    strcpy(names[4], "benchmark_info.txt");
-    strcpy(names[5], "abt03\\abt03.scl");
-    strcpy(names[6], "abt013\abt03.wts");
-
-    return true;
 }
 
 // ---------------------------------------------------------------------------

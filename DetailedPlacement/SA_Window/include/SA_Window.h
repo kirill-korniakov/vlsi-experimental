@@ -16,21 +16,24 @@
 
 class SAWindow: public RectangularWindow
 {
-  protected:
-    int T;
+protected:
+    double T;
+    double currWL;
+    int *windowNets;
+    int nNets;    
 
-  public:
-    SAWindow(int _nRows, int _first, double x_array[], int _num, const Circuit &circuit,
-             int indexes[]);
+public:
+    SAWindow(int _nRows, int _first, double x_array[], int _num, const Circuit &circuit, int indexes[],
+        double _wl, int *changedNets, int changedNetsCount);
     ~SAWindow() {}
     void ReduceTemperature() { T *= KOEF; }
-    int GetRandomCell();
-    double GetFuncValue(Circuit &circuit);
+    int GetRandomCell();    
     void ShiftCell(int cellInd, Circuit &circuit);
     void InsertCell();
     void ExchangeTwoCells();
     void SearchOnSortedCells(bool trial, Circuit &circuit);
     void GeneralSearch();
+    double GetFuncValue(Circuit &circuit);
 };
 
 void MakeWindows(Circuit &circuit, int nSteps, int nCells, int nRows);
