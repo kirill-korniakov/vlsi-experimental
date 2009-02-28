@@ -1,0 +1,7 @@
+benchmark: 	ibm01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	ibm01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	ibm01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	ibm01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	ibm01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	abt01.aux	 Program aborted because of error during parsing. Error code: 1
+benchmark: 	abt01.aux	 Program aborted because of error during parsing. Error code: 1
