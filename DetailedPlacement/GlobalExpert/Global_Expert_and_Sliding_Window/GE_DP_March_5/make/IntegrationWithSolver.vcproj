@@ -514,8 +514,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="mapm.lib /NODEFAULTLIB:LIBCMT"
-				AdditionalDependencies="ws2_32.lib mpi.lib SendRecvSK.lib shlwapi.lib &quot;GlobExp.lib&quot; mpreal_Release.lib"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
+				AdditionalDependencies="mpi.lib shlwapi.lib GlobExpSolver.lib"
 				OutputFile="$(SolutionDir)\..\Bin\circuit_with_GE_solver.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;D:\Program Files\MPICH\SDK\Lib&quot;;$(SolutionDir)\..\GlobalExpertSolver"

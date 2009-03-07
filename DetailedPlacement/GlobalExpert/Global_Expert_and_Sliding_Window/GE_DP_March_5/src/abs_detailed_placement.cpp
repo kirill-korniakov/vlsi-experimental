@@ -184,8 +184,8 @@ GeneralWindow::GeneralWindow(int _nRows, int _first, double x_array[],
   {
     int index = indexes[i];
     elements[i].cellIndex = index;
-    double _x = circuit.placement[index].xCoord - 0.5 * circuit.nodes[index].width;		
-    double _y = circuit.placement[index].yCoord - 0.5 * circuit.rows[0].height;		
+    double _x = circuit.placement[index].xCoord - 0.5 * circuit.nodes[index].width;  
+    double _y = circuit.placement[index].yCoord - 0.5 * circuit.rows[0].height;  
     elements[i].XCoord = ConvertXY_To_X(_x, _y, circuit);
   }
 }
@@ -253,29 +253,29 @@ double GeneralWindow::g1WindowBounds(const Circuit &circuit)
     if (_XCoord < boundX[0])
     {
       penalty += boundX[0] - _XCoord;
-			//cout<<"windowBounds: index="<<index<<endl;
+  	//cout<<"windowBounds: index="<<index<<endl;
       continue;
     }
 
     if ((_XCoord + width) > boundX[nRows])
     {
       penalty += _XCoord + width - boundX[nRows];
-			//cout<<"windowBounds: index="<<index<<endl<<circuit.placement[index].xCoord<<endl<<_XCoord<<endl;			
+  	//cout<<"windowBounds: index="<<index<<endl<<circuit.placement[index].xCoord<<endl<<_XCoord<<endl;  	
       continue;
     }
 
     for (int j = 1; j < nRows + 1; j++)
     {
       if (((boundX[j] - width) < _XCoord) && (_XCoord < boundX[j])) {
-				if ((_XCoord + width - boundX[j]) > halfWidth) {
-          penalty += boundX[j] - _XCoord;					
-				}
+    if ((_XCoord + width - boundX[j]) > halfWidth) {
+          penalty += boundX[j] - _XCoord;    	
+    }
 
-				else {
-          penalty += _XCoord + width - boundX[j];					
-				}
-				break;
-			}
+    else {
+          penalty += _XCoord + width - boundX[j];    	
+    }
+    break;
+  	}
     }     
   }
 
@@ -422,6 +422,7 @@ void GetStartPoint(int *&siteIndexes, int nRows, const Circuit &circuit) { //def
 bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, int siteIndexes[],
                      int *&cellIndexes, double *&bounds, const Circuit &circuit)
 {
+    bool isWindowCreated = true;
     int** arrOfSites;
     int numOfSites = circuit.rows[0].numSites;
     double siteWidth;
@@ -487,13 +488,21 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, int siteIndexes[],
     for (int i = 0; i < nCells; i++)
         cellIndexes[i] = 0;
 
+    int *lastCellIndex = new int [nRows];
+
+    for (int i = 0; i < nRows; i++)
+        lastCellIndex[i] = -1;
+
     //catching cells in window
     while (currCellsNum < nCells) {    
         for (int i = 0; ((i < nRows) && (currCellsNum < nCells)); i++) { //for all rows
             if (endOfRow[i] == true)
-                continue;            
+                continue;
 
-            while ((rowWidthInSites[i] + siteIndexes[i] - 1 < numOfSites) && (arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1] == -1)) 
+            while ((rowWidthInSites[i] + siteIndexes[i] - 1 < numOfSites) &&
+                ((arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1] == -1) ||
+                (arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1] == lastCellIndex[i])))
+
                 rowWidthInSites[i]++;
 
             if (rowWidthInSites[i] >= numOfSites - siteIndexes[i]) { //the end of the row
@@ -506,14 +515,15 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, int siteIndexes[],
             else { //cell was found
                 int cellIdx = arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1];
                 cellWidthInSites = circuit.nodes[cellIdx].width / siteWidth;
-                rowWidthInSites[i] += cellWidthInSites;
+                rowWidthInSites[i] += cellWidthInSites - 1;
 
                 cellIndexes[currCellsNum++] = cellIdx;
+                lastCellIndex[i] = cellIdx;
 
-                while ((rowWidthInSites[i] + siteIndexes[i] - 1 < numOfSites) && (arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1] == -1)) 
-                    rowWidthInSites[i]++; //move to the next cell
-                
-                //rowWidthInSites[i]--;
+                /*while ((rowWidthInSites[i] + siteIndexes[i] - 1 < numOfSites) && (arrOfSites[i][rowWidthInSites[i] + siteIndexes[i] - 1] == -1)) 
+                rowWidthInSites[i]++; //move to the next cell
+
+                rowWidthInSites[i]--;*/
             }
         }
 
@@ -521,13 +531,16 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, int siteIndexes[],
         {
             printf("only %d cells were found\n", currCellsNum);
             nCells = currCellsNum;
+            //isWindowCreated = false;
             break;
         }
     }
 
+    delete [] lastCellIndex;
+
     if (nCells == 0)
     {
-      return false;
+        isWindowCreated = false;
     }
 
     //initialize bounds
@@ -544,7 +557,7 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, int siteIndexes[],
 
     delete [] rowWidthInSites;
     delete [] endOfRow;
-    return true;
+    return isWindowCreated;
 }
 
 void MakeWindows(Circuit &circuit, int nSteps, int nCells, int nRows)

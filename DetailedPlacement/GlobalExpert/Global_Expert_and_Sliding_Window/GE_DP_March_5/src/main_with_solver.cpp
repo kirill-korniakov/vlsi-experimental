@@ -20,7 +20,7 @@
 #include "GlobalExpertSolver.h"
 #include "mpi.h"
 
-#define numOfCells 5
+#define numOfCells 4
 #define numOfSteps 10
 #define numOfRows 3
 
@@ -40,23 +40,23 @@ double __cdecl function(const double * y, int num_of_function)
 
   for(int i = 0; i < slidingWindow->elementsNum; i++)
   {
-	  slidingWindow->elements[i].XCoord = y[i];
+    slidingWindow->elements[i].XCoord = y[i]; //(int)(y[i] / circuit.rows[0].siteWidth) * circuit.rows[0].siteWidth;
     //slidingWindow->spaces[i] = y[i];  //for window with sorted cells
   }
 
   switch (num_of_function) {
   case 0: // constraint 1 - geometry
-	  res = slidingWindow->g1WindowBounds(circuit); //slidingWindow->CalcBoundsPenalty(circuit); //
-	  break;
+    res = slidingWindow->g1WindowBounds(circuit); //slidingWindow->CalcBoundsPenalty(circuit); //
+    break;
 
   case 1: // constraint 2 - overlaps
-	  res = slidingWindow->g2Overlaps(circuit); //slidingWindow->CalcWireLenght(circuit, x_array); //
-	break;
+    res = slidingWindow->g2Overlaps(circuit); //slidingWindow->CalcWireLenght(circuit, x_array); //
+    break;
 
   case 2: // criterion - HPWL
     res = currWL = slidingWindow->RecalcWl(circuit, currWL, changedNets, nChangedNets);
     //slidingWindow->CalcWL(circuit); 
-  break;
+    break;
 
   default:
     res = 0; break;
@@ -89,12 +89,12 @@ int ReadBounds(char fileName[], double *&boundsArray, char *&auxName, int &first
   for (int i = 0; i < stringSize; i++) {
     str[i] = '\0';
     num[i] = '\0';
-		auxName[i] = '\0';
+  auxName[i] = '\0';
   }
 
   fgets(str, stringSize - 1, f); //getting aux file name
 	for(int i = 0; str[i] != '\n'; i++)
-		auxName[i] = str[i];
+  auxName[i] = str[i];
 	
 	fgets(str, stringSize - 1, f); //getting number of rows
 
@@ -111,7 +111,7 @@ int ReadBounds(char fileName[], double *&boundsArray, char *&auxName, int &first
 
   fgets(str, stringSize - 1, f); //getting index of first row
   for(int j = 0; j < k2 + 1; j++)
-		num[j] = '\0';
+  num[j] = '\0';
 
   k1 = 0;
   k2 = 0;
@@ -128,7 +128,7 @@ int ReadBounds(char fileName[], double *&boundsArray, char *&auxName, int &first
 
   for(int i = 0; i < rowsNum * 2;) { //getting bounds of rows
     for(int j = 0; j < k2 + 1; j++)
-		num[j] = '\0';
+  num[j] = '\0';
 
     k1 = 0;
     k2 = 0;
@@ -154,8 +154,8 @@ int ReadBounds(char fileName[], double *&boundsArray, char *&auxName, int &first
     
     boundsArray[i++] = atof(num); //first bound for this row    
 
-		for(int j = 0; j < k2 + 1; j++)
-			num[j] = '\0';
+  for(int j = 0; j < k2 + 1; j++)
+  	num[j] = '\0';
 
     k2 = 0;
     k1 += 2;
@@ -259,9 +259,10 @@ int main(int argc, char* argv[])
   int firstRowIdx;
 
   for (int step = 0; step < numOfSteps; step++)
-  {    
+  {
+    double wlBeforeGE;
 //-------------------Parameters	for Global Expert------------------------------
-    TGlobExpSolverParams GE_solver;
+    GlobalExpertSolver GE_solver;
     GE_solver.NumOfConstraints = 2;
     GE_solver.OrderOfConstraints = new int[2]; //2 for general task
     GE_solver.OrderOfConstraints[0] = 0;
@@ -335,6 +336,7 @@ int main(int argc, char* argv[])
     }
 
     slidingWindow = new GeneralWindow(nRows, firstRowIdx, x_array, nCells, circuit, cellIndexes);
+    wlBeforeGE = slidingWindow->RecalcWl(circuit, currWL, changedNets, nChangedNets);
     printf("bounds penalty: %f\n", slidingWindow->g1WindowBounds(circuit));
     printf("overlaps: %f\n", slidingWindow->g2Overlaps(circuit));
 
@@ -351,8 +353,8 @@ int main(int argc, char* argv[])
       GE_solver.firstPoint[i] = slidingWindow->elements[i].XCoord;
     }
 
-    double* y = new double[GE_solver.N];
-    double* f = new double[GE_solver.NumOfConstraints + GE_solver.NumOfCriteria];
+    //double* y = new double[GE_solver.N];
+    //double* f = new double[GE_solver.NumOfConstraints + GE_solver.NumOfCriteria];
     TGlobExpResults searchResults;
     searchResults.foundY = new double [GE_solver.N];
     char error_msg[MAX_PATH_LENGTH];
@@ -364,33 +366,54 @@ int main(int argc, char* argv[])
     }
     else
     {
-      printf("\n\n+++++ Minimum was found!\n");
-
-      printf("y* = [ ");
-      for (int i = 0; i < GE_solver.N; ++i)
+      if (searchResults.maximumIndex == 3)
       {
-        printf("%.3f", y[i]);
-        if (i < GE_solver.N - 1)
+        printf("\n\n+++++ Minimum was found!\n");
+
+        printf("y* = [ ");
+        for (int i = 0; i < GE_solver.N; ++i)
         {
-         printf(", ");
+          printf("%.3f", searchResults.foundY[i]);
+          if (i < GE_solver.N - 1)
+          {
+            printf(", ");
+          }
+        }
+        printf(" ]\nf* = %lf\n", searchResults.foundF);
+
+        // update current placement
+        if (searchResults.foundF > wlBeforeGE)
+        {
+            for(int i = 0; i < slidingWindow->elementsNum; i++)
+            {
+                slidingWindow->elements[i].XCoord = (int)(GE_solver.firstPoint[i] / circuit.rows[0].siteWidth) * circuit.rows[0].siteWidth;                
+            }
+        }
+  
+        else
+        {
+
+            for(int i = 0; i < slidingWindow->elementsNum; i++)
+            {
+            slidingWindow->elements[i].XCoord = (int)(searchResults.foundY[i] / circuit.rows[0].siteWidth) * circuit.rows[0].siteWidth;
+            //slidingWindow->spaces[i] = searchResults.foundY[i];  //for window with sorted cells
+            }
         }
       }
-
-      printf(" ]\nf* = (");
-      for (int i = 0; i < GE_solver.NumOfConstraints + GE_solver.NumOfCriteria; ++i)
+      else
       {
-        printf("%.3f", f[i]);
-        if (i < GE_solver.NumOfConstraints + GE_solver.NumOfCriteria - 1)
+        printf("\n\n----- Minimum was not found!\n");
+
+        for(int i = 0; i < slidingWindow->elementsNum; i++)
         {
-          printf(", ");
+            slidingWindow->elements[i].XCoord = (int)(GE_solver.firstPoint[i] / circuit.rows[0].siteWidth) * circuit.rows[0].siteWidth;
+            //slidingWindow->spaces[i] = searchResults.foundY[i];  //for window with sorted cells
         }
       }
-      printf(" )\n");
     }
 
     slidingWindow->PlaceCells(circuit);
-    currWL = slidingWindow->RecalcWl(circuit, currWL, changedNets, nChangedNets);
-    currWL = slidingWindow->CalcWL(circuit);
+    currWL = slidingWindow->RecalcWl(circuit, currWL, changedNets, nChangedNets); //CalcWL(circuit);
 
     delete slidingWindow;
     delete [] x_array;
@@ -405,7 +428,9 @@ int main(int argc, char* argv[])
     //delete [] GE_solver.a;
     //delete [] GE_solver.b;
     //delete [] GE_solver.firstPoint;
-    printf("WL: %.10lf\n", currWL);
+    printf("WL: %lf\n", currWL);
+    CheckLegalityOfPlacement(circuit);
+    printf("Press any key to continue...");
     _getch();
   }
 

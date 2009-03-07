@@ -2,7 +2,7 @@
 //                                                                         //
 //                    NIZHNY NOVGOROD STATE UNIVERSITY                     //
 //                                                                         //
-//                    Copyright (c) 1999-2008 by NNSU.                     //
+//                    Copyright (c) 1999-2009 by NNSU.                     //
 //                          All Rights Reserved.                           //
 //                                                                         //
 //  File:      GlobalExpert.h                                              //
@@ -19,9 +19,7 @@
 namespace GlobalExpert
 {
 
-//#define GLOBAL_EXPERT_EXPORTS
-
-#ifdef GLOBAL_EXPERT_EXPORTS
+#ifdef GLOBAL_EXPERT_DLL_EXPORTS
 #define GLOBAL_EXPERT_API __declspec(dllexport)
 #else
 #define GLOBAL_EXPERT_API __declspec(dllimport)
@@ -40,7 +38,7 @@ class Logger;
 
 
 // ---------------------------------------------------------------------------
-struct TGlobExpResults
+struct GLOBAL_EXPERT_API TGlobExpResults
 {
   // basic result data
   double* foundY;
@@ -63,7 +61,7 @@ struct TGlobExpResults
 };
 
 // ---------------------------------------------------------------------------
-class TGlobExpSolverParams
+class GLOBAL_EXPERT_API GlobalExpertSolver
 {
 public:
   bool NeedToLoad;
@@ -112,10 +110,10 @@ public:
   bool processLogging;
   bool sendRecvLogging;
 
-  TGlobExpSolverParams();
-  TGlobExpSolverParams(const tMultiFunction& objectiveFunction);
-  TGlobExpSolverParams(const tFunction& objectiveFunction);
-  ~TGlobExpSolverParams();
+  GlobalExpertSolver();
+  GlobalExpertSolver(const tMultiFunction& objectiveFunction);
+  GlobalExpertSolver(const tFunction& objectiveFunction);
+  ~GlobalExpertSolver();
 
   void EnableOptionalLoggers();
   void SetDomain(const double* _a, const double* _b, const int _N);
