@@ -1,0 +1,254 @@
+#include "Legalization.h"
+#include <algorithm>
+#include <float.h>
+#include <math.h>
+
+class CellsXComparator
+{
+  HCells& m_cells;
+
+public:
+  CellsXComparator(HCells& cells): m_cells(cells) {}
+
+  bool operator() (HCell first, HCell second)
+  {
+    return m_cells.GetDouble<HCell::X>(first) < m_cells.GetDouble<HCell::X>(second);
+  }
+};
+
+struct AbacusCluster
+{
+  size_t FirstCellIdx;
+  size_t LastCellIdx;
+  
+  double TotalWeight; //total weight of cells in this cluster
+  int TotalWidth;  //total width of cells in this cluster (sites number)
+  double Q;
+  int X; //column number
+};
+
+struct AbacusRow
+{
+  typedef TemplateTypes<HCell>::vector AbacusRowCells;
+  typedef TemplateTypes<AbacusCluster>::list AbacusRowClusters;
+
+  AbacusRowCells CellsInRow;
+  AbacusRowClusters ClustersInRow;
+  int Width; //sites number
+};
+
+class Abacus
+{
+  HDesign& m_design;
+  HDPGrid& m_grid;
+
+  AbacusRow* m_rows;
+
+  void _InitAbacusRow(int idx, int maxCellsAwaited)
+  {
+    m_rows[idx].Width = 0;
+    m_rows[idx].CellsInRow.reserve(maxCellsAwaited);
+  }
+  
+  AbacusCluster _MakeNewCluster(int rowIdx, HCell cell)
+  {
+    AbacusCluster res;
+    res.LastCellIdx = res.FirstCellIdx = m_rows[rowIdx].CellsInRow.size();
+    res.TotalWidth = m_grid.CellSitesNum(cell);
+    res.TotalWeight = m_grid.SiteWidth() * m_grid.SiteWidth() * res.TotalWidth * res.TotalWidth;
+    double cellX = m_design.GetDouble<HCell::X>(cell);
+    res.Q = cellX * res.TotalWeight;
+    res.X = m_grid.FindColumn(cellX);
+    if (res.X + res.TotalWidth > m_grid.NumCols() - 1)
+      res.X = m_grid.NumCols() - res.TotalWidth;
+    return res;
+  }
+
+  AbacusCluster _MergeClusters(const AbacusCluster& first, const AbacusCluster& second)
+  {
+    AbacusCluster res;
+    res.FirstCellIdx = first.FirstCellIdx;
+    res.LastCellIdx = second.LastCellIdx;
+    res.TotalWeight = first.TotalWeight + second.TotalWeight;
+    res.TotalWidth = first.TotalWidth + second.TotalWidth;
+    res.Q = first.Q + second.Q - (first.TotalWidth * m_grid.SiteWidth()) * second.TotalWeight;
+    res.X = m_grid.FindColumn(res.Q / res.TotalWeight);
+    if (res.X + res.TotalWidth > m_grid.NumCols() - 1)
+      res.X = m_grid.NumCols() - res.TotalWidth;
+    return res;
+  }
+
+public:
+  void PlaceCellIntoRow(int rowIdx, HCell cell)
+  {
+    //DEPENDENCY: cluster should be created before adding cell to row
+    AbacusCluster lastCluster = _MakeNewCluster(rowIdx, cell);
+    m_rows[rowIdx].CellsInRow.push_back(cell);
+    m_rows[rowIdx].Width += lastCluster.TotalWidth;
+    while (!m_rows[rowIdx].ClustersInRow.empty()
+      && lastCluster.X < m_rows[rowIdx].ClustersInRow.back().X + m_rows[rowIdx].ClustersInRow.back().TotalWidth)
+    {
+      lastCluster = _MergeClusters(m_rows[rowIdx].ClustersInRow.back(), lastCluster);
+      m_rows[rowIdx].ClustersInRow.pop_back();
+    }
+    m_rows[rowIdx].ClustersInRow.push_back(lastCluster);
+  }
+
+  bool TryPlaceCellIntoRow(int rowIdx, HCell cell, double& newX)
+  {
+    if (m_rows[rowIdx].Width + m_grid.CellSitesNum(cell) > m_grid.NumCols())
+      return false;
+    AbacusCluster last_cluster = _MakeNewCluster(rowIdx, cell);
+    int cell_width = last_cluster.TotalWidth;
+
+    if (!m_rows[rowIdx].ClustersInRow.empty())
+      for (AbacusRow::AbacusRowClusters::reverse_iterator cl = m_rows[rowIdx].ClustersInRow.rbegin();
+        cl != m_rows[rowIdx].ClustersInRow.rend()
+        && last_cluster.X < cl->X + cl->TotalWidth; ++cl)
+      {
+        last_cluster = _MergeClusters(*cl, last_cluster);
+      }
+
+    newX = m_grid.ColumnX(last_cluster.X + last_cluster.TotalWidth - cell_width);
+    return true;
+  }
+
+  bool ConsiderRow(HCell cell, int rowIdx, int& bestRow, double& bestDistance)
+  {
+    if (rowIdx >= 0 && rowIdx < m_grid.NumRows())
+    {
+      double cellX = m_design.GetDouble<HCell::X>(cell);
+      double cellY = m_design.GetDouble<HCell::Y>(cell);
+      if (Distance(cellX, cellY, cellX, m_grid.RowY(rowIdx)) < bestDistance)
+      {
+        double newX = DBL_MAX;
+        if (TryPlaceCellIntoRow(rowIdx, cell, newX))
+        {
+          double dist = Distance(cellX, cellY, newX, m_grid.RowY(rowIdx));
+          if (dist < bestDistance)
+          {
+            bestRow = rowIdx;
+            bestDistance = dist;
+          }
+        }
+        return true;
+      }
+      return false;//placeing cell to this row makes no sense
+    }
+    return false;//row outside of design
+  }
+
+  void UpdateCellsCoordinates()
+  {
+    for (int i = 0; i < m_grid.NumRows(); ++i)
+    {
+      for (AbacusRow::AbacusRowClusters::iterator cluster = m_rows[i].ClustersInRow.begin();
+        cluster != m_rows[i].ClustersInRow.end(); ++cluster)
+      {
+        int column = cluster->X;
+        for (size_t j = cluster->FirstCellIdx; j <= cluster->LastCellIdx; ++j)
+        {
+          m_grid.PutCell(m_rows[i].CellsInRow[j], i, column);
+          column += m_grid.CellSitesNum(m_rows[i].CellsInRow[j]);
+        }
+      }
+    }
+  }
+
+  double Distance(double x1, double y1, double x2, double y2)
+  {
+    return fabs(x1 - x2) + fabs(y1 - y2);
+  }
+
+  Abacus(HDPGrid& grid): m_grid(grid), m_design(grid.Design())
+  {
+    m_rows = new AbacusRow[m_grid.NumRows()];
+
+    int cellsPerRow = 3 * m_design.Cells.PlaceableCellsCount() / m_grid.NumRows() / 2;
+    for (int i = 0; i < m_grid.NumRows(); ++i)
+      _InitAbacusRow(i, cellsPerRow);
+  }
+
+  ~Abacus()
+  {
+    delete[] m_rows;
+  }
+};
+
+void AbacusLegalization(HDPGrid& grid)
+{
+  HDesign& design = grid.Design();
+  ConfigContext ctx = design.cfg.OpenContext("Abacus");
+
+  HCell* cells = new HCell[design.Cells.PlaceableCellsCount()];
+
+  unsigned maxDeviationInRows = design.cfg.ValueOf(".maxDeviationInRows", 3u);
+
+  bool usePlotter = design.cfg.ValueOf(".usePlotter", false);
+  bool drawSites = design.cfg.ValueOf(".drawSites", false);
+  int plotterStep = design.cfg.ValueOf(".plotterStep", 500);
+  HPlotter::WaitTime plotterSpeed = (HPlotter::WaitTime)design.cfg.ValueOf(".plotterSpeed", 1);
+
+  //order cells by X coordinate
+  int pos = 0;
+  for (HCells::PlaceableCellsEnumeratorW pCell = design.Cells.GetPlaceableCellsEnumeratorW(); pCell.MoveNext(); )
+  {
+    cells[pos++] = pCell;
+    grid.RecalcSitesNum(pCell);
+  }
+  ASSERT(pos == design.Cells.PlaceableCellsCount());
+  std::sort(cells, cells + pos, CellsXComparator(design.Cells));
+
+  Abacus abacus(grid);
+
+  //major loop of legalization
+  for (int i = 0; i < pos; i++)
+  {
+    double bestDistance = DBL_MAX;
+    int nearestRow = grid.FindRow(design.GetDouble<HCell::Y>(cells[i]));
+    int bestRow = -1;
+
+    //try to place cell into nearest row
+    abacus.ConsiderRow(cells[i], nearestRow, bestRow, bestDistance);
+
+    //try to improve current result using adjacent rows
+    for (unsigned d = 1; d <= maxDeviationInRows; d++)
+    {
+      // this variable MUST be defined inside cycle
+      int attempts = 2; //NOTE: optimization, we not going too far if it does not make sense
+      
+      //look below nearest row
+      if (!abacus.ConsiderRow(cells[i], nearestRow - d, bestRow, bestDistance))
+        attempts--;
+
+      //look above nearest row
+      if (!abacus.ConsiderRow(cells[i], nearestRow + d, bestRow, bestDistance))
+        attempts--;
+
+      if (attempts == 0)
+        break;
+    }
+
+    if (bestRow < 0)
+    {
+      LOGERROR("Abacus unable to legalize design");
+      return;
+    }
+    else
+      abacus.PlaceCellIntoRow(bestRow, cells[i]);
+
+    if (usePlotter)
+      if ((i + 1) % plotterStep == 0)
+      {
+        abacus.UpdateCellsCoordinates();
+        design.Plotter.ShowLegalizationState(plotterSpeed, drawSites);
+      }
+  }//for (int i = 0; i < nCells; i++)
+
+  abacus.UpdateCellsCoordinates();
+
+  if (usePlotter)
+    design.Plotter.ShowLegalizationState(plotterSpeed, drawSites);
+  
+  delete[] cells;
+}
