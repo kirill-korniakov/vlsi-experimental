@@ -1,0 +1,13 @@
+package OptimizationPorts version 1.0 {
+  interface SolverPort extends Solver.OptimizationSolver, gov.cca.Port {
+    int Initialize();
+    int Solve();
+    int Finalize();
+  };
+
+  interface LAFactoryPort extends LinearAlgebra.Factory, gov.cca.Port {};
+  interface ModelPort extends Optimize.OptimizationModel, gov.cca.Port {};
+
+};
+
+    

@@ -1,0 +1,13 @@
+#if !defined(__PETSCVERSION_H)
+#define __PETSCVERSION_H
+
+#define PETSC_VERSION_RELEASE    1
+#define PETSC_VERSION_MAJOR      2
+#define PETSC_VERSION_MINOR      3
+#define PETSC_VERSION_SUBMINOR   3
+#define PETSC_VERSION_PATCH      15
+#define PETSC_VERSION_DATE       "May, 23, 2007"
+#define PETSC_VERSION_PATCH_DATE "Tue Sep 23 10:02:49 CDT 2008"
+#define PETSC_VERSION_HG         "31306062cd1a6f6a2496fccb4878f485c9b91760"
+
+#endif

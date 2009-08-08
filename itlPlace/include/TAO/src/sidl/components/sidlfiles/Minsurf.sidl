@@ -1,0 +1,5 @@
+package Minsurf version 0.0.3 {
+  class Component implements-all OptimizationPorts.ModelPort,
+    gov.cca.Component {};
+};
+    
