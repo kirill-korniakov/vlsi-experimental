@@ -20,6 +20,9 @@ void ReportBenchmarkStatistics(HDesign& design);
 //nets reports
 //распечатка количества двупиновых, трёхпиновых и т.д. нэтов.
 void ReportNetsInfo(HDesign& design);
+//for converting placement to Fast Router input format
+void PrintToFastRouterFormat(HDesign& hd, char* fileName);
+void PrintToBoxRouterFormat(HDesign& hd, char* fileName);
 //Информация о количестве нэтов каждого типа (all, skipped, buffered, removed, Active).
 void ReportCountNetsWithTypes(HDesign& design);
 void ReportNetPins(HDesign& hd, HNet net);
