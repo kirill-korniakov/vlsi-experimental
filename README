@@ -1,0 +1,150 @@
+/****************************************************************************/
+/*
+  Released Software: Fast Buffer Insertion for Interconnect Optimization
+                     Version 2.3: 2003 - 2007
+
+  Author:  Zhuo Li                       -- zhybear@gmail.com 
+  Author:  Weiping Shi                   -- wshi@ee.tamu.edu
+
+                        All Rights Reserved
+
+Description: 
+  This software contain codes for the buffer insertion to maximize
+  the slack at the source. 
+  Several algorithms are included: Lillis, Cheng and Lin O(b^2n^2) time 
+  algorithm (extended from Van Ginneken's O(n^2) time algorithm), 
+  Shi and Li's O(b^2nlog^2n) time algorithm (original FBI), 
+  and Li and Shi's O(bn^2) time algorithm .
+  For more detailed description about these algorithms, see
+  
+  "Buffer placement in distributed RC-tree network for minimal
+   Elmore delay," by L. P. P. P. van Ginneken, International Symposium 
+   on Circuits and Systems , pp. 865-868, 1990.
+
+   "Optimal wire sizing and buffer insertion for low power and a generalized 
+   delay model,"
+   by J. Lllis, C.K. Cheng and T.-T. Y. Lin, IEEE J. Solid-State Circuits,
+   vol. 31(3), pp. 437-447, 1996.
+   
+   "An O(nlogn) time algorithm for optimal buffer insertion",
+   by Weiping Shi and Zhuo Li, Proc. of 40th Design Automation Conference
+   (DAC), 2003, pp. 580-585.  
+
+   "A Fast Algorithm for Optimal Buffer Insertion",
+   by Weiping Shi and Zhuo Li, IEEE Transaction on Computer-Aided Design of 
+   Integrated Circuits and Systems, vol. 24, no. 6, June 2005, pp. 879-891.
+
+   "An O(bn^2) Time Algorithm for Optimal Buffer Insertion with b Buffer
+   Types", by Zhuo Li and Weiping Shi, Conference on Design, Automation and
+   Test in Europe (DATE), Munich, Germany, March 7-11 2005, pp. 1324-1329.
+
+   "An O(mn) Time Algorithm for Optimal Buffer Insertion of Nets with m Sinks",
+   by Zhuo Li and Weiping Shi, 11st Asia and South Pacific Design Automation 
+   Conference (ASP-DAC), Yokohama, Japan, Jan.2006, pp. 320-325.   
+*/
+/****************************************************************************/
+
+ 
+ 
+The programs are available on "as is" basis. They are not guaranteed
+to be free of bugs, and the authors assume no responsibility for any
+potential problems.
+
+The programs are designed to run under Linux or Solaris 2.7 with any
+gcc 2.95 or above compiler. The executable file is for Linux.
+
+****We are working on the improved version based on C++ with more 
+general input and buffer libraries and minimal buffer cost version.
+
+Run "make" to generate the executable. If you want to run on WINDOWS, 
+you need to have getopt.c and getopt.h which are included in standard 
+GNU C library. 
+
+PACKAGE 
+   buffer_insert:     O(nlog^2n) time algorithm
+   buffer_insert_bn2: O(bn2) time algorithm
+   buffer_insert_mn: O(mn) time algorithm 
+   routing_tree.m:   MATLAB program to read the output tree and buffer information
+
+   makefile: makefile
+   main.c:  main program to call different algorithm
+   io.c  :  read input tree, print output tree
+   van.c :  Van Ginneken algorithm
+   shili.c: FBI algorithm
+   tree.c : red-black tree for candidate tree
+   expiration_list.c: red-black tree for expiration list
+   wire_segment.c: do the equal wire segmenting.
+   van_b.c : O(bn2) algorithm
+   van_mn.c : O(mn) algorithm
+
+SYNOPSIS
+	buffer_insert -f netfile -b libraryfile [-t] [-o] [-d]
+
+OPTIONS
+    -f netfile
+	topology file filename. 
+
+    -b libraryfile
+        Buffer Library filename.
+
+    -t
+	Print the time and memory used by the buffer insertion algorithm. 
+
+    -o
+	Print nonredundent solutions before the source, detail memory usage.
+
+    -d
+	Print debugging information.
+
+INPUT FORMAT
+   Use the format described in sample.net to build a tree.
+   Use the format described in sample.lib to build the technology file.
+
+   Wire Segmenting coef: Define how many segments are divided for each 
+   original edge (use "ulimit -s unlimited" to set unlimited stack for 
+   larger wire segmenting coef and trees) 
+
+buffer_insert
+   Van Ginneken (1) or FBI Algorithm (2): 
+    1: Lillis et al. O(b^2n^2) Algorithm
+    2: FBI Algorithm 
+
+buffer_insert_bn2
+   O(bn2) (1) or FBI Algorithm (2): 
+    1: O(bn^2) Algorithm
+    2: FBI Algorithm 
+
+buffer_insert_mn
+   O(mn) (1) or FBI Algorithm (2):
+    1: O(mn) Algorithm
+    2: FBI Algorithm
+   
+OUTPUT 
+   1. The slack after buffer insertion and total number of buffers added are printed.
+   1. The buffer location information is stored in file with netfile.buf extension name. 
+   2. The net file after segmenting is stored in file netfile.finalnet. 
+   3. Use routing_tree.m (written in MATLAB) to read the netfile.buf and .finalnet to display the tree
+      and buffer information
+
+
+SAMPLE 
+   Eight sample net topology files are included: p1.net, p2.net, r1.net, 
+   r2.net, r3.net, r4.net, r5.net, long_line.net. 
+   p1, p2, r1, r2, r3, r4, and r5 are generated by constructing routing trees with
+   an algorithm similar to A-tree algorithm on clock net benchmarks 
+   from IBM benchmarks (from R.S. Tsay) and MCNC benchmarks (from DAC90 paper by Jackson et al.).
+   The details can be found at http://vlsicad.ucsd.edu/GSRC/bookshelf/Slots/BST/
+   or paper 
+   "On the Bounded-Skew Clock and Steiner Routing Problems", 
+   by D. J.-H. Huang, A. B. Kahng, and C.-W. A. Tsao, 
+   Proc. 32nd ACM/IEEE Design Automation Conf., 1995, pp. 508-513. 
+   
+   long_line are a two-pin net randomly generated. 
+   
+   Three buffer library sample files are included: buffer1.lib, buffer5.lib, 
+   buffer32.lib.
+
+
+
+
+

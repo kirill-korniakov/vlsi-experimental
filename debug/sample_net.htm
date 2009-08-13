@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://dropzone.tamu.edu/~zhuoli/GSRC/sample.net -->
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251">
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY><PRE>wire_res_per_unit 0.01660  #ohm#
+wire_cap_per_unit 0.027000 #fF#
+
+driver 2615.590088 2958.229004 180.000000 # source coordinate x, y, driver_resistance(ohm),
+                                           the index of source node is default 0#
+number_of_sinks 269                       # number of sinks #
+sink 1 3380.000000 270.000000 500.000000 0.000000 # sink index, coordinate x, y, sink cap (fF), required arrival time (ps) # 
+sink 2 3020.000000 270.000000 500.000000 0.000000 
+...
+
+number_of_candidate_nodes 268    # number of internal nodes #
+candidate 20000 5220.000000 5560.000000    # node index, coordinate x and y #
+candidate 20001 4880.000000 5560.000000
+...
+
+edge 0 20000          #edge start node index, end node index#
+edge 20000 1
+edge 20000 20001
+edge 20001 2
+</PRE></BODY></HTML>

@@ -1,0 +1,181 @@
+/****************************************************************************/
+/*
+  Released Software: Fast Buffer Insertion for Interconnect Optimization
+                     Version 2.3: 2003 - 2007
+
+  Author:  Zhuo (Robert) Li              -- zhybear@gmail.com 
+  Author:  Weiping Shi                   -- wshi@ee.tamu.edu
+
+                        All Rights Reserved
+
+Description: 
+  This software contain codes for the buffer insertion to maximize
+  the slack at the source. 
+  Several algorithms are included: Lillis, Cheng and Lin O(b^2n^2) time 
+  algorithm (extended from Van Ginneken's O(n^2) time algorithm), 
+  Shi and Li's O(b^2nlog^2n) time algorithm (original FBI), 
+  Li and Shi's O(bn^2) time algorithm, and 
+  Li and Shi's O(mn) time algorithm.
+  For more detailed description about these algorithms, see
+  
+  "Buffer placement in distributed RC-tree network for minimal
+   Elmore delay," by L. P. P. P. van Ginneken, International Symposium 
+   on Circuits and Systems , pp. 865-868, 1990.
+
+   "Optimal wire sizing and buffer insertion for low power and a generalized 
+   delay model,"
+   by J. Lllis, C.K. Cheng and T.-T. Y. Lin, IEEE J. Solid-State Circuits,
+   vol. 31(3), pp. 437-447, 1996.
+   
+   "An O(nlogn) time algorithm for optimal buffer insertion",
+   by Weiping Shi and Zhuo Li, Proc. of 40th Design Automation Conference
+   (DAC), 2003, pp. 580-585.  
+
+   "A Fast Algorithm for Optimal Buffer Insertion",
+   by Weiping Shi and Zhuo Li, IEEE Transaction on Computer-Aided Design of 
+   Integrated Circuits and Systems, vol. 24, no. 6, June 2005, pp. 879-891.
+
+   "An O(bn^2) Time Algorithm for Optimal Buffer Insertion with b Buffer
+   Types", by Zhuo Li and Weiping Shi, Conference on Design, Automation and
+   Test in Europe (DATE), Munich, Germany, March 7-11 2005, pp. 1324-1329.
+
+   "An O(mn) Time Algorithm for Optimal Buffer Insertion of Nets with m Sinks",
+   by Zhuo Li and Weiping SHi, 11st Asia and South Pacific Design Automation
+   Conference (ASP-DAC), Yokohama, Japan, Jan. 2006, pp. 320-325
+*/
+/****************************************************************************/
+
+ 
+ 
+The programs are available on "as is" basis. They are not guaranteed
+to be free of bugs, and the authors assume no responsibility for any
+potential problems.
+
+The programs are designed to run under Linux or Solaris 2.7 with any
+gcc 2.95 or above compiler. The executable file is for Linux.
+
+****We are working on the improved version based on C++ with more 
+general input and buffer libraries and minimal buffer cost version.
+
+
+UPDATE:
+   1. Make O(nlog^2n) algorithm a little bit faster by changing red-black tree code
+   
+   2. Clever memory management and predictive pruning has been implemented in regular van Ginnken algorithm, O(bn^2) and O(mn) algorithms
+      in last version. In this version, I turned on these options as default.
+
+NOTE, BUG and FIX:
+ 
+   1. Our VG Algorithm, Van Ginnken's 1990 Algorithm, Lillis et al. 1996 
+Algorithm:
+
+   The VG algorithm implemented in this software is slightly different from
+   1990 ISCAS paper and Lillis 1996 paper. In Lillis et al. 1996 paper, 
+   at every node, the algorithm first merges two subbranches 
+   solutions if this node degree > 2, then add a buffer at this node and propagate
+   wire to the driving node. However, this flow has limit to add decoupling capacitance.
+   Consider following example,
+     u ------ v ------- v1
+              |
+              |
+              |
+              v2
+   In Lillis et al. 1996 algorithm, suppose wire (v, v2) and (v, v1) have   
+   nonzero resistance and capacitance.
+   Then suppose we have got candidate lists for v2 and v1, N(v2) and N(v1) respectively.
+   N(v2) and N(v1) includes the edge delay on e(v, v2) and e(v, v1).
+   When the algorithm process to node v,  N(v2) and N(v1) are merged to 
+   form N(v). Then if v is a buffer position, a buffer x are tried at this node and 
+   there could be a new candidate generated. Insert the new candidate to N(v) and
+   propagate through edge e(u, v), prune redundant solutions. Then new N(v) are formed.
+   Note that, there is no buffer will be added at node v on e(v,v2),
+   or on e(v, v1). The decoupling effect of buffer is ignored. To
+   let the algorithm add the decoupling buffer, user need to
+   add two dummy nodes on e(v, v2) and e(v,v1) with zero distance to node v.
+   I think in the software developed by Lillis group automatically do 
+   that.
+   
+   To automatically allow decoupling, in this software package, we implemented VG in 
+   a little different way. And indeed this is what 1990 VG algorithm is!
+   Sorry for previous note on the decoupling difference between 1990 VG 
+   and ours though there are still difference there.
+
+   Still use the above example, and suppose N(v2) and N(v1) are candidate lists
+   including the edge delay on e(v,v2) and e(v,v1). Our algorithm first try to 
+   add a buffer for N(v2) at node v with the direction driving v2, and insert it 
+   into N(v2). 
+   Do the same process for N(v1). Then merge N(v2) and N(v1) to form N(v) and add the 
+   wire delay on e(u, v). Then, the decoupling buffer are considered. 
+   One problem of this implementation is there
+   will be no buffer added at node v on edge e(u,v), if u is not a dummy node.
+   User can add a dummy node on e(u,v) just before node v to force the algorithm consider 
+   adding buffer there. 
+  
+   If there is three dummy nodes at each node with degree = 3, then Lillis et al.
+   1996 algorithm without cost consideration and our
+   implementation will give same result. Generally, without adding 
+   any dummy nodes by user and dummy nodes are not automatically generated,
+   this implementation may give better slack due to decoupling consideration. 
+   The future version of this program will consider these 3 locations, buffer at v
+   on edge (u,v), buffer at v on edge (v, v1), buffer at v on edge (v, v2), automatically even
+   there are no dummy nodes at node v. 
+
+   As mentioned, though our algorithm and VG (1990) have the same the basic flow and 
+   merging point operations, our implementation of storing buffer types and locations 
+   are much different from VG's algorithm. In 1990 VG, the top-down process 
+   to find the buffer location and the types are more time consuming since 
+   another dynamic programming like procedure may be called again to reconstruct
+   the solution. The reason is VG only stores one global candidate list. 
+   Lillis et al. algorithm and most other buffer insertion algorithms 
+   stores a candidate list at every node, which is easy for retrieving the 
+   buffer location for a given solution, but may have memory overhead. 
+   In this implementation, we use a technique to save the space 
+   for candidate list (not storing candidate list at every node) while also
+   can efficiently retrieve the buffer information even for a partial solution. 
+   The detail can be look into our transaction version. 
+
+   2. Multiple Layers and Vias:
+
+   Multiple layers and vias are not implemented for this version. 
+   Currently there is only one unit resistance and capacitance. 
+   Edge with nonzero resistance and zero capacitance is not allowed, such as via.
+   (however, zero resistance and capacitance edge is allowed.) 
+   It can be easy implemented with la field introduced in our dac and transaction paper and will be implemented in next version.
+   
+   3. Driver and Buffer Library Requirement: 
+   
+   The driver resistance must be equal or greater than one of 
+   buffer resistance in buffer library for FBI algorithm. Van Ginnken's algorithm does not 
+   have this limitation.  This limitation will be solved 
+   in next version.
+   The Buffer Library must be sorted in decreasing driving resistance order. For O(bn^2) and O(mn) algorithm, this version also assumes the capacitance
+   is in reverse order (but not necessary, you can easily change the code to put z[i] in corresponding sorting capacitance order). Note that
+   in the cost version, both constraints are not necessary.
+
+   4. Tree Topology: 
+
+   The source node should have degree 1. If the source node has 
+   degree 2, it will generate wrong result. User can add a dummy
+   node at source node that can have degree 2, and then connect the source 
+   node to this node. 
+   
+   Every node can have maximum degree 3. User need to add dummy
+   node to separate node with degree greater than 3. 
+   
+   5. Buffer Position:
+
+   In this version, buffer can be inserted at any node. If there is zero length wire,
+   buffer will still be inserted.
+   
+   6. Stack Overflow:
+
+   More segmenting points implies more speedup of FBI algorithm and gives 
+   better slack. However, it may result overflow of stack and segmenting 
+   fault of program. In a SUN SPAC machine of 450MHZ and 2G pc, segment coef 
+   under 50 for all sample nets are tested. Set "ulimit -s unlimited" for 
+   bigger wire segmenting points with unlimited stack size.
+   
+   7. Maximum buffer Library size is upgraded from 24 to 64. If you want to treat the case 
+   with more than 64 buffer types, please contact the author. 
+
+Version 2.1.   Wed Oct 19 23:42:26 CST 2005
