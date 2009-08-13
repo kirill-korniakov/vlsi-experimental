@@ -16,11 +16,12 @@
 
 class HDesign;
 
-#define EPS	0.000000000000000000000001
+#define EPS	0.000000000000000000000001 * 1000//!!!
 #define MAXBUFFERTYPE 64
 #define nullSP m_hd.SteinerPoints.Null()
 #define QM 1
 #define PREDICT 1 //NOTE: predictive pruning 
+#define TREATZERO 1
 
 class VanGinneken
 {
@@ -73,7 +74,7 @@ private:
   RLnode *redundent(RLnode *list);
   RLnode *add_buffer(double distance, RLnode *list, int px, int py);
   double distance(VGNode *t, VGNode *t1);
-  RLnode* MergeLists(RLnode* sleft, RLnode* sright);
+  RLnode* MergeLists(RLnode* sleft, RLnode* sright, VGNode *t);
 
   //NOTE: метод запускающий алгоритм Ван Генникена
   RLnode *van(VGNode *t, double& van_answer, double rd);

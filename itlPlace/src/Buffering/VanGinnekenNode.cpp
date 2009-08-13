@@ -65,6 +65,7 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
   int nLeft = 0, nRight = 0;//NOTE:номер последнего в левом(правом) поддереве 
   int res = index;
   bool isLeft = false;
+  bool isInter = m_hd.SteinerPoints.GetBool<HSteinerPoint::IsInternal>(m_SubtreeRoot);
 
   if (m_LeftEnd != nullSP )
   {
@@ -369,22 +370,27 @@ VGNode* VGNode::GetLeft()
 
 VGNode* VGNode::RightStep() 
 { 
-  if ((isRightNodeExist == true) || (m_nLeftSteps != 0))
-  {
-    m_RelativePosition = 1;
-    if ((m_nRightSteps < m_steps) && (right != 0))
+  if (m_nRightSteps < 1)
+    if ((isRightNodeExist == true) || (m_nLeftSteps == 0))
     {
-      m_nRightSteps++;
-      return this;
-    } 
-    else
-    {
-      isTransitionR = true;
-      return right;
+      m_RelativePosition = 1;
+      if ((m_nRightSteps < m_steps) && (right != 0))
+      {
+        m_nRightSteps++;
+        return this;
+      } 
+      else
+      {
+        isTransitionR = true;
+        return right;
+      }
     }
+    else
+      return NULL;
+  else
+  {
+    return LeftStep();
   }
-  else 
-    return NULL;
 }
 
 VGNode* VGNode::GetRight() 
@@ -441,6 +447,13 @@ VGNode& VGNode::GetSteinerPoint(int index, VGNode& node, VGItem& result, bool do
   if (doIndexesClear)
     IndexesClear();
 
+  if (index < node.Index())
+  {
+    ALERTFORMAT(("ERROR buffering: buffer index is inadmissible "));
+    index = node.Index();
+    return node;
+  }
+
   if (node.Index() == index)
   {
     result.x = node.X(1);
@@ -455,6 +468,8 @@ VGNode& VGNode::GetSteinerPoint(int index, VGNode& node, VGItem& result, bool do
     }
     return node;
   }
+
+
   if (index <= node.m_leftCount)
   {
     return GetSteinerPoint(index, *node.LeftStep(), result); 
@@ -526,4 +541,23 @@ bool VGNode::IsReal()
     return true;
   else
     return false;
+}
+
+double VGNode::LengthTree(bool doIndexesClear)
+{
+  if (doIndexesClear)
+    IndexesClear();
+  double lengthTree = 0;
+  if (left != NULL)
+  {
+    lengthTree += left->LengthTree();
+    lengthTree += (fabs(m_xs - m_xle)  + fabs(m_ys - m_yle));
+  }
+  if (right != NULL)
+  {
+    lengthTree += right->LengthTree();
+    lengthTree += (fabs(m_xs - m_xre)  + fabs(m_ys - m_yre));
+  }
+
+  return lengthTree;
 }

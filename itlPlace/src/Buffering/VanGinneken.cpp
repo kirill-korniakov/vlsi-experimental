@@ -48,6 +48,7 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
 
   m_doReportBuffering = m_hd.cfg.lookforDefValue("Buffering.doReportBuffering", false);
   final_location_van = new Comp();
+
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -230,7 +231,7 @@ VanGinneken::RLnode *VanGinneken::add_buffer(double distance, RLnode *list, int 
     RLnode* pred = &dummy;
     while (y != 0)
     {
-      if (fabs(z[j]->cap - y->cap) < 1e-10)
+      if (fabs(z[j]->cap - y->cap) < (1e-10 * 1000))//!!!
       {
         if (z[j]->time > y->time)
         {
@@ -286,10 +287,10 @@ VanGinneken::RLnode *VanGinneken::add_buffer(double distance, RLnode *list, int 
 
 double VanGinneken::distance(VGNode *t, VGNode *t1)
 {
-  return (fabs((t->X(0) - t1->X(1))) + fabs(t->Y(0) - t1->Y(1)));
+  return ((fabs((t->X(0) - t1->X(1))) + fabs(t->Y(0) - t1->Y(1)))) * FBI_LENGTH_SCALING;
 }
 
-VanGinneken::RLnode* VanGinneken::MergeLists(RLnode* sleft, RLnode* sright)
+VanGinneken::RLnode* VanGinneken::MergeLists(RLnode* sleft, RLnode* sright, VGNode *t)
 {
   RLnode dummy;
   RLnode* s = &dummy;
@@ -325,6 +326,8 @@ VanGinneken::RLnode* VanGinneken::MergeLists(RLnode* sleft, RLnode* sright)
 #endif
       s->com = p;
       sleft = sleft->next;
+      p->x = t->Index();
+      p->y = t->Index();
     }
     else
     {
@@ -342,11 +345,14 @@ VanGinneken::RLnode* VanGinneken::MergeLists(RLnode* sleft, RLnode* sright)
       p->counter = 0;
 #endif
       s->com = p;
-      sright = sright->next;					
+      sright = sright->next;
+      p->x = t->Index();
+      p->y = t->Index();
     }
 
     s->cap = c;
     s->time = q;
+
   }
   s->next = 0;
 
@@ -403,8 +409,8 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
     sleft = add_buffer(k1, sleft, t->Index(), t->LeftStep()->Index());
     t->BackStep();
     sleft = redundent(sleft);
-    /*NOTE: if the node has only one child (default left), only 
-    return update solution of left child */
+    //NOTE: if the node has only one child (default left), only 
+    //return update solution of left child 
     if (!t->IsRightNodeExist())
     {
       return sleft;
@@ -417,7 +423,7 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
     }
   }	
 
-  return MergeLists(sleft, sright);
+  return MergeLists(sleft, sright, t);
 }
 
 
@@ -464,12 +470,7 @@ void VanGinneken::InitializeBuffersIdxs()
 
 int VanGinneken::NetBuffering(HNet& net)
 {
-  if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
-  {
-    m_hd.Plotter.ShowPlacement();
-    m_hd.Plotter.PlotNetSteinerTree(net, Color_Black);
-    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
-  }
+
 
   bool isNewNet = (m_hd.Nets.GetString<HNet::Name>(net).find("BufferedPart") != -1);
   bool isNetBuffered = (m_hd.Nets.Get<HNet::Kind, NetKind>(net) == NetKind_Buffered);
@@ -477,6 +478,13 @@ int VanGinneken::NetBuffering(HNet& net)
 
   if (!isNetBufferable)
     return 0;
+  
+  if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
+  {
+    m_hd.Plotter.ShowPlacement();
+    m_hd.Plotter.PlotNetSteinerTree(net, Color_Black);
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
+  }
 
   int nUnits = RunVG(net);
 
@@ -505,7 +513,11 @@ int VanGinneken::NetBuffering(HNet& net)
   if (m_doReportBuffering)
   {
     ALERTFORMAT(("Buffered net: %s", m_hd[net].Name().c_str()));
+    double lengthTree = m_vgNetSplitted.LengthTree(true);
+    ALERTFORMAT(("Length Tree = %f", lengthTree));
     ALERTFORMAT(("  Pin count: %d\tBuffers count: %d", m_hd[net].PinsCount(), nBuffersInserted));
+    int x;
+    printbuffer(final_location_van, &x);
   }
 
   if (nBuffersInserted > 0) 
@@ -626,16 +638,25 @@ int VanGinneken::RunVG(HNet& net)
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
-
+  if (m_hd.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>((m_hd.SteinerPoints[m_hd[net].Source()])) != nullSP)
+  {
+    ALERTFORMAT(("In source 2 edges"));
+  }
   if (nUnits > 0)
   {
     double someSlack;
     double driverResistance = m_AvailableBuffers[0].Resistance;
     m_VGOutput = van(&m_vgNetSplitted, someSlack, driverResistance);
-    print(m_VGOutput);
-    ALERT("Solution");
+    //print(m_VGOutput);
+    //ALERT("Solution");
     int x = 0;
-    printbuffer(final_location_van, &x);
+    //printbuffer(final_location_van, &x);
+    //ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsours = %.10f\ncsink = %.10f\n", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
+    double lenNet = driverResistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * sinkCapacitance / m_WirePhisics.LinearC;
+    double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
+    double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
+    double countBufferOpt = (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
+    ALERTFORMAT(("Buffer count optimal = %.10f", countBufferOpt));
     return nUnits;
   }
   else 
@@ -703,7 +724,7 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
 void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
 {
   WARNING_ASSERT(m_buffersIdxsAtNetSplitted[0] > 0);
-
+  int nNewNetPin = 0;
   int nPins = 0;
   char cellIdx[10];
   VGItem vgItem;
@@ -716,6 +737,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
 
   //allocate pins
   PinsCountCalculation(m_vgNetSplitted, 0, nPins, true);
+  nNewNetPin += nPins;
   m_hd.Nets.AllocatePins(subNet, nPins);  
 
   //init source
@@ -743,6 +765,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
     VGNode& nodeStart = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
     PinsCountCalculation(nodeStart, m_buffersIdxsAtNetSplitted[j], nPins);
     nPins++;
+    nNewNetPin += nPins;
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source
@@ -751,13 +774,21 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
     //add other pins
     VGNode& nodeStart2 = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
     AddSinks2Net(insertedBuffers, subNet, nodeStart2, m_buffersIdxsAtNetSplitted[j], m_hd[subNet].GetSinksEnumeratorW());
-
+    
+    
     if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
     {
       m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
       m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
     }
   }
+  int pinCount = m_hd.Nets.GetInt<HNet::PinsCount>(net);
+  if (nNewNetPin != (pinCount + m_buffersIdxsAtNetSplitted[0] * 2))
+  {
+    WARNING_ASSERT(nNewNetPin == pinCount);
+    ALERTFORMAT(("new net pin count = %d", nNewNetPin));
+  }
+
 }
 
 void VanGinneken::CreateNetsAndCells(HNet& net)
@@ -864,7 +895,10 @@ void VanGinneken::ParsingFinalLocationVan(VanGinneken::Comp *com)
   }
   VGItem resultBuf;
   if ((com->buffertype != 0) && (com->buffertype != -1) && 
-    (!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()))
+      (!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) //&&
+      //(!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) &&
+      //(com->x != com->y)
+     )
   {
     int i = GetIdx(m_buffersIdxsAtNetSplitted, com->y);
     if (i == -1)

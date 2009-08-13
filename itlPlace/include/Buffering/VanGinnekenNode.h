@@ -4,10 +4,12 @@
 #include "HDesign.h"
 
 #define	INFINITY	20000000000.0
-const int FBI_WIRE_RESISTANCE_SCALING  = 1000000;
-const int FBI_CELL_RESISTANCE_SCALING  = 1000;
-const int FBI_CELL_CAPACITANCE_SCALING = 1000;
-const int FBI_TIME_SCALING             = 1000;
+const double FBI_WIRE_RESISTANCE_SCALING  = 1;//000000.0;
+const double FBI_CELL_RESISTANCE_SCALING  = 1;//000.0;
+const double FBI_CELL_CAPACITANCE_SCALING = 1;//000.0;
+const double FBI_TIME_SCALING             = 1;//000.0;//000000.0;]
+const double FBI_LENGTH_SCALING           = 1;// / 1000.0;
+
 
 //NOTE: Результат взятия звена VGNode по индексу
 class VGItem
@@ -87,6 +89,8 @@ public:
   bool IsReal();  //NOTE: по звену можно получить штейнерскую точку
   void IndexesClear();  //NOTE: обнуление индексов в дереве
 
+  double LengthTree(bool doIndexesClear = false);
+
 protected:
   HDesign&      m_hd;
 
@@ -112,6 +116,9 @@ protected:
 
   int m_leftCount; //NOTE: число звеньев в левом поддереве
   bool isRightNodeExist;
+
+
+
 };
 
 #endif //__VanGinnekenNode_H__
