@@ -4,11 +4,11 @@
 #include "HDesign.h"
 
 #define	INFINITY	20000000000.0
-const double FBI_WIRE_RESISTANCE_SCALING  = 1;//000000.0;
-const double FBI_CELL_RESISTANCE_SCALING  = 1;//000.0;
+const double FBI_WIRE_RESISTANCE_SCALING  = 1000.0;
+const double FBI_CELL_RESISTANCE_SCALING  = 1000.0;
 const double FBI_CELL_CAPACITANCE_SCALING = 1;//000.0;
-const double FBI_TIME_SCALING             = 1;//000.0;//000000.0;]
-const double FBI_LENGTH_SCALING           = 1;// / 1000.0;
+const double FBI_TIME_SCALING             = 1000.0;//000000.0;]
+const double FBI_LENGTH_SCALING           = 1 / 1000.0;
 
 
 //NOTE: Результат взятия звена VGNode по индексу

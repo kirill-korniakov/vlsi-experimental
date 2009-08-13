@@ -16,7 +16,7 @@
 
 class HDesign;
 
-#define EPS	0.000000000000000000000001 * 1000//!!!
+#define EPS	0.000000000000000000000001 //!!!
 #define MAXBUFFERTYPE 64
 #define nullSP m_hd.SteinerPoints.Null()
 #define QM 1

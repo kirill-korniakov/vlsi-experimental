@@ -110,7 +110,8 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
   if ((left == NULL) && (right == NULL)) 
   {
     WARNING_ASSERT(m_typePoint != 0);
-
+    string celName = m_hd.Cells.GetString<HCell::Name>(m_hd.Pins.Get<HPin::Cell, HCell>(m_hd.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot)));
+    string pinName = m_hd.Pins.GetString<HPin::Name>(m_hd.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot));
     if (!m_hd.SteinerPoints.GetBool<HSteinerPoint::IsInternal>(m_SubtreeRoot))
     {
       HTimingPointWrapper timPointForSubtreeRoot = 

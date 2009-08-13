@@ -231,7 +231,7 @@ VanGinneken::RLnode *VanGinneken::add_buffer(double distance, RLnode *list, int 
     RLnode* pred = &dummy;
     while (y != 0)
     {
-      if (fabs(z[j]->cap - y->cap) < (1e-10 * 1000))//!!!
+      if (fabs(z[j]->cap - y->cap) < (1e-10))//!!!
       {
         if (z[j]->time > y->time)
         {
@@ -470,8 +470,6 @@ void VanGinneken::InitializeBuffersIdxs()
 
 int VanGinneken::NetBuffering(HNet& net)
 {
-
-
   bool isNewNet = (m_hd.Nets.GetString<HNet::Name>(net).find("BufferedPart") != -1);
   bool isNetBuffered = (m_hd.Nets.Get<HNet::Kind, NetKind>(net) == NetKind_Buffered);
   bool isNetBufferable = !isNewNet && !m_isFreeSpaceEnded && !isNetBuffered;
