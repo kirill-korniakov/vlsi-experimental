@@ -84,7 +84,7 @@ namespace libconfig
     T lookupDefValue(const char *path, const T& def)
     {
       T res;
-      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.", __FUNCTION__);
+      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
       return lookupValue(path, res) ? res : def;
     }
 
@@ -104,7 +104,7 @@ namespace libconfig
     T lookforDefValue(const char *path, const T& def)
     {
       T res;
-      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.", __FUNCTION__);
+      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
       return lookupValue(path, res)
         ? res
         : (gCfg.lookupValue(path, res)
@@ -164,7 +164,7 @@ extern libconfig::ConfigExt gCfg;
 
 inline libconfig::Setting & libconfig::ConfigExt::lookfor(const char *path) const
 {
-  printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.", __FUNCTION__);
+  printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
   return exists(path) ? lookup(path) : gCfg.lookup(path);
 }
 

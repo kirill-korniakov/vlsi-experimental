@@ -179,3 +179,26 @@ void PrintToBoxRouterFormat(HDesign& hd, char* fileName)
         }
     }
 }
+
+void ReportNetTiming(HDesign& design, HNet net)
+{
+  HNetWrapper netW = design[net]; 
+  double RAT, AAT;
+  string pinName;
+  ALERTFORMAT(("Reporting net %s timing", netW.Name().c_str()));
+  
+  for (HNetWrapper::PinsEnumeratorW currPin = netW.GetPinsEnumeratorW(); currPin.MoveNext();)
+  {
+    HTimingPointWrapper tp = design[design.TimingPoints[currPin]];
+    RAT = tp.RequiredTime();
+    AAT = tp.ArrivalTime();
+
+    if (currPin.IsPrimary())
+      pinName = currPin.Name();
+    else
+      pinName = design.Cells.GetString<HCell::Name>(currPin.Cell()) + "." + currPin.Name();
+
+    ALERTFORMAT(("RAT at %s\t= %.10f", pinName.c_str(), RAT));
+    ALERTFORMAT(("AAT at %s\t= %.10f", pinName.c_str(), AAT));
+  }
+}

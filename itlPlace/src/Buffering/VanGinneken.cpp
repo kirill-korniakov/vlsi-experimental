@@ -642,9 +642,10 @@ int VanGinneken::RunVG(HNet& net)
   }
   if (nUnits > 0)
   {
-    double someSlack;
+    double newSlackAtSource;
     double driverResistance = m_AvailableBuffers[0].Resistance;
-    m_VGOutput = van(&m_vgNetSplitted, someSlack, driverResistance);
+    m_VGOutput = van(&m_vgNetSplitted, newSlackAtSource, driverResistance);
+    ALERTFORMAT(("(vananswer) RAT at source AB = %.10f", newSlackAtSource));
     //print(m_VGOutput);
     //ALERT("Solution");
     int x = 0;
@@ -740,7 +741,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
 
   //init source
   m_hd.Nets.Set<HNet::Source, HPin>(subNet, m_hd[net].Source());
-
+  
   //add other pins
   AddSinks2Net(insertedBuffers, subNet, m_vgNetSplitted, 0, m_hd[subNet].GetSinksEnumeratorW(), true);
 

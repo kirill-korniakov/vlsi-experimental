@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include "STA.h"
+#include "Reporting.h"
 
 void NetlistBuffering(HDesign& design)
 {
@@ -71,16 +72,19 @@ void TestBuffering(HDesign& design)
   
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
   {
-    if (nIter.PinsCount() == 2) 
+    //if (nIter.PinsCount() == 2) 
+    if (nIter.Name() == "G117") 
     {
-      HPin source = nIter.Source();
-      HPin sink = nIter.LastSink();
-      if (!design.Pins.GetBool<HPin::IsPrimary>(source)&& !design.Pins.GetBool<HPin::IsPrimary>(sink))
+      //HPin source = nIter.Source();
+      //HPin sink = nIter.LastSink();
+      //if (!design.Pins.GetBool<HPin::IsPrimary>(source)&& !design.Pins.GetBool<HPin::IsPrimary>(sink))
       {
+        ReportNetTiming(design, nIter);
         vg.NetBuffering(nIter);
         FindTopologicalOrder(design);
         ALERT("not legalized");
         STA(design);
+        ReportNetTiming(design, nIter);
         ALERT("legalized");
         Legalization(DPGrid);
         STA(design);
