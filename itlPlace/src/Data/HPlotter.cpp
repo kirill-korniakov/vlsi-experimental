@@ -620,12 +620,12 @@ void HPlotter::PlotText(string text, double textSize)
   CvFont font;
   string bufText = text;
   if (textSize == -1)
-	textSize = m_hd.cfg.lookforDefValue("plotter.textSize", 1.0);
+    textSize = m_hd.cfg.lookforDefValue("plotter.textSize", 1.0);
   cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, textSize, textSize , 0.0, 1, 1);
   int start = 0;
   int t = 1;
   char* str = new char[text.length() * 4];
-  
+
   for (unsigned int i = 0; i < text.length(); i++)
   {
     if ((text[i] == '\n') || (i == text.length() - 1))
@@ -633,25 +633,25 @@ void HPlotter::PlotText(string text, double textSize)
       for (unsigned int j = start; j < i; j++)
         bufText[j - start] = text[j];
       bufText[i - start] = '\0';
-	  int j2 = 0;
-	  
+      int j2 = 0;
+
       for (unsigned int j = 0; j < bufText.length(); j++)
-	  {
+      {
         if (bufText[j] == '\t')
-		{
-			str[j2] = ' ';
-			j2++;
-			str[j2] = ' ';
-			j2++;
-			str[j2] = ' ';
-			j2++;
-			str[j2] = ' ';
-			
-		}
-		else
-			str[j2] = bufText[j];
-		j2++;
-	  }
+        {
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+
+        }
+        else
+          str[j2] = bufText[j];
+        j2++;
+      }
       point.x = DesignX2ImageX(10);
       point.y = int(m_Data->textSpaceHeight - 30 * t * textSize);
       cvPutText(IMG, str, point, &font, GetColor(Color_Black));
@@ -755,6 +755,9 @@ void HPlotter::ShowPlacement(WaitTime waitTime)
 
 void HPlotter::AutoShowPlacement(WaitTime waitTime)
 {
+  if (!IsEnabled())
+    return;
+    
   static int i = 0;
   if (i++ % m_Data->autoRefreshStep == 0)
   {

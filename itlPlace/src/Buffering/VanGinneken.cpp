@@ -33,7 +33,7 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
 {
   LoadAvailableBuffers();
   m_WirePhisics = m_hd.RoutingLayers.Physics;
-  m_WirePhisics.SetLinearC(m_WirePhisics.LinearC);   //convert to the femtoFarad/10^-6m
+  m_WirePhisics.SetLinearC(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
   m_WirePhisics.SetRPerDist(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
 
   m_nCandidatesForBuffering = -1;
@@ -46,9 +46,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
     m_freeSpace = m_freeSpace - cellW.Height() * cellW.Width(); 
   m_isFreeSpaceEnded = false;
 
-  m_doReportBuffering = m_hd.cfg.lookforDefValue("Buffering.doReportBuffering", false);
-  final_location_van = new Comp();
-
+  m_doReportBuffering = m_hd.cfg.ValueOf("Buffering.doReportBuffering", false);
+  m_finalLocationVan = new Comp();
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -399,7 +398,7 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
       if (q > van_answer)
       {
         van_answer = q;
-        final_location_van = x->com; //NOTE: вот тут и берем результат!!!
+        m_finalLocationVan = x->com; //NOTE: вот тут и берем результат!!!
       }
     }
     return sleft;
@@ -430,7 +429,7 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
 void VanGinneken::LoadAvailableBuffers()
 {
   BufferInfo buf;
-  const char* name = m_hd.cfg.lookforDefValue("GlobalPlacement.bufferName", (const char*)"INVX1");
+  const char* name = m_hd.cfg.ValueOf("GlobalPlacement.bufferName", (const char*)"INVX1");
   buf.BufferMacroType = Utils::FindMacroTypeByName(m_hd, name);
   Utils::CalcElementTRC(m_hd, buf.BufferMacroType, &buf.TIntrinsic, &buf.Resistance, &buf.Capacitance);
   buf.Resistance  *= FBI_CELL_RESISTANCE_SCALING;
@@ -440,31 +439,7 @@ void VanGinneken::LoadAvailableBuffers()
 
 void VanGinneken::InitializeBuffersIdxs()
 {
-  /* RLnode* rln = m_VGOutput;
-
-  m_RATidx = 0;
-  while (rln != NULL)
-  {
-  m_RATidx++;
-  rln = rln->next;
-  }  
-  m_RATs = new double[m_RATidx];
-
-  rln = m_VGOutput;
-  int i = 0;
-  while (rln != NULL)
-  {
-  m_RATs[i] = rln->time;
-  i++;
-  rln = rln->next;
-  }
-  m_RATidx = 0;
-
-  RLNodeParsing(m_VGOutput);
-  list_delete(rln);
-  list_delete(m_VGOutput);
-  delete [] m_RATs;*/
-  ParsingFinalLocationVan(final_location_van);
+  ParsingFinalLocationVan(m_finalLocationVan);
   std::sort(m_buffersIdxsAtNetSplitted + 1, m_buffersIdxsAtNetSplitted + m_buffersIdxsAtNetSplitted[0] + 1);
 }
 
@@ -476,12 +451,13 @@ int VanGinneken::NetBuffering(HNet& net)
 
   if (!isNetBufferable)
     return 0;
-  
-  if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
+
+  if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
   {
     m_hd.Plotter.ShowPlacement();
     m_hd.Plotter.PlotNetSteinerTree(net, Color_Black);
-    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
+    m_hd.Plotter.PlotText(m_hd.Nets.GetString<HNet::Name>(net));
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
   }
 
   int nUnits = RunVG(net);
@@ -489,13 +465,9 @@ int VanGinneken::NetBuffering(HNet& net)
   if (nUnits > 0)
   {
     m_buffersIdxsAtNetSplitted = new int[nUnits + 1];
-    m_InternalVGInsertedBufferIdxs = new int[nUnits + 1];
-    m_RATsAtInsertedBuffers = new double[nUnits + 1];
     for (int i = 0; i <= nUnits; i++)
     {
       m_buffersIdxsAtNetSplitted[i] = 0;
-      m_InternalVGInsertedBufferIdxs[i] = 0;
-      m_RATsAtInsertedBuffers[i] = 0.0;
     }
   }
   else
@@ -515,7 +487,7 @@ int VanGinneken::NetBuffering(HNet& net)
     ALERTFORMAT(("Length Tree = %f", lengthTree));
     ALERTFORMAT(("  Pin count: %d\tBuffers count: %d", m_hd[net].PinsCount(), nBuffersInserted));
     int x;
-    printbuffer(final_location_van, &x);
+    printbuffer(m_finalLocationVan, &x);
   }
 
   if (nBuffersInserted > 0) 
@@ -531,18 +503,6 @@ int VanGinneken::NetBuffering(HNet& net)
   }
 
   delete [] m_buffersIdxsAtNetSplitted;
-  delete [] m_InternalVGInsertedBufferIdxs;
-  delete [] m_RATsAtInsertedBuffers;
-}
-
-void VanGinneken::RLNodeParsing(RLnode* rln)
-{
-  if (rln->next != NULL)
-  {
-    ParsingComp(rln->com);
-    m_RATidx++;
-    RLNodeParsing(rln->next);
-  }
 }
 
 void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nodeStart, int startNodeIdx,  
@@ -632,11 +592,11 @@ int VanGinneken::RunVG(HNet& net)
   WARNING_ASSERT(net.Kind != NetKind_Buffered);
 
   m_vgNetSplitted.Destroy();
-  int steps = m_hd.cfg.lookforDefValue("Buffering.steps", 1);
+  int steps = m_hd.cfg.ValueOf("Buffering.steps", 1);
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
-  m_vgNetSplitted.UpdatingTree();
+
   if (m_hd.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>((m_hd.SteinerPoints[m_hd[net].Source()])) != nullSP)
   {
     ALERTFORMAT(("In source 2 edges"));
@@ -651,7 +611,7 @@ int VanGinneken::RunVG(HNet& net)
     //ALERT("Solution");
     int x = 0;
     //printbuffer(final_location_van, &x);
-    ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsours = %.10f\ncsink = %.10f\n", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
+    //ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsource = %.10f\ncsink = %.10f", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
     double lenNet = driverResistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * sinkCapacitance / m_WirePhisics.LinearC;
     double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
     double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
@@ -711,11 +671,12 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
 
       if (m_doReportBuffering)
         ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), bufferX, bufferY, m_buffersIdxsAtNetSplitted[i]));
-
-      if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
+        //ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), vgBuffer.x, vgBuffer.y, m_buffersIdxsAtNetSplitted[i]));
+      
+      if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
       {
         m_hd.Plotter.PlotCell(insertedBuffers[i - 1], Color_Orange);
-        m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
+        m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
       }
     }
   }
@@ -746,10 +707,10 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
   //add other pins
   AddSinks2Net(insertedBuffers, subNet, m_vgNetSplitted, 0, m_hd[subNet].GetSinksEnumeratorW(), true);
 
-  if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
+  if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
   {
     m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
-    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
   }
 
   for (int j = 1; j <= m_buffersIdxsAtNetSplitted[0]; j++)
@@ -776,10 +737,10 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
     AddSinks2Net(insertedBuffers, subNet, nodeStart2, m_buffersIdxsAtNetSplitted[j], m_hd[subNet].GetSinksEnumeratorW());
     
     
-    if (m_hd.cfg.lookforDefValue("Buffering.plotBuffering", false))
+    if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
     {
       m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
-      m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.lookforDefValue("Buffering.plotWait", 1));
+      m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
     }
   }
   int pinCount = m_hd.Nets.GetInt<HNet::PinsCount>(net);
@@ -788,7 +749,6 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
     WARNING_ASSERT(nNewNetPin == pinCount);
     ALERTFORMAT(("new net pin count = %d", nNewNetPin));
   }
-
 }
 
 void VanGinneken::CreateNetsAndCells(HNet& net)
@@ -841,45 +801,6 @@ int VanGinneken::CriticalPathBuffering(HCriticalPath aPath)
   return nBuf;
 }
 
-void VanGinneken::ParsingComp(VanGinneken::Comp *com)
-{
-  if (com == NULL)
-    return;
-  if (com->left != NULL)
-  {
-    ParsingComp(com->left);
-  }
-  if (com->right != NULL)
-  {
-    ParsingComp(com->right);
-  }
-
-  if ((com->buffertype != 0) && (com->buffertype != -1) && (com->counter != 0))
-  {
-    VGItem resultBuf;
-    if (!m_vgNetSplitted.GetSteinerPoint(com->x, m_vgNetSplitted, resultBuf, true).IsReal())
-    {
-      int i = GetIdx(m_InternalVGInsertedBufferIdxs, com->counter);
-      if (i == -1)
-      {
-        m_InternalVGInsertedBufferIdxs[0]++;
-        m_buffersIdxsAtNetSplitted[0]++;
-        m_buffersIdxsAtNetSplitted[m_buffersIdxsAtNetSplitted[0]] = com->x;
-        m_InternalVGInsertedBufferIdxs[m_buffersIdxsAtNetSplitted[0]] = com->counter;
-        m_RATsAtInsertedBuffers[m_buffersIdxsAtNetSplitted[0]] = m_RATs[m_RATidx];
-      }
-      else
-      {
-        if (m_RATsAtInsertedBuffers[i] < m_RATs[m_RATidx] )
-        {
-          m_RATsAtInsertedBuffers[i] = m_RATs[m_RATidx];
-          m_buffersIdxsAtNetSplitted[i] = com->x;
-        }
-      }
-    }
-  }
-}
-
 void VanGinneken::ParsingFinalLocationVan(VanGinneken::Comp *com)
 {
 
@@ -916,7 +837,7 @@ int VanGinneken::BufferingTillDegradation()
   ALERT("BUFFERING STARTED");
 
   int n = 0;
-  int pathPack = m_hd.cfg.lookforDefValue("Buffering.pathPack", 1);
+  int pathPack = m_hd.cfg.ValueOf("Buffering.pathPack", 1);
   if (pathPack != 0)
   {
     int countCP = m_hd.CriticalPaths.Count();
@@ -956,164 +877,6 @@ int VanGinneken::BufferingTillDegradation()
     n = BufferingOfMostCriticalPaths();
   ALERT("BUFFERING FINISHED");
   return n;
-}
-
-std::vector<CriticalPathsCriticality> VanGinneken::BufferingDesign(HDPGrid& DPGrid,  int argc, 
-                                                                   char** argv, int& j, const char * s)
-{
-  int n = 0;
-  int nCriticalPaths = m_hd.CriticalPaths.Count();
-  std::vector<CriticalPathsCriticality> vecPath(nCriticalPaths);
-  std::vector<CriticalPathsCriticality> vecPathOpt(nCriticalPaths);
-
-  int idx = 0;
-  for (HCriticalPaths::EnumeratorW criticalPathW = m_hd.CriticalPaths.GetEnumeratorW(); 
-    criticalPathW.MoveNext(); )
-  { 
-    vecPath[idx].criticality = criticalPathW.Criticality();
-    vecPath[idx].path = criticalPathW;
-    idx++;
-  }
-  std::sort(vecPath.begin(), vecPath.end(), NameSortCPC());
-
-  double tns = 999999, wns = 999999, tns2 = 999999, wns2 = 999999;
-  tns = Utils::TNS(m_hd);
-  wns = Utils::WNS(m_hd);
-  tns2 = tns; wns2 = wns;
-
-  int i = 0;
-  while (i < nCriticalPaths)
-  {
-    n = CriticalPathBuffering(vecPath[i].path);
-
-    tns2 = tns; wns2 = wns;
-    if (n > 0)
-    {
-      FindTopologicalOrder(m_hd);
-      STA(m_hd);
-      tns = Utils::TNS(m_hd);
-      wns = Utils::WNS(m_hd);
-      if ((tns < tns2) && (wns < wns2))
-      {
-        printf("\nIndex buffers path = %d\n", i);
-        vecPathOpt[j].criticality = 
-          m_hd.CriticalPaths.GetDouble<HCriticalPath::Criticality>(vecPath[i].path);
-        vecPathOpt[j].path = vecPath[i].path;
-        j++;
-      }
-    }
-    i++;
-  }
-  return vecPathOpt;
-}
-
-int VanGinneken::Buffering2Pass(HDPGrid& DPGrid,  int argc, char** argv, const char* exportFileName)
-{
-  /*WRITELINE("");
-  ALERT("BUFFERING STARTED");
-
-  int n = 0;
-  int j = 0;
-  ExportDEF(m_hd, exportFileName);
-  HDesign hd2;
-  bool isCyclesEnabled = false;
-  int nCyclesCounter = 0;    
-  gCfg.LoadConfiguration("itlVLSI.cfg");
-  InitializeLogging();
-  InitFLUTE();
-  hd2.Initialize();
-  hd2.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
-  hd2.cfg.SetArguments(argc, argv);
-  ParseLEF(hd2);
-  if (hd2.cfg.Defined("benchmark.lib"))
-  ParseLIB(hd2);
-  TranslateTechnology(hd2);
-  char* str = new char [strlen(exportFileName) + 15];
-  str[0] = 0;
-  strcat(strcat(str, ".\\ExportDEF\\"), exportFileName);
-  ParseDEF(hd2, str);
-  InitializeTiming(hd2);
-  if (hd2.cfg.lookforDefValue("DesignFlow.SkipSpecialNets", false))
-  Utils::SkipSpecialNets(hd2);
-  PinPlacement(hd2);
-  hd2.Plotter.Initialize();
-  hd2.Plotter.ShowPlacement(HPlotter::NO_WAIT);
-  WRITELINE("");
-  ALERT("Timing:");
-  STA(hd2);
-
-  FindCriticalPaths(hd2);  
-  ReportCriticalPathsToLogFile(hd2, hd2.cfg.lookforDefValue("CriticalPaths.countLogReportCriticalPaths", 0));
-  PlotTopCriticalPathsAndSaveImages(hd2, hd2.cfg.lookforDefValue("CriticalPaths.countPlotCriticalPaths", 0));
-
-  if (hd2.cfg.lookforDefValue("NetWeighting.useNetWeights", false))
-  {
-  if (hd2.cfg.lookforDefValue("NetWeighting.nMacroIterations", 0) > 0)
-  {
-  isCyclesEnabled = true;
-  PrepareNextLoop(hd2, argc, argv, nCyclesCounter);
-  }
-  }
-  VanGinneken vg(hd2);
-  std::vector<CriticalPathsCriticality> vecPathOpt = vg.BufferingDesign(DPGrid, argc, argv, j, exportFileName);
-
-  n = 0;
-  for (int h = 0; h < j; h++)
-  {
-  n += CriticalPathBuffering(vecPathOpt[h].path);
-  m_hd.Plotter.ShowPlacement();
-  }
-  return n;*/
-  return 0;
-}
-
-void BuffTiming(HDesign &hd, double& tns, double& wns, bool doReport, int argc, char** argv, char * s)
-{
-  //try
-  //{
-  //  ExportDEF(hd, s);
-  //  HDesign* hd2 = new HDesign();
-  //  bool isCyclesEnabled = false;
-  //  int nCyclesCounter = 0;     //NOTE: Number of work cycles of the main flow
-  //  gCfg.LoadConfiguration("itlVLSI.cfg");
-  //  InitializeLogging();
-
-  //  InitFLUTE();
-
-  //  hd2->Initialize();
-
-  //  hd2->cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
-  //  hd2->cfg.SetArguments(argc, argv);
-
-  //  ParseLEF(*hd2);
-  //  if (hd2->cfg.Defined("benchmark.lib"))
-  //    ParseLIB(*hd2);
-
-  //  TranslateTechnology(*hd2);
-
-  //  char* str = new char [strlen(s) + 15];
-  //  str[0] = 0;
-  //  strcat(strcat(str, ".\\ExportDEF\\"), s);
-  //  ParseDEF2(*hd2, str);
-
-  // InitializeTiming(*hd2);
-
-  //  if (hd2->cfg.lookforDefValue("DesignFlow.SkipSpecialNets", false))
-  //    Utils::SkipSpecialNets(*hd2);
-
-  //  PinPlacement(*hd2);
-
-  //  if (doReport)
-  //    ALERT("STA after buffering:");
-  //  STA(*hd2, doReport);
-  //  tns = Utils::TNS(*hd2);
-  //  wns = Utils::WNS(*hd2);
-  //  delete hd2;
-  //}
-  //catch(...)
-  //{
-  //  return;
-  //}
 }
 
 /* print list */

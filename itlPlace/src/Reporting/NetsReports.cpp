@@ -15,6 +15,19 @@ void ReportNetPins(HDesign& design, HNet net)
   }
 }
 
+void ReportNetPinsCoordinates(HDesign& design, HNet net)
+{
+  WRITELINE("Net %s pins:", design.GetString<HNet::Name>(net).c_str());
+  for (HNet::PinsEnumeratorW pin = design.Get<HNet::Pins, HNet::PinsEnumeratorW>(net); pin.MoveNext(); )
+  {
+    WRITELINE("  %s\tx = %f\ty = %f",
+      pin.Name().c_str(),
+      design.GetDouble<HPin::X>(pin),
+      design.GetDouble<HPin::Y>(pin)
+      );
+  }
+}
+
 void ReportNetsInfo(HDesign& design) 
 {
   int maxPinCount = 0;
@@ -32,13 +45,11 @@ void ReportNetsInfo(HDesign& design)
     nNetsWithPins[j] = 0;
   }
 
-
-
   int index = 0;
 
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetFullEnumeratorW(); nIter.MoveNext(); )
   {
-    nNetsWithPins[nIter.PinsCount()]++ ;
+    nNetsWithPins[nIter.PinsCount()]++;
   }
 
   WRITELINE("");
@@ -47,8 +58,7 @@ void ReportNetsInfo(HDesign& design)
     if (nNetsWithPins[i] != 0)
       WRITELINE("  Number of nets with\t%d\tpin =\t%d", i, nNetsWithPins[i]);
 
-   delete []nNetsWithPins ;
-
+   delete [] nNetsWithPins;
 }
 
 void ReportCountNetsWithTypes(HDesign& design)

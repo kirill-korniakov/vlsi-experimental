@@ -41,10 +41,13 @@ VGNode::~VGNode()
 
 void VGNode::UpdatingTree()
 { 
-  left->m_xle = m_xs;
+  /*left->m_xle = m_xs;
   left->m_yre = m_ys;
   left->left->m_xs  = m_xs;
-  left->right->m_ys  = m_ys;
+  left->right->m_ys  = m_ys;*/
+  double bigNumber = 2000000000000;
+  m_xle += bigNumber;
+  left->m_xs += bigNumber;
 }
 
 int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requiredArrivalTime, 

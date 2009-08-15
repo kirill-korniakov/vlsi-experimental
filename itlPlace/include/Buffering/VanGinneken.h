@@ -81,8 +81,6 @@ private:
 
   void LoadAvailableBuffers();
 
-  //NOTE: переводит индексы из comp в массив
-  void ParsingComp(Comp* com);
   void ParsingFinalLocationVan(VanGinneken::Comp *com);
 
   //NOTE: создает и инициализирует VGnode
@@ -100,41 +98,25 @@ private:
   void AddSinks2Net(HCell* insertedBuffers, HNet& net, VGNode& startNode, int startNodeIdx, 
     HNetWrapper::PinsEnumeratorW& pinEnum, bool doIndexesClear = false);
 
-  //NOTE: переводит RLNode в массив индексов буферов
-  void RLNodeParsing(RLnode* rln);
-
   void print(RLnode* x);
   void printbuffer(Comp *x, int *i);
 
-
-  //NOTE: буферизует все пути и возвращает только те на которых было улучшение
-  std::vector<CriticalPathsCriticality> VanGinneken::BufferingDesign(HDPGrid& DPGrid, int argc, 
-    char** argv, int& j, const char* s);
-
-  //NOTE:переменные  
   BuffersVector       m_AvailableBuffers;  //NOTE: библиотека доступных буферов для вставки
   HWirePhysicalParams m_WirePhisics;
   HDesign&            m_hd;
-  VGNode              m_vgNetSplitted;              //composition node 
+  VGNode              m_vgNetSplitted;
   int                 m_nCandidatesForBuffering;  //количество нетов которые хотели буферизовать
   int*                m_buffersIdxsAtNetSplitted; //индексы звеньев в которые рекомендуется вставить буферы,
-  //m_buffersIdxsAtNetSplitted[i][0] храним длину значимой области 
+                                                  //m_buffersIdxsAtNetSplitted[i][0] храним длину значимой области 
 
   RLnode* m_VGOutput;                     //результирующий RLNode выдаваемый методом Ван Генникена
-  int*    m_InternalVGInsertedBufferIdxs; //индексы буферов взятые из результирующего RLNode
-  double* m_RATsAtInsertedBuffers;        //массив required arrival time at the node соответствующих индексу буфера 
-  double* m_RATs;                         //массив required arrival time at the node взятых из RLNode
-
-  int     m_nCriticalPaths;     //NOTE: соличество критических путей которые пытались буферизовать
-  int     m_RATidx;             //NOTE: текущий индекс в массиве rAT
-  double  m_freeSpace;          //NOTE: количество оставшегося свободного пространства на плате
-  bool    m_isFreeSpaceEnded;   //NOTE: кончилось ли свободное пространство
+  int     m_nCriticalPaths;     //количество критических путей, которые пытались буферизовать
+  int     m_RATidx;             //текущий индекс в массиве rAT
+  double  m_freeSpace;          //количество оставшегося свободного пространства на плате
+  bool    m_isFreeSpaceEnded;   //кончилось ли свободное пространство
 
   bool    m_doReportBuffering;
-  Comp*    final_location_van;   //NOTE: последняя структура Comp созданая Ван Генникеном
+  Comp*   m_finalLocationVan;   //NOTE: последняя структура Comp созданая Ван Генникеном
 };
-
-//NOTE: извращенный метод подсчета тайминга, //WARNING: при частом использование приводит к падению программы
-void BuffTiming(HDesign &hd, double& tns, double& wns, bool doReport, int argc, char** argv, char * s);
 
 #endif //__VanGinneken_H__

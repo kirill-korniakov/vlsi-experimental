@@ -26,6 +26,7 @@ void PrintToBoxRouterFormat(HDesign& hd, char* fileName);
 //Информация о количестве нэтов каждого типа (all, skipped, buffered, removed, Active).
 void ReportCountNetsWithTypes(HDesign& design);
 void ReportNetPins(HDesign& hd, HNet net);
+void ReportNetPinsCoordinates(HDesign& hd, HNet net);
 void ReportNetTiming(HDesign& design, HNet net);
 
 //timing reports

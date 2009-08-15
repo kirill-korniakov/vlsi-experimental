@@ -4,6 +4,7 @@
 #include "Auxiliary.h"
 #include "STA.h"
 #include "Reporting.h"
+#include "Parser.h"
 
 void NetlistBuffering(HDesign& design)
 {
@@ -74,25 +75,42 @@ double w = design.Circuit.Width();
   
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
   {
-    //if (nIter.PinsCount() == 3) 
-    if (nIter.Name() == "m1_n") 
-    {
-      //HPin source = nIter.Source();
-      //HPin sink = nIter.LastSink();
-      //if (!design.Pins.GetBool<HPin::IsPrimary>(source)&& !design.Pins.GetBool<HPin::IsPrimary>(sink))
-      {
-        ReportNetTiming(design, nIter);
-        vg.NetBuffering(nIter);
-        FindTopologicalOrder(design);
-        ALERT("not legalized");
-        STA(design);
-        ReportNetTiming(design, nIter);
-        ALERT("legalized");
-        //Legalization(DPGrid);
-        STA(design);
-        //break;
-      }
-    }
+    if (nIter.PinsCount() != 2) 
+    	continue;
+    	
+    //if (nIter.Name() != "overflw")
+    //	continue;
+
+    //bool isAnyPinPrimary = false;
+    //for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
+    //{
+    //  if (currPin.IsPrimary())
+    //  {
+    //    isAnyPinPrimary = true;
+    //    break;
+    //  }
+    //}
+    //if (isAnyPinPrimary)
+    //{
+    //  continue;
+    //}
+
+    WRITELINE("");
+    ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
+    ReportNetPinsCoordinates(design, nIter);
+    STA(design);
+    ReportNetTiming(design, nIter);
+    ExportDEF(design, "not_buffered");
+    vg.NetBuffering(nIter);
+    ExportDEF(design, "buffered");
+    FindTopologicalOrder(design);
+    //ALERT("After buffer insertion:");
+    STA(design);
+    ReportNetTiming(design, nIter);
+    //ALERT("After legalization:");
+    //Legalization(DPGrid);
+    //STA(design);
+    break;
   }
 
   WRITELINE("");
