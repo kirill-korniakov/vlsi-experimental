@@ -631,7 +631,8 @@ void PropagateArrivals(HDesign& design)
 
 void PropagateRequires(HDesign& design)
 {
-  HTimingPoint firstPoint = design.TimingPoints.FirstInternalPoint();
+  HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
+
   for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
     pt.GoPrevious() != firstPoint; )
   {
