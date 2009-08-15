@@ -1,0 +1,17 @@
+wire_res_per_unit 0.0003367  #ohm#
+wire_cap_per_unit 0.0002034  #fF#
+
+driver 287.979 410.409 2475.0967064       # source coordinate x, y, driver_resistance(ohm),
+                                           the index of source node is default 0#
+number_of_sinks 2                          # number of sinks #
+sink 1  287.979 402.489   6.26898    -219.65860166488156 # sink index, coordinate x, y, sink cap (fF), required arrival time (ps) # 
+sink 2  670.188 410.409   6.26898    0.00
+
+
+number_of_candidate_nodes 268    # number of internal nodes #
+candidate 20000 287.979 410.409     # node index, coordinate x and y #
+
+
+edge 0 20000          #edge start node index, end node index#
+edge 20000 1
+edge 20000 2
