@@ -39,6 +39,14 @@ VGNode::~VGNode()
   Destroy();
 }
 
+void VGNode::UpdatingTree()
+{ 
+  left->m_xle = m_xs;
+  left->m_yre = m_ys;
+  left->left->m_xs  = m_xs;
+  left->right->m_ys  = m_ys;
+}
+
 int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requiredArrivalTime, 
                            int steps, int typePoint, int act, int index)
 {

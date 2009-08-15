@@ -636,6 +636,7 @@ int VanGinneken::RunVG(HNet& net)
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
+  m_vgNetSplitted.UpdatingTree();
   if (m_hd.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>((m_hd.SteinerPoints[m_hd[net].Source()])) != nullSP)
   {
     ALERTFORMAT(("In source 2 edges"));
@@ -650,7 +651,7 @@ int VanGinneken::RunVG(HNet& net)
     //ALERT("Solution");
     int x = 0;
     //printbuffer(final_location_van, &x);
-    //ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsours = %.10f\ncsink = %.10f\n", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
+    ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsours = %.10f\ncsink = %.10f\n", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
     double lenNet = driverResistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * sinkCapacitance / m_WirePhisics.LinearC;
     double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
     double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));

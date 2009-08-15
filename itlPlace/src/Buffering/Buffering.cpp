@@ -61,6 +61,8 @@ void TestBuffering(HDesign& design)
   ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA before buffering:");
   STA(design);
+      
+double w = design.Circuit.Width();
 
   //buffering
   VanGinneken vg(design);
@@ -72,8 +74,8 @@ void TestBuffering(HDesign& design)
   
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
   {
-    //if (nIter.PinsCount() == 2) 
-    if (nIter.Name() == "G117") 
+    //if (nIter.PinsCount() == 3) 
+    if (nIter.Name() == "m1_n") 
     {
       //HPin source = nIter.Source();
       //HPin sink = nIter.LastSink();
@@ -86,9 +88,9 @@ void TestBuffering(HDesign& design)
         STA(design);
         ReportNetTiming(design, nIter);
         ALERT("legalized");
-        Legalization(DPGrid);
+        //Legalization(DPGrid);
         STA(design);
-        break;
+        //break;
       }
     }
   }

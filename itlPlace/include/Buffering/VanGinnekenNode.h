@@ -51,6 +51,9 @@ public:
     HDesign& hd, int act, int index);
 
   ~VGNode();
+  //отладочная функция.
+  void UpdatingTree();
+
 
   //NOTE: Инициализация дерева начиная с корня, по Штейнерскому дереву
   int InitializeTree(HSteinerPoint start,  double capacitance, double requiredArrivalTime, int steps, 
