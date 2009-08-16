@@ -39,14 +39,14 @@ int main(int argc, char** argv)
     TranslateTechnology(hd);
 
     ParseDEF(hd);
-    
-    //NOTE: cfg key DesignFlow.Timing is not clearly connected with this initialization
+
+    if (hd.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
+      Utils::SkipSpecialNets(hd);//must be called before InitializeTiming
+	  
+	//NOTE: cfg key DesignFlow.Timing is not clearly connected with this initialization
     // in my mind. I think we have to always initialize this structures.
     //if (hd.cfg.lookforDefValue("DesignFlow.Timing", false))
       InitializeTiming(hd);
-
-    if (hd.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
-      Utils::SkipSpecialNets(hd);
 
     PinPlacement(hd);
 

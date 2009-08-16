@@ -107,8 +107,13 @@ IGETTER(bool, HTimingPoint::IsTimingStartPoint, HTimingPoints)
     return false;
   if (m_hd->GetBool<HPin::IsPrimary>(pin))
     return true;
-  return m_hd->GetBool<HCell::IsSequential>(m_hd->Get<HPin::Cell, HCell>(pin))
-    && !::IsNull(m_hd->Get<HPin::Net, HNet>(pin));
+  if (m_hd->GetBool<HCell::IsSequential>(m_hd->Get<HPin::Cell, HCell>(pin))
+    && !::IsNull(m_hd->Get<HPin::Net, HNet>(pin)))
+  {
+    HPinType ptype = m_hd->Get<HPin::Type, HPinType>(pin);
+    return m_hd->Get<HPinType::Function, PinFunction>(ptype) == PinFunction_Signal;
+  }
+  return false;
 }
 
 IGETTER(bool, HTimingPoint::IsTimingEndPoint, HTimingPoints)
@@ -118,8 +123,13 @@ IGETTER(bool, HTimingPoint::IsTimingEndPoint, HTimingPoints)
     return false;
   if (m_hd->GetBool<HPin::IsPrimary>(pin))
     return true;
-  return m_hd->GetBool<HCell::IsSequential>(m_hd->Get<HPin::Cell, HCell>(pin))
-    && !::IsNull(m_hd->Get<HPin::Net, HNet>(pin));
+  if (m_hd->GetBool<HCell::IsSequential>(m_hd->Get<HPin::Cell, HCell>(pin))
+    && !::IsNull(m_hd->Get<HPin::Net, HNet>(pin)))
+  {
+    HPinType ptype = m_hd->Get<HPin::Type, HPinType>(pin);
+    return m_hd->Get<HPinType::Function, PinFunction>(ptype) == PinFunction_Signal;
+  }
+  return false;
 }
 
 //Critical paths

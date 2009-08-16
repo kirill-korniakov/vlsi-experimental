@@ -23,7 +23,7 @@ void NetlistBuffering(HDesign& design)
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
   {
     vg.NetBuffering(nIter);
-    FindTopologicalOrder(design);
+    //FindTopologicalOrder(design);
     ALERT("not legalized");
     STA(design);
     ALERT("legalized");
@@ -104,7 +104,7 @@ void TestBuffering(HDesign& design)
     vg.NetBuffering(nIter);
     //ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
-    FindTopologicalOrder(design);
+    //FindTopologicalOrder(design);
     //ALERT("After buffer insertion:");
     STA(design);
     ReportNetTiming(design, nIter);
@@ -115,7 +115,7 @@ void TestBuffering(HDesign& design)
   }
 
   WRITELINE("");
-  FindTopologicalOrder(design);
+  //FindTopologicalOrder(design);
   ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering (not legalized):");
   STA(design);
@@ -130,7 +130,7 @@ void TestBuffering(HDesign& design)
   design.Plotter.SaveMilestoneImage("BI+LEG");
 
   WRITELINE("");
-  FindTopologicalOrder(design);
+  //FindTopologicalOrder(design);
   ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering and legalization:");
   STA(design);

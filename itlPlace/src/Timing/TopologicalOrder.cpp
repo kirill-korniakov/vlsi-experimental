@@ -8,6 +8,12 @@ void FindTopologicalOrder(HDesign& design)
   HTimingPointWrapper tp_arrival = design[design.TimingPoints.TopologicalOrderRoot()];
   HTimingPointWrapper tp_required = design[design.TimingPoints.TopologicalOrderRoot()];
 
+  if (!::IsNull(tp_arrival.Next()) && !::IsNull(tp_required.Previous()))
+  {
+    LOGERROR("Method \"FindTopologicalOrder\" can be called only one time for each benchmark.\n");
+    return;
+  }
+
   TemplateTypes<HCell>::queue ready_cells;
   TemplateTypes<HNet>::queue ready_nets;
 

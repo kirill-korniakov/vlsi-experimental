@@ -529,6 +529,14 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
       subNetPinEnum.MoveNext();
 
       m_hd.Nets.AssignPin(subNet, subNetPinEnum, cellPinIter);
+
+      {//update topological order
+        HTimingPoint source = m_hd.TimingPoints[m_hd.Get<HNet::Source, HPin>(subNet)];
+        //TODO: fix next line
+        HPin bufferOutput = Utils::FindCellPinByName(m_hd, insertedBuffers[coordinate - 1], "Y");
+        Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferOutput], source);
+        Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[cellPinIter], source);
+      }
       return;
     }
   }
@@ -863,7 +871,7 @@ int VanGinneken::BufferingTillDegradation()
       if ((i % pathPack) == 0)
       {
         tns2 = tns; wns2 = wns;
-        FindTopologicalOrder(m_hd);
+        //FindTopologicalOrder(m_hd);
         STA(m_hd, DO_NOT_REPORT);
         tns = Utils::TNS(m_hd);
         wns = Utils::WNS(m_hd);
