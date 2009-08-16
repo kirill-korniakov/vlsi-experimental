@@ -8,7 +8,7 @@
 #include "DelayCalculation.h"
 #include "Timing.h" 
 #include "Legalization.h"
-#include "Reporting.h"
+
 
 #include <crtdbg.h>
 #include <fstream>
@@ -25,18 +25,6 @@ class HDesign;
 
 class VanGinneken
 {
-public:
-  VanGinneken(HDesign& design);
-
-  //NOTE: двупроходная буферизация, сначало выбираем "хорошие" пути, потом их буферизуем
-  int Buffering2Pass(HDPGrid& DPGrid, int argc, char** argv, const char* exportFileName);
-  int BufferingTillDegradation(); //NOTE: буферизуем до ухудшения
-
-  int NetBuffering(HNet &net);    //NOTE: буферизация нета
-
-  int BufferingOfMostCriticalPaths(int nPaths = 0); //NOTE: буферизуются все критические пути
-  int CriticalPathBuffering(HCriticalPath aPath);   //NOTE: буферизация критического пути
-
 private:
   struct BufferInfo
   {
@@ -66,6 +54,23 @@ private:
     Comp *com;    //NOTE: buffer location 
   } RLnode;
 
+public:
+  VanGinneken(HDesign& design);
+
+  //NOTE: двупроходная буферизация, сначало выбираем "хорошие" пути, потом их буферизуем
+  int Buffering2Pass(HDPGrid& DPGrid, int argc, char** argv, const char* exportFileName);
+  int BufferingTillDegradation(); //NOTE: буферизуем до ухудшения
+
+  int NetBuffering(HNet &net);    //NOTE: буферизация нета
+
+  int BufferingOfMostCriticalPaths(int nPaths = 0); //NOTE: буферизуются все критические пути
+  int CriticalPathBuffering(HCriticalPath aPath);   //NOTE: буферизация критического пути
+  
+  HWirePhysicalParams GetPhysical();
+  BufferInfo* GetBufferInfo();
+  VGNode GetVGTree();
+
+private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
 
   RLnode *create_list(VGNode *t); //NOTE: создает RLnode
@@ -100,6 +105,8 @@ private:
 
   void print(RLnode* x);
   void printbuffer(Comp *x, int *i);
+
+  double CalculationOptimumNumberBuffers(HNet net);
 
   BuffersVector       m_AvailableBuffers;  //NOTE: библиотека доступных буферов для вставки
   HWirePhysicalParams m_WirePhisics;

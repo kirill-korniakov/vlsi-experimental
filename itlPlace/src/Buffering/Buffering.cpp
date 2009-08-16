@@ -7,7 +7,8 @@
 #include "Parser.h"
 
 void NetlistBuffering(HDesign& design)
-{
+{ 
+  ConfigContext ctx = design.cfg.OpenContext("Buffering");
   WRITELINE("");
   ALERT("BUFFERING STARTED");
 
@@ -57,14 +58,13 @@ void NetlistBuffering(HDesign& design)
 
 void TestBuffering(HDesign& design)
 {
+  ConfigContext ctx = design.cfg.OpenContext("Buffering");
   WRITELINE("");
   ALERT("BUFFERING STARTED");
   ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA before buffering:");
   STA(design);
       
-double w = design.Circuit.Width();
-
   //buffering
   VanGinneken vg(design);
   HDPGrid DPGrid(design);
@@ -102,6 +102,7 @@ double w = design.Circuit.Width();
     ReportNetTiming(design, nIter);
     ExportDEF(design, "not_buffered");
     vg.NetBuffering(nIter);
+    //ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
     FindTopologicalOrder(design);
     //ALERT("After buffer insertion:");
@@ -110,7 +111,7 @@ double w = design.Circuit.Width();
     //ALERT("After legalization:");
     //Legalization(DPGrid);
     //STA(design);
-    break;
+    //break;
   }
 
   WRITELINE("");

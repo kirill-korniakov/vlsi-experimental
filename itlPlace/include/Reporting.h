@@ -2,6 +2,7 @@
 #define __REPORTING_H__
 
 #include "HDesign.h"
+#include "VanGinneken.h"
 
 //macro types reports
 void ReportCellsByMacroFunction(HDesign& design);
@@ -47,5 +48,9 @@ void ReportNegativeSlacks(HDesign&);
 void ReportCriticalPathsToLogFile(HDesign&, int n = -1);
 void PlotCriticalPathsAndSaveImages(HDesign&);
 void PlotTopCriticalPathsAndSaveImages(HDesign& design, int n = -1);
+
+//Buffering reporting
+void ReportBufferingPhysics(VanGinneken & vg);
+
 
 #endif //__REPORTING_H__

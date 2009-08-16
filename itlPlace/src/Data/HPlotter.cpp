@@ -618,9 +618,10 @@ void HPlotter::PlotText(string text, double textSize)
   CvPoint point;
 
   CvFont font;
-  string bufText = text;
+  string bufText = text + text;
   if (textSize == -1)
     textSize = m_hd.cfg.lookforDefValue("plotter.textSize", 1.0);
+  
   cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, textSize, textSize , 0.0, 1, 1);
   int start = 0;
   int t = 1;
@@ -630,9 +631,9 @@ void HPlotter::PlotText(string text, double textSize)
   {
     if ((text[i] == '\n') || (i == text.length() - 1))
     {
-      for (unsigned int j = start; j < i; j++)
+      for (unsigned int j = start; j <= i; j++)
         bufText[j - start] = text[j];
-      bufText[i - start] = '\0';
+      bufText[i - start + 1] = '\0';
       int j2 = 0;
 
       for (unsigned int j = 0; j < bufText.length(); j++)

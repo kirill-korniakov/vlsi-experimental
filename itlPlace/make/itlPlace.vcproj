@@ -4952,6 +4952,10 @@
 				Name="Reporting"
 				>
 				<File
+					RelativePath="..\src\Reporting\BufferingReport.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Reporting\CellsReports.cpp"
 					>
 				</File>

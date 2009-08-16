@@ -19,6 +19,7 @@
 #include "VanGinneken.h"
 #include "SAWindow.h"
 
+
 int GetIdx(int* a, int b)
 {
   for (int i = 1; i <= a[0]; i++)
@@ -46,7 +47,7 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
     m_freeSpace = m_freeSpace - cellW.Height() * cellW.Width(); 
   m_isFreeSpaceEnded = false;
 
-  m_doReportBuffering = m_hd.cfg.ValueOf("Buffering.doReportBuffering", false);
+  m_doReportBuffering = m_hd.cfg.ValueOf(".doReportBuffering", false);
   m_finalLocationVan = new Comp();
 };
 
@@ -452,12 +453,12 @@ int VanGinneken::NetBuffering(HNet& net)
   if (!isNetBufferable)
     return 0;
 
-  if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
+  if (m_hd.cfg.ValueOf(".plotBuffering", false))
   {
     m_hd.Plotter.ShowPlacement();
     m_hd.Plotter.PlotNetSteinerTree(net, Color_Black);
     m_hd.Plotter.PlotText(m_hd.Nets.GetString<HNet::Name>(net));
-    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
   }
 
   int nUnits = RunVG(net);
@@ -592,7 +593,7 @@ int VanGinneken::RunVG(HNet& net)
   WARNING_ASSERT(net.Kind != NetKind_Buffered);
 
   m_vgNetSplitted.Destroy();
-  int steps = m_hd.cfg.ValueOf("Buffering.steps", 1);
+  int steps = m_hd.cfg.ValueOf(".steps", 1);
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
@@ -611,12 +612,9 @@ int VanGinneken::RunVG(HNet& net)
     //ALERT("Solution");
     int x = 0;
     //printbuffer(final_location_van, &x);
-    //ALERTFORMAT(("rw = %.10f\ncw = %.10f\nrsource = %.10f\ncsink = %.10f", m_WirePhisics.RPerDist, m_WirePhisics.LinearC, driverResistance, sinkCapacitance));
-    double lenNet = driverResistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * sinkCapacitance / m_WirePhisics.LinearC;
-    double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
-    double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
-    double countBufferOpt = (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
-    ALERTFORMAT(("Buffer count optimal = %.10f", countBufferOpt));
+    
+    if (m_doReportBuffering)
+      ALERTFORMAT(("Buffer count optimal = %.10f", CalculationOptimumNumberBuffers(net)));
     return nUnits;
   }
   else 
@@ -673,10 +671,10 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
         ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), bufferX, bufferY, m_buffersIdxsAtNetSplitted[i]));
         //ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), vgBuffer.x, vgBuffer.y, m_buffersIdxsAtNetSplitted[i]));
       
-      if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
+      if (m_hd.cfg.ValueOf(".plotBuffering", false))
       {
         m_hd.Plotter.PlotCell(insertedBuffers[i - 1], Color_Orange);
-        m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
+        m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
       }
     }
   }
@@ -707,10 +705,10 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
   //add other pins
   AddSinks2Net(insertedBuffers, subNet, m_vgNetSplitted, 0, m_hd[subNet].GetSinksEnumeratorW(), true);
 
-  if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
+  if (m_hd.cfg.ValueOf(".plotBuffering", false))
   {
     m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
-    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
   }
 
   for (int j = 1; j <= m_buffersIdxsAtNetSplitted[0]; j++)
@@ -737,10 +735,10 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
     AddSinks2Net(insertedBuffers, subNet, nodeStart2, m_buffersIdxsAtNetSplitted[j], m_hd[subNet].GetSinksEnumeratorW());
     
     
-    if (m_hd.cfg.ValueOf("Buffering.plotBuffering", false))
+    if (m_hd.cfg.ValueOf(".plotBuffering", false))
     {
       m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
-      m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf("Buffering.plotWait", 1));
+      m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
     }
   }
   int pinCount = m_hd.Nets.GetInt<HNet::PinsCount>(net);
@@ -837,7 +835,7 @@ int VanGinneken::BufferingTillDegradation()
   ALERT("BUFFERING STARTED");
 
   int n = 0;
-  int pathPack = m_hd.cfg.ValueOf("Buffering.pathPack", 1);
+  int pathPack = m_hd.cfg.ValueOf(".pathPack", 1);
   if (pathPack != 0)
   {
     int countCP = m_hd.CriticalPaths.Count();
@@ -911,4 +909,31 @@ void VanGinneken::printbuffer(Comp *x, int *i)
     printbuffer(x->right, i);
 }
 
+HWirePhysicalParams VanGinneken::GetPhysical()
+{
+  return m_WirePhisics;
+}
 
+VanGinneken::BufferInfo* VanGinneken::GetBufferInfo()
+{
+  if (m_AvailableBuffers.size() > 0)
+    return &m_AvailableBuffers[0];
+  else
+    return NULL;
+
+}
+
+VGNode VanGinneken::GetVGTree()
+{
+  m_vgNetSplitted.IndexesClear();
+  return m_vgNetSplitted;
+}
+
+double VanGinneken::CalculationOptimumNumberBuffers(HNet net)
+{
+  double lenNet = m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
+  double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
+  double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
+  return (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
+  
+}
