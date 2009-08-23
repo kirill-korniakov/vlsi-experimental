@@ -49,6 +49,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
 
   m_doReportBuffering = m_hd.cfg.ValueOf(".doReportBuffering", false);
   m_finalLocationVan = new Comp();
+  bestTNS = INFINITY;
+  bestWNS = INFINITY;
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -582,10 +584,13 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double tnsAfterLegalization = Utils::TNS(m_hd);
     double wnsAfterLegalization = Utils::WNS(m_hd);
 
-    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering))
+    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering) && (bestTNS > tnsAfterLegalization) && (bestWNS > wnsAfterLegalization))
     {
       delete [] newNet;
       delete [] insertedBuffers;
+      bestTNS = tnsAfterLegalization;
+      bestWNS = wnsAfterLegalization;
+      ALERTFORMAT(("buffer insite = %d", nBuffersInserted));
       return nBuffersInserted;
     }
 
@@ -599,7 +604,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
       {
         if ((cellPinIter.Direction() == PinDirection_INPUT) || (cellPinIter.Direction() == PinDirection_OUTPUT))
         {
-          Utils::DeletePointInTree(m_hd, m_hd.TimingPoints[cellPinIter]);
+          Utils::DeletePointInList(m_hd, m_hd.TimingPoints[cellPinIter]);
         }
       }
       m_hd.Cells.Set<HCell::PlacementStatus>(insertedBuffers[j], PlacementStatus_Fictive);
@@ -612,7 +617,6 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     STA(m_hd);
     double tns = Utils::TNS(m_hd);
     double wns = Utils::WNS(m_hd);
-
     return 0;
 
   }

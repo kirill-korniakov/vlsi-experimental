@@ -125,6 +125,7 @@ private:
 
   bool    m_doReportBuffering;
   Comp*   m_finalLocationVan;   //NOTE: последняя структура Comp созданая Ван Генникеном
+  double bestTNS, bestWNS;
 };
 
 #endif //__VanGinneken_H__
