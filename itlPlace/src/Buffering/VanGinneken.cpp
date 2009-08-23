@@ -34,8 +34,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
 {
   LoadAvailableBuffers();
   m_WirePhisics = m_hd.RoutingLayers.Physics;
-  m_WirePhisics.SetLinearC(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
-  m_WirePhisics.SetRPerDist(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
+  m_WirePhisics.SetLinearC(0.000027000);//(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
+  m_WirePhisics.SetRPerDist(0.01660);//(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
 
   m_nCandidatesForBuffering = -1;
   m_nCriticalPaths = 0;
@@ -118,7 +118,7 @@ VanGinneken::RLnode *VanGinneken::redundent(RLnode *list)
 #else
     x = r->time - pred->time;
 #endif
-    if (x < EPS)
+    if (x < (EPS))
     {
       pred->next = r->next;
 #if QM
@@ -406,8 +406,11 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
   }
   else
   {
-    sleft = add_buffer(k1, sleft, t->Index(), t->LeftStep()->Index());
+    int x = t->Index();
+    int y = t->LeftStep()->Index();
     t->BackStep();
+    sleft = add_buffer(k1, sleft, x, y);
+    
     sleft = redundent(sleft);
     //NOTE: if the node has only one child (default left), only 
     //return update solution of left child 
@@ -417,8 +420,11 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
     }
     else
     {
-      sright = add_buffer(k2, sright, t->Index(), t->RightStep()->Index());
+      int x = t->Index();
+      int y = t->RightStep()->Index();
       t->BackStep();
+      sright = add_buffer(k2, sright, x, y);
+      
       sright = redundent(sright);
     }
   }	
@@ -504,6 +510,119 @@ int VanGinneken::NetBuffering(HNet& net)
   }
 
   delete [] m_buffersIdxsAtNetSplitted;
+}
+
+int VanGinneken::NetBufferNotDegradation(HNet &net)
+{
+
+  bool isNewNet = (m_hd.Nets.GetString<HNet::Name>(net).find("BufferedPart") != -1);
+  bool isNetBuffered = (m_hd.Nets.Get<HNet::Kind, NetKind>(net) == NetKind_Buffered);
+  bool isNetBufferable = !isNewNet && !m_isFreeSpaceEnded && !isNetBuffered;
+
+  if (!isNetBufferable)
+    return 0;
+
+  if (m_hd.cfg.ValueOf(".plotBuffering", false))
+  {
+    m_hd.Plotter.ShowPlacement();
+    m_hd.Plotter.PlotNetSteinerTree(net, Color_Black);
+    m_hd.Plotter.PlotText(m_hd.Nets.GetString<HNet::Name>(net));
+    m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
+  }
+
+  int nUnits = RunVG(net);
+
+  if (nUnits > 0)
+  {
+    m_buffersIdxsAtNetSplitted = new int[nUnits + 1];
+    for (int i = 0; i <= nUnits; i++)
+    {
+      m_buffersIdxsAtNetSplitted[i] = 0;
+    }
+  }
+  else
+  {
+    ALERTFORMAT(("RunVG failed on net %s", m_hd[net].Name().c_str()));
+    return 0;
+  }
+
+  m_nCandidatesForBuffering++;
+  InitializeBuffersIdxs();
+  int nBuffersInserted = m_buffersIdxsAtNetSplitted[0];
+
+  if (m_doReportBuffering)
+  {
+    ALERTFORMAT(("Buffered net: %s", m_hd[net].Name().c_str()));
+    double lengthTree = m_vgNetSplitted.LengthTree(true);
+    ALERTFORMAT(("Length Tree = %f", lengthTree));
+    ALERTFORMAT(("  Pin count: %d\tBuffers count: %d", m_hd[net].PinsCount(), nBuffersInserted));
+    int x;
+    printbuffer(m_finalLocationVan, &x);
+  }
+
+  if (nBuffersInserted > 0) 
+  {
+    double tnsBeforeBuffering = Utils::TNS(m_hd);
+    double wnsBeforeBuffering = Utils::WNS(m_hd);
+
+    HDPGrid DPGrid(m_hd);
+    NetKind netKind = m_hd.Nets.Get<HNet::Kind, NetKind>(net);
+    m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
+    
+    HCell* insertedBuffers = new HCell[m_buffersIdxsAtNetSplitted[0]];
+    HNet* newNet = new HNet[m_buffersIdxsAtNetSplitted[0] + 1];
+    
+    CreateCells(string("InsertedBuffer_") + m_hd[net].Name(), insertedBuffers);
+
+    CreateNets(net, insertedBuffers, newNet);
+
+    Legalization(DPGrid);
+
+    STA(m_hd);
+    double tnsAfterLegalization = Utils::TNS(m_hd);
+    double wnsAfterLegalization = Utils::WNS(m_hd);
+
+    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering))
+    {
+      delete [] newNet;
+      delete [] insertedBuffers;
+      return nBuffersInserted;
+    }
+
+    m_hd.Nets.Set<HNet::Kind>(net, netKind);
+    for (int i = 0; i <= m_buffersIdxsAtNetSplitted[0]; i++)
+      m_hd.Nets.Set<HNet::Kind>(newNet[i], NetKind_Removed);
+
+    for (int j = 0; j < m_buffersIdxsAtNetSplitted[0]; j++)
+    {
+      for (HCell::PinsEnumeratorW cellPinIter = m_hd[insertedBuffers[j]].GetPinsEnumeratorW(); cellPinIter.MoveNext();)
+      {
+        if ((cellPinIter.Direction() == PinDirection_INPUT) || (cellPinIter.Direction() == PinDirection_OUTPUT))
+        {
+          Utils::DeletePointInTree(m_hd, m_hd.TimingPoints[cellPinIter]);
+        }
+      }
+      m_hd.Cells.Set<HCell::PlacementStatus>(insertedBuffers[j], PlacementStatus_Fictive);
+    }
+    
+    delete [] newNet;
+    delete [] insertedBuffers;
+    m_hd.TimingPoints.CountStartAndEndPoints();
+
+    STA(m_hd);
+    double tns = Utils::TNS(m_hd);
+    double wns = Utils::WNS(m_hd);
+
+    return 0;
+
+  }
+  else
+  {
+    return 0;
+  }
+
+  delete [] m_buffersIdxsAtNetSplitted;
+
 }
 
 void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nodeStart, int startNodeIdx,  
@@ -605,7 +724,7 @@ int VanGinneken::RunVG(HNet& net)
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
-
+  
   if (m_hd.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>((m_hd.SteinerPoints[m_hd[net].Source()])) != nullSP)
   {
     ALERTFORMAT(("In source 2 edges"));
@@ -615,14 +734,12 @@ int VanGinneken::RunVG(HNet& net)
     double newSlackAtSource;
     double driverResistance = m_AvailableBuffers[0].Resistance;
     m_VGOutput = van(&m_vgNetSplitted, newSlackAtSource, driverResistance);
-    ALERTFORMAT(("(vananswer) RAT at source AB = %.10f", newSlackAtSource));
-    //print(m_VGOutput);
-    //ALERT("Solution");
-    int x = 0;
-    //printbuffer(final_location_van, &x);
     
     if (m_doReportBuffering)
+    {
+      ALERTFORMAT(("(vananswer) RAT at source AB = %.10f", newSlackAtSource));
       ALERTFORMAT(("Buffer count optimal = %.10f", CalculationOptimumNumberBuffers(net)));
+    }
     return nUnits;
   }
   else 
@@ -688,7 +805,7 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
   }
 }
 
-void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
+void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
 {
   WARNING_ASSERT(m_buffersIdxsAtNetSplitted[0] > 0);
   int nNewNetPin = 0;
@@ -698,6 +815,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
 
   //allocate new net
   HNet subNet = m_hd.Nets.AllocateNet(false);
+  newNet[0] = subNet;
   m_hd.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
   sprintf(cellIdx, "%d", 0);
   m_hd.Nets.Set<HNet::Name>(subNet, m_hd[net].Name() + "__BufferedPart_" + string(cellIdx));
@@ -723,6 +841,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
   {
     //allocate new net
     subNet = m_hd.Nets.AllocateNet(false);
+    newNet[j] = subNet;
     m_hd.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
     sprintf(cellIdx, "%d", j);
     m_hd.Nets.Set<HNet::Name>(subNet, m_hd[net].Name() + "__BufferedPart_" + string(cellIdx));
@@ -760,12 +879,14 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers)
 void VanGinneken::CreateNetsAndCells(HNet& net)
 {
   HCell* insertedBuffers = new HCell[m_buffersIdxsAtNetSplitted[0]];
+  HNet* newNet = new HNet[m_buffersIdxsAtNetSplitted[0] + 1];
 
   CreateCells(string("InsertedBuffer_") + m_hd[net].Name(), insertedBuffers);
 
-  CreateNets(net, insertedBuffers);
+  CreateNets(net, insertedBuffers, newNet);
 
   delete [] insertedBuffers;
+  delete [] newNet;
 }
 
 int VanGinneken::BufferingOfMostCriticalPaths(int nPaths)
@@ -799,10 +920,12 @@ int VanGinneken::CriticalPathBuffering(HCriticalPath aPath)
   for(HCriticalPath::PointsEnumeratorW i = criticalPathW.GetEnumeratorW(); i.MoveNext() && !m_isFreeSpaceEnded; )
   {
     HPinWrapper pin = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())]; 
-    HNet ne = pin.Net();
-    bool f = false;
+    HNet net = pin.Net();
     m_nCriticalPaths++;
-    nBuf += NetBuffering(ne);
+    if (m_hd.cfg.ValueOf(".isNetBufferNotDegradation", false))
+      nBuf += NetBufferNotDegradation(net);
+    else
+      nBuf += NetBuffering(net);
   }
   return nBuf;
 }

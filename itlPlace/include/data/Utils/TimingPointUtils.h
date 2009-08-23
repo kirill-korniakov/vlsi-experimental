@@ -9,6 +9,7 @@ namespace Utils
   double WNS(HDesign& design);
 
   void InsertNextPoint(HDesign& design, HTimingPoint pointToPlace, HTimingPoint afterThisPoint);
+  void DeletePointInTree(HDesign& design, HTimingPoint pointDelete);
 };
 
 #endif //__TIMINGPOINTUTILS_H__

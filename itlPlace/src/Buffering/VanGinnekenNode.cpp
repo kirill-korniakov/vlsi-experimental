@@ -41,13 +41,120 @@ VGNode::~VGNode()
 
 void VGNode::UpdatingTree()
 { 
-  /*left->m_xle = m_xs;
-  left->m_yre = m_ys;
-  left->left->m_xs  = m_xs;
-  left->right->m_ys  = m_ys;*/
-  double bigNumber = 2000000000000;
-  m_xle += bigNumber;
-  left->m_xs += bigNumber;
+  int step = 2;
+
+  m_SubtreeRoot = nullSP;
+  m_LeftEnd = nullSP;
+  m_RightEnd = nullSP;
+  m_steps = step;
+  m_nLeftSteps = 0; 
+  m_nRightSteps = 0;
+  m_xs = 2615590.088;
+  m_xle = 5220000.000;
+  m_xre = 0;
+  m_ys = 2958229.004;
+  m_yle = 5560000.000;
+  m_yre = 0;
+  m_Capacitance = 0.5;
+  m_RAT = 0;
+  m_typePoint = 0;
+  m_RelativePosition = 2;
+  m_indexStart = 0;
+
+  left = new VGNode(nullSP, nullSP, nullSP,0 , 0, 0, 0, 0, m_hd, 0, 0);
+  right = NULL;
+  m_leftCount = (step + 1) * 4;
+  isRightNodeExist = false;
+
+  left->m_SubtreeRoot = nullSP;
+  left->m_LeftEnd = nullSP;
+  left->m_RightEnd = nullSP;
+  left->m_steps = step;
+  left->m_nLeftSteps = 0; 
+  left->m_nRightSteps = 0;
+  left->m_xs = 5220000.000;
+  left->m_xle = 3380000.000;
+  left->m_xre = 4880000.000;
+  left->m_ys = 5560000.000;
+  left->m_yle = 270000.000;
+  left->m_yre = 5560000.000;
+  left->m_Capacitance = 0.5;
+  left->m_RAT = 0;
+  left->m_typePoint = 1;
+  left->m_RelativePosition = 0;
+  left->m_indexStart = (step + 1) * 1;;
+  left->left = new VGNode(nullSP, nullSP, nullSP,0 , 0, 0, 0, 0, m_hd, 0, 0);
+  left->m_leftCount = (step + 1) * 2;;
+  left->isRightNodeExist = true;
+  
+
+  left->left->m_SubtreeRoot = nullSP;
+  left->left->m_LeftEnd = nullSP;
+  left->left->m_RightEnd = nullSP;
+  left->left->m_steps = step;
+  left->left->m_nLeftSteps = 0; 
+  left->left->m_nRightSteps = 0;
+  left->left->m_xs = 3380000.000;
+  left->left->m_xle = 0;
+  left->left->m_xre = 0;
+  left->left->m_ys = 270000.000;
+  left->left->m_yle = 0;
+  left->left->m_yre = 0;
+  left->left->m_Capacitance = 0.5;
+  left->left->m_RAT = 0;
+  left->left->m_typePoint = 2;
+  left->left->m_RelativePosition = 0;
+  left->left->m_indexStart = (step + 1) * 2;
+  left->left->left = NULL;
+  left->left->right = NULL;
+  left->left->isRightNodeExist = false;
+  
+
+  left->right = new VGNode(nullSP, nullSP, nullSP,0 , 0, 0, 0, 0, m_hd, 0, 0);
+  left->right->m_SubtreeRoot = nullSP;
+  left->right->m_LeftEnd = nullSP;
+  left->right->m_RightEnd = nullSP;
+  left->right->m_steps = step;
+  left->right->m_nLeftSteps = 0; 
+  left->right->m_nRightSteps = 0;
+  left->right->m_xs = 4880000.000;
+  left->right->m_xle = 3020000.000;
+  left->right->m_xre = 0;
+  left->right->m_ys = 5560000.000;
+  left->right->m_yle = 270000.000;
+  left->right->m_yre = 0;
+  left->right->m_Capacitance = 0.5;
+  left->right->m_RAT = 0;
+  left->right->m_typePoint = 1;
+  left->right->m_RelativePosition = 1;
+  left->right->m_indexStart = (step + 1) * 3;
+  left->right->left = new VGNode(nullSP, nullSP, nullSP,0 , 0, 0, 0, 0, m_hd, 0, 0);
+  left->right->right = NULL;
+  left->right->m_leftCount = (step + 1) * 4;
+  left->right->isRightNodeExist = false;
+  
+
+  left->right->left->m_SubtreeRoot = nullSP;
+  left->right->left->m_LeftEnd = nullSP;
+  left->right->left->m_RightEnd = nullSP;
+  left->right->left->m_steps = step;
+  left->right->left->m_nLeftSteps = 0; 
+  left->right->left->m_nRightSteps = 0;
+  left->right->left->m_xs = 3020000.000;
+  left->right->left->m_xle = 0;
+  left->right->left->m_xre = 0;
+  left->right->left->m_ys = 270000.000;
+  left->right->left->m_yle = 0;
+  left->right->left->m_yre = 0;
+  left->right->left->m_Capacitance = 0.5;
+  left->right->left->m_RAT = 0;
+  left->right->left->m_typePoint = 2;
+  left->right->left->m_RelativePosition = 0;
+  left->right->left->m_indexStart = (step + 1) * 4;;
+  left->right->left->left = NULL;
+  left->right->left->right = NULL;
+  left->right->left->isRightNodeExist = false;
+
 }
 
 int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requiredArrivalTime, 

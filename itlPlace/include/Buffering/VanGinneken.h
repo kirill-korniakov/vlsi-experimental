@@ -69,6 +69,7 @@ public:
   HWirePhysicalParams GetPhysical();
   BufferInfo* GetBufferInfo();
   VGNode GetVGTree();
+  int NetBufferNotDegradation(HNet &net);
 
 private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
@@ -99,7 +100,7 @@ private:
   //NOTE: Создает новые неты и целы
   void CreateNetsAndCells(HNet& net);  
   void CreateCells(string bufferName, HCell* insertedBuffers);
-  void CreateNets(HNet& net, HCell* insertedBuffers);
+  void CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet);
   void AddSinks2Net(HCell* insertedBuffers, HNet& net, VGNode& startNode, int startNodeIdx, 
     HNetWrapper::PinsEnumeratorW& pinEnum, bool doIndexesClear = false);
 

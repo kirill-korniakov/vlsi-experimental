@@ -69,4 +69,31 @@ namespace Utils
     if (needRecalc)
       design.TimingPoints.CountStartAndEndPoints();//we need only adjust first & last internal points
   }
+
+  void DeletePointInTree(HDesign& design, HTimingPoint pointDelete)
+  {/*
+    if (::IsNull(design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete)))
+    { 
+      HTimingPoint lastPoint = design.TimingPoints.LastInternalPoint();
+      design.Set<HTimingPoint::NextPoint>(design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete), lastPoint);
+      return;
+    }
+
+    if (::IsNull(design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete)))
+    {
+      HTimingPoint firstPoint = design.TimingPoints.FirstInternalPoint();
+      design.Set<HTimingPoint::PreviousPoint>(design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete), firstPoint);
+      return;
+    }*/
+
+    HTimingPoint previousPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete);
+    HTimingPoint nextPoint = design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete);
+
+    design.Set<HTimingPoint::PreviousPoint>(nextPoint, previousPoint);
+    design.Set<HTimingPoint::NextPoint>(previousPoint, nextPoint);
+
+    //design.Set<HTimingPoint::PreviousPoint>(pointDelete, design.TimingPoints.Null());
+    //design.Set<HTimingPoint::NextPoint>(pointDelete, design.TimingPoints.Null());
+  
+  }
 }
