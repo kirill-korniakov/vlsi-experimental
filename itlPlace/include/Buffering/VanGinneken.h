@@ -8,11 +8,11 @@
 #include "DelayCalculation.h"
 #include "Timing.h" 
 #include "Legalization.h"
-
-
 #include <crtdbg.h>
 #include <fstream>
 #include "VanGinnekenNode.h"
+#include "PlacementQualityAnalyzer.h"
+
 
 class HDesign;
 
@@ -125,7 +125,8 @@ private:
 
   bool    m_doReportBuffering;
   Comp*   m_finalLocationVan;   //NOTE: последняя структура Comp созданая Ван Генникеном
-  double bestTNS, bestWNS;
+  double  bestTNS, bestWNS;
+  PlacementQualityAnalyzer* m_QualityAnalyzer; 
 };
 
 #endif //__VanGinneken_H__

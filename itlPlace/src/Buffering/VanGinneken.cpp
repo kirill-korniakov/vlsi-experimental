@@ -34,8 +34,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
 {
   LoadAvailableBuffers();
   m_WirePhisics = m_hd.RoutingLayers.Physics;
-  m_WirePhisics.SetLinearC(0.000027000);//(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
-  m_WirePhisics.SetRPerDist(0.01660);//(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
+  m_WirePhisics.SetLinearC(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
+  m_WirePhisics.SetRPerDist(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
 
   m_nCandidatesForBuffering = -1;
   m_nCriticalPaths = 0;
@@ -51,6 +51,7 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   m_finalLocationVan = new Comp();
   bestTNS = INFINITY;
   bestWNS = INFINITY;
+  m_QualityAnalyzer = new PlacementQualityAnalyzer(m_hd);
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -564,6 +565,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
   if (nBuffersInserted > 0) 
   {
+    m_QualityAnalyzer->SaveCurrentPlacementAsBestAchieved();
     double tnsBeforeBuffering = Utils::TNS(m_hd);
     double wnsBeforeBuffering = Utils::WNS(m_hd);
 
@@ -578,9 +580,13 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
     CreateNets(net, insertedBuffers, newNet);
 
+    STA(m_hd, m_doReportBuffering);
+    double tnsAfterBuffering = Utils::TNS(m_hd);
+    double wnsAfterBuffering = Utils::WNS(m_hd);
+
     Legalization(DPGrid);
 
-    STA(m_hd);
+    STA(m_hd, m_doReportBuffering);
     double tnsAfterLegalization = Utils::TNS(m_hd);
     double wnsAfterLegalization = Utils::WNS(m_hd);
 
@@ -614,9 +620,11 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     delete [] insertedBuffers;
     m_hd.TimingPoints.CountStartAndEndPoints();
 
-    STA(m_hd);
+    STA(m_hd, m_doReportBuffering);
     double tns = Utils::TNS(m_hd);
     double wns = Utils::WNS(m_hd);
+
+    m_QualityAnalyzer->RestoreBestAchievedPlacement();
     return 0;
 
   }
