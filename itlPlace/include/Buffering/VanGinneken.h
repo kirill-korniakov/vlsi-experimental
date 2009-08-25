@@ -109,6 +109,9 @@ private:
 
   double CalculationOptimumNumberBuffers(HNet net);
 
+  void SaveCurrentPlacementAsBestAchieved();
+  void RestoreBestAchievedPlacement();
+
   BuffersVector       m_AvailableBuffers;  //NOTE: библиотека доступных буферов дл€ вставки
   HWirePhysicalParams m_WirePhisics;
   HDesign&            m_hd;
@@ -126,7 +129,10 @@ private:
   bool    m_doReportBuffering;
   Comp*   m_finalLocationVan;   //NOTE: последн€€ структура Comp создана€ ¬ан √енникеном
   double  bestTNS, bestWNS;
-  PlacementQualityAnalyzer* m_QualityAnalyzer; 
+  int m_BestPlacementCellsCount;
+  double* m_BestPlacementCellsX;
+  double* m_BestPlacementCellsY;
+
 };
 
 #endif //__VanGinneken_H__

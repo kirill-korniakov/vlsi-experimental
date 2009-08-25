@@ -51,7 +51,10 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   m_finalLocationVan = new Comp();
   bestTNS = INFINITY;
   bestWNS = INFINITY;
-  m_QualityAnalyzer = new PlacementQualityAnalyzer(m_hd);
+  m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
+  m_BestPlacementCellsX = new double[m_BestPlacementCellsCount];
+  m_BestPlacementCellsY = new double[m_BestPlacementCellsCount];
+
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -565,7 +568,6 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
   if (nBuffersInserted > 0) 
   {
-    m_QualityAnalyzer->SaveCurrentPlacementAsBestAchieved();
     double tnsBeforeBuffering = Utils::TNS(m_hd);
     double wnsBeforeBuffering = Utils::WNS(m_hd);
 
@@ -624,9 +626,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double tns = Utils::TNS(m_hd);
     double wns = Utils::WNS(m_hd);
 
-    m_QualityAnalyzer->RestoreBestAchievedPlacement();
     return 0;
-
   }
   else
   {
@@ -1079,4 +1079,32 @@ double VanGinneken::CalculationOptimumNumberBuffers(HNet net)
   double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
   return (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
   
+}
+
+void VanGinneken::SaveCurrentPlacementAsBestAchieved()
+{
+  if(m_BestPlacementCellsCount < m_hd.Cells.CellsCount())
+  {
+    delete[] m_BestPlacementCellsX;
+    delete[] m_BestPlacementCellsY;
+    m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
+    m_BestPlacementCellsX = new double[m_BestPlacementCellsCount];
+    m_BestPlacementCellsY = new double[m_BestPlacementCellsCount];
+  }
+  int i = 0;
+  for (HCells::CellsEnumeratorW cell = m_hd.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
+  {
+    m_BestPlacementCellsX[i] = cell.X();
+    m_BestPlacementCellsY[i] = cell.Y();
+  }
+}
+
+void VanGinneken::RestoreBestAchievedPlacement()
+{
+  int i = 0;
+  for (HCells::CellsEnumeratorW cell = m_hd.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
+  {
+    cell.SetX(m_BestPlacementCellsX[i]);
+    cell.SetY(m_BestPlacementCellsY[i]);
+  }
 }
