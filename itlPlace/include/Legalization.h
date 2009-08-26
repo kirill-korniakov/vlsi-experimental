@@ -7,6 +7,8 @@ void Legalization(HDPGrid& grid);
 
 void AbacusLegalization(HDPGrid& grid);
 
+void WeightedAbacusLegalization(HDPGrid& grid);
+
 //legality checks
 
 bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensitivity = 1e-6, bool drawMismatchses = false);

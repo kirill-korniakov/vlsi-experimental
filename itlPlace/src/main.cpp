@@ -114,9 +114,6 @@ int main(int argc, char** argv)
         STA(hd);
       }
 
-      PrintToFastRouterFormat(hd, "pci_spoci_ctrl.def.fr");
-      PrintToBoxRouterFormat(hd, "pci_spoci_ctrl.def.br");
-
       //TIMING
       if (hd.cfg.ValueOf("DesignFlow.Timing", false))
       {
