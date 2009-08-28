@@ -432,7 +432,7 @@ double GetMultiplier(HCell cell, HDesign& hd)
   return multiplier;
 }
 
-void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const double multiplier = 1.3)
+void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const double multiplier)
 {
   FindCriticalPaths(hd);
   for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
@@ -486,7 +486,9 @@ void WeightedAbacusLegalization(HDPGrid& grid)
     grid.RecalcSitesNum(pCell);
   }
   ASSERT(pos == design.Cells.PlaceableCellsCount());
-  InitialiseCellsWeights(wCells, pos, design);
+  double multiplier = design.cfg.ValueOf(".weightMultiplier", 1.3);
+  ALERTFORMAT(("weight multiplier: %f", multiplier));
+  InitialiseCellsWeights(wCells, pos, design, multiplier);
   std::sort(wCells, wCells + pos, AbacusCellsComparator(design.Cells));
 
   WeightedAbacus abacus(grid);

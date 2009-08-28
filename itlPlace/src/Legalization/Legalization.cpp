@@ -24,7 +24,7 @@ void Legalization(HDPGrid& grid)
   }
 
   double wlAfterL = Utils::CalculateHPWL(grid.Design(), false);
-  ALERTFORMAT(("HPWL after  legalization: %f", wlAfterL));
+  ALERTFORMAT(("HPWL after legalization: %f", wlAfterL));
   ALERTFORMAT(("Improvement after legalization: %f%%", 100.0 * (1.0 - wlAfterL/wlBeforeL) ));
 
   ALERT("LEGALIZATION FINISHED");
