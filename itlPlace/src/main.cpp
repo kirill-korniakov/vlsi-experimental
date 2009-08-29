@@ -153,6 +153,12 @@ int main(int argc, char** argv)
         printf("press any key to continue...\n");
         _getch();
       }
+
+      if (hd.cfg.ValueOf("DesignFlow.PrintToRoutersFormats", false))
+      {
+        PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.ISPDFileName", "bench.fr"));
+        PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.LabyrinthFileName", "bench.br"));
+      }
     }
     
     //BUFFERING
