@@ -41,12 +41,9 @@ int main(int argc, char** argv)
     ParseDEF(hd);
 
     if (hd.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
-      Utils::SkipSpecialNets(hd);//must be called before InitializeTiming
+      Utils::SkipSpecialNets(hd);//WARNING: must be called before InitializeTiming
 	  
-	//NOTE: cfg key DesignFlow.Timing is not clearly connected with this initialization
-    // in my mind. I think we have to always initialize this structures.
-    //if (hd.cfg.lookforDefValue("DesignFlow.Timing", false))
-      InitializeTiming(hd);
+    InitializeTiming(hd);
 
     PinPlacement(hd);
 
@@ -142,15 +139,19 @@ int main(int argc, char** argv)
         int nMaxLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 50);
         int nMaxPins   = hd.cfg.ValueOf("CongestionMap.nMaxPins", 20);
         int nMaxCLines = hd.cfg.ValueOf("CongestionMap.nMaxCLines", 10);
-        TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);          
+
+        TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
+
         tileGrid.DrawCongestionMap(hd, nMaxLines);
-        printf("press any key to continue...\n");
+        ALERT("press any key to continue...");
         _getch();
+        
         tileGrid.DrawPinDensity(hd, nMaxPins);
-        printf("press any key to continue...\n");
+        ALERT("press any key to continue...");
         _getch();
+        
         tileGrid.DrawCriticalCongestionMap(hd, nMaxCLines);
-        printf("press any key to continue...\n");
+        ALERT("press any key to continue...");
         _getch();
       }
 

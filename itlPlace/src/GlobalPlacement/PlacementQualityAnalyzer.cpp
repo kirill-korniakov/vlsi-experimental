@@ -69,7 +69,6 @@ PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design)
   nIterationsWithoutGain(0)
 {
   m_grid = new HDPGrid(m_design);
-  InitializeTiming(m_design);
 }
 
 PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
