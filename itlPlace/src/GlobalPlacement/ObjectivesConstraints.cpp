@@ -597,7 +597,7 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   //The following coefficient greatly affects quality of placement
   //because it determines initial distribution of cells over bins. 
   //We have to choose small value to keep good HPWL.
-  double muInitialmultiplier = context->hd->cfg.lookforDefValue("TAOOptions.muInitialMultiplier", 0.1);
+  double muInitialmultiplier = context->hd->cfg.ValueOf("TAOOptions.muInitialMultiplier", 0.1);
   PrecalcExponents(context, x);
 
   double criteriaValue;
@@ -1009,11 +1009,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
   //PrintDerivatives(nClusterVariables, nBufferVariables, gradient);
 
-  static bool plotGradients = context->hd->cfg.lookforDefValue("GlobalPlacement.plotGradients", false);
+  static bool plotGradients = context->hd->cfg.ValueOf("GlobalPlacement.plotGradients", false);
   if (plotGradients)
   {
-    static double scaling = context->hd->cfg.lookforDefValue("GlobalPlacement.gradientScaling", 1.0);
-    static int waitTime = context->hd->cfg.lookforDefValue("GlobalPlacement.plotWait", 1);
+    static double scaling = context->hd->cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
+    static int waitTime = context->hd->cfg.ValueOf("GlobalPlacement.plotWait", 1);
     context->hd->Plotter.ShowGradients(context->ci->mCurrentNumberOfClusters, 
       context->binGrid.nBinRows, context->binGrid.nBinCols, context->ci->netList.size(), 
       (double*)solution, context->gLSE, context->gSOD, context->gQS, gradient, scaling, (HPlotter::WaitTime)waitTime);

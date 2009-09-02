@@ -689,7 +689,7 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
   sort(ci.netList.begin(), ci.netList.end(), PredicateNetListLess);
 
   //delete duplicated nets
-  if (hd.cfg.lookforDefValue("Clustering.deleteDuplicatingNets", true))
+  if (hd.cfg.ValueOf("Clustering.deleteDuplicatingNets", true))
   {
     ALERTFORMAT(("NetList size before duplicates removing: %d", ci.netList.size()));
     netListIterator = unique(ci.netList.begin(), ci.netList.end(), IsEqualNetListBinaryPredicate);
@@ -836,7 +836,7 @@ void MarkClustersAsValid(ClusteringInformation& ci)
 
 string GetClusteringInformationFileName(HDesign& hd)
 {
-  string fileName = hd.cfg.lookfor("Clustering.clusteringInformationLoadFileName");
+  string fileName = hd.cfg.ValueOf("Clustering.clusteringInformationLoadFileName");
   if (fileName == "")
   {
     fileName = ".\\ClusteringInformation\\" + hd.Circuit.Name() + ".ci";
@@ -852,7 +852,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
   ci.mCurrentNumberOfClusters = hd.Cells.MovableCellsCount();
   ci.clusters.resize(ci.mCurrentNumberOfClusters);
   
-  if (hd.cfg.lookforDefValue("Clustering.useClusteringInformationFromFile", false))
+  if (hd.cfg.ValueOf("Clustering.useClusteringInformationFromFile", false))
   {//LOAD CLUSTERING INFO AND ESCAPE
     string fileName = GetClusteringInformationFileName(hd);
     if (ci.LoadFromFile(fileName.c_str(), hd.Circuit.Name().c_str(), hd))

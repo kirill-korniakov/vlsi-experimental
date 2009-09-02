@@ -171,7 +171,7 @@ void AnalyticalGlobalPlacement::SetInitialState(HDesign& hd, ClusteringInformati
   static double maxX = hd.Circuit.PlacementMaxX();
   static double minY = hd.Circuit.PlacementMinY();
   static double maxY = hd.Circuit.PlacementMaxY();
-  static double shufflePercent = hd.cfg.lookforDefValue("GlobalPlacement.shufflePercent", 0.0);
+  static double shufflePercent = hd.cfg.ValueOf(".shufflePercent", 0.0);
 
   int clusterIdx = -1;
   while (GetNextActiveClusterIdx(&ci, clusterIdx))
@@ -435,8 +435,8 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
 
 void AnalyticalGlobalPlacement::UpdateMu(AppCtx& user, HDesign& hd, int iterate)
 {
-  user.muSpreading     *= hd.cfg.lookforDefValue("TAOOptions.muSpreadingMultiplier", 2);
-  user.muBorderPenalty *= hd.cfg.lookforDefValue("TAOOptions.muBorderPenaltyMultiplier", 2);
+  user.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2);
+  user.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2);
 
   if (user.useLRSpreading)
   {
@@ -567,10 +567,10 @@ void AnalyticalGlobalPlacement::ConstructBinGrid(HDesign& hd, AppCtx& user, int 
     desiredNumberOfClustersAtEveryBin);
 
   //TODO: probably we can choose this parameter better
-  user.alpha = user.binGrid.binWidth * hd.cfg.lookforDefValue("GlobalPlacement.alphaMultiplier", 0.5);
+  user.alpha = user.binGrid.binWidth * hd.cfg.ValueOf(".alphaMultiplier", 0.5);
 
   //TODO: correct this potential radius calculation
-  double potentialRatio = hd.cfg.lookforDefValue("GlobalPlacement.potentialRatio", 2.1); //WARNING: must be greater than 0.5
+  double potentialRatio = hd.cfg.ValueOf(".potentialRatio", 2.1); //WARNING: must be greater than 0.5
   user.potentialRadiusX = potentialRatio*user.binGrid.binWidth;
   user.potentialRadiusY = potentialRatio*user.binGrid.binHeight;
   user.invPSX = 1 / user.potentialRadiusX / user.potentialRadiusX;
@@ -769,12 +769,12 @@ void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, A
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
                                              Vec& x, Vec& xl, Vec& xu, TAO_SOLVER& tao, TAO_APPLICATION& taoapp)
 {
-  const char* taoCmd = hd.cfg.lookfor("TAOOptions.commandLine");
+  const char* taoCmd = hd.cfg.ValueOf("TAOOptions.commandLine");
   TaoInit(taoCmd);
   int info;
 
   /* Create TAO solver with desired solution method */
-  info = TaoCreate(PETSC_COMM_SELF, hd.cfg.lookfor("TAOOptions.method"), &tao); CHKERRQ(info);
+  info = TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao); CHKERRQ(info);
   info = TaoApplicationCreate(PETSC_COMM_SELF, &taoapp); CHKERRQ(info);
 
   // Allocate vectors for the solution and gradient
@@ -799,12 +799,12 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   info = TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
   CHKERRQ(info);
 
-  int nInnerIterations = hd.cfg.lookforDefValue("TAOOptions.nInnerIterations", 1000);
+  int nInnerIterations = hd.cfg.ValueOf("TAOOptions.nInnerIterations", 1000);
   info = TaoSetMaximumIterates(tao, nInnerIterations); CHKERRQ(info);
-  double fatol = hd.cfg.lookforDefValue("TAOOptions.fatol", 1.0e-14);
-  double frtol = hd.cfg.lookforDefValue("TAOOptions.frtol", 1.0e-14);
-  double catol = hd.cfg.lookforDefValue("TAOOptions.catol", 1.0e-8);
-  double crtol = hd.cfg.lookforDefValue("TAOOptions.crtol", 1.0e-8);
+  double fatol = hd.cfg.ValueOf("TAOOptions.fatol", 1.0e-14);
+  double frtol = hd.cfg.ValueOf("TAOOptions.frtol", 1.0e-14);
+  double catol = hd.cfg.ValueOf("TAOOptions.catol", 1.0e-8);
+  double crtol = hd.cfg.ValueOf("TAOOptions.crtol", 1.0e-8);
   info = TaoSetTolerances(tao, fatol, frtol, catol, crtol); CHKERRQ(info);
 
   /* Check for TAO command line options */
@@ -841,7 +841,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
 
   //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
   InitializeOptimizationContext(hd, ci, context);
-  ConstructBinGrid(hd, context, hd.cfg.lookforDefValue("Clustering.desiredNumberOfClustersAtEveryBin", 10));
+  ConstructBinGrid(hd, context, hd.cfg.ValueOf("Clustering.desiredNumberOfClustersAtEveryBin", 10));
   retCode = InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp); CHKERRQ(retCode);
   ReportIterationInfo(ci, context);
   ReportBinGridInfo(context);
@@ -871,26 +871,26 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   double discrepancy = 100.0; //NOTE: dummy big value
   static int metaIteration = 1;
 
-  static int nOuterIters = hd.cfg.lookforDefValue("TAOOptions.nOuterIterations", 32);
+  static int nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
   ALERTFORMAT(("hd.isGlobalPlacementDone = %s", hd.isGlobalPlacementDone ? "true" : "false"));
   if (hd.isGlobalPlacementDone)
   { // reload the value (we're in the beginning of the GP)
-    nOuterIters = hd.cfg.lookforDefValue("TAOOptions.nOuterIterations", 32);
+    nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
     hd.isGlobalPlacementDone = false;
   }
 
   PlacementQualityAnalyzer* QA = 0;
-  if(hd.cfg.lookforDefValue("GlobalPlacement.useQAClass", false))
+  if(hd.cfg.ValueOf(".useQAClass", false))
   {
     QA = new PlacementQualityAnalyzer(hd);
-    if (hd.cfg.lookforDefValue("GlobalPlacement.earlyExit", false))
+    if (hd.cfg.ValueOf(".earlyExit", false))
     {
       QA->SaveCurrentPlacementAsBestAchieved();
     }
   }
 
   int iteration = 1;
-  static double targetDiscrepancy = hd.cfg.lookforDefValue("GlobalPlacement.targetDiscrepancy", 2.0);
+  static double targetDiscrepancy = hd.cfg.ValueOf(".targetDiscrepancy", 2.0);
   while (1)
   {
     //print iteration info
@@ -902,7 +902,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       ALERTFORMAT(("muBorderPenalty = %.20f", context.muBorderPenalty));
     ALERTFORMAT(("HPWL initial   = %f", Utils::CalculateHPWL(hd, true)));
 
-    hd.Plotter.ShowGlobalPlacement(hd.cfg.lookforDefValue("GlobalPlacement.plotWires", false), 
+    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".plotWires", false), 
       context.binGrid.nBinRows, context.binGrid.nBinCols);
 
     // Tao solve the application
@@ -932,10 +932,10 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     ALERTFORMAT(("discrepancy = %f", discrepancy));
     ALERTFORMAT(("Sum of Ki = %f", CalculateSumOfK(hd, ci)));
     
-    if (hd.cfg.lookforDefValue("GlobalPlacement.useQAClass", false))
+    if (hd.cfg.ValueOf(".useQAClass", false))
     {
       QA->AnalyzeQuality(iteration - 2);
-      if (hd.cfg.lookforDefValue("GlobalPlacement.earlyExit", false))
+      if (hd.cfg.ValueOf(".earlyExit", false))
         if (!QA->IsNextIterationApproved())
         {
           QA->RestoreBestAchievedPlacement();
@@ -959,9 +959,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   metaIteration++;
 
   //QA report
-  if (hd.cfg.lookforDefValue("GlobalPlacement.useQAClass", false))
+  if (hd.cfg.ValueOf(".useQAClass", false))
   {
-    if (QA->IsAcceptableImprovementAchieved() || !hd.cfg.lookforDefValue("GlobalPlacement.earlyExit", false))
+    if (QA->IsAcceptableImprovementAchieved() || !hd.cfg.ValueOf(".earlyExit", false))
       QA->AnalyzeQuality(iteration);
     QA->Report();
     delete QA;

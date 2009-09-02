@@ -113,9 +113,9 @@ public:
 
   ClusteringInformation(HDesign& hd)
   {
-    mClusterRatio                 = hd.cfg.lookforDefValue("Clustering.clusterRatio", 5);
-    mDesiredFinalNumberOfClusters = hd.cfg.lookforDefValue("Clustering.desiredFinalNumberOfClusters", 2000);
-    mClustersAreaTolerance        = hd.cfg.lookforDefValue("Clustering.clustersAreaTolerance", 1.5);
+    mClusterRatio                 = hd.cfg.ValueOf("Clustering.clusterRatio", 5);
+    mDesiredFinalNumberOfClusters = hd.cfg.ValueOf("Clustering.desiredFinalNumberOfClusters", 2000);
+    mClustersAreaTolerance        = hd.cfg.ValueOf("Clustering.clustersAreaTolerance", 1.5);
   }
 
   void SaveToFile(const char* fileName, const char* benchName, HDesign& hd);
