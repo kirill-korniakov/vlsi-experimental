@@ -22,7 +22,7 @@ Line::Line(double _x1, double _y1, double _x2, double _y2): x1(_x1), y1(_y1),
 {
   if ((IsEqual(x1, x2)) && (IsEqual(y1, y2)))
   {
-    printf("error: points are equal!\n");
+    LOGERROR("error: points are equal!\n");
     lineType = 1;
     k = x1;
   }
@@ -61,7 +61,7 @@ double Line::GetX(double _y)
       return x1;
       break;
     default:
-      printf("error: this line is horizontal\n");
+      LOGERROR("error: this line is horizontal\n");
       return -1;
   }
 }
@@ -77,12 +77,12 @@ double Line::GetY(double _x)
     return b; //horizontal
     break;
   default:
-    printf("error: this line is vertical\n");
+    LOGERROR("error: this line is vertical\n");
     return -1;
   }    
 }
 
 void Line::Print()
 {
-  printf("type = %d\nk = %f\nb = %f\n", lineType, k, b);
+  WRITE("type = %d\nk = %f\nb = %f\n", lineType, k, b);
 }

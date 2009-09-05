@@ -816,7 +816,7 @@ void HPlotter::DrawTileWires(double x1, double y1, double x2, double y2, int nLi
   else
     resColor = cvScalar(255 - 255 * nLines / nMaxLines, 255 - 255 * nLines / nMaxLines,
     255 - 255 * nLines / nMaxLines);
-  //resColor = cvScalar(255 * nLines / nMaxLines, 255 * nLines / nMaxLines, 255 * nLines / nMaxLines);
+    //resColor = cvScalar(255 * nLines / nMaxLines, 255 * nLines / nMaxLines, 255 * nLines / nMaxLines);
 
   cvRectangle(IMG, start, finish, resColor, CV_FILLED);
   Refresh();

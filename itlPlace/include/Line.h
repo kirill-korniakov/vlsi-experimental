@@ -8,6 +8,8 @@
 #ifndef __LINE_H__
 #define __LINE_H__
 
+#include "HDesign.h"
+
 bool IsEqual(double value1, double value2, double eps = 0.0001);
 
 //enum LineType {vertical, horizontal, general}

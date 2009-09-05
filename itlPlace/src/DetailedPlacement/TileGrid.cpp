@@ -9,11 +9,10 @@
 #include <stdio.h>
 #include "OpenCV/cv.h"
 #include "OpenCV/highgui.h"
-//#include "HPlotter.h"
 #include "HCriticalPath.h"
 
 
-TileGrid::TileGrid(int nHor, int nVert, HDPGrid& _grid): nHorTiles(nHor), nVertTiles(nVert)
+TileGrid::TileGrid(int nHor, int nVert, HDPGrid& grid): nHorTiles(nHor), nVertTiles(nVert)
 {
   tiles = new Tile* [nHorTiles];
 
@@ -21,16 +20,35 @@ TileGrid::TileGrid(int nHor, int nVert, HDPGrid& _grid): nHorTiles(nHor), nVertT
   {
     tiles[i] = new Tile [nVertTiles];
   }
+    
+  xMin = grid.ColumnX(grid.NumCols());
+  yMin = grid.RowY(grid.NumRows());
+  xMax = grid.ColumnX(0);
+  yMax = grid.RowY(0);
+  
+  for (HNets::NetsEnumeratorW curNet = grid.Design().Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+  {
+        for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
+        {
+            if (xMin > currPin.X())
+                xMin = currPin.X();
 
-  //TODO: check it---------------------------------------------
-  yMin = _grid.RowY(0);
-  yMax = _grid.RowY(_grid.NumRows() - 1) + _grid.SiteHeight();
-  xMin = _grid.ColumnX(0);
-  xMax = _grid.ColumnX(_grid.NumCols() - 1) + _grid.SiteWidth();
-  //------------------------------------------------------------
+            if (xMax < currPin.X())
+                xMax = currPin.X();
+
+            if (yMin > currPin.Y())
+                yMin = currPin.Y();
+
+            if (yMax < currPin.Y())
+                yMax = currPin.Y();
+        }
+  }
+
+  xMax += grid.SiteWidth();  //in order to place pins with xNax (or yMax)
+  yMax += grid.SiteHeight(); //to the last tiles
 
   tileWidth  = (xMax - xMin) / nHorTiles;
-  tileHeight = (yMax - yMin) / nVertTiles;  
+  tileHeight = (yMax - yMin) / nVertTiles;
 
   for (int i = 0; i < nHorTiles; i++)
   {
@@ -57,32 +75,31 @@ TileIndexes TileGrid::FindTileByXY(double _x, double _y)
 {
   if (_x < xMin)
   {
-    printf("error: _x < xMin!\n");
+    LOGERROR("error: _x < xMin!\n");
     _x = xMin;
   }
 
   if (_x > xMax)
   {
-    printf("error: _x > xMax!\n");
+    LOGERROR("error: _x > xMax!\n");
     _x = xMax - tileWidth / 8;
   }
 
   if (_y < yMin)
   {
-    printf("error: _y < yMin!\n");
+    LOGERROR("error: _y < yMin!\n");
     _y = yMin;
   }
 
   if (_y > yMax)
   {
-    printf("error: _y > yMax!\n");
+    LOGERROR("error: _y > yMax!\n");
     _y = yMax - tileWidth / 8;
   }
 
   int horIdx  = min((int)((_x - xMin) / tileWidth), (nHorTiles - 1));
   int vertIdx = min((int)((_y - yMin) / tileHeight), (nVertTiles - 1));
   TileIndexes tileIdx(horIdx, vertIdx);
-  //printf("idx: %d, %d\n", tileIdx.horInd, tileIdx.vertInd);
   return tileIdx;
 }
 
@@ -134,14 +151,11 @@ void TileGrid::CalcLinesInTiles(HDesign& _design)
     double y2 = currLine->GetY2();
     TileIndexes firstTileIdxs  = FindTileByXY(x1, y1);
     TileIndexes secondTileIdxs = FindTileByXY(x2, y2);
-    //printf("horInd: %d, vertInd: %d\n", firstTileIdxs.horInd, firstTileIdxs.vertInd);
-    //printf("horInd: %d, vertInd: %d\n", secondTileIdxs.horInd, secondTileIdxs.vertInd);
     tiles[secondTileIdxs.horInd][secondTileIdxs.vertInd].IncNWires();
 
     while (!((firstTileIdxs.horInd == secondTileIdxs.horInd)
       && (firstTileIdxs.vertInd == secondTileIdxs.vertInd)))
     {
-      //printf("horInd: %d, vertInd: %d\n", firstTileIdxs.horInd, firstTileIdxs.vertInd);
       tiles[firstTileIdxs.horInd][firstTileIdxs.vertInd].IncNWires();
       //double currTileX = xMin + tileWidth * firstTileIdxs.horInd;
 
@@ -268,10 +282,8 @@ void TileGrid::CalcLinesInTiles(HDesign& _design)
 
       else //error!
       {
-        printf("error: where are the tiles?!\n");
+        LOGERROR("error in working with tiles!\n");
       }
-
-      //printf("finished\n");
     } //while()
 
     currLine++;
@@ -385,7 +397,7 @@ void TileGrid::CalcCriticalWires(HDesign& _design)
         else
         {
           firstTileIdxs.horInd--;
-        };
+        }
       }
 
       //7 - left
@@ -420,10 +432,8 @@ void TileGrid::CalcCriticalWires(HDesign& _design)
 
       else //error!
       {
-        printf("error: where are the tiles?!\n");
+        LOGERROR("error in working with tiles?!\n");
       }
-
-      //printf("finished\n");
     } //while()
 
     currLine++;
@@ -432,15 +442,15 @@ void TileGrid::CalcCriticalWires(HDesign& _design)
 
 void TileGrid::Print()
 {
-  printf("minX = %f, minY = %f\n", xMin, yMin);
+  WRITE("minX = %f, minY = %f\n", xMin, yMin);
   for (int i = 0; i < nHorTiles; i++)
   {
     for (int j = 0; j < nVertTiles; j++)
     {
-      printf("tile[%d][%d] x: %f, y: %f ", i, j, tiles[i][j].GetX(), tiles[i][j].GetY());
+      WRITE("tile[%d][%d] x: %f, y: %f ", i, j, tiles[i][j].GetX(), tiles[i][j].GetY());
     }
 
-    printf("\n");
+    WRITE("\n");
   }
 
   std::list<Line>::iterator currLine = lines.begin();
@@ -523,7 +533,7 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxLines)
     
     if (nCriticalPoints <= 1)
     {
-      printf("not enough points in critical path\n");
+      WRITE("only one point in critical path\n");
     }
   }
 

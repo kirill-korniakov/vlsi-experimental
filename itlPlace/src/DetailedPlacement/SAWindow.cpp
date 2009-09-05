@@ -36,7 +36,7 @@ SAWindow::SAWindow(int _nRows, int _first, double x_array[], int _num, HCell cap
 
   /*for (int i = 0; i < nCells; i++)
   {
-  printf("index: %d, name: %s\n", i, m_grid.Design().GetString<HCell::Name>(cells[i].cell).c_str());
+  ALERTFORMAT(("index: %d, name: %s\n", i, m_grid.Design().GetString<HCell::Name>(cells[i].cell).c_str())_;
   }*/
 
   optimalCoords = new RectangularWindowElement [nCells];
@@ -477,7 +477,7 @@ void MakeSAWindows(int nSteps, int nCells, int nRows, HDPGrid &_grid)
 
   for (int i = 0; i < nSteps; i++)
   {
-    printf("iter: %d\n", i);        
+    ALERTFORMAT(("iter: %d\n", i));
     bool isWindowCreated = false;
     int nFoundCells = nCells;
     firstRowIdx = rand() % (_grid.NumRows() - nRows); //circuit.nRows;        
@@ -490,14 +490,14 @@ void MakeSAWindows(int nSteps, int nCells, int nRows, HDPGrid &_grid)
       continue;
 
     double currWL = Utils::CalculateHPWL(_grid.Design(), true);
-    printf("wl before = %f\n", currWL);
+    ALERTFORMAT(("wl before = %f\n", currWL));
     SAWindow *slidingWindow = new SAWindow(nRows, firstRowIdx, x_array, nFoundCells, capturedCells,
       currWL, _grid);						
     //slidingWindow->SearchOnSortedCells(false);
     slidingWindow->GeneralSearch();
     slidingWindow->PlaceCells();
-    printf("bounds penalty: %f\n", slidingWindow->g1WindowBounds());
-    printf("overlaps: %f\n", slidingWindow->g2Overlaps());
+    ALERTFORMAT(("bounds penalty: %f\n", slidingWindow->g1WindowBounds()));
+    ALERTFORMAT(("overlaps: %f\n", slidingWindow->g2Overlaps()));
     _grid.FindCellsPositions();
     delete slidingWindow;
   }
@@ -506,7 +506,7 @@ void MakeSAWindows(int nSteps, int nCells, int nRows, HDPGrid &_grid)
   CheckOverlaps(_grid, 100, true);
   _grid.Design().Plotter.PlotPlacement();
   double currWL = Utils::CalculateHPWL(_grid.Design(), false);
-  printf("final wl = %f, time: %f\n", currWL, difftime(t2, t1));
-  printf("start wl = %f, improvement: %f% \n", startWL, ((startWL - currWL) * 100 / startWL));    
+  ALERTFORMAT(("final wl = %f, time: %f\n", currWL, difftime(t2, t1)));
+  ALERTFORMAT(("start wl = %f, improvement: %f% \n", startWL, ((startWL - currWL) * 100 / startWL)));
   _getch();
 }

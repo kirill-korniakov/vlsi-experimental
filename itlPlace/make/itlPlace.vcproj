@@ -4788,10 +4788,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\DetailedPlacement\GESW.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\DetailedPlacement\GlobalSwap.cpp"
 					>
 				</File>
@@ -5839,14 +5835,6 @@
 				</File>
 				<File
 					RelativePath="..\include\DetailedPlacementSwappers.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\GESW.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\GlobalExpertSolver.h"
 					>
 				</File>
 				<File

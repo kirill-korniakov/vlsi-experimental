@@ -98,7 +98,7 @@ void RectangularWindow::PlaceCells()
   for (int i = 0; i < nCells; i++)
   {
     HCell currCell = cells[i].cell;    
-    m_grid.Design().Set<HCell::X>(currCell, cells[i].XCoord); //TODO: check it
+    m_grid.Design().Set<HCell::X>(currCell, cells[i].XCoord);
     m_grid.Design().Set<HCell::Y>(currCell, cells[i].YCoord);
   }
 }
@@ -226,9 +226,9 @@ double WindowWithNotOrderedCells::ConvertXY_To_X(HCell cell)
 {
   int rowInd = m_grid.CellRow(cell);    
 
-  if ((rowInd < 0) || (rowInd >= m_grid.NumRows())) //TODO: check it
+  if ((rowInd < 0) || (rowInd >= m_grid.NumRows()))
   {
-    printf("error in ConvertXY_To_X: y = %f!\n", (m_grid.Design()).GetDouble<HCell::Y>(cell));
+    LOGERROR("error in ConvertXY_To_X!");
     _getch();
     return -1;
   }
@@ -247,7 +247,7 @@ Coordinates WindowWithNotOrderedCells::ConvertX_To_XY(double xExtended)
     if ((boundX[i] <= xExtended) && (xExtended < boundX[i + 1]))
     {
       //int rowInd = nRows - i - 1 + firstRow;
-      coordinates.xCoord = xExtended - boundX[i] + windowBounds[i * 2]; //TODO: check it
+      coordinates.xCoord = xExtended - boundX[i] + windowBounds[i * 2];
       coordinates.yCoord = m_grid.RowY(firstRow + i);
     }
   }
@@ -269,7 +269,6 @@ Coordinates WindowWithNotOrderedCells::ConvertX_To_XY(double xExtended)
 
 double WindowWithNotOrderedCells::g1WindowBounds()
 {
-  //printf("g1 started...");
   double penalty = 0;
 
   for (int i = 0; i < nCells; i++)
@@ -305,14 +304,11 @@ double WindowWithNotOrderedCells::g1WindowBounds()
       }
     }     
   }
-
-  //printf("g1 finished\n");
   return penalty;
 }
 
 double WindowWithNotOrderedCells::g2Overlaps()
 {
-  //printf("g2 started...");
   double penalty = 0;
 
   for (int i = 0; i < nCells; i++)
@@ -336,17 +332,13 @@ double WindowWithNotOrderedCells::g2Overlaps()
         penalty += (first_x - second_x + width);
     }
   }
-
-  //printf("g2 finished\n");
   return penalty;
 }
 
 double WindowWithNotOrderedCells::CalcWL()
-{  
-  printf("calc WL started...");
-  PlaceCells(); //TODO: check it
+{
+  PlaceCells();
   double WL = Utils::CalculateHPWL(m_grid.Design(), true);
-  printf("finished\n");
   return WL;
 }
 
@@ -357,7 +349,7 @@ void WindowWithNotOrderedCells::PlaceCells()
   {
     HCell currCell = cells[i].cell;
     coord = ConvertX_To_XY(cells[i].XCoord);        
-    m_grid.Design().Set<HCell::X>(currCell, coord.xCoord); //TODO: check it
+    m_grid.Design().Set<HCell::X>(currCell, coord.xCoord);
     m_grid.Design().Set<HCell::Y>(currCell, coord.yCoord);
   }    
 }
@@ -540,7 +532,7 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, HCell cells[], int
 
     if (endedRows == nRows)
     {
-      printf("only %d cells were found\n", currCellsNum);
+      WRITE("only %d cells were found\n", currCellsNum);
       nCells = currCellsNum;
       //isWindowCreated = false;
       break;
@@ -555,8 +547,6 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, HCell cells[], int
   }
 
   //initialize bounds
-  //bounds = new double [nRows * 2];
-
   for (int i = 0; i < nRows; i++)
   {        
     bounds[2 * i] = _grid.ColumnX(siteIndexes[i]); // left bound of this row in the window           
@@ -570,7 +560,7 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, HCell cells[], int
 
     if (siteIndexes[i] + rowWidthInSites[i] > _grid.NumCols())
     {
-      printf("warning: ...");
+      LOGERROR("error while counting sites\n");
       _getch();
     }
   }
@@ -607,13 +597,9 @@ void MakeWindows(int nSteps, int nCells, int _nRows, HDPGrid &_grid)
       nRows, firstRowIdx, x_array,
       nFoundCells, capturedCells, _grid);
     slidingWindow->PlaceCells();        
-    printf("bounds penalty: %f\n", slidingWindow->g1WindowBounds());
-    //printf("overlaps: %f\n", slidingWindow->g2Overlaps());
-    printf("recalc WL: %f\n", slidingWindow->CalcWL());
+    WRITE("bounds penalty: %f\n", slidingWindow->g1WindowBounds());
+    WRITE("recalc WL: %f\n", slidingWindow->CalcWL());
     delete slidingWindow;
-    //delete [] x_array;
-    //delete [] siteIndexes;
-    //delete [] capturedCells;
     _getch();
   }
 }
