@@ -569,7 +569,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
   {
     double tnsBeforeBuffering = Utils::TNS(m_hd);
     double wnsBeforeBuffering = Utils::WNS(m_hd);
-
+    SaveCurrentPlacementAsBestAchieved();
     HDPGrid DPGrid(m_hd);
     NetKind netKind = m_hd.Nets.Get<HNet::Kind, NetKind>(net);
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
@@ -620,7 +620,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     delete [] newNet;
     delete [] insertedBuffers;
     m_hd.TimingPoints.CountStartAndEndPoints();
-
+    RestoreBestAchievedPlacement();
     STA(m_hd, m_doReportBuffering);
     double tns = Utils::TNS(m_hd);
     double wns = Utils::WNS(m_hd);
