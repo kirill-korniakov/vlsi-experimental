@@ -34,6 +34,13 @@ private:
     double Resistance;
   };
 
+  struct Placement
+  {
+    HCell cell;
+    double BestPlacementCellsX;
+    double BestPlacementCellsY;
+  };
+
   //NOTE: хранит индексы 
   typedef struct comp
   { 
@@ -130,8 +137,7 @@ private:
   Comp*   m_finalLocationVan;   //NOTE: последняя структура Comp созданая Ван Генникеном
   double  bestTNS, bestWNS;
   int m_BestPlacementCellsCount;
-  double* m_BestPlacementCellsX;
-  double* m_BestPlacementCellsY;
+  Placement* m_BestPlacement;
 
 };
 

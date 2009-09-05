@@ -51,8 +51,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   bestTNS = INFINITY;
   bestWNS = INFINITY;
   m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
-  m_BestPlacementCellsX = new double[m_BestPlacementCellsCount];
-  m_BestPlacementCellsY = new double[m_BestPlacementCellsCount];
+  m_BestPlacement = new Placement [m_BestPlacementCellsCount];
+  
 
 };
 
@@ -1084,26 +1084,41 @@ void VanGinneken::SaveCurrentPlacementAsBestAchieved()
 {
   if(m_BestPlacementCellsCount < m_hd.Cells.CellsCount())
   {
-    delete[] m_BestPlacementCellsX;
-    delete[] m_BestPlacementCellsY;
+    delete[] m_BestPlacement;
+    
     m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
-    m_BestPlacementCellsX = new double[m_BestPlacementCellsCount];
-    m_BestPlacementCellsY = new double[m_BestPlacementCellsCount];
+    m_BestPlacement = new Placement [m_BestPlacementCellsCount];
   }
   int i = 0;
   for (HCells::CellsEnumeratorW cell = m_hd.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
   {
-    m_BestPlacementCellsX[i] = cell.X();
-    m_BestPlacementCellsY[i] = cell.Y();
+    m_BestPlacement[i].BestPlacementCellsX = cell.X();
+    m_BestPlacement[i].BestPlacementCellsY = cell.Y();
+    m_BestPlacement[i].cell = cell;
   }
 }
 
 void VanGinneken::RestoreBestAchievedPlacement()
 {
   int i = 0;
-  for (HCells::CellsEnumeratorW cell = m_hd.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
+  for (HCells::CellsEnumeratorW cell = m_hd.Cells.GetEnumeratorW(); (cell.MoveNext() && i < m_BestPlacementCellsCount); ++i)
   {
-    cell.SetX(m_BestPlacementCellsX[i]);
-    cell.SetY(m_BestPlacementCellsY[i]);
+    if(m_BestPlacement[i].cell != cell)
+    {
+      for(int j = 0; j < m_BestPlacementCellsCount; j++)
+      {
+        if(m_BestPlacement[i].cell == cell)
+        {
+          cell.SetX(m_BestPlacement[j].BestPlacementCellsX);
+          cell.SetY(m_BestPlacement[j].BestPlacementCellsY);
+        }
+
+      }
+    }
+    else
+    {
+      cell.SetX(m_BestPlacement[i].BestPlacementCellsX);
+      cell.SetY(m_BestPlacement[i].BestPlacementCellsY);
+    }
   }
 }
