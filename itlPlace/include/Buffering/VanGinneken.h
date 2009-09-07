@@ -138,6 +138,7 @@ private:
   double  bestTNS, bestWNS;
   int m_BestPlacementCellsCount;
   Placement* m_BestPlacement;
+  HDPGrid DPGrid;
 
 };
 

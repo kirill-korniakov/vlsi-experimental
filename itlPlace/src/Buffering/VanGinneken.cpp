@@ -29,8 +29,9 @@ int GetIdx(int* a, int b)
 }
 
 VanGinneken::VanGinneken(HDesign& design): 
-m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
+m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0), DPGrid(design)
 {
+
   LoadAvailableBuffers();
   m_WirePhisics = m_hd.RoutingLayers.Physics;
   m_WirePhisics.SetLinearC(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
@@ -570,7 +571,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double tnsBeforeBuffering = Utils::TNS(m_hd);
     double wnsBeforeBuffering = Utils::WNS(m_hd);
     SaveCurrentPlacementAsBestAchieved();
-    HDPGrid DPGrid(m_hd);
+    
     NetKind netKind = m_hd.Nets.Get<HNet::Kind, NetKind>(net);
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     
@@ -581,11 +582,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
     CreateNets(net, insertedBuffers, newNet);
 
-    STA(m_hd, m_doReportBuffering);
-    double tnsAfterBuffering = Utils::TNS(m_hd);
-    double wnsAfterBuffering = Utils::WNS(m_hd);
-
-    Legalization(DPGrid);
+    //Legalization(DPGrid);
 
     STA(m_hd, m_doReportBuffering);
     double tnsAfterLegalization = Utils::TNS(m_hd);
@@ -938,6 +935,7 @@ int VanGinneken::CriticalPathBuffering(HCriticalPath aPath)
     else
       nBuf += NetBuffering(net);
   }
+  Legalization(DPGrid);
   return nBuf;
 }
 
