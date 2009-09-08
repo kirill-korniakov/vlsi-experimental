@@ -297,6 +297,7 @@ bool layerAssign, labyrinth;
 unsigned maxRipIter, maxGreedyIter;
 double timeOut;
 string outputFile;
+string resultsFile;
 
   FGRParams(void) { setDefault(); }
   FGRParams(int argc, char **argv);

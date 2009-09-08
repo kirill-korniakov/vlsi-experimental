@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -23,6 +24,7 @@ using std::make_pair;
 using std::min;
 using std::max;
 using std::swap;
+using std::ofstream;
 
 #include "FGR.h"
 
@@ -88,41 +90,71 @@ void FGR::printStatistics(bool checkRouted, bool final)
     }
   }
 
-  if(final) cout << "final ";
-  cout << "nets routed " << netsRouted << " ("
-       << 100.*static_cast<double>(netsRouted)/static_cast<double>(routableNets) << "%)" << endl;
-  if(final) cout << "final ";
-  cout << "total length for routed nets " << routedLen << endl;
-  if(final) cout << "final ";
-  cout << "total number of vias " << numVias << endl;
-  if(final) cout << "final ";
-  cout << "total wirelength " << routedLen + viaFactor*numVias << endl;
-  if(final) cout << "final ";
-  cout << "number of edges overfull is " << overfullEdges << " ("
-       << 100.*static_cast<double>(overfullEdges)/static_cast<double>(nonViaEdges) << "%)" << endl;
-  if(final) cout << "final ";
-  cout << "max overfill is " << maxOverfill << endl;
-  if(final) cout << "final ";
-  cout << "total overfill is " << totalOverflow << endl;
-  if(final) cout << "final ";
-  cout << "avg overfill is " << totalOverflow/static_cast<double>(nonViaEdges) << endl;
-  if(final) cout << "final ";
-  cout << "CPU time: " << cpuTime() << " seconds" << endl;  
+  ofstream outfile(params.resultsFile.c_str());
+
+  if(!outfile.good())
+  {
+    outfile << "Could not open `" << params.resultsFile << "' for writing." << endl;
+  }
+  
+  if (final) outfile << "final ";
+  outfile << "nets routed " << netsRouted << " ("
+    << 100.*static_cast<double>(netsRouted)/static_cast<double>(routableNets) << "%)" << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "total length for routed nets " << routedLen << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "total number of vias " << numVias << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "total wirelength " << routedLen + viaFactor*numVias << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "number of edges overfull is " << overfullEdges << " ("
+    << 100.*static_cast<double>(overfullEdges)/static_cast<double>(nonViaEdges) << "%)" << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "max overfill is " << maxOverfill << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "total overfill is " << totalOverflow << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "avg overfill is " << totalOverflow/static_cast<double>(nonViaEdges) << endl;
+  
+  if(final) outfile << "final ";
+  
+  outfile << "CPU time: " << cpuTime() << " seconds" << endl;  
 }
 
 void FGR::printStatisticsLight(void)
 {
-  cout << "total length for routed nets " << totalSegments << endl;
+  ofstream outfile(params.resultsFile.c_str());
+
+  if(!outfile.good())
+  {
+    outfile << "Could not open `" << params.resultsFile << "' for writing." << endl;
+  }
+
+  outfile << "total length for routed nets " << totalSegments << endl;
   if(numLayers > 1)
   {
-    cout << "total number of vias " << totalVias << endl;
-    cout << "total wirelength " << totalSegments + viaFactor*totalVias << endl;
+    outfile << "total number of vias " << totalVias << endl;
+    outfile << "total wirelength " << totalSegments + viaFactor*totalVias << endl;
   }
-  cout << "number of edges overfull is " << overfullEdges << " ("
+  outfile << "number of edges overfull is " << overfullEdges << " ("
        << 100.*static_cast<double>(overfullEdges)/static_cast<double>(nonViaEdges) << "%)" << endl;
-  cout << "total overfill is " << totalOverflow << endl;
-  cout << "avg overfill is " << totalOverflow/static_cast<double>(nonViaEdges) << endl;
-  cout << "CPU time: " << cpuTime() << " seconds" << endl;  
+  outfile << "total overfill is " << totalOverflow << endl;
+  outfile << "avg overfill is " << totalOverflow/static_cast<double>(nonViaEdges) << endl;
+  outfile << "CPU time: " << cpuTime() << " seconds" << endl;  
 }
 
 void BitBoard::setBit(IdType id)
@@ -553,16 +585,17 @@ void FGR::ripUpSegment(const SubNetIdType &subNetId, IdType edgeId)
 
 void FGRParams::usage(const char *exename)
 {
-  cout << "Usage: " << exename << " <filename> [options]" << endl;
-  cout << endl;
-  cout << "Available options:" << endl;
-  cout << "  -labyrinth            Input is in Labyrinth format" << endl;
-  cout << "  -o <filename>         Save routes in <filename>" << endl;
-  cout << "  -maxRipIter <uint>    Maximum rip-up and re-route iterations" << endl;
-  cout << "  -timeOut <double>     Rip-up and re-route timeout (seconds)" << endl;
-  cout << "  -maxGreedyIter <uint> Maximum greedy iterations" << endl;
-  cout << "  -full3d               Do not use layer assignment" << endl;
-  cout << endl;
+  ofstream outfile(resultsFile.c_str());
+  outfile << "Usage: " << exename << " <filename> [options]" << endl;
+  outfile << endl;
+  outfile << "Available options:" << endl;
+  outfile << "  -labyrinth            Input is in Labyrinth format" << endl;
+  outfile << "  -o <filename>         Save routes in <filename>" << endl;
+  outfile << "  -maxRipIter <uint>    Maximum rip-up and re-route iterations" << endl;
+  outfile << "  -timeOut <double>     Rip-up and re-route timeout (seconds)" << endl;
+  outfile << "  -maxGreedyIter <uint> Maximum greedy iterations" << endl;
+  outfile << "  -full3d               Do not use layer assignment" << endl;
+  outfile << endl;
   exit(0);
 }
 
@@ -578,19 +611,21 @@ void FGRParams::setDefault(void)
 
 void FGRParams::print(void) const
 {
-  cout << endl << "FGR parameters:" << endl;
-  cout << "Labyrinth format:       " << (labyrinth ? "true" : "false") << endl;
-  cout << "Layer assignment:       " << (layerAssign ? "true" : "false") << endl;
-  cout << "Maximum RRR iterations: " << maxRipIter << endl;
-  cout << "Max RRR runtime:        " << timeOut << " seconds" << endl;
+  ofstream outfile(resultsFile.c_str());
+  outfile << endl << "FGR parameters:" << endl;
+  outfile << "Labyrinth format:       " << (labyrinth ? "true" : "false") << endl;
+  outfile << "Layer assignment:       " << (layerAssign ? "true" : "false") << endl;
+  outfile << "Maximum RRR iterations: " << maxRipIter << endl;
+  outfile << "Max RRR runtime:        " << timeOut << " seconds" << endl;
   if(!outputFile.empty())
-    cout << "Save routes to file:    `" << outputFile << "'" << endl;
-  cout << endl;
+    outfile << "Save routes to file:    `" << outputFile << "'" << endl;
+  outfile << endl;
 }
 
 FGRParams::FGRParams(int argc, char **argv)
 {
   setDefault();
+  ofstream outfile(resultsFile.c_str());
 
   if(argc < 2)
   {
@@ -607,11 +642,12 @@ FGRParams::FGRParams(int argc, char **argv)
     {
       if(i+1 < argc)
       {
-        outputFile = argv[++i];
+        outputFile  = argv[++i];
+        resultsFile = outputFile + ".results";
       }
       else
       {
-        cout << "option -o requires an argument" << endl;
+        outfile << "option -o requires an argument" << endl;
         usage(argv[0]);
       }
     }
@@ -631,7 +667,7 @@ FGRParams::FGRParams(int argc, char **argv)
       }
       else
       {
-        cout << "option -maxRipIter requires an argument" << endl;
+        outfile << "option -maxRipIter requires an argument" << endl;
         usage(argv[0]);
       }
     }
@@ -643,7 +679,7 @@ FGRParams::FGRParams(int argc, char **argv)
       }
       else
       {
-        cout << "option -maxGreedyIter requires an argument" << endl;
+        outfile << "option -maxGreedyIter requires an argument" << endl;
         usage(argv[0]);
       }
     }
@@ -655,13 +691,13 @@ FGRParams::FGRParams(int argc, char **argv)
       }
       else
       {
-        cout << "option -timeOut requires an argument" << endl;
+        outfile << "option -timeOut requires an argument" << endl;
         usage(argv[0]);
       }
     }
     else
     {
-      cout << "unknown commandline option" << endl;
+      outfile << "unknown commandline option" << endl;
       usage(argv[0]);
     }
   }

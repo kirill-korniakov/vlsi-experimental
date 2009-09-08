@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -6,10 +5,10 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <fstream>
 
 using std::vector;
 using std::pair;
-using std::cout;
 using std::endl;
 using std::flush;
 using std::string;
@@ -18,6 +17,7 @@ using std::numeric_limits;
 using std::make_pair;
 using std::min;
 using std::max;
+using std::ofstream;
 
 #include "FGR.h"
 
@@ -86,6 +86,12 @@ CostType DLMCost::operator()(IdType edgeId, IdType netId) const
 
 void FGR::routeFlatSubNets(bool allowOverflow, const CostFunction &f)
 {
+  ofstream outfile(params.resultsFile.c_str());
+
+  if(!outfile.good())
+  {
+    outfile << "Could not open `" << params.resultsFile << "' for writing." << endl;
+  }
   unsigned flatNetsRouted = 0;
   vector<SubNetIdType> order;
   for(unsigned i = 0; i < nets.size(); ++i)
@@ -102,7 +108,7 @@ void FGR::routeFlatSubNets(bool allowOverflow, const CostFunction &f)
 
   for(unsigned i = 0; i < order.size(); ++i)
   {
-    if(i % 100 == 0) cout << i << "\r" << flush;
+    if(i % 100 == 0) outfile << i << "\r" << flush;
 
     const SubNet &snet = nets[order[i].first].subnets[order[i].second];
 
@@ -115,7 +121,7 @@ void FGR::routeFlatSubNets(bool allowOverflow, const CostFunction &f)
     }
   }
 
-  cout << flatNetsRouted << " flat sub nets routed" << endl;
+  outfile << flatNetsRouted << " flat sub nets routed" << endl;
 }
 
 CostType FGR::routeSubNet(const SubNetIdType &subNetId, bool allowOverflow, bool bboxConstrain, const CostFunction &f)
@@ -168,6 +174,12 @@ void FGR::ripUpSubNet(const SubNetIdType &subNetId)
 
 void FGR::routeSubNets(bool allowOverflow, const CostFunction &f)
 {
+  ofstream outfile(params.resultsFile.c_str());
+
+  if(!outfile.good())
+  {
+    outfile << "Could not open `" << params.resultsFile << "' for writing." << endl;
+  }
   vector<SubNetIdType> order;
   for(unsigned i = 0; i < nets.size(); ++i)
   {
@@ -183,7 +195,7 @@ void FGR::routeSubNets(bool allowOverflow, const CostFunction &f)
 
   for(unsigned i = 0; i < order.size(); ++i)
   {
-    if(i % 100 == 0) cout << i << "\r" << flush;
+    if(i % 100 == 0) outfile << i << "\r" << flush;
 
     if(nets[order[i].first].subnets[order[i].second].routed) continue;
 
@@ -435,6 +447,13 @@ CostType FGR::routeMaze(const SubNetIdType &subNetId, bool allowOverflow,
 
 void FGR::doRRR(void)
 {
+  ofstream outfile(params.resultsFile.c_str());
+
+  if(!outfile.good())
+  {
+    outfile << "Could not open `" << params.resultsFile << "' for writing." << endl;
+  }
+
   if(params.maxRipIter == 0) return;
 
   vector<SubNetIdType> subNetsToRip;
@@ -443,11 +462,11 @@ void FGR::doRRR(void)
 
   DLMCost dlm(*this);
 
-  cout << endl;
+  outfile << endl;
 
   if(params.maxRipIter != numeric_limits<unsigned>::max())
   {
-    cout << "Performing at most " << params.maxRipIter << " rip-up and re-route iteration(s)" << endl;
+    outfile << "Performing at most " << params.maxRipIter << " rip-up and re-route iteration(s)" << endl;
   }
 
   double startCPU = cpuTime();
@@ -487,7 +506,7 @@ void FGR::doRRR(void)
 
     if(subNetsToRip.size() == 0)
     {
-      cout << "No more subnets to rip up, quitting" << endl;
+      outfile << "No more subnets to rip up, quitting" << endl;
       break;
     }
 
@@ -514,11 +533,11 @@ void FGR::doRRR(void)
       sort(netsToRebuild.begin(), netsToRebuild.end());
       netsToRebuild.erase(unique(netsToRebuild.begin(), netsToRebuild.end()), netsToRebuild.end());
 
-      cout << endl << "rebuilding " << netsToRebuild.size() << " nets" << endl;
+      outfile << endl << "rebuilding " << netsToRebuild.size() << " nets" << endl;
 
       for(unsigned i = 0; i < netsToRebuild.size(); ++i)
       {
-        if(i % 100 == 0) cout << i << "\r" << flush;
+        if(i % 100 == 0) outfile << i << "\r" << flush;
 
         redoTree(netsToRebuild[i], allowOverflow, bboxConstrain, dlm);
       }
@@ -527,11 +546,11 @@ void FGR::doRRR(void)
     {
       sort(subNetsToRip.begin(), subNetsToRip.end(), CompareByBox(nets));
 
-      cout << endl << "number of sub nets that need to be ripped up: " << subNetsToRip.size() << endl;
+      outfile << endl << "number of sub nets that need to be ripped up: " << subNetsToRip.size() << endl;
 
       for(unsigned i = 0; i < subNetsToRip.size(); ++i)
       {
-        if(i % 100 == 0) cout << i << "\r" << flush;
+        if(i % 100 == 0) outfile << i << "\r" << flush;
 
         const SubNetIdType &subNetId = subNetsToRip[i];
 
@@ -561,18 +580,18 @@ void FGR::doRRR(void)
 
     subNetsToRip.clear();
     ++iterations;
-    cout << "after rip-up iteration " << iterations << endl;
+    outfile << "after rip-up iteration " << iterations << endl;
     printStatisticsLight();
     double cpuTimeUsed = cpuTime();
 
     if(iterations >= params.maxRipIter)
     {
-      cout << "Iterations exceeded, quitting" << endl;
+      outfile << "Iterations exceeded, quitting" << endl;
       break;
     }
     if(cpuTimeUsed > startCPU + params.timeOut)
     {
-      cout << "Timeout exceeeded, quitting" << endl;
+      outfile << "Timeout exceeeded, quitting" << endl;
       break;
     }
   }
@@ -580,9 +599,11 @@ void FGR::doRRR(void)
 
 void FGR::layerAssignment(void)
 {
+  ofstream outfile(params.resultsFile.c_str());;
+  
   if(!params.layerAssign)
   {
-    cout << "skipping layer assignment" << endl;
+    outfile << "skipping layer assignment" << endl;
     return;
   }
 
@@ -608,7 +629,7 @@ void FGR::layerAssignment(void)
 
   for(unsigned i = 0; i < order.size(); ++i)
   {
-    if(i % 100 == 0) cout << i << "\r" << flush;
+    if(i % 100 == 0) outfile << i << "\r" << flush;
 
     SubNet &snet = nets[order[i].first].subnets[order[i].second];
     const unsigned netId = order[i].first;
@@ -1005,9 +1026,10 @@ void FGR::layerAssignment(void)
 
 void FGR::greedyImprovement(void)
 {
+  ofstream outfile(params.resultsFile.c_str());
   if(totalOverflow > 0)
   {
-    cout << "skipping greedy improvement due to illegal solution" << endl;
+    outfile << "skipping greedy improvement due to illegal solution" << endl;
     return;
   }
 
@@ -1026,41 +1048,42 @@ void FGR::greedyImprovement(void)
   }
   sort(order.begin(), order.end(), CompareByBox(nets));
 
-  cout << "performing " << params.maxGreedyIter << " greedy improvement iteration(s)" << endl;
+  outfile << "performing " << params.maxGreedyIter << " greedy improvement iteration(s)" << endl;
 
   for(unsigned iterations = 1; iterations <= params.maxGreedyIter; ++iterations)
   {
-    cout << endl << "examining " << order.size() << " subnets " << endl;
+    outfile << endl << "examining " << order.size() << " subnets " << endl;
     for(unsigned i = 0; i < order.size(); ++i)
     {
-      if(i % 100 == 0) cout << i << "\r" << flush;
+      if(i % 100 == 0) outfile << i << "\r" << flush;
 
       ripUpSubNet(order[i]);
 
       routeSubNet(order[i], donotallowOverflow, noBBoxConstrain, uc);
     }
-    cout << "after greedy improvement iteration " << iterations << endl;
+    outfile << "after greedy improvement iteration " << iterations << endl;
     printStatisticsLight();
   }
 }
 
 void FGR::initialRouting(void)
 {
+  ofstream outfile(params.resultsFile.c_str());
   unsigned totalSubNets = 0;
   for(unsigned i = 0; i < nets.size(); ++i)
   {
     totalSubNets += nets[i].subnets.size();
   }
-  cout << "total sub nets " << totalSubNets << endl;
+  outfile << "total sub nets " << totalSubNets << endl;
 
   DLMCost dlm(*this);
 
-  cout << "routing flat nets" << endl;
+  outfile << "routing flat nets" << endl;
   const bool donotallowOverflow = false;
   routeFlatSubNets(donotallowOverflow, dlm);
-  cout << "CPU time: " << cpuTime() << " seconds " << endl;
+  outfile << "CPU time: " << cpuTime() << " seconds " << endl;
 
-  cout << "routing remaining nets" << endl;
+  outfile << "routing remaining nets" << endl;
   const bool allowOverflow = true;
   routeSubNets(allowOverflow, dlm);
 

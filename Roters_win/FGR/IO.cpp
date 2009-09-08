@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -14,7 +13,6 @@ using std::ifstream;
 using std::ofstream;
 using std::vector;
 using std::pair;
-using std::cout;
 using std::endl;
 using std::flush;
 using std::string;
@@ -30,8 +28,8 @@ void expect(string s1, string s2)
 {
   if(s1 != s2)
   {
-    cout << "Parsing error. Expected `" << s2
-         << "' but got `" << s1 << "' instead" << endl;
+//    outfile << "Parsing error. Expected `" << s2
+//         << "' but got `" << s1 << "' instead" << endl;
     exit(0);
   }
 }
@@ -58,15 +56,16 @@ void FGR::parseInput(const char *filename)
   }
 
   ifstream infile(filename);
+  ofstream outfile(params.resultsFile.c_str());
 
   if(!infile.good())
   {
-    cout << "Could not open `" << filename << "' for reading" << endl;
+    outfile << "Could not open `" << filename << "' for reading" << endl;
     exit(0);
   }
   else
   {
-    cout << "Reading from `" << filename << "' ..." << endl;
+    outfile << "Reading from `" << filename << "' ..." << endl;
   }
 
   string tmp;
@@ -77,7 +76,7 @@ void FGR::parseInput(const char *filename)
 
   if(numLayers <= 2) params.layerAssign = false;
 
-  cout << "grid size " << xTiles << "x" << yTiles << endl;
+  outfile << "grid size " << xTiles << "x" << yTiles << endl;
 
   infile >> tmp; expect(tmp, string("vertical"));
   infile >> tmp; expect(tmp, string("capacity"));
@@ -143,7 +142,7 @@ void FGR::parseInput(const char *filename)
 
   infile >> numNets;
 
-  cout << "total nets " << numNets << endl;
+  outfile << "total nets " << numNets << endl;
 
   unsigned netsTooBig = 0;
   nets.reserve(numNets);
@@ -172,7 +171,7 @@ void FGR::parseInput(const char *filename)
 
       if(params.layerAssign && newPin.z >= 2)
       {
-        cout << "Warning: layer assignment is incompatible with "
+        outfile << "Warning: layer assignment is incompatible with "
              << "pins not being on layers 1 or 2, capping the layer to 2" << endl;
         newPin.z = 1;
       }
@@ -242,7 +241,7 @@ void FGR::parseInput(const char *filename)
     }
   }
 
-  cout << "number of nets too big: " << netsTooBig << endl;
+  outfile << "number of nets too big: " << netsTooBig << endl;
 
   // build the routing grid graph
   bool skipEmpty = true;
@@ -268,7 +267,7 @@ void FGR::parseInput(const char *filename)
       {
         if(newCap != 0.)
         {
-          cout << "Increasing capacity on a previously empty edge." << endl;
+          outfile << "Increasing capacity on a previously empty edge." << endl;
           exit(0);
         }
       }
@@ -290,7 +289,7 @@ void FGR::parseInput(const char *filename)
       {
         if(newCap != 0.)
         {
-          cout << "Increasing capacity on a previously empty edge." << endl;
+          outfile << "Increasing capacity on a previously empty edge." << endl;
           exit(0);
         }
       }
@@ -306,7 +305,7 @@ void FGR::parseInput(const char *filename)
     }
     else
     {
-      cout << "Bad capacity change" << endl;
+      outfile << "Bad capacity change" << endl;
       exit(0);
     }
   }
@@ -362,15 +361,16 @@ void FGR::parseInput(const char *filename)
 void FGR::parseInputLab(const char *filename)
 {
   ifstream infile(filename);
+  ofstream outfile(params.resultsFile.c_str());
 
   if(!infile.good())
   {
-    cout << "Could not open `" << filename << "' for reading" << endl;
+    outfile << "Could not open `" << filename << "' for reading" << endl;
     exit(0);
   }
   else
   {
-    cout << "Reading from `" << filename << "' ..." << endl;
+    outfile << "Reading from `" << filename << "' ..." << endl;
   }
 
   string tmp;
@@ -381,7 +381,7 @@ void FGR::parseInputLab(const char *filename)
   numLayers = 1;
   params.layerAssign = false;
 
-  cout << "grid size " << xTiles << "x" << yTiles << endl;
+  outfile << "grid size " << xTiles << "x" << yTiles << endl;
 
   infile >> tmp; expect(tmp, string("vertical"));
   infile >> tmp; expect(tmp, string("capacity"));
@@ -421,7 +421,7 @@ void FGR::parseInputLab(const char *filename)
 
   infile >> numNets;
 
-  cout << "total nets " << numNets << endl;
+  outfile << "total nets " << numNets << endl;
 
   unsigned netsTooBig = 0;
   nets.reserve(numNets);
@@ -522,7 +522,7 @@ void FGR::parseInputLab(const char *filename)
     }
   }
 
-  cout << "number of nets too big: " << netsTooBig << endl;
+  outfile << "number of nets too big: " << netsTooBig << endl;
 
   // build the routing grid graph
   bool skipEmpty = true;
@@ -538,15 +538,16 @@ void FGR::parseInputLab(const char *filename)
 void FGR::parseInputMapper(const char *filename)
 {
   ifstream infile(filename);
+  ofstream outfile(params.resultsFile.c_str());
 
   if(!infile.good())
   {
-    cout << "Could not open `" << filename << "' for reading" << endl;
+    outfile << "Could not open `" << filename << "' for reading" << endl;
     exit(0);
   }
   else
   {
-    cout << "Reading from `" << filename << "' ..." << endl;
+    outfile << "Reading from `" << filename << "' ..." << endl;
   }
 
   string tmp;
@@ -557,7 +558,7 @@ void FGR::parseInputMapper(const char *filename)
 
   if(numLayers <= 2) params.layerAssign = false;
 
-  cout << "grid size " << xTiles << "x" << yTiles << endl;
+  outfile << "grid size " << xTiles << "x" << yTiles << endl;
 
   infile >> tmp; expect(tmp, string("vertical"));
   infile >> tmp; expect(tmp, string("capacity"));
@@ -623,7 +624,7 @@ void FGR::parseInputMapper(const char *filename)
 
   infile >> numNets;
 
-  cout << "total nets " << numNets << endl;
+  outfile << "total nets " << numNets << endl;
 
   nets.reserve(numNets);
 
@@ -716,15 +717,16 @@ void FGR::parseInputMapper(const char *filename)
 void FGR::parseSolution(const char* filename)
 {
   ifstream infile(filename);
+  ofstream outfile(params.resultsFile.c_str());
 
   if(!infile.good())
   {
-    cout << "Could not open `" << filename << "' for reading" << endl;
+    outfile << "Could not open `" << filename << "' for reading" << endl;
     exit(0);
   }
   else
   {
-    cout << "Reading from `" << filename << "' ..." << endl;
+    outfile << "Reading from `" << filename << "' ..." << endl;
   }
 
   string netname;
@@ -735,7 +737,7 @@ void FGR::parseSolution(const char* filename)
   {
     if(netNameToIdx.find(netname) == netNameToIdx.end())
     {
-      cout << "unknown net with name `" << netname << "'" << endl;
+      outfile << "unknown net with name `" << netname << "'" << endl;
       exit(0);
     }
 
@@ -764,33 +766,33 @@ void FGR::parseSolution(const char* filename)
 
       if(tilex1 >= xTiles)
       {
-        cout << "illegal x position " << x1 << endl;
+        outfile << "illegal x position " << x1 << endl;
         exit(0);
       }
       if(tiley1 >= yTiles)
       {
-        cout << "illegal y position " << y1 << endl;
+        outfile << "illegal y position " << y1 << endl;
         exit(0);
       }
       if(tilez1 >= numLayers)
       {
-        cout << "illegal layer " << z1 << endl;
+        outfile << "illegal layer " << z1 << endl;
         exit(0);
       }
 
       if(tilex2 >= xTiles)
       {
-        cout << "illegal x position " << x2 << endl;
+        outfile << "illegal x position " << x2 << endl;
         exit(0);
       }
       if(tiley2 >= yTiles)
       {
-        cout << "illegal y position " << y2 << endl;
+        outfile << "illegal y position " << y2 << endl;
         exit(0);
       }
       if(tilez2 >= numLayers)
       {
-        cout << "illegal layer " << z2 << endl;
+        outfile << "illegal layer " << z2 << endl;
         exit(0);
       }
 
@@ -843,11 +845,11 @@ void FGR::writeRoutes(const string &filename)
 
   if(!outfile.good())
   {
-    cout << "Could not open `" << filename << "' for writing." << endl;
+    outfile << "Could not open `" << filename << "' for writing." << endl;
     return;
   }
 
-  cout << "Writing `" << filename << "' ..." << flush;
+  outfile << "Writing `" << filename << "' ..." << flush;
 
   for(unsigned i = 0; i < nets.size(); ++i)
   {
@@ -921,7 +923,7 @@ void FGR::writeRoutes(const string &filename)
     }
   }
 
-  cout << " done" << endl;
+  outfile << " done" << endl;
 }
 
 const char* coolMap[] = {
@@ -1011,7 +1013,8 @@ void FGR::plotXPM(const string &filename)
     image.push_back(horizLine);
   }
 
-  cout << "maxratio was " << maxRatio << endl;
+  ofstream outfile(params.resultsFile.c_str());
+  outfile << "maxratio was " << maxRatio << endl;
 
   for(unsigned j = 0; j < yTiles-1; ++j)
   {
