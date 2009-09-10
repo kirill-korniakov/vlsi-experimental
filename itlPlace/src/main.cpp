@@ -12,6 +12,7 @@
 #include "Buffering.h"
 #include "TileGrid.h"
 #include <conio.h>
+#include "FGR.h"
 
 using namespace libconfig;
 
@@ -159,6 +160,7 @@ int main(int argc, char** argv)
       {
         PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.ISPDFileName", "bench.fr"));
         PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.LabyrinthFileName", "bench.br"));
+        fgr::FGRRouting();
       }
     }
     
