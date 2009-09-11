@@ -451,8 +451,8 @@ void FGR::parseInputAsLab(HDPGrid& grid)
       double pinY = (currPin.Y() - yMin) / c_tileHeight;
 
       Point newPin;
-      newPin.x = static_cast<unsigned>(floor((pinX - minX)/tileWidth));
-      newPin.y = static_cast<unsigned>(floor((pinY - minY)/tileHeight));
+      newPin.x = static_cast<unsigned>(floor((pinX - minX) / tileWidth));
+      newPin.y = static_cast<unsigned>(floor((pinY - minY) / tileHeight));
       newPin.z = 0;
       temp.pins.push_back(newPin);
     }

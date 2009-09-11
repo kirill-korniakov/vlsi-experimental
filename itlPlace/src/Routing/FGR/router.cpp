@@ -16,7 +16,7 @@ using std::ofstream;
 #include "stdTypes.h"
 using namespace fgr;
 
-int fgr::FGRRouting()
+int fgr::FGRRouting(HDPGrid& grid)
 {
   // parameters
   string outputfile;
@@ -44,12 +44,25 @@ int fgr::FGRRouting()
   FGRParams parms;
   parms.labyrinth   = true;
   parms.layerAssign = false;
+  
+  string tmpstr = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.FGROutputFile", "bench.fgr");
+  int pos = 0;
+  
+  while (tmpstr[pos] != '.')
+    pos++;
+
+  tmpstr[pos + 1] = 'f';
+  tmpstr[pos + 2] = 'g';
+  tmpstr[pos + 3] = 'r';
+
+  parms.outputFile = tmpstr;
+  parms.resultsFile = tmpstr + ".results";
 
   FGR fgr(parms);
 
   // read in the nets and create the grid
   //fgr.parseInput(argv[1]);
-  //fgr.parseInputAsLab();
+  fgr.parseInputAsLab(grid);
 
   ofstream outfile(resultsFile.c_str(), std::ios::app);
 

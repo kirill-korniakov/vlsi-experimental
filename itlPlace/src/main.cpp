@@ -160,7 +160,7 @@ int main(int argc, char** argv)
       {
         PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.ISPDFileName", "bench.fr"));
         PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.LabyrinthFileName", "bench.br"));
-        fgr::FGRRouting();
+        fgr::FGRRouting(DPGrid);
       }
     }
     

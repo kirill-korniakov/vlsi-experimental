@@ -608,6 +608,7 @@ void FGRParams::setDefault(void)
   maxGreedyIter = 1;
   timeOut = 60.*60.*24.; // 24 hours
   outputFile = "";
+  resultsFile = "";
 }
 
 void FGRParams::print(void) const
@@ -627,7 +628,7 @@ void FGRParams::print(void) const
 FGRParams::FGRParams(int argc, char **argv)
 {
   setDefault();
-  ofstream outfile(resultsFile.c_str(), std::ios::app);
+  ofstream outfile("FGRWaring.txt", std::ios::app);
 
   if(argc < 2)
   {

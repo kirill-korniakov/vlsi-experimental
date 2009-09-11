@@ -394,7 +394,7 @@ namespace fgr
   };
 
   double cpuTime();
-  int FGRRouting();
+  int FGRRouting(HDPGrid& grid);
 
   const CostType powMax = 1.e12;
   const CostType powBase = 5.;
