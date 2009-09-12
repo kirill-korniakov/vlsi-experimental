@@ -41,11 +41,15 @@ int fgr::FGRRouting(HDPGrid& grid)
   }*/
 
   //FGRParams parms(argc, argv);
+  //---Initialise FGRParams----------------------------------------------------
   FGRParams parms;
   parms.labyrinth   = true;
   parms.layerAssign = false;
+  parms.timeOut     = grid.Design().cfg.ValueOf("FGRRouting.maxRoutingTime", 86400)
+                      + clock() / CLOCKS_PER_SEC; //not to take into account the
+                                                  //time used before router started
   
-  string tmpstr = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.FGROutputFile", "bench.fgr");
+  string tmpstr = grid.Design().cfg.ValueOf("FGRRouting.FGROutputFile", "bench.fgr");
   int pos = 0;
   
   while (tmpstr[pos] != '.')
@@ -57,6 +61,7 @@ int fgr::FGRRouting(HDPGrid& grid)
 
   parms.outputFile = tmpstr;
   parms.resultsFile = tmpstr + ".results";
+  //---------------------------------------------------------------------------
 
   FGR fgr(parms);
 

@@ -95,17 +95,17 @@ void PrintToFastRouterFormat(HDPGrid& grid, const char* fileName)
         return;
     }
 
-    int nHorTiles  = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nHorTiles", 0);
-    int nVertTiles = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nVertTiles", 0);
+    int nHorTiles  = grid.Design().cfg.ValueOf("FGRRouting.nHorTiles", 0);
+    int nVertTiles = grid.Design().cfg.ValueOf("FGRRouting.nVertTiles", 0);
 
     if (nHorTiles * nVertTiles == 0)
     {
-      nHorTiles  = grid.NumRows();
-      nVertTiles = grid.NumRows();
+      nHorTiles  = grid.NumRows() / 2;
+      nVertTiles = grid.NumRows() / 2;
     }
 
-    int verticalCapacity   = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.verticalCapacity", 7);
-    int horizontalCapacity = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.horizontalCapacity", 7);
+    int verticalCapacity   = grid.Design().cfg.ValueOf("FGRRouting.verticalCapacity", 20);
+    int horizontalCapacity = grid.Design().cfg.ValueOf("FGRRouting.horizontalCapacity", 20);
     fprintf(routerInputFile, "grid %d %d %d\n", nHorTiles, nVertTiles, 2);
     fprintf(routerInputFile, "vertical capacity %d %d\n", 0, verticalCapacity);
     fprintf(routerInputFile, "horizontal capacity %d %d\n", horizontalCapacity, 0);
@@ -183,17 +183,17 @@ void PrintToBoxRouterFormat(HDPGrid& grid, const char* fileName)
         return;
     }
 
-    int nHorTiles  = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nHorTiles", 0);
-    int nVertTiles = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nVertTiles", 0);
+    int nHorTiles  = grid.Design().cfg.ValueOf("FGRRouting.nHorTiles", 0);
+    int nVertTiles = grid.Design().cfg.ValueOf("FGRRouting.nVertTiles", 0);
 
     if (nHorTiles * nVertTiles == 0)
     {
-      nHorTiles  = grid.NumRows();
-      nVertTiles = grid.NumRows();
+      nHorTiles  = grid.NumRows() / 2;
+      nVertTiles = grid.NumRows() / 2;
     }
 
-    int verticalCapacity   = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.verticalCapacity", 7);
-    int horizontalCapacity = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.horizontalCapacity", 7);
+    int verticalCapacity   = grid.Design().cfg.ValueOf("FGRRouting.verticalCapacity", 20);
+    int horizontalCapacity = grid.Design().cfg.ValueOf("FGRRouting.horizontalCapacity", 20);
     fprintf(routerInputFile, "grid %d %d\n", nHorTiles, nVertTiles);
     fprintf(routerInputFile, "vertical capacity %d\n", verticalCapacity);
     fprintf(routerInputFile, "horizontal capacity %d\n", horizontalCapacity);

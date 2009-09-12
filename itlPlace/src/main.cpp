@@ -156,10 +156,16 @@ int main(int argc, char** argv)
         _getch();
       }
 
-      if (hd.cfg.ValueOf("DesignFlow.PrintToRoutersFormats", false))
+      if (hd.cfg.ValueOf("DesignFlow.FGRRouting", false))
       {
-        PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.ISPDFileName", "bench.fr"));
-        PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("PrintingToRoutersFormats.LabyrinthFileName", "bench.br"));
+        if (hd.cfg.ValueOf("FGRRouting.PrintToRoutersFormats", false))
+        {
+          PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("FGRRouting.ISPDFileName",
+                                                         "bench.fr"));
+          
+          PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("FGRRouting.LabyrinthFileName",
+                                                        "bench.br"));
+        }
         fgr::FGRRouting(DPGrid);
       }
     }
@@ -168,7 +174,8 @@ int main(int argc, char** argv)
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
       //FIXME: delete this block
-      for (HNets::NetsEnumeratorW nIter = hd.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
+      for (HNets::NetsEnumeratorW nIter = hd.Nets.GetNetsEnumeratorW();
+                                                      nIter.MoveNext(); ) 
       {
         if (nIter.Name() == "overflw__BufferedPart_0" ||
           nIter.Name() == "overflw__BufferedPart_1")

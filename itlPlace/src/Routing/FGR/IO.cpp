@@ -362,8 +362,8 @@ void FGR::parseInput(const char *filename)
 void FGR::parseInputAsLab(HDPGrid& grid)
 {
   ofstream outfile(params.resultsFile.c_str(), std::ios::app);
-  xTiles = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nHorTiles", 0);
-  yTiles = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.nVertTiles", 0);
+  xTiles = grid.Design().cfg.ValueOf("FGRRouting.nHorTiles", 0);
+  yTiles = grid.Design().cfg.ValueOf("FGRRouting.nVertTiles", 0);
 
   if (xTiles * yTiles == 0)
   {
@@ -376,10 +376,10 @@ void FGR::parseInputAsLab(HDPGrid& grid)
 
   outfile << "grid size " << xTiles << "x" << yTiles << endl;
 
-  unsigned vcap = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.verticalCapacity", 20);
+  unsigned vcap = grid.Design().cfg.ValueOf("FGRRouting.verticalCapacity", 20);
   vertCaps.push_back(vcap);
 
-  unsigned hcap = grid.Design().cfg.ValueOf("PrintingToRoutersFormats.horizontalCapacity", 20);
+  unsigned hcap = grid.Design().cfg.ValueOf("FGRRouting.horizontalCapacity", 20);
   horizCaps.push_back(hcap);
 
   minWidths.push_back(0);
