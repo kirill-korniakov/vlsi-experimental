@@ -30,9 +30,8 @@ def send_mail(
     msg['Subject'] = subject
 
     msg.attach(MIMEText(text))
+    #msg.attach(MIMEText(text, "html", "UTF-8"))
 
-#    files = ["testAttach.txt"]
-#    files = ["pythonOutput_ispd04.xls"]
     for file in files:
         part = MIMEBase('application', "octet-stream")
         #part.set_payload(open(file, "rb").read())
