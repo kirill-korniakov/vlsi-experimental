@@ -376,11 +376,43 @@ void FGR::parseInputAsLab(HDPGrid& grid)
 
   outfile << "grid size " << xTiles << "x" << yTiles << endl;
 
-  unsigned vcap = grid.Design().cfg.ValueOf("FGRRouting.verticalCapacity", 20);
-  vertCaps.push_back(vcap);
+  unsigned vcap, hcap;
 
-  unsigned hcap = grid.Design().cfg.ValueOf("FGRRouting.horizontalCapacity", 20);
+  if (grid.Design().cfg.ValueOf("FGRRouting.calculateCapacity", false))
+  {
+    double rowHeight          = grid.SiteHeight();
+    double Pitch              = 0;
+    unsigned powerTracsPerRow = grid.Design().cfg.ValueOf(
+                                "FGRRouting.powerTracsPerRow", 2);
+
+    for (HRoutingLayers::EnumeratorW layer =
+         grid.Design().RoutingLayers.GetEnumeratorW(); layer.MoveNext(); )
+    {
+      if (layer.Name() == "Metal2" || layer.Name() == "metal2")
+      {
+        Pitch = layer.Pitch();
+        break;
+      }
+    }
+
+    if (Pitch == 0)
+    {
+      LOGCRITICAL("Pitch of layer2 was not found");
+    }
+
+    vcap = (1 - powerTracsPerRow * Pitch / rowHeight) * 2 * rowHeight / Pitch;
+    hcap = vcap;
+  }
+
+  else
+  {
+    vcap = grid.Design().cfg.ValueOf("FGRRouting.verticalCapacity", 20);
+    hcap = grid.Design().cfg.ValueOf("FGRRouting.horizontalCapacity", 20);
+  }
+
+  vertCaps.push_back(vcap);
   horizCaps.push_back(hcap);
+  outfile << "vertical capacity   " << vcap << "\nhorizontal capacity " <<hcap<< endl;
 
   minWidths.push_back(0);
   minSpacings.push_back(0);
