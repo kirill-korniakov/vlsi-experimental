@@ -505,16 +505,16 @@ void TileGrid::DrawPinDensity(HDesign& hd, int nMaxPins)
   }
 }
 
-void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxLines)
+void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMax—Lines)
 {
   for (HCriticalPaths::EnumeratorW path = hd.CriticalPaths.GetEnumeratorW(); path.MoveNext();)
   {
     HCriticalPath::PointsEnumeratorW currPoint = path.GetEnumeratorW();
+    currPoint.MoveNext();
     int nCriticalPoints = 1;
     HPinWrapper currPin = hd[hd.Get<HTimingPoint::Pin, HPin>(currPoint.TimingPoint())];
     double x1 = currPin.X();
     double y1 = currPin.Y();
-    currPoint.MoveNext();
 
     while (currPoint.MoveNext())
     {
@@ -529,6 +529,7 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxLines)
       criticalLines.push_back(newLine);
       x1 = x2;
       y1 = y2;
+      currPoint.MoveNext();
     }
     
     if (nCriticalPoints <= 1)
@@ -540,6 +541,12 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxLines)
   //draw
   CalcCriticalWires(hd);
 
+  if (lines.size() != 0)
+  {
+    int nMaxAllLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 10);
+    nMax—Lines = nMaxAllLines * criticalLines.size() / lines.size();
+  }
+
   for (int i = 0; i < nHorTiles; i++)
   {
     for (int j = 0; j < nVertTiles; j++)
@@ -549,7 +556,7 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxLines)
       double x2 = x1 + tileWidth;
       double y2 = y1 + tileHeight;
       hd.Plotter.DrawTileWires(x1, y1, x2, y2, tiles[i][j].GetNCriticalWires(),
-                               nMaxLines);
+                               nMax—Lines);
     }
   }
 }

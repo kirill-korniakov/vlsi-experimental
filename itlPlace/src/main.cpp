@@ -135,11 +135,11 @@ int main(int argc, char** argv)
 
       if (hd.cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
       {          
-        int nHorTiles  = hd.cfg.ValueOf("CongestionMap.nHorTiles", 20);
-        int nVertTiles = hd.cfg.ValueOf("CongestionMap.nVertTiles", 20);
-        int nMaxLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 50);
-        int nMaxPins   = hd.cfg.ValueOf("CongestionMap.nMaxPins", 20);
-        int nMaxCLines = hd.cfg.ValueOf("CongestionMap.nMaxCLines", 10);
+        int nHorTiles  = DPGrid.NumRows();
+        int nVertTiles = nHorTiles;
+        int nMaxLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 10);
+        int nMaxPins   = hd.cfg.ValueOf("CongestionMap.nMaxPins", 10);
+        int nMaxCLines = hd.cfg.ValueOf("CongestionMap.nMaxCLines", 4);
 
         TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
 

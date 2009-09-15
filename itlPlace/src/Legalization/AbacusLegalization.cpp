@@ -457,7 +457,7 @@ void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const
           }
         }
       }      
-      //pointsEnumW.MoveNext();
+      pointsEnumW.MoveNext();
     }
   }
 }
