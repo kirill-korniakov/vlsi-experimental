@@ -78,6 +78,9 @@ public:
   VGNode GetVGTree();
   int NetBufferNotDegradation(HNet &net);
 
+  int GetNCandidatesForBuffering();
+  int GetNReverts();
+
 private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
 
@@ -123,7 +126,6 @@ private:
   HWirePhysicalParams m_WirePhisics;
   HDesign&            m_hd;
   VGNode              m_vgNetSplitted;
-  int                 m_nCandidatesForBuffering;  //количество нетов которые хотели буферизовать
   int*                m_buffersIdxsAtNetSplitted; //индексы звеньев в которые рекомендуется вставить буферы,
                                                   //m_buffersIdxsAtNetSplitted[i][0] храним длину значимой области 
 
@@ -139,6 +141,9 @@ private:
   int m_BestPlacementCellsCount;
   Placement* m_BestPlacement;
   HDPGrid DPGrid;
+
+  int m_nCandidatesForBuffering;  //количество нетов которые хотели буферизовать
+  int m_nReverts; //количество откато
 
 };
 

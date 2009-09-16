@@ -173,22 +173,7 @@ int main(int argc, char** argv)
     //BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
-      //FIXME: delete this block
-      for (HNets::NetsEnumeratorW nIter = hd.Nets.GetNetsEnumeratorW();
-                                                      nIter.MoveNext(); ) 
-      {
-        if (nIter.Name() == "overflw__BufferedPart_0" ||
-          nIter.Name() == "overflw__BufferedPart_1")
-        {
-          ReportNetPinsCoordinates(hd, nIter);
-          ReportNetTiming(hd, nIter);
-          hd.Plotter.ShowPlacement();
-          hd.Plotter.PlotNetSteinerTree(nIter, Color_Black);
-          hd.Plotter.PlotText(hd.Nets.GetString<HNet::Name>(nIter));
-          hd.Plotter.Refresh(HPlotter::WAIT_10_SECONDS);
-        }
-      }
-      TestBuffering(hd);
+      NetlistBuffering(hd);
     }
 
     //EXPORT

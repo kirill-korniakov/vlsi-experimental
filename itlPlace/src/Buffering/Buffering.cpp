@@ -11,8 +11,6 @@ void NetlistBuffering(HDesign& design)
   ConfigContext ctx = design.cfg.OpenContext("Buffering");
   WRITELINE("");
   ALERT("BUFFERING STARTED");
-
-  //report
   ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA before buffering:");
   STA(design);
@@ -20,38 +18,29 @@ void NetlistBuffering(HDesign& design)
   //buffering
   VanGinneken vg(design);
   HDPGrid DPGrid(design);
-  for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
-  {
-    vg.NetBuffering(nIter);
-    //FindTopologicalOrder(design);
-    ALERT("not legalized");
-    STA(design);
-    ALERT("legalized");
-    Legalization(DPGrid);
-    STA(design);
-  }
-  
-  //report
+
+  ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
+  ALERTFORMAT(("Net candidates for buffering = %d", vg.GetNCandidatesForBuffering()));
+  ALERTFORMAT(("Reverts = %d", vg.GetNReverts()));
   WRITELINE("");
+
   ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering (not legalized):");
   STA(design);
   design.Plotter.ShowPlacement();
   design.Plotter.SaveMilestoneImage("BI");
 
-
   //legalization
   WRITELINE("");
   ALERT("Legalization after buffering:");
   Legalization(DPGrid);
-  
-  //report
+  design.Plotter.ShowPlacement();
+  design.Plotter.SaveMilestoneImage("BI+LEG");
+
   WRITELINE("");
   ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering and legalization:");
   STA(design);
-  design.Plotter.ShowPlacement();
-  design.Plotter.SaveMilestoneImage("BI+LEG");
 
   ALERT("BUFFERING FINISHED");
 }

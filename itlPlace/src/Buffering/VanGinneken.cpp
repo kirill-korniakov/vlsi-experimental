@@ -37,7 +37,8 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   m_WirePhisics.SetLinearC(m_WirePhisics.LinearC * FBI_WIRE_CAPACITANCE_SCALING);  //convert to the femtoFarad/10^-6m
   m_WirePhisics.SetRPerDist(m_WirePhisics.RPerDist * FBI_WIRE_RESISTANCE_SCALING); //convert to the ohms/10^-6m
 
-  m_nCandidatesForBuffering = -1;
+  m_nCandidatesForBuffering = 0;
+  m_nReverts = 0;
   m_nCriticalPaths = 0;
 
   m_vgNetSplitted.NULLPointer();
@@ -598,6 +599,8 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
       return nBuffersInserted;
     }
 
+    m_nReverts++;
+
     m_hd.Nets.Set<HNet::Kind>(net, netKind);
     for (int i = 0; i <= m_buffersIdxsAtNetSplitted[0]; i++)
       m_hd.Nets.Set<HNet::Kind>(newNet[i], NetKind_Removed);
@@ -935,7 +938,8 @@ int VanGinneken::CriticalPathBuffering(HCriticalPath aPath)
     else
       nBuf += NetBuffering(net);
   }
-  Legalization(DPGrid);
+  if (m_hd.cfg.ValueOf(".isLegalization", false))
+    Legalization(DPGrid);
   return nBuf;
 }
 
@@ -1119,4 +1123,14 @@ void VanGinneken::RestoreBestAchievedPlacement()
       cell.SetY(m_BestPlacement[i].BestPlacementCellsY);
     }
   }
+}
+
+int VanGinneken::GetNCandidatesForBuffering()
+{
+  return m_nCandidatesForBuffering;
+}
+
+int VanGinneken::GetNReverts()
+{
+  return m_nReverts;
 }
