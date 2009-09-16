@@ -27,6 +27,8 @@ class NewNetAndCell
 {
 public:
   NewNetAndCell(int netCount, int celCount, HNet netOld);
+  NewNetAndCell();
+  NewNetAndCell(const NewNetAndCell& m);
   ~NewNetAndCell();
 
   int GetNNET();
@@ -37,6 +39,8 @@ public:
   
   void SetNet(HNet newNet, int index); 
   void SetCell(HCell newCell, int index);
+
+  NewNetAndCell& operator = (const NewNetAndCell& m );
 
 protected:
   int nNet;

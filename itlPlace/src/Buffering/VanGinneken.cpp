@@ -54,7 +54,7 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   bestWNS = INFINITY;
   m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
   m_BestPlacement = new Placement [m_BestPlacementCellsCount];
-  
+
 
 };
 
@@ -417,7 +417,7 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
     int y = t->LeftStep()->Index();
     t->BackStep();
     sleft = add_buffer(k1, sleft, x, y);
-    
+
     sleft = redundent(sleft);
     //NOTE: if the node has only one child (default left), only 
     //return update solution of left child 
@@ -431,7 +431,7 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
       int y = t->RightStep()->Index();
       t->BackStep();
       sright = add_buffer(k2, sright, x, y);
-      
+
       sright = redundent(sright);
     }
   }	
@@ -509,14 +509,16 @@ int VanGinneken::NetBuffering(HNet& net)
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     CreateNetsAndCells(net);
 
+    delete [] m_buffersIdxsAtNetSplitted;
     return nBuffersInserted;
   }
   else
   {
+    delete [] m_buffersIdxsAtNetSplitted;
     return 0;
   }
 
-  delete [] m_buffersIdxsAtNetSplitted;
+
 }
 
 int VanGinneken::NetBufferNotDegradation(HNet &net)
@@ -572,79 +574,67 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double tnsBeforeBuffering = Utils::TNS(m_hd);
     double wnsBeforeBuffering = Utils::WNS(m_hd);
     SaveCurrentPlacementAsBestAchieved();
-    
-    NetKind netKind = m_hd.Nets.Get<HNet::Kind, NetKind>(net);
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
-    
-    HCell* insertedBuffers = new HCell[m_buffersIdxsAtNetSplitted[0]];
-    HNet* newNet = new HNet[m_buffersIdxsAtNetSplitted[0] + 1];
-    
-    CreateCells(string("InsertedBuffer_") + m_hd[net].Name(), insertedBuffers);
 
-    CreateNets(net, insertedBuffers, newNet);
+    CreateNetsAndCells(net);
 
-    //Legalization(DPGrid);
 
     STA(m_hd, m_doReportBuffering);
     double tnsAfterLegalization = Utils::TNS(m_hd);
     double wnsAfterLegalization = Utils::WNS(m_hd);
 
-    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering) && (bestTNS > tnsAfterLegalization) && (bestWNS > wnsAfterLegalization))
+    if ((tnsAfterLegalization <= tnsBeforeBuffering) && (wnsAfterLegalization <= wnsBeforeBuffering) 
+      && (bestTNS >= tnsAfterLegalization) && (bestWNS >= wnsAfterLegalization))
     {
-      delete [] newNet;
-      delete [] insertedBuffers;
       bestTNS = tnsAfterLegalization;
       bestWNS = wnsAfterLegalization;
       ALERTFORMAT(("buffer insite = %d", nBuffersInserted));
+      delete [] m_buffersIdxsAtNetSplitted;
       return nBuffersInserted;
     }
 
     m_nReverts++;
 
-    m_hd.Nets.Set<HNet::Kind>(net, netKind);
-    for (int i = 0; i <= m_buffersIdxsAtNetSplitted[0]; i++)
-      m_hd.Nets.Set<HNet::Kind>(newNet[i], NetKind_Removed);
+    RemoveNewNetAndCell(net);
 
-    for (int j = 0; j < m_buffersIdxsAtNetSplitted[0]; j++)
-    {
-      for (HCell::PinsEnumeratorW cellPinIter = m_hd[insertedBuffers[j]].GetPinsEnumeratorW(); cellPinIter.MoveNext();)
-      {
-        if ((cellPinIter.Direction() == PinDirection_INPUT) || (cellPinIter.Direction() == PinDirection_OUTPUT))
-        {
-          Utils::DeletePointInList(m_hd, m_hd.TimingPoints[cellPinIter]);
-        }
-      }
-      m_hd.Cells.Set<HCell::PlacementStatus>(insertedBuffers[j], PlacementStatus_Fictive);
-    }
-    
-    delete [] newNet;
-    delete [] insertedBuffers;
-    m_hd.TimingPoints.CountStartAndEndPoints();
-    RestoreBestAchievedPlacement();
-    STA(m_hd, m_doReportBuffering);
-    double tns = Utils::TNS(m_hd);
-    double wns = Utils::WNS(m_hd);
-
+    delete [] m_buffersIdxsAtNetSplitted;
     return 0;
   }
   else
   {
+    delete [] m_buffersIdxsAtNetSplitted;
     return 0;
   }
-
-  delete [] m_buffersIdxsAtNetSplitted;
-
 }
 
- void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
- {
-   NameFindNNC findNNC(oldNet);
-  // NewNetAndCell newNetAndCell = 
-  // newNetAndCellcollection
-     std::find_if(newNetAndCellcollection.begin(), newNetAndCellcollection.end(), findNNC);
-//newNetAndCellcollection.
-   //.value_type.GetNNet()
- }
+void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
+{
+  NameFindNNC findNNC(oldNet);
+  NewNetAndCell newNetAndCell;
+  if (newNetAndCellcollection[newNetAndCellcollection.size() - 1].GetOldNet() == oldNet)
+    newNetAndCell = newNetAndCellcollection[newNetAndCellcollection.size() - 1];
+  else
+    newNetAndCell = std::find_if(newNetAndCellcollection.begin(), newNetAndCellcollection.end(), findNNC)[0];
+
+  m_hd.Nets.Set<HNet::Kind>(oldNet, NetKind_Active);
+  for (int i = 0; i < newNetAndCell.GetNNET(); i++)
+    m_hd.Nets.Set<HNet::Kind>(newNetAndCell.GetNet(i), NetKind_Removed);
+
+  for (int j = 0; j < newNetAndCell.GetNCell(); j++)
+  {
+    for (HCell::PinsEnumeratorW cellPinIter = m_hd[newNetAndCell.GetCell(j)].GetPinsEnumeratorW(); cellPinIter.MoveNext();)
+    {
+      if ((cellPinIter.Direction() == PinDirection_INPUT) || (cellPinIter.Direction() == PinDirection_OUTPUT))
+      {
+        Utils::DeletePointInList(m_hd, m_hd.TimingPoints[cellPinIter]);
+      }
+    }
+    m_hd.Cells.Set<HCell::PlacementStatus>(newNetAndCell.GetCell(j), PlacementStatus_Fictive);
+  }
+
+  m_hd.TimingPoints.CountStartAndEndPoints();
+  RestoreBestAchievedPlacement();
+}
 
 void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nodeStart, int startNodeIdx,  
                                HNetWrapper::PinsEnumeratorW& subNetPinEnum, bool doIndexesClear)
@@ -745,7 +735,7 @@ int VanGinneken::RunVG(HNet& net)
   double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
-  
+
   if (m_hd.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>((m_hd.SteinerPoints[m_hd[net].Source()])) != nullSP)
   {
     ALERTFORMAT(("In source 2 edges"));
@@ -755,7 +745,7 @@ int VanGinneken::RunVG(HNet& net)
     double newSlackAtSource;
     double driverResistance = m_AvailableBuffers[0].Resistance;
     m_VGOutput = van(&m_vgNetSplitted, newSlackAtSource, driverResistance);
-    
+
     if (m_doReportBuffering)
     {
       ALERTFORMAT(("(vananswer) RAT at source AB = %.10f", newSlackAtSource));
@@ -815,8 +805,8 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
 
       if (m_doReportBuffering)
         ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), bufferX, bufferY, m_buffersIdxsAtNetSplitted[i]));
-        //ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), vgBuffer.x, vgBuffer.y, m_buffersIdxsAtNetSplitted[i]));
-      
+      //ALERTFORMAT(("  %s: x = %.10f\ty = %.10f\tindex = %d", bufferFullName.c_str(), vgBuffer.x, vgBuffer.y, m_buffersIdxsAtNetSplitted[i]));
+
       if (m_hd.cfg.ValueOf(".plotBuffering", false))
       {
         m_hd.Plotter.PlotCell(insertedBuffers[i - 1], Color_Orange);
@@ -848,7 +838,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
 
   //init source
   m_hd.Nets.Set<HNet::Source, HPin>(subNet, m_hd[net].Source());
-  
+
   //add other pins
   AddSinks2Net(insertedBuffers, subNet, m_vgNetSplitted, 0, m_hd[subNet].GetSinksEnumeratorW(), true);
 
@@ -881,8 +871,8 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     //add other pins
     VGNode& nodeStart2 = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
     AddSinks2Net(insertedBuffers, subNet, nodeStart2, m_buffersIdxsAtNetSplitted[j], m_hd[subNet].GetSinksEnumeratorW());
-    
-    
+
+
     if (m_hd.cfg.ValueOf(".plotBuffering", false))
     {
       m_hd.Plotter.PlotNetSteinerTree(subNet, Color_Magenta);
@@ -902,7 +892,7 @@ void VanGinneken::CreateNetsAndCells(HNet& net)
   HCell* insertedBuffers = new HCell[m_buffersIdxsAtNetSplitted[0]];
   HNet* newNet = new HNet[m_buffersIdxsAtNetSplitted[0] + 1];
 
-  
+
   CreateCells(string("InsertedBuffer_") + m_hd[net].Name(), insertedBuffers);
 
   CreateNets(net, insertedBuffers, newNet);
@@ -913,8 +903,9 @@ void VanGinneken::CreateNetsAndCells(HNet& net)
     newNetAndCell.SetNet(newNet[i], i);
   for (int i = 0; i < m_buffersIdxsAtNetSplitted[0]; i++)
     newNetAndCell.SetCell(insertedBuffers[i], i);
-  
-  newNetAndCellcollection.push_back(newNetAndCell);
+
+  NewNetAndCell bufernNNC = newNetAndCell;
+  newNetAndCellcollection.push_back(bufernNNC);
 
   delete [] insertedBuffers;
   delete [] newNet;
@@ -935,7 +926,7 @@ int VanGinneken::BufferingOfMostCriticalPaths(int nPaths)
     idx++;
   }
   std::sort(vecPath.begin(), vecPath.end(), NameSortCPC());
-  
+
   for (int i = 0; (i < countCP) && (!isCompleted); i++)
   {
     if ((nPaths != 0) && (i >= nPaths))
@@ -979,10 +970,10 @@ void VanGinneken::ParsingFinalLocationVan(VanGinneken::Comp *com)
   }
   VGItem resultBuf;
   if ((com->buffertype != 0) && (com->buffertype != -1) && 
-      (!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) //&&
-      //(!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) &&
-      //(com->x != com->y)
-     )
+    (!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) //&&
+    //(!m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, resultBuf, true).IsReal()) &&
+    //(com->x != com->y)
+    )
   {
     int i = GetIdx(m_buffersIdxsAtNetSplitted, com->y);
     if (i == -1)
@@ -1100,7 +1091,7 @@ double VanGinneken::CalculationOptimumNumberBuffers(HNet net)
   double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
   double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
   return (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
-  
+
 }
 
 void VanGinneken::SaveCurrentPlacementAsBestAchieved()
@@ -1108,7 +1099,7 @@ void VanGinneken::SaveCurrentPlacementAsBestAchieved()
   if(m_BestPlacementCellsCount < m_hd.Cells.CellsCount())
   {
     delete[] m_BestPlacement;
-    
+
     m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
     m_BestPlacement = new Placement [m_BestPlacementCellsCount];
   }
@@ -1172,6 +1163,29 @@ NewNetAndCell::~NewNetAndCell()
   delete [] cell;
 }
 
+NewNetAndCell::NewNetAndCell()
+{
+  nNet = 1;
+  nCell = 1;
+  net = new HNet [nNet];
+  cell = new HCell [nCell];
+}
+
+NewNetAndCell::NewNetAndCell(const NewNetAndCell& m)
+{
+  nNet = m.nNet;
+  nCell = m.nCell;
+  oldNet = m.oldNet;
+  net = new HNet [nNet];
+  cell = new HCell [nCell];
+
+  for (int i = 0; i < nNet; i++)
+    net[i] = m.net[i];
+
+  for (int j = 0; j < nCell; j++)
+    cell[j] = m.cell[j];
+}
+
 int NewNetAndCell::GetNNET()
 {
   return nNet;
@@ -1217,7 +1231,7 @@ void NewNetAndCell::SetNet(HNet newNet, int index)
 void NewNetAndCell::SetCell(HCell newCell, int index)
 {
   if ((index < nCell) && (index >= 0))
-     cell[index] = newCell;
+    cell[index] = newCell;
   else
   {
     ERROR_ASSERT(((index < nCell) && (index >= 0)));
@@ -1227,4 +1241,23 @@ void NewNetAndCell::SetCell(HCell newCell, int index)
 HNet NewNetAndCell::GetOldNet()
 {
   return oldNet;
+}
+
+NewNetAndCell& NewNetAndCell::operator = (const NewNetAndCell& m )
+{
+  delete [] net;
+  delete [] cell;
+  nNet = m.nNet;
+  nCell = m.nCell;
+  oldNet = m.oldNet;
+  net = new HNet [nNet];
+  cell = new HCell [nCell];
+
+  for (int i = 0; i < nNet; i++)
+    net[i] = m.net[i];
+
+  for (int j = 0; j < nCell; j++)
+    cell[j] = m.cell[j];
+
+  return *this;
 }

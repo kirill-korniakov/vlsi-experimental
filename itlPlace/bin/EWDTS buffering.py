@@ -21,6 +21,9 @@ def parseLog(logName, benchmark):
     blHPWL = 0.0
     blTNS  = 0.0
     blWNS  = 0.0
+    bi = 0
+    Candidates = 0
+    Reverts = 0
 
     for line in fh.readlines():
         #get HPWL
@@ -110,6 +113,25 @@ def parseLog(logName, benchmark):
             po.write(line[1:11].replace('.', ',') + '\t')
             po.write('\t')
             continue
+        
+        idx = line.find('Buffer inside = ')
+        if idx != -1:
+            bi = line[idx + len('Buffer inside = '):-1]
+            po.write(bi + '\t')
+            continue
+
+        idx = line.find('Net candidates for buffering = ')
+        if idx != -1:
+            Candidates = line[idx + len('Net candidates for buffering = '):-1]
+            po.write(Candidates + '\t')
+            continue
+
+        idx = line.find('Reverts = ')
+        if idx != -1:
+            Reverts = line[idx + len('Reverts = '):-1]
+            po.write(Reverts + '\t')
+            continue
+            
 
     fh.close()
     po.close()
@@ -124,7 +146,7 @@ po = open(outputFileName, 'w')
 #if (po == NULL):
 #    print('Couldn't open ' + outputFileName + '. Exiting.')
 #    exit
-po.write('\tHPWL\tTNS\tWNS\tTime\t\tbHPWL\tbTNS\tbWNS\tbTime\t\tblHPWL\tblTNS\tblWNS\tblTime\t')
+po.write('\tHPWL\tTNS\tWNS\tTime\t\tbHPWL\tbTNS\tbWNS\tbTime\t\tblHPWL\tblTNS\tblWNS\tblTime\tBuffer inside\tCandidates\tReverts')
 po.close()
 
 for benchmark in testSet:
