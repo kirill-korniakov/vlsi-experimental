@@ -23,6 +23,44 @@ class HDesign;
 #define PREDICT 1 //NOTE: predictive pruning 
 #define TREATZERO 1
 
+class NewNetAndCell
+{
+public:
+  NewNetAndCell(int netCount, int celCount, HNet netOld);
+  ~NewNetAndCell();
+
+  int GetNNET();
+  int GetNCell();
+  HNet GetNet(int index);
+  HCell GetCell(int index);
+  HNet GetOldNet();
+  
+  void SetNet(HNet newNet, int index); 
+  void SetCell(HCell newCell, int index);
+
+protected:
+  int nNet;
+  int nCell;
+  HNet* net;
+  HCell* cell;
+  HNet oldNet;
+};
+
+class NameFindNNC
+{  
+public:
+  HNet net;
+  NameFindNNC(HNet& newNet)
+  {
+    net = newNet;
+  }
+
+  bool operator() (NewNetAndCell& a)
+  { 
+      return a.GetOldNet()  == net; 
+  };
+};
+
 class VanGinneken
 {
 private:
@@ -81,6 +119,7 @@ public:
   int GetNCandidatesForBuffering();
   int GetNReverts();
 
+  void RemoveNewNetAndCell(HNet oldNet);
 private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
 
@@ -144,6 +183,8 @@ private:
 
   int m_nCandidatesForBuffering;  //количество нетов которые хотели буферизовать
   int m_nReverts; //количество откато
+
+  std::vector<NewNetAndCell> newNetAndCellcollection;
 
 };
 

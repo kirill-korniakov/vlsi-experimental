@@ -636,6 +636,16 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
 }
 
+ void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
+ {
+   NameFindNNC findNNC(oldNet);
+  // NewNetAndCell newNetAndCell = 
+  // newNetAndCellcollection
+     std::find_if(newNetAndCellcollection.begin(), newNetAndCellcollection.end(), findNNC);
+//newNetAndCellcollection.
+   //.value_type.GetNNet()
+ }
+
 void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nodeStart, int startNodeIdx,  
                                HNetWrapper::PinsEnumeratorW& subNetPinEnum, bool doIndexesClear)
 {
@@ -892,9 +902,19 @@ void VanGinneken::CreateNetsAndCells(HNet& net)
   HCell* insertedBuffers = new HCell[m_buffersIdxsAtNetSplitted[0]];
   HNet* newNet = new HNet[m_buffersIdxsAtNetSplitted[0] + 1];
 
+  
   CreateCells(string("InsertedBuffer_") + m_hd[net].Name(), insertedBuffers);
 
   CreateNets(net, insertedBuffers, newNet);
+
+  NewNetAndCell newNetAndCell(m_buffersIdxsAtNetSplitted[0] + 1, m_buffersIdxsAtNetSplitted[0], net);
+
+  for (int i = 0; i <= m_buffersIdxsAtNetSplitted[0]; i++)
+    newNetAndCell.SetNet(newNet[i], i);
+  for (int i = 0; i < m_buffersIdxsAtNetSplitted[0]; i++)
+    newNetAndCell.SetCell(insertedBuffers[i], i);
+  
+  newNetAndCellcollection.push_back(newNetAndCell);
 
   delete [] insertedBuffers;
   delete [] newNet;
@@ -915,6 +935,7 @@ int VanGinneken::BufferingOfMostCriticalPaths(int nPaths)
     idx++;
   }
   std::sort(vecPath.begin(), vecPath.end(), NameSortCPC());
+  
   for (int i = 0; (i < countCP) && (!isCompleted); i++)
   {
     if ((nPaths != 0) && (i >= nPaths))
@@ -1133,4 +1154,77 @@ int VanGinneken::GetNCandidatesForBuffering()
 int VanGinneken::GetNReverts()
 {
   return m_nReverts;
+}
+
+NewNetAndCell::NewNetAndCell(int netCount, int celCount, HNet netOld)
+{
+  nNet = netCount;
+  nCell = celCount;
+  oldNet = netOld;
+
+  net = new HNet [nNet];
+  cell = new HCell [nCell];
+};
+
+NewNetAndCell::~NewNetAndCell()
+{
+  delete [] net;
+  delete [] cell;
+}
+
+int NewNetAndCell::GetNNET()
+{
+  return nNet;
+}
+
+int NewNetAndCell::GetNCell()
+{
+  return nCell;
+}
+
+HNet NewNetAndCell::GetNet(int index)
+{
+  if ((index < nNet) && (index >= 0))
+    return net[index];
+  else
+  {
+    ERROR_ASSERT(((index < nNet) && (index >= 0)));
+    return net[nNet - 1];
+  }
+}
+
+HCell NewNetAndCell::GetCell(int index)
+{
+  if ((index < nCell) && (index >= 0))
+    return cell[index];
+  else
+  {
+    ERROR_ASSERT(((index < nCell) && (index >= 0)));
+    return cell[nCell - 1];
+  }
+}
+
+void NewNetAndCell::SetNet(HNet newNet, int index)
+{
+  if ((index < nNet) && (index >= 0))
+    net[index] = newNet;
+  else
+  {
+    ERROR_ASSERT(((index < nNet) && (index >= 0)));
+  }
+}
+
+void NewNetAndCell::SetCell(HCell newCell, int index)
+{
+  if ((index < nCell) && (index >= 0))
+     cell[index] = newCell;
+  else
+  {
+    ERROR_ASSERT(((index < nCell) && (index >= 0)));
+  }
+}
+
+HNet NewNetAndCell::GetOldNet()
+{
+  return oldNet;
 }
