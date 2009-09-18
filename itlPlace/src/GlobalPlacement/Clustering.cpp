@@ -232,7 +232,7 @@ void Merge(std::vector<int>& a, std::vector<int>& b, int result[])
     result[pos3++] = a[pos1++];
 }
 
-double AffinityLite(std::vector<int>& a, std::vector<int>& b, int* netListSizes, Cluster& ac, Cluster& bc)
+double AffinityLite(HDesign& hd, std::vector<int>& a, std::vector<int>& b, int* netListSizes, Cluster& ac, Cluster& bc)
 {
   double result = 0.0;
   long size1 = static_cast<int>(a.size());
@@ -248,7 +248,7 @@ double AffinityLite(std::vector<int>& a, std::vector<int>& b, int* netListSizes,
     else
     {
       if (netListSizes[a[pos1]] > 1)
-        result += 1 / ((netListSizes[a[pos1]] - 1) * ac.area * bc.area);
+        result += hd._Design.NetList.netWeight[pos1] / ((netListSizes[a[pos1]] - 1) * ac.area * bc.area);
       ++pos1;
       ++pos2;
     }
@@ -256,11 +256,11 @@ double AffinityLite(std::vector<int>& a, std::vector<int>& b, int* netListSizes,
   return result;
 }
 
-double Affinity(const int& firstClusterIdx, const int& secondClusterIdx, 
+double Affinity(HDesign& hd, const int& firstClusterIdx, const int& secondClusterIdx, 
              std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
              std::vector<ConnectionsVector>& currTableOfAdjacentNets)
 {
-  return AffinityLite(currTableOfAdjacentNets[firstClusterIdx],
+  return AffinityLite(hd, currTableOfAdjacentNets[firstClusterIdx],
     currTableOfAdjacentNets[secondClusterIdx],
     netListSizes,
     clusters[firstClusterIdx],
@@ -396,7 +396,7 @@ int FindBestNeighbour(HDesign& hd, ClusteringInformation& ci, int* netListSizes,
       if (!AreClustersMergeable(ci, mergeCandidate.clusterIdx, neighborCandidateIdx))
         continue;
       
-      double score = Affinity(mergeCandidate.clusterIdx, neighborCandidateIdx, ci.clusters, ci.netList, 
+      double score = Affinity(hd, mergeCandidate.clusterIdx, neighborCandidateIdx, ci.clusters, ci.netList, 
                               netListSizes, ci.tableOfAdjacentNets);
 
       if (mergeCandidate.score < score)

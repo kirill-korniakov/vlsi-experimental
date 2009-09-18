@@ -88,7 +88,7 @@ typedef std::list<ClusteringInfoAtEachLevel>::reverse_iterator ClusteringLogIter
 
 typedef std::list<NetList>::reverse_iterator NetLevelsIterator;
 
-typedef double (*pAffinityFunction)(const int& firstClusterIdx, const int& secondClusterIdx,
+typedef double (*pAffinityFunction)(HDesign& hd, const int& firstClusterIdx, const int& secondClusterIdx,
                                     std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
                                     std::vector<ConnectionsVector>& currTableOfAdjacentNets);
 
@@ -146,7 +146,7 @@ bool PredicateMergePairGreater(MergeCandidate elem1, MergeCandidate elem2);
 //double AffinityInterp(const int& firstClusterIdx, const int& secondClusterIdx,
 //                   std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
 //                   std::vector<ConnectionsVector>& currTableOfAdjacentNets);
-double Affinity(const int& firstClusterIdx, const int& secondClusterIdx, 
+double Affinity(HDesign& hd, const int& firstClusterIdx, const int& secondClusterIdx, 
              std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
              std::vector<ConnectionsVector>& currTableOfAdjacentNets);
 // affinity function that considers euclidean distance
