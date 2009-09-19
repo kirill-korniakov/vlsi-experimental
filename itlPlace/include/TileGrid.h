@@ -12,8 +12,8 @@
 #include "HDPGrid.h"
 #include "Line.h"
 #include "HPlotter.h"
-#include "OpenCV/cv.h"
-#include "OpenCV/highgui.h"
+
+void PlotCongestionMaps(HDPGrid& DPGrid);
 
 struct TileIndexes
 {

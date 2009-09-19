@@ -31,6 +31,7 @@ protected:
  public:
   Line(double _x1, double _y1, double _x2, double _y2);
   ~Line() {}
+  double GetLineType() {return lineType;}
   double GetX1() { return x1; }
   double GetY1() { return y1; }
   double GetX2() { return x2; }

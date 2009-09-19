@@ -7,9 +7,8 @@
 
 #include "TileGrid.h"
 #include <stdio.h>
-#include "OpenCV/cv.h"
-#include "OpenCV/highgui.h"
 #include "HCriticalPath.h"
+#include <conio.h>
 
 
 TileGrid::TileGrid(int nHor, int nVert, HDPGrid& grid): nHorTiles(nHor), nVertTiles(nVert)
@@ -114,7 +113,9 @@ void TileGrid::GetLinesFromTree(HSteinerPoint& _point, HDesign& _design)
     double x2 = _design.GetDouble<HSteinerPoint::X>(leftPoint);
     double y2 = _design.GetDouble<HSteinerPoint::X>(leftPoint);
     Line newLine(x1, y1, x2, y2);
-    lines.push_back(newLine);
+
+    if (newLine.GetLineType() > -1)
+      lines.push_back(newLine);
     GetLinesFromTree(leftPoint, _design);
   }
 
@@ -124,7 +125,9 @@ void TileGrid::GetLinesFromTree(HSteinerPoint& _point, HDesign& _design)
     double x2 = _design.GetDouble<HSteinerPoint::X>(rightPoint);
     double y2 = _design.GetDouble<HSteinerPoint::X>(rightPoint);
     Line newLine(x1, y1, x2, y2);
-    lines.push_back(newLine);
+
+    if (newLine.GetLineType() > -1)
+      lines.push_back(newLine);
     GetLinesFromTree(rightPoint, _design);
   }
 }
@@ -526,7 +529,9 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMax—Lines)
       double x2 = currentPin.X();
       double y2 = currentPin.Y();
       Line newLine(x1, y1, x2, y2);
-      criticalLines.push_back(newLine);
+
+      if (newLine.GetLineType() > -1)
+        criticalLines.push_back(newLine);
       x1 = x2;
       y1 = y2;
       currPoint.MoveNext();
@@ -559,4 +564,27 @@ void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMax—Lines)
                                nMax—Lines);
     }
   }
+}
+
+void PlotCongestionMaps(HDPGrid& DPGrid)
+{
+  int nHorTiles  = DPGrid.NumRows() / 2;
+  int nVertTiles = nHorTiles;
+  int nMaxLines  = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxLines", 10);
+  int nMaxPins   = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxPins", 10);
+  int nMaxCLines = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxCLines", 4);
+
+  TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
+
+  tileGrid.DrawCongestionMap(DPGrid.Design(), nMaxLines);
+  ALERT("press any key to continue...");
+  _getch();
+
+  tileGrid.DrawPinDensity(DPGrid.Design(), nMaxPins);
+  ALERT("press any key to continue...");
+  _getch();
+
+  tileGrid.DrawCriticalCongestionMap(DPGrid.Design(), nMaxCLines);
+  ALERT("press any key to continue...");
+  _getch();
 }

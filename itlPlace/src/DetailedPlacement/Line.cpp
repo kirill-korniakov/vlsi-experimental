@@ -22,8 +22,8 @@ Line::Line(double _x1, double _y1, double _x2, double _y2): x1(_x1), y1(_y1),
 {
   if ((IsEqual(x1, x2)) && (IsEqual(y1, y2)))
   {
-    LOGERROR("error: points are equal!\n");
-    lineType = 1;
+    //LOGERROR("error: points are equal!\n");
+    lineType = -1;
     k = x1;
   }
   

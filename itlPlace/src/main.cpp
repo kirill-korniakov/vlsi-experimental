@@ -11,7 +11,7 @@
 #include "Utils.h"
 #include "Buffering.h"
 #include "TileGrid.h"
-#include <conio.h>
+//#include <conio.h>
 #include "FGR.h"
 
 using namespace libconfig;
@@ -135,25 +135,7 @@ int main(int argc, char** argv)
 
       if (hd.cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
       {          
-        int nHorTiles  = DPGrid.NumRows();
-        int nVertTiles = nHorTiles;
-        int nMaxLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 10);
-        int nMaxPins   = hd.cfg.ValueOf("CongestionMap.nMaxPins", 10);
-        int nMaxCLines = hd.cfg.ValueOf("CongestionMap.nMaxCLines", 4);
-
-        TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
-
-        tileGrid.DrawCongestionMap(hd, nMaxLines);
-        ALERT("press any key to continue...");
-        _getch();
-        
-        tileGrid.DrawPinDensity(hd, nMaxPins);
-        ALERT("press any key to continue...");
-        _getch();
-        
-        tileGrid.DrawCriticalCongestionMap(hd, nMaxCLines);
-        ALERT("press any key to continue...");
-        _getch();
+        PlotCongestionMaps(DPGrid);
       }
 
       if (hd.cfg.ValueOf("DesignFlow.FGRRouting", false))
