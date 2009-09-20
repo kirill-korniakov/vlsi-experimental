@@ -583,8 +583,8 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double tnsAfterLegalization = Utils::TNS(m_hd);
     double wnsAfterLegalization = Utils::WNS(m_hd);
 
-    if ((tnsAfterLegalization <= tnsBeforeBuffering) && (wnsAfterLegalization <= wnsBeforeBuffering) 
-      && (bestTNS >= tnsAfterLegalization) && (bestWNS >= wnsAfterLegalization))
+    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering) 
+      && (bestTNS > tnsAfterLegalization) && (bestWNS > wnsAfterLegalization))
     {
       bestTNS = tnsAfterLegalization;
       bestWNS = wnsAfterLegalization;
@@ -630,6 +630,8 @@ void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
       }
     }
     m_hd.Cells.Set<HCell::PlacementStatus>(newNetAndCell.GetCell(j), PlacementStatus_Fictive);
+    HCellWrapper cw = m_hd[newNetAndCell.GetCell(j)];
+    m_hd._Design.NetList.nCellsEnd--;
   }
 
   m_hd.TimingPoints.CountStartAndEndPoints();
