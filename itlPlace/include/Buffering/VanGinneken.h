@@ -144,6 +144,9 @@ private:
 
   //NOTE: создает и инициализирует VGnode
   int RunVG(HNet& net);
+public:
+  double __DriverResistance;
+private:
 
   void InitializeBuffersIdxs();
 

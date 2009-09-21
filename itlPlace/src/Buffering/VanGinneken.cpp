@@ -461,7 +461,7 @@ int VanGinneken::NetBuffering(HNet& net)
 {
   bool isNewNet = (m_hd.Nets.GetString<HNet::Name>(net).find("BufferedPart") != -1);
   bool isNetBuffered = (m_hd.Nets.Get<HNet::Kind, NetKind>(net) == NetKind_Buffered);
-  bool isNetBufferable = !isNewNet && !m_isFreeSpaceEnded && !isNetBuffered;
+  bool isNetBufferable = true;//!isNewNet && !m_isFreeSpaceEnded && !isNetBuffered;
 
   if (!isNetBufferable)
     return 0;
@@ -745,7 +745,7 @@ int VanGinneken::RunVG(HNet& net)
   if (nUnits > 0)
   {
     double newSlackAtSource;
-    double driverResistance = m_AvailableBuffers[0].Resistance;
+    double driverResistance = __DriverResistance;//m_AvailableBuffers[0].Resistance;
     m_VGOutput = van(&m_vgNetSplitted, newSlackAtSource, driverResistance);
 
     if (m_doReportBuffering)

@@ -99,6 +99,24 @@ namespace DelayCalculationInternals
     }
   };
 
+  class LumpedRCExtractor
+  {
+  public:
+    void CalculateWireExtractedRC(HDesign& aDesign, HSteinerPoint aFirstPoint, HSteinerPoint aSecondPoint) const
+    {
+      HWirePhysicalParams& aPhysics = aDesign.RoutingLayers.Physics;
+      double l = fabs(aDesign.GetDouble<HSteinerPoint::X>(aFirstPoint)
+          - aDesign.GetDouble<HSteinerPoint::X>(aSecondPoint))
+        + fabs(aDesign.GetDouble<HSteinerPoint::Y>(aFirstPoint)
+          - aDesign.GetDouble<HSteinerPoint::Y>(aSecondPoint));
+
+      aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint,
+          aPhysics.LinearC * l);
+      aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint,
+          aPhysics.RPerDist * l);
+    }
+  };
+
 
   class TwoDirectionalDelaysCalculator
   {
@@ -193,7 +211,7 @@ namespace DelayCalculationInternals
         {
           HSteinerPoint rightPoint = design.Get<HSteinerPoint::Right, HSteinerPoint>(point);
           cap += design.GetDouble<HSteinerPoint::ExtractedC>(rightPoint)
-            + design.GetDouble<HSteinerPoint::RiseObservedC>(rightPoint);
+            + design.GetDouble<HSteinerPoint::ObservedC>(rightPoint);
         }
       }
 
@@ -270,7 +288,8 @@ namespace DelayCalculationInternals
 enum LayersModel
 {
   LayersModel_OneDirection,
-  LayersModel_TwoDirections
+  LayersModel_TwoDirections,
+  LayersModel_Lumped
 };
 
 enum SignalModel
@@ -283,6 +302,32 @@ template<LayersModel lmodel, SignalModel smodel>
 inline void CalculateNetDelays(HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
 {
   This_method_should_not_be_instantiated;
+}
+
+template<>
+inline void CalculateNetDelays<LayersModel_Lumped, SignalModel_Universal>
+  (HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
+{
+  DelayCalculationInternals::CalcNetDelays(
+    design,
+    net,
+    ptContainer,
+    DelayCalculationInternals::LumpedRCExtractor(),
+    DelayCalculationInternals::OneDirectionalDelaysCalculator()
+  );
+}
+
+template<>
+inline void CalculateNetDelays<LayersModel_Lumped, SignalModel_RiseFall>
+  (HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
+{
+  DelayCalculationInternals::CalcNetDelays(
+    design,
+    net,
+    ptContainer,
+    DelayCalculationInternals::LumpedRCExtractor(),
+    DelayCalculationInternals::TwoDirectionalDelaysCalculator()
+  );
 }
 
 template<>
@@ -351,6 +396,14 @@ inline void CalculateWireDelays(HDesign& design)
   //ALERT("RC EXTRACTION & DELAY CALCULATION FINISHED");
 }
 
+template<LayersModel lmodel, SignalModel smodel>
+inline void CalculateNetDelays(HDesign& design, HNet net)
+{
+  ConfigContext ctx = design.cfg.OpenContext("DelayCalculator");
+  DelayCalculationInternals::PointsContainer ptContainer(design.cfg.ValueOf(".initialNetPointsReserve", 90));
+  CalculateNetDelays<lmodel, smodel>(design, net, ptContainer);
+}
+
 inline void CalculateWireDelays(HDesign& design, LayersModel lmodel, SignalModel smodel)
 {
   if (lmodel == LayersModel_OneDirection)
@@ -358,11 +411,20 @@ inline void CalculateWireDelays(HDesign& design, LayersModel lmodel, SignalModel
       CalculateWireDelays<LayersModel_OneDirection, SignalModel_Universal>(design);
     else
       CalculateWireDelays<LayersModel_OneDirection, SignalModel_RiseFall>(design);
-  else
+  else if (lmodel == LayersModel_TwoDirections)
     if (smodel == SignalModel_Universal)
       CalculateWireDelays<LayersModel_TwoDirections, SignalModel_Universal>(design);
     else
       CalculateWireDelays<LayersModel_TwoDirections, SignalModel_RiseFall>(design);
+  else if (lmodel == LayersModel_Lumped)
+    if (smodel == SignalModel_Universal)
+      CalculateWireDelays<LayersModel_Lumped, SignalModel_Universal>(design);
+    else
+      CalculateWireDelays<LayersModel_Lumped, SignalModel_RiseFall>(design);
+  else
+  {
+    LOGCRITICAL("Unsupported Layers Model");
+  }
 }
 
 #endif //__DELAY_CALCULATION_H__

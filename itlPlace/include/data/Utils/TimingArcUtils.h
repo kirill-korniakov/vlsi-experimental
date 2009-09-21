@@ -10,6 +10,8 @@ namespace Utils
 
   TimingType GetTimingType(const char* typeStr);
   const char* GetTimingTypeStr(TimingType ttype);
+
+  HTimingArcType FindTimingArc(HDesign& hd, HPinType startPin, HPinType endPin);
 };
 
 #endif //__TIMINGARCUTILS_H__

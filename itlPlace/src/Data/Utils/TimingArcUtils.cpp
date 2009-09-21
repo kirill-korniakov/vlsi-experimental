@@ -117,4 +117,17 @@ namespace Utils
       return "unknown";
     }
   }
+
+  HTimingArcType FindTimingArc(HDesign& hd, HPinType startPin, HPinType endPin)
+  {
+    for (HPinType::ArcsEnumeratorW arc = hd[endPin].GetArcsEnumeratorW(); arc.MoveNext(); )
+    {
+      if (arc.GetStartPinType(endPin) != startPin)
+        continue;
+
+      if (arc.TimingType() == TimingType_Combinational || arc.TimingType() == TimingType_RisingEdge)
+        return arc;
+    }
+    return hd.TimingArcTypes.Null();
+  }
 }

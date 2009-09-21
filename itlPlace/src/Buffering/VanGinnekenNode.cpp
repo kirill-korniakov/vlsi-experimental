@@ -39,7 +39,7 @@ VGNode::~VGNode()
   Destroy();
 }
 
-void VGNode::UpdatingTree()
+void VGNode::UpdatingTree1()
 { 
   int step = 2;
 
@@ -172,7 +172,7 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
   m_ys = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_SubtreeRoot);
   m_yle = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_LeftEnd);
   m_yre = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_RightEnd);
-  m_Capacitance = capacitance;
+  m_Capacitance = 0.0;//capacitance;
   m_RAT = requiredArrivalTime;
   m_typePoint = typePoint;
   m_RelativePosition = act;
@@ -230,6 +230,7 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
     WARNING_ASSERT(m_typePoint != 0);
     string celName = m_hd.Cells.GetString<HCell::Name>(m_hd.Pins.Get<HPin::Cell, HCell>(m_hd.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot)));
     string pinName = m_hd.Pins.GetString<HPin::Name>(m_hd.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot));
+    m_Capacitance = m_hd.GetDouble<HPinType::Capacitance>(m_hd.Get<HPin::Type, HPinType>(m_hd.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot)));
     if (!m_hd.SteinerPoints.GetBool<HSteinerPoint::IsInternal>(m_SubtreeRoot))
     {
       HTimingPointWrapper timPointForSubtreeRoot = 
