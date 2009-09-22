@@ -1,7 +1,7 @@
 import subprocess
 
 testSet = ['s298', 'pci_spoci_ctrl', 'tv80', 'ac97_ctrl',
-'b21', 'b22', 'b17', 'ethernet', 'RISC', 'des_perf', 'pci_spoci_ctrl']
+'b21', 'b22', 'b17', 'b18']
 
 outputFileName = 'BufferingOutput.xls'
 
@@ -146,7 +146,7 @@ po = open(outputFileName, 'w')
 #if (po == NULL):
 #    print('Couldn't open ' + outputFileName + '. Exiting.')
 #    exit
-po.write('\tHPWL\tTNS\tWNS\tTime\t\tbHPWL\tbTNS\tbWNS\tbTime\t\tblHPWL\tblTNS\tblWNS\tblTime\tBuffer inside\tCandidates\tReverts')
+po.write('\tHPWL\tTNS\tWNS\tTime\t\tBuffer inside\tCandidates\tReverts\tbHPWL\tbTNS\tbWNS\tbTime\t\tblHPWL\tblTNS\tblWNS\tblTime\t')
 po.close()
 
 for benchmark in testSet:

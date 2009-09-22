@@ -43,6 +43,9 @@ BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string
 
   result.m_Lbuf = result.Rb() / hd.RoutingLayers.Physics.RPerDist + result.Cb() / hd.RoutingLayers.Physics.LinearC;
   result.m_Dbuf = sqrt(2.0 * (result.Tb() + result.Rb() * result.Cb()) / hd.RoutingLayers.Physics.RPerDist / hd.RoutingLayers.Physics.LinearC);
+  
+  double resistance = 0, capacitance = 0;
+  Utils::CalcElementTRC(hd, result.m_BufType, &result.tIntrinsic, &resistance, &capacitance);
 
   return result;
 }

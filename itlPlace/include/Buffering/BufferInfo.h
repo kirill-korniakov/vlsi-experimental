@@ -19,6 +19,7 @@ private:
   double m_Lbuf;
   double m_Dbuf;
   HMacroType m_BufType;
+  double tIntrinsic;
 public:
 
   double Rb() const {return m_R;}
@@ -26,6 +27,13 @@ public:
   double Tb() const {return m_T;}
   double Lbuf() const {return m_Lbuf;}
   double Dbuf() const {return m_Dbuf;}
+
+  HMacroType BufferMacroType() {return m_BufType;}
+  double TIntrinsic() {return tIntrinsic;}
+  double Capacitance() {return m_C;}
+  double Resistance() {return m_R;}
+
+
 
   HMacroType Type() const {return m_BufType;}
 

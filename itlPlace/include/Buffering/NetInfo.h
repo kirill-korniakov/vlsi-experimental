@@ -7,14 +7,6 @@
 class NetInfo
 {
 private:
-  NetInfo() 
-  {
-    m_Rd = m_Cs = m_HPWL = m_WL = m_Lnet = m_Dnet = m_Lext = m_X2opt = m_Xmin = 0.0;
-    m_Xmax = m_Kopt = m_KoptNaked = m_MaxRealDelay = m_SumRealDelay = m_OttenDelay = 0.0;
-    m_OptimalDelay = m_KoptDelay = 0.0;
-    m_KoptInt = m_Fanout = 0;
-    m_IsOttenApplicable = m_IsOttenApplicableExact = m_IsModifiedOttenApplicable = false;
-  }
 
   double m_Rd;
   double m_Cs;//sum of sinks capacitances
@@ -44,6 +36,15 @@ private:
 
   static void SetNetInfoComputedFields(BufferInfo& buf, NetInfo& n, double r, double c);
 public:
+  NetInfo() 
+  {
+    m_Rd = m_Cs = m_HPWL = m_WL = m_Lnet = m_Dnet = m_Lext = m_X2opt = m_Xmin = 0.0;
+    m_Xmax = m_Kopt = m_KoptNaked = m_MaxRealDelay = m_SumRealDelay = m_OttenDelay = 0.0;
+    m_OptimalDelay = m_KoptDelay = 0.0;
+    m_KoptInt = m_Fanout = 0;
+    m_IsOttenApplicable = m_IsOttenApplicableExact = m_IsModifiedOttenApplicable = false;
+  }
+
   static NetInfo Create(HDesign& hd, HNet net, BufferInfo& buf);
 
   double Rd() const {return m_Rd;}

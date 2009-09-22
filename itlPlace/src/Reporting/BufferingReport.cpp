@@ -6,7 +6,7 @@ void ReportBufferingPhysics(VanGinneken& vg)
   {
     ALERTFORMAT(("Wire Resistance\t= %.10f", vg.GetPhysical().RPerDist));
     ALERTFORMAT(("Wire Capacitance\t= %.10f", vg.GetPhysical().LinearC));
-    ALERTFORMAT(("buffer Resistance\t= %.10f", vg.GetBufferInfo()->Resistance));
-    ALERTFORMAT(("buffer Capacitance\t= %.10f", vg.GetBufferInfo()->Capacitance));
+    ALERTFORMAT(("buffer Resistance\t= %.10f", vg.GetBufferInfo()->Resistance()));
+    ALERTFORMAT(("buffer Capacitance\t= %.10f", vg.GetBufferInfo()->Capacitance()));
   }
 }

@@ -12,6 +12,9 @@
 #include <fstream>
 #include "VanGinnekenNode.h"
 #include "PlacementQualityAnalyzer.h"
+#include "NetInfo.h"
+#include "BufferInfo.h"
+#include "TimingHelpers.h"
 
 
 class HDesign;
@@ -68,14 +71,6 @@ public:
 class VanGinneken
 {
 private:
-  struct BufferInfo
-  {
-    HMacroType BufferMacroType;
-    double TIntrinsic;
-    double Capacitance;
-    double Resistance;
-  };
-
   struct Placement
   {
     HCell cell;
@@ -145,7 +140,7 @@ private:
   //NOTE: создает и инициализирует VGnode
   int RunVG(HNet& net);
 public:
-  double __DriverResistance;
+   NetInfo netInfo;
 private:
 
   void InitializeBuffersIdxs();
@@ -192,7 +187,6 @@ private:
   int m_nReverts; //количество откато
 
   std::vector<NewNetAndCell> newNetAndCellcollection;
-
 };
 
 #endif //__VanGinneken_H__

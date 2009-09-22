@@ -29,7 +29,7 @@ int GetIdx(int* a, int b)
 }
 
 VanGinneken::VanGinneken(HDesign& design): 
-m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0), DPGrid(design)
+m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0), DPGrid(design) 
 {
 
   LoadAvailableBuffers();
@@ -54,8 +54,6 @@ m_hd(design), m_vgNetSplitted(nullSP, nullSP, nullSP, 0, 0, 0, 0, 0, m_hd, 0, 0)
   bestWNS = INFINITY;
   m_BestPlacementCellsCount = m_hd.Cells.CellsCount();
   m_BestPlacement = new Placement [m_BestPlacementCellsCount];
-
-
 };
 
 VanGinneken::RLnode *VanGinneken::create_list(VGNode *t)
@@ -120,8 +118,8 @@ VanGinneken::RLnode *VanGinneken::redundent(RLnode *list)
   while (r != 0)
   {
 #if PREDICT
-    x = (r->time - m_AvailableBuffers[m_AvailableBuffers.size()-1].Resistance * r->cap) - 
-      (pred->time - m_AvailableBuffers[m_AvailableBuffers.size()-1].Resistance * pred->cap);
+    x = (r->time - m_AvailableBuffers[m_AvailableBuffers.size()-1].Resistance() * r->cap) - 
+      (pred->time - m_AvailableBuffers[m_AvailableBuffers.size()-1].Resistance() * pred->cap);
 #else
     x = r->time - pred->time;
 #endif
@@ -192,8 +190,8 @@ VanGinneken::RLnode *VanGinneken::add_buffer(double distance, RLnode *list, int 
     {
       //WARNING: delays calculation
       double q = y->time 
-        - m_AvailableBuffers[i].TIntrinsic //NOTE:own delay
-        - m_AvailableBuffers[i].Resistance * y->cap; //NOTE:driver delay on observed capacitance
+        - m_AvailableBuffers[i].TIntrinsic() //NOTE:own delay
+        - m_AvailableBuffers[i].Resistance() * y->cap; //NOTE:driver delay on observed capacitance
       if (q > qmax)
       {
         qmax = q;
@@ -205,7 +203,7 @@ VanGinneken::RLnode *VanGinneken::add_buffer(double distance, RLnode *list, int 
 
     z[i] = new RLnode();
     //NOTE:total_solution += sizeof(RLnode);
-    z[i]->cap = m_AvailableBuffers[i].Capacitance;
+    z[i]->cap = m_AvailableBuffers[i].Capacitance();
     z[i]->time = qmax;
 
     Comp* p = new Comp();
@@ -442,12 +440,14 @@ VanGinneken::RLnode *VanGinneken::van(VGNode *t, double& van_answer, double rd)
 
 void VanGinneken::LoadAvailableBuffers()
 {
-  BufferInfo buf;
+  /*BufferInfo buf;
   const char* name = m_hd.cfg.ValueOf("GlobalPlacement.bufferName", (const char*)"INVX1");
   buf.BufferMacroType = Utils::FindMacroTypeByName(m_hd, name);
-  Utils::CalcElementTRC(m_hd, buf.BufferMacroType, &buf.TIntrinsic, &buf.Resistance, &buf.Capacitance);
-  buf.Resistance  *= FBI_CELL_RESISTANCE_SCALING;
-  buf.Capacitance *= FBI_CELL_CAPACITANCE_SCALING;
+  Utils::CalcElementTRC(m_hd, buf.BufferMacroType, &buf.TIntrinsic(), &buf.Resistance(), &buf.Capacitance());
+  buf.Resistance()  *= FBI_CELL_RESISTANCE_SCALING;
+  buf.Capacitance() *= FBI_CELL_CAPACITANCE_SCALING;
+  m_AvailableBuffers.push_back(buf);*/
+  BufferInfo buf = BufferInfo::Create(m_hd);
   m_AvailableBuffers.push_back(buf);
 }
 
@@ -465,6 +465,8 @@ int VanGinneken::NetBuffering(HNet& net)
 
   if (!isNetBufferable)
     return 0;
+
+  netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
 
   if (m_hd.cfg.ValueOf(".plotBuffering", false))
   {
@@ -539,6 +541,8 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
   }
 
+  netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
+
   int nUnits = RunVG(net);
 
   if (nUnits > 0)
@@ -580,15 +584,16 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
 
     STA(m_hd, m_doReportBuffering);
-    double tnsAfterLegalization = Utils::TNS(m_hd);
-    double wnsAfterLegalization = Utils::WNS(m_hd);
+    double tnsAfterBuffering = Utils::TNS(m_hd);
+    double wnsAfterBuffering = Utils::WNS(m_hd);
 
-    if ((tnsAfterLegalization < tnsBeforeBuffering) && (wnsAfterLegalization < wnsBeforeBuffering) 
-      && (bestTNS > tnsAfterLegalization) && (bestWNS > wnsAfterLegalization))
+    if ((tnsAfterBuffering < tnsBeforeBuffering) && (wnsAfterBuffering < wnsBeforeBuffering) 
+      && (bestTNS > tnsAfterBuffering) && (bestWNS > wnsAfterBuffering))
     {
-      bestTNS = tnsAfterLegalization;
-      bestWNS = wnsAfterLegalization;
-      ALERTFORMAT(("buffer insite = %d", nBuffersInserted));
+      bestTNS = tnsAfterBuffering;
+      bestWNS = wnsAfterBuffering;
+      if (m_doReportBuffering)
+        ALERTFORMAT(("buffer insite = %d in net %s", nBuffersInserted, m_hd.Nets.GetString<HNet::Name>(net).c_str()));
       delete [] m_buffersIdxsAtNetSplitted;
       return nBuffersInserted;
     }
@@ -734,7 +739,7 @@ int VanGinneken::RunVG(HNet& net)
 
   m_vgNetSplitted.Destroy();
   int steps = m_hd.cfg.ValueOf(".steps", 1);
-  double sinkCapacitance = m_AvailableBuffers[0].Capacitance;
+  double sinkCapacitance = m_AvailableBuffers[0].Capacitance();
   int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
     sinkCapacitance, 0, steps, 0, 2, 0);
 
@@ -745,7 +750,7 @@ int VanGinneken::RunVG(HNet& net)
   if (nUnits > 0)
   {
     double newSlackAtSource;
-    double driverResistance = __DriverResistance;//m_AvailableBuffers[0].Resistance;
+    double driverResistance = netInfo.Rd();//m_AvailableBuffers[0].Resistance();
     m_VGOutput = van(&m_vgNetSplitted, newSlackAtSource, driverResistance);
 
     if (m_doReportBuffering)
@@ -767,8 +772,8 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
   char bufferIdx[10];
   string bufferFullName;
 
-  double bufferWidth = m_hd[m_AvailableBuffers[0].BufferMacroType].SizeX();
-  double bufferHeight =  m_hd[m_AvailableBuffers[0].BufferMacroType].SizeY();
+  double bufferWidth = m_hd[m_AvailableBuffers[0].BufferMacroType()].SizeX();
+  double bufferHeight =  m_hd[m_AvailableBuffers[0].BufferMacroType()].SizeY();
   double bufferSquare = bufferWidth * bufferHeight;
   double bufferX, bufferY;
 
@@ -802,7 +807,7 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
       m_hd.Cells.Set<HCell::Y>(insertedBuffers[i - 1], bufferY);
 
       //set macrotype and initialize pins
-      m_hd.Cells.Set<HCell::MacroType>(insertedBuffers[i - 1], m_AvailableBuffers[0].BufferMacroType);
+      m_hd.Cells.Set<HCell::MacroType>(insertedBuffers[i - 1], m_AvailableBuffers[0].BufferMacroType());
       m_hd.Pins.AllocatePins(insertedBuffers[i - 1]);
 
       if (m_doReportBuffering)
@@ -1072,7 +1077,7 @@ HWirePhysicalParams VanGinneken::GetPhysical()
   return m_WirePhisics;
 }
 
-VanGinneken::BufferInfo* VanGinneken::GetBufferInfo()
+BufferInfo* VanGinneken::GetBufferInfo()
 {
   if (m_AvailableBuffers.size() > 0)
     return &m_AvailableBuffers[0];
@@ -1089,11 +1094,10 @@ VGNode VanGinneken::GetVGTree()
 
 double VanGinneken::CalculationOptimumNumberBuffers(HNet net)
 {
-  double lenNet = m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
-  double lenBuf =  m_AvailableBuffers[0].Resistance / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance / m_WirePhisics.LinearC;
-  double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic + m_AvailableBuffers[0].Capacitance * m_AvailableBuffers[0].Resistance) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
+  double lenNet = m_AvailableBuffers[0].Resistance() / m_WirePhisics.RPerDist + m_hd.Nets.GetInt<HNet::SinksCount>(net) * m_AvailableBuffers[0].Capacitance() / m_WirePhisics.LinearC;
+  double lenBuf =  m_AvailableBuffers[0].Resistance() / m_WirePhisics.RPerDist + m_AvailableBuffers[0].Capacitance() / m_WirePhisics.LinearC;
+  double dBuf = sqrt(2*(m_AvailableBuffers[0].TIntrinsic() + m_AvailableBuffers[0].Capacitance() * m_AvailableBuffers[0].Resistance()) / (m_WirePhisics.LinearC * m_WirePhisics.RPerDist));
   return (m_vgNetSplitted.LengthTree(true) * FBI_LENGTH_SCALING + lenNet - lenBuf) / dBuf - 1.0;
-
 }
 
 void VanGinneken::SaveCurrentPlacementAsBestAchieved()
