@@ -583,15 +583,20 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     CreateNetsAndCells(net);
 
 
-    STA(m_hd, m_doReportBuffering);
-    double tnsAfterBuffering = Utils::TNS(m_hd);
-    double wnsAfterBuffering = Utils::WNS(m_hd);
+    //STA(m_hd, m_doReportBuffering);
+    //double tnsAfterBuffering = Utils::TNS(m_hd);
+    //double wnsAfterBuffering = Utils::WNS(m_hd);
 
-    if ((tnsAfterBuffering < tnsBeforeBuffering) && (wnsAfterBuffering < wnsBeforeBuffering) 
-      && (bestTNS > tnsAfterBuffering) && (bestWNS > wnsAfterBuffering))
+    double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+    double maxSlack = netInfo.MaxRealDelay();
+    
+
+   // if ((tnsAfterBuffering < tnsBeforeBuffering) && (wnsAfterBuffering < wnsBeforeBuffering) 
+   //   && (bestTNS > tnsAfterBuffering) && (bestWNS > wnsAfterBuffering))
+    if (vgSlack < maxSlack)
     {
-      bestTNS = tnsAfterBuffering;
-      bestWNS = wnsAfterBuffering;
+      //bestTNS = tnsAfterBuffering;
+      //bestWNS = wnsAfterBuffering;
       if (m_doReportBuffering)
         ALERTFORMAT(("buffer insite = %d in net %s", nBuffersInserted, m_hd.Nets.GetString<HNet::Name>(net).c_str()));
       delete [] m_buffersIdxsAtNetSplitted;
@@ -670,7 +675,7 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
       {//update topological order
         HTimingPoint source = m_hd.TimingPoints[m_hd.Get<HNet::Source, HPin>(subNet)];
         //TODO: fix next line
-        HPin bufferOutput = Utils::FindCellPinByName(m_hd, insertedBuffers[coordinate - 1], "Y");
+        HPin bufferOutput = Utils::FindCellPinByName(m_hd, insertedBuffers[coordinate - 1], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferOutput], source);
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[cellPinIter], source);
       }
@@ -873,7 +878,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source
-    m_hd.Nets.Set<HNet::Source, HPin>(subNet, Utils::FindCellPinByName(m_hd, insertedBuffers[j - 1], "Y"));
+    m_hd.Nets.Set<HNet::Source, HPin>(subNet, Utils::FindCellPinByName(m_hd, insertedBuffers[j - 1], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.InputPin", "A")));
 
     //add other pins
     VGNode& nodeStart2 = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
