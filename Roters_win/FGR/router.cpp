@@ -100,6 +100,7 @@ int main(int argc, char **argv)
     fgr.writeRoutes(parms.outputFile);
   }
 
+  fgr.plotXPM(parms.outputFile);
   //system("PAUSE");
   return 0;
 }

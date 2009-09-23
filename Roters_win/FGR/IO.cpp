@@ -1013,8 +1013,8 @@ void FGR::plotXPM(const string &filename)
     image.push_back(horizLine);
   }
 
-  ofstream outfile(params.resultsFile.c_str());
-  outfile << "maxratio was " << maxRatio << endl;
+  //ofstream outfile(params.resultsFile.c_str());
+  //cout << "maxratio was " << maxRatio << endl;
 
   for(unsigned j = 0; j < yTiles-1; ++j)
   {

@@ -585,7 +585,7 @@ void FGR::ripUpSegment(const SubNetIdType &subNetId, IdType edgeId)
 
 void FGRParams::usage(const char *exename)
 {
-  ofstream outfile(resultsFile.c_str());
+/*  ofstream outfile(resultsFile.c_str());
   outfile << "Usage: " << exename << " <filename> [options]" << endl;
   outfile << endl;
   outfile << "Available options:" << endl;
@@ -595,7 +595,7 @@ void FGRParams::usage(const char *exename)
   outfile << "  -timeOut <double>     Rip-up and re-route timeout (seconds)" << endl;
   outfile << "  -maxGreedyIter <uint> Maximum greedy iterations" << endl;
   outfile << "  -full3d               Do not use layer assignment" << endl;
-  outfile << endl;
+  outfile << endl;*/
   exit(0);
 }
 
