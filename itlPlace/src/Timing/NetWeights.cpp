@@ -201,7 +201,7 @@ void MakeAnotherLoop(HDesign& hd, int argc, char** argv)
   string newCMD;
   LPSTR commandLine;
 
-  if (hd.cfg.lookforDefValue("NetWeighting.nMacroIterations", 10) > 9)
+  if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10) > 9)
   {
     ALERT("The number of net weights iterations must be less than 10");
     return;
@@ -211,7 +211,7 @@ void MakeAnotherLoop(HDesign& hd, int argc, char** argv)
   si.cb = sizeof(si);
   ZeroMemory(&pi, sizeof(pi));
 
-  nIter = GetnIter(hd.cfg.lookfor("NetWeighting.netWeightsImportFileName"));
+  nIter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));
   ALERTFORMAT(("Current iteration of net weighting is %d", nIter++));
 
   nwtsFileName = hd.Circuit.Name() + "_" + IntToString(nIter) + ".nwts";
@@ -220,7 +220,7 @@ void MakeAnotherLoop(HDesign& hd, int argc, char** argv)
   ExportNetWeights(hd, nwtsFileName.c_str());
   ExportDEF(hd, defFileName);
   
-  if (nIter == hd.cfg.lookforDefValue("NetWeighting.nMacroIterations", 0))
+  if (nIter == hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0))
   {
     ALERT("The specified number of net weights iterations is performed");
     return;
@@ -251,7 +251,7 @@ void MakeAnotherLoop(HDesign& hd, int argc, char** argv)
 void PrepareNextLoop(HDesign& hd, int argc, char** argv, int& nCyclesCounter)
 {
   //int nIter;  // number of current iteration
-  int nLoops = hd.cfg.lookforDefValue("NetWeighting.nMacroIterations", 10);
+  int nLoops = hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10);
   string nwtsFileName;
   string defFileName;
   static string tnsStr = "";
@@ -263,7 +263,7 @@ void PrepareNextLoop(HDesign& hd, int argc, char** argv, int& nCyclesCounter)
     //return;
   }
 
-  nCyclesCounter = GetnIter(hd.cfg.lookfor("NetWeighting.netWeightsImportFileName"));
+  nCyclesCounter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));
   ALERTFORMAT(("Current iteration of net weighting is %d", nCyclesCounter));
 
   nwtsFileName = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter+1) + ".nwts";
