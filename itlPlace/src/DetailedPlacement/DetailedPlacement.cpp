@@ -14,6 +14,14 @@ void DetailedPlacement(HDPGrid& grid)
   double wlBeforeDP = Utils::CalculateHPWL(grid.Design(), true);
   double wlBeforeIteration = wlBeforeDP;
   double wlAfterIteration  = wlBeforeDP;
+
+  bool isGS = grid.Design().cfg.ValueOf(".GlobalSwap.active", true);
+  bool isVS = grid.Design().cfg.ValueOf(".VerticalSearch.active", true);
+  bool isHS = grid.Design().cfg.ValueOf(".HorizontalSearch.active", true);
+
+  double wlAfterGlobalSwap = 0.0;
+  double wlAfterVerticalSearch = 0.0;
+  double wlAfterHorizontalSearch = 0.0;
   
   ALERTFORMAT(("%5s %5s %25s %11s %11s", "Iter", "Stage", "WireLength", "Ratio", "DPRatio"));
   ALERTFORMAT(("%5d %5s %25f %11s %11s\n", 1, "-", wlBeforeDP, "-", "-"));
@@ -26,57 +34,77 @@ void DetailedPlacement(HDPGrid& grid)
     wlBeforeIteration = wlAfterIteration;
 
     //GLOBAL SWAP
-    GlobalSwap(grid);
-    if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-      || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-      || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-      )
-      Legalization(grid);
-    grid.Design().Plotter.Refresh();
+    if (isGS)
+    {
+      GlobalSwap(grid);
+      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
+        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
+        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
+        )
+        Legalization(grid);
+      grid.Design().Plotter.Refresh();
 
-    double wlAfterGlobalSwap = Utils::CalculateHPWL(grid.Design(), true);
-    ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
-      iteration,
-      "GS", 
-      wlAfterGlobalSwap,
-      (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeIteration * 100.0,
-      (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeDP * 100.0));
+      wlAfterGlobalSwap = Utils::CalculateHPWL(grid.Design(), true);
+      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+        iteration,
+        "GS", 
+        wlAfterGlobalSwap,
+        (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeIteration * 100.0,
+        (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeDP * 100.0));
+    }
+    else
+      wlAfterGlobalSwap = wlBeforeIteration;
 
     //VERTICAL SEARCH
-    VerticalSearch(grid);
-    if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-      || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-      || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-      )
-      Legalization(grid);
-    grid.Design().Plotter.Refresh();
+    if (isVS)
+    {
+      VerticalSearch(grid);
+      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
+        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
+        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
+        )
+        Legalization(grid);
+      grid.Design().Plotter.Refresh();
 
-    double wlAfterVerticalSearch = Utils::CalculateHPWL(grid.Design(), true);
-    ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
-      iteration,
-      "VS",
-      wlAfterVerticalSearch,
-      (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeIteration * 100.0,
-      (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeDP * 100.0));
+      wlAfterVerticalSearch = Utils::CalculateHPWL(grid.Design(), true);
+      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+        iteration,
+        "VS",
+        wlAfterVerticalSearch,
+        (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeIteration * 100.0,
+        (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeDP * 100.0));
+    }
+    else
+      wlAfterVerticalSearch = wlAfterGlobalSwap;
 
     //HORIZONTAL SEARCH
-    HorizontalSearch(grid);
-    if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-      || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-      || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-      )
-      Legalization(grid);
-    grid.Design().Plotter.Refresh();
+    if (isHS)
+    {
+      HorizontalSearch(grid);
+      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
+        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
+        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
+        )
+        Legalization(grid);
+      grid.Design().Plotter.Refresh();
 
-    double wlAfterHorizontalSearch = Utils::CalculateHPWL(grid.Design(), true);
-    ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
-      iteration,
-      "HS",
-      wlAfterHorizontalSearch,
-      (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeIteration * 100.0,
-      (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeDP * 100.0));
+      wlAfterHorizontalSearch = Utils::CalculateHPWL(grid.Design(), true);
+      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+        iteration,
+        "HS",
+        wlAfterHorizontalSearch,
+        (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeIteration * 100.0,
+        (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeDP * 100.0));
+    }
 
-    wlAfterIteration = wlAfterHorizontalSearch;
+    if (isHS)
+      wlAfterIteration = wlAfterHorizontalSearch;
+    else if (isVS)
+      wlAfterIteration = wlAfterVerticalSearch;
+    else
+      wlAfterIteration = wlAfterGlobalSwap;
+
+    //wlAfterIteration = wlAfterHorizontalSearch;
     ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%\n",
       iteration,
       "",
