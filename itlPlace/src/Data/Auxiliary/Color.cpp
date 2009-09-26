@@ -1,7 +1,7 @@
 #include "Color.h"
 
 static int known_colors[][3] =
-{
+{ 
   { 212, 208, 200 } /*ActiveBorder*/,
   {  51,  94, 168 } /*ActiveCaption*/,
   { 255, 255, 255 } /*ActiveCaptionText*/,
