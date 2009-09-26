@@ -525,16 +525,35 @@ int VanGinneken::NetBuffering(HNet& net)
     double tns2 = Utils::TNS(m_hd);
     double wns2 = Utils::WNS(m_hd);
     if ((tns2 <= tns) && (wns2 <= wns))
-    {
-      ALERTFORMAT(("YES!!!"))
+    {     
+      double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+      double maxSlack = netInfo.MaxRealDelay();
+
+      if (vgSlack < maxSlack)
+        ALERTFORMAT(("YES!!!"));
     }
     else
-    {
-      ERROR_ASSERT(FATALERRORLEVEL, ((tns2 <= tns) && (wns2 <= wns)))
+      //if ((tns2 == tns) && (wns2 == wns))
+      //{
+      //  double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+      //  double maxSlack = netInfo.MaxRealDelay();
 
-    }
-    delete [] m_buffersIdxsAtNetSplitted;
-    return nBuffersInserted;
+      //  if (vgSlack < maxSlack)
+
+      //    ALERTFORMAT(("NO!!!"));
+
+      //}
+      //else
+      {     
+        double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+        double maxSlack = netInfo.MaxRealDelay();
+
+        if (vgSlack < maxSlack)
+          ERROR_ASSERT(FATALERRORLEVEL, ((tns2 <= tns) && (wns2 <= wns)));
+
+      }
+      delete [] m_buffersIdxsAtNetSplitted;
+      return nBuffersInserted;
   }
   else
   {
@@ -562,7 +581,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     m_hd.Plotter.PlotText(m_hd.Nets.GetString<HNet::Name>(net));
     m_hd.Plotter.Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(".plotWait", 1));
   }
-  
+
   int nUnits = RunVG(net);
 
   if (nUnits > 0)
@@ -595,9 +614,9 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
   if (nBuffersInserted > 0) 
   {
-	netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
+    netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
 
-	SaveCurrentPlacementAsBestAchieved();
+    SaveCurrentPlacementAsBestAchieved();
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
 
     CreateNetsAndCells(net);
@@ -605,7 +624,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
     double maxSlack = netInfo.MaxRealDelay();
 
-	if (vgSlack < maxSlack)
+    if (vgSlack < maxSlack)
     {
       if (m_doReportBuffering)
         ALERTFORMAT(("buffer insite = %d in net %s", nBuffersInserted, m_hd.Nets.GetString<HNet::Name>(net).c_str()));
@@ -661,6 +680,7 @@ void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
 void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nodeStart, int startNodeIdx,  
                                HNetWrapper::PinsEnumeratorW& subNetPinEnum, bool doIndexesClear)
 {
+  bool f = doIndexesClear;
   if (doIndexesClear)
     nodeStart.IndexesClear();
 
@@ -669,9 +689,9 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
   //insert sink pin (buffer input) to the subnet
   if (coordinate != -1)
   {
-    if ((nodeStart.Index() != startNodeIdx) || (nodeStart.Index() == 0))
+    if ((nodeStart.Index() != startNodeIdx) || ((nodeStart.Index() == 0) && f))
     {      
-	  HPin bufferInput = Utils::FindCellPinByName(m_hd, insertedBuffers[coordinate - 1], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.InputPin", "A"));
+      HPin bufferInput = Utils::FindCellPinByName(m_hd, insertedBuffers[coordinate - 1], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.InputPin", "A"));
 
       subNetPinEnum.MoveNext();
 
@@ -717,14 +737,13 @@ void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int&
 {
   if (doIndexesClear)
     startNode.IndexesClear();
-  else
-    if (startNode.Index() == 0)
-      nPins++;
-  
-  if ((GetIdx(m_buffersIdxsAtNetSplitted, startNode.Index()) != -1) && (startNode.Index() != startNodeIdx))
+
+  if ((GetIdx(m_buffersIdxsAtNetSplitted, startNode.Index()) != -1))
   {
-    nPins++;
-    return;
+    if ((startNode.Index() != startNodeIdx) || (startNode.Index() == 0))
+      nPins++;
+    if (startNode.Index() != startNodeIdx) 
+      return;
   }
   if (startNode.LeftStep() != NULL)
   {
@@ -737,7 +756,7 @@ void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int&
     PinsCountCalculation(*startNode.RightStep(), startNodeIdx, nPins);
     startNode.BackStep();
   }
-  if (!startNode.IsInternal())
+  if ((!startNode.IsInternal()) && (startNode.Index() != 0))
   {
     nPins++;
     return;
@@ -881,13 +900,13 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     nPins = 0;
     VGNode& nodeStart = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
     PinsCountCalculation(nodeStart, m_buffersIdxsAtNetSplitted[j], nPins);
-    nPins++;
+    //nPins++;
     nNewNetPin += nPins;
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source
     m_hd.Nets.Set<HNet::Source, HPin>(subNet, Utils::FindCellPinByName(m_hd, insertedBuffers[j - 1], 
-		m_hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y")));
+      m_hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y")));
 
     //add other pins
     VGNode& nodeStart2 = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
