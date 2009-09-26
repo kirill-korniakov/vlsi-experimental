@@ -1,6 +1,3 @@
-/**
- * @version $Rev$, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
- */
 #include "Logging.h"
 #include <stdio.h>
 #include <stdlib.h>
