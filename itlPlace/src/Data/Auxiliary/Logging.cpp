@@ -1,5 +1,5 @@
 /**
- * @version $Rev: 529576 $, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
+ * @version $Rev$, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
  */
 #include "Logging.h"
 #include <stdio.h>
