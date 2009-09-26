@@ -5,6 +5,8 @@
 #include "stdTypes.h"
 #include <stdarg.h>
 
+const char* RevisionNumber = "$Rev$";
+
 namespace logging
 {
 
