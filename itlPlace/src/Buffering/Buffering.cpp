@@ -150,11 +150,11 @@ void TestBuffering(HDesign& design)
   string name = Aux::CreateCoolFileName("", design.Circuit.Name() + "_Buffered" ,".def");
 
   //FIXME: debugging
-  ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
+  //ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
   
-  /*for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
+  for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
   {
-    if (nIter.PinsCount() != 3) 
+    if (nIter.PinsCount() != 2) 
     	continue;
     	
     //if (nIter.Name() != "overflw")
@@ -174,24 +174,24 @@ void TestBuffering(HDesign& design)
       continue;
     }
 
-    WRITELINE("");
+    /*WRITELINE("");
     ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
     ReportNetPinsCoordinates(design, nIter);
     STA(design);
     ReportNetTiming(design, nIter);
-    ExportDEF(design, "not_buffered");
+    ExportDEF(design, "not_buffered");*/
     vg.NetBuffering(nIter);
-    ReportBufferingPhysics(vg);
+    /*ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
     //FindTopologicalOrder(design);
     //ALERT("After buffer insertion:");
     STA(design);
-    ReportNetTiming(design, nIter);
+    ReportNetTiming(design, nIter);*/
     //ALERT("After legalization:");
     //Legalization(DPGrid);
     //STA(design);
-    break;
-  }*/
+    //break;
+  }
 
   WRITELINE("");
   //FindTopologicalOrder(design);

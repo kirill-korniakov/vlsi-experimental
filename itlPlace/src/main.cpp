@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     //BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
-      NetlistBuffering(hd);
+      TestBuffering(hd);
     }
 
     //EXPORT

@@ -505,12 +505,34 @@ int VanGinneken::NetBuffering(HNet& net)
     int x;
     printbuffer(m_finalLocationVan, &x);
   }
-
+  netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
+  if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
+  {
+    m_buffersIdxsAtNetSplitted[0] = 1;
+    m_buffersIdxsAtNetSplitted[1] = 0;
+    nBuffersInserted = 1;
+  }
+  else
+    return 0;
   if (nBuffersInserted > 0) 
   {
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
+    STA(m_hd);
+    double tns = Utils::TNS(m_hd);
+    double wns = Utils::WNS(m_hd);
     CreateNetsAndCells(net);
+    STA(m_hd);
+    double tns2 = Utils::TNS(m_hd);
+    double wns2 = Utils::WNS(m_hd);
+    if ((tns2 <= tns) && (wns2 <= wns))
+    {
+      ALERTFORMAT(("YES!!!"))
+    }
+    else
+    {
+      ERROR_ASSERT(FATALERRORLEVEL, ((tns2 <= tns) && (wns2 <= wns)))
 
+    }
     delete [] m_buffersIdxsAtNetSplitted;
     return nBuffersInserted;
   }
@@ -695,10 +717,12 @@ void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int&
 {
   if (doIndexesClear)
     startNode.IndexesClear();
-
+  else
+    if (startNode.Index() == 0)
+      nPins++;
+  
   if ((GetIdx(m_buffersIdxsAtNetSplitted, startNode.Index()) != -1) && (startNode.Index() != startNodeIdx))
   {
-    int ind = startNode.Index();
     nPins++;
     return;
   }
@@ -718,6 +742,7 @@ void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int&
     nPins++;
     return;
   }
+
   return;
 }
 
