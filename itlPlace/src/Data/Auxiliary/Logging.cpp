@@ -5,7 +5,15 @@
 #include "stdTypes.h"
 #include <stdarg.h>
 
-const char* RevisionNumber = "$Rev$";
+extern long RevisionNumber;
+
+void PrintRevisionNumber()
+{
+  if (RevisionNumber != 0)
+    printf("Running itlPlace revision: %d\n", RevisionNumber);
+  else
+    printf("Running unknown revision of itlPlace\n");
+}
 
 namespace logging
 {

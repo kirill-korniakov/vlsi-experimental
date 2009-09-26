@@ -24,6 +24,7 @@ int main(int argc, char** argv)
     
     gCfg.LoadConfiguration("itlVLSI.cfg");
     InitializeLogging();
+    PrintRevisionNumber();
 
     InitFLUTE();
 

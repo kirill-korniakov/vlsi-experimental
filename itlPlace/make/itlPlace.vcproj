@@ -24,6 +24,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -107,6 +109,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -196,6 +200,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -285,6 +291,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -373,6 +381,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -456,6 +466,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -5100,6 +5112,14 @@
 					</File>
 					<File
 						RelativePath="..\src\Data\Auxiliary\Logging.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Data\Auxiliary\Revision.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Data\Auxiliary\Revision.tmpl"
 						>
 					</File>
 				</Filter>

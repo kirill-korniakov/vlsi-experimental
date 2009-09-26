@@ -8,6 +8,7 @@ typedef usec_t timetype;
 #define GETSECONDSFROMTIME(time) ((double)((time) / 1000000.0))
 
 void InitializeLogging();
+void PrintRevisionNumber();
 
 #ifndef LOGGGINGLEVEL
 #define LOGGGINGLEVEL 1
