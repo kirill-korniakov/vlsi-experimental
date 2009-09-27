@@ -157,8 +157,8 @@ void TestBuffering(HDesign& design)
     if (nIter.PinsCount() != 2) 
     	continue;
     	
-    //if (nIter.Name() != "overflw")
-    //	continue;
+    /*if (nIter.Name() != "n_5108")
+    	continue;*/
 
     bool isAnyPinPrimary = false;
     for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)

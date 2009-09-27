@@ -509,7 +509,7 @@ int VanGinneken::NetBuffering(HNet& net)
   if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
   {
     m_buffersIdxsAtNetSplitted[0] = 1;
-    m_buffersIdxsAtNetSplitted[1] = 0;
+    m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
     nBuffersInserted = 1;
   }
   else
@@ -526,34 +526,26 @@ int VanGinneken::NetBuffering(HNet& net)
     double wns2 = Utils::WNS(m_hd);
     if ((tns2 <= tns) && (wns2 <= wns))
     {     
+      //все эорошо
       double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
       double maxSlack = netInfo.MaxRealDelay();
-
+      
       if (vgSlack < maxSlack)
         ALERTFORMAT(("YES!!!"));
     }
     else
-      //if ((tns2 == tns) && (wns2 == wns))
-      //{
-      //  double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-      //  double maxSlack = netInfo.MaxRealDelay();
+    {   
+      //плохо
+      double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+      double maxSlack = netInfo.MaxRealDelay();
+      string name = m_hd.Nets.GetString<HNet::Name>(net);
+      ALERTFORMAT(("NO!!! (tns2 > tns) || (wns2 > wns)"));
+      if (vgSlack < maxSlack)
+        ALERTFORMAT(("NO!!! (tns2 > tns) || (wns2 > wns) and  vgSlack < maxSlack"));//
 
-      //  if (vgSlack < maxSlack)
-
-      //    ALERTFORMAT(("NO!!!"));
-
-      //}
-      //else
-      {     
-        double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-        double maxSlack = netInfo.MaxRealDelay();
-
-        if (vgSlack < maxSlack)
-          ERROR_ASSERT(FATALERRORLEVEL, ((tns2 <= tns) && (wns2 <= wns)));
-
-      }
-      delete [] m_buffersIdxsAtNetSplitted;
-      return nBuffersInserted;
+    }
+    delete [] m_buffersIdxsAtNetSplitted;
+    return nBuffersInserted;
   }
   else
   {
@@ -735,15 +727,22 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
 
 void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int& nPins, bool doIndexesClear)
 {
+  bool f = doIndexesClear;
   if (doIndexesClear)
     startNode.IndexesClear();
 
   if ((GetIdx(m_buffersIdxsAtNetSplitted, startNode.Index()) != -1))
   {
-    if ((startNode.Index() != startNodeIdx) || (startNode.Index() == 0))
-      nPins++;
-    if (startNode.Index() != startNodeIdx) 
+    if (((startNode.Index() == 0) && f) && startNode.Index() == startNodeIdx)
+    {    
+      nPins += 2;
       return;
+    }
+    if (startNode.Index() != startNodeIdx)
+    {
+      nPins++;
+      return;
+    }
   }
   if (startNode.LeftStep() != NULL)
   {
@@ -756,9 +755,10 @@ void VanGinneken::PinsCountCalculation(VGNode& startNode, int startNodeIdx, int&
     PinsCountCalculation(*startNode.RightStep(), startNodeIdx, nPins);
     startNode.BackStep();
   }
-  if ((!startNode.IsInternal()) && (startNode.Index() != 0))
+  if (!startNode.IsInternal())
   {
-    nPins++;
+    if (!((f == false) && (startNode.Index() ==  0) ))
+      nPins++;
     return;
   }
 
@@ -873,6 +873,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
   //allocate pins
   PinsCountCalculation(m_vgNetSplitted, 0, nPins, true);
   nNewNetPin += nPins;
+  nPins++;
   m_hd.Nets.AllocatePins(subNet, nPins);  
 
   //init source
@@ -900,8 +901,9 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     nPins = 0;
     VGNode& nodeStart = m_vgNetSplitted.GetSteinerPoint(m_buffersIdxsAtNetSplitted[j], m_vgNetSplitted, vgItem, true);
     PinsCountCalculation(nodeStart, m_buffersIdxsAtNetSplitted[j], nPins);
-    //nPins++;
+    nPins++;
     nNewNetPin += nPins;
+    nPins++;
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source
@@ -922,7 +924,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
   int pinCount = m_hd.Nets.GetInt<HNet::PinsCount>(net);
   if (nNewNetPin != (pinCount + m_buffersIdxsAtNetSplitted[0] * 2))
   {
-    WARNING_ASSERT(nNewNetPin == pinCount);
+    ERROR_ASSERT(nNewNetPin == pinCount);
     ALERTFORMAT(("new net pin count = %d", nNewNetPin));
   }
 }
