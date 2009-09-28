@@ -180,7 +180,9 @@ void TestBuffering(HDesign& design)
     STA(design);
     ReportNetTiming(design, nIter);
     ExportDEF(design, "not_buffered");*/
-    vg.NetBuffering(nIter);
+    int ghkjb = vg.NetBuffering(nIter);
+    //if (ghkjb != 0)
+    //  break;
     /*ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
     //FindTopologicalOrder(design);

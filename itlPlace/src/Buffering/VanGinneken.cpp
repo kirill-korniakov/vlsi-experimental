@@ -873,7 +873,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
   //allocate pins
   PinsCountCalculation(m_vgNetSplitted, 0, nPins, true);
   nNewNetPin += nPins;
-  nPins++;
+ 
   m_hd.Nets.AllocatePins(subNet, nPins);  
 
   //init source
@@ -903,7 +903,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     PinsCountCalculation(nodeStart, m_buffersIdxsAtNetSplitted[j], nPins);
     nPins++;
     nNewNetPin += nPins;
-    nPins++;
+  
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source
