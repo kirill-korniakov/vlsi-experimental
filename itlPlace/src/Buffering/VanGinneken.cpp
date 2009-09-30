@@ -457,6 +457,34 @@ void VanGinneken::InitializeBuffersIdxs()
   std::sort(m_buffersIdxsAtNetSplitted + 1, m_buffersIdxsAtNetSplitted + m_buffersIdxsAtNetSplitted[0] + 1);
 }
 
+int VanGinneken::MathBuffering(HNet& net)
+{
+  netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
+
+  if (!(netInfo.X2opt() < 0.0 && netInfo.Xmax() > 0.0))
+    return 0;
+
+  m_vgNetSplitted.Destroy();
+  int steps = m_hd.cfg.ValueOf(".steps", 1);
+  double sinkCapacitance = m_AvailableBuffers[0].Capacitance();
+  int nUnits = m_vgNetSplitted.InitializeTree(m_hd.SteinerPoints[m_hd[net].Source()], 
+    sinkCapacitance, 0, steps, 0, 2, 0);
+
+  m_buffersIdxsAtNetSplitted = new int[2];
+  m_buffersIdxsAtNetSplitted[0] = 1;//one buffer
+  m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
+
+  InitializeBuffersIdxs();
+  int nBuffersInserted = m_buffersIdxsAtNetSplitted[0];
+
+  m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
+  CreateNetsAndCells(net);
+
+  delete[] m_buffersIdxsAtNetSplitted;
+
+  return 1;
+}
+
 int VanGinneken::NetBuffering(HNet& net)
 {
   bool isNewNet = (m_hd.Nets.GetString<HNet::Name>(net).find("BufferedPart") != -1);
@@ -506,14 +534,14 @@ int VanGinneken::NetBuffering(HNet& net)
     printbuffer(m_finalLocationVan, &x);
   }
   netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
-  if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
-  {
-    m_buffersIdxsAtNetSplitted[0] = 1;
-    m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
-    nBuffersInserted = 1;
-  }
-  else
-    return 0;
+  //if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
+  //{
+  //  m_buffersIdxsAtNetSplitted[0] = 1;
+  //  m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
+  //  nBuffersInserted = 1;
+  //}
+  //else
+  //  return 0;
   if (nBuffersInserted > 0) 
   {
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
@@ -873,7 +901,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
   //allocate pins
   PinsCountCalculation(m_vgNetSplitted, 0, nPins, true);
   nNewNetPin += nPins;
- 
+  //nPins++;
   m_hd.Nets.AllocatePins(subNet, nPins);  
 
   //init source
@@ -903,7 +931,7 @@ void VanGinneken::CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet)
     PinsCountCalculation(nodeStart, m_buffersIdxsAtNetSplitted[j], nPins);
     nPins++;
     nNewNetPin += nPins;
-  
+    //nPins++;
     m_hd.Nets.AllocatePins(subNet, nPins);
 
     //init source

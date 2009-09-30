@@ -132,6 +132,50 @@ int main(int argc, char** argv)
             PrepareNextLoop(hd, argc, argv, i);
           }
         }
+
+        if (0)
+        {
+          ConfigContext ctx = hd.cfg.OpenContext("Buffering");
+          VanGinneken vg(hd);
+          BufferInfo buf = BufferInfo::Create(hd);
+
+          HNetWrapper bufferedNet = hd[hd.Nets.Null()];
+
+          double TNS = Utils::TNS(hd);
+          double WNS = Utils::WNS(hd);
+          ExportDEF(hd, "def_1.def");
+
+          TimingHelper th(hd);
+
+          //double vgSlack = GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+
+          for(HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+          {
+            if (net.Name() == "n_4598")
+            {
+              NetInfo netInfo = NetInfo::Create(hd, net, buf);
+              double before_buffering = th.GetBufferedNetMaxDelay(net, netInfo, buf);
+              if (vg.MathBuffering(net) > 0)
+              {
+                bufferedNet = net;
+                //break;
+              }
+              double after_buffering = th.GetBufferedNetMaxDelay(net, netInfo, buf);
+              WRITELINE("before %.10f", before_buffering);
+              WRITELINE("after  %.10f", after_buffering);
+              break;
+            }
+          }
+
+          STA(hd);
+
+          double TNS1 = Utils::TNS(hd);
+          double WNS1 = Utils::WNS(hd);
+
+          WRITELINE("TNS: %.10f", TNS - TNS1);
+          WRITELINE("WNS: %.10f", WNS - WNS1);
+          ExportDEF(hd, "def_2.def");
+        }
       }
 
       if (hd.cfg.ValueOf("DesignFlow.DrawCongestionMap", false))

@@ -14,6 +14,7 @@ public:
   TimingHelper(HDesign& design):hd(design){}
   
   double GetBufferedNetMaxDelay(HNet net, NetInfo& ninf, BufferInfo& binf);
+  void PrintNetPinsDetails(HNet net, BufferInfo& binf);
 };
 
 #endif //__TIMINGHELPERS_H__

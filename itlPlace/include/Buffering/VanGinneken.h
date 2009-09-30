@@ -106,6 +106,7 @@ public:
   int BufferingTillDegradation(); //NOTE: буферизуем до ухудшения
 
   int NetBuffering(HNet &net);    //NOTE: буферизация нета
+  int MathBuffering(HNet& net);
 
   int BufferingOfMostCriticalPaths(int nPaths = 0); //NOTE: буферизуются все критические пути
   int CriticalPathBuffering(HCriticalPath aPath);   //NOTE: буферизация критического пути
