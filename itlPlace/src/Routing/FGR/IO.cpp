@@ -1175,9 +1175,11 @@ const char* Colors[] = {
 "W", "X", "Y", "Z", "0", "1", "2", "3",
 "4", "5", "6", "7", "8", "9", ",", "."};
 
-void FGR::plotXPM(const string &filename)
+void FGR::plotXPM(const string &filename, unsigned nPix)
 {
-  const unsigned numColors = 64;
+  const unsigned numColors   = 64;
+  const unsigned nGoodColors = 55;
+  unsigned multiplier = floor((double)nPix / xTiles); 
 
   string fullfilename = filename + string(".xpm");
 
@@ -1186,7 +1188,8 @@ void FGR::plotXPM(const string &filename)
   xpmFile<<"/* XPM */"<<endl;
   xpmFile<<"static char *congestion[] = {"<<endl;
   xpmFile<<"/* columns rows colors chars-per-pixel */"<<endl;
-  xpmFile<<"\""<<xTiles-1<<" "<<yTiles-1<<" "
+  //xpmFile<<"\""<<xTiles-1<<" "<<yTiles-1<<" "
+  xpmFile<<"\""<<xTiles * multiplier<<" "<<yTiles * multiplier<<" "
          <<numColors<<" 1\","<<endl;
   for(unsigned i=0; i<numColors; ++i)
     xpmFile<<"\""<<coolMap[i]<<"\","<<endl;
@@ -1196,55 +1199,90 @@ void FGR::plotXPM(const string &filename)
 
   double maxRatio = 1.;
 
-  for(unsigned rj = 2; rj <= yTiles; ++rj)
+  //for(unsigned rj = 2; rj <= yTiles; ++rj)
+  for(unsigned rj = 1; rj <= yTiles; ++rj)
   {
     unsigned j = yTiles - rj;
     vector<double> horizLine;
-    for(unsigned i = 0; i < xTiles-1; ++i)
+    for(unsigned i = 0; i < xTiles; ++i)
     {
-      double xUsage = 0., xCap = 0., yUsage = 0., yCap = 0.;
+      double x1Usage = 0., x1Cap = 0., y1Usage = 0., y1Cap = 0.;
+      double x2Usage = 0., x2Cap = 0., y2Usage = 0., y2Cap = 0.;
       for(unsigned k = 0; k < tiles.size(); ++k)
       {
-        unsigned xEdgeId = tiles[k][j][i].incX;
-        unsigned yEdgeId = tiles[k][j][i].incY;
+        unsigned x1EdgeId = tiles[k][j][i].incX;
+        unsigned y1EdgeId = tiles[k][j][i].incY;
+        unsigned x2EdgeId = tiles[k][j][i].decX;
+        unsigned y2EdgeId = tiles[k][j][i].decY;
 
-        if(xEdgeId != UINT_MAX)
+        if(x1EdgeId != UINT_MAX)
         {
-          xUsage += edges[xEdgeId].usage;
-          xCap += edges[xEdgeId].capacity;
+          x1Usage += edges[x1EdgeId].usage;
+          x1Cap += edges[x1EdgeId].capacity;
         }
-        if(yEdgeId != UINT_MAX)
+        if(y1EdgeId != UINT_MAX)
         {
-          yUsage += edges[yEdgeId].usage;
-          yCap += edges[yEdgeId].capacity;
+          y1Usage += edges[y1EdgeId].usage;
+          y1Cap += edges[y1EdgeId].capacity;
+        }
+        if(x2EdgeId != UINT_MAX)
+        {
+          x2Usage += edges[x2EdgeId].usage;
+          x2Cap += edges[x2EdgeId].capacity;
+        }
+        if(y2EdgeId != UINT_MAX)
+        {
+          y2Usage += edges[y2EdgeId].usage;
+          y2Cap += edges[y2EdgeId].capacity;
         }
       }
 
-      double xRatio = static_cast<double>(xUsage)/static_cast<double>(xCap);
-      double yRatio = static_cast<double>(yUsage)/static_cast<double>(yCap);
+      double x1Ratio = 0, y1Ratio = 0, x2Ratio = 0, y2Ratio = 0;
+      
+      if (x1Cap > 0)
+        x1Ratio = static_cast<double>(x1Usage)/static_cast<double>(x1Cap);
+        
+      if (y1Cap > 0)
+        y1Ratio = static_cast<double>(y1Usage)/static_cast<double>(y1Cap);
+        
+      if (x2Cap > 0)  
+        x2Ratio = static_cast<double>(x2Usage)/static_cast<double>(x2Cap);
+        
+      if (y2Cap > 0)
+        y2Ratio = static_cast<double>(y2Usage)/static_cast<double>(y2Cap);
 
-      double totalRatio = 0.5*(xRatio + yRatio);
-
+      double totalRatio = max(max(x1Ratio, y1Ratio), max(x2Ratio, y2Ratio)); //0.5*(xRatio + yRatio);
+      //double totalRatio = 0.5*(x1Ratio + y1Ratio);
       maxRatio = max(maxRatio, totalRatio);
 
+      for (unsigned i1 = 0; i1 < multiplier; i1++)
       horizLine.push_back(totalRatio);
     }
+    for (unsigned i1 = 0; i1 < multiplier; i1++)
     image.push_back(horizLine);
   }
 
-  ofstream outfile(params.resultsFile.c_str(), std::ios::app);
-  outfile << "maxratio was " << maxRatio << endl;
-
-  for(unsigned j = 0; j < yTiles-1; ++j)
+  //for(unsigned j = 0; j < yTiles-1; ++j)
+  for(unsigned j = 0; j < yTiles * multiplier; ++j)
   {
     xpmFile<<"\"";
-    for(unsigned i = 0; i < xTiles-1; ++i)
+    //for(unsigned i = 0; i < xTiles-1; ++i)
+    for(unsigned i = 0; i < xTiles * multiplier; ++i)
     {
-      unsigned index = static_cast<unsigned>(floor((image[j][i]/maxRatio)*static_cast<double>(numColors-1)));
+      //unsigned j1 = j / multiplier;
+      //unsigned i1 = i / multiplier;
+      unsigned index = 0;
+
+      if (image[j][i] <= 1)
+        index = static_cast<unsigned>(floor((image[j][i])*static_cast<double>(nGoodColors-1)));
+
+      else
+      	index = static_cast<unsigned>(floor((image[j][i]/maxRatio)*static_cast<double>(numColors - nGoodColors - 1)))
+                + nGoodColors;
 
       xpmFile<<Colors[index];
     }
-    if(j == yTiles-2)
+    if(j == yTiles * multiplier - 1)
     {
       xpmFile<<"\""<<endl;
     }
@@ -1255,5 +1293,4 @@ void FGR::plotXPM(const string &filename)
   }
   xpmFile<<");"<<endl;
   xpmFile.close();
-  outfile.close();
 }

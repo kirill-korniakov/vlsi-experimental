@@ -120,5 +120,6 @@ int fgr::FGRRouting(HDPGrid& grid)
 
   //system("PAUSE");
   outfile.close();
+  fgr.plotXPM(parms.outputFile, 900);
   return 0;
 }

@@ -390,7 +390,7 @@ namespace fgr
         void printStatistics(bool checkRouted = true, bool final = false);
         void printStatisticsLight(void);
 
-        void plotXPM(const string &filename);
+        void plotXPM(const string &filename, unsigned nPix);
   };
 
   double cpuTime();
