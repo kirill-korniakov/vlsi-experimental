@@ -15,20 +15,7 @@ void Legalization(HDPGrid& grid)
   if (doReport)
     ALERTFORMAT(("HPWL before legalization: %f", wlBeforeL));
 
-  if (grid.Design().cfg.ValueOf("Abacus.useWeights", false))
-  {
-    if (doReport)
-      ALERT("Weighted Abacus");
-    WeightedAbacusLegalization(grid);
-  }
-
-  else
-  {
-    if (doReport)
-      ALERT("Abacus");
-    AbacusLegalization(grid);
-  }
-
+  AbacusLegalization(grid);
   double wlAfterL = Utils::CalculateHPWL(grid.Design(), false);
   if (doReport)
   {
