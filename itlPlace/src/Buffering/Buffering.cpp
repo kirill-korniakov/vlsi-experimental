@@ -157,7 +157,7 @@ void TestBuffering(HDesign& design)
   bool f = false;
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); i++) 
   {
-    if (i <= count)
+    /*if (i <= count)
       continue;
     if (nIter.PinsCount() != 2) 
     	continue;
@@ -165,7 +165,7 @@ void TestBuffering(HDesign& design)
     /*if (nIter.Name() != "n_5108")
     	continue;*/
 
-    bool isAnyPinPrimary = false;
+    /*bool isAnyPinPrimary = false;
     for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
     {
       if (currPin.IsPrimary())
@@ -177,7 +177,7 @@ void TestBuffering(HDesign& design)
     if (isAnyPinPrimary)
     {
       continue;
-    }
+    }*/
 
     /*WRITELINE("");
     ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
@@ -186,13 +186,13 @@ void TestBuffering(HDesign& design)
     ReportNetTiming(design, nIter);
     ExportDEF(design, "not_buffered");*/
     int ghkjb = vg.NetBuffering(nIter);
-    if (ghkjb != 0)
+    /*if (ghkjb != 0)
     {
       ALERTFORMAT(("netIter = %d", i));
       f = true;
       j++;
       break;
-    }
+    }*/
     /*ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
     //FindTopologicalOrder(design);
@@ -206,9 +206,9 @@ void TestBuffering(HDesign& design)
     //break;
     
   }
-  if (!f)
+  /*if (!f)
     ALERTFORMAT(("netIter = %d", i));
-  ALERTFORMAT(("netc = %d", j));
+  ALERTFORMAT(("netc = %d", j));*/
   /*WRITELINE("");
   //FindTopologicalOrder(design);
   ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));

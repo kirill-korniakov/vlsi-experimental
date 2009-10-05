@@ -539,56 +539,57 @@ int VanGinneken::NetBuffering(HNet& net)
     //m_buffersIdxsAtNetSplitted[0] = 1;
     //m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
     //nBuffersInserted = 1;
-  }
-  else
-    return 0;
-  if (nBuffersInserted > 0) 
-  {
     ALERTFORMAT(("net name %s", m_hd.Nets.GetString<HNet::Name>(net).c_str()));
-    m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     ALERT("STA before buffering:");
     STA(m_hd);
     double tns = Utils::TNS(m_hd);
     double wns = Utils::WNS(m_hd);
     ALERTFORMAT(("maxSlack = %f", netInfo.MaxRealDelay()));
+    ALERTFORMAT(("Pins count = %d", m_hd.Nets.GetInt<HNet::PinsCount>(net)));
+    ALERTFORMAT(("HPWL = %f", netInfo.HPWL()));
+    ALERTFORMAT(("WL = %f", netInfo.WL()));
+    ALERTFORMAT(("Lext = %f", netInfo.Lext()));
+    ALERTFORMAT(("Buffer count = %d", m_buffersIdxsAtNetSplitted[0]));
+  }
+  else
+    return 0;
+
+
+
+  if (nBuffersInserted > 0) 
+  {
+    m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     CreateNetsAndCells(net);
-    ALERT("STA after buffering (not legalized):");
+    ALERT("STA after buffering (real):");
     STA(m_hd);
     double tns2 = Utils::TNS(m_hd);
     double wns2 = Utils::WNS(m_hd);
     ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
-    if ((tns2 <= tns) && (wns2 <= wns))
-    {     
-      //все эорошо
-      double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-      double maxSlack = netInfo.MaxRealDelay();
-      //if (vgSlack < maxSlack)
-
-        ALERTFORMAT(("YES!!!"));
-    }
-    else
-    {   
-      //плохо
-      double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-      double maxSlack = netInfo.MaxRealDelay();
-      string name = m_hd.Nets.GetString<HNet::Name>(net);
-     
-      ALERTFORMAT(("NO!!! (tns2 > tns) || (wns2 > wns)"));
-      //if (vgSlack < maxSlack)
-      //  ALERTFORMAT(("NO!!! (tns2 > tns) || (wns2 > wns) and  vgSlack < maxSlack"));//
-
-    }
-   
-
-    delete [] m_buffersIdxsAtNetSplitted;
+    RemoveNewNetAndCell(net);
+    //delete [] m_buffersIdxsAtNetSplitted;
     return nBuffersInserted;
   }
   else
   {
-    delete [] m_buffersIdxsAtNetSplitted;
+    ALERT("STA after buffering (real):");
+    STA(m_hd);
+    double tns2 = Utils::TNS(m_hd);
+    double wns2 = Utils::WNS(m_hd);
+    ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
+    //delete [] m_buffersIdxsAtNetSplitted;
     return 0;
   }
-
+  m_buffersIdxsAtNetSplitted[0] = 1;
+  m_buffersIdxsAtNetSplitted[1] = 0;//в какое звено вставляем буфер
+  nBuffersInserted = 1;
+  CreateNetsAndCells(net);
+  ALERT("STA after buffering in source:");
+  STA(m_hd);
+  double tns2 = Utils::TNS(m_hd);
+  double wns2 = Utils::WNS(m_hd);
+  ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
+  RemoveNewNetAndCell(net);
+  delete [] m_buffersIdxsAtNetSplitted;
 
 }
 
