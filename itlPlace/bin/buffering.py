@@ -1,14 +1,15 @@
 import subprocess
 
-testSet = ['_tv80']
+testSet = ['s298', 'pci_spoci_ctrl', 'tv80', 'ac97_ctrl',
+'b21', 'b22', 'b17', 'b18']
 
-outputFileName = 'BufferingOutput.xls'
+outputFileName = 'BufferingOutput'
 
 def parseLog(logName, benchmark):
     fh = open(logName, 'r')
-    po = open(outputFileName, 'a')
+    po = open(outputFileName + benchmark + '.xls', 'a')
 
-    po.write('\n' + benchmark + '\t')    # set the benchmark name
+    po.write('\n' + benchmark)    # set the benchmark name
 
     isTiming = False
     HPWL = 0.0
@@ -30,12 +31,12 @@ def parseLog(logName, benchmark):
     vgSlack = 0.0
 
     for line in fh.readlines():
-        po.write('\n');  
+        
         
         idx = line.find('net name ')
         if idx != -1:
             net = line[idx + len('net name '):-1]
-            po.write(net + '\t')
+            po.write('\t' + net + '\t')
             continue
 
         
@@ -55,37 +56,38 @@ def parseLog(logName, benchmark):
         if (isTiming) and (idx != -1):
             WNS = line[idx + len('  WNS: '):-1]
             po.write(WNS.replace('.', ',') + '\t')
-            isTiming = False
+            
             continue
         idx = line.find('maxSlack = ')
-        if  (idx != -1):
+        if  (isTiming) and (idx != -1):
             maxSlack = line[idx + len('maxSlack = '):-1]
-            po.write(maxSlack.replace('.', ',') + '\t\t')
+            po.write(maxSlack.replace('.', ',') + '\t')
             continue
         idx = line.find('Pins count = ')
-        if idx != -1:
+        if (isTiming) and (idx != -1):
             PinsCount = line[idx + len('Pins count = '):-1]
             po.write(PinsCount + '\t')
             continue
         idx = line.find('HPWL = ')
-        if idx != -1:
+        if (isTiming) and (idx != -1):
             HPWL = line[idx + len('HPWL = '):-1]
             po.write(HPWL.replace('.', ',') + '\t')
             continue
         idx = line.find('WL = ')
-        if idx != -1:
+        if (isTiming) and (idx != -1):
             WL = line[idx + len('WL = '):-1]
             po.write(WL.replace('.', ',') + '\t')
             continue
         idx = line.find('Lext = ')
-        if idx != -1:
+        if (isTiming) and (idx != -1):
             Lext = line[idx + len('Lext = '):-1]
             po.write(Lext.replace('.', ',') + '\t')
             continue
         idx = line.find('Buffer count = ')
-        if idx != -1:
+        if (isTiming) and (idx != -1):
             bi = line[idx + len('Buffer count = '):-1]
-            po.write(bi + '\t')
+            po.write(bi + '\t\t')
+            isTiming = False
             continue
 
         #get bSTA
@@ -104,10 +106,10 @@ def parseLog(logName, benchmark):
             WNS = line[idx + len('  WNS: '):-1]
             po.write(WNS.replace('.', ',') + '\t')
             continue
-        idx = line.find('vgSlack = ')
+        idx = line.find('vgrSlack = ')
         if (isTiming) and (idx != -1):
-            vgSlack = line[idx + len('vgSlack = '):-1]
-            po.write(vgSlack.replace('.', ',') + '\t')
+            vgSlack = line[idx + len('vgrSlack = '):-1]
+            po.write(vgSlack.replace('.', ',') + '\t\t')
             isTiming = False
             continue
 
@@ -130,7 +132,8 @@ def parseLog(logName, benchmark):
         idx = line.find('vgSlack = ')
         if (isTiming) and (idx != -1):
             vgSlack = line[idx + len('vgSlack = '):-1]
-            po.write(vgSlack.replace('.', ',') + '\t\n')
+            po.write(vgSlack.replace('.', ',') + '\t\t\n')
+            
             isTiming = False
             continue
         
@@ -145,14 +148,15 @@ def parseLog(logName, benchmark):
 
 print('Performing tests on the following set of benchmarks: ' + ', '.join(testSet))
         
-po = open(outputFileName, 'w')
-#if (po == NULL):
-#    print('Couldn't open ' + outputFileName + '. Exiting.')
-#    exit
-po.write('\tnet\tTNS\tWNS\tmaxSlack\tPins count\tHPWL\tWL\tLext\tBuffer count\t\tbrTNS\tbrWNS\tvgrSlack\t\tbTNS\tbWNS\tvgSlack\t')
-po.close()
+
 
 for benchmark in testSet:
+    po = open(outputFileName + benchmark + '.xls', 'w')
+    #if (po == NULL):
+    #    print('Couldn't open ' + outputFileName + '. Exiting.')
+    #    exit
+    po.write('\tnet\tTNS\tWNS\tmaxSlack\tPins count\tHPWL\tWL\tLext\tBuffer count\t\tbrTNS\tbrWNS\tvgrSlack\t\tbTNS\tbWNS\tvgSlack\t')
+    po.close()
     #Run
     logFileName = '.\\IWLS05\\' + benchmark + '.log'
     fPlacerOutput = open(logFileName, 'w');
