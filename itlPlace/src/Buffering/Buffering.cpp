@@ -140,9 +140,9 @@ void TestBuffering(HDesign& design)
   ConfigContext ctx = design.cfg.OpenContext("Buffering");
   WRITELINE("");
   ALERT("BUFFERING STARTED");
-  ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA before buffering:");
-  STA(design);
+  //ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
+  //ALERT("STA before buffering:");
+  STA(design, false);
       
   //buffering
   VanGinneken vg(design);
@@ -151,9 +151,14 @@ void TestBuffering(HDesign& design)
 
   //FIXME: debugging
   //ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
-  
-  for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); ) 
+  int count = design.cfg.ValueOf(".netIter", 0);
+  int i = 0;
+  int j = 0;
+  bool f = false;
+  for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); i++) 
   {
+    if (i <= count)
+      continue;
     if (nIter.PinsCount() != 2) 
     	continue;
     	
@@ -181,8 +186,13 @@ void TestBuffering(HDesign& design)
     ReportNetTiming(design, nIter);
     ExportDEF(design, "not_buffered");*/
     int ghkjb = vg.NetBuffering(nIter);
-    //if (ghkjb != 0)
-    //  break;
+    if (ghkjb != 0)
+    {
+      ALERTFORMAT(("netIter = %d", i));
+      f = true;
+      j++;
+      break;
+    }
     /*ReportBufferingPhysics(vg);
     ExportDEF(design, "buffered");
     //FindTopologicalOrder(design);
@@ -192,10 +202,14 @@ void TestBuffering(HDesign& design)
     //ALERT("After legalization:");
     //Legalization(DPGrid);
     //STA(design);
+    
     //break;
+    
   }
-
-  WRITELINE("");
+  if (!f)
+    ALERTFORMAT(("netIter = %d", i));
+  ALERTFORMAT(("netc = %d", j));
+  /*WRITELINE("");
   //FindTopologicalOrder(design);
   ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering (not legalized):");
@@ -215,6 +229,6 @@ void TestBuffering(HDesign& design)
   ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
   ALERT("STA after buffering and legalization:");
   STA(design);
-
+*/
   ALERT("BUFFERING FINISHED");
 }
