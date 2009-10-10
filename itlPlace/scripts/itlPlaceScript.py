@@ -54,7 +54,7 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
 
     for line in fh.readlines():
         if isBeforeDP:
-            idx = line.find('HPWL after  legalization: ')
+            idx = line.find('HPWL after legalization: ')
             if idx != -1:
                 HPWL = line[idx + len('HPWL after  legalization: '):-1]
                 HPWLsBDP.append(float(HPWL))
