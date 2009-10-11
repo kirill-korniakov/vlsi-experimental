@@ -629,6 +629,59 @@ void PropagateArrivals(HDesign& design)
   }//for (HTimingPointWrapper pt
 }
 
+void PropagateArrivalsUnidirectionally(HDesign& design)
+{//only rise delays used
+  for (HTimingPointWrapper pt = design[design.TimingPoints.FirstInternalPoint()];
+    !::IsNull(pt); pt.GoNext())
+  {
+    HPin pin = pt.Pin();
+    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+    {//single arc from net source
+      HNet net = design.Get<HPin::Net, HNet>(pin);
+      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
+      HSteinerPoint this_point = design.SteinerPoints[pin];
+      pt.SetRiseArrivalTime(design.GetDouble<HTimingPoint::RiseArrivalTime>(source)
+        + design.GetDouble<HSteinerPoint::PathDelay>(this_point));
+      pt.SetRiseArrivalAncestor(source);
+    }
+    else
+    {//here can be several cell's arcs
+      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
+      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
+      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+      {
+        HSteinerPoint this_point = design.SteinerPoints[pin];
+        double observedC = design.GetDouble<HSteinerPoint::ObservedC>(this_point);
+        double worstTime = -DBL_MAX;
+        HTimingPoint worstRelatedPoint = design.TimingPoints.Null();
+        
+        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
+          arc.MoveNext(); )
+        {
+          if (arc.TimingType() == TimingType_Combinational)
+          {
+            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
+
+            double time = design.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
+                  + arc.TIntrinsicRise() 
+                  + arc.ResistanceRise() * observedC;
+
+            if (time > worstTime)
+            {
+              worstTime = time;
+              worstRelatedPoint = startPoint;
+            }
+          }//if (arc.TimingType() == TimingType_Combinational)
+        }//for (HPinType::ArcsEnumeratorW arc
+
+        //set results
+        pt.SetRiseArrivalTime(worstTime);
+        pt.SetRiseArrivalAncestor(worstRelatedPoint);
+      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+  }//for (HTimingPointWrapper pt
+}
+
 void PropagateRequires(HDesign& design)
 {
   HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
@@ -651,7 +704,7 @@ void PropagateRequires(HDesign& design)
         design.Set<HTimingPoint::FallRequiredAncestor>(source, (HTimingPoint)pt);
       }
       
-      double thisRiseRequired = pt.FallRequiredTime()
+      double thisRiseRequired = pt.RiseRequiredTime()
         - design.GetDouble<HSteinerPoint::RisePathDelay>(this_point);
       if (design.GetDouble<HTimingPoint::RiseRequiredTime>(source) > thisRiseRequired)
       {
@@ -732,6 +785,59 @@ void PropagateRequires(HDesign& design)
   }//for (HTimingPointWrapper pt
 }
 
+void PropagateRequiresUnidirectionally(HDesign& design)
+{
+  HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
+
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    pt.GoPrevious() != firstPoint; )
+  {
+    HPin pin = pt.Pin();
+    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+    {//single arc to net source
+      HNet net = design.Get<HPin::Net, HNet>(pin);
+      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
+      HSteinerPoint this_point = design.SteinerPoints[pin];
+      
+      double thisRiseRequired = pt.RiseRequiredTime()
+        - design.GetDouble<HSteinerPoint::PathDelay>(this_point);
+      if (design.GetDouble<HTimingPoint::RiseRequiredTime>(source) > thisRiseRequired)
+      {
+        design.Set<HTimingPoint::RiseRequiredTime>(source, thisRiseRequired);
+        design.Set<HTimingPoint::RiseRequiredAncestor>(source, (HTimingPoint)pt);
+      }
+    }
+    else
+    {
+      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
+      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
+      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+      {
+        HSteinerPoint this_point = design.SteinerPoints[pin];
+        double observedC = design.GetDouble<HSteinerPoint::ObservedC>(this_point);
+
+        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
+          arc.MoveNext(); )
+        {
+          if (arc.TimingType() == TimingType_Combinational)
+          {
+            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
+            double time = pt.RiseRequiredTime()
+              - arc.TIntrinsicRise() 
+              - arc.ResistanceRise() * observedC;
+
+            if (time < design.GetDouble<HTimingPoint::RiseRequiredTime>(startPoint))
+            {
+              design.Set<HTimingPoint::RiseRequiredTime>(startPoint, time);
+              design.Set<HTimingPoint::RiseRequiredAncestor>(startPoint, (HTimingPoint)pt);
+            }
+          }//if (arc.TimingType() == TimingType_Combinational)
+        }//for (HPinType::ArcsEnumeratorW arc
+      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+  }//for (HTimingPointWrapper pt
+}
+
 void PropagateDelays(HDesign& design, double clock_cycle)
 {
   //WRITELINE("");
@@ -749,11 +855,19 @@ void PropagateDelays(HDesign& design, double clock_cycle)
   SetEndPointsRequires(design, clock_cycle);
   //ALERT("Requires initialized");
 
-  //propagate delays
-  PropagateArrivals(design);
-  //ALERT("Arrivals propagated");
-  PropagateRequires(design);
-  //ALERT("Requires propagated");
+  if (design.cfg.ValueOf("Timing.CalulateUnidirectionally", false))
+  {
+    PropagateArrivalsUnidirectionally(design);
+    PropagateRequiresUnidirectionally(design);
+  }
+  else
+  {
+    //propagate delays
+    PropagateArrivals(design);
+    //ALERT("Arrivals propagated");
+    PropagateRequires(design);
+    //ALERT("Requires propagated");
+  }
 
   //ALERT("TIMING FINISHED");
 }
