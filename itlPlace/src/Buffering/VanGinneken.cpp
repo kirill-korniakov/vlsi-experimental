@@ -533,12 +533,13 @@ int VanGinneken::NetBuffering(HNet& net)
     int x;
     printbuffer(m_finalLocationVan, &x);
   }
+
+  //ÄÀËÜØÅ ÍÀ×ÈÍÀŞÒÑß İÊÑÏÅĞÅÌÅÍÒÛ
   netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
+  //ïğîâåğÿåì óñëîâèå
   if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
   {
-    //m_buffersIdxsAtNetSplitted[0] = 1;
-    //m_buffersIdxsAtNetSplitted[1] = 0;//â êàêîå çâåíî âñòàâëÿåì áóôåğ
-    //nBuffersInserted = 1;
+    //ÑÁÎĞ ÄÀÍÍÛÕ ÄÎ ÁÓÔÅĞÈÇÀÖÈÈ:
     ALERTFORMAT(("net name %s", m_hd.Nets.GetString<HNet::Name>(net).c_str()));
     ALERT("STA before buffering:");
     STA(m_hd);
@@ -555,30 +556,38 @@ int VanGinneken::NetBuffering(HNet& net)
     return 0;
 
 
-
+  //ÁËÎÊ ĞÅÀËÜÍÎÉ ÁÓÔÅĞÈÇÀÖÈÈ
+  //{
+  double vgRSlack = 0;
   if (nBuffersInserted > 0) 
   {
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     CreateNetsAndCells(net);
-    ALERT("STA after buffering (real):");
+    ALERTFORMAT(("STA after buffering (real):"));
     STA(m_hd);
     double tns2 = Utils::TNS(m_hd);
     double wns2 = Utils::WNS(m_hd);
-    ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
+    vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+    ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
     RemoveNewNetAndCell(net);
-    //delete [] m_buffersIdxsAtNetSplitted;
-    return nBuffersInserted;
+    //delete [] m_buffersIdxsAtNetSplitted;// (1) ĞÀÑÊÎÌÅÍÒÈĞÎÂÀÒÜ ÅÑËÈ ÂÑÒÀÂÊÀ ÁÓÔÅĞÀ Â ÄĞÀÉÂÅĞ ÍÅ ÍÓÆÍÀ
+    //return nBuffersInserted;
   }
   else
   {
-    ALERT("STA after buffering (real):");
+    ALERTFORMAT(("STA after buffering (real):"));
     STA(m_hd);
     double tns2 = Utils::TNS(m_hd);
     double wns2 = Utils::WNS(m_hd);
-    ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
-    //delete [] m_buffersIdxsAtNetSplitted;
-    return 0;
+    vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+    ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
+    //delete [] m_buffersIdxsAtNetSplitted;// (2) ĞÀÑÊÎÌÅÍÒÈĞÎÂÀÒÜ ÅÑËÈ ÂÑÒÀÂÊÀ ÁÓÔÅĞÀ Â ÄĞÀÉÂÅĞ ÍÅ ÍÓÆÍÀ
+    //return 0;
   }
+  //}
+
+  //ÁËÎÊ ÂÑÒÀÂÊÈ ÁÓÔÅĞÀ Â ÄĞÀÉÂÅĞ(åñëè îí íå íóæåí ğàñêîìåíòèğîâàòü (1) è (2) )
+  //{
   m_buffersIdxsAtNetSplitted[0] = 1;
   m_buffersIdxsAtNetSplitted[1] = 0;//â êàêîå çâåíî âñòàâëÿåì áóôåğ
   nBuffersInserted = 1;
@@ -587,9 +596,12 @@ int VanGinneken::NetBuffering(HNet& net)
   STA(m_hd);
   double tns2 = Utils::TNS(m_hd);
   double wns2 = Utils::WNS(m_hd);
-  ALERTFORMAT(("vgSlack = %f", TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]) ));
+  double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+  ALERTFORMAT(("vgSlack = %f", vgSlack ));
   RemoveNewNetAndCell(net);
+  return 1;
   delete [] m_buffersIdxsAtNetSplitted;
+  //}
 
 }
 

@@ -91,9 +91,8 @@ def parseLog(logName, benchmark):
             continue
 
         #get bSTA
-        idx = line.find('STA after buffering (real):\n')
+        idx = line.find('STA after buffering (real):')
         if idx != -1:
-            
             isTiming = True
             continue
         idx = line.find('  TNS: ')
@@ -133,7 +132,6 @@ def parseLog(logName, benchmark):
         if (isTiming) and (idx != -1):
             vgSlack = line[idx + len('vgSlack = '):-1]
             po.write(vgSlack.replace('.', ',') + '\t\t\n')
-            
             isTiming = False
             continue
         

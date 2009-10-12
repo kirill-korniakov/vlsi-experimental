@@ -157,55 +157,66 @@ void TestBuffering(HDesign& design)
   bool f = false;
   for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); i++) 
   {
-    /*if (i <= count)
-      continue;
-    if (nIter.PinsCount() != 2) 
-    	continue;
-    	
-    /*if (nIter.Name() != "n_5108")
-    	continue;*/
+    // (1) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (2)  )
+    //{
+    //if (i <= count)
+    //  continue;
+    //}
+    //Сколько пинов должно быть в нете
+    //if (nIter.PinsCount() != 2) 
+    //	continue;
+    //имя необходимого нета	
+    //if (nIter.Name() != "n_116")
+    //	continue;
 
-    /*bool isAnyPinPrimary = false;
-    for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
-    {
-      if (currPin.IsPrimary())
-      {
-        isAnyPinPrimary = true;
-        break;
-      }
-    }
-    if (isAnyPinPrimary)
-    {
-      continue;
-    }*/
+    //Рассматриваются ли неы в которые входят Primary pin
+    //bool isAnyPinPrimary = false;
+    //for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
+    //{
+    //  if (currPin.IsPrimary())
+    //  {
+    //    isAnyPinPrimary = true;
+    //    break;
+    //  }
+    //}
+    //if (isAnyPinPrimary)
+    //{
+    //  continue;
+    //}
 
-    /*WRITELINE("");
-    ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
-    ReportNetPinsCoordinates(design, nIter);
-    STA(design);
-    ReportNetTiming(design, nIter);
-    ExportDEF(design, "not_buffered");*/
-    int ghkjb = vg.NetBuffering(nIter);
-    /*if (ghkjb != 0)
-    {
-      ALERTFORMAT(("netIter = %d", i));
-      f = true;
-      j++;
-      break;
-    }*/
-    /*ReportBufferingPhysics(vg);
-    ExportDEF(design, "buffered");
-    //FindTopologicalOrder(design);
+    //несколько отчетов до буферизации
+    //WRITELINE("");
+    //ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
+    //ReportNetPinsCoordinates(design, nIter);
+    //STA(design);
+    //ReportNetTiming(design, nIter);
+    //ExportDEF(design, "not_buffered");
+
+    int nBuf = vg.NetBuffering(nIter);
+    // (2) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (1)  )
+    //if (nBuf != 0)
+    //{
+    //  ALERTFORMAT(("netIter = %d", i));
+    //  f = true;
+    //  j++;
+    //  break;
+    //}
+
+    //несколько отчетов после буферизации
+    //ReportBufferingPhysics(vg);
+    //ExportDEF(design, "buffered");
     //ALERT("After buffer insertion:");
-    STA(design);
-    ReportNetTiming(design, nIter);*/
+    //STA(design);
+    //ReportNetTiming(design, nIter);
     //ALERT("After legalization:");
     //Legalization(DPGrid);
     //STA(design);
     
-    //break;
+    //break;//раскоментировать если нужен только один нет.
     
   }
+
+  //финальные отчеты
   /*if (!f)
     ALERTFORMAT(("netIter = %d", i));
   ALERTFORMAT(("netc = %d", j));*/
