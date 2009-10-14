@@ -1,0 +1,18 @@
+package LinearAlgebra version 0.0.2 {
+  interface Factory {
+    int initialize();
+    int finalize();
+    
+    /**
+     * createVec returns a pointer to a TaoVec 
+     */
+    opaque createVec(in int n);
+
+    
+
+    /**
+     * createMat returns a pointer to a TaoMat
+     */
+    opaque createMat(in int m, in int n);
+  };
+};

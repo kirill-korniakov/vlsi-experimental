@@ -1,0 +1,6 @@
+#include "tao_solver.h"
+#include "src/externaltao/esitao/interface/taovec_esi.h"
+#include "src/externaltao/esitao/interface/taomat_esi.h"
+#include "src/externaltao/esitao/esisolver/esiapplication.h"
+#include "src/externaltao/esitao/esisolver/taoesiapp.h"
+#include "src/externaltao/esitao/interface/taolinearsolver_esi.h"

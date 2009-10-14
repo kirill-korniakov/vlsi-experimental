@@ -1,0 +1,10 @@
+pci_spoci_ctrl
+s298
+b18
+ethernet
+b17
+b22
+b21
+ac97_ctrl
+tv80
+des_perf
