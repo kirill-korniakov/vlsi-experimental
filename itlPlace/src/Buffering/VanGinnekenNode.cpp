@@ -172,6 +172,10 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
   m_ys = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_SubtreeRoot);
   m_yle = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_LeftEnd);
   m_yre = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_RightEnd);
+  if ((m_xs == m_xle) && (m_ys == m_yle))
+  {
+    ALERTFORMAT(("CHUDO!!!"));
+  }
   m_Capacitance = 0.0;//capacitance;
   m_RAT = requiredArrivalTime;
   m_typePoint = typePoint;

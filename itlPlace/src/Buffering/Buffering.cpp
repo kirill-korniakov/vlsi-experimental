@@ -166,7 +166,7 @@ void TestBuffering(HDesign& design)
     //if (nIter.PinsCount() != 2) 
     //	continue;
     //имя необходимого нета	
-    //if (nIter.Name() != "n_116")
+    //if (nIter.Name() != "n_3865")
     //	continue;
 
     //Рассматриваются ли неы в которые входят Primary pin
