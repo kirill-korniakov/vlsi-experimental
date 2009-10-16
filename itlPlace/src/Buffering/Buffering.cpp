@@ -238,8 +238,8 @@ void TestBuffering(HDesign& design)
   WRITELINE("");
   //FindTopologicalOrder(design);
   ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA after buffering and legalization:");
+  ALERT("STA after buffering and legalization:");*/
   STA(design);
-*/
+
   ALERT("BUFFERING FINISHED");
 }

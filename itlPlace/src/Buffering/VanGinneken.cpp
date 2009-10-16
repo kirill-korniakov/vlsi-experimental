@@ -599,8 +599,11 @@ int VanGinneken::NetBuffering(HNet& net)
   double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
   ALERTFORMAT(("vgSlack = %f", vgSlack ));
   RemoveNewNetAndCell(net);
-  return 1;
+  STA(m_hd);
+
   delete [] m_buffersIdxsAtNetSplitted;
+  return 1;
+
   //}
 
 }
@@ -698,7 +701,10 @@ void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
 
   m_hd.Nets.Set<HNet::Kind>(oldNet, NetKind_Active);
   for (int i = 0; i < newNetAndCell.GetNNET(); i++)
+  {
     m_hd.Nets.Set<HNet::Kind>(newNetAndCell.GetNet(i), NetKind_Removed);
+	m_hd._Design.NetList.nNetsEnd--;
+  }
 
   for (int j = 0; j < newNetAndCell.GetNCell(); j++)
   {
@@ -711,7 +717,9 @@ void VanGinneken::RemoveNewNetAndCell(HNet oldNet)
     }
     m_hd.Cells.Set<HCell::PlacementStatus>(newNetAndCell.GetCell(j), PlacementStatus_Fictive);
     HCellWrapper cw = m_hd[newNetAndCell.GetCell(j)];
+	m_hd._Design.NetList.nPinsEnd = m_hd._Design.NetList.nPinsEnd - m_hd.Cells.GetInt<HCell::PinsCount>(newNetAndCell.GetCell(j));
     m_hd._Design.NetList.nCellsEnd--;
+	
   }
 
   m_hd.TimingPoints.CountStartAndEndPoints();
