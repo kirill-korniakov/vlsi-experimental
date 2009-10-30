@@ -133,6 +133,7 @@ int main(int argc, char** argv)
           }
         }
 
+        //BufferingAndReport(hd);
         if (0)
         {
           ConfigContext ctx = hd.cfg.OpenContext("Buffering");
@@ -151,7 +152,7 @@ int main(int argc, char** argv)
 
           for(HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
           {
-            if (net.Name() == "n_4598")
+            //if (net.Name() == "n_4598")
             {
               NetInfo netInfo = NetInfo::Create(hd, net, buf);
               double before_buffering = th.GetBufferedNetMaxDelay(net, netInfo, buf);

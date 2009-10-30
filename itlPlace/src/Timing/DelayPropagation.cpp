@@ -1,439 +1,501 @@
 #include "Timing.h"
 #include <float.h>
 
-void GetArrivalRisingArc(HDesign& hd,
-                  HTimingPoint startPoint,
-                  HTimingPoint endPoint,
-                  HTimingArcType* risingArc,
-                  double* arcRiseTime,
-                  bool* isInversed)
+enum PropagationDirection
 {
-  HPin pin = hd.Get<HTimingPoint::Pin, HPin>(endPoint);
-  HPinType ptype = hd.Get<HPin::Type, HPinType>(pin);
-  if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-  {
-    HPin start_pin = hd.Get<HTimingPoint::Pin, HPin>(startPoint);
-    HSteinerPoint endStPoint = hd.SteinerPoints[pin];
-    double riseObservedC = hd.GetDouble<HSteinerPoint::RiseObservedC>(endStPoint);
-    double worstRiseTime = -DBL_MAX;
-    bool found = false;
-    for (HPinType::ArcsEnumeratorW arc = hd.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-      arc.MoveNext(); )
-    {
-      if (arc.TimingType() == TimingType_Combinational
-        && arc.GetStartPin(pin) == start_pin)
-      {
-        found = true;
-        double riseTime;
-        bool isSignalInversed;
+  PropagationDirection_Arrival = 0,
+  PropagationDirection_Required = 1
+};
 
-        switch (arc.TimingSense())
-        {
-        case TimingSense_PositiveUnate:
-          {
-            riseTime = hd.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
-              + arc.TIntrinsicRise() 
-              + arc.ResistanceRise() * riseObservedC;
-            isSignalInversed = false;
-          }
-          break;
-        case TimingSense_NegativeUnate:
-          {
-            riseTime = hd.GetDouble<HTimingPoint::FallArrivalTime>(startPoint)
-              + arc.TIntrinsicRise() 
-              + arc.ResistanceRise() * riseObservedC;
-            isSignalInversed = true;
-          }
-          break;
-        case TimingSense_NonUnate:
-          {
-            double pinArrival1 = hd.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint);
-            double pinArrival2 = hd.GetDouble<HTimingPoint::FallArrivalTime>(startPoint);
-            if (pinArrival1 >= pinArrival2)
-            {
-              riseTime = pinArrival1
-                + arc.TIntrinsicRise() 
-                + arc.ResistanceRise() * riseObservedC;
-              isSignalInversed = false;
-            }
-            else
-            {
-              riseTime = pinArrival2
-                + arc.TIntrinsicRise() 
-                + arc.ResistanceRise() * riseObservedC;
-              isSignalInversed = true;
-            }
-          }
-          break;
-        default:
-          LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-          break;
-        }//switch (arc.TimingSense())
-        if (riseTime > worstRiseTime)
-        {
-          worstRiseTime = riseTime;
-          *risingArc = arc;
-          *isInversed = isSignalInversed;
-        }
-      }
+template<class memberType>
+struct RFPair
+{
+  memberType fall;
+  memberType rise;
+
+  RFPair() {}
+  RFPair(const memberType& value): fall(value), rise(value) {}
+  RFPair(const memberType& f, const memberType& r): fall(f), rise(r){}
+
+  RFPair& operator=(const memberType& value)
+  {
+    fall = rise = value;
+    return *this;
+  }
+};
+
+typedef double Float1D;
+typedef RFPair<double> Float2D;
+
+typedef bool Bool1D;
+typedef RFPair<bool> Bool2D;
+
+typedef HTimingPoint TimingPoint1D;
+typedef RFPair<HTimingPoint> TimingPoint2D;
+
+template<int SignalDirectionsNumber>
+class DelayPropagation;
+
+template<>
+class DelayPropagation<2>
+{
+  HDesign& design;
+
+public:
+  typedef Float2D CapacitanceType;
+  typedef Float2D TimeType;
+  typedef Bool2D BoolType;
+  typedef TimingPoint2D TimingPoint;
+
+  DelayPropagation(HDesign& hd): design(hd) {}
+
+  CapacitanceType GetObservedC(HSteinerPoint point)
+  {
+    return CapacitanceType(
+      design.GetDouble<HSteinerPoint::FallObservedC>(point),
+      design.GetDouble<HSteinerPoint::RiseObservedC>(point));
+  }
+
+  TimeType GetArrivalTime(HTimingPoint point)
+  {
+    return TimeType(
+      design.GetDouble<HTimingPoint::FallArrivalTime>(point),
+      design.GetDouble<HTimingPoint::RiseArrivalTime>(point));
+  }
+
+  TimeType GetRequiredTime(HTimingPoint point)
+  {
+    return TimeType(
+      design.GetDouble<HTimingPoint::FallRequiredTime>(point),
+      design.GetDouble<HTimingPoint::RiseRequiredTime>(point));
+  }
+
+  BoolType GetSignalInversions(TimingSense arcSense, const TimeType& time)
+  {
+    switch (arcSense)
+    {
+    case TimingSense_PositiveUnate:
+      return BoolType(false);
+    case TimingSense_NegativeUnate:
+      return BoolType(true);
+    case TimingSense_NonUnate:
+      if (time.rise > time.fall)
+        return BoolType(true, false);
+      else if (time.rise < time.fall)
+        return BoolType(false, true);
+      return BoolType(false);
+    default:
+      LOGERRORFORMAT(("Unknown timing sense: %d", arcSense));
+      return BoolType(false);
+    }//switch (arc.TimingSense())
+  }
+
+  TimeType GetArcOutputTimeArrival(const HTimingArcTypeWrapper& arc,
+    const CapacitanceType& observedC,
+    const TimeType& inputTime,
+    BoolType& inversed)
+  {
+    inversed = GetSignalInversions(arc.TimingSense(), inputTime);
+
+    return TimeType(
+      arc.TIntrinsicFall() + arc.ResistanceFall() * observedC.fall
+        + (inversed.fall ? inputTime.rise : inputTime.fall),
+      arc.TIntrinsicRise() + arc.ResistanceRise() * observedC.rise
+        + (inversed.rise ? inputTime.fall : inputTime.rise));
+  }
+
+  TimeType GetArcOutputTimeRequired(const HTimingArcTypeWrapper& arc,
+    const CapacitanceType& observedC,
+    const TimeType& inputTime,
+    BoolType& inversed)
+  {
+    TimeType time(
+      arc.TIntrinsicFall() + arc.ResistanceFall() * observedC.fall - inputTime.fall,
+      arc.TIntrinsicRise() + arc.ResistanceRise() * observedC.rise - inputTime.rise);
+
+    inversed = GetSignalInversions(arc.TimingSense(), time);
+
+    return TimeType (
+      inversed.fall ? -time.rise : - time.fall,
+      inversed.rise ? -time.fall : - time.rise);
+  }
+
+  void AccumulateWorstArrivalInFirst(
+    TimeType& wTime, BoolType& wInversed, TimingPoint& wPoint,
+    const TimeType& time, const BoolType& inversed, HTimingPoint point)
+  {
+    if (time.fall > wTime.fall)
+    {
+      wTime.fall = time.fall;
+      wPoint.fall = point;
+      wInversed.fall = inversed.fall;
     }
+    if (time.rise > wTime.rise)
+    {
+      wTime.rise = time.rise;
+      wPoint.rise = point;
+      wInversed.rise = inversed.rise;
+    }
+  }
+
+  void SetArrivalTime(HTimingPoint point, const TimeType& time)
+  {
+    design.Set<HTimingPoint::FallArrivalTime>(point, time.fall);
+    design.Set<HTimingPoint::RiseArrivalTime>(point, time.rise);
+  }
+
+  void SetRequiredTime(HTimingPoint point, const TimeType& time)
+  {
+    design.Set<HTimingPoint::FallRequiredTime>(point, time.fall);
+    design.Set<HTimingPoint::RiseRequiredTime>(point, time.rise);
+  }
+
+  void SetArrivalAncestor(HTimingPoint point, const TimingPoint& anc)
+  {
+    design.Set<HTimingPoint::FallArrivalAncestor>(point, anc.fall);
+    design.Set<HTimingPoint::RiseArrivalAncestor>(point, anc.rise);
+  }
+
+  void SetArrivalInversion(HTimingPoint point, const BoolType& inv)
+  {
+    design.Set<HTimingPoint::IsFallArrivalInversed>(point, inv.fall);
+    design.Set<HTimingPoint::IsRiseArrivalInversed>(point, inv.rise);
+  }
+
+  void AccumulateWorstRequiredOnPin(HTimingPoint targetPoint,
+    const TimeType& time, const BoolType& inversed, HTimingPoint point)
+  {
+    if (time.fall < design.GetDouble<HTimingPoint::FallRequiredTime>(targetPoint))
+    {
+      design.Set<HTimingPoint::FallRequiredTime>(targetPoint, time.fall);
+      design.Set<HTimingPoint::FallRequiredAncestor>(targetPoint, point);
+      design.Set<HTimingPoint::IsFallRequiredInversed>(targetPoint, inversed.fall);
+    }
+    if (time.rise < design.GetDouble<HTimingPoint::RiseRequiredTime>(targetPoint))
+    {
+      design.Set<HTimingPoint::RiseRequiredTime>(targetPoint, time.rise);
+      design.Set<HTimingPoint::RiseRequiredAncestor>(targetPoint, point);
+      design.Set<HTimingPoint::IsRiseRequiredInversed>(targetPoint, inversed.rise);
+    }
+  }
+
+  TimeType GetSinkArrivalTime(HTimingPoint source, HSteinerPoint sink)
+  {
+    return TimeType(
+      design.GetDouble<HTimingPoint::FallArrivalTime>(source) + design.GetDouble<HSteinerPoint::FallPathDelay>(sink),
+      design.GetDouble<HTimingPoint::RiseArrivalTime>(source) + design.GetDouble<HSteinerPoint::RisePathDelay>(sink));
+  }
+
+  TimeType GetSourceRequiredTime(HTimingPoint sink)
+  {
+    HSteinerPoint point = design.SteinerPoints[design.Get<HTimingPoint::Pin, HPin>(sink)];
+    return TimeType(
+      design.GetDouble<HTimingPoint::FallRequiredTime>(sink) - design.GetDouble<HSteinerPoint::FallPathDelay>(point),
+      design.GetDouble<HTimingPoint::RiseRequiredTime>(sink) - design.GetDouble<HSteinerPoint::RisePathDelay>(point));
+  }
+
+  void AccumulateSourceRequiredTime(HTimingPoint source, HTimingPoint sink, const TimeType& time)
+  {
+    if (design.GetDouble<HTimingPoint::FallRequiredTime>(source) > time.fall)
+    {
+      design.Set<HTimingPoint::FallRequiredTime>(source, time.fall);
+      design.Set<HTimingPoint::FallRequiredAncestor>(source, sink);
+    }
+    if (design.GetDouble<HTimingPoint::RiseRequiredTime>(source) > time.rise)
+    {
+      design.Set<HTimingPoint::RiseRequiredTime>(source, time.rise);
+      design.Set<HTimingPoint::RiseRequiredAncestor>(source, sink);
+    }
+  }
+
+  TimeType GetEdgeArcOutputTime(const HTimingArcTypeWrapper& arc, const HTimingPointWrapper& sp, HSteinerPoint spst)
+  {
+    return TimeType(
+      sp.FallArrivalTime() + arc.TIntrinsicFall()
+        + arc.ResistanceFall() * design.GetDouble<HSteinerPoint::FallObservedC>(spst),
+      sp.RiseArrivalTime() + arc.TIntrinsicRise()
+        + arc.ResistanceRise() * design.GetDouble<HSteinerPoint::RiseObservedC>(spst));
+  }
+
+  TimeType GetSetupArcOutputTime(const HTimingArcTypeWrapper& arc, const HTimingPointWrapper& ep)
+  {
+    return TimeType(
+      ep.FallRequiredTime() - arc.TIntrinsicFall(),
+      ep.RiseRequiredTime() - arc.TIntrinsicRise());
+  }
+};
+
+template<>
+class DelayPropagation<1>
+{
+  HDesign& design;
+
+public:
+  typedef Float1D CapacitanceType;
+  typedef Float1D TimeType;
+  typedef Bool1D BoolType;
+  typedef TimingPoint1D TimingPoint;
+
+  DelayPropagation(HDesign& hd): design(hd) {}
+
+  CapacitanceType GetObservedC(HSteinerPoint point)
+  {
+    return design.GetDouble<HSteinerPoint::ObservedC>(point);
+  }
+
+  TimeType GetArrivalTime(HTimingPoint point)
+  {
+    return design.GetDouble<HTimingPoint::ArrivalTime>(point);
+  }
+
+  TimeType GetRequiredTime(HTimingPoint point)
+  {
+    return design.GetDouble<HTimingPoint::RequiredTime>(point);
+  }
+
+  BoolType GetSignalInversions(TimingSense arcSense, const TimeType& time)
+  {
+    switch (arcSense)
+    {
+    case TimingSense_PositiveUnate:
+    case TimingSense_NegativeUnate:
+    case TimingSense_NonUnate:
+      return BoolType(false);
+    default:
+      LOGERRORFORMAT(("Unknown timing sense: %d", arcSense));
+      return BoolType(false);
+    }//switch (arc.TimingSense())
+  }
+
+  TimeType GetArcOutputTimeArrival(const HTimingArcTypeWrapper& arc,
+    const CapacitanceType& observedC,
+    const TimeType& inputTime,
+    BoolType& inversed)
+  {
+    inversed = GetSignalInversions(arc.TimingSense(), inputTime);
+
+    return arc.TIntrinsicRise() + arc.ResistanceRise() * observedC + inputTime;
+  }
+
+  TimeType GetArcOutputTimeRequired(const HTimingArcTypeWrapper& arc,
+    const CapacitanceType& observedC,
+    const TimeType& inputTime,
+    BoolType& inversed)
+  {
+    inversed = GetSignalInversions(arc.TimingSense(), inputTime);
+    return inputTime - arc.TIntrinsicRise() - arc.ResistanceRise() * observedC;
+  }
+
+  void AccumulateWorstArrivalInFirst(
+    TimeType& wTime, BoolType& wInversed, TimingPoint& wPoint,
+    const TimeType& time, const BoolType& inversed, HTimingPoint point)
+  {
+    if (time > wTime)
+    {
+      wTime = time;
+      wPoint = point;
+      wInversed = inversed;
+    }
+  }
+
+  void SetArrivalTime(HTimingPoint point, const TimeType& time)
+  {
+    design.Set<HTimingPoint::ArrivalTime>(point, time);
+  }
+
+  void SetRequiredTime(HTimingPoint point, const TimeType& time)
+  {
+    design.Set<HTimingPoint::RequiredTime>(point, time);
+  }
+
+  void SetArrivalAncestor(HTimingPoint point, const TimingPoint& anc)
+  {
+    design.Set<HTimingPoint::ArrivalAncestor>(point, anc);
+  }
+
+  void SetArrivalInversion(HTimingPoint point, const BoolType& inv)
+  {
+  }
+
+  void AccumulateWorstRequiredOnPin(HTimingPoint targetPoint,
+    const TimeType& time, const BoolType& inversed, HTimingPoint point)
+  {
+    if (time < design.GetDouble<HTimingPoint::RequiredTime>(targetPoint))
+    {
+      design.Set<HTimingPoint::RequiredTime>(targetPoint, time);
+      design.Set<HTimingPoint::RequiredAncestor>(targetPoint, point);
+    }
+  }
+
+  TimeType GetSinkArrivalTime(HTimingPoint source, HSteinerPoint sink)
+  {
+    return design.GetDouble<HTimingPoint::ArrivalTime>(source) + design.GetDouble<HSteinerPoint::PathDelay>(sink);
+  }
+
+  TimeType GetSourceRequiredTime(HTimingPoint sink)
+  {
+    HSteinerPoint point = design.SteinerPoints[design.Get<HTimingPoint::Pin, HPin>(sink)];
+    return design.GetDouble<HTimingPoint::RequiredTime>(sink) - design.GetDouble<HSteinerPoint::PathDelay>(point);
+  }
+
+  void AccumulateSourceRequiredTime(HTimingPoint source, HTimingPoint sink, const TimeType& time)
+  {
+    if (design.GetDouble<HTimingPoint::RequiredTime>(source) > time)
+    {
+      design.Set<HTimingPoint::RequiredTime>(source, time);
+      design.Set<HTimingPoint::RequiredAncestor>(source, sink);
+    }
+  }
+
+  TimeType GetEdgeArcOutputTime(const HTimingArcTypeWrapper& arc, const HTimingPointWrapper& sp, HSteinerPoint spst)
+  {
+    return sp.ArrivalTime() + arc.TIntrinsicRise()
+      + arc.ResistanceRise() * design.GetDouble<HSteinerPoint::ObservedC>(spst);
+  }
+
+  TimeType GetSetupArcOutputTime(const HTimingArcTypeWrapper& arc, const HTimingPointWrapper& ep)
+  {
+    return ep.RequiredTime() - arc.TIntrinsicRise();
+  }
+};
+
+template<int sdNum>
+void CalcArrivalTimeOnOutputPin(HDesign& design, HPin pin, DelayPropagation<sdNum>& dp)
+{//search for worst signal from cell inputs
+  HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
+  if (design.GetInt<HPinType::TimingArcsCount>(ptype) == 0) return;
+
+  HSteinerPoint this_point = design.SteinerPoints[pin];
+  DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
+
+  DelayPropagation<sdNum>::TimeType worstTime = -DBL_MAX;
+  DelayPropagation<sdNum>::BoolType worstInversed = false;
+  DelayPropagation<sdNum>::TimingPoint worstRelatedPoint = design.TimingPoints.Null();
+
+  for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
+    arc.MoveNext(); )
+  {
+    if (arc.TimingType() != TimingType_Combinational) continue;//skip constraint arcs
+
+    HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
+
+    //arc delays
+    DelayPropagation<sdNum>::BoolType inversed;
+    DelayPropagation<sdNum>::TimeType time 
+      = dp.GetArcOutputTimeArrival(arc, observedC, dp.GetArrivalTime(startPoint), inversed);
+    //remember results
+    dp.AccumulateWorstArrivalInFirst(worstTime, worstInversed, worstRelatedPoint, time, inversed, startPoint);
+  }//for (HPinType::ArcsEnumeratorW arc
+
+  //save results
+  HTimingPoint pt = design.TimingPoints[pin];
+  dp.SetArrivalTime(pt, worstTime);
+  dp.SetArrivalAncestor(pt, worstRelatedPoint);
+  dp.SetArrivalInversion(pt, worstInversed);
+}
+
+template<int sdNum>
+void PropagateArrivals(HDesign& design)
+{
+  DelayPropagation<sdNum> dp(design);
+
+  for (HTimingPointWrapper pt = design[design.TimingPoints.FirstInternalPoint()];
+    !::IsNull(pt); pt.GoNext())
+  {
+    HPin pin = pt.Pin();
+    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+    {//single arc from net source
+      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(design.Get<HPin::Net, HNet>(pin))];
+      dp.SetArrivalTime(pt, dp.GetSinkArrivalTime(source, design.SteinerPoints[pin]));
+      dp.SetArrivalAncestor(pt, source);
+    }
+    else
+    {//here can be several cell's arcs
+      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
+      CalcArrivalTimeOnOutputPin(design, pin, dp);
+    }
+  }//for (HTimingPointWrapper pt
+}
+
+template<int sdNum>
+void CalcRequiredTimeOnInputPins(HDesign& design, HPin pin, DelayPropagation<sdNum>& dp)
+{
+  HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
+  if (design.GetInt<HPinType::TimingArcsCount>(ptype) == 0) return;
+
+  HSteinerPoint this_point = design.SteinerPoints[pin];
+  HTimingPoint pt = design.TimingPoints[pin];
+
+  DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
+  DelayPropagation<sdNum>::TimeType ptTime = dp.GetRequiredTime(pt);
+
+  //apply each arc that gives worst known solution
+  for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
+    arc.MoveNext(); )
+  {
+    if (arc.TimingType() != TimingType_Combinational) continue;
     
-    if(found)
-    {
-      *arcRiseTime = hd.GetDouble<HTimingArcType::TIntrinsicRise>(*risingArc)
-        + hd.GetDouble<HTimingArcType::ResistanceRise>(*risingArc) * riseObservedC;
-    }
-    else
-    {
-      *arcRiseTime = 0;
-      *isInversed = false;
-      *risingArc = hd.TimingArcTypes.Null();
-    }
-  }
-  else
-  {
-    *arcRiseTime = 0;
-    *isInversed = false;
-    *risingArc = hd.TimingArcTypes.Null();
-  }
+    HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
+
+    DelayPropagation<sdNum>::BoolType inversed;
+    DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, ptTime, inversed);
+
+    dp.AccumulateWorstRequiredOnPin(startPoint, time, inversed, pt);
+  }//for (HPinType::ArcsEnumeratorW arc
 }
 
-void GetArrivalFallingArc(HDesign& hd,
-                         HTimingPoint startPoint,
-                         HTimingPoint endPoint,
-                         HTimingArcType* fallingArc,
-                         double* arcFallTime,
-                         bool* isInversed)
+template<int sdNum>
+void PropagateRequires(HDesign& design)
 {
-  HPin pin = hd.Get<HTimingPoint::Pin, HPin>(endPoint);
-  HPinType ptype = hd.Get<HPin::Type, HPinType>(pin);
-  if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+  DelayPropagation<sdNum> dp(design);
+  HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
+
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    pt.GoPrevious() != firstPoint; )
   {
-    HPin start_pin = hd.Get<HTimingPoint::Pin, HPin>(startPoint);
-    HSteinerPoint endStPoint = hd.SteinerPoints[pin];
-    double fallObservedC = hd.GetDouble<HSteinerPoint::FallObservedC>(endStPoint);
-    double worstFallTime = -DBL_MAX;
-    bool found = false;
-    for (HPinType::ArcsEnumeratorW arc = hd.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-      arc.MoveNext(); )
-    {
-      if (arc.TimingType() == TimingType_Combinational
-        && arc.GetStartPin(pin) == start_pin)
-      {
-        found = true;
-        double fallTime;
-        bool isSignalInversed;
-
-        switch (arc.TimingSense())
-        {
-        case TimingSense_PositiveUnate:
-          {
-            fallTime = hd.GetDouble<HTimingPoint::FallArrivalTime>(startPoint)
-              + arc.TIntrinsicFall() 
-              + arc.ResistanceFall() * fallObservedC;
-            isSignalInversed = false;
-          }
-          break;
-        case TimingSense_NegativeUnate:
-          {
-            fallTime = hd.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
-              + arc.TIntrinsicFall() 
-              + arc.ResistanceFall() * fallObservedC;
-            isSignalInversed = true;
-          }
-          break;
-        case TimingSense_NonUnate:
-          {
-            double pinArrival2 = hd.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint);
-            double pinArrival1 = hd.GetDouble<HTimingPoint::FallArrivalTime>(startPoint);
-            if (pinArrival1 >= pinArrival2)
-            {
-              fallTime = pinArrival1
-                + arc.TIntrinsicFall() 
-                + arc.ResistanceFall() * fallObservedC;
-              isSignalInversed = false;
-            }
-            else
-            {
-              fallTime = pinArrival2
-                + arc.TIntrinsicFall() 
-                + arc.ResistanceFall() * fallObservedC;
-              isSignalInversed = true;
-            }
-          }
-          break;
-        default:
-          LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-          break;
-        }//switch (arc.TimingSense())
-        if (fallTime > worstFallTime)
-        {
-          worstFallTime = fallTime;
-          *fallingArc = arc;
-          *isInversed = isSignalInversed;
-        }
-      }
-    }
-
-    if(found)
-    {
-      *arcFallTime = hd.GetDouble<HTimingArcType::TIntrinsicFall>(*fallingArc)
-        + hd.GetDouble<HTimingArcType::ResistanceFall>(*fallingArc) * fallObservedC;
+    HPin pin = pt.Pin();
+    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+    {//single arc to net source
+      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(design.Get<HPin::Net, HNet>(pin))];
+      dp.AccumulateSourceRequiredTime(source, pt, dp.GetSourceRequiredTime(pt));
     }
     else
     {
-      *arcFallTime = 0;
-      *isInversed = false;
-      *fallingArc = hd.TimingArcTypes.Null();
+      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
+      CalcRequiredTimeOnInputPins(design, pin, dp);
     }
-  }
-  else
-  {
-    *arcFallTime = 0;
-    *isInversed = false;
-    *fallingArc = hd.TimingArcTypes.Null();
-  }
+  }//for (HTimingPointWrapper pt
 }
 
-void GetRequiredFallingArc(HDesign& hd,
-                          HTimingPoint startPoint,
-                          HTimingPoint endPoint,
-                          HTimingArcType* fallingArc,
-                          double* arcFallTime,
-                          bool* isInversed)
-{
-  HPin pin = hd.Get<HTimingPoint::Pin, HPin>(endPoint);
-  HPinType ptype = hd.Get<HPin::Type, HPinType>(pin);
-  if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-  {
-    HPin start_pin = hd.Get<HTimingPoint::Pin, HPin>(startPoint);
-    HSteinerPoint endStPoint = hd.SteinerPoints[pin];
-    double fallObservedC = hd.GetDouble<HSteinerPoint::FallObservedC>(endStPoint);
-    double riseObservedC = hd.GetDouble<HSteinerPoint::RiseObservedC>(endStPoint);
-    double worstFallTime = DBL_MAX;
-    bool found = false;
-    for (HPinType::ArcsEnumeratorW arc = hd.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-      arc.MoveNext(); )
-    {
-      if (arc.TimingType() == TimingType_Combinational
-        && arc.GetStartPin(pin) == start_pin)
-      {
-        found = true;
-        double fallTime;
-        bool isSignalInversed;
-
-        switch (arc.TimingSense())
-        {
-        case TimingSense_PositiveUnate:
-          {
-            fallTime = hd.GetDouble<HTimingPoint::FallRequiredTime>(endPoint)
-              - arc.TIntrinsicFall() 
-              - arc.ResistanceFall() * fallObservedC;
-            isSignalInversed = false;
-          }
-          break;
-        case TimingSense_NegativeUnate:
-          {
-            fallTime = hd.GetDouble<HTimingPoint::RiseRequiredTime>(endPoint)
-              - arc.TIntrinsicRise() 
-              - arc.ResistanceRise() * riseObservedC;
-            isSignalInversed = true;
-          }
-          break;
-        case TimingSense_NonUnate:
-          {
-            double fallTime1 = hd.GetDouble<HTimingPoint::FallRequiredTime>(endPoint)
-              - arc.TIntrinsicFall() 
-              - arc.ResistanceFall() * fallObservedC;
-            double riseTime1 = hd.GetDouble<HTimingPoint::RiseRequiredTime>(endPoint)
-              - arc.TIntrinsicRise() 
-              - arc.ResistanceRise() * riseObservedC;
-            if (fallTime1 <= riseTime1)
-            {
-              fallTime = fallTime1;
-              isSignalInversed = false;
-            }
-            else
-            {
-              fallTime = riseTime1;
-              isSignalInversed = true;
-            }
-          }
-          break;
-        default:
-          LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-          break;
-        }//switch (arc.TimingSense())
-        if (fallTime < worstFallTime)
-        {
-          worstFallTime = fallTime;
-          *fallingArc = arc;
-          *isInversed = isSignalInversed;
-        }
-      }
-    }
-
-    if(found)
-    {
-      if(*isInversed)
-        *arcFallTime = hd.GetDouble<HTimingArcType::TIntrinsicRise>(*fallingArc)
-          + hd.GetDouble<HTimingArcType::ResistanceRise>(*fallingArc) * riseObservedC;
-      else
-        *arcFallTime = hd.GetDouble<HTimingArcType::TIntrinsicFall>(*fallingArc)
-          + hd.GetDouble<HTimingArcType::ResistanceFall>(*fallingArc) * fallObservedC;
-    }
-    else
-    {
-      *arcFallTime = 0;
-      *isInversed = false;
-      *fallingArc = hd.TimingArcTypes.Null();
-    }
-  }
-  else
-  {
-    *arcFallTime = 0;
-    *isInversed = false;
-    *fallingArc = hd.TimingArcTypes.Null();
-  }
-}
-
-void GetRequiredRisingArc(HDesign& hd,
-                          HTimingPoint startPoint,
-                          HTimingPoint endPoint,
-                          HTimingArcType* risingArc,
-                          double* arcRiseTime,
-                          bool* isInversed)
-{
-  HPin pin = hd.Get<HTimingPoint::Pin, HPin>(endPoint);
-  HPinType ptype = hd.Get<HPin::Type, HPinType>(pin);
-  if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-  {
-    HPin start_pin = hd.Get<HTimingPoint::Pin, HPin>(startPoint);
-    HSteinerPoint endStPoint = hd.SteinerPoints[pin];
-    double fallObservedC = hd.GetDouble<HSteinerPoint::FallObservedC>(endStPoint);
-    double riseObservedC = hd.GetDouble<HSteinerPoint::RiseObservedC>(endStPoint);
-    double worstRiseTime = DBL_MAX;
-    bool found = false;
-    for (HPinType::ArcsEnumeratorW arc = hd.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-      arc.MoveNext(); )
-    {
-      if (arc.TimingType() == TimingType_Combinational
-        && arc.GetStartPin(pin) == start_pin)
-      {
-        found = true;
-        double riseTime;
-        bool isSignalInversed;
-
-        switch (arc.TimingSense())
-        {
-        case TimingSense_PositiveUnate:
-          {
-            riseTime = hd.GetDouble<HTimingPoint::RiseRequiredTime>(endPoint)
-              - arc.TIntrinsicRise() 
-              - arc.ResistanceRise() * riseObservedC;
-            isSignalInversed = false;
-          }
-          break;
-        case TimingSense_NegativeUnate:
-          {
-            riseTime = hd.GetDouble<HTimingPoint::FallRequiredTime>(endPoint)
-              - arc.TIntrinsicFall() 
-              - arc.ResistanceFall() * fallObservedC;
-            isSignalInversed = true;
-          }
-          break;
-        case TimingSense_NonUnate:
-          {
-            double fallTime1 = hd.GetDouble<HTimingPoint::FallRequiredTime>(endPoint)
-              - arc.TIntrinsicFall() 
-              - arc.ResistanceFall() * fallObservedC;
-            double riseTime1 = hd.GetDouble<HTimingPoint::RiseRequiredTime>(endPoint)
-              - arc.TIntrinsicRise() 
-              - arc.ResistanceRise() * riseObservedC;
-            if (riseTime1 <= fallTime1)
-            {
-              riseTime = riseTime1;
-              isSignalInversed = false;
-            }
-            else
-            {
-              riseTime = fallTime1;
-              isSignalInversed = true;
-            }
-          }
-          break;
-        default:
-          LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-          break;
-        }//switch (arc.TimingSense())
-        if (riseTime < worstRiseTime)
-        {
-          worstRiseTime = riseTime;
-          *risingArc = arc;
-          *isInversed = isSignalInversed;
-        }
-      }
-    }
-
-    if(found)
-    {
-      if(!*isInversed)
-        *arcRiseTime = hd.GetDouble<HTimingArcType::TIntrinsicRise>(*risingArc)
-          + hd.GetDouble<HTimingArcType::ResistanceRise>(*risingArc) * riseObservedC;
-      else
-        *arcRiseTime = hd.GetDouble<HTimingArcType::TIntrinsicFall>(*risingArc)
-          + hd.GetDouble<HTimingArcType::ResistanceFall>(*risingArc) * fallObservedC;
-    }
-    else
-    {
-      *arcRiseTime = 0;
-      *isInversed = false;
-      *risingArc = hd.TimingArcTypes.Null();
-    }
-  }
-  else
-  {
-    *arcRiseTime = 0;
-    *isInversed = false;
-    *risingArc = hd.TimingArcTypes.Null();
-  }
-}
+template<int sdNum>
 void SetStartPointsArrivals(HDesign& design, double clock_cycle)
 {
+  DelayPropagation<sdNum> dp(design);
+
   HTimingPoint startPointsEnd = design.TimingPoints.FirstInternalPoint();
   for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()];
     sp.GoNext() != startPointsEnd; )
   {
     if (design.GetBool<HPin::IsPrimary>(sp.Pin()))
-    {
-      sp.SetFallArrivalTime(0.0);
-      sp.SetRiseArrivalTime(0.0);
-    }
+      dp.SetArrivalTime(sp, 0.0);
     else 
-    {
+    {//flip-flops and latches
       switch (design.Get<HMacroType::Type, MacroType>(
                 design.Get<HCell::MacroType, HMacroType>(
                   design.Get<HPin::Cell, HCell>(sp.Pin()))))
       {
       case MacroType_REFF:
-        sp.SetFallArrivalTime(0.0);
-        sp.SetRiseArrivalTime(0.0);
-        break;
       case MacroType_HLSL:
-        sp.SetFallArrivalTime(0.0);
-        sp.SetRiseArrivalTime(0.0);
+        dp.SetArrivalTime(sp, 0.0);
         break;
       case MacroType_FEFF:
-        sp.SetFallArrivalTime(-clock_cycle * 0.5);
-        sp.SetRiseArrivalTime(-clock_cycle * 0.5);
+        dp.SetArrivalTime(sp, -clock_cycle * 0.5);
         break;
       case MacroType_LLSL:
-        sp.SetFallArrivalTime(clock_cycle * 0.5);
-        sp.SetRiseArrivalTime(clock_cycle * 0.5);
+        dp.SetArrivalTime(sp, clock_cycle * 0.5);
         break;
       default:
-        sp.SetFallArrivalTime(0.0);
-        sp.SetRiseArrivalTime(0.0);
+        dp.SetArrivalTime(sp, 0.0);
         break;
       }
 
@@ -445,37 +507,27 @@ void SetStartPointsArrivals(HDesign& design, double clock_cycle)
         arc.MoveNext(); )
       {
         if (arc.TimingType() == TimingType_RisingEdge || arc.TimingType() == TimingType_FallingEdge)
-        {
-          sp.SetRiseArrivalTime(sp.RiseArrivalTime()
-            + arc.TIntrinsicRise()
-            + arc.ResistanceRise() * design.GetDouble<HSteinerPoint::RiseObservedC>(this_point));
-          sp.SetFallArrivalTime(sp.FallArrivalTime()
-            + arc.TIntrinsicFall()
-            + arc.ResistanceFall() * design.GetDouble<HSteinerPoint::FallObservedC>(this_point));
-        }
-      }//for (HPinType::ArcsEnumeratorW arc
+          dp.SetArrivalTime(sp, dp.GetEdgeArcOutputTime(arc, sp, this_point));
+      }
     }
   }//for (HTimingPointWrapper sp
 
-  //prefill other points
+  //prefill other points (set to negative infinity)
   for (HTimingPointWrapper p = design[startPointsEnd]; !::IsNull(p); p.GoNext())
-  {
-    p.SetRiseArrivalTime(-DBL_MAX);
-    p.SetFallArrivalTime(-DBL_MAX);
-  }
+    dp.SetArrivalTime(p, -DBL_MAX);
 }
 
+template<int sdNum>
 void SetEndPointsRequires(HDesign& design, double clock_cycle)
 {
+  DelayPropagation<sdNum> dp(design);
+
   HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
   for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];
     ep.GoPrevious() != endPointsEnd; )
   {
     if (design.GetBool<HPin::IsPrimary>(ep.Pin()))
-    {
-      ep.SetFallRequiredTime(clock_cycle);
-      ep.SetRiseRequiredTime(clock_cycle);
-    }
+      dp.SetRequiredTime(ep, clock_cycle);
     else 
     {
       switch (design.Get<HMacroType::Type, MacroType>(
@@ -483,24 +535,15 @@ void SetEndPointsRequires(HDesign& design, double clock_cycle)
                   design.Get<HPin::Cell, HCell>(ep.Pin()))))
       {
       case MacroType_REFF:
-        ep.SetFallRequiredTime(clock_cycle);
-        ep.SetRiseRequiredTime(clock_cycle);
+      case MacroType_LLSL:
+        dp.SetRequiredTime(ep, clock_cycle);
         break;
       case MacroType_HLSL:
-        ep.SetFallRequiredTime(clock_cycle * 0.5);
-        ep.SetRiseRequiredTime(clock_cycle * 0.5);
-        break;
       case MacroType_FEFF:
-        ep.SetFallRequiredTime(clock_cycle * 0.5);
-        ep.SetRiseRequiredTime(clock_cycle * 0.5);
-        break;
-      case MacroType_LLSL:
-        ep.SetFallRequiredTime(clock_cycle);
-        ep.SetRiseRequiredTime(clock_cycle);
+        dp.SetRequiredTime(ep, clock_cycle * 0.5);
         break;
       default:
-        ep.SetFallRequiredTime(clock_cycle);
-        ep.SetRiseRequiredTime(clock_cycle);
+        dp.SetRequiredTime(ep, clock_cycle);
         break;
       }
 
@@ -511,368 +554,232 @@ void SetEndPointsRequires(HDesign& design, double clock_cycle)
         arc.MoveNext(); )
       {
         if (arc.TimingType() == TimingType_SetupRising || arc.TimingType() == TimingType_SetupFalling)
-        {
-          ep.SetRiseRequiredTime(ep.RiseRequiredTime() + arc.TIntrinsicRise());
-          ep.SetFallRequiredTime(ep.FallRequiredTime() + arc.TIntrinsicFall());
-        }
-      }//for (HPinType::ArcsEnumeratorW arc
+          dp.SetRequiredTime(ep, dp.GetSetupArcOutputTime(arc, ep));
+      }
     }
   }//for (HTimingPointWrapper ep
 
   //prefill other points
   for (HTimingPointWrapper p = design[endPointsEnd]; !::IsNull(p); p.GoPrevious())
-  {
-    p.SetRiseRequiredTime(DBL_MAX);
-    p.SetFallRequiredTime(DBL_MAX);
-  }
+    dp.SetRequiredTime(p, DBL_MAX);
 }
 
-void PropagateArrivals(HDesign& design)
+template<int SignalDirectionsNum>
+void PropagateDelaysInternal(HDesign& design, double clock_cycle)
 {
-  for (HTimingPointWrapper pt = design[design.TimingPoints.FirstInternalPoint()];
-    !::IsNull(pt); pt.GoNext())
-  {
-    HPin pin = pt.Pin();
-    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-    {//single arc from net source
-      HNet net = design.Get<HPin::Net, HNet>(pin);
-      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
-      HSteinerPoint this_point = design.SteinerPoints[pin];
-      pt.SetFallArrivalTime(design.GetDouble<HTimingPoint::FallArrivalTime>(source)
-        + design.GetDouble<HSteinerPoint::FallPathDelay>(this_point));
-      pt.SetRiseArrivalTime(design.GetDouble<HTimingPoint::RiseArrivalTime>(source)
-        + design.GetDouble<HSteinerPoint::RisePathDelay>(this_point));
-      pt.SetFallArrivalAncestor(source);
-      pt.SetRiseArrivalAncestor(source);
-    }
-    else
-    {//here can be several cell's arcs
-      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
-      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
-      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-      {
-        HSteinerPoint this_point = design.SteinerPoints[pin];
-        double fallObservedC = design.GetDouble<HSteinerPoint::FallObservedC>(this_point);
-        double riseObservedC = design.GetDouble<HSteinerPoint::RiseObservedC>(this_point);
-        double worstFallTime = -DBL_MAX;
-        double worstRiseTime = -DBL_MAX;
-        HTimingPoint worstFallRelatedPoint = design.TimingPoints.Null();
-        HTimingPoint worstRiseRelatedPoint = design.TimingPoints.Null();
-        
-        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-          arc.MoveNext(); )
-        {
-          if (arc.TimingType() == TimingType_Combinational)
-          {
-            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
-            double fallTime = -DBL_MAX;
-            double riseTime = -DBL_MAX;
-
-            switch (arc.TimingSense())
-            {
-            case TimingSense_PositiveUnate:
-              {
-                fallTime = design.GetDouble<HTimingPoint::FallArrivalTime>(startPoint)
-                  + arc.TIntrinsicFall() 
-                  + arc.ResistanceFall() * fallObservedC;
-                riseTime = design.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
-                  + arc.TIntrinsicRise() 
-                  + arc.ResistanceRise() * riseObservedC;
-              }
-              break;
-            case TimingSense_NegativeUnate:
-              {
-                fallTime = design.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
-                  + arc.TIntrinsicFall() 
-                  + arc.ResistanceFall() * fallObservedC;
-                riseTime = design.GetDouble<HTimingPoint::FallArrivalTime>(startPoint)
-                  + arc.TIntrinsicRise() 
-                  + arc.ResistanceRise() * riseObservedC;
-              }
-              break;
-            case TimingSense_NonUnate:
-              {
-                double pinArrival = max(design.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint),
-                                        design.GetDouble<HTimingPoint::FallArrivalTime>(startPoint));
-                fallTime = pinArrival
-                  + arc.TIntrinsicFall() 
-                  + arc.ResistanceFall() * fallObservedC;
-                riseTime = pinArrival
-                  + arc.TIntrinsicRise() 
-                  + arc.ResistanceRise() * riseObservedC;
-              }
-              break;
-            default:
-              LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-              break;
-            }//switch (arc.TimingSense())
-            if (fallTime > worstFallTime)
-            {
-              worstFallTime = fallTime;
-              worstFallRelatedPoint = startPoint;
-            }
-            if (riseTime > worstRiseTime)
-            {
-              worstRiseTime = riseTime;
-              worstRiseRelatedPoint = startPoint;
-            }
-          }//if (arc.TimingType() == TimingType_Combinational)
-        }//for (HPinType::ArcsEnumeratorW arc
-
-        //set results
-        pt.SetFallArrivalTime(worstFallTime);
-        pt.SetRiseArrivalTime(worstRiseTime);
-        pt.SetFallArrivalAncestor(worstFallRelatedPoint);
-        pt.SetRiseArrivalAncestor(worstRiseRelatedPoint);
-      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-  }//for (HTimingPointWrapper pt
-}
-
-void PropagateArrivalsUnidirectionally(HDesign& design)
-{//only rise delays used
-  for (HTimingPointWrapper pt = design[design.TimingPoints.FirstInternalPoint()];
-    !::IsNull(pt); pt.GoNext())
-  {
-    HPin pin = pt.Pin();
-    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-    {//single arc from net source
-      HNet net = design.Get<HPin::Net, HNet>(pin);
-      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
-      HSteinerPoint this_point = design.SteinerPoints[pin];
-      pt.SetRiseArrivalTime(design.GetDouble<HTimingPoint::RiseArrivalTime>(source)
-        + design.GetDouble<HSteinerPoint::PathDelay>(this_point));
-      pt.SetRiseArrivalAncestor(source);
-    }
-    else
-    {//here can be several cell's arcs
-      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
-      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
-      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-      {
-        HSteinerPoint this_point = design.SteinerPoints[pin];
-        double observedC = design.GetDouble<HSteinerPoint::ObservedC>(this_point);
-        double worstTime = -DBL_MAX;
-        HTimingPoint worstRelatedPoint = design.TimingPoints.Null();
-        
-        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-          arc.MoveNext(); )
-        {
-          if (arc.TimingType() == TimingType_Combinational)
-          {
-            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
-
-            double time = design.GetDouble<HTimingPoint::RiseArrivalTime>(startPoint)
-                  + arc.TIntrinsicRise() 
-                  + arc.ResistanceRise() * observedC;
-
-            if (time > worstTime)
-            {
-              worstTime = time;
-              worstRelatedPoint = startPoint;
-            }
-          }//if (arc.TimingType() == TimingType_Combinational)
-        }//for (HPinType::ArcsEnumeratorW arc
-
-        //set results
-        pt.SetRiseArrivalTime(worstTime);
-        pt.SetRiseArrivalAncestor(worstRelatedPoint);
-      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-  }//for (HTimingPointWrapper pt
-}
-
-void PropagateRequires(HDesign& design)
-{
-  HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
-
-  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
-    pt.GoPrevious() != firstPoint; )
-  {
-    HPin pin = pt.Pin();
-    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-    {//single arc to net source
-      HNet net = design.Get<HPin::Net, HNet>(pin);
-      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
-      HSteinerPoint this_point = design.SteinerPoints[pin];
-      
-      double thisFallRequired = pt.FallRequiredTime()
-        - design.GetDouble<HSteinerPoint::FallPathDelay>(this_point);
-      if (design.GetDouble<HTimingPoint::FallRequiredTime>(source) > thisFallRequired)
-      {
-        design.Set<HTimingPoint::FallRequiredTime>(source, thisFallRequired);
-        design.Set<HTimingPoint::FallRequiredAncestor>(source, (HTimingPoint)pt);
-      }
-      
-      double thisRiseRequired = pt.RiseRequiredTime()
-        - design.GetDouble<HSteinerPoint::RisePathDelay>(this_point);
-      if (design.GetDouble<HTimingPoint::RiseRequiredTime>(source) > thisRiseRequired)
-      {
-        design.Set<HTimingPoint::RiseRequiredTime>(source, thisRiseRequired);
-        design.Set<HTimingPoint::RiseRequiredAncestor>(source, (HTimingPoint)pt);
-      }
-    }
-    else
-    {
-      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
-      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
-      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-      {
-        HSteinerPoint this_point = design.SteinerPoints[pin];
-        double fallObservedC = design.GetDouble<HSteinerPoint::FallObservedC>(this_point);
-        double riseObservedC = design.GetDouble<HSteinerPoint::RiseObservedC>(this_point);
-
-        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-          arc.MoveNext(); )
-        {
-          if (arc.TimingType() == TimingType_Combinational)
-          {
-            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
-            double fallTime = DBL_MAX;
-            double riseTime = DBL_MAX;
-
-            switch (arc.TimingSense())
-            {
-            case TimingSense_PositiveUnate:
-              {
-                fallTime = pt.FallRequiredTime()
-                  - arc.TIntrinsicFall() 
-                  - arc.ResistanceFall() * fallObservedC;
-                riseTime = pt.RiseRequiredTime()
-                  - arc.TIntrinsicRise() 
-                  - arc.ResistanceRise() * riseObservedC;
-              }
-              break;
-            case TimingSense_NegativeUnate:
-              {
-                fallTime = pt.RiseRequiredTime()
-                  - arc.TIntrinsicRise() 
-                  - arc.ResistanceRise() * riseObservedC;
-                riseTime = pt.FallRequiredTime()
-                  - arc.TIntrinsicFall() 
-                  - arc.ResistanceFall() * fallObservedC;
-              }
-              break;
-            case TimingSense_NonUnate:
-              {
-                fallTime = pt.FallRequiredTime()
-                  - arc.TIntrinsicFall() 
-                  - arc.ResistanceFall() * fallObservedC;
-                riseTime = pt.RiseRequiredTime()
-                  - arc.TIntrinsicRise() 
-                  - arc.ResistanceRise() * riseObservedC;
-                fallTime = riseTime = min(fallTime, riseTime);
-              }
-              break;
-            default:
-              LOGERRORFORMAT(("Unknown timing sense: %d", arc.TimingSense()));
-              break;
-            }//switch (arc.TimingSense())
-            if (fallTime < design.GetDouble<HTimingPoint::FallRequiredTime>(startPoint))
-            {
-              design.Set<HTimingPoint::FallRequiredTime>(startPoint, fallTime);
-              design.Set<HTimingPoint::FallRequiredAncestor>(startPoint, (HTimingPoint)pt);
-            }
-            if (riseTime < design.GetDouble<HTimingPoint::RiseRequiredTime>(startPoint))
-            {
-              design.Set<HTimingPoint::RiseRequiredTime>(startPoint, riseTime);
-              design.Set<HTimingPoint::RiseRequiredAncestor>(startPoint, (HTimingPoint)pt);
-            }
-          }//if (arc.TimingType() == TimingType_Combinational)
-        }//for (HPinType::ArcsEnumeratorW arc
-      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-  }//for (HTimingPointWrapper pt
-}
-
-void PropagateRequiresUnidirectionally(HDesign& design)
-{
-  HTimingPoint firstPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
-
-  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
-    pt.GoPrevious() != firstPoint; )
-  {
-    HPin pin = pt.Pin();
-    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-    {//single arc to net source
-      HNet net = design.Get<HPin::Net, HNet>(pin);
-      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(net)];
-      HSteinerPoint this_point = design.SteinerPoints[pin];
-      
-      double thisRiseRequired = pt.RiseRequiredTime()
-        - design.GetDouble<HSteinerPoint::PathDelay>(this_point);
-      if (design.GetDouble<HTimingPoint::RiseRequiredTime>(source) > thisRiseRequired)
-      {
-        design.Set<HTimingPoint::RiseRequiredTime>(source, thisRiseRequired);
-        design.Set<HTimingPoint::RiseRequiredAncestor>(source, (HTimingPoint)pt);
-      }
-    }
-    else
-    {
-      ASSERT((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT));
-      HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
-      if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-      {
-        HSteinerPoint this_point = design.SteinerPoints[pin];
-        double observedC = design.GetDouble<HSteinerPoint::ObservedC>(this_point);
-
-        for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
-          arc.MoveNext(); )
-        {
-          if (arc.TimingType() == TimingType_Combinational)
-          {
-            HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
-            double time = pt.RiseRequiredTime()
-              - arc.TIntrinsicRise() 
-              - arc.ResistanceRise() * observedC;
-
-            if (time < design.GetDouble<HTimingPoint::RiseRequiredTime>(startPoint))
-            {
-              design.Set<HTimingPoint::RiseRequiredTime>(startPoint, time);
-              design.Set<HTimingPoint::RiseRequiredAncestor>(startPoint, (HTimingPoint)pt);
-            }
-          }//if (arc.TimingType() == TimingType_Combinational)
-        }//for (HPinType::ArcsEnumeratorW arc
-      }//if (design.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
-    }//if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-  }//for (HTimingPointWrapper pt
+  SetStartPointsArrivals<SignalDirectionsNum>(design, clock_cycle);
+  SetEndPointsRequires<SignalDirectionsNum>(design, clock_cycle);
+  PropagateArrivals<SignalDirectionsNum>(design);
+  PropagateRequires<SignalDirectionsNum>(design);
 }
 
 void PropagateDelays(HDesign& design, double clock_cycle)
 {
-  //WRITELINE("");
-  //ALERT("TIMING STARTED (delays propagation phase)...");
-
-  //remove all previously calculated results
   design.TimingPoints.ClearTimingResults();
-  //ALERT("Clear finished");
 
-  //initialize arrival times
-  SetStartPointsArrivals(design, clock_cycle);
-  //ALERT("Arrivals initialized");
-
-  //initialize required times
-  SetEndPointsRequires(design, clock_cycle);
-  //ALERT("Requires initialized");
-
-  if (design.cfg.ValueOf("Timing.CalulateUnidirectionally", false))
-  {
-    PropagateArrivalsUnidirectionally(design);
-    PropagateRequiresUnidirectionally(design);
-  }
+  if (design.cfg.ValueOf("Timing.SignalDirectionsUsed", 2) == 1)
+    PropagateDelaysInternal<1>(design, clock_cycle);
   else
-  {
-    //propagate delays
-    PropagateArrivals(design);
-    //ALERT("Arrivals propagated");
-    PropagateRequires(design);
-    //ALERT("Requires propagated");
-  }
-
-  //ALERT("TIMING FINISHED");
+    PropagateDelaysInternal<2>(design, clock_cycle);
 }
 
 void PropagateDelays(HDesign& design)
 {
   PropagateDelays(design, design.cfg.ValueOf("benchmark.target_clock_cycle", 0.0));
+}
+
+template<int sdNum, class ArcSelector>
+HTimingArcType FindArc(HDesign& design,
+                       HTimingPoint basePoint,
+                       const ArcSelector& arcSelector,
+                       typename DelayPropagation<sdNum>::TimeType& arcTime,
+                       typename DelayPropagation<sdNum>::BoolType& inversed)
+{
+  HTimingPoint startPoint = arcSelector.GetStartPoint(design, basePoint);
+  HTimingPoint endPoint = arcSelector.GetEndPoint(design, basePoint);
+
+  HPin endPin = design.Get<HTimingPoint::Pin, HPin>(endPoint);
+  HPinType endPinType = design.Get<HPin::Type, HPinType>(endPin);
+
+  if (design.GetInt<HPinType::TimingArcsCount>(endPinType) > 0)
+  {
+    DelayPropagation<sdNum> dp(design);
+    HPin startPin = design.Get<HTimingPoint::Pin, HPin>(startPoint);
+    HSteinerPoint endStPoint = design.SteinerPoints[endPin];
+
+    DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(endStPoint);
+    bool found = false;
+    arcTime = arcSelector.GetBestPossibleTime();
+    HTimingArcType wArc = design.TimingArcTypes.Null();
+
+    for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(endPinType);
+      arc.MoveNext(); )
+    {
+      if (arc.TimingType() == TimingType_Combinational
+        && arc.GetStartPin(endPin) == startPin)
+      {
+        found = true;
+        DelayPropagation<sdNum>::BoolType timeInversed;
+        DelayPropagation<sdNum>::TimeType time = arcSelector.GetArcOutputTime(dp, arc, observedC, startPoint, endPoint, timeInversed);
+
+        if (arcSelector.FirstTimeIsWorse(time, arcTime))
+        {
+          arcTime = time;
+          inversed = timeInversed;
+          wArc = arc;
+        }
+      }
+    }
+
+    if (found) return wArc;
+  }//if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
+
+  arcTime = 0.0;
+  inversed = false;
+  return design.TimingArcTypes.Null();
+}
+
+template<int sdNum>
+struct ArcSelectorBase
+{
+  typedef DelayPropagation<sdNum> DP;
+  typedef typename DP::CapacitanceType CapacitanceType;
+  typedef typename DP::TimeType TimeType;
+  typedef typename DP::BoolType BoolType;
+};
+
+template<int sdNum>
+struct ArrivalArcSelectorBase: public ArcSelectorBase<sdNum>
+{
+  HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return basePoint; }
+  double GetBestPossibleTime() const {return -DBL_MAX;}
+  TimeType GetArcOutputTime(DP& dp, const HTimingArcTypeWrapper& arc,
+    CapacitanceType observedC, HTimingPoint startPoint, HTimingPoint endPoint, BoolType& timeInversed) const
+  {
+    return dp.GetArcOutputTimeArrival(arc, observedC, dp.GetArrivalTime(startPoint), timeInversed);
+  }
+};
+
+struct ArrivalArcSelector1D: public ArrivalArcSelectorBase<1>
+{
+  HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::ArrivalAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1 > time2; }
+};
+
+struct ArrivalArcSelector2DRise: public ArrivalArcSelectorBase<2>
+{
+  HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RiseArrivalAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.rise > time2.rise; }
+};
+
+struct ArrivalArcSelector2DFall: public ArrivalArcSelectorBase<2>
+{
+  HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::FallArrivalAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.fall > time2.fall; }
+};
+
+template<int sdNum>
+struct RequiredArcSelectorBase: public ArcSelectorBase<sdNum>
+{
+  HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return basePoint; }
+  double GetBestPossibleTime() const {return DBL_MAX;}
+  TimeType GetArcOutputTime(DP& dp, const HTimingArcTypeWrapper& arc,
+    CapacitanceType observedC, HTimingPoint startPoint, HTimingPoint endPoint, BoolType& timeInversed) const
+  {
+    return dp.GetArcOutputTimeRequired(arc, observedC, dp.GetRequiredTime(endPoint), timeInversed);
+  }
+};
+
+struct RequiredArcSelector1D: public RequiredArcSelectorBase<1>
+{
+  HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RequiredAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1 < time2; }
+};
+
+struct RequiredArcSelector2DRise: public RequiredArcSelectorBase<2>
+{
+  HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RiseRequiredAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.rise < time2.rise; }
+};
+
+struct RequiredArcSelector2DFall: public RequiredArcSelectorBase<2>
+{
+  HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::FallRequiredAncestor, HTimingPoint>(basePoint); }
+  bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.fall < time2.fall; }
+};
+
+void GetArrivalRisingArc(HDesign& hd,
+                         HTimingPoint startPoint,
+                         HTimingPoint endPoint,
+                         HTimingArcType* risingArc,
+                         double* arcRiseTime,
+                         bool* isInversed)
+{
+  DelayPropagation<2>::TimeType time;
+  DelayPropagation<2>::BoolType inv;
+  *risingArc = FindArc<2>(hd, endPoint, ArrivalArcSelector2DRise(), time, inv);
+  *arcRiseTime = time.rise;
+  *isInversed = inv.rise;
+}
+
+void GetArrivalFallingArc(HDesign& hd,
+                         HTimingPoint startPoint,
+                         HTimingPoint endPoint,
+                         HTimingArcType* fallingArc,
+                         double* arcFallTime,
+                         bool* isInversed)
+{
+  DelayPropagation<2>::TimeType time;
+  DelayPropagation<2>::BoolType inv;
+  *fallingArc = FindArc<2>(hd, endPoint, ArrivalArcSelector2DFall(), time, inv);
+  *arcFallTime = time.fall;
+  *isInversed = inv.fall;
+}
+
+void GetArrivalArc(HDesign& hd,
+                         HTimingPoint startPoint,
+                         HTimingPoint endPoint,
+                         HTimingArcType* arc,
+                         double* arcTime,
+                         bool* isInversed)
+{
+  *arc = FindArc<1>(hd, endPoint, ArrivalArcSelector1D(), *arcTime, *isInversed);
+}
+
+void GetRequiredFallingArc(HDesign& hd,
+                           HTimingPoint startPoint,
+                           HTimingPoint endPoint,
+                           HTimingArcType* fallingArc,
+                           double* arcFallTime,
+                           bool* isInversed)
+{
+  DelayPropagation<2>::TimeType time;
+  DelayPropagation<2>::BoolType inv;
+  *fallingArc = FindArc<2>(hd, endPoint, RequiredArcSelector2DFall(), time, inv);
+  *arcFallTime = time.fall;
+  *isInversed = inv.fall;
+}
+
+void GetRequiredRisingArc(HDesign& hd,
+                          HTimingPoint startPoint,
+                          HTimingPoint endPoint,
+                          HTimingArcType* risingArc,
+                          double* arcRiseTime,
+                          bool* isInversed)
+{
+  DelayPropagation<2>::TimeType time;
+  DelayPropagation<2>::BoolType inv;
+  *risingArc = FindArc<2>(hd, endPoint, RequiredArcSelector2DRise(), time, inv);
+  *arcRiseTime = time.rise;
+  *isInversed = inv.rise;
+}
+
+void GetRequiredArc(HDesign& hd,
+                          HTimingPoint startPoint,
+                          HTimingPoint endPoint,
+                          HTimingArcType* arc,
+                          double* arcTime,
+                          bool* isInversed)
+{
+  *arc = FindArc<1>(hd, endPoint, RequiredArcSelector1D(), *arcTime, *isInversed);
 }

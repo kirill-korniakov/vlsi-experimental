@@ -135,29 +135,19 @@ NetInfo NetInfo::Create(HDesign& hd, HNet net, BufferInfo& buf)
 
   //get worst timing arc
   HTimingPoint sourceTP = hd.TimingPoints[source];
-  HTimingPoint sfa = hd.Get<HTimingPoint::FallArrivalAncestor, HTimingPoint>(sourceTP);
-  HTimingPoint sra = hd.Get<HTimingPoint::RiseArrivalAncestor, HTimingPoint>(sourceTP);
+  HTimingPoint sa = hd.Get<HTimingPoint::ArrivalAncestor, HTimingPoint>(sourceTP);
 
-  HTimingArcType risingArc, fallingArc;
-  double arcRiseTime, arcFallTime;
+  HTimingArcType arc;
+  double arcTime;
   bool isInversed;
 
-  GetArrivalRisingArc(hd, sra, sourceTP, &risingArc, &arcRiseTime, &isInversed);
-  GetArrivalFallingArc(hd, sfa, sourceTP, &fallingArc, &arcFallTime, &isInversed);
+  GetArrivalArc(hd, sa, sourceTP, &arc, &arcTime, &isInversed);
 
-  double driverDelay = arcRiseTime;//max(arcRiseTime, arcFallTime);
+  double driverDelay = arcTime;
 
   //calc Rd
-  if (arcRiseTime >= arcFallTime || true)
-  {
-    n.m_Rd = hd.GetDouble<HTimingArcType::ResistanceRise>(risingArc);
-    driverDelay -= hd.GetDouble<HTimingArcType::TIntrinsicRise>(risingArc);
-  }
-  else
-  {
-    n.m_Rd = hd.GetDouble<HTimingArcType::ResistanceFall>(fallingArc);
-    driverDelay -= hd.GetDouble<HTimingArcType::TIntrinsicFall>(fallingArc);
-  }
+  n.m_Rd = hd.GetDouble<HTimingArcType::ResistanceRise>(arc);
+  driverDelay -= hd.GetDouble<HTimingArcType::TIntrinsicRise>(arc);
 
   //calc Cs and Fanout, and real delays
   n.m_Cs = 0.0;

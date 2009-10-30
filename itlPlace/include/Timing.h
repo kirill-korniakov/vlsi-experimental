@@ -9,11 +9,11 @@ void PropagateDelays(HDesign& design, double clock_cycle);
 void PropagateDelays(HDesign& design);
 
 
-void SetStartPointsArrivals(HDesign& design, double clock_cycle);
-void SetEndPointsRequires(HDesign& design, double clock_cycle);
-
-void PropagateArrivals(HDesign& design);
-void PropagateRequires(HDesign& design);
+//void SetStartPointsArrivals(HDesign& design, double clock_cycle);
+//void SetEndPointsRequires(HDesign& design, double clock_cycle);
+//
+//void PropagateArrivals(HDesign& design);
+//void PropagateRequires(HDesign& design);
 
 void FindCriticalPaths(HDesign& design);
 
@@ -38,6 +38,12 @@ void GetArrivalFallingArc(HDesign& hd,
                           HTimingArcType* fallingArc,
                           double* arcFallTime,
                           bool* isInversed);
+void GetArrivalArc(HDesign& hd,
+                         HTimingPoint startPoint,
+                         HTimingPoint endPoint,
+                         HTimingArcType* arc,
+                         double* arcTime,
+                         bool* isInversed);
 void GetRequiredFallingArc(HDesign& hd,
                            HTimingPoint startPoint,
                            HTimingPoint endPoint,
@@ -49,6 +55,12 @@ void GetRequiredRisingArc(HDesign& hd,
                           HTimingPoint endPoint,
                           HTimingArcType* risingArc,
                           double* arcRiseTime,
+                          bool* isInversed);
+void GetRequiredArc(HDesign& hd,
+                          HTimingPoint startPoint,
+                          HTimingPoint endPoint,
+                          HTimingArcType* arc,
+                          double* arcTime,
                           bool* isInversed);
 
 inline void InitializeTiming(HDesign& design)

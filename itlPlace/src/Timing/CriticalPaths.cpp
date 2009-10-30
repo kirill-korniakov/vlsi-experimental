@@ -40,42 +40,26 @@ inline HTimingPoint GetAncestor<PathExtractionType_Required>(const HTimingPointW
 }
 
 template<PathExtractionType ext>
-bool IsSignalInverted(HDesign& design, HTimingPoint current_point, HTimingPoint next_point, SignalDirection current_dir);
+bool IsSignalInverted(HDesign& design, HTimingPoint current_point, SignalDirection current_dir);
 
 template<>
 bool IsSignalInverted<PathExtractionType_Arrival>(HDesign& design,
                                                   HTimingPoint current_point,
-                                                  HTimingPoint next_point,
                                                   SignalDirection current_dir)
 {
-  bool isInverted = false;
-  HTimingArcType arc;
-  double time;
-  if (current_dir == SignalDirection_Rise)
-    GetArrivalRisingArc(design, next_point, current_point, &arc, &time, &isInverted);
-  else if (current_dir == SignalDirection_Fall)
-    GetArrivalFallingArc(design, next_point, current_point, &arc, &time, &isInverted);
-  else
-    LOGCRITICAL("Unknown signal direction");
-  return isInverted;
+  return current_dir == SignalDirection_Fall 
+    ? design.GetBool<HTimingPoint::IsFallArrivalInversed>(current_point)
+    : design.GetBool<HTimingPoint::IsRiseArrivalInversed>(current_point);
 }
 
 template<>
 bool IsSignalInverted<PathExtractionType_Required>(HDesign& design,
                                                   HTimingPoint current_point,
-                                                  HTimingPoint next_point,
                                                   SignalDirection current_dir)
 {
-  bool isInverted = false;
-  HTimingArcType arc;
-  double time;
-  if (current_dir == SignalDirection_Rise)
-    GetRequiredRisingArc(design, current_point, next_point, &arc, &time, &isInverted);
-  else if (current_dir == SignalDirection_Fall)
-    GetRequiredFallingArc(design, current_point, next_point, &arc, &time, &isInverted);
-  else
-    LOGCRITICAL("Unknown signal direction");
-  return isInverted;
+  return current_dir == SignalDirection_Fall 
+    ? design.GetBool<HTimingPoint::IsFallRequiredInversed>(current_point)
+    : design.GetBool<HTimingPoint::IsRiseRequiredInversed>(current_point);
 }
 
 template<PathExtractionType ext>
@@ -95,15 +79,11 @@ void ExtractPath(HDesign& design, HTimingPoint extractionStartPoint, SignalDirec
       if(design.Get<HPin::Cell, HCell>(next_point.Pin())
         == design.Get<HPin::Cell, HCell>(sPoint.Pin()))
       {//same cell - signal inversion is possible
-        if(IsSignalInverted<ext>(design, sPoint, next_point, current_direction))
+        if(IsSignalInverted<ext>(design, sPoint, current_direction))
           if(current_direction == SignalDirection_Rise)
             current_direction = SignalDirection_Fall;
           else
             current_direction = SignalDirection_Rise;
-        //if(next_point.RiseArrivalTime() > next_point.FallArrivalTime())
-        //  current_direction = SignalDirection_Rise;
-        //else if(next_point.RiseArrivalTime() < next_point.FallArrivalTime())
-        //  current_direction = SignalDirection_Fall;
       }
 
       last_point = design.CriticalPathPoints.AllocatePoint();
