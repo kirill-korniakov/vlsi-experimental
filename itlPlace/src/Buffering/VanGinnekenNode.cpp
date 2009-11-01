@@ -174,7 +174,7 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
   m_yre = m_hd.SteinerPoints.GetDouble<HSteinerPoint::Y>(m_RightEnd);
   if ((m_xs == m_xle) && (m_ys == m_yle))
   {
-    ALERTFORMAT(("CHUDO!!!"));
+    //ALERTFORMAT(("CHUDO!!!"));
   }
   m_Capacitance = 0.0;//capacitance;
   m_RAT = requiredArrivalTime;
@@ -236,7 +236,7 @@ int VGNode::InitializeTree(HSteinerPoint start, double capacitance, double requi
     {
       HTimingPointWrapper timPointForSubtreeRoot = 
         m_hd[m_hd.TimingPoints[m_hd.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot)]];
-      m_RAT = timPointForSubtreeRoot.RequiredTime() * FBI_TIME_SCALING;
+      m_RAT = timPointForSubtreeRoot.RequiredTime();
       m_Capacitance = m_hd.GetDouble<HPinType::Capacitance>(m_hd.Get<HPin::Type, HPinType>(m_hd.Get<HSteinerPoint::Pin, HPin>(m_SubtreeRoot)));
     }
 

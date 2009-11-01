@@ -72,19 +72,8 @@ namespace Utils
 
   void DeletePointInList(HDesign& design, HTimingPoint pointDelete)
   {
-    if (::IsNull(design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete)))
-    { 
-      HTimingPoint lastPoint = design.TimingPoints.LastInternalPoint();
-      design.Set<HTimingPoint::NextPoint>(design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete), lastPoint);
-      return;
-    }
-
-    if (::IsNull(design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete)))
-    {
-      HTimingPoint firstPoint = design.TimingPoints.FirstInternalPoint();
-      design.Set<HTimingPoint::PreviousPoint>(design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete), firstPoint);
-      return;
-    }
+    bool needRecalc = design.GetBool<HTimingPoint::IsTimingStartPoint>(pointDelete)
+      || design.GetBool<HTimingPoint::IsTimingEndPoint>(pointDelete);
 
     HTimingPoint previousPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointDelete);
     HTimingPoint nextPoint = design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointDelete);
@@ -94,6 +83,7 @@ namespace Utils
 
     design.Set<HTimingPoint::PreviousPoint>(pointDelete, design.TimingPoints.Null());
     design.Set<HTimingPoint::NextPoint>(pointDelete, design.TimingPoints.Null());
-  
+
+    if (needRecalc) design.TimingPoints.CountStartAndEndPoints();
   }
 }

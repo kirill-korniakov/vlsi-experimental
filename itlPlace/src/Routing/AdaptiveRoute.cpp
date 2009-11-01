@@ -17,3 +17,10 @@ void AdaptiveRoute(HDesign& aDesign)
     AdaptiveRoute(aDesign, niter);
   //ALERT("ADAPTIVE ROUTING FINISHED");
 }
+
+void RemoveRouting(HDesign& aDesign, HNet& aNet)
+{
+  HWireWrapper wire = aDesign[aDesign.Wires[aNet]];
+  if (wire.RoutingType() != RoutingType_Unrouted)
+    aDesign.SteinerPoints.RemoveSteinerTree(wire.Root());
+}

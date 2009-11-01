@@ -119,7 +119,7 @@ public:
   int GetNCandidatesForBuffering();
   int GetNReverts();
 
-  void RemoveNewNetAndCell(HNet oldNet);
+  void RestoreBufferedNet(HNet oldNet);
 private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
 
