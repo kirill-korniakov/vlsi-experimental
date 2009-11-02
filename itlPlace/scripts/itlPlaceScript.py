@@ -56,7 +56,7 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
         if isBeforeDP:
             idx = line.find('HPWL after legalization: ')
             if idx != -1:
-                HPWL = line[idx + len('HPWL after  legalization: '):-1]
+                HPWL = line[idx + len('HPWL after legalization: '):-1]
                 HPWLsBDP.append(float(HPWL))
                 
                 # get time
@@ -309,8 +309,8 @@ class DistributionBuilder(QtGui.QWidget):
         smtppass = '22JUL22:19:49'
         #subject = "Experiments results on " + setName + " with " + cfgName
 
-        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        #RECIPIENTS = ['zhivoderov.a@gmail.com']
+        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
         #text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
