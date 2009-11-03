@@ -575,6 +575,7 @@ int VanGinneken::InsertBuffers(HNet& net)
   m_BufferIndexes.clear();
   m_BufferIndexes.push_back(0);//в какое звено вставляем буфер
   nBuffersInserted = 1;
+  m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
   CreateNetsAndCells(net);
   ALERT("STA after buffering in source:");
   STA(m_hd);
@@ -586,7 +587,6 @@ int VanGinneken::InsertBuffers(HNet& net)
   STA(m_hd);
 
   return 1;
-
   //}
 
 }
