@@ -85,7 +85,7 @@ void HCells::BuildTerminalsIndex()
 {
   m_terminals.Clear();
   for (CellsEnumerator i = GetEnumerator(); i.MoveNext(); )
-    if (GetBool<HCell::IsTerminal>(i))
+    if (GetBool<HCell::IsTerminal>(i) && Get<HCell::PlacementStatus, PlacementStatus>(i) != PlacementStatus_Fictive)
     {
       m_terminals.Add(::ToID(i));
     }

@@ -115,6 +115,9 @@ void PrintToPL( HDesign& hd, const std::string fileName )//печать в фейл.pl
 	 
 	 for(HCells::CellsEnumeratorW i = hd.Cells.GetEnumeratorW() ; i.MoveNext(); )//цикл печати элементов
 	 {
+     if (i.PlacementStatus() != PlacementStatus_Movable
+       && i.PlacementStatus() != PlacementStatus_Fixed)
+       continue;
 
 		 if ( ferror(dataFile ) != 0) //проверка на ошибку
 		 {

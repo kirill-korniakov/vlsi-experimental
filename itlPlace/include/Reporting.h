@@ -49,8 +49,4 @@ void ReportCriticalPathsToLogFile(HDesign&, int n = -1);
 void PlotCriticalPathsAndSaveImages(HDesign&);
 void PlotTopCriticalPathsAndSaveImages(HDesign& design, int n = -1);
 
-//Buffering reporting
-void ReportBufferingPhysics(VanGinneken & vg);
-
-
 #endif //__REPORTING_H__

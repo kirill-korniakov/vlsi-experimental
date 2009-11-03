@@ -25,6 +25,9 @@ void ReportCellByMacroType(HDesign& design)
   string name;
   for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
   {
+    if (cell.PlacementStatus() != PlacementStatus_Movable
+      && cell.PlacementStatus() != PlacementStatus_Fixed)
+      continue;
 
     HCellWrapper cw = design[cell] ;
     name = design.MacroTypes.GetString<HMacroType::Name>(cw.Type());
@@ -81,21 +84,23 @@ void ReportMacroTypeInfo(HDesign& design)
       WRITELINE("     # Direction =\t%d", enuPin.Direction());
       WRITELINE("     # Function  =\t%s", Utils::GetPinFunctionStr(enuPin.Function()));
 
-      for (HCells::CellsEnumeratorW cell = 
-        design.Cells.GetEnumeratorW(); cell.MoveNext(); )
-        for (HCell::PinsEnumeratorW enuPinCell = 
-          cell.GetPinsEnumeratorW(); enuPinCell.MoveNext();)
-          if (enuPinCell.Name() == enuPin.Name())
-          {                       
-            xDisplacement = enuPinCell.OffsetX();
-            yDisplacement = enuPinCell.OffsetY();
-            break;
-          }  
+      //извиняюсь, но дальше написана хрень какая-то
+      //в таком виде это просто нельзя использовать
+      //for (HCells::CellsEnumeratorW cell = 
+      //  design.Cells.GetEnumeratorW(); cell.MoveNext(); )
+      //  for (HCell::PinsEnumeratorW enuPinCell = 
+      //    cell.GetPinsEnumeratorW(); enuPinCell.MoveNext();)
+      //    if (enuPinCell.Name() == enuPin.Name())
+      //    {                       
+      //      xDisplacement = enuPinCell.OffsetX();
+      //      yDisplacement = enuPinCell.OffsetY();
+      //      break;
+      //    }  
 
 
-      WRITELINE("     # Displacement of cell : ");
-      WRITELINE("               X =\t%f", xDisplacement);
-      WRITELINE("               Y =\t%f\n", yDisplacement);
+      //WRITELINE("     # Displacement of cell : ");
+      //WRITELINE("               X =\t%f", xDisplacement);
+      //WRITELINE("               Y =\t%f\n", yDisplacement);
 
     }
   }

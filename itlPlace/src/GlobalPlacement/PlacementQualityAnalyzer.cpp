@@ -6,66 +6,19 @@
 #include "Legalization.h"
 #include "STA.h"
 
-void PlacementQualityAnalyzer::SavePlacement()
-{
-  if(m_rows_size < m_design.Cells.CellsCount())
-  {
-    delete[] m_xrow;
-    delete[] m_yrow;
-    m_rows_size = m_design.Cells.CellsCount();
-    m_xrow = new double[m_rows_size];
-    m_yrow = new double[m_rows_size];
-  }
-  int i = 0;
-  for (HCells::CellsEnumeratorW cell = m_design.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
-  {
-    m_xrow[i] = cell.X();
-    m_yrow[i] = cell.Y();
-  }
-}
-
-void PlacementQualityAnalyzer::RestorePlacement()
-{
-  int i = 0;
-  for (HCells::CellsEnumeratorW cell = m_design.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
-  {
-    cell.SetX(m_xrow[i]);
-    cell.SetY(m_yrow[i]);
-  }
-}
-
 void PlacementQualityAnalyzer::SaveCurrentPlacementAsBestAchieved()
 {
-  if(m_BestPlacementCellsCount < m_design.Cells.CellsCount())
-  {
-    delete[] m_BestPlacementCellsX;
-    delete[] m_BestPlacementCellsY;
-    m_BestPlacementCellsCount = m_design.Cells.CellsCount();
-    m_BestPlacementCellsX = new double[m_BestPlacementCellsCount];
-    m_BestPlacementCellsY = new double[m_BestPlacementCellsCount];
-  }
-  int i = 0;
-  for (HCells::CellsEnumeratorW cell = m_design.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
-  {
-    m_BestPlacementCellsX[i] = cell.X();
-    m_BestPlacementCellsY[i] = cell.Y();
-  }
+  m_BestPlacement.SavePlacement(m_design);
 }
 
 void PlacementQualityAnalyzer::RestoreBestAchievedPlacement()
 {
-  int i = 0;
-  for (HCells::CellsEnumeratorW cell = m_design.Cells.GetEnumeratorW(); cell.MoveNext(); ++i)
-  {
-    cell.SetX(m_BestPlacementCellsX[i]);
-    cell.SetY(m_BestPlacementCellsY[i]);
-  }
+  m_BestPlacement.RestorePlacement(m_design);
 }
 
 PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design)
-  : m_design(design), m_grid(0), m_rows_size(0), m_xrow(0), m_yrow(0), m_experiments(),
-  m_BestPlacementHPWLLegalized(0.0), m_BestPlacementCellsCount(0), 
-  m_BestPlacementCellsX(0), m_BestPlacementCellsY(0),
+  : m_design(design), m_grid(0), m_experiments(),
+  m_BestPlacementHPWLLegalized(0.0),
   nIterationsWithoutGain(0)
 {
   m_grid = new HDPGrid(m_design);
@@ -74,10 +27,6 @@ PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design)
 PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
 {
   delete m_grid;
-  delete m_xrow;
-  delete m_yrow;
-  delete m_BestPlacementCellsX;
-  delete m_BestPlacementCellsY;
 }
 
 void PlacementQualityAnalyzer::AnalyzeQuality(int id)
@@ -92,7 +41,7 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id)
   pq.wns = Utils::WNS(m_design);
 
   //legalization
-  SavePlacement();
+  m_Placement.SavePlacement(m_design);
   AbacusLegalization(*m_grid);
   pq.hpwl_legalized = Utils::CalculateHPWL(m_design, false);
 
@@ -105,7 +54,7 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id)
   pq.tns_legalized = Utils::TNS(m_design);
   pq.wns_legalized = Utils::WNS(m_design);
 
-  RestorePlacement();
+  m_Placement.RestorePlacement(m_design);
 
   m_experiments.push_back(pq);
 }

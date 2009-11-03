@@ -35,6 +35,10 @@ void ReportBenchmarkStatistics(HDesign& design)
   int nPin = 0;
   for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
   {
+    if (cell.PlacementStatus() != PlacementStatus_Movable
+      && cell.PlacementStatus() != PlacementStatus_Fixed)
+      continue;
+
     nCell++;
     nPin += cell.PinsCount();
   }

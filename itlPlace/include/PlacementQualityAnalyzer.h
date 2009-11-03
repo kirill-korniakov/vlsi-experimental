@@ -3,6 +3,7 @@
 
 #include "HDesign.h"
 #include "HDPGrid.h"
+#include "PlacementStorage.h"
 
 class PlacementQualityAnalyzer
 {
@@ -19,21 +20,15 @@ private:
   };
   typedef TemplateTypes<PlacementQuality>::list QualityList;
 
-  double* m_xrow;
-  double* m_yrow;
-  int m_rows_size;
   HDPGrid* m_grid;
   HDesign& m_design;
   QualityList m_experiments;
   int nIterationsWithoutGain;
-
-  double* m_BestPlacementCellsX;
-  double* m_BestPlacementCellsY;
-  int     m_BestPlacementCellsCount;
   double m_BestPlacementHPWLLegalized;
+  
+  PlacementStorage m_Placement;//made class member to minimize nemory allocations count
+  PlacementStorage m_BestPlacement;
 
-  void SavePlacement();
-  void RestorePlacement();
   double LastIterImprovement();
 
 public:

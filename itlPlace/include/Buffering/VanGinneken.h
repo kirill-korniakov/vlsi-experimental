@@ -8,14 +8,11 @@
 #include "DelayCalculation.h"
 #include "Timing.h" 
 #include "Legalization.h"
-#include <crtdbg.h>
-#include <fstream>
 #include "VanGinnekenNode.h"
-#include "PlacementQualityAnalyzer.h"
 #include "NetInfo.h"
 #include "BufferInfo.h"
 #include "TimingHelpers.h"
-
+//#include "PlacementStorage.h"
 
 class HDesign;
 
@@ -26,58 +23,9 @@ class HDesign;
 #define PREDICT 1 //NOTE: predictive pruning 
 #define TREATZERO 1
 
-class NewNetAndCell
-{
-public:
-  NewNetAndCell(int netCount, int celCount, HNet netOld);
-  NewNetAndCell();
-  NewNetAndCell(const NewNetAndCell& m);
-  ~NewNetAndCell();
-
-  int GetNNET();
-  int GetNCell();
-  HNet GetNet(int index);
-  HCell GetCell(int index);
-  HNet GetOldNet();
-  
-  void SetNet(HNet newNet, int index); 
-  void SetCell(HCell newCell, int index);
-
-  NewNetAndCell& operator = (const NewNetAndCell& m );
-
-protected:
-  int nNet;
-  int nCell;
-  HNet* net;
-  HCell* cell;
-  HNet oldNet;
-};
-
-class NameFindNNC
-{  
-public:
-  HNet net;
-  NameFindNNC(HNet& newNet)
-  {
-    net = newNet;
-  }
-
-  bool operator() (NewNetAndCell& a)
-  { 
-      return a.GetOldNet()  == net; 
-  };
-};
-
 class VanGinneken
 {
 private:
-  struct Placement
-  {
-    HCell cell;
-    double BestPlacementCellsX;
-    double BestPlacementCellsY;
-  };
-
   //NOTE: хранит индексы 
   typedef struct comp
   { 
@@ -101,27 +49,21 @@ private:
 public:
   VanGinneken(HDesign& design);
 
-  //NOTE: двупроходная буферизация, сначало выбираем "хорошие" пути, потом их буферизуем
-  int Buffering2Pass(HDPGrid& DPGrid, int argc, char** argv, const char* exportFileName);
-  int BufferingTillDegradation(); //NOTE: буферизуем до ухудшения
-
-  int NetBuffering(HNet &net);    //NOTE: буферизация нета
+  int InsertBuffers(HNet &net);    //NOTE: буферизация нета
   int MathBuffering(HNet& net);
 
   int BufferingOfMostCriticalPaths(int nPaths = 0); //NOTE: буферизуются все критические пути
   int CriticalPathBuffering(HCriticalPath aPath);   //NOTE: буферизация критического пути
-  
-  HWirePhysicalParams GetPhysical();
-  BufferInfo* GetBufferInfo();
-  VGNode GetVGTree();
   int NetBufferNotDegradation(HNet &net);
+  int BufferingTillDegradation(); //NOTE: буферизуем до ухудшения
 
   int GetNCandidatesForBuffering();
   int GetNReverts();
 
-  void RestoreBufferedNet(HNet oldNet);
+  NetInfo netInfo;
 private:
   typedef TemplateTypes<BufferInfo>::vector BuffersVector;
+  typedef TemplateTypes<int>::vector IndexesVector;
 
   RLnode *create_list(VGNode *t); //NOTE: создает RLnode
   void list_delete(RLnode *l);  //NOTE: удаляет RLnode
@@ -136,13 +78,10 @@ private:
 
   void LoadAvailableBuffers();
 
-  void ParsingFinalLocationVan(VanGinneken::Comp *com);
+  void ParseFinalVanLocation(VanGinneken::Comp *com);
 
   //NOTE: создает и инициализирует VGnode
   int RunVG(HNet& net);
-public:
-   NetInfo netInfo;
-private:
 
   void InitializeBuffersIdxs();
 
@@ -150,7 +89,7 @@ private:
   void PinsCountCalculation(VGNode& startNode, int startNodeIdx, int& nPins, bool doIndexesClear = false);
 
   //NOTE: Создает новые неты и целы
-  void CreateNetsAndCells(HNet& net);  
+  void CreateNetsAndCells(HNet& net);
   void CreateCells(string bufferName, HCell* insertedBuffers);
   void CreateNets(HNet& net, HCell* insertedBuffers, HNet* newNet);
   void AddSinks2Net(HCell* insertedBuffers, HNet& net, VGNode& startNode, int startNodeIdx, 
@@ -159,16 +98,14 @@ private:
   void print(RLnode* x);
   void printbuffer(Comp *x, int *i);
 
-  double CalculationOptimumNumberBuffers(HNet net);
-
-  void SaveCurrentPlacementAsBestAchieved();
-  void RestoreBestAchievedPlacement();
+  int FindBufferNumberByIndex(int index);
 
   BuffersVector       m_AvailableBuffers;  //NOTE: библиотека доступных буферов для вставки
   HWirePhysicalParams m_WirePhisics;
   HDesign&            m_hd;
   VGNode              m_vgNetSplitted;
-  int*                m_buffersIdxsAtNetSplitted; //индексы звеньев в которые рекомендуется вставить буферы,
+  IndexesVector       m_BufferIndexes;
+  //int*                m_buffersIdxsAtNetSplitted; //индексы звеньев в которые рекомендуется вставить буферы,
                                                   //m_buffersIdxsAtNetSplitted[i][0] храним длину значимой области 
 
   RLnode* m_VGOutput;                     //результирующий RLNode выдаваемый методом Ван Генникена
@@ -180,14 +117,11 @@ private:
   bool    m_doReportBuffering;
   Comp*   m_finalLocationVan;   //NOTE: последняя структура Comp созданая Ван Генникеном
   double  bestTNS, bestWNS;
-  int m_BestPlacementCellsCount;
-  Placement* m_BestPlacement;
+  //PlacementStorage m_Placement;
   HDPGrid DPGrid;
 
   int m_nCandidatesForBuffering;  //количество нетов которые хотели буферизовать
   int m_nReverts; //количество откато
-
-  std::vector<NewNetAndCell> newNetAndCellcollection;
 };
 
 #endif //__VanGinneken_H__

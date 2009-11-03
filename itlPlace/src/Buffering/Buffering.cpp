@@ -95,7 +95,7 @@ void BufferingAndReport(HDesign& design)
       buffers += n.KoptInt();
 
       //vg.__DriverResistance = n.Rd();
-      int vgbufs = vg.NetBuffering(net);
+      int vgbufs = vg.InsertBuffers(net);
       vgbuffers += vgbufs;
 
       double bufferedDelay = TimingHelper(design).GetBufferedNetMaxDelay(net, n, buf);
@@ -192,7 +192,7 @@ void TestBuffering(HDesign& design)
     //ReportNetTiming(design, nIter);
     //ExportDEF(design, "not_buffered");
 
-    int nBuf = vg.NetBuffering(nIter);
+    int nBuf = vg.InsertBuffers(nIter);
     // (2) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (1)  )
     //if (nBuf != 0)
     //{

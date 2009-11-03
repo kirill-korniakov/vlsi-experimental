@@ -132,6 +132,10 @@ int componentCB(defwCallbackType_e c, defiUserData ud)
 
   for(HCells::CellsEnumeratorW i = def.design->Cells.GetEnumeratorW(); i.MoveNext(); )
   {
+    if (i.PlacementStatus() != PlacementStatus_Movable
+       && i.PlacementStatus() != PlacementStatus_Fixed)
+       continue;
+
     status = defwComponent(
       i.Name().c_str(),
       def.useOriginalNames
@@ -227,6 +231,7 @@ int netCB(defwCallbackType_e c, defiUserData ud)
       }
       else
       {
+        ASSERT((def.design->Get<HCell::PlacementStatus, PlacementStatus>(piter.Cell()) != PlacementStatus_Fictive));
         status = defwNetConnection(
           def.design->GetString<HCell::Name>(piter.Cell()).c_str(),
           def.useOriginalNames

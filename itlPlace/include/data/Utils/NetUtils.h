@@ -16,6 +16,8 @@ namespace Utils
   void SkipSpecialNets(HDesign& hd);
   void RemoveNet(HDesign& hd, HNet net);
 
+  void RestoreBufferedNet(HDesign& design, HNet oldNet);
+
   void CalculateLNets(HDesign& hd);
 
 };

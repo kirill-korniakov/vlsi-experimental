@@ -8,7 +8,7 @@ void ReportCellsByMacroFunction(HDesign& design)
   for (int i = 0; i <= MacroType_Last; ++i)
     counts[i] = 0;
 
-  for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
+  for (HCells::PlaceableCellsEnumeratorW cell = design.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
     counts[design[cell.Type()].Type()]++;
 
   WRITELINE("");

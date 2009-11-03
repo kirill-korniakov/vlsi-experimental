@@ -4767,6 +4767,10 @@
 					RelativePath="..\src\Auxiliary\OutputDump.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Auxiliary\PlacementStorage.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="GlobalPlacement"
@@ -4983,10 +4987,6 @@
 			<Filter
 				Name="Reporting"
 				>
-				<File
-					RelativePath="..\src\Reporting\BufferingReport.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Reporting\CellsReports.cpp"
 					>
@@ -5999,6 +5999,10 @@
 				</File>
 				<File
 					RelativePath="..\include\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\PlacementStorage.h"
 					>
 				</File>
 				<File

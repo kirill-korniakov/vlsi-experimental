@@ -1,4 +1,5 @@
 #include "NetUtils.h"
+#include "TimingPointUtils.h"
 #include "math.h"
 #include <vector>
 #include <algorithm>
@@ -198,6 +199,33 @@ namespace Utils
     }
     ALERTFORMAT(("\tskipped %d nets", nSkipped));
     ALERT("NETS SKIPPING FINISHED...");
+  }
+
+  static void RemoveRepeatersTree(HDesign& design, HNet originalNet, HNet netToRemove, HPin bufferInput)
+  {
+    HPin source = design.Get<HNet::Source, HPin>(netToRemove);
+    if (design.Get<HPin::OriginalNet, HNet>(source) != originalNet)
+    {
+      Utils::DeletePointInList(design, design.TimingPoints[bufferInput]);
+      Utils::DeletePointInList(design, design.TimingPoints[source]);
+      design.Set<HCell::PlacementStatus>(design.Get<HPin::Cell, HCell>(source), PlacementStatus_Fictive);
+    }
+
+    for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(netToRemove); sink.MoveNext(); )
+      if (sink.OriginalNet() != originalNet)
+        for (HCell::PinsEnumeratorW cpin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(sink.Cell()); cpin.MoveNext(); )
+          if (cpin.Direction() == PinDirection_OUTPUT && cpin.Net() != design.Nets.Null())
+            RemoveRepeatersTree(design, originalNet, cpin.Net(), sink);
+
+    RemoveRouting(design, netToRemove);
+    Utils::RemoveNet(design, netToRemove);
+  }
+
+  void RestoreBufferedNet(HDesign& design, HNet oldNet)
+  {
+    if (design.Get<HNet::Kind, NetKind>(oldNet) != NetKind_Buffered) return;
+    RemoveRepeatersTree(design, oldNet, design.Get<HPin::Net, HNet>(design.Get<HNet::Source, HPin>(oldNet)), design.Pins.Null());
+    design.Set<HNet::Kind>(oldNet, NetKind_Active);
   }
 
   void CalculateLNets(HDesign& hd)
