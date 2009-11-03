@@ -213,9 +213,12 @@ namespace Utils
 
     for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(netToRemove); sink.MoveNext(); )
       if (sink.OriginalNet() != originalNet)
+      {
+        ASSERT(MacroType_BUF == (design.Get<HMacroType::Type, MacroType>(design.Get<HCell::MacroType, HMacroType>(sink.Cell()))));
         for (HCell::PinsEnumeratorW cpin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(sink.Cell()); cpin.MoveNext(); )
           if (cpin.Direction() == PinDirection_OUTPUT && cpin.Net() != design.Nets.Null())
             RemoveRepeatersTree(design, originalNet, cpin.Net(), sink);
+      }
 
     RemoveRouting(design, netToRemove);
     Utils::RemoveNet(design, netToRemove);
@@ -226,6 +229,13 @@ namespace Utils
     if (design.Get<HNet::Kind, NetKind>(oldNet) != NetKind_Buffered) return;
     RemoveRepeatersTree(design, oldNet, design.Get<HPin::Net, HNet>(design.Get<HNet::Source, HPin>(oldNet)), design.Pins.Null());
     design.Set<HNet::Kind>(oldNet, NetKind_Active);
+
+    for (HNet::PinsEnumeratorW pin = design.Get<HNet::Pins, HNet::PinsEnumeratorW>(oldNet); pin.MoveNext(); )
+    {
+      ASSERT(::IsNull(pin.Net()));
+      ASSERT(pin.OriginalNet() == oldNet);
+      pin.SetNet(oldNet);
+    }
   }
 
   void CalculateLNets(HDesign& hd)
