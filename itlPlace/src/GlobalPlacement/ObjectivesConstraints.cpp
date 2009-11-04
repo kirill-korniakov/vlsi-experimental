@@ -34,18 +34,18 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   //ALERTFORMAT(("penaltyValue = %f", penaltyValue));
 
   //calculate mu value
-  context->muInitial = muInitialmultiplier * (*criteriaValue) / penaltyValue;
-  context->muSpreading = context->muInitial;
+  context->spreadingData.muInitial = muInitialmultiplier * (*criteriaValue) / penaltyValue;
+  context->spreadingData.muSpreading = context->spreadingData.muInitial;
 
   if (context->useLRSpreading)
   {
-    for (int i = 0; i < context->binGrid.nBins; ++i)
+    for (int i = 0; i < context->spreadingData.binGrid.nBins; ++i)
     {
-      context->muBinsPen[i] = context->muInitial;
+      context->spreadingData.muBinsPen[i] = context->spreadingData.muInitial;
     }
   }
 
-  context->muBorderPenalty = context->muInitial;
+  context->muBorderPenalty = context->spreadingData.muInitial;
 }
 
 void SetGradientToZero(double* gradient, int nComponents)
@@ -239,7 +239,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     static double scaling = context->hd->cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
     static int waitTime = context->hd->cfg.ValueOf("GlobalPlacement.plotWait", 1);
     context->hd->Plotter.ShowGradients(context->ci->mCurrentNumberOfClusters, 
-      context->binGrid.nBinRows, context->binGrid.nBinCols, context->ci->netList.size(), 
+      context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, context->ci->netList.size(), 
       (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient, 
       scaling, (HPlotter::WaitTime)waitTime);
   }

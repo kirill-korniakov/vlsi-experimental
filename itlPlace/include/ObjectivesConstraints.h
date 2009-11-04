@@ -29,18 +29,25 @@ struct BinGrid
   int     nBins;
 };
 
-// User-defined TAO application context - contains data needed by the 
-// application-provided call-back routines that evaluate the function and gradient
-struct AppCtx
+struct LRData
 {
-  HDesign*                hd;
-  ClusteringInformation*  ci;
-  BinGrid                 binGrid;
+  double    alphaTWL;
+  double    c;
+  double    r;
+  double    mu;
 
-  int*      clusterIdx2solutionIdxLUT;
-  int*      solutionIdx2clusterIdxLUT;
+  LRData()
+  {
+    alphaTWL = 0.0;
+    mu = 0.0;
+    c = 0.0;
+    r = 0.0;
+  }
+};
 
-  double    alpha;
+struct SpreadingData
+{
+  BinGrid   binGrid;
 
   double    totalCellArea;
   double    desiredCellsAreaAtEveryBin;
@@ -52,12 +59,34 @@ struct AppCtx
 
   double    muInitial;
   double    muSpreading;
-  double    muBorderPenalty;
   double*   muBinsPen;
 
   double*   binsPenaltyValues;
-  double    borderPenaltyVal;
   double*   individualBinsDiscrepancy;
+
+  SpreadingData()
+  {
+    binGrid.bins = 0;
+    clusterPotentialOverBins = 0;
+  }
+};
+
+// User-defined TAO application context - contains data needed by the 
+// application-provided call-back routines that evaluate the function and gradient
+struct AppCtx
+{
+  HDesign*                hd;
+  ClusteringInformation*  ci;
+
+  int*      clusterIdx2solutionIdxLUT;
+  int*      solutionIdx2clusterIdxLUT;
+
+  double    alpha;
+
+  SpreadingData spreadingData;
+
+  double    muBorderPenalty;
+  double    borderPenaltyVal;
 
   double*   precalcedExponents;
   double*   argsForPrecalcedExponents;
@@ -70,9 +99,8 @@ struct AppCtx
   double*   gLR;
   double*   gQS;
 
-  double    alphaTWL;
-  double    c;
-  double    r;
+  LRData    LRdata;
+
   double    Lbuf;
   double    Dbuf;
   double    DbufLbufDifferenceOfSquares;
@@ -103,8 +131,6 @@ struct AppCtx
     ci           = NULL;
     clusterIdx2solutionIdxLUT = 0;
     solutionIdx2clusterIdxLUT = 0;
-    binGrid.bins = NULL;
-    clusterPotentialOverBins = NULL;
 
     gLSE = 0;
     gSOD = 0;
@@ -113,10 +139,6 @@ struct AppCtx
 
     Lbuf = 0;
     DbufLbufDifferenceOfSquares = 0;
-
-    alphaTWL = 0.0;
-    c = 0.0;
-    r = 0.0;
   }
 };
 

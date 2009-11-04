@@ -8,4 +8,7 @@ void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
 double CalculateDiscrepancy(Vec& x, void* data);
 double SpreadingPenalty(AppCtx* user, PetscScalar* x);
 
+int CalcMaxAffectedArea(double potentialSize, double binSize);
+void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClustersAtEveryBin);
+
 #endif

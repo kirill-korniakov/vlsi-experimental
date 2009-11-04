@@ -343,8 +343,8 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
     {
       start.x = DesignX2ImageX(coordinates[2*i+0]);
       start.y = DesignY2ImageY(coordinates[2*i+1]);
-      finish.x = DesignX2ImageX(coordinates[2*i+0] + scaling*gradients[2*i+0]); //FIXME: move to the cfg
-      finish.y = DesignY2ImageY(coordinates[2*i+1] + scaling*gradients[2*i+1]); //or think about visual scaling
+      finish.x = DesignX2ImageX(coordinates[2*i+0] + scaling*gradients[2*i+0]);
+      finish.y = DesignY2ImageY(coordinates[2*i+1] + scaling*gradients[2*i+1]);
       cvDrawLine(IMG, start, finish, GetColor(color));
       cvDrawCircle(IMG, finish, 1, GetColor(color));
     }

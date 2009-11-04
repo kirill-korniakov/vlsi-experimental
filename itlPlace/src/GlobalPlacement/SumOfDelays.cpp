@@ -19,7 +19,7 @@ double GetNetDelay(PetscScalar* coordinates, int nClusterCoordinates, int i, App
     context->ci->netList[i].Lnet + 
     ki * context->Lbuf;
 
-  //FIXME: debugging variables
+  //NOTE: debugging variables
   double x = 0.0;
   double y = 0.0;
 

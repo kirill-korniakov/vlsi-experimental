@@ -64,10 +64,18 @@ struct MergedCluster
 struct ClusteredNet
 {
   std::vector<int> clusterIdxs;
+
   double weight;
+
   double Lnet;
   double k;
   double braces;
+
+  //Lagrangian Relaxation data
+  //FIXME: fill this fields with correct values
+  double sourceDrive;
+  std::vector<double> sinkLoad;
+  std::vector<double> muVector;
 
   ClusteredNet()
   {

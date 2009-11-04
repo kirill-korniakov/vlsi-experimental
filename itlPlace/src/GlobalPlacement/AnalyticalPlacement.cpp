@@ -20,7 +20,7 @@
 
 using namespace std;
 
-timetype expTime = 0; //FIXME
+timetype expTime = 0;
 timetype lseTime = 0;
 timetype lseGradTime = 0;
 timetype calcPotentialsTime = 0;
@@ -43,12 +43,8 @@ namespace AnalyticalGlobalPlacement
   int InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, Vec& x, Vec& xl, Vec& xu, 
     TAO_SOLVER& tao, TAO_APPLICATION& taoapp);
 
-  
-  void ConstructBinGrid(HDesign& hd, AppCtx& user, int aDesiredNumberOfClustersAtEveryBin = -1);
   void InitializeOptimizationContext(HDesign& hd, ClusteringInformation& ci, AppCtx& context);
   void FreeMemory(AppCtx &user);
-  void DetermineDimensionsOfBinGrid(HDesign& hd, std::vector<Cluster>& clusters, const int nClusters, 
-    BinGrid& binGrid, int desiredNumberOfClustersAtEveryBin);
  
   void SetVariablesValues(ClusteringInformation & ci, Vec& x);
   void GetVariablesValues(ClusteringInformation& ci, Vec x);
@@ -430,36 +426,26 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
   }
 }
 
-void AnalyticalGlobalPlacement::UpdateMu(AppCtx& user, HDesign& hd, int iterate)
+void AnalyticalGlobalPlacement::UpdateMu(AppCtx& context, HDesign& hd, int iterate)
 {
-  user.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2);
-  user.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2);
+  context.spreadingData.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2);
+  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2);
 
-  if (user.useLRSpreading)
+  if (context.useLRSpreading)
   {
-    //for (int i = 0; i < user.binGrid.nBins; ++i)
-    //{
-    //  if (user.individualBinsDiscrepancy[i] > 4 && user.individualBinsDiscrepancy[i] < 10)
-    //    user.muBinsPen[i] *= 2 * user.individualBinsDiscrepancy[i]/* + 1*/;
-    //  else
-    //    user.muBinsPen[i] *= 2;
-    //}
+    BinGrid& binGrid = context.spreadingData.binGrid;
 
-    for (int i = 0; i < user.binGrid.nBinRows; ++i)
+    for (int i = 0; i < binGrid.nBinRows; ++i)
     {
-      for (int j = 0; j < user.binGrid.nBinCols; ++j)
+      for (int j = 0; j < binGrid.nBinCols; ++j)
       {
-        user.muBinsPen[i * user.binGrid.nBinCols + j] += user.muInitial * pow(user.muInitial, 0.2) / pow(2.0, iterate)
-          * (user.binGrid.bins[i][j].sumPotential - user.desiredCellsAreaAtEveryBin)
-          * (user.binGrid.bins[i][j].sumPotential - user.desiredCellsAreaAtEveryBin);
-
-        //user.muBinsPen[i * user.binGrid.nBinCols + j] = std::max(0.0, user.muBinsPen[i * user.binGrid.nBinCols + j]);
-
-        //if (user.muBinsPen[i * user.binGrid.nBinCols + j] < 0) 
-        //user.muBinsPen[i * user.binGrid.nBinCols + j] = -user.muBinsPen[i * user.binGrid.nBinCols + j];
-        //printf("%.16f\t", user.muBinsPen[i * user.nBinCols + j]);
+        context.spreadingData.muBinsPen[i * binGrid.nBinCols + j] += 
+          context.spreadingData.muInitial 
+          * pow(context.spreadingData.muInitial, 0.2) 
+          / pow(2.0, iterate)
+          * (binGrid.bins[i][j].sumPotential - context.spreadingData.desiredCellsAreaAtEveryBin)
+          * (binGrid.bins[i][j].sumPotential - context.spreadingData.desiredCellsAreaAtEveryBin);
       }
-      //printf("\n");
     }
   }
 }
@@ -546,128 +532,6 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
   return OK;
 }
 
-int CalcMaxAffectedArea(double potentialSize, double binSize)
-{
-  return 1+2*static_cast<int>(ceil(potentialSize/binSize));
-}
-
-void AnalyticalGlobalPlacement::ConstructBinGrid(HDesign& hd, AppCtx& user, int aDesiredNumberOfClustersAtEveryBin)
-{
-  static int desiredNumberOfClustersAtEveryBin;
-  if (aDesiredNumberOfClustersAtEveryBin != -1)
-    desiredNumberOfClustersAtEveryBin = aDesiredNumberOfClustersAtEveryBin;
-  else
-    desiredNumberOfClustersAtEveryBin--;
-
-  // Calculate current bin grid
-  DetermineDimensionsOfBinGrid(hd, user.ci->clusters, user.ci->mCurrentNumberOfClusters, user.binGrid, 
-    desiredNumberOfClustersAtEveryBin);
-
-  //TODO: probably we can choose this parameter better
-  user.alpha = user.binGrid.binWidth * hd.cfg.ValueOf(".alphaMultiplier", 0.5);
-
-  //TODO: correct this potential radius calculation
-  double potentialRatio = hd.cfg.ValueOf(".potentialRatio", 2.1); //WARNING: must be greater than 0.5
-  user.potentialRadiusX = potentialRatio*user.binGrid.binWidth;
-  user.potentialRadiusY = potentialRatio*user.binGrid.binHeight;
-  user.invPSX = 1 / user.potentialRadiusX / user.potentialRadiusX;
-  user.invPSY = 1 / user.potentialRadiusY / user.potentialRadiusY;
-
-  int maxAffectedRows = CalcMaxAffectedArea(user.potentialRadiusY, user.binGrid.binHeight);
-  int maxAffectedCols = CalcMaxAffectedArea(user.potentialRadiusX, user.binGrid.binWidth);
-
-  //free memory from previous iteration
-  //FIXME: last iteration causes memory leak
-  if (user.clusterPotentialOverBins)
-  {
-    for (int i = 0; i<maxAffectedRows; i++)
-    {
-      if (user.clusterPotentialOverBins[i])
-        delete [] user.clusterPotentialOverBins[i];
-    }
-    delete [] user.clusterPotentialOverBins;
-  }
-  if (user.binGrid.bins)
-  {
-    for (int j = 0; j < user.binGrid.nBinRows; ++j)
-    {
-      if (user.binGrid.bins[j])
-        delete [] user.binGrid.bins[j];
-    }
-    delete [] user.binGrid.bins;
-  }
-
-  //allocate memory
-  user.clusterPotentialOverBins = new double*[maxAffectedRows];
-  for (int i = 0; i < maxAffectedRows; i++)
-  {
-    user.clusterPotentialOverBins[i] = new double[maxAffectedCols];
-  }
-  user.binGrid.bins = new Bin*[user.binGrid.nBinRows];
-  for (int j = 0; j < user.binGrid.nBinRows; ++j)
-  {
-    user.binGrid.bins[j] = new Bin[user.binGrid.nBinCols];
-  }
-
-  for (int i = 0; i < user.binGrid.nBinRows; ++i)
-  {
-    for (int j = 0; j < user.binGrid.nBinCols; ++j)
-    {
-      user.binGrid.bins[i][j].xCoord = (j + 0.5) * user.binGrid.binWidth;
-      user.binGrid.bins[i][j].yCoord = (i + 0.5) * user.binGrid.binHeight;
-    }
-  }
-  //set coordinates of bins from lower and upper border
-  for (int j = 0; j < user.binGrid.nBinCols; ++j)
-  {
-    user.binGrid.bins[0][j].yCoord = 0.0;
-    user.binGrid.bins[user.binGrid.nBinRows-1][j].yCoord = user.binGrid.binHeight * user.binGrid.nBinRows;
-  }
-  //set coordinates of bins from left and right border
-  for (int i = 0; i < user.binGrid.nBinRows; ++i)
-  {
-    user.binGrid.bins[i][0].xCoord = 0.0;
-    user.binGrid.bins[i][user.binGrid.nBinCols-1].xCoord = user.binGrid.binWidth * user.binGrid.nBinCols;
-  }
-  
-  user.binGrid.nBins = user.binGrid.nBinCols * user.binGrid.nBinRows;
-  
-  user.totalCellArea = 0.0;
-  for (int i = 0; i < static_cast<int>(user.ci->clusters.size()); ++i)
-  {
-    if (user.ci->clusters[i].isFake == false)
-    {
-      user.totalCellArea += user.ci->clusters[i].area;
-    }
-  }
-  user.desiredCellsAreaAtEveryBin = user.totalCellArea / user.binGrid.nBins;
-
-  //if (useNetWeights)
-  {
-    int nNets = user.ci->netList.size();//hd.Nets.Count();
-    HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW();
-    
-    for (int i = 0; i < nNets && netW.MoveNext(); ++i)
-    {
-      user.ci->netList[i].weight = netW.Weight();
-    }
-  }
-  if (user.useLRSpreading)
-  {
-    user.borderPenaltyVal    = 0.0;
-    user.binsPenaltyValues   = new double[user.binGrid.nBins * 3];
-    user.muBinsPen                 = user.binsPenaltyValues + user.binGrid.nBins;
-    user.individualBinsDiscrepancy = user.binsPenaltyValues + user.binGrid.nBins*2;
-  }
-
-  unsigned int coordsCount       = user.ci->mCurrentNumberOfClusters + user.ci->terminalCells.size() + user.ci->primaryPins.size();
-  user.precalcedExponents        = new double[coordsCount * 8];
-  user.argsForPrecalcedExponents = user.precalcedExponents + coordsCount * 4;
-  user.netListSizes              = new int[user.ci->netList.size()];
-
-  CalculateNetListSizes(user.ci->netList, user.netListSizes);
-}
-
 void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, ClusteringInformation& ci, AppCtx& context)
 {
   context.hd = &hd;
@@ -707,9 +571,10 @@ void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, Clust
   context.DbufLbufDifferenceOfSquares = D*D - L*L;
   
   //FIXME: set real values
-  context.alphaTWL = 1.0;
-  context.c = 1.0;
-  context.r = 1.0;
+  context.LRdata.alphaTWL = 1.0;
+  context.LRdata.c = 1.0;
+  context.LRdata.r = 1.0;
+  context.LRdata.mu = hd.cfg.ValueOf(".muLR", 1.0);
 
   context.gradientBalance       = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
   
@@ -725,27 +590,27 @@ void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, Clust
   context.useNetWeights         = hd.cfg.ValueOf("NetWeighting.useNetWeights", false);
 }
 
-//TODO: check if all the memory is released
 void AnalyticalGlobalPlacement::FreeMemory(AppCtx &context)
 {
-  for (int j = 0; j < context.binGrid.nBinRows; ++j)
+  for (int j = 0; j < context.spreadingData.binGrid.nBinRows; ++j)
   {
-    delete [] context.binGrid.bins[j];
+    delete [] context.spreadingData.binGrid.bins[j];
   }
-  delete [] context.binGrid.bins;
+  delete [] context.spreadingData.binGrid.bins;
 
-  int maxAffectedRows = CalcMaxAffectedArea(context.potentialRadiusY, context.binGrid.binHeight);
+  int maxAffectedRows = CalcMaxAffectedArea(context.spreadingData.potentialRadiusY, 
+    context.spreadingData.binGrid.binHeight);
   for (int i = 0; i < maxAffectedRows; ++i)
   {
-    delete [] context.clusterPotentialOverBins[i];
+    delete [] context.spreadingData.clusterPotentialOverBins[i];
   }
-  delete [] context.clusterPotentialOverBins;
+  delete [] context.spreadingData.clusterPotentialOverBins;
   
   if (context.useLRSpreading)
   {
-    delete [] context.binsPenaltyValues;
-    delete [] context.muBinsPen;
-    delete [] context.individualBinsDiscrepancy;
+    delete [] context.spreadingData.binsPenaltyValues;
+    delete [] context.spreadingData.muBinsPen;
+    delete [] context.spreadingData.individualBinsDiscrepancy;
   }
 
   //FIXME: check correctness of memory deletion
@@ -755,11 +620,17 @@ void AnalyticalGlobalPlacement::FreeMemory(AppCtx &context)
   delete[] context.gLSE;
 }
 
-void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& user)
+void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& context)
 {
-  ALERTFORMAT(("Bin grid: %d x %d", user.binGrid.nBinRows, user.binGrid.nBinCols));
-  ALERTFORMAT(("Bin width: %f\tBin height: %f", user.binGrid.binWidth, user.binGrid.binHeight));
-  ALERTFORMAT(("Potential radius X: %f\tPotential radius Y: %f", user.potentialRadiusX, user.potentialRadiusY));
+  ALERTFORMAT(("Bin grid: %d x %d", 
+    context.spreadingData.binGrid.nBinRows, 
+    context.spreadingData.binGrid.nBinCols));
+  ALERTFORMAT(("Bin width: %f\tBin height: %f", 
+    context.spreadingData.binGrid.binWidth, 
+    context.spreadingData.binGrid.binHeight));
+  ALERTFORMAT(("Potential radius X: %f\tPotential radius Y: %f", 
+    context.spreadingData.potentialRadiusX, 
+    context.spreadingData.potentialRadiusY));
 }
 
 void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, AppCtx& user)
@@ -787,7 +658,8 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   // Set solution vec and an initial guess
   SetVariablesValues(ci, x);
 
-  hd.Plotter.ShowGlobalPlacement(false, context.binGrid.nBinRows, context.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
+  hd.Plotter.ShowGlobalPlacement(false, context.spreadingData.binGrid.nBinRows, 
+    context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
 
   info = TaoAppSetInitialSolutionVec(taoapp, x); CHKERRQ(info);
 
@@ -901,13 +773,13 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     WRITELINE("");
     ALERTFORMAT(("TAO iteration %d.%d", metaIteration, iteration++));
     if (context.useQuadraticSpreading)
-      ALERTFORMAT(("muSpreading = %.20f", context.muSpreading));
+      ALERTFORMAT(("muSpreading = %.20f", context.spreadingData.muSpreading));
     if (context.useBorderPenalty)
       ALERTFORMAT(("muBorderPenalty = %.20f", context.muBorderPenalty));
     ALERTFORMAT(("HPWL initial   = %f", Utils::CalculateHPWL(hd, true)));
 
     hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".plotWires", false), 
-      context.binGrid.nBinRows, context.binGrid.nBinCols);
+      context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
 
     // Tao solve the application
     retCode = TaoSolveApplication(taoapp, tao); CHKERRQ(retCode);
@@ -972,28 +844,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   }
 
   return OK;
-}
-
-void AnalyticalGlobalPlacement::DetermineDimensionsOfBinGrid(HDesign& hd, vector<Cluster>& clusters, 
-                                                             const int nClusters, BinGrid& binGrid,
-                                                             int desiredNumberOfClustersAtEveryBin)
-{
-  static double minX = hd.Circuit.PlacementMinX();
-  static double maxX = hd.Circuit.PlacementMaxX();
-  static double minY = hd.Circuit.PlacementMinY();
-  static double maxY = hd.Circuit.PlacementMaxY();
-
-  double circuitAspectRatio = (maxX - minX) / (maxY - minY);
-
-  binGrid.nBinRows = static_cast<int>(sqrt(circuitAspectRatio * nClusters/desiredNumberOfClustersAtEveryBin));
-  binGrid.nBinCols = static_cast<int>(Aux::dtoi(circuitAspectRatio * binGrid.nBinRows));
-  
-  //WARNING: we need odd numbers, because cells will not move otherwise
-  if (binGrid.nBinRows % 2 == 0) binGrid.nBinRows++; 
-  if (binGrid.nBinCols % 2 == 0) binGrid.nBinCols++;
-  
-  binGrid.binWidth = (maxX - minX) / binGrid.nBinCols;
-  binGrid.binHeight = (maxY - minY) / binGrid.nBinRows;
 }
 
 double AnalyticalGlobalPlacement::CalculateSumOfK(HDesign& hd, ClusteringInformation& ci)

@@ -22,7 +22,7 @@ int GetPrecalcedExponentsIdx(AppCtx* context, int clusterIdx)
   }
 }
 
-void GetClusterCoordinates(int clusterIdx, PetscScalar *coordinates, 
+void GetClusterCoordinates(int clusterIdx, PetscScalar* coordinates, 
                            AppCtx* context, double& x, double& y)
 {
   if (IsMovableCell(clusterIdx))
@@ -74,22 +74,6 @@ double CalcNetLSE(AppCtx* data, PetscScalar* coordinates, int netIdx)
   data->SUM4[netIdx] = sumExp4;
 
   return data->alpha * log(sumExp1 * sumExp2 * sumExp3 * sumExp4);
-}
-
-double CalcDistance2Sink(AppCtx* context, PetscScalar* coordinates, int netIdx, int sinkIdx)
-{
-  double sourceX = 0.0;
-  double sourceY = 0.0;
-  double sinkX = 0.0;
-  double sinkY = 0.0;
-
-  int realClusterIdx;
-  realClusterIdx = context->ci->netList[netIdx].clusterIdxs[0];
-  GetClusterCoordinates(realClusterIdx, coordinates, context, sourceX, sourceY);
-  realClusterIdx = context->ci->netList[netIdx].clusterIdxs[sinkIdx];
-  GetClusterCoordinates(realClusterIdx, coordinates, context, sinkX, sinkY);
-
-  return fabs(sourceX - sinkX) + fabs(sourceY - sinkY);
 }
 
 double CalcNetLSEGradient(AppCtx* context, int netIdx, int idxInSolutionVector)

@@ -671,7 +671,7 @@
 					Name="ObjectivesConstraints"
 					>
 					<File
-						RelativePath="..\include\BorderPenalty.cpp"
+						RelativePath="..\src\GlobalPlacement\BorderPenalty.cpp"
 						>
 					</File>
 					<File
