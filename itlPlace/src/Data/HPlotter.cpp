@@ -777,7 +777,7 @@ void HPlotter::ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, W
 }
 
 void HPlotter::ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNets,
-                             double* x, double* gLSE, double* gSOD, double* gQS, double* g,
+                             double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g,
                              double scaling, WaitTime waitTime)
 {
   Clear();
@@ -786,6 +786,7 @@ void HPlotter::ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNet
   PlotPlacement();
   PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
   PlotGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
+  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_Pink);
   PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
   PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
   Refresh(waitTime);

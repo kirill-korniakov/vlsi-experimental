@@ -14,6 +14,7 @@
 #include "Clustering.h"
 #include "GlobalPlacement.h"
 #include "ObjectivesConstraints.h"
+#include "Spreading.h"
 #include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 
@@ -25,9 +26,6 @@ timetype lseGradTime = 0;
 timetype calcPotentialsTime = 0;
 timetype quadraticSpreading = 0;
 timetype quadraticSpreadingGradTime = 0;
-
-timetype start = 0;
-timetype finish = 0;
 
 namespace AnalyticalGlobalPlacement
 {
@@ -63,7 +61,6 @@ namespace AnalyticalGlobalPlacement
   void GetKValues(ClusteringInformation& ci, Vec x);
   void SetBounds(HDesign& hd, ClusteringInformation& ci, Vec& xl, Vec& xu);
 
-  double CalculateDiscrepancy(Vec& x, void* data); 
   double CalculateSumOfK(HDesign& hd, ClusteringInformation& ci);
   void ReportIterationInfo(ClusteringInformation& ci, AppCtx& user);
   void ReportBinGridInfo(AppCtx& user);
@@ -694,9 +691,10 @@ void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, Clust
 
   int nVariables = 2 * context.ci->mCurrentNumberOfClusters + context.ci->netList.size();
 
-  context.gLSE = new double[3*nVariables + 4*context.ci->netList.size()];
+  context.gLSE = new double[4*nVariables + 4*context.ci->netList.size()];
   context.gSOD = context.gLSE + nVariables;
-  context.gQS  = context.gSOD + nVariables;
+  context.gLR  = context.gSOD + nVariables;
+  context.gQS  = context.gLR  + nVariables;
   context.SUM1 = context.gQS  + nVariables;
   context.SUM2 = context.SUM1 + context.ci->netList.size();
   context.SUM3 = context.SUM2 + context.ci->netList.size();
@@ -707,11 +705,17 @@ void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, Clust
   context.Lbuf = L;
   context.Dbuf = D;
   context.DbufLbufDifferenceOfSquares = D*D - L*L;
+  
+  //FIXME: set real values
+  context.alphaTWL = 1.0;
+  context.c = 1.0;
+  context.r = 1.0;
 
   context.gradientBalance       = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
   
   context.useLogSumExp          = hd.cfg.ValueOf(".useLogSumExp", true);
   context.useSumOfDelays        = hd.cfg.ValueOf(".useSumOfDelays", false);
+  context.useLR                 = hd.cfg.ValueOf(".useLR", false);
   context.useQuadraticSpreading = hd.cfg.ValueOf(".useQuadraticSpreading", true);
   context.useLRSpreading        = hd.cfg.ValueOf(".useLRSpreading", false);
   context.useBorderPenalty      = hd.cfg.ValueOf(".useBorderPenalty", true);
@@ -990,100 +994,6 @@ void AnalyticalGlobalPlacement::DetermineDimensionsOfBinGrid(HDesign& hd, vector
   
   binGrid.binWidth = (maxX - minX) / binGrid.nBinCols;
   binGrid.binHeight = (maxY - minY) / binGrid.nBinRows;
-}
-
-double AnalyticalGlobalPlacement::CalculateDiscrepancy(Vec& x, void* data)
-{
-  AppCtx* user = (AppCtx*)data;
-  
-  double maximum = 0;
-  double dimension;  // половина стороны квадрата, площадь которого равна площади текущего кластера
-  int min_col;
-  int max_col;
-  int min_row;
-  int max_row;
-  // доли, на которые делится бинами данный кластер (от 0 до 1)
-  double leftRatio  = 0.0;  
-  double rightRatio = 0.0;
-  double lowerRatio = 0.0;
-  double upperRatio = 0.0;
-
-  PetscScalar* solution;
-  VecGetArray(x, &solution);
-
-  double *clustersAreasInBins = new double[user->binGrid.nBins];
-  for (int i = 0; i < user->binGrid.nBins; ++i)
-  {
-    clustersAreasInBins[i] = 0;
-  }
-
-  int idxInSolutionVector;
-  for (int i = 0; i < static_cast<int>(user->ci->clusters.size()); ++i)
-  {
-    if (user->ci->clusters[i].isFake)
-      continue;
-    
-    idxInSolutionVector = user->clusterIdx2solutionIdxLUT[i];
-    dimension = sqrt((double)user->ci->clusters[i].area) / 2;
-    min_col = static_cast<int>((solution[2*idxInSolutionVector+0]-dimension) / user->binGrid.binWidth);
-    max_col = static_cast<int>((solution[2*idxInSolutionVector+0]+dimension) / user->binGrid.binWidth);
-    min_row = static_cast<int>((solution[2*idxInSolutionVector+1]-dimension) / user->binGrid.binHeight);    
-    max_row = static_cast<int>((solution[2*idxInSolutionVector+1]+dimension) / user->binGrid.binHeight);
-    
-    MoveBinIndexesIntoBorders(user, min_col, min_row, max_col, max_row);
-
-    if (min_col != max_col)
-    {
-      leftRatio  = (user->binGrid.binWidth * (min_col + 1) - solution[2*idxInSolutionVector+0] + dimension) / (2*dimension);
-    }
-    else
-    {
-      leftRatio = 0.0;
-    }
-    rightRatio = 1 - leftRatio;
-
-    if (min_row != max_row)
-    {
-      lowerRatio = (user->binGrid.binHeight * (min_row + 1) - solution[2*idxInSolutionVector+1] + dimension) / (2*dimension);
-    } 
-    else
-    {
-      lowerRatio = 0.0;
-    }
-    upperRatio = 1 - lowerRatio;
-
-    if (fabs(leftRatio + rightRatio + lowerRatio + upperRatio - 2) > 0.001) 
-    {
-      break;
-    }
-
-    clustersAreasInBins[min_row * user->binGrid.nBinCols + min_col] += 
-      user->ci->clusters[i].area * leftRatio * lowerRatio;
-    clustersAreasInBins[min_row * user->binGrid.nBinCols + max_col] += 
-      user->ci->clusters[i].area * rightRatio * lowerRatio;
-    clustersAreasInBins[max_row * user->binGrid.nBinCols + min_col] += 
-      user->ci->clusters[i].area * leftRatio * upperRatio;
-    clustersAreasInBins[max_row * user->binGrid.nBinCols + max_col] += 
-      user->ci->clusters[i].area * rightRatio * upperRatio;
-  }
-
-  for (int i = 0; i < user->binGrid.nBins; ++i)
-  {
-    if (maximum < clustersAreasInBins[i])
-    {
-      maximum = clustersAreasInBins[i];
-    }
-
-    if (user->useLRSpreading)
-    {
-      user->individualBinsDiscrepancy[i] = clustersAreasInBins[i] / user->desiredCellsAreaAtEveryBin;
-    }
-  }
-
-  delete [] clustersAreasInBins;
-  VecRestoreArray(x, &solution);
-
-  return maximum / user->desiredCellsAreaAtEveryBin;
 }
 
 double AnalyticalGlobalPlacement::CalculateSumOfK(HDesign& hd, ClusteringInformation& ci)

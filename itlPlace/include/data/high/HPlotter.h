@@ -36,7 +36,7 @@ public:
   void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
   void ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime = NO_WAIT);
   void ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNets,
-    double* x, double* gLSE, double* gSOD, double* gQS, double* g,
+    double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g,
     double scaling, WaitTime waitTime = NO_WAIT);
   void ShowLegalizationState(WaitTime waitTime, bool drawSites);
 

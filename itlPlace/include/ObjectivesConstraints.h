@@ -67,8 +67,12 @@ struct AppCtx
   
   double*   gLSE;
   double*   gSOD;
+  double*   gLR;
   double*   gQS;
 
+  double    alphaTWL;
+  double    c;
+  double    r;
   double    Lbuf;
   double    Dbuf;
   double    DbufLbufDifferenceOfSquares;
@@ -81,11 +85,15 @@ struct AppCtx
 
   bool useLogSumExp;
   bool useSumOfDelays;
+  bool useLR;
+
   bool useQuadraticSpreading;
   bool useLRSpreading;
+  
   bool useBorderPenalty;
   bool useBorderBounds;
   bool useUnidirectSpreading;
+  
   bool useNetWeights;
 
   //constructor
@@ -100,15 +108,19 @@ struct AppCtx
 
     gLSE = 0;
     gSOD = 0;
+    gLR  = 0;
     gQS  = 0;
 
     Lbuf = 0;
     DbufLbufDifferenceOfSquares = 0;
+
+    alphaTWL = 0.0;
+    c = 0.0;
+    r = 0.0;
   }
 };
 
 int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ptr);
 void CalcMuInitial(PetscScalar* x, AppCtx* context);
-void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 
 #endif
