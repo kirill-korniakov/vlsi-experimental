@@ -142,25 +142,10 @@ namespace Utils
       hd.Set<HNet::Kind>(net, unbind_kind);
       for (HNet::PinsEnumeratorW pin = hd.Get<HNet::Pins, HNet::PinsEnumeratorW>(net); pin.MoveNext(); )
       {
-        bool isPinBuf = true;
-        HNet netNew;
-
-        for (HNets::NetsEnumeratorW nIter = hd.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); )
-          for (HNetWrapper::PinsEnumeratorW pw = nIter.GetPinsEnumeratorW(); pw.MoveNext(); )
-            if ((pw == pin) && (nIter != net) && (nIter.Kind() != NetKind_Removed))
-            {
-              isPinBuf = false;
-              netNew = nIter;
-            }
-
-            if ((pin.Net() == net) && isPinBuf)
-            {
-              pin.SetNet(hd.Nets.Null());
-              int n = hd.Nets.GetInt<HNet::PinsCount>(net);
-            }
-            if (!isPinBuf)
-              pin.SetNet(netNew);
-
+        if (pin.Net() == net)
+        {
+          pin.SetNet(hd.Nets.Null());
+        }
       }
     }
   }
