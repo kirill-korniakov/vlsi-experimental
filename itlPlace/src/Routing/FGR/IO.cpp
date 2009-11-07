@@ -1178,8 +1178,8 @@ const char* Colors[] = {
 void FGR::plotXPM(const string &filename, unsigned nPix)
 {
   const unsigned numColors   = 64;
-  const unsigned nGoodColors = 55;
-  unsigned multiplier = floor((double)nPix / xTiles); 
+  const unsigned nGoodColors = 55; //colors used to draw not overflowed tiles
+  unsigned multiplier = floor((double)nPix / xTiles); //num of pixels in tile's edge 
 
   string fullfilename = filename + string(".xpm");
 
@@ -1188,36 +1188,38 @@ void FGR::plotXPM(const string &filename, unsigned nPix)
   xpmFile<<"/* XPM */"<<endl;
   xpmFile<<"static char *congestion[] = {"<<endl;
   xpmFile<<"/* columns rows colors chars-per-pixel */"<<endl;
-  //xpmFile<<"\""<<xTiles-1<<" "<<yTiles-1<<" "
   xpmFile<<"\""<<xTiles * multiplier<<" "<<yTiles * multiplier<<" "
          <<numColors<<" 1\","<<endl;
-  for(unsigned i=0; i<numColors; ++i)
+
+  for(unsigned i = 0; i < numColors; ++i)
     xpmFile<<"\""<<coolMap[i]<<"\","<<endl;
+
   xpmFile<<"/* pixels */"<<endl;
 
   vector< vector< double > > image;
-
   double maxRatio = 1.;
 
-  //for(unsigned rj = 2; rj <= yTiles; ++rj)
+  //calculate usage of all edges
   for(unsigned rj = 1; rj <= yTiles; ++rj)
   {
     unsigned j = yTiles - rj;
     vector<double> horizLine;
+
     for(unsigned i = 0; i < xTiles; ++i)
     {
       double x1Usage = 0., x1Cap = 0., y1Usage = 0., y1Cap = 0.;
       double x2Usage = 0., x2Cap = 0., y2Usage = 0., y2Cap = 0.;
+
       for(unsigned k = 0; k < tiles.size(); ++k)
       {
-        unsigned x1EdgeId = tiles[k][j][i].incX;
-        unsigned y1EdgeId = tiles[k][j][i].incY;
-        unsigned x2EdgeId = tiles[k][j][i].decX;
-        unsigned y2EdgeId = tiles[k][j][i].decY;
+        unsigned x1EdgeId = tiles[k][j][i].incX; //right edge of this tile
+        unsigned y1EdgeId = tiles[k][j][i].incY; //top edge
+        unsigned x2EdgeId = tiles[k][j][i].decX; //left edge
+        unsigned y2EdgeId = tiles[k][j][i].decY; //down edge
 
         if(x1EdgeId != UINT_MAX)
         {
-          x1Usage += edges[x1EdgeId].usage;
+          x1Usage += edges[x1EdgeId].usage; //num of wires croosing this edge
           x1Cap += edges[x1EdgeId].capacity;
         }
         if(y1EdgeId != UINT_MAX)
@@ -1235,7 +1237,7 @@ void FGR::plotXPM(const string &filename, unsigned nPix)
           y2Usage += edges[y2EdgeId].usage;
           y2Cap += edges[y2EdgeId].capacity;
         }
-      }
+      } //for(unsigned k = 0; k < tiles.size(); ++k)
 
       double x1Ratio = 0, y1Ratio = 0, x2Ratio = 0, y2Ratio = 0;
       
@@ -1251,38 +1253,237 @@ void FGR::plotXPM(const string &filename, unsigned nPix)
       if (y2Cap > 0)
         y2Ratio = static_cast<double>(y2Usage)/static_cast<double>(y2Cap);
 
-      double totalRatio = max(max(x1Ratio, y1Ratio), max(x2Ratio, y2Ratio)); //0.5*(xRatio + yRatio);
-      //double totalRatio = 0.5*(x1Ratio + y1Ratio);
+      double totalRatio = max(max(x1Ratio, y1Ratio), max(x2Ratio, y2Ratio));
       maxRatio = max(maxRatio, totalRatio);
 
       for (unsigned i1 = 0; i1 < multiplier; i1++)
-      horizLine.push_back(totalRatio);
-    }
-    for (unsigned i1 = 0; i1 < multiplier; i1++)
-    image.push_back(horizLine);
-  }
+        horizLine.push_back(totalRatio);
+    } //for(unsigned i = 0; i < xTiles; ++i)
 
-  //for(unsigned j = 0; j < yTiles-1; ++j)
+    for (unsigned i1 = 0; i1 < multiplier; i1++)
+      image.push_back(horizLine);
+  } //for(unsigned rj = 1; rj <= yTiles; ++rj)
+
+  //draw tiles
   for(unsigned j = 0; j < yTiles * multiplier; ++j)
   {
     xpmFile<<"\"";
-    //for(unsigned i = 0; i < xTiles-1; ++i)
+
     for(unsigned i = 0; i < xTiles * multiplier; ++i)
     {
-      //unsigned j1 = j / multiplier;
-      //unsigned i1 = i / multiplier;
       unsigned index = 0;
 
-      if (image[j][i] <= 1)
-        index = static_cast<unsigned>(floor((image[j][i])*static_cast<double>(nGoodColors-1)));
+      if (image[j][i] <= 1) //tile was not overflowed
+        index = static_cast<unsigned>(floor((image[j][i]) //use
+                * static_cast<double>(nGoodColors-1)));   //"good" colors
 
-      else
-      	index = static_cast<unsigned>(floor((image[j][i]/maxRatio)*static_cast<double>(numColors - nGoodColors - 1)))
-                + nGoodColors;
+      else //tile was overflowed
+      	index = static_cast<unsigned>(floor((image[j][i]/maxRatio) //use "bad" colors
+                * static_cast<double>(numColors - nGoodColors - 1))) + nGoodColors;
+
+      xpmFile<<Colors[index];
+    }
+
+    if(j == yTiles * multiplier - 1) //last line in the file
+    {
+      xpmFile<<"\""<<endl;
+    }
+    else
+    {
+      xpmFile<<"\","<<endl;
+    }
+  }
+
+  xpmFile<<");"<<endl;
+  xpmFile.close();
+}
+
+void FGR::plotEdgesXPM(const string &filename, unsigned nPix)
+{
+  const unsigned numColors   = 64;
+  const unsigned nGoodColors = 55;
+  unsigned multiplier = floor((double)nPix / xTiles); 
+
+  string fullfilename = filename + string("edges.xpm");
+
+  ofstream xpmFile(fullfilename.c_str());
+
+  xpmFile<<"/* XPM */"<<endl;
+  xpmFile<<"static char *congestion[] = {"<<endl;
+  xpmFile<<"/* columns rows colors chars-per-pixel */"<<endl;
+  xpmFile<<"\""<<xTiles * multiplier<<" "<<yTiles * multiplier<<" "
+         <<numColors<<" 1\","<<endl;
+
+  for(unsigned i=0; i<numColors; ++i)
+    xpmFile<<"\""<<coolMap[i]<<"\","<<endl;
+
+  xpmFile<<"/* pixels */"<<endl;
+
+  vector< vector< double > > image;
+  double maxRatio = 1.;
+
+  //calculate usage of edges
+  for(unsigned rj = 1; rj <= yTiles; ++rj)
+  {
+    unsigned j = yTiles - rj;
+    vector<double> horizLine;
+    vector<double> vertEdgeLine;
+
+    for(unsigned i = 0; i < xTiles; ++i)
+    {
+      double x1Usage = 0., x1Cap = 0., y1Usage = 0., y1Cap = 0.;
+      for(unsigned k = 0; k < tiles.size(); ++k)
+      {
+        unsigned x1EdgeId = tiles[k][j][i].incX; //right edge of this tile
+        unsigned y1EdgeId = tiles[k][j][i].decY; //down edge
+
+        if(x1EdgeId != UINT_MAX)
+        {
+          x1Usage += edges[x1EdgeId].usage;
+          x1Cap += edges[x1EdgeId].capacity;
+        }
+        if(y1EdgeId != UINT_MAX)
+        {
+          y1Usage += edges[y1EdgeId].usage;
+          y1Cap += edges[y1EdgeId].capacity;
+        }
+      }
+
+      double x1Ratio = 0, y1Ratio = 0;
+      
+      if (x1Cap > 0)
+        x1Ratio = static_cast<double>(x1Usage)/static_cast<double>(x1Cap);
+        
+      if (y1Cap > 0)
+        y1Ratio = static_cast<double>(y1Usage)/static_cast<double>(y1Cap);
+
+      double totalRatio = y1Ratio;
+      maxRatio = max(maxRatio, max(totalRatio, x1Ratio));
+
+      for (unsigned i1 = 0; i1 < multiplier; i1++)  //put down edge of a tile
+        horizLine.push_back(totalRatio);
+      
+      //----remember right edge--------------------
+      unsigned i1 = 0;
+
+      for (; i1 < multiplier / 4; i1++)
+        vertEdgeLine.push_back(x1Ratio); //add pixels for right edge
+      
+      for (; i1 < multiplier; i1++)
+        vertEdgeLine.push_back(0);       //add pixels for space
+      //--------------------------------------
+    } //for(unsigned i = 0; i < xTiles; ++i)
+
+    //---add right edge-----------------------
+    unsigned i11 = 0;
+
+    for (; i11 < multiplier / 4; i11++)
+      image.push_back(horizLine);
+    
+    for (; i11 < multiplier; i11++)
+      image.push_back(vertEdgeLine);
+    //----------------------------------------
+  } //for(unsigned rj = 1; rj <= yTiles; ++rj)
+  
+  //draw edges
+  for(unsigned j = 0; j < yTiles * multiplier; ++j)
+  {
+    xpmFile<<"\"";
+
+    for(unsigned i = 0; i < xTiles * multiplier; ++i)
+    {
+      unsigned index = 0;
+
+      if (image[j][i] <= 1) //edge is not overflowed
+        index = static_cast<unsigned>(floor((image[j][i]) //use "good"
+                * static_cast<double>(nGoodColors-1)));   //colors
+
+      else //edge is overflowed
+      	index = static_cast<unsigned>(floor((image[j][i]/maxRatio) //use "bad" colors
+                * static_cast<double>(numColors - nGoodColors - 1))) + nGoodColors;
 
       xpmFile<<Colors[index];
     }
     if(j == yTiles * multiplier - 1)
+    {
+      xpmFile<<"\""<<endl;
+    }
+    else
+    {
+      xpmFile<<"\","<<endl;
+    }
+  }
+  xpmFile<<");"<<endl;
+  xpmFile.close();
+}
+
+void FGR::plotColorsXPM(const string &filename, unsigned nVertPix)
+{
+  const unsigned numColors   = 64;
+  const unsigned nGoodColors = 55;
+  const unsigned nHorPix     = 1000;
+  unsigned multiplier = floor((double)nVertPix / numColors);
+
+  string fullfilename = filename + string(".xpm");
+
+  ofstream xpmFile(fullfilename.c_str());
+
+  xpmFile<<"/* XPM */"<<endl;
+  xpmFile<<"static char *congestion[] = {"<<endl;
+  xpmFile<<"/* columns rows colors chars-per-pixel */"<<endl;
+  xpmFile<<"\""<<nHorPix<<" "<<numColors * multiplier<<" "
+         <<numColors<<" 1\","<<endl;
+
+  for(unsigned i=0; i<numColors; ++i)
+    xpmFile<<"\""<<coolMap[i]<<"\","<<endl;
+
+  xpmFile<<"/* pixels */"<<endl;
+
+  vector< vector< double > > image;
+
+  for(unsigned rj = 0; rj < numColors; ++rj) //for all colors
+  {
+    vector<double> horizLine;
+    vector<double> whiteLine;
+
+    for (unsigned i1 = 0; i1 < 200; i1++)
+    {
+        horizLine.push_back(rj);         //add index of a current color
+        whiteLine.push_back(0);
+    }
+    
+    for (unsigned i1 = 200; i1 < nHorPix; i1++)
+    {
+        horizLine.push_back(0);         //add space
+        whiteLine.push_back(0);
+    }
+
+    unsigned i2 = 0;
+    
+    while (i2 < multiplier / 2)
+    {
+      image.push_back(horizLine);                  //add few lines with this color
+      i2++;
+    }
+    
+    while (i2 < multiplier)
+    {
+      image.push_back(whiteLine);                  //add white lines
+      i2++;
+    }
+  }
+
+  for(unsigned j = 0; j < numColors * multiplier; ++j)
+  {
+    xpmFile<<"\"";
+
+    for(unsigned i = 0; i < nHorPix; ++i)
+    {
+      unsigned index = image[j][i];
+      xpmFile<<Colors[index];
+    }
+
+    if(j == numColors * multiplier - 1)
     {
       xpmFile<<"\""<<endl;
     }

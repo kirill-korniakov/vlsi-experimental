@@ -22,25 +22,6 @@ int fgr::FGRRouting(HDPGrid& grid)
   string outputfile;
   string resultsFile;
 
-  /*for(int i = 2; i < argc; ++i)
-  {
-    if(argv[i] == string("-o"))
-    {
-      if(i+1 < argc)
-      {
-        outputfile = argv[++i];
-        resultsFile = outputfile + ".results";
-      }
-      else
-      {
-        //outfile << "option -o requires an argument" << endl;
-        FGRParams::usage(argv[0]);
-        return 0;
-      }
-    }
-  }*/
-
-  //FGRParams parms(argc, argv);
   //---Initialise FGRParams----------------------------------------------------
   FGRParams parms;
   parms.labyrinth   = true;
@@ -66,7 +47,6 @@ int fgr::FGRRouting(HDPGrid& grid)
   FGR fgr(parms);
 
   // read in the nets and create the grid
-  //fgr.parseInput(argv[1]);
   fgr.parseInputAsLab(grid);
 
   ofstream outfile(resultsFile.c_str(), std::ios::app);
@@ -120,6 +100,9 @@ int fgr::FGRRouting(HDPGrid& grid)
 
   //system("PAUSE");
   outfile.close();
-  fgr.plotXPM(parms.outputFile, 900);
+
+  unsigned int imageSize = grid.Design().cfg.ValueOf("FGRRouting.ImageSize", 900);
+  fgr.plotXPM(parms.outputFile, imageSize);
+  fgr.plotEdgesXPM(parms.outputFile, imageSize);
   return 0;
 }

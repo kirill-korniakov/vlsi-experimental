@@ -391,6 +391,8 @@ namespace fgr
         void printStatisticsLight(void);
 
         void plotXPM(const string &filename, unsigned nPix);
+        void plotEdgesXPM(const string &filename, unsigned nPix);
+        void plotColorsXPM(const string &filename, unsigned nPix);
   };
 
   double cpuTime();

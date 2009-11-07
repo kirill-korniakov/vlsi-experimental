@@ -11,7 +11,6 @@
 #include "Utils.h"
 #include "Buffering.h"
 #include "TileGrid.h"
-//#include <conio.h>
 #include "FGR.h"
 
 using namespace libconfig;
