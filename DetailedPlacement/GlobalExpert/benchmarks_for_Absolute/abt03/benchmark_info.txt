@@ -1,7 +1,0 @@
-abt03.aux
-RowsNum: 4;
-firstRow: 0;
-Row1: [3; 8];
-Row2: [4; 7];
-Row3: [1; 10];
-Row4: [2; 9];
