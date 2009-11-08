@@ -86,7 +86,7 @@ void AnalyticalPlacement(HDesign& hd)
   Relaxation(hd, ci);
 
   ClusteringLogIterator clusteringLogIterator = ci.clusteringLog.rbegin();
-  NetLevelsIterator netLevelsIterator = ci.netLevels.rbegin();
+  NetListIterator netLevelsIterator = ci.netLevels.rbegin();
   if (netLevelsIterator != ci.netLevels.rend()) 
     ++netLevelsIterator;
 
@@ -279,7 +279,7 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
   }
   for (int i = 2*idx; i < nVariables; i++)
   {//set upper borders for ki variables
-    initValues[i] = hd.cfg.ValueOf(".bufferCountUpperBound", 100.0); //FIXME: set correct upper bound
+    initValues[i] = hd.cfg.ValueOf(".bufferCountUpperBound", 100.0); //TODO: set correct upper bound
   }
   VecSetValues(xu, nVariables, idxs, initValues, INSERT_VALUES);
 
@@ -569,13 +569,9 @@ void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, Clust
   context.Lbuf = L;
   context.Dbuf = D;
   context.DbufLbufDifferenceOfSquares = D*D - L*L;
-  
-  //FIXME: set real values
-  context.LRdata.alphaTWL = 1.0;
-  context.LRdata.c = 1.0;
-  context.LRdata.r = 1.0;
-  context.LRdata.mu = hd.cfg.ValueOf(".muLR", 1.0);
 
+  context.LRdata.Initialize(hd);
+  
   context.gradientBalance       = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
   
   context.useLogSumExp          = hd.cfg.ValueOf(".useLogSumExp", true);

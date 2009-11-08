@@ -149,7 +149,6 @@ void TestBuffering(HDesign& design)
   HDPGrid DPGrid(design);
   string name = Aux::CreateCoolFileName("", design.Circuit.Name() + "_Buffered" ,".def");
 
-  //FIXME: debugging
   //ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
   int count = design.cfg.ValueOf(".netIter", 0);
   int i = 0;

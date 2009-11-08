@@ -3,22 +3,17 @@
 
 extern timetype expTime;
 
-double CalcSourceMu(AppCtx* context, int netIdx)
+double GetCi(AppCtx* context, int netIdx, int sinkIdx)
 {
-  //FIXME: use correct values
-  int nArcs = 1;
-  return context->LRdata.mu * (double)nArcs;
-}
-
-double GetCi(AppCtx* context, int sinkIdx)
-{
-  return context->LRdata.r * context->LRdata.c * context->LRdata.mu; //FIXME: use correct values
+  return context->LRdata.r * context->LRdata.c 
+    * context->ci->netList[netIdx].muNetVector[sinkIdx-1];
 }
 
 double GetBi(AppCtx* context, int netIdx, int sinkIdx)
 {
-  double sinkLoad = 1.0;  //FIXME: use correct values
-  return context->LRdata.r * context->LRdata.mu * sinkLoad;
+  return context->LRdata.r 
+    * context->ci->netList[netIdx].muNetVector[sinkIdx-1] 
+    * context->ci->netList[netIdx].sinkLoad[sinkIdx-1];
 }
 
 double GetDoi(AppCtx* context, PetscScalar* solution, int netIdx, int sinkIdx)
@@ -61,16 +56,19 @@ int GetDoiDerivative(AppCtx* context, PetscScalar* solution,
     return 0;
 }
 
+double GetA(AppCtx* context, int netIdx)
+{
+  return context->LRdata.alphaTWL + context->LRdata.c * context->ci->netList[netIdx].sourceAFactor;
+}
+
 double GetBraces(AppCtx* context, PetscScalar* solution, int netIdx)
 {
-  double sourceDrive = 1.0; //FIXME: use correct values
-
-  double A = context->LRdata.alphaTWL + context->LRdata.c * CalcSourceMu(context, netIdx) * sourceDrive;
+  double A = GetA(context, netIdx);
   
   double secondTerm = 0.0;
   for (int s = 1; s < context->netListSizes[netIdx]; s++)
   {
-    double Ci = GetCi(context, s);
+    double Ci = GetCi(context, netIdx, s);
     double Doi = GetDoi(context, solution, netIdx, s);
 
     secondTerm += Ci * Doi;
@@ -148,14 +146,14 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, Pet
 
       term1 = braces * gLSE;
 
-      int pinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
-      ERROR_ASSERT(pinIdx != -1);
+      int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
+      ERROR_ASSERT(clusterPinIdx != -1);
 
       double clusterCoordinate = solution[idxInSolutionVector];
-      if (pinIdx != 0)
+      if (clusterPinIdx != 0)
       {//this cluster is a sink
-        double Ci = GetCi(context, pinIdx);
-        double Bi = GetBi(context, netIdx, pinIdx);
+        double Ci = GetCi(context, netIdx, clusterPinIdx);
+        double Bi = GetBi(context, netIdx, clusterPinIdx);
         double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, 0);
         int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
 
@@ -166,8 +164,8 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, Pet
       {
         for (int sinkIdx = 1; sinkIdx < context->netListSizes[netIdx]; sinkIdx++)
         {
-          double Ci = GetCi(context, pinIdx);
-          double Bi = GetBi(context, netIdx, pinIdx);
+          double Ci = GetCi(context, netIdx, sinkIdx);
+          double Bi = GetBi(context, netIdx, sinkIdx);
           double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, sinkIdx);
           int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
 

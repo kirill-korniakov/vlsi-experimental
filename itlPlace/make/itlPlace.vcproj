@@ -652,10 +652,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\GlobalPlacement\Clustering.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\GlobalPlacement\PinPlacement.cpp"
 					>
 				</File>
@@ -675,10 +671,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\LagrangianRelaxation.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\GlobalPlacement\LogSumExp.cpp"
 						>
 					</File>
@@ -687,11 +679,39 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\Spreading.cpp"
+						RelativePath="..\src\GlobalPlacement\SumOfDelays.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Clustering"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\Clustering.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\SumOfDelays.cpp"
+						RelativePath="..\src\GlobalPlacement\ClusteringInformationImportExport.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="LagrangianRelaxation"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\LagrangianRelaxation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\MuCalculations.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Spreading"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\Spreading.cpp"
 						>
 					</File>
 				</Filter>
@@ -5542,10 +5562,6 @@
 				Name="vGlobalPlacement"
 				>
 				<File
-					RelativePath="..\include\Clustering.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\GlobalPlacement.h"
 					>
 				</File>
@@ -5561,10 +5577,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\LagrangianRelaxation.h"
-						>
-					</File>
-					<File
 						RelativePath="..\include\LogSumExp.h"
 						>
 					</File>
@@ -5573,11 +5585,51 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\Spreading.h"
+						RelativePath="..\include\OptimizationContext.h"
 						>
 					</File>
 					<File
 						RelativePath="..\include\SumOfDelays.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Clustering"
+					>
+					<File
+						RelativePath="..\include\Clustering.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\ClusteringData.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="LagrangianRelaxation"
+					>
+					<File
+						RelativePath="..\include\LagrangianRelaxation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\LagrangianRelaxationData.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\MuCalculations.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Spreading"
+					>
+					<File
+						RelativePath="..\include\Spreading.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\SpreadingData.h"
 						>
 					</File>
 				</Filter>

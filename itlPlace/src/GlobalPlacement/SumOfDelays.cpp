@@ -5,7 +5,8 @@ extern timetype expTime;
 
 double GetNetKOpt(PetscScalar* coordinates, int nClusterCoordinates, int i, AppCtx* context)
 {
-  double kopt = (CalcNetLSE(context, coordinates, i) + context->ci->netList[i].Lnet - context->Lbuf) / context->Dbuf - 1;
+  double kopt = (CalcNetLSE(context, coordinates, i) 
+    + context->ci->netList[i].Lnet - context->Lbuf) / context->Dbuf - 1;
   return kopt;
 }
 
