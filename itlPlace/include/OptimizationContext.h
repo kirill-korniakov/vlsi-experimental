@@ -4,36 +4,32 @@
 #include "HDesign.h"
 
 #include "Clustering.h"
-#include "SpreadingData.h"
+#include "LogSumExpData.h"
+#include "SumOfDelaysData.h"
 #include "LagrangianRelaxationData.h"
+#include "SpreadingData.h"
 
 // User-defined TAO application context - contains data needed by the 
 // application-provided call-back routines that evaluate the function and gradient
 struct AppCtx
 {
+  void Initialize(HDesign& ahd, ClusteringInformation& aci);
+  void FreeMemory();
+
   HDesign*                hd;
   ClusteringInformation*  ci;
 
-  SpreadingData spreadingData;
-
+  LSEData   LSEdata;
+  SODData   SODdata;
   LRData    LRdata;
+    
+  SpreadingData spreadingData;
   
-  int*      clusterIdx2solutionIdxLUT;
-  int*      solutionIdx2clusterIdxLUT;
-
-  double    alpha;
-
   double    muBorderPenalty;
   double    borderPenaltyVal;
 
-  double*   precalcedExponents;
-  double*   argsForPrecalcedExponents;
-  int       batchSize;                // quantity of exponents calculated at a time by vdExp
-
-  double* SUM1;
-  double* SUM2;
-  double* SUM3;
-  double* SUM4;
+  int*      clusterIdx2solutionIdxLUT;
+  int*      solutionIdx2clusterIdxLUT;
 
   int*      netListSizes;
 
@@ -41,11 +37,6 @@ struct AppCtx
   double*   gSOD;
   double*   gLR;
   double*   gQS;
-
-  double    Lbuf;
-  double    Dbuf;
-  double    DbufLbufDifferenceOfSquares;
-  double    gradientBalance;
 
   bool useLogSumExp;
   bool useSumOfDelays;
@@ -59,23 +50,6 @@ struct AppCtx
   bool useUnidirectSpreading;
 
   bool useNetWeights;
-
-  //constructor
-  AppCtx()
-  {
-    hd           = NULL;
-    ci           = NULL;
-    clusterIdx2solutionIdxLUT = 0;
-    solutionIdx2clusterIdxLUT = 0;
-
-    gLSE = 0;
-    gSOD = 0;
-    gLR  = 0;
-    gQS  = 0;
-
-    Lbuf = 0;
-    DbufLbufDifferenceOfSquares = 0;
-  }
 };
 
 #endif

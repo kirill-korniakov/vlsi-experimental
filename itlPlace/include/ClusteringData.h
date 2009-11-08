@@ -52,24 +52,13 @@ struct MergedCluster
 struct ClusteredNet
 {
   std::vector<int> clusterIdxs;
-
+  
   double weight;
-
-  //SumOfDelays data
-  double Lnet;
   double k;
-  double braces;
-
-  //Lagrangian Relaxation data
-  double sourceAFactor;
-  std::vector<double> sinkLoad;
-  std::vector<double> muNetVector;
 
   ClusteredNet()
   {
     weight = 1.0;
-    k = 0.0;
-    sourceAFactor = 0.0;
   }
 };
 

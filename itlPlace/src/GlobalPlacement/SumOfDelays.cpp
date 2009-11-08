@@ -6,7 +6,7 @@ extern timetype expTime;
 double GetNetKOpt(PetscScalar* coordinates, int nClusterCoordinates, int i, AppCtx* context)
 {
   double kopt = (CalcNetLSE(context, coordinates, i) 
-    + context->ci->netList[i].Lnet - context->Lbuf) / context->Dbuf - 1;
+    + context->SODdata.netSODData[i].Lnet - context->SODdata.Lbuf) / context->SODdata.Dbuf - 1;
   return kopt;
 }
 
@@ -15,19 +15,19 @@ double GetNetDelay(PetscScalar* coordinates, int nClusterCoordinates, int i, App
   double ki = 0.0;
   ki = coordinates[nClusterCoordinates + i]; //WARNING: this index is correct
   
-  context->ci->netList[i].braces = 
+  context->SODdata.netSODData[i].braces = 
     CalcNetLSE(context, coordinates, i) + 
-    context->ci->netList[i].Lnet + 
-    ki * context->Lbuf;
+    context->SODdata.netSODData[i].Lnet + 
+    ki * context->SODdata.Lbuf;
 
   //NOTE: debugging variables
   double x = 0.0;
   double y = 0.0;
 
-  x = context->ci->netList[i].braces;
+  x = context->SODdata.netSODData[i].braces;
   x = x * x;
   x = x / (ki + 1);
-  y = ki * context->DbufLbufDifferenceOfSquares;
+  y = ki * context->SODdata.DbufLbufDifferenceOfSquares;
 
   return x + y;
 }
@@ -64,7 +64,7 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
     for (int j = 0; j < nAdjacentNets; ++j)
     {//consider all adjacent nets
       netIdx = context->ci->tableOfAdjacentNets[clusterIdx][j];
-      gradient[i] += 2 * context->ci->netList[netIdx].braces * 
+      gradient[i] += 2 * context->SODdata.netSODData[netIdx].braces * 
         CalcNetLSEGradient(context, netIdx, i);
     }
   }
@@ -75,9 +75,9 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
   {
     ki = coordinates[i]; //WARNING: this index is correct
     netIdx = i - nClusterCoordinates;
-    gradient[i] = context->DbufLbufDifferenceOfSquares + 
-      (2 * context->ci->netList[netIdx].braces * context->Lbuf * (ki + 1) - 
-      context->ci->netList[netIdx].braces * context->ci->netList[netIdx].braces) / 
+    gradient[i] = context->SODdata.DbufLbufDifferenceOfSquares + 
+      (2 * context->SODdata.netSODData[netIdx].braces * context->SODdata.Lbuf * (ki + 1) - 
+      context->SODdata.netSODData[netIdx].braces * context->SODdata.netSODData[netIdx].braces) / 
       ((ki + 1) * (ki + 1));
   }
 }

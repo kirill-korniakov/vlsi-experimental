@@ -46,7 +46,7 @@ void GetClusterCoordinates(int clusterIdx, PetscScalar* coordinates,
   }
 }
 
-double CalcNetLSE(AppCtx* data, PetscScalar* coordinates, int netIdx)
+double CalcNetLSE(AppCtx* context, PetscScalar* coordinates, int netIdx)
 {
   double sumExp1 = 0.0;
   double sumExp2 = 0.0;
@@ -56,83 +56,64 @@ double CalcNetLSE(AppCtx* data, PetscScalar* coordinates, int netIdx)
   int precalcedExponentsIdx;
   int realClusterIdx;
 
-  int netSize = data->netListSizes[netIdx];
+  int netSize = context->netListSizes[netIdx];
 
   for (int j = 0; j < netSize; ++j)
   {
-    realClusterIdx = data->ci->netList[netIdx].clusterIdxs[j];
-    precalcedExponentsIdx = GetPrecalcedExponentsIdx(data, realClusterIdx);
+    realClusterIdx = context->ci->netList[netIdx].clusterIdxs[j];
+    precalcedExponentsIdx = GetPrecalcedExponentsIdx(context, realClusterIdx);
 
-    sumExp1 += data->precalcedExponents[4*precalcedExponentsIdx + 0];
-    sumExp2 += data->precalcedExponents[4*precalcedExponentsIdx + 1];
-    sumExp3 += data->precalcedExponents[4*precalcedExponentsIdx + 2];
-    sumExp4 += data->precalcedExponents[4*precalcedExponentsIdx + 3];
+    sumExp1 += context->LSEdata.precalcedExponents[4*precalcedExponentsIdx + 0];
+    sumExp2 += context->LSEdata.precalcedExponents[4*precalcedExponentsIdx + 1];
+    sumExp3 += context->LSEdata.precalcedExponents[4*precalcedExponentsIdx + 2];
+    sumExp4 += context->LSEdata.precalcedExponents[4*precalcedExponentsIdx + 3];
   }
-  data->SUM1[netIdx] = sumExp1;
-  data->SUM2[netIdx] = sumExp2;
-  data->SUM3[netIdx] = sumExp3;
-  data->SUM4[netIdx] = sumExp4;
+  context->LSEdata.SUM1[netIdx] = sumExp1;
+  context->LSEdata.SUM2[netIdx] = sumExp2;
+  context->LSEdata.SUM3[netIdx] = sumExp3;
+  context->LSEdata.SUM4[netIdx] = sumExp4;
 
-  return data->alpha * log(sumExp1 * sumExp2 * sumExp3 * sumExp4);
+  return context->LSEdata.alpha * log(sumExp1 * sumExp2 * sumExp3 * sumExp4);
 }
 
 double CalcNetLSEGradient(AppCtx* context, int netIdx, int idxInSolutionVector)
 {
   double sum1 = 0.0;
   double sum2 = 0.0;
-  //int precalcedExponentsIdx;
 
-  //int netSize = context->netListSizes[netIdx];
-  //int netSize = static_cast<int>(context->ci->netList[netIdx].clusterIdxs.size());
-
-  //for (int k = 0; k < netSize; ++k)
-  //{
-  //  int realClusterIdx = context->ci->netList[netIdx].clusterIdxs[k];
-  //  precalcedExponentsIdx = GetPrecalcedExponentsIdx(context, realClusterIdx);
-
-  //  //if (idxInSolutionVector % 2 == 0)
-  //  {
-  //    sum1 += context->precalcedExponents[4*precalcedExponentsIdx + 0 + 2 * (idxInSolutionVector % 2)];
-  //    sum2 += context->precalcedExponents[4*precalcedExponentsIdx + 1 + 2 * (idxInSolutionVector % 2)];
-  //  }
-  //  /*else
-  //  {
-  //    sum1 += context->precalcedExponents[4*precalcedExponentsIdx + 2];
-  //    sum2 += context->precalcedExponents[4*precalcedExponentsIdx + 3];
-  //  }*/
-  //}
   if (idxInSolutionVector % 2 == 0)
   {
-    sum1 = context->SUM1[netIdx];
-    sum2 = context->SUM2[netIdx];
+    sum1 = context->LSEdata.SUM1[netIdx];
+    sum2 = context->LSEdata.SUM2[netIdx];
   }
   else
   {
-    sum1 = context->SUM3[netIdx];
-    sum2 = context->SUM4[netIdx];
+    sum1 = context->LSEdata.SUM3[netIdx];
+    sum2 = context->LSEdata.SUM4[netIdx];
   }
 
   //TODO [issue 131]: we need alpha here, but parameters tuning will follow
   return /*context->alpha * */
-    (context->precalcedExponents[2*idxInSolutionVector + 0] / sum1 - 
-    context->precalcedExponents[2*idxInSolutionVector + 1] / sum2) * context->ci->netList[netIdx].weight;
+    (context->LSEdata.precalcedExponents[2*idxInSolutionVector + 0] / sum1 - 
+    context->LSEdata.precalcedExponents[2*idxInSolutionVector + 1] / sum2) * 
+    context->ci->netList[netIdx].weight;
 }
 
-void PerformArgsAssignment(AppCtx* userData, PetscScalar* coordinates, double* arguments)
+void PerformArgsAssignment(AppCtx* context, PetscScalar* coordinates, double* arguments)
 {
   int i;
-  int nClusters    = userData->ci->mCurrentNumberOfClusters;
-  int nTerminals   = userData->ci->terminalCells.size();
-  int nPrimaryPins = userData->ci->primaryPins.size();
+  int nClusters    = context->ci->mCurrentNumberOfClusters;
+  int nTerminals   = context->ci->terminalCells.size();
+  int nPrimaryPins = context->ci->primaryPins.size();
   int realClusterIdx;
   double x = 0.0;
   double y = 0.0;
-  double alpha = userData->alpha;
+  double alpha = context->LSEdata.alpha;
 
   for (i = 0; i < nClusters; ++i)
   {
-    realClusterIdx = userData->solutionIdx2clusterIdxLUT[2 * i];
-    GetClusterCoordinates(realClusterIdx, coordinates, userData, x, y);
+    realClusterIdx = context->solutionIdx2clusterIdxLUT[2 * i];
+    GetClusterCoordinates(realClusterIdx, coordinates, context, x, y);
     arguments[4*i + 0] = (+x / alpha);
     arguments[4*i + 1] = (-x / alpha);
     arguments[4*i + 2] = (+y / alpha);
@@ -141,7 +122,7 @@ void PerformArgsAssignment(AppCtx* userData, PetscScalar* coordinates, double* a
 
   for (i = 0; i < nTerminals; ++i)
   {
-    GetClusterCoordinates(i + SHIFT_NUMBER_FOR_TERMINALS, coordinates, userData, x, y);
+    GetClusterCoordinates(i + SHIFT_NUMBER_FOR_TERMINALS, coordinates, context, x, y);
     arguments[4*(i + nClusters) + 0] = (+x / alpha);
     arguments[4*(i + nClusters) + 1] = (-x / alpha);
     arguments[4*(i + nClusters) + 2] = (+y / alpha);
@@ -150,7 +131,7 @@ void PerformArgsAssignment(AppCtx* userData, PetscScalar* coordinates, double* a
 
   for (i = 0; i < nPrimaryPins; ++i)
   {
-    GetClusterCoordinates(i + SHIFT_NUMBER_FOR_PRIMARY_PINS, coordinates, userData, x, y);
+    GetClusterCoordinates(i + SHIFT_NUMBER_FOR_PRIMARY_PINS, coordinates, context, x, y);
     arguments[4*(i + nClusters + nTerminals) + 0] = (+x / alpha);
     arguments[4*(i + nClusters + nTerminals) + 1] = (-x / alpha);
     arguments[4*(i + nClusters + nTerminals) + 2] = (+y / alpha);
@@ -158,26 +139,27 @@ void PerformArgsAssignment(AppCtx* userData, PetscScalar* coordinates, double* a
   }
 }
 
-void PrecalcExponents(AppCtx* userData, PetscScalar* coordinates)
+void PrecalcExponents(AppCtx* context, PetscScalar* coordinates)
 {
   int i;
-  int nClusters    = userData->ci->mCurrentNumberOfClusters;
-  int nTerminals   = userData->ci->terminalCells.size();
-  int nPrimaryPins = userData->ci->primaryPins.size();
+  int nClusters    = context->ci->mCurrentNumberOfClusters;
+  int nTerminals   = context->ci->terminalCells.size();
+  int nPrimaryPins = context->ci->primaryPins.size();
 
   int count = (nClusters + nTerminals + nPrimaryPins) * 4; 
-  double* arguments = userData->argsForPrecalcedExponents;
+  double* arguments = context->LSEdata.argsForPrecalcedExponents;
 
-  PerformArgsAssignment(userData, coordinates, arguments);
+  PerformArgsAssignment(context, coordinates, arguments);
 
 #ifdef __MKL_VML_H__
-  int batchSize = userData->batchSize;
+  int batchSize = context->LSEdata.batchSize;
   for (i = 0; i < count / batchSize; ++i)
-    vdExp(batchSize, &arguments[i * batchSize], &userData->precalcedExponents[i * batchSize]);
-  vdExp(count % batchSize, &arguments[count - count % batchSize], &userData->precalcedExponents[count - count % batchSize]);
+    vdExp(batchSize, &arguments[i * batchSize], &context->LSEdata.precalcedExponents[i * batchSize]);
+  vdExp(count % batchSize, &arguments[count - count % batchSize], 
+    &context->LSEdata.precalcedExponents[count - count % batchSize]);
 #else
   for (i = 0; i < count; ++i)
-    userData->precalcedExponents[i] = exp(arguments[i]);
+    context->LSEdata.precalcedExponents[i] = exp(arguments[i]);
 #endif
 }
 

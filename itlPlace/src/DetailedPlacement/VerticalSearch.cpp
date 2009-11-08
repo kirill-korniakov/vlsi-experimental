@@ -416,7 +416,7 @@ void VerticalSwapper::FindOptimalRow()
   /*int tmp;
   GetOptimalPosition(m_Grid, m_Cell, m_OptimalRowIdx, tmp);*/
 
-  /*if (m_Grid.Design().cfg.lookforDefValue("DetailedPlacement.tmp_drawOptimalSites", false))
+  /*if (m_Grid.Design().cfg.ValueOf("DetailedPlacement.tmp_drawOptimalSites", false))
   {//TODO: delete or accept this plotting
     m_Grid.Design().Plotter.DrawCircle(m_Grid.Design().Circuit.PlacementMinX() + m_OriginColIdx*m_Grid.SiteWidth(), 
       m_Grid.Design().Circuit.PlacementMinY() + m_OptimalRowIdx*m_Grid.SiteHeight(), 4, Color_Green);

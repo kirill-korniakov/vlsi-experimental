@@ -146,7 +146,7 @@ void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& contex
   }
   meanBuffGradient /= double(nVariables - nClusterVariables);
   
-  scale = fabs(context->gradientBalance * meanCoordGradient / meanBuffGradient);
+  scale = fabs(context->SODdata.gradientBalance * meanCoordGradient / meanBuffGradient);
 
   for (int i = nClusterVariables; i < nVariables; i++)
   {

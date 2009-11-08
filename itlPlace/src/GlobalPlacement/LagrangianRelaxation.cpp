@@ -6,14 +6,14 @@ extern timetype expTime;
 double GetCi(AppCtx* context, int netIdx, int sinkIdx)
 {
   return context->LRdata.r * context->LRdata.c 
-    * context->ci->netList[netIdx].muNetVector[sinkIdx-1];
+    * context->LRdata.netLRData[netIdx].muNetVector[sinkIdx-1];
 }
 
 double GetBi(AppCtx* context, int netIdx, int sinkIdx)
 {
   return context->LRdata.r 
-    * context->ci->netList[netIdx].muNetVector[sinkIdx-1] 
-    * context->ci->netList[netIdx].sinkLoad[sinkIdx-1];
+    * context->LRdata.netLRData[netIdx].muNetVector[sinkIdx-1] 
+    * context->LRdata.netLRData[netIdx].sinkLoad[sinkIdx-1];
 }
 
 double GetDoi(AppCtx* context, PetscScalar* solution, int netIdx, int sinkIdx)
@@ -58,7 +58,7 @@ int GetDoiDerivative(AppCtx* context, PetscScalar* solution,
 
 double GetA(AppCtx* context, int netIdx)
 {
-  return context->LRdata.alphaTWL + context->LRdata.c * context->ci->netList[netIdx].sourceAFactor;
+  return context->LRdata.alphaTWL + context->LRdata.c * context->LRdata.netLRData[netIdx].sourceAFactor;
 }
 
 double GetBraces(AppCtx* context, PetscScalar* solution, int netIdx)

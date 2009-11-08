@@ -194,7 +194,7 @@ Color HPlotter::_GetCellColor(HCell plotCell)
   if (onlyOnce)
   {
     //get types of buffers
-    const char* bufferName = m_hd.cfg.lookforDefValue("GlobalPlacement.bufferName", (const char*)"INVX1");
+    const char* bufferName = m_hd.cfg.ValueOf("GlobalPlacement.bufferName", (const char*)"INVX1");
     bufferType = Utils::FindMacroTypeByName(m_hd, bufferName);
     onlyOnce = false;
   }
@@ -353,7 +353,7 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
 
 void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
 {
-  static double maxKi = m_hd.cfg.lookforDefValue("GlobalPlacement.bufferCountUpperBound", 0.0);
+  static double maxKi = m_hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 0.0);
   if (!IsEnabled() || maxKi <= 0.0) 
     return;    
 
@@ -532,7 +532,7 @@ void HPlotter::StartVideoWriting(string fileName, string dirName)
     movieFileName = Aux::CreateCoolFileName(dirName, fileName, ".avi");
   
   char codecName[] = "xvid";
-  double fps = m_hd.cfg.lookforDefValue("plotter.fps", 1.0);
+  double fps = m_hd.cfg.ValueOf("plotter.fps", 1.0);
   m_Data->vw = cvCreateVideoWriter(movieFileName.c_str(), 
     (CV_FOURCC(codecName[0], codecName[1], codecName[2], codecName[3])),
     fps, movieFrameSize);
@@ -585,9 +585,9 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath, string fileName)
       finish.y = DesignY2ImageY(pin2.Y());
 
       if (i.SignalDirection() == SignalDirection_Fall)
-        cvLine(IMG, start, finish, GetColor(Color_Black), m_hd.cfg.lookforDefValue("CriticalPaths.thicknessLines", 1));
+        cvLine(IMG, start, finish, GetColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
       else
-        cvLine(IMG, start, finish, GetColor(Color_Red), m_hd.cfg.lookforDefValue("CriticalPaths.thicknessLines", 1));
+        cvLine(IMG, start, finish, GetColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
       if (index <=1 )
         cvCircle(IMG, finish, 2, GetColor(Color_Plum), 2);
       else
@@ -620,7 +620,7 @@ void HPlotter::PlotText(string text, double textSize)
   CvFont font;
   string bufText = text + text;
   if (textSize == -1)
-    textSize = m_hd.cfg.lookforDefValue("plotter.textSize", 1.0);
+    textSize = m_hd.cfg.ValueOf("plotter.textSize", 1.0);
   
   cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, textSize, textSize , 0.0, 1, 1);
   int start = 0;

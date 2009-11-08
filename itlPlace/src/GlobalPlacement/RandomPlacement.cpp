@@ -11,7 +11,7 @@ void RandomPlacement(HDesign& design)
   double width  = design.Circuit.PlacementWidth();
   double height = design.Circuit.PlacementHeight();
   double rndX, rndY;
-  srand(design.cfg.lookforDefValue("GlobalPlacement.randSeed", 0));
+  srand(design.cfg.ValueOf("GlobalPlacement.randSeed", 0));
 
   for (HCells::PlaceableCellsEnumeratorW i = design.Cells.GetPlaceableCellsEnumeratorW(); i.MoveNext(); )
   {

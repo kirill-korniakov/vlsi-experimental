@@ -3,18 +3,26 @@
 
 #include "HDesign.h"
 
-struct LRData
+struct NetLRData
 {
+  double sourceAFactor;
+  std::vector<double> sinkLoad;
+  std::vector<double> muNetVector;
+};
+
+class LRData
+{
+ public:
   double    alphaTWL;
   double    c;
   double    r;
+  std::vector<NetLRData> netLRData;
 
-  void Initialize(HDesign& hd)
-  {
-    alphaTWL = hd.cfg.ValueOf(".LagrangianRelaxation.alphaTWL", 1.0);
-    c = hd.RoutingLayers.Physics.CPerDist;
-    r = hd.RoutingLayers.Physics.RPerDist;
-  }
+  void Initialize(HDesign& hd);
+
+ private:
+  void InitializeNets(HDesign& hd);
+  void AssignLRData(HDesign &hd, HNets::NetsEnumeratorW net, int netIdx);
 };
 
 #endif

@@ -8,7 +8,7 @@
 #include <vector>
 #include <list>
 
-#include "tao.h"
+
 #include "Auxiliary.h"
 #include "Configuration.h"
 #include "Clustering.h"
@@ -18,6 +18,8 @@
 #include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 
+#include "AnalyticalPlacement.h"
+
 using namespace std;
 
 timetype expTime = 0;
@@ -26,41 +28,6 @@ timetype lseGradTime = 0;
 timetype calcPotentialsTime = 0;
 timetype quadraticSpreading = 0;
 timetype quadraticSpreadingGradTime = 0;
-
-namespace AnalyticalGlobalPlacement
-{
-  int Relaxation(HDesign& hd, ClusteringInformation& ci);
-
-  void ReportTimes();
-  int Solve(HDesign &hd, ClusteringInformation& ci, AppCtx &context, TAO_APPLICATION taoapp, 
-    TAO_SOLVER tao, Vec x);
-
-  void UpdateMu( AppCtx &user, HDesign &hd, int iterate );
-
-  int Interpolation(HDesign& hd, ClusteringInformation& ci);
-
-  void InitializeDataStructures(std::vector<Cluster>& clusters, NetList& netList);  
-  int InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, Vec& x, Vec& xl, Vec& xu, 
-    TAO_SOLVER& tao, TAO_APPLICATION& taoapp);
-
-  void InitializeOptimizationContext(HDesign& hd, ClusteringInformation& ci, AppCtx& context);
-  void FreeMemory(AppCtx &user);
- 
-  void SetVariablesValues(ClusteringInformation & ci, Vec& x);
-  void GetVariablesValues(ClusteringInformation& ci, Vec x);
-  void SetInitialState(HDesign& hd, ClusteringInformation& ci);
-  void UpdateCellsCoordinates(HDesign& hd, ClusteringInformation& ci);
-  void WriteCellsCoordinates2Clusters(HDesign& hd, ClusteringInformation& ci);
-  void SetClustersCoords(ClusteringInformation& ci, Vec& x);
-  void GetClusterCoordinates(ClusteringInformation& ci, Vec x);
-  void SetKValues(ClusteringInformation& ci, Vec& x);
-  void GetKValues(ClusteringInformation& ci, Vec x);
-  void SetBounds(HDesign& hd, ClusteringInformation& ci, Vec& xl, Vec& xu);
-
-  double CalculateSumOfK(HDesign& hd, ClusteringInformation& ci);
-  void ReportIterationInfo(ClusteringInformation& ci, AppCtx& user);
-  void ReportBinGridInfo(AppCtx& user);
-}
 
 using namespace AnalyticalGlobalPlacement;
 
@@ -186,7 +153,7 @@ void AnalyticalGlobalPlacement::SetInitialState(HDesign& hd, ClusteringInformati
   }
 }
 
-int* InitIdxs(int nVariables, int shift)
+int* AnalyticalGlobalPlacement::InitIdxs(int nVariables, int shift)
 {
   int* idxs = new int[nVariables];
   for (int i = 0; i < nVariables; ++i)
@@ -211,23 +178,6 @@ void AnalyticalGlobalPlacement::SetClustersCoords(ClusteringInformation& ci, Vec
   int* idxs = InitIdxs(2*ci.mCurrentNumberOfClusters, 0);
 
   VecSetValues(x, 2*ci.mCurrentNumberOfClusters, idxs, initValues, INSERT_VALUES);
-
-  delete[] initValues;
-  delete[] idxs;
-}
-
-void AnalyticalGlobalPlacement::SetKValues(ClusteringInformation& ci, Vec& x)
-{
-  int nK = ci.netList.size();
-
-  PetscScalar* initValues = new PetscScalar[nK];
-  int* idxs = InitIdxs(nK, 2*ci.mCurrentNumberOfClusters);
-
-  for (int i = 0; i < nK; i++)
-  {
-    initValues[i] = 0.0;
-  }
-  VecSetValues(x, nK, idxs, initValues, INSERT_VALUES);
 
   delete[] initValues;
   delete[] idxs;
@@ -306,21 +256,7 @@ void AnalyticalGlobalPlacement::GetClusterCoordinates(ClusteringInformation& ci,
   delete[] idxs;
 }
 
-void AnalyticalGlobalPlacement::GetKValues(ClusteringInformation& ci, Vec x)
-{
-  int nK = ci.netList.size();
-  PetscScalar* values = new PetscScalar[nK];
-  int* idxs = InitIdxs(nK, 2*ci.mCurrentNumberOfClusters);
 
-  VecGetValues(x, PetscInt(nK), idxs, values);
-  for (int i = 0; i < nK; i++)
-  {
-    ci.netList[i].k = values[i];
-  }
-
-  delete[] values;
-  delete[] idxs;
-}
 
 void AnalyticalGlobalPlacement::GetVariablesValues(ClusteringInformation& ci, Vec x)
 {
@@ -363,7 +299,7 @@ void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
   ALERTFORMAT(("Average movement %f", averageMovement));
 }
 
-void PrintTerminationReason(TaoTerminateReason reason)
+void ReportTerminationReason(TaoTerminateReason reason)
 {
   char message[256];
 
@@ -532,90 +468,6 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
   return OK;
 }
 
-void AnalyticalGlobalPlacement::InitializeOptimizationContext(HDesign& hd, ClusteringInformation& ci, AppCtx& context)
-{
-  context.hd = &hd;
-  context.ci = &ci;
-
-  int j = 0;
-  context.solutionIdx2clusterIdxLUT = new int[2*CalculateNumberOfActiveClusters(ci) + static_cast<int>(ci.clusters.size())]; 
-  context.clusterIdx2solutionIdxLUT = context.solutionIdx2clusterIdxLUT + 2*CalculateNumberOfActiveClusters(ci); 
-  for(int i = 0; i < static_cast<int>(ci.clusters.size()); i++)
-  {
-    if (!ci.clusters[i].isFake)
-    {
-      context.clusterIdx2solutionIdxLUT[i] = j;
-      context.solutionIdx2clusterIdxLUT[2*j+0] = i;
-      context.solutionIdx2clusterIdxLUT[2*j+1] = i;
-      ++j;
-    }
-    else
-      context.clusterIdx2solutionIdxLUT[i] = -1;
-  }
-
-  int nVariables = 2 * context.ci->mCurrentNumberOfClusters + context.ci->netList.size();
-
-  context.gLSE = new double[4*nVariables + 4*context.ci->netList.size()];
-  context.gSOD = context.gLSE + nVariables;
-  context.gLR  = context.gSOD + nVariables;
-  context.gQS  = context.gLR  + nVariables;
-  context.SUM1 = context.gQS  + nVariables;
-  context.SUM2 = context.SUM1 + context.ci->netList.size();
-  context.SUM3 = context.SUM2 + context.ci->netList.size();
-  context.SUM4 = context.SUM3 + context.ci->netList.size();
-
-  double L, D;
-  Utils::CalcBufferLD(hd, 0, &L, &D);
-  context.Lbuf = L;
-  context.Dbuf = D;
-  context.DbufLbufDifferenceOfSquares = D*D - L*L;
-
-  context.LRdata.Initialize(hd);
-  
-  context.gradientBalance       = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
-  
-  context.useLogSumExp          = hd.cfg.ValueOf(".useLogSumExp", true);
-  context.useSumOfDelays        = hd.cfg.ValueOf(".useSumOfDelays", false);
-  context.useLR                 = hd.cfg.ValueOf(".useLR", false);
-  context.useQuadraticSpreading = hd.cfg.ValueOf(".useQuadraticSpreading", true);
-  context.useLRSpreading        = hd.cfg.ValueOf(".useLRSpreading", false);
-  context.useBorderPenalty      = hd.cfg.ValueOf(".useBorderPenalty", true);
-  context.useBorderBounds       = hd.cfg.ValueOf(".useBorderBounds", true);
-  context.useUnidirectSpreading = hd.cfg.ValueOf(".useUnidirectSpreading", false);
-  context.batchSize             = hd.cfg.ValueOf(".batchSizeForvdExp", 1000);
-  context.useNetWeights         = hd.cfg.ValueOf("NetWeighting.useNetWeights", false);
-}
-
-void AnalyticalGlobalPlacement::FreeMemory(AppCtx &context)
-{
-  for (int j = 0; j < context.spreadingData.binGrid.nBinRows; ++j)
-  {
-    delete [] context.spreadingData.binGrid.bins[j];
-  }
-  delete [] context.spreadingData.binGrid.bins;
-
-  int maxAffectedRows = CalcMaxAffectedArea(context.spreadingData.potentialRadiusY, 
-    context.spreadingData.binGrid.binHeight);
-  for (int i = 0; i < maxAffectedRows; ++i)
-  {
-    delete [] context.spreadingData.clusterPotentialOverBins[i];
-  }
-  delete [] context.spreadingData.clusterPotentialOverBins;
-  
-  if (context.useLRSpreading)
-  {
-    delete [] context.spreadingData.binsPenaltyValues;
-    delete [] context.spreadingData.muBinsPen;
-    delete [] context.spreadingData.individualBinsDiscrepancy;
-  }
-
-  //FIXME: check correctness of memory deletion
-  delete[] context.precalcedExponents;
-  delete[] context.netListSizes;
-  delete[] context.solutionIdx2clusterIdxLUT;
-  delete[] context.gLSE;
-}
-
 void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& context)
 {
   ALERTFORMAT(("Bin grid: %d x %d", 
@@ -712,8 +564,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   int             retCode;    // used to check for functions returning nonzero
 
   //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
-  InitializeOptimizationContext(hd, ci, context);
-  ConstructBinGrid(hd, context, hd.cfg.ValueOf("Clustering.desiredNumberOfClustersAtEveryBin", 10));
+  context.Initialize(hd, ci);
   retCode = InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp); CHKERRQ(retCode);
   ReportIterationInfo(ci, context);
   ReportBinGridInfo(context);
@@ -731,7 +582,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     retCode = VecDestroy(xl); CHKERRQ(retCode);
     retCode = VecDestroy(xu); CHKERRQ(retCode);
   }
-  FreeMemory(context);
+  context.FreeMemory();
 
   return OK;
 }
@@ -788,7 +639,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     double xdiff;
     TaoTerminateReason reason;  // termination reason
     retCode = TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason); CHKERRQ(retCode);
-    PrintTerminationReason(reason);
+    ReportTerminationReason(reason);
 
     // if found any solution
     if (innerTAOIterations >= 1)
@@ -842,13 +693,3 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   return OK;
 }
 
-double AnalyticalGlobalPlacement::CalculateSumOfK(HDesign& hd, ClusteringInformation& ci)
-{
-  double s = 0.0;
-  int netListSize = static_cast<int>(ci.netList.size());
-  for (int i = 0; i < netListSize; i++)
-  {
-    s += ci.netList[i].k;
-  }
-  return s;
-}

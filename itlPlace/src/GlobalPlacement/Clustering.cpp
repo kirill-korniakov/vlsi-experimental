@@ -1,11 +1,9 @@
 #include "Clustering.h"
-#include "MuCalculations.h"
 
 #include <vector>
 #include "math.h"
 #include <stdlib.h>
 #include <conio.h>
-#include "Utils.h"
 
 //TODO: do smth with this trash
 #define MARK_NEIGHBORS_INVALID true
@@ -86,33 +84,6 @@ int AssignClusterIdx(HDesign& hd, ClusteringInformation& ci, HNet::PinsEnumerato
   return clusterIdx;
 }
 
-HMacroType GetMacrotype(HDesign &hd, HPin pin)
-{
-  HCell cell = hd.Pins.Get<HPin::Cell, HCell>(pin);
-  //ALERTFORMAT(("%s", hd.GetString<HPin::Name>(source).c_str()));
-  HMacroType type = hd.Cells.Get<HCell::MacroType, HMacroType>(cell);
-  
-  return type;
-}
-
-void AssignLRData(HDesign &hd, ClusteringInformation &ci, HNets::NetsEnumeratorW net, int netIdx )
-{
-  HPin source = hd.Nets.Get<HNet::Source, HPin>(net);
-  HMacroType type = GetMacrotype(hd, source);
-  
-  std::vector<double> muSourceVector;
-  InitializeMuSourceVector(hd, muSourceVector, Utils::GetNOutArcs(hd, type));
-  ci.netList[netIdx].sourceAFactor = 
-    Utils::CalcSourceAFactor(hd, type, muSourceVector);
-
-  InitializeMuNetVector(hd, ci.netList[netIdx].muNetVector, net.SinksCount());
-  HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext();
-  for (; pin.MoveNext(); )
-  {
-    ci.netList[netIdx].sinkLoad.push_back(Utils::GetSinkLoad(hd, GetMacrotype(hd, pin)));
-  }
-}
-
 void AssignClusters(HDesign& hd, ClusteringInformation &ci, HNets::NetsEnumeratorW& net, int netIdx)
 {
   //put pins (we also add terminals and primary pins for LogSumExp calculation)
@@ -141,10 +112,6 @@ void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
 
     ci.netList[netIdx].weight = net.Weight();
     
-    ci.netList[netIdx].Lnet   = net.LNet();
-        
-    AssignLRData(hd, ci, net, netIdx);
-      
     netIdx++;
   }
 

@@ -652,6 +652,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\GlobalPlacement\KiRoutines.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\GlobalPlacement\PinPlacement.cpp"
 					>
 				</File>
@@ -671,15 +675,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\LogSumExp.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\GlobalPlacement\ObjectivesConstraints.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\SumOfDelays.cpp"
+						RelativePath="..\src\GlobalPlacement\OptimizationContext.cpp"
 						>
 					</File>
 				</Filter>
@@ -703,6 +703,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\GlobalPlacement\LagrangianRelaxationData.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\GlobalPlacement\MuCalculations.cpp"
 						>
 					</File>
@@ -712,6 +716,34 @@
 					>
 					<File
 						RelativePath="..\src\GlobalPlacement\Spreading.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\SpreadingData.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="SumOfDelays"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\SumOfDelays.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\SumOfDelaysData.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="LogSumExp"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\LogSumExp.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\LogSumExpData.cpp"
 						>
 					</File>
 				</Filter>
@@ -5562,6 +5594,10 @@
 				Name="vGlobalPlacement"
 				>
 				<File
+					RelativePath="..\include\AnalyticalPlacement.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\GlobalPlacement.h"
 					>
 				</File>
@@ -5577,19 +5613,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\LogSumExp.h"
-						>
-					</File>
-					<File
 						RelativePath="..\include\ObjectivesConstraints.h"
 						>
 					</File>
 					<File
 						RelativePath="..\include\OptimizationContext.h"
-						>
-					</File>
-					<File
-						RelativePath="..\include\SumOfDelays.h"
 						>
 					</File>
 				</Filter>
@@ -5630,6 +5658,30 @@
 					</File>
 					<File
 						RelativePath="..\include\SpreadingData.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="SumOfDelays"
+					>
+					<File
+						RelativePath="..\include\SumOfDelays.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\SumOfDelaysData.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="LogSumExp"
+					>
+					<File
+						RelativePath="..\include\LogSumExp.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\LogSumExpData.h"
 						>
 					</File>
 				</Filter>
