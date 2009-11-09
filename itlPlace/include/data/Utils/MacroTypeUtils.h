@@ -15,10 +15,6 @@ namespace Utils
   void CalcElementTRC(HDesign& design, HMacroType elementType, double* T, double* R, double* C);
   void CalcElementLD(HDesign& design, HMacroType elementType, double* L, double* D);
   void CalcBufferLD(HDesign& design, const char* name, double* L, double* D);
-
-  int GetNOutArcs(HDesign& design, HMacroType elementType);
-  double CalcSourceAFactor(HDesign& design, HMacroType elementType, std::vector<double>& muSource);
-  double GetSinkLoad(HDesign& design, HMacroType elementType);
 };
 
 #endif //__MACROTYPEUTILS_H__

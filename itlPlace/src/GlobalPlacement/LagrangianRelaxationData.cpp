@@ -2,31 +2,42 @@
 #include "Utils.h"
 #include "MuCalculations.h"
 
-HMacroType GetMacrotype(HDesign &hd, HPin pin)
+double CalcSourceAFactor(HDesign& design, HPinType sourceType, std::vector<double>& muSource)
 {
-  HCell cell = hd.Pins.Get<HPin::Cell, HCell>(pin);
-  //ALERTFORMAT(("%s", hd.GetString<HPin::Name>(source).c_str()));
-  HMacroType type = hd.Cells.Get<HCell::MacroType, HMacroType>(cell);
+  double sourceAFactor = 0.0;
 
-  return type;
+  int i = 0;
+  for (HPinType::ArcsEnumeratorW arc = design[sourceType].GetArcsEnumeratorW(); arc.MoveNext(); )
+    if (arc.TimingType() == TimingType_Combinational || arc.TimingType() == TimingType_RisingEdge)
+    {
+      sourceAFactor += 0.5 * muSource[i] * (arc.ResistanceFall() + arc.ResistanceRise());
+      i++;
+    }
+
+  return sourceAFactor;
 }
 
-void LRData::AssignLRData(HDesign &hd, HNets::NetsEnumeratorW net, int netIdx)
+int CalcNumberOfLRArc(HDesign& design, HPinType sourceType)
 {
-  HPin source = hd.Nets.Get<HNet::Source, HPin>(net);
-  HMacroType type = GetMacrotype(hd, source);
+  int i = 0;
+  for (HPinType::ArcsEnumeratorW arc = design[sourceType].GetArcsEnumeratorW(); arc.MoveNext(); )
+    if (arc.TimingType() == TimingType_Combinational || arc.TimingType() == TimingType_RisingEdge)
+      i++;
+
+  return i;
+}
+
+void LRData::AssignLRData(HDesign &hd, HNetWrapper net, int netIdx)
+{
+  HPinType sourceType = hd.Get<HPin::Type, HPinType>(net.Source());
 
   std::vector<double> muSourceVector;
-  InitializeMuSourceVector(hd, muSourceVector, Utils::GetNOutArcs(hd, type));
-  netLRData[netIdx].sourceAFactor = 
-    Utils::CalcSourceAFactor(hd, type, muSourceVector);
+  InitializeMuSourceVector(hd, muSourceVector, CalcNumberOfLRArc(hd, sourceType));
+  netLRData[netIdx].sourceAFactor = CalcSourceAFactor(hd, sourceType, muSourceVector);
 
   InitializeMuNetVector(hd, netLRData[netIdx].muNetVector, net.SinksCount());
-  HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext();
-  for (; pin.MoveNext(); )
-  {
-    netLRData[netIdx].sinkLoad.push_back(Utils::GetSinkLoad(hd, GetMacrotype(hd, pin)));
-  }
+  for (HNet::SinksEnumeratorW sink = net.GetSinksEnumeratorW(); sink.MoveNext(); )
+    netLRData[netIdx].sinkLoad.push_back(hd.GetDouble<HPinType::Capacitance>(sink.Type()));
 }
 
 void LRData::InitializeNets(HDesign& hd)
@@ -45,7 +56,7 @@ void LRData::InitializeNets(HDesign& hd)
 void LRData::Initialize(HDesign& hd)
 {
   alphaTWL = hd.cfg.ValueOf(".LagrangianRelaxation.alphaTWL", 1.0);
-  c = hd.RoutingLayers.Physics.CPerDist;
+  c = hd.RoutingLayers.Physics.LinearC;
   r = hd.RoutingLayers.Physics.RPerDist;
 
   InitializeNets(hd);

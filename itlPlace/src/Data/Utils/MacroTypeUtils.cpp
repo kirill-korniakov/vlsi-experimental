@@ -291,69 +291,6 @@ namespace Utils
     }
   }
 
-  int GetNOutArcs(HDesign& design, HMacroType elementType)
-  {
-    if (::IsNull(elementType))
-      return 0;
-
-    int i = 0;
-    for (HMacroType::PinsEnumeratorW pinType = design.Get<HMacroType::PinTypesEnumerator, 
-      HMacroType::PinsEnumeratorW>(elementType); pinType.MoveNext(); )
-    {
-      if (pinType.Direction() == PinDirection_OUTPUT)
-      {
-          for (HPinType::ArcsEnumeratorW arc = pinType.GetArcsEnumeratorW(); arc.MoveNext(); )
-          {
-            i++;
-          }
-
-          return i;
-      }
-    }
-  }
-
-  double CalcSourceAFactor(HDesign& design, HMacroType elementType, std::vector<double>& muSource)
-  {
-    double sourceAFactor = 0.0;
-
-    if (::IsNull(elementType))
-      return 0.0;
-
-    int i = 0;
-    for (HMacroType::PinsEnumeratorW pinType = design.Get<HMacroType::PinTypesEnumerator, 
-      HMacroType::PinsEnumeratorW>(elementType); pinType.MoveNext(); )
-    {
-      if (pinType.Direction() == PinDirection_OUTPUT)
-      {
-        for (HPinType::ArcsEnumeratorW arc = pinType.GetArcsEnumeratorW(); arc.MoveNext(); )
-        {
-          TimingType tt = arc.TimingType();
-          if (arc.TimingType() == TimingType_Combinational ||
-              arc.TimingType() == TimingType_RisingEdge) //NOTE:FIXME: this is workaround of issue 141
-          {
-            sourceAFactor += muSource[i] * (arc.ResistanceFall() + arc.ResistanceRise());
-          }
-        }
-
-        return sourceAFactor;
-      }
-    }
-  }
-
-  double GetSinkLoad(HDesign& design, HMacroType elementType)
-  {
-    if (::IsNull(elementType))
-      return 0.0;
-
-    int i = 0;
-    for (HMacroType::PinsEnumeratorW pinType = design.Get<HMacroType::PinTypesEnumerator, 
-      HMacroType::PinsEnumeratorW>(elementType); pinType.MoveNext(); )
-    {
-      if (pinType.Direction() == PinDirection_INPUT)
-        return pinType.Capacitance();
-    }
-  }
-
   void CalcBufferLD(HDesign& design, const char* name, double* L, double* D)
   {
     if (name == 0)

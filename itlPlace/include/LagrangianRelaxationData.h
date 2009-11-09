@@ -22,7 +22,7 @@ class LRData
 
  private:
   void InitializeNets(HDesign& hd);
-  void AssignLRData(HDesign &hd, HNets::NetsEnumeratorW net, int netIdx);
+  void AssignLRData(HDesign &hd, HNetWrapper net, int netIdx);
 };
 
 #endif
