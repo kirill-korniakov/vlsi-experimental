@@ -133,16 +133,12 @@ NetInfo NetInfo::Create(HDesign& hd, HNet net, BufferInfo& buf)
   HPin source = hd.Get<HNet::Source, HPin>(net);
   ERROR_ASSERT(!::IsNull(source));
 
-  //get worst timing arc
   HTimingPoint sourceTP = hd.TimingPoints[source];
-  HTimingPoint sa = hd.Get<HTimingPoint::ArrivalAncestor, HTimingPoint>(sourceTP);
-
-  HTimingArcType arc;
+  //get worst timing arc
   double arcTime;
   bool isInversed;
-
-  GetArrivalArc(hd, sa, sourceTP, &arc, &arcTime, &isInversed);
-
+  HTimingArcType arc = FindArrivalArc(hd, sourceTP, SignalDirection_None, arcTime, isInversed);
+  
   double driverDelay = arcTime;
 
   //calc Rd

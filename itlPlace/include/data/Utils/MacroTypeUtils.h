@@ -11,10 +11,6 @@ namespace Utils
 
   const char* GetMacroFunctionName(MacroType mtype);
   MacroType GetMacroFunctionType(const char* name);
-
-  void CalcElementTRC(HDesign& design, HMacroType elementType, double* T, double* R, double* C);
-  void CalcElementLD(HDesign& design, HMacroType elementType, double* L, double* D);
-  void CalcBufferLD(HDesign& design, const char* name, double* L, double* D);
 };
 
 #endif //__MACROTYPEUTILS_H__

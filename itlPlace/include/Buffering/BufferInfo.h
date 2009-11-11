@@ -19,8 +19,10 @@ private:
   double m_Lbuf;
   double m_Dbuf;
   HMacroType m_BufType;
-  double tIntrinsic;
+  //double tIntrinsic;
 public:
+
+  static const SignalDirection SignalModel = SignalDirection_Average;
 
   double Rb() const {return m_R;}
   double Cb() const {return m_C;}
@@ -28,12 +30,9 @@ public:
   double Lbuf() const {return m_Lbuf;}
   double Dbuf() const {return m_Dbuf;}
 
-  HMacroType BufferMacroType() {return m_BufType;}
-  double TIntrinsic() {return tIntrinsic;}
+  double TIntrinsic() {return m_T;}
   double Capacitance() {return m_C;}
   double Resistance() {return m_R;}
-
-
 
   HMacroType Type() const {return m_BufType;}
 

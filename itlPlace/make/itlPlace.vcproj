@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="itlPlace"
 	ProjectGUID="{10EDF02C-5EB0-4A8B-A45D-B00D27F0749D}"
 	RootNamespace="itlPlace"
@@ -1144,6 +1144,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Data\Utils\TimingPointUtils.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Data\Utils\TimingUtils.cpp"
 						>
 					</File>
 				</Filter>
@@ -5530,6 +5534,10 @@
 					</File>
 					<File
 						RelativePath="..\include\data\Utils\TimingPointUtils.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\data\Utils\TimingUtils.h"
 						>
 					</File>
 					<File

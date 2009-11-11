@@ -63,6 +63,19 @@ void GetRequiredArc(HDesign& hd,
                           double* arcTime,
                           bool* isInversed);
 
+
+HTimingArcType FindArrivalArc(HDesign& hd,
+                         HTimingPoint arcEndPoint,
+                         SignalDirection dir,
+                         double& arcTime,
+                         bool& isInversed);
+
+HTimingArcType FindRequiredArc(HDesign& hd,
+                         HTimingPoint arcStartPoint,
+                         SignalDirection dir,
+                         double& arcTime,
+                         bool& isInversed);
+
 inline void InitializeTiming(HDesign& design)
 {
   design.SteinerPoints.Initialize();

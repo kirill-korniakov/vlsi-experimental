@@ -507,7 +507,10 @@ void SetStartPointsArrivals(HDesign& design, double clock_cycle)
         arc.MoveNext(); )
       {
         if (arc.TimingType() == TimingType_RisingEdge || arc.TimingType() == TimingType_FallingEdge)
+        {
           dp.SetArrivalTime(sp, dp.GetEdgeArcOutputTime(arc, sp, this_point));
+          dp.SetArrivalAncestor(sp, design.TimingPoints[design.TimingArcTypes.GetStartPin(arc, sp.Pin())]);
+        }
       }
     }
   }//for (HTimingPointWrapper sp
@@ -615,7 +618,9 @@ HTimingArcType FindArc(HDesign& design,
     for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(endPinType);
       arc.MoveNext(); )
     {
-      if (arc.TimingType() == TimingType_Combinational
+      if ((arc.TimingType() == TimingType_Combinational 
+        || arc.TimingType() == TimingType_RisingEdge
+        || arc.TimingType() == TimingType_FallingEdge)
         && arc.GetStartPin(endPin) == startPin)
       {
         found = true;
@@ -782,4 +787,72 @@ void GetRequiredArc(HDesign& hd,
                           bool* isInversed)
 {
   *arc = FindArc<1>(hd, endPoint, RequiredArcSelector1D(), *arcTime, *isInversed);
+}
+
+HTimingArcType FindArrivalArc(HDesign& hd,
+                         HTimingPoint arcEndPoint,
+                         SignalDirection dir,
+                         double& arcTime,
+                         bool& isInversed)
+{
+  switch (dir)
+  {
+  case SignalDirection_Fall:
+    {
+      DelayPropagation<2>::TimeType time;
+      DelayPropagation<2>::BoolType inv;
+      HTimingArcType ret = FindArc<2>(hd, arcEndPoint, ArrivalArcSelector2DFall(), time, inv);
+      arcTime = time.fall;
+      isInversed = inv.fall;
+      return ret;
+    }
+  case SignalDirection_Rise:
+    {
+      DelayPropagation<2>::TimeType time;
+      DelayPropagation<2>::BoolType inv;
+      HTimingArcType ret = FindArc<2>(hd, arcEndPoint, ArrivalArcSelector2DRise(), time, inv);
+      arcTime = time.rise;
+      isInversed = inv.rise;
+      return ret;
+    }
+  case SignalDirection_None:
+    return FindArc<1>(hd, arcEndPoint, ArrivalArcSelector1D(), arcTime, isInversed);
+  default:
+    LOGCRITICALFORMAT(("Unsupported signal direction: %d", dir));
+    return hd.TimingArcTypes.Null();
+  };
+}
+
+HTimingArcType FindRequiredArc(HDesign& hd,
+                         HTimingPoint arcStartPoint,
+                         SignalDirection dir,
+                         double& arcTime,
+                         bool& isInversed)
+{
+  switch (dir)
+  {
+  case SignalDirection_Fall:
+    {
+      DelayPropagation<2>::TimeType time;
+      DelayPropagation<2>::BoolType inv;
+      HTimingArcType ret = FindArc<2>(hd, arcStartPoint, RequiredArcSelector2DFall(), time, inv);
+      arcTime = time.fall;
+      isInversed = inv.fall;
+      return ret;
+    }
+  case SignalDirection_Rise:
+    {
+      DelayPropagation<2>::TimeType time;
+      DelayPropagation<2>::BoolType inv;
+      HTimingArcType ret = FindArc<2>(hd, arcStartPoint, RequiredArcSelector2DRise(), time, inv);
+      arcTime = time.rise;
+      isInversed = inv.rise;
+      return ret;
+    }
+  case SignalDirection_None:
+    return FindArc<1>(hd, arcStartPoint, RequiredArcSelector1D(), arcTime, isInversed);
+  default:
+    LOGCRITICALFORMAT(("Unsupported signal direction: %d", dir));
+    return hd.TimingArcTypes.Null();
+  };
 }

@@ -235,66 +235,10 @@ namespace Utils
   return mt;
   }
 
-  void CalcElementLD(HDesign& design, HMacroType elementType, double* L, double* D)
-  {
-    *L = *D = 0;
-
-    if (::IsNull(elementType))
-      return;
-
-    double T;
-    double R;
-    double C;    
-
-    CalcElementTRC(design, elementType, &T, &R, &C);
-
-    *L = R / design.RoutingLayers.Physics.RPerDist + C / design.RoutingLayers.Physics.CPerDist;
-    *D = sqrt(2.0 * (T + R * C) / design.RoutingLayers.Physics.RPerDist / design.RoutingLayers.Physics.CPerDist);
-
-    return;
-  }
-
-  void CalcElementTRC(HDesign& design, HMacroType elementType, double* T, double* R, double* C)
-  {
-    *T = *R = 0.0;
-
-    if (::IsNull(elementType))
-      return;
-
-    for (HMacroType::PinsEnumeratorW pinType = design.Get<HMacroType::PinTypesEnumerator, 
-         HMacroType::PinsEnumeratorW>(elementType); pinType.MoveNext(); )
-    {
-      if (pinType.Direction() == PinDirection_INPUT)
-        *C = pinType.Capacitance();
-
-      if (pinType.Direction() == PinDirection_OUTPUT)
-      {
-        int nArcs = 0;
-
-        for (HPinType::ArcsEnumeratorW arc = pinType.GetArcsEnumeratorW(); arc.MoveNext(); )
-        {
-          TimingType tt = arc.TimingType();
-          if (arc.TimingType() == TimingType_Combinational ||
-            arc.TimingType() == TimingType_RisingEdge) //NOTE:FIXME: this is workaround of issue 141
-          {
-            *T += arc.TIntrinsicFall() + arc.TIntrinsicRise();
-            *R += arc.ResistanceFall() + arc.ResistanceRise();
-            nArcs += 2;
-          }
-        }
-
-        *T /= nArcs;
-        *R /= nArcs;
-
-        return;
-      }
-    }
-  }
-
-  void CalcBufferLD(HDesign& design, const char* name, double* L, double* D)
-  {
-    if (name == 0)
-      name = design.cfg.ValueOf("GlobalPlacement.bufferName", "INVX1");
-    CalcElementLD(design, FindMacroTypeByName(design, name), L, D);
-  }
+  //void CalcBufferLD(HDesign& design, const char* name, double* L, double* D)
+  //{
+  //  if (name == 0)
+  //    name = design.cfg.ValueOf("GlobalPlacement.bufferName", "INVX1");
+  //  CalcElementLD(design, FindMacroTypeByName(design, name), L, D);
+  //}
 }

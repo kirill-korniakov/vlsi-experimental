@@ -1,5 +1,6 @@
 #include "SumOfDelaysData.h"
 #include "Utils.h"
+#include "BufferInfo.h"
 
 void SODData::InitializeNets(HDesign& hd)
 {
@@ -16,11 +17,10 @@ void SODData::InitializeNets(HDesign& hd)
 
 void SODData::Initialize(HDesign& hd)
 {
-  double L, D;
-  Utils::CalcBufferLD(hd, 0, &L, &D);
-  Lbuf = L;
-  Dbuf = D;
-  DbufLbufDifferenceOfSquares = D*D - L*L;
+  BufferInfo bi = BufferInfo::Create(hd);
+  Lbuf = bi.Lbuf();
+  Dbuf = bi.Dbuf();
+  DbufLbufDifferenceOfSquares = Dbuf*Dbuf - Lbuf*Lbuf;
 
   gradientBalance = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
 

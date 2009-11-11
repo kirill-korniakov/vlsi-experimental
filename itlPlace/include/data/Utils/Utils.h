@@ -8,3 +8,4 @@
 #include "PinTypeUtils.h"
 #include "TimingPointUtils.h"
 #include "TimingArcUtils.h"
+#include "TimingUtils.h"

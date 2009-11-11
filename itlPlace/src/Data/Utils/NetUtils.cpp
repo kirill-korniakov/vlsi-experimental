@@ -1,8 +1,6 @@
 #include "NetUtils.h"
 #include "TimingPointUtils.h"
-#include "math.h"
-#include <vector>
-#include <algorithm>
+#include "TimingUtils.h"
 #include "Reporting.h"
 
 namespace Utils
@@ -242,44 +240,12 @@ namespace Utils
 
   void CalculateLNets(HDesign& hd)
   {
+    const SignalDirection sigDir = SignalDirection_Average;
+
     for (HNets::NetsEnumeratorW net = hd.Nets.GetFullEnumeratorW(); net.MoveNext(); )
-    {
-      double lnet = 0.0;
-
-      for (HNet::SinksEnumeratorW sink = net.GetSinksEnumeratorW(); sink.MoveNext(); )
-      {
-        //ALERTFORMAT(("Sink: %s\tCap: %f", hd.GetString<HPin::Name>(sink).c_str(), 
-        //  hd.GetDouble<HPinType::Capacitance>(sink.Type())));
-        lnet += hd.GetDouble<HPinType::Capacitance>(sink.Type());
-      }
-
-      lnet /= hd.RoutingLayers.Physics.CPerDist;
-
-      double R = 0;
-      int nArcs = 0;
-
-      //HPin pin = net.Source();
-      //HPinType pt = hd.Get<HPin::Type, HPinType>(net.Source());
-      //bool isEntered = false;
-      for (HPinType::ArcsEnumeratorW arc = hd.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(hd.Get<HPin::Type, HPinType>(net.Source()));
-        arc.MoveNext(); )
-      {
-        //isEntered = true;
-        if (arc.TimingType() == TimingType_Combinational)
-        {
-          R += arc.ResistanceFall() + arc.ResistanceRise();
-          nArcs += 2;
-        }
-      }
-      //if (!isEntered)
-      //{
-      //  ALERT(hd.GetString<HPin::Name>(net.Source()).c_str());
-      //}
-      //isEntered = false;
-      
-      if (nArcs > 0) 
-        lnet += R / nArcs / hd.RoutingLayers.Physics.RPerDist;
-      net.SetLNet(lnet);
-    }
+      net.SetLNet(Utils::LNet(
+        Utils::GetDriverWorstPhisics(hd, net.Source(), sigDir),
+        GetNetLoad(hd, net, sigDir),
+        hd.RoutingLayers.Physics));
   }
 }

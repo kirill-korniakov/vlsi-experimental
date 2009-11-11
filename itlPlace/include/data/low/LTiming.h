@@ -7,6 +7,8 @@ enum SignalDirection
 {
   SignalDirection_Rise = 0,
   SignalDirection_Fall = 1,
+  SignalDirection_None = 2,
+  SignalDirection_Average = 3,
   SignalDirection_Default = 0
 };
 

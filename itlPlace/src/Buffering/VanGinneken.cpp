@@ -555,7 +555,7 @@ int VanGinneken::InsertBuffers(HNet& net)
     ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
     Utils::RestoreBufferedNet(m_hd, net);
     // (1) пюяйнлемрхпнбюрэ еякх бярюбйю астепю б дпюибеп ме мсфмю
-    //return nBuffersInserted;
+    return nBuffersInserted;
   }
   else
   {
@@ -566,7 +566,7 @@ int VanGinneken::InsertBuffers(HNet& net)
     vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
     ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
     // (2) пюяйнлемрхпнбюрэ еякх бярюбйю астепю б дпюибеп ме мсфмю
-    //return 0;
+    return 0;
   }
   //}
 
@@ -802,8 +802,8 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
   char bufferIdx[10];
   string bufferFullName;
 
-  double bufferWidth = m_hd[m_AvailableBuffers[0].BufferMacroType()].SizeX();
-  double bufferHeight =  m_hd[m_AvailableBuffers[0].BufferMacroType()].SizeY();
+  double bufferWidth = m_hd[m_AvailableBuffers[0].Type()].SizeX();
+  double bufferHeight =  m_hd[m_AvailableBuffers[0].Type()].SizeY();
   double bufferSquare = bufferWidth * bufferHeight;
   double bufferX, bufferY;
 
@@ -838,7 +838,7 @@ void VanGinneken::CreateCells(string bufferName, HCell* insertedBuffers)
       m_hd.Cells.Set<HCell::Y>(insertedBuffers[i], bufferY);
 
       //set macrotype and initialize pins
-      m_hd.Cells.Set<HCell::MacroType>(insertedBuffers[i], m_AvailableBuffers[0].BufferMacroType());
+      m_hd.Cells.Set<HCell::MacroType>(insertedBuffers[i], m_AvailableBuffers[0].Type());
       m_hd.Pins.AllocatePins(insertedBuffers[i]);
 
       if (m_doReportBuffering)
