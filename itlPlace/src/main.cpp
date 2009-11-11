@@ -12,6 +12,7 @@
 #include "Buffering.h"
 #include "TileGrid.h"
 #include "FGR.h"
+#include "ExportToRouters.h"
 
 using namespace libconfig;
 
