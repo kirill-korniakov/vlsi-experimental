@@ -22,6 +22,10 @@ PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design)
   nIterationsWithoutGain(0)
 {
   m_grid = new HDPGrid(m_design);
+  m_Placement.SavePlacement(m_design);
+  AbacusLegalization(*m_grid);
+  m_BestPlacementHPWLLegalized = Utils::CalculateHPWL(m_design, false);
+  m_Placement.RestorePlacement(m_design);
 }
 
 PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
@@ -61,7 +65,7 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id)
 
 double PlacementQualityAnalyzer::LastIterImprovement()
 {
-  if (!m_experiments.empty() && m_BestPlacementHPWLLegalized > 0.0)
+  if (!m_experiments.empty())
     return 1.0 - m_experiments.back().hpwl_legalized/m_BestPlacementHPWLLegalized;
   else
     return 1.0;
@@ -72,7 +76,7 @@ bool PlacementQualityAnalyzer::IsAcceptableImprovementAchieved()
   double improvement = LastIterImprovement();
   ALERTFORMAT(("HPWL Leg. gain over best placement is %.3f%%", improvement*100.0));
 
-  if (improvement > m_design.cfg.ValueOf(".improvementTreshold", 0.0))
+  if (improvement > m_design.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0))
   {
     m_BestPlacementHPWLLegalized = m_experiments.back().hpwl_legalized; //TODO: move from here
     return true;
@@ -94,7 +98,7 @@ bool PlacementQualityAnalyzer::IsNextIterationApproved()
   else
   {
     nIterationsWithoutGain++;
-    static int maxIterationsWithoutGain = m_design.cfg.ValueOf(".nTolerantIterations", 3);
+    static int maxIterationsWithoutGain = m_design.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 3);
     if (nIterationsWithoutGain > maxIterationsWithoutGain)
     {
       nIterationsWithoutGain = 0;

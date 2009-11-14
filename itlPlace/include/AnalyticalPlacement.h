@@ -25,7 +25,7 @@ namespace AnalyticalGlobalPlacement
 
   void SetVariablesValues(ClusteringInformation & ci, Vec& x);
   void GetVariablesValues(ClusteringInformation& ci, Vec x);
-  void SetInitialState(HDesign& hd, ClusteringInformation& ci);
+  void PlaceToTheCenterIntially(HDesign& hd, ClusteringInformation& ci);
   void UpdateCellsCoordinates(HDesign& hd, ClusteringInformation& ci);
   void WriteCellsCoordinates2Clusters(HDesign& hd, ClusteringInformation& ci);
   void SetClustersCoords(ClusteringInformation& ci, Vec& x);

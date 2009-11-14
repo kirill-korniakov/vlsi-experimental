@@ -125,9 +125,52 @@ double LR(AppCtx* context, PetscScalar* solution)
   return LRValue;
 }
 
+double GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solution, int idxInSolutionVector)
+{
+  double term1 = 0.0;
+  double term2 = 0.0;
+  double term3 = 0.0;
+
+  int netIdx = context->ci->tableOfAdjacentNets[clusterIdx][j];
+  double braces = GetBraces(context, solution, netIdx);
+  double LSE = CalcNetLSE(context, solution, netIdx);
+  double gLSE = CalcNetLSEGradient(context, netIdx, idxInSolutionVector);
+
+  term1 = braces * gLSE;
+
+  int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
+  ERROR_ASSERT(clusterPinIdx != -1);
+
+  double clusterCoordinate = solution[idxInSolutionVector];
+  if (clusterPinIdx != 0)
+  {//this cluster is a sink
+    double Ci = GetCi(context, netIdx, clusterPinIdx);
+    double Bi = GetBi(context, netIdx, clusterPinIdx);
+    double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, 0);
+    int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
+
+    term2 = LSE * 0.5 * Ci * doiDerivative;
+    term3 = Bi * doiDerivative;
+  }
+  else
+  {
+    for (int sinkIdx = 1; sinkIdx < context->netListSizes[netIdx]; sinkIdx++)
+    {
+      double Ci = GetCi(context, netIdx, sinkIdx);
+      double Bi = GetBi(context, netIdx, sinkIdx);
+      double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, sinkIdx);
+      int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
+
+      term2 += LSE * 0.5 * Ci * doiDerivative;
+      term3 += Bi * doiDerivative;
+    }
+  }
+
+  return term1 + term2 + term3;
+}
+
 void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, PetscScalar* g)
 {
-  //#pragma omp parallel for
   for (int idxInSolutionVector = 0; idxInSolutionVector < nCoordinates; idxInSolutionVector++)
   {
     int clusterIdx = context->solutionIdx2clusterIdxLUT[idxInSolutionVector];
@@ -135,46 +178,7 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, Pet
     //consider all adjacent nets
     for (int j = 0; j < tableSize; ++j)
     {
-      double term1 = 0.0;
-      double term2 = 0.0;
-      double term3 = 0.0;
-
-      int netIdx = context->ci->tableOfAdjacentNets[clusterIdx][j];
-      double braces = GetBraces(context, solution, netIdx);
-      double LSE = CalcNetLSE(context, solution, netIdx);
-      double gLSE = CalcNetLSEGradient(context, netIdx, idxInSolutionVector);
-
-      term1 = braces * gLSE;
-
-      int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
-      ERROR_ASSERT(clusterPinIdx != -1);
-
-      double clusterCoordinate = solution[idxInSolutionVector];
-      if (clusterPinIdx != 0)
-      {//this cluster is a sink
-        double Ci = GetCi(context, netIdx, clusterPinIdx);
-        double Bi = GetBi(context, netIdx, clusterPinIdx);
-        double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, 0);
-        int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
-
-        term2 = LSE * 0.5 * Ci * doiDerivative;
-        term3 = Bi * doiDerivative;
-      }
-      else
-      {
-        for (int sinkIdx = 1; sinkIdx < context->netListSizes[netIdx]; sinkIdx++)
-        {
-          double Ci = GetCi(context, netIdx, sinkIdx);
-          double Bi = GetBi(context, netIdx, sinkIdx);
-          double partnerCoordinate = GetPartnerCoordinate(context, solution, idxInSolutionVector%2, netIdx, sinkIdx);
-          int doiDerivative = GetDoiDerivative(context, solution, clusterCoordinate, partnerCoordinate);
-
-          term2 += LSE * 0.5 * Ci * doiDerivative;
-          term3 += Bi * doiDerivative;
-        }
-      }
-
-      g[idxInSolutionVector] += term1 + term2 + term3;
+      g[idxInSolutionVector] += GetNetDerivative(context, clusterIdx, j, solution, idxInSolutionVector);
     }
   }
 }

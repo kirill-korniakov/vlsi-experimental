@@ -862,7 +862,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
   ci.mCurrentNumberOfClusters = hd.Cells.MovableCellsCount();
   ci.clusters.resize(ci.mCurrentNumberOfClusters);
   
-  if (hd.cfg.ValueOf("Clustering.useClusteringInformationFromFile", false))
+  if (hd.cfg.ValueOf(".Clustering.useClusteringInformationFromFile", false))
   {//LOAD CLUSTERING INFO AND ESCAPE
     string fileName = GetClusteringInformationFileName(hd);
     if (ci.LoadFromFile(fileName.c_str(), hd.Circuit.Name().c_str(), hd))

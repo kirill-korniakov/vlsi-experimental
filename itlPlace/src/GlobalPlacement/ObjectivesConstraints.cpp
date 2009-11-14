@@ -92,40 +92,52 @@ void PrintCoordinates(int nClusterVariables, int nBufferVariables, double* solut
   WRITELINE("");
 }
 
-void PrintDerivatives(int nClusterVariables, int nBufferVariables, double* gradient)
+void PrintDerivatives(int nClusterVariables, int nBufferVariables, double* gradient,
+                      bool clusterX, bool clusterY, bool ki)
 {
-  ALERT("Cluster X derivatives:");
-  for (int i = 0; i < nClusterVariables/2; i++)
-  {
-    WRITE("%.2f ", gradient[2*i]);
-    if ((i+1) % 10 == 0)
-    {
-      WRITELINE("");
-    }
-  }
-  WRITELINE("");
+  const std::string format = "%.10f ";
 
-  //ALERT("Cluster Y derivatives:");
-  //for (int i = 0; i < nClusterVariables/2; i++)
-  //{
-  //  WRITE("%.2f ", gradient[2*i+1]);
-  //  if ((i+1) % 10 == 0)
-  //  {
-  //    WRITELINE("");
-  //  }
-  //}
-  //WRITELINE("");
-
-  ALERT("Buffer counts derivatives:");
-  for (i = nClusterVariables; i < nClusterVariables + nBufferVariables; i++)
+  if (clusterX)
   {
-    WRITE("%.2f ", gradient[i]);
-    if ((i - nClusterVariables + 1) % 10 == 0)
+    ALERT("Cluster X derivatives:");
+    for (int i = 0; i < nClusterVariables/2; i++)
     {
-      WRITELINE("");
+      WRITE(format.c_str(), gradient[2*i]);
+      if ((i+1) % 10 == 0)
+      {
+        WRITELINE("");
+      }
     }
+    WRITELINE("");
   }
-  WRITELINE("");
+
+  if (clusterY)
+  {
+    ALERT("Cluster Y derivatives:");
+    for (int i = 0; i < nClusterVariables/2; i++)
+    {
+      WRITE(format.c_str(), gradient[2*i+1]);
+      if ((i+1) % 10 == 0)
+      {
+        WRITELINE("");
+      }
+    }
+    WRITELINE("");
+  }
+
+  if (ki)
+  {
+    ALERT("ki derivatives:");
+    for (int i = nClusterVariables; i < nClusterVariables + nBufferVariables; i++)
+    {
+      WRITE(format.c_str(), gradient[i]);
+      if ((i - nClusterVariables + 1) % 10 == 0)
+      {
+        WRITELINE("");
+      }
+    }
+    WRITELINE("");
+  }
 }
 
 void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& context)
@@ -179,6 +191,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   timetype start = 0;
   timetype finish = 0;
 
+  double* LRValue = new double;
+  double* QSValue = new double;
+  *LRValue = 0.0;
+  *QSValue = 0.0;
+
 #pragma omp parallel sections
   {
 #pragma omp section
@@ -195,7 +212,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 
       if (context->useLR)
       {
-        LR_AddObjectiveAndGradient(context, solution, f);
+        LR_AddObjectiveAndGradient(context, solution, LRValue);
+        *f += *LRValue;
       }
     }
 
@@ -203,7 +221,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     {
       if (context->useQuadraticSpreading)
       {
-        QS_AddObjectiveAndGradient(context, solution, f);
+        QS_AddObjectiveAndGradient(context, solution, QSValue);
+        *f += *QSValue;
       }
 
       if (context->useLRSpreading)
@@ -231,7 +250,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   }
 
   //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
-  //PrintDerivatives(nClusterVariables, nBufferVariables, gradient);
+  //PrintDerivatives(nClusterVariables, nBufferVariables, gradient, true, true, false);
 
   static bool plotGradients = context->hd->cfg.ValueOf("GlobalPlacement.plotGradients", false);
   if (plotGradients)

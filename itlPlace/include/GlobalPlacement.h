@@ -4,7 +4,9 @@
 #include "HDesign.h"
 
 void PinPlacement(HDesign&);
-void AnalyticalPlacement(HDesign&);
+
+void GlobalPlacement(HDesign&, string cfgContext);
+
 void RandomPlacement(HDesign&);
 
 #endif

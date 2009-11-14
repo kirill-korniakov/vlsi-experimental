@@ -31,12 +31,13 @@ timetype quadraticSpreadingGradTime = 0;
 
 using namespace AnalyticalGlobalPlacement;
 
-void AnalyticalPlacement(HDesign& hd)
+void GlobalPlacement(HDesign& hd, std::string cfgContext)
 {
-  ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement");
+  ConfigContext ctx = hd.cfg.OpenContext(cfgContext);
 
   WRITELINE("");
   ALERT("ANALYTICAL PLACEMENT STARTED");
+  ALERTFORMAT(("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true)));
 
   ClusteringInformation ci(hd);
   ci.affinityFunction = Affinity;
@@ -45,7 +46,15 @@ void AnalyticalPlacement(HDesign& hd)
   Clustering(hd, ci);
   
   //set initial placement
-  SetInitialState(hd, ci);
+  if (hd.cfg.ValueOf("GlobalPlacement.placeToTheCenter", false))
+  {
+    PlaceToTheCenterIntially(hd, ci);
+  }
+  else
+  {
+    WriteCellsCoordinates2Clusters(hd, ci);
+  }
+  ALERTFORMAT(("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true)));
 
   //perform placement of clustered netlist
   //TODO: think about reorganization of loop below
@@ -123,7 +132,7 @@ int TaoInit(const char* taoCmd)
   return OK;
 }
 
-void AnalyticalGlobalPlacement::SetInitialState(HDesign& hd, ClusteringInformation& ci)
+void AnalyticalGlobalPlacement::PlaceToTheCenterIntially(HDesign& hd, ClusteringInformation& ci)
 {
   ALERT("SET INITIAL STATE");
 
@@ -131,7 +140,7 @@ void AnalyticalGlobalPlacement::SetInitialState(HDesign& hd, ClusteringInformati
   static double maxX = hd.Circuit.PlacementMaxX();
   static double minY = hd.Circuit.PlacementMinY();
   static double maxY = hd.Circuit.PlacementMaxY();
-  static double shufflePercent = hd.cfg.ValueOf(".shufflePercent", 0.0);
+  static double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
 
   int clusterIdx = -1;
   while (GetNextActiveClusterIdx(&ci, clusterIdx))
@@ -144,8 +153,7 @@ void AnalyticalGlobalPlacement::SetInitialState(HDesign& hd, ClusteringInformati
       shufflePercent/100.0*hd.Circuit.PlacementHeight();
   }
   UpdateCellsCoordinates(hd, ci);
-  ALERTFORMAT(("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true)));
-
+  
   int netListSize = static_cast<int>(ci.netList.size());
   for (int i = 0; i < netListSize; i++)
   {
@@ -229,7 +237,7 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
   }
   for (int i = 2*idx; i < nVariables; i++)
   {//set upper borders for ki variables
-    initValues[i] = hd.cfg.ValueOf(".bufferCountUpperBound", 100.0); //TODO: set correct upper bound
+    initValues[i] = hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 100.0); //TODO: set correct upper bound
   }
   VecSetValues(xu, nVariables, idxs, initValues, INSERT_VALUES);
 
@@ -364,8 +372,8 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
 
 void AnalyticalGlobalPlacement::UpdateMu(AppCtx& context, HDesign& hd, int iterate)
 {
-  context.spreadingData.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2);
-  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2);
+  context.spreadingData.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
+  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
 
   if (context.useLRSpreading)
   {
@@ -603,17 +611,22 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   }
 
   PlacementQualityAnalyzer* QA = 0;
-  if(hd.cfg.ValueOf(".useQAClass", false))
+  if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
     QA = new PlacementQualityAnalyzer(hd);
-    if (hd.cfg.ValueOf(".earlyExit", false))
+    if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
     {
       QA->SaveCurrentPlacementAsBestAchieved();
     }
   }
 
+  if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+  {
+    QA->AnalyzeQuality(0);
+  }
+
   int iteration = 1;
-  static double targetDiscrepancy = hd.cfg.ValueOf(".targetDiscrepancy", 2.0);
+  static double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
   while (1)
   {
     //print iteration info
@@ -625,7 +638,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       ALERTFORMAT(("muBorderPenalty = %.20f", context.muBorderPenalty));
     ALERTFORMAT(("HPWL initial   = %f", Utils::CalculateHPWL(hd, true)));
 
-    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".plotWires", false), 
+    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
       context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
 
     // Tao solve the application
@@ -655,10 +668,10 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     ALERTFORMAT(("discrepancy = %f", discrepancy));
     ALERTFORMAT(("Sum of Ki = %f", CalculateSumOfK(hd, ci)));
     
-    if (hd.cfg.ValueOf(".useQAClass", false))
+    if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
-      QA->AnalyzeQuality(iteration - 2);
-      if (hd.cfg.ValueOf(".earlyExit", false))
+      QA->AnalyzeQuality(iteration - 1);
+      if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
         if (!QA->IsNextIterationApproved())
         {
           QA->RestoreBestAchievedPlacement();
@@ -682,9 +695,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   metaIteration++;
 
   //QA report
-  if (hd.cfg.ValueOf(".useQAClass", false))
+  if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
-    if (QA->IsAcceptableImprovementAchieved() || !hd.cfg.ValueOf(".earlyExit", false))
+    if (QA->IsAcceptableImprovementAchieved() || !hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
       QA->AnalyzeQuality(iteration);
     QA->Report();
     delete QA;

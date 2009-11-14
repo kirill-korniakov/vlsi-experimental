@@ -74,9 +74,17 @@ int main(int argc, char** argv)
       //GLOBAL PLACEMENT
       if (hd.cfg.ValueOf("DesignFlow.GlobalPlacement", false))
       {
-        AnalyticalPlacement(hd);
+        GlobalPlacement(hd, hd.cfg.ValueOf("params.objective"));
         hd.Plotter.ShowPlacement();
         hd.Plotter.SaveMilestoneImage("GP");
+      }
+
+      //LR-TDP
+      if (hd.cfg.ValueOf("DesignFlow.LR", false))
+      {
+        GlobalPlacement(hd, "LR");
+        hd.Plotter.ShowPlacement();
+        hd.Plotter.SaveMilestoneImage("LR");
       }
       
       HDPGrid DPGrid(hd);

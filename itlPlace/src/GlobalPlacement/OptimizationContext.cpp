@@ -37,14 +37,14 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   CalculateNetListSizes(ci->netList, netListSizes);
 
   useNetWeights         = ahd.cfg.ValueOf("NetWeighting.useNetWeights", false);
-  useLogSumExp          = ahd.cfg.ValueOf(".useLogSumExp", true);
-  useSumOfDelays        = ahd.cfg.ValueOf(".useSumOfDelays", false);
-  useLR                 = ahd.cfg.ValueOf(".useLR", false);
-  useQuadraticSpreading = ahd.cfg.ValueOf(".useQuadraticSpreading", true);
-  useUnidirectSpreading = ahd.cfg.ValueOf(".useUnidirectSpreading", false);
-  useLRSpreading        = ahd.cfg.ValueOf(".useLRSpreading", false);
-  useBorderPenalty      = ahd.cfg.ValueOf(".useBorderPenalty", true);
-  useBorderBounds       = ahd.cfg.ValueOf(".useBorderBounds", true);
+  useLogSumExp          = ahd.cfg.ValueOf("GlobalPlacement.useLogSumExp", false);
+  useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);
+  useLR                 = ahd.cfg.ValueOf("GlobalPlacement.useLR", false);
+  useQuadraticSpreading = ahd.cfg.ValueOf("GlobalPlacement.useQuadraticSpreading", false);
+  useUnidirectSpreading = ahd.cfg.ValueOf("GlobalPlacement.useUnidirectSpreading", false);
+  useLRSpreading        = ahd.cfg.ValueOf("GlobalPlacement.useLRSpreading", false);
+  useBorderPenalty      = ahd.cfg.ValueOf("GlobalPlacement.useBorderPenalty", false);
+  useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)
     LSEdata.Initialize(ahd, aci, spreadingData.binGrid.binWidth);
@@ -77,7 +77,7 @@ void AppCtx::FreeMemory()
     delete [] spreadingData.individualBinsDiscrepancy;
   }
 
-  //FIXME: check correctness of memory deletion
+  //TODO: check correctness of memory deletion
   delete[] LSEdata.precalcedExponents;
   delete[] netListSizes;
   delete[] solutionIdx2clusterIdxLUT;
