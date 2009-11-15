@@ -17,12 +17,12 @@ windowTitle = 'Automatic Building Script iltPlace'
 
 def Absolutize(x):
     divisor = x[0]
-    if diviser != 0:
+    if diviser != 0.0:
 	    for i in range(0, len(x)):
 	        x[i] = x[i] / divisor
-	else:
-		for i in range(0, len(x)):
-	        x[i] = 0.0
+    else:
+        for i in range(0, len(x)):
+            x[i] = 0.0
     return x
 
 def PrintAbsValues(po, sequence):
