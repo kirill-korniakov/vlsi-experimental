@@ -204,6 +204,13 @@ int main(int argc, char** argv)
         }
         fgr::FGRRouting(DPGrid);
       }
+
+      if (Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
+      {
+        // Exit the main loop of the placement
+        ALERT("We have satisfied the timing constraints");
+        break;
+      }
     }
     
     //BUFFERING
