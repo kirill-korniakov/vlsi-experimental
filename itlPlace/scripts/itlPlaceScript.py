@@ -17,8 +17,12 @@ windowTitle = 'Automatic Building Script iltPlace'
 
 def Absolutize(x):
     divisor = x[0]
-    for i in range(0, len(x)):
-        x[i] = x[i] / divisor
+    if diviser != 0:
+	    for i in range(0, len(x)):
+	        x[i] = x[i] / divisor
+	else:
+		for i in range(0, len(x)):
+	        x[i] = 0.0
     return x
 
 def PrintAbsValues(po, sequence):
@@ -127,9 +131,20 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
         PrintAbsValues(po, TNSsBDP)
         PrintAbsValues(po, WNSsBDP)
         PrintAbsValues(po, HPWLsBDP)
+        
+        po.write(str(HPWLsBDP[TNSsBDP.index(min(TNSsBDP))] / HPWLsBDP[0]).replace('.', ','))
+        po.write(';')
+        po.write(str(HPWLsBDP[WNSsBDP.index(min(WNSsBDP))] / HPWLsBDP[0]).replace('.', ','))
+        po.write(2*';')
+        
         PrintAbsValues(po, TNSsADP)
         PrintAbsValues(po, WNSsADP)
         PrintAbsValues(po, HPWLsADP)
+        
+        po.write(str(HPWLsADP[TNSsADP.index(min(TNSsADP))] / HPWLsADP[0]).replace('.', ','))
+        po.write(';')
+        po.write(str(HPWLsADP[WNSsADP.index(min(WNSsADP))] / HPWLsADP[0]).replace('.', ','))
+        po.write(2*';')
     po.close()
     fh.close()
 
@@ -309,8 +324,8 @@ class DistributionBuilder(QtGui.QWidget):
         smtppass = '22JUL22:19:49'
         #subject = "Experiments results on " + setName + " with " + cfgName
 
-        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        RECIPIENTS = ['zhivoderov.a@gmail.com']
+        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        #RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
         #text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
@@ -384,13 +399,13 @@ class DistributionBuilder(QtGui.QWidget):
             
             printStr = ''
             if isBeforeDP:
-                printStr += 3 * ('before DP' + 12*';')
+                printStr += 3 * ('before DP' + 12*';') + 3*';'
             if isDP:
                 printStr += 3 * ('after DP' + 12*';')
             po.write(';' + printStr)
             po.write('\n')
             printStr = 9*nColumnSets*';HPWL;TNS;WNS;Time' + nColumnSets*(2*';' + 'TNS' + 8*';' + \
-                       ';min;average;;WNS' + 8*';' + ';min;average;;HPWL' + 8*';' + ';min;average')
+                       ';min;average;;WNS' + 8*';' + ';min;average;;HPWL' + 8*';' + ';min;average;;HPWL for min TNS;HPWL for min WNS')
             po.write(printStr)
         po.close()
 
