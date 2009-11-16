@@ -10,6 +10,9 @@ namespace Utils
 
   void InsertNextPoint(HDesign& design, HTimingPoint pointToPlace, HTimingPoint afterThisPoint);
   void DeletePointInList(HDesign& design, HTimingPoint pointDelete);
+
+  string MakePointFullName(HDesign& design, HTimingPoint point);
+  void PrintTopologicalOrder(HDesign& design);
 };
 
 #endif //__TIMINGPOINTUTILS_H__

@@ -34,3 +34,11 @@ void Utils::AllocatePinsForAllCells(HDesign& design, double reservePercent)
   for(HCells::CellsEnumerator i = design.Cells.GetEnumerator(); i.MoveNext(); )
     design.Pins.AllocatePins(i);
 }
+
+string Utils::MakePinFullName(HDesign& design, HPin pin)
+{
+  if (design.GetBool<HPin::IsPrimary>(pin))
+    return string("PIN ") + design.GetString<HPin::Name>(pin);
+  else
+    return design.GetString<HCell::Name>(design.Get<HPin::Cell, HCell>(pin)) + " " + design.GetString<HPin::Name>(pin);
+}

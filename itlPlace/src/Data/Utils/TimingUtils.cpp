@@ -1,4 +1,5 @@
 #include "TimingUtils.h"
+#include "TimingPointUtils.h"
 #include "Timing.h"
 
 using namespace Utils;
@@ -317,4 +318,147 @@ DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HMacroType elemen
     result.T /= outputs;
   }
   return result;
+}
+
+static bool VerifyPin(HDesign& design, HPin pin)
+{
+  HTimingPointWrapper point = design[design.TimingPoints[pin]];
+  if (::IsNull(point.Next()) && ::IsNull(point.Previous()))
+    return true;
+
+  if (design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(point.Next()) != point)
+  {
+    LOGWARNINGFORMAT(("Point [%s] breaks topological order. Previous point [%s] has [%s] as next.",
+      Utils::MakePointFullName(design, point).c_str(),
+      Utils::MakePointFullName(design, point.Next()).c_str(),
+      Utils::MakePointFullName(design, design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(point.Next())).c_str()
+      ));
+    return false;
+  }
+  if (design.Get<HTimingPoint::NextPoint, HTimingPoint>(point.Previous()) != point)
+  {
+    LOGWARNINGFORMAT(("Point [%s] breaks topological order. Next point [%s] has [%s] as previous.",
+      Utils::MakePointFullName(design, point).c_str(),
+      Utils::MakePointFullName(design, point.Previous()).c_str(),
+      Utils::MakePointFullName(design, design.Get<HTimingPoint::NextPoint, HTimingPoint>(point.Previous())).c_str()
+      ));
+    return false;
+  }
+  return true;
+}
+
+bool Utils::VerifyTimingCalculationOrder(HDesign& design)
+{
+  bool verified = true;
+  int pointscount = 0;
+
+  //1. Verify topologically ordered list integrity
+  for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
+  {
+    if (cell.PlacementStatus() == PlacementStatus_Fictive) continue;
+
+    for (HCell::PinsEnumerator pin = cell.GetPinsEnumerator(); pin.MoveNext(); )
+    {
+      verified = VerifyPin(design, pin);
+      pointscount++;
+    }
+  }
+
+  for (HPins::PrimariesEnumerator pad = design.Pins.GetEnumerator(); pad.MoveNext(); )
+  {
+    verified = VerifyPin(design, pad);
+    pointscount++;
+  }
+
+  if (!verified) return verified;
+
+  //2. Verify/detect cycles
+  int idx = 0;
+  for (HTimingPointWrapper point = design[design.TimingPoints.TopologicalOrderRoot()]; !::IsNull(point.GoNext()); )
+  {
+    idx++;
+    if (idx > pointscount)
+    {
+      verified = false;
+      LOGWARNING("Detected cycle in topological order.");
+      break;
+    }
+  }
+
+  idx = 0;
+  for (HTimingPointWrapper point = design[design.TimingPoints.TopologicalOrderRoot()]; !::IsNull(point.GoPrevious()); )
+  {
+    idx++;
+    if (idx > pointscount)
+    {
+      verified = false;
+      LOGWARNING("Detected cycle in topological backward order.");
+      break;
+    }
+  }
+
+  if (!verified) return verified;
+
+  //3. Verify timing start and end points
+  HTimingPoint root = design.TimingPoints.TopologicalOrderRoot();
+
+  //start points
+  HTimingPointWrapper sp = design[root];
+  int spCount = 0;
+
+  while (sp.GoNext().IsTimingStartPoint())
+    spCount++;
+
+  if (sp != design.TimingPoints.FirstInternalPoint())
+  {
+    LOGWARNINGFORMAT(("Timing start points are calculated incorrectly. First internal is [%s] instead of [%s].",
+      Utils::MakePointFullName(design, sp).c_str(),
+      Utils::MakePointFullName(design, design.TimingPoints.FirstInternalPoint()).c_str()
+      ));
+    verified = false;
+  }
+  if (spCount != design.TimingPoints.StartPointsCount())
+  {
+    LOGWARNINGFORMAT(("Timing start points are calculated incorrectly. There are %d points instead of %d.",
+      spCount,
+      design.TimingPoints.StartPointsCount()
+      ));
+    verified = false;
+  }
+
+  //end points
+  HTimingPointWrapper ep = design[root];
+  int epCount = 0;
+
+  while (ep.GoPrevious().IsTimingEndPoint())
+    epCount++;
+
+  if (ep != design.TimingPoints.LastInternalPoint())
+  {
+    LOGWARNINGFORMAT(("Timing end points are calculated incorrectly. Last internal is [%s] instead of [%s].",
+      Utils::MakePointFullName(design, ep).c_str(),
+      Utils::MakePointFullName(design, design.TimingPoints.LastInternalPoint()).c_str()
+      ));
+    verified = false;
+  }
+  if (epCount != design.TimingPoints.EndPointsCount())
+  {
+    LOGWARNINGFORMAT(("Timing end points are calculated incorrectly. There are %d points instead of %d.",
+      epCount,
+      design.TimingPoints.EndPointsCount()
+      ));
+    verified = false;
+  }
+
+  //internal points
+  while (sp.GoNext() != ep)
+    if (sp.IsTimingStartPoint() || sp.IsTimingEndPoint())
+    {
+      LOGWARNINGFORMAT(("Timing start/end point is placed inside internal points. Point name is [%s].",
+        Utils::MakePointFullName(design, sp).c_str()
+      ));
+      verified = false;
+    }
+
+  return verified;
 }

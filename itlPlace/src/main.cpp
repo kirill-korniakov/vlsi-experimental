@@ -216,7 +216,10 @@ int main(int argc, char** argv)
     //BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
-      TestBuffering(hd);
+      if (hd.cfg.ValueOf("Buffering.BufferingType", "Test") == string("Test"))
+        TestBuffering(hd);
+      else
+        NetlistBuffering(hd);
     }
 
     //EXPORT

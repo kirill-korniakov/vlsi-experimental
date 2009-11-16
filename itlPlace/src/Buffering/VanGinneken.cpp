@@ -554,6 +554,7 @@ int VanGinneken::InsertBuffers(HNet& net)
     vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
     ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
     Utils::RestoreBufferedNet(m_hd, net);
+    ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
     // (1) –¿— ŒÃ≈Õ“»–Œ¬¿“‹ ≈—À» ¬—“¿¬ ¿ ¡”‘≈–¿ ¬ ƒ–¿…¬≈– Õ≈ Õ”∆Õ¿
     return nBuffersInserted;
   }
@@ -584,6 +585,7 @@ int VanGinneken::InsertBuffers(HNet& net)
   double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
   ALERTFORMAT(("vgSlack = %f", vgSlack ));
   Utils::RestoreBufferedNet(m_hd, net);
+  ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
   STA(m_hd);
 
   return 1;
@@ -658,6 +660,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     m_nReverts++;
 
     Utils::RestoreBufferedNet(m_hd, net);
+    ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
 
     return 0;
   }
@@ -693,6 +696,7 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
         HPin bufferOutput = Utils::FindCellPinByName(m_hd, insertedBuffers[bufferNumber], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferInput], source);
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferOutput], m_hd.TimingPoints[bufferInput]);
+        ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
       }
       return;
     }

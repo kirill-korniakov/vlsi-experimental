@@ -54,6 +54,7 @@ namespace Utils
     return sqrt(2.0 * ndriver.R * netLoad / wires.RPerDist / wires.LinearC);
   }
 
+  bool VerifyTimingCalculationOrder(HDesign& design);
 
 }
 

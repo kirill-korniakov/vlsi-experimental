@@ -1,4 +1,5 @@
 #include "TimingPointUtils.h"
+#include "PinUtils.h"
 
 namespace Utils
 {
@@ -85,5 +86,31 @@ namespace Utils
     design.Set<HTimingPoint::NextPoint>(pointDelete, design.TimingPoints.Null());
 
     if (needRecalc) design.TimingPoints.CountStartAndEndPoints();
+
+    if (pointDelete == design.TimingPoints.FirstInternalPoint())
+      design._Design.Timing.tpFirstInternalPoint = ::ToID(nextPoint);
+
+    if (pointDelete == design.TimingPoints.LastInternalPoint())
+      design._Design.Timing.tpLastInternalPoint = ::ToID(previousPoint);
+  }
+
+  string MakePointFullName(HDesign& design, HTimingPoint point)
+  {
+    return Utils::MakePinFullName(design, design.Get<HTimingPoint::Pin, HPin>(point));
+  }
+
+  void PrintTopologicalOrder(HDesign& design)
+  {
+    WRITELINE("=================================");
+    WRITELINE("=================================");
+    for (HTimingPointWrapper point = design[design.TimingPoints.TopologicalOrderRoot()];
+      !::IsNull(point.GoNext()); )
+    {
+      WRITELINE(Utils::MakePointFullName(design, point).c_str());
+    }
+    WRITELINE("=================================");
+    WRITELINE("=================================");
+    WRITELINE("");
+    WRITELINE("");
   }
 }
