@@ -110,7 +110,7 @@ def parseLog(logName, benchmark):
             isTiming = False
 
             # get time
-            po.write(line[1:11].replace('.', ',') + '\t')
+            po.write(line[1:11].replace('.', ',') + '\t\n')
             po.write('\t')
             continue
         

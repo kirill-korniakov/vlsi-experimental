@@ -639,7 +639,9 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
   }
 
   if (nBuffersInserted > 0) 
-  {
+  { 
+    double tns = Utils::TNS(m_hd);
+    double wns = Utils::WNS(m_hd);
     netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
 
     //m_Placement.SavePlacement(m_hd);
@@ -649,8 +651,11 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
     double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
     double maxSlack = netInfo.MaxRealDelay();
-
-    if (vgSlack < maxSlack)
+    STA(m_hd);
+    double btns = Utils::TNS(m_hd);
+    double bwns = Utils::WNS(m_hd);
+    //if (vgSlack < maxSlack)
+    if  (((tns >= btns) && (wns >= bwns)) && (vgSlack < maxSlack))
     {
       if (m_doReportBuffering)
         ALERTFORMAT(("buffer insite = %d in net %s", nBuffersInserted, m_hd.Nets.GetString<HNet::Name>(net).c_str()));
@@ -658,8 +663,10 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     }
 
     m_nReverts++;
-
+    
     Utils::RestoreBufferedNet(m_hd, net);
+
+    STA(m_hd,true);
     ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
 
     return 0;
