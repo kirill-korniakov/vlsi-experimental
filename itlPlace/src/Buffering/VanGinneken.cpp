@@ -651,7 +651,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
 
     double vgSlack = TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
     double maxSlack = netInfo.MaxRealDelay();
-    STA(m_hd);
+    STA(m_hd, false);
     double btns = Utils::TNS(m_hd);
     double bwns = Utils::WNS(m_hd);
     //if (vgSlack < maxSlack)
@@ -666,7 +666,7 @@ int VanGinneken::NetBufferNotDegradation(HNet &net)
     
     Utils::RestoreBufferedNet(m_hd, net);
 
-    STA(m_hd,true);
+    STA(m_hd, false);
     ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
 
     return 0;
@@ -1000,8 +1000,11 @@ void VanGinneken::ParseFinalVanLocation(VanGinneken::Comp *com)
   if (com->right != 0) ParseFinalVanLocation(com->right);
 
   if ((com->buffertype != 0) && (com->buffertype != -1))
-    if (FindBufferNumberByIndex(com->x) == -1)
-      m_BufferIndexes.push_back(com->x);
+    if (FindBufferNumberByIndex(com->y) == -1)
+    {
+      VGItem result;
+        m_BufferIndexes.push_back(com->y);
+    }
 }
 
 

@@ -151,10 +151,10 @@ po.close()
 
 for benchmark in testSet:
     #Run
-    logFileName = '.\\IWLS05\\' + benchmark + '.log'
+    logFileName = '.\\def\\' + benchmark + '.log'
     fPlacerOutput = open(logFileName, 'w');
     subprocess.Popen(['itlPlaceRelease.exe', 'default.cfg',
-        '--benchmark.def=.\\IWLS05\\' + benchmark + '.def'],
+        '--benchmark.def=.\\def\\' + benchmark + '.def'],
         stdout = fPlacerOutput).communicate()
     fPlacerOutput.close()
     print(benchmark + ' is done...')
