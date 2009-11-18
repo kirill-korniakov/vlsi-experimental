@@ -282,13 +282,13 @@ class DistributionBuilder(QtGui.QWidget):
         filesList = []
         groupNames = []
         group = []
-        filesListInGroups = list(list())#[[]]
+        filesListInGroups = list(list())
         cfgCommentsList = []
         stringsList  = (open(listName).read()).split('\n')
         # Perform filtering:
         stringsList = [x for x in stringsList if not x.strip().startswith('#')]
         for idx, str in enumerate(stringsList):
-            str.expandtabs()
+            str = str.expandtabs()
             if str.startswith(' '):
                 continue  # skip all cfg names in a group because they have already been processed
             if str.endswith(':'):
@@ -345,6 +345,7 @@ class DistributionBuilder(QtGui.QWidget):
     
     def RunTestsOnCfgList(self, setName):
         cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(binDir + setName + 'cfg.list')
+        #print(str(filesListInGroups))
         isDP = (self.cbIWLS05isDP.checkState() == 2) if (setName == iwls05) else (self.cbISPD04isDP.checkState() == 2)
         isBeforeDP = (self.cbIWLS05BDP.checkState() == 2) if (setName == iwls05) else (self.cbIWLS05BDP.checkState() == 2)
         
@@ -372,6 +373,7 @@ class DistributionBuilder(QtGui.QWidget):
             cfgName = defaultCfgName
         isTimingPresent = False
         pythonOutput = self.GetPythonOutput(setName, cfgName)
+        print('Config name = %s' % cfgName)
         print("Performing tests on the following set of benchmarks: " + ", ".join(testSet))
 
         po = open(pythonOutput, 'w')
