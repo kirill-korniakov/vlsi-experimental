@@ -12,6 +12,7 @@ void HCriticalPaths::Initialize(int pathsLimit)
     Grow(pathsLimit);
   m_ld->Timing.cpFirstPointIdx[0] = 0;
   m_ld->Timing.cpAfterLastPointIdx[0] = 0;
+  m_ld->Timing.cpExtractionType[0] = PathExtractionType_Arrival;
 
   m_ld->Timing.ncpEnd = 1;
   OnInitialize(pathsLimit);
@@ -22,6 +23,7 @@ void HCriticalPaths::Grow(int pathsLimit)
   int old_size = m_ld->Timing.ncpLimit;
   ::Grow(&m_ld->Timing.cpFirstPointIdx, old_size, pathsLimit);
   ::Grow(&m_ld->Timing.cpAfterLastPointIdx, old_size, pathsLimit);
+  ::Grow(&m_ld->Timing.cpExtractionType, old_size, pathsLimit);
   m_ld->Timing.ncpLimit = pathsLimit;
 
   OnGrow(old_size, pathsLimit);

@@ -1,11 +1,5 @@
 #include "Timing.h"
 
-enum PathExtractionType
-{
-  PathExtractionType_Arrival,
-  PathExtractionType_Required
-};
-
 template<PathExtractionType ext>
 inline HTimingPoint GetAncestor(const HTimingPointWrapper& point, SignalDirection dir);
 
@@ -119,6 +113,7 @@ void ExtractPath(HDesign& design, HTimingPoint extractionStartPoint, SignalDirec
     }
 
     HCriticalPath path = design.CriticalPaths.AllocatePath();
+    design.Set<HCriticalPath::ExtractionType>(path, ext);
     design.CriticalPathPoints.SetPoints(path, first_point, last_point, ext == PathExtractionType_Arrival);
   }
 }

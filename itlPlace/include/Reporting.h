@@ -47,4 +47,6 @@ void ReportCriticalPathsToLogFile(HDesign&, int n = -1);
 void PlotCriticalPathsAndSaveImages(HDesign&);
 void PlotTopCriticalPathsAndSaveImages(HDesign& design, int n = -1);
 
+void PrintCriticalPaths(HDesign& hd, int nPaths);
+
 #endif //__REPORTING_H__

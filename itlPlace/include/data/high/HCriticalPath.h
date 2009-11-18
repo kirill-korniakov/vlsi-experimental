@@ -12,7 +12,8 @@ enum Properties
   PointsCount,
   Points,
   StartPoint,
-  EndPoint
+  EndPoint,
+  ExtractionType
 };
 
 typedef HEnumerator<HCriticalPathPoint> PointsEnumerator;
@@ -44,6 +45,8 @@ BEGINHCOLLECTION(HCriticalPaths, HCriticalPath)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
+  PROPERTYA(PathExtractionType, HCriticalPath::ExtractionType, m_ld->Timing.cpExtractionType);
+
   //getters specializations
   GETTER(double, HCriticalPath::Criticality); //implemented in HExternalMethods.h
 
@@ -66,6 +69,7 @@ ENDHCOLLECTION(HCriticalPaths)
 
 BEGINWRAPPER(HCriticalPathWrapper, HCriticalPaths)
 
+  PROPERTYWD(PathExtractionType, ExtractionType);
   //Getters
   GETTERWD(int, PointsCount)
   GETTERWD(double, Criticality)

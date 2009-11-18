@@ -12,6 +12,12 @@ enum SignalDirection
   SignalDirection_Default = 0
 };
 
+enum PathExtractionType
+{
+  PathExtractionType_Arrival,
+  PathExtractionType_Required
+};
+
 struct LTiming
 {
   //binded to pins
@@ -39,6 +45,7 @@ struct LTiming
 
   int* cpFirstPointIdx;
   int* cpAfterLastPointIdx;
+  PathExtractionType* cpExtractionType;
   int ncpEnd;
   int ncpLimit;
 
@@ -64,6 +71,7 @@ struct LTiming
     this->cppSigDirection = 0;
     this->cpFirstPointIdx = 0;
     this->cpAfterLastPointIdx = 0;
+    this->cpExtractionType = 0;
     this->ncpEnd = 0;
     this->ncpLimit = 0;
   }

@@ -509,7 +509,8 @@ void SetStartPointsArrivals(HDesign& design, double clock_cycle)
         if (arc.TimingType() == TimingType_RisingEdge || arc.TimingType() == TimingType_FallingEdge)
         {
           dp.SetArrivalTime(sp, dp.GetEdgeArcOutputTime(arc, sp, this_point));
-          dp.SetArrivalAncestor(sp, design.TimingPoints[design.TimingArcTypes.GetStartPin(arc, sp.Pin())]);
+          HPin startPin = design.TimingArcTypes.GetStartPin(arc, sp.Pin());
+          dp.SetArrivalAncestor(sp, design.TimingPoints[startPin]);
         }
       }
     }
@@ -636,7 +637,11 @@ HTimingArcType FindArc(HDesign& design,
       }
     }
 
-    if (found) return wArc;
+    if (found)
+    {
+      arcSelector.AdjustArcTime(design, basePoint == startPoint ? endPoint : startPoint, inversed, arcTime);
+      return wArc;
+    }
   }//if (hd.GetInt<HPinType::TimingArcsCount>(ptype) > 0)
 
   arcTime = 0.0;
@@ -669,18 +674,30 @@ struct ArrivalArcSelector1D: public ArrivalArcSelectorBase<1>
 {
   HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::ArrivalAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1 > time2; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime -= design.GetDouble<HTimingPoint::ArrivalTime>(contrPoint);
+  }
 };
 
 struct ArrivalArcSelector2DRise: public ArrivalArcSelectorBase<2>
 {
   HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RiseArrivalAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.rise > time2.rise; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime.rise -= isInversed.rise ? design.GetDouble<HTimingPoint::FallArrivalTime>(contrPoint) : design.GetDouble<HTimingPoint::RiseArrivalTime>(contrPoint);
+  }
 };
 
 struct ArrivalArcSelector2DFall: public ArrivalArcSelectorBase<2>
 {
   HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::FallArrivalAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.fall > time2.fall; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime.fall -= isInversed.fall ? design.GetDouble<HTimingPoint::RiseArrivalTime>(contrPoint) : design.GetDouble<HTimingPoint::FallArrivalTime>(contrPoint);
+  }
 };
 
 template<int sdNum>
@@ -699,18 +716,33 @@ struct RequiredArcSelector1D: public RequiredArcSelectorBase<1>
 {
   HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RequiredAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1 < time2; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime -= design.GetDouble<HTimingPoint::RequiredTime>(contrPoint);
+    arcTime = -arcTime;
+  }
 };
 
 struct RequiredArcSelector2DRise: public RequiredArcSelectorBase<2>
 {
   HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::RiseRequiredAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.rise < time2.rise; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime.rise -= isInversed.rise ? design.GetDouble<HTimingPoint::FallRequiredTime>(contrPoint) : design.GetDouble<HTimingPoint::RiseRequiredTime>(contrPoint);
+    arcTime.rise = -arcTime.rise;
+  }
 };
 
 struct RequiredArcSelector2DFall: public RequiredArcSelectorBase<2>
 {
   HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return design.Get<HTimingPoint::FallRequiredAncestor, HTimingPoint>(basePoint); }
   bool FirstTimeIsWorse(TimeType time1, TimeType time2) const { return time1.fall < time2.fall; }
+  void AdjustArcTime(HDesign& design, HTimingPoint contrPoint, BoolType& isInversed, TimeType& arcTime) const
+  {
+    arcTime.fall -= isInversed.fall ? design.GetDouble<HTimingPoint::RiseRequiredTime>(contrPoint) : design.GetDouble<HTimingPoint::FallRequiredTime>(contrPoint);
+    arcTime.fall = -arcTime.fall;
+  }
 };
 
 void GetArrivalRisingArc(HDesign& hd,
