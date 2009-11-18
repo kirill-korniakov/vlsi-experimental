@@ -1,0 +1,90 @@
+#ifndef __TIMING_POINT_MUS__
+#define __TIMING_POINT_MUS__
+
+#include "HDesign.h"
+
+class TimingPointMus
+{
+public:
+  TimingPointMus(HDesign& design);
+  ~TimingPointMus();
+
+  void UpdateMus(HDesign& design);
+  void ReportMus(HDesign& design);
+
+  void GetNetMus(HDesign& design, HNet net,
+                 std::vector<double>& cellArcMus, 
+                 std::vector<double>& netArcMus);
+
+private:
+
+  double* MuS;
+  std::vector<double>* MuIn;
+  int size;
+
+  void GetMuIn(HDesign& design, HTimingPoint pt, std::vector<double>& inMus);
+  void GetMuOut(HDesign& design, HTimingPoint pt, std::vector<double>& outMus);
+
+  int GetMuInCount(HTimingPoint pt) const { return MuIn[::ToID(pt)].size() / 2; }
+
+  double GetMuS(HTimingPoint pt) const { return MuS[::ToID(pt)]; }
+  double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
+  double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }
+
+  void SetMuS(HTimingPoint pt, double value) const { MuS[::ToID(pt)] = value; }
+  void SetMuInA(HTimingPoint pt, int index, double value) const { MuIn[::ToID(pt)][index] = value; }
+  void SetMuInR(HTimingPoint pt, int index, double value) const {  MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = value; }
+
+  double SumOutMuA(HDesign& design, HTimingPoint pt);
+  double SumOutMuR(HDesign& design, HTimingPoint pt);
+
+  void UpdateOutMuR(HDesign& design, HTimingPoint pt, double multiplier);
+
+  struct AccumulateMu
+  {
+    bool UseArrival;
+    double sum;
+    AccumulateMu(bool useArrival):UseArrival(useArrival), sum(0.0) {}
+
+    void operator() (TimingPointMus& pm, HTimingPoint pt, int idx)
+    {
+      if (UseArrival)
+        sum += pm.GetMuInA(pt, idx);
+      else
+        sum += pm.GetMuInR(pt, idx);
+    }
+  };
+
+  struct GetMuOutVector
+  {
+    std::vector<double>& muOut;
+
+    GetMuOutVector(std::vector<double>& vec): muOut(vec)
+    {
+      muOut.clear();
+    } 
+
+    void operator() (TimingPointMus& pm, HTimingPoint pt, int idx)
+    {
+      muOut.push_back(pm.GetMuInA(pt, idx) + pm.GetMuInR(pt, idx));
+    }
+  };
+
+  struct UpdateMuR
+  {
+    double Multiplier;
+    UpdateMuR(double multiplier):Multiplier(multiplier) {}
+
+    void operator() (TimingPointMus& pm, HTimingPoint pt, int idx)
+    {
+      pm.SetMuInR(pt, idx, Multiplier * pm.GetMuInR(pt, idx));
+    }
+  };
+
+  template<class Action>
+  void IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo);
+
+  void InitPoint(HDesign& design, HTimingPoint pt);
+};
+
+#endif

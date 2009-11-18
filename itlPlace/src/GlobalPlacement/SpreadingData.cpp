@@ -126,7 +126,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   //if (useNetWeights)
   {
     int nNets = context.ci->netList.size();//hd.Nets.Count();
-    HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW();
+    HNets::ActiveNetsEnumeratorW netW = hd.Nets.GetNetsEnumeratorW();
 
     for (int i = 0; i < nNets && netW.MoveNext(); ++i)
     {

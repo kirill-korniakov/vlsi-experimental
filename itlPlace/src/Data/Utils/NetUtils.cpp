@@ -194,6 +194,7 @@ namespace Utils
         if (hd.cfg.ValueOf("Timing.reportSkippedNets", false))
           ReportNetPins(hd, net);
         SkipNet(hd, net);
+        ALERTFORMAT(("\tNet \"%s\" skipped", net.Name().c_str()));
         nSkipped++;
       }
     }

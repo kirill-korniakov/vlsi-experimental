@@ -640,6 +640,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\GlobalPlacement\PlacementQualityAnalyzer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Auxiliary\PlacementStorage.cpp"
 					>
 				</File>
@@ -657,10 +661,6 @@
 				</File>
 				<File
 					RelativePath="..\src\GlobalPlacement\PinPlacement.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\GlobalPlacement\PlacementQualityAnalyzer.cpp"
 					>
 				</File>
 				<File
@@ -707,13 +707,17 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\MuCalculations.cpp"
+						RelativePath="..\src\GlobalPlacement\TimingPointMus.cpp"
 						>
 					</File>
 				</Filter>
 				<Filter
 					Name="Spreading"
 					>
+					<File
+						RelativePath="..\src\GlobalPlacement\LRSpreading.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\src\GlobalPlacement\Spreading.cpp"
 						>
@@ -5617,10 +5621,6 @@
 					RelativePath="..\include\GlobalPlacement.h"
 					>
 				</File>
-				<File
-					RelativePath="..\include\PlacementQualityAnalyzer.h"
-					>
-				</File>
 				<Filter
 					Name="ObjectivesConstraints"
 					>
@@ -5661,7 +5661,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\MuCalculations.h"
+						RelativePath="..\include\TimingPointMus.h"
 						>
 					</File>
 				</Filter>
@@ -5767,6 +5767,10 @@
 				</File>
 				<File
 					RelativePath="..\include\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\PlacementQualityAnalyzer.h"
 					>
 				</File>
 				<File

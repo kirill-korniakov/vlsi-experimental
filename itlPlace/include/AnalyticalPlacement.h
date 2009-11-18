@@ -8,22 +8,22 @@ namespace AnalyticalGlobalPlacement
 {
   void ReportTimes();
   void ReportIterationInfo(ClusteringInformation& ci, AppCtx& user);
-  void ReportBinGridInfo(AppCtx& user);
+  void ReportBinGridInfo(AppCtx& context);
 
   void InitializeDataStructures(std::vector<Cluster>& clusters, NetList& netList);  
-  int InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
+  int InitializeTAO(HDesign& hd, ClusteringInformation& ci, AppCtx &context, 
     Vec& x, Vec& xl, Vec& xu, 
     TAO_SOLVER& tao, TAO_APPLICATION& taoapp);
   
   int Relaxation(HDesign& hd, ClusteringInformation& ci);
   int Interpolation(HDesign& hd, ClusteringInformation& ci);
   
-  int Solve(HDesign &hd, ClusteringInformation& ci, AppCtx &context, TAO_APPLICATION taoapp, 
+  int Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, TAO_APPLICATION taoapp, 
     TAO_SOLVER tao, Vec x);
 
-  void UpdateMu( AppCtx &user, HDesign &hd, int iterate );
+  int ReportTerminationReason( int retCode, TAO_SOLVER tao );
 
-  void SetVariablesValues(ClusteringInformation & ci, Vec& x);
+  void SetVariablesValues(ClusteringInformation& ci, Vec& x);
   void GetVariablesValues(ClusteringInformation& ci, Vec x);
   void PlaceToTheCenterIntially(HDesign& hd, ClusteringInformation& ci);
   void UpdateCellsCoordinates(HDesign& hd, ClusteringInformation& ci);

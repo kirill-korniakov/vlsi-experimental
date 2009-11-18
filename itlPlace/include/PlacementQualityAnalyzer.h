@@ -7,6 +7,19 @@
 
 class PlacementQualityAnalyzer
 {
+public:
+  PlacementQualityAnalyzer(HDesign& design);
+  ~PlacementQualityAnalyzer();
+
+  void AnalyzeQuality(int id);
+  void Report();
+
+  void SaveCurrentPlacementAsBestAchieved();
+  void RestoreBestAchievedPlacement();
+
+  bool IsAcceptableImprovementAchieved();
+  bool IsNextIterationApproved();
+
 private:
   struct PlacementQuality
   {
@@ -26,23 +39,10 @@ private:
   int nIterationsWithoutGain;
   double m_BestPlacementHPWLLegalized;
   
-  PlacementStorage m_Placement;//made class member to minimize nemory allocations count
+  PlacementStorage m_Placement; //NOTE: made class member to minimize memory allocations count
   PlacementStorage m_BestPlacement;
 
   double LastIterImprovement();
-
-public:
-  PlacementQualityAnalyzer(HDesign& design);
-  ~PlacementQualityAnalyzer();
-
-  void AnalyzeQuality(int id);
-  void Report();
-
-  void SaveCurrentPlacementAsBestAchieved();
-  void RestoreBestAchievedPlacement();
-  
-  bool IsAcceptableImprovementAchieved();
-  bool IsNextIterationApproved();
 };
 
 #endif //__PLACEMENT_QUALITY_ANALYZER__

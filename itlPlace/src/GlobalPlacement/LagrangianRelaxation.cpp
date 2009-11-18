@@ -6,13 +6,13 @@ extern timetype expTime;
 double GetCi(AppCtx* context, int netIdx, int sinkIdx)
 {
   return context->LRdata.r * context->LRdata.c 
-    * context->LRdata.netLRData[netIdx].muNetVector[sinkIdx-1];
+    * context->LRdata.netLRData[netIdx].netArcMus[sinkIdx-1];
 }
 
 double GetBi(AppCtx* context, int netIdx, int sinkIdx)
 {
   return context->LRdata.r 
-    * context->LRdata.netLRData[netIdx].muNetVector[sinkIdx-1] 
+    * context->LRdata.netLRData[netIdx].netArcMus[sinkIdx-1] 
     * context->LRdata.netLRData[netIdx].sinkLoad[sinkIdx-1];
 }
 

@@ -357,8 +357,8 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
           double gradY;
           CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
             /*potX,*/ gradX, /*potY,*/ gradY);
-          gX += context->spreadingData.muSpreading * gradX;
-          gY += context->spreadingData.muSpreading * gradY;
+          gX += context->spreadingData.spreadingWeight * gradX;
+          gY += context->spreadingData.spreadingWeight * gradY;
         }
       }
 
@@ -371,7 +371,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
 void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution, double* &f)
 {
   timetype start = GET_TIME_METHOD();
-  *f += context->spreadingData.muSpreading * SpreadingPenalty(context, solution);
+  *f += context->spreadingData.spreadingWeight * SpreadingPenalty(context, solution);
   //ALERTFORMAT(("SPR = %f", addValue));
   timetype finish = GET_TIME_METHOD();
   quadraticSpreading += finish - start;
@@ -380,16 +380,6 @@ void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution, double*
   AddSpreadingPenaltyGradient(context, solution, context->gQS);
   finish = GET_TIME_METHOD();
   quadraticSpreadingGradTime += finish - start;
-}
-
-void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*& f)
-{
-  SpreadingPenalty(context, solution);
-  *f += Aux::ScalarProduct(context->spreadingData.muBinsPen, 
-    context->spreadingData.binsPenaltyValues, 
-    context->spreadingData.binGrid.nBins);
-  //ALERTFORMAT(("LRS = %f", addValue));
-  AddSpreadingPenaltyGradient(context, solution, context->gQS); //FIXME:HACK: use proper gradient
 }
 
 double CalculateDiscrepancy(Vec& x, void* data)

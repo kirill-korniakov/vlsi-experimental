@@ -15,6 +15,7 @@
 #include "GlobalPlacement.h"
 #include "ObjectivesConstraints.h"
 #include "Spreading.h"
+#include "MuCalculations.h"
 #include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 
@@ -307,7 +308,7 @@ void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
   ALERTFORMAT(("Average movement %f", averageMovement));
 }
 
-void ReportTerminationReason(TaoTerminateReason reason)
+void PrintReason(TaoTerminateReason reason)
 {
   char message[256];
 
@@ -367,30 +368,6 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
     HCell cell = ci.clusters[clusterIdx].cells[0]; //Utils::FindCellByName(hd, ci.clusters[clusterIdx].cells[0]);
     ci.clusters[clusterIdx].xCoord = hd.GetDouble<HCell::X>(cell) + hd.GetDouble<HCell::Width>(cell)/2.0;
     ci.clusters[clusterIdx].yCoord = hd.GetDouble<HCell::Y>(cell) + hd.GetDouble<HCell::Height>(cell)/2.0;
-  }
-}
-
-void AnalyticalGlobalPlacement::UpdateMu(AppCtx& context, HDesign& hd, int iterate)
-{
-  context.spreadingData.muSpreading     *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
-
-  if (context.useLRSpreading)
-  {
-    BinGrid& binGrid = context.spreadingData.binGrid;
-
-    for (int i = 0; i < binGrid.nBinRows; ++i)
-    {
-      for (int j = 0; j < binGrid.nBinCols; ++j)
-      {
-        context.spreadingData.muBinsPen[i * binGrid.nBinCols + j] += 
-          context.spreadingData.muInitial 
-          * pow(context.spreadingData.muInitial, 0.2) 
-          / pow(2.0, iterate)
-          * (binGrid.bins[i][j].sumPotential - context.spreadingData.desiredCellsAreaAtEveryBin)
-          * (binGrid.bins[i][j].sumPotential - context.spreadingData.desiredCellsAreaAtEveryBin);
-      }
-    }
   }
 }
 
@@ -595,6 +572,32 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   return OK;
 }
 
+void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
+{
+  context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
+  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
+
+  UpdateLRSpreadingMu(context, hd, 32); //TODO: ISSUE 18 COMMENT 12
+
+  context.LRdata.UpdateMultipliers(hd);
+}
+
+int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
+{
+  int retCode = 0;
+
+  //Get termination information
+  double f;
+  double gnorm;
+  double cnorm;
+  double xdiff;
+  TaoTerminateReason reason;  // termination reason
+  retCode = TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason); CHKERRQ(retCode);
+  PrintReason(reason);
+
+  return retCode;
+}
+
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x)
 {
@@ -633,7 +636,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     WRITELINE("");
     ALERTFORMAT(("TAO iteration %d.%d", metaIteration, iteration++));
     if (context.useQuadraticSpreading)
-      ALERTFORMAT(("muSpreading = %.20f", context.spreadingData.muSpreading));
+      ALERTFORMAT(("spreadingWeight = %.20f", context.spreadingData.spreadingWeight));
     if (context.useBorderPenalty)
       ALERTFORMAT(("muBorderPenalty = %.20f", context.muBorderPenalty));
     ALERTFORMAT(("HPWL initial   = %f", Utils::CalculateHPWL(hd, true)));
@@ -643,16 +646,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
     // Tao solve the application
     retCode = TaoSolveApplication(taoapp, tao); CHKERRQ(retCode);
-
-    //Get termination information
-    int innerTAOIterations;
-    double f;
-    double gnorm;
-    double cnorm;
-    double xdiff;
-    TaoTerminateReason reason;  // termination reason
-    retCode = TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason); CHKERRQ(retCode);
-    ReportTerminationReason(reason);
+    
+    int innerTAOIterations = 0;
+    retCode = ReportTerminationReason(tao, innerTAOIterations); CHKERRQ(retCode);
 
     // if found any solution
     if (innerTAOIterations >= 1)
@@ -662,7 +658,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       discrepancy = CalculateDiscrepancy(x, &context);
     }
 
-    UpdateMu(context, hd, 32); //TODO: ISSUE 18 COMMENT 12
+    UpdateWeights(context, hd, 32);
 
     //print iteration info
     ALERTFORMAT(("discrepancy = %f", discrepancy));

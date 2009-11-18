@@ -14,7 +14,7 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   //The following coefficient greatly affects quality of placement
   //because it determines initial distribution of cells over bins. 
   //We have to choose small value to keep good HPWL.
-  double muInitialmultiplier = context->hd->cfg.ValueOf("TAOOptions.muInitialMultiplier", 0.1);
+  double spreadingWeightInitialMultiplier = context->hd->cfg.ValueOf("TAOOptions.spreadingWeightInitialMultiplier", 0.1);
   PrecalcExponents(context, x);
 
   //calculate criteria value
@@ -34,18 +34,18 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   //ALERTFORMAT(("penaltyValue = %f", penaltyValue));
 
   //calculate mu value
-  context->spreadingData.muInitial = muInitialmultiplier * (*criteriaValue) / penaltyValue;
-  context->spreadingData.muSpreading = context->spreadingData.muInitial;
+  context->spreadingData.spreadingWeightInitial = spreadingWeightInitialMultiplier * (*criteriaValue) / penaltyValue;
+  context->spreadingData.spreadingWeight = context->spreadingData.spreadingWeightInitial;
 
   if (context->useLRSpreading)
   {
     for (int i = 0; i < context->spreadingData.binGrid.nBins; ++i)
     {
-      context->spreadingData.muBinsPen[i] = context->spreadingData.muInitial;
+      context->spreadingData.muBinsPen[i] = context->spreadingData.spreadingWeightInitial;
     }
   }
 
-  context->muBorderPenalty = context->spreadingData.muInitial;
+  context->muBorderPenalty = context->spreadingData.spreadingWeightInitial;
 }
 
 void SetGradientToZero(double* gradient, int nComponents)

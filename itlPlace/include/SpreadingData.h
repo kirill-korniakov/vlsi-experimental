@@ -36,8 +36,8 @@ struct SpreadingData
   double    invPSX;
   double    invPSY;
 
-  double    muInitial;
-  double    muSpreading;
+  double    spreadingWeightInitial;
+  double    spreadingWeight;
   double*   muBinsPen;
 
   double*   binsPenaltyValues;

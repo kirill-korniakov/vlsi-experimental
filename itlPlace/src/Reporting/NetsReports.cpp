@@ -75,7 +75,7 @@ void ReportCountNetsWithTypes(HDesign& design)
 void ReportNetTiming(HDesign& design, HNet net)
 {
   HNetWrapper netW = design[net]; 
-  double RAT, AAT;
+  double RAT, AAT, NS;
   string pinName;
   ALERTFORMAT(("Reporting net %s timing", netW.Name().c_str()));
   
@@ -84,6 +84,7 @@ void ReportNetTiming(HDesign& design, HNet net)
     HTimingPointWrapper tp = design[design.TimingPoints[currPin]];
     RAT = tp.RequiredTime();
     AAT = tp.ArrivalTime();
+    NS = tp.NegativeSlack();
 
     if (currPin.IsPrimary())
       pinName = currPin.Name();
@@ -92,5 +93,6 @@ void ReportNetTiming(HDesign& design, HNet net)
 
     ALERTFORMAT(("RAT at %s\t= %.10f", pinName.c_str(), RAT));
     ALERTFORMAT(("AAT at %s\t= %.10f", pinName.c_str(), AAT));
+    ALERTFORMAT(("NS at %s\t= %.10f", pinName.c_str(), NS));
   }
 }
