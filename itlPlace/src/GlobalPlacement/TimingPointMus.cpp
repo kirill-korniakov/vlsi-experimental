@@ -1,4 +1,6 @@
 #include "TimingPointMus.h"
+#include "Utils.h"
+#include "STA.h"
 
 int CalcNumberOfLRArc(HDesign& design, HNet net)
 {
@@ -22,12 +24,47 @@ TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0)
 
   for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()]; !::IsNull(sp.GoNext()); )
     InitPoint(design, sp);
+
+  EnforceFlowProperty(design);
 }
 
 TimingPointMus::~TimingPointMus()
 {
   ::Grow(&MuS, size, 0);
   ::Grow(&MuIn, size, 0);
+}
+
+void TimingPointMus::EnforceArrivalFlowProperty(HDesign& design, HTimingPoint pt)
+{
+  double leftSum = SumInMuA(pt);
+  double rightSum = GetMuS(pt) + SumOutMuA(design, pt);
+
+  UpdateInMuA(pt, rightSum / leftSum);
+}
+
+void TimingPointMus::EnforceRequiredFlowProperty(HDesign& design, HTimingPoint pt)
+{
+  double leftSum = SumInMuR(pt) + GetMuS(pt);
+  double rightSum =  SumOutMuR(design, pt);
+
+  UpdateOutMuR(design, pt, leftSum / rightSum);
+}
+
+void TimingPointMus::EnforceFlowProperty(HDesign& design)
+{
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    !::IsNull(pt.GoNext()); )
+  {
+    EnforceRequiredFlowProperty(design, pt);
+  }
+
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    !::IsNull(pt.GoPrevious()); )
+  {
+    EnforceArrivalFlowProperty(design, pt);
+  }
+
+  //ReportMus(design);
 }
 
 void TimingPointMus::ReportMus(HDesign& design)
@@ -127,7 +164,26 @@ void TimingPointMus::InitPoint(HDesign& design, HTimingPoint pt)
 
 void TimingPointMus::UpdateMus(HDesign& design)
 {
-  //FIXME: create implementation
+  STA(design);
+
+  double wns = Utils::WNS(design);
+  double ns = 0.0;
+  double factor;
+
+  for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()]; 
+       !::IsNull(sp.GoNext()); )
+  {
+    ns = sp.NegativeSlack();
+    factor = (ns / wns) * (ns / wns);
+    for (int i = 0; i < GetMuInCount(sp); i++)
+    {
+      SetMuInA(sp, i, GetMuInA(sp, i) * factor);
+      SetMuInR(sp, i, GetMuInR(sp, i) * factor);
+    }
+    SetMuS(sp, GetMuS(sp) * factor);
+  }
+
+  EnforceFlowProperty(design);
 }
 
 void TimingPointMus::GetNetMus(HDesign& design, HNet net, 
@@ -139,4 +195,32 @@ void TimingPointMus::GetNetMus(HDesign& design, HNet net,
 
   GetMuIn(design, point, cellArcMus);
   GetMuOut(design, point, netArcMus);
+}
+
+double TimingPointMus::SumInMuA(HTimingPoint pt)
+{
+  double sum = 0.0;
+  for (int i = 0; i < GetMuInCount(pt); i++)
+  {
+    sum += GetMuInA(pt, i);
+  }
+  return sum;
+}
+
+double TimingPointMus::SumInMuR(HTimingPoint pt )
+{
+  double sum = 0.0;
+  for (int i = 0; i < GetMuInCount(pt); i++)
+  {
+    sum += GetMuInR(pt, i);
+  }
+  return sum;
+}
+
+void TimingPointMus::UpdateInMuA(HTimingPoint pt, double multiplier)
+{
+  for (int i = 0; i < GetMuInCount(pt); i++)
+  {
+    SetMuInA(pt, i, GetMuInA(pt, i) * multiplier);
+  }
 }

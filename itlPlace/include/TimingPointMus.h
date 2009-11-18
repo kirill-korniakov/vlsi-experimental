@@ -22,6 +22,10 @@ private:
   std::vector<double>* MuIn;
   int size;
 
+  void EnforceFlowProperty(HDesign& design);
+  void EnforceArrivalFlowProperty(HDesign& design, HTimingPoint pt);
+  void EnforceRequiredFlowProperty(HDesign& design, HTimingPoint pt);
+
   void GetMuIn(HDesign& design, HTimingPoint pt, std::vector<double>& inMus);
   void GetMuOut(HDesign& design, HTimingPoint pt, std::vector<double>& outMus);
 
@@ -31,14 +35,18 @@ private:
   double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
   double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }
 
-  void SetMuS(HTimingPoint pt, double value) const { MuS[::ToID(pt)] = value; }
-  void SetMuInA(HTimingPoint pt, int index, double value) const { MuIn[::ToID(pt)][index] = value; }
-  void SetMuInR(HTimingPoint pt, int index, double value) const {  MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = value; }
+  double BorderValue(double value) { return max(0.01, min(value, 0.99)); }
+  void SetMuS(HTimingPoint pt, double value) { MuS[::ToID(pt)] = BorderValue(value); }
+  void SetMuInA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = BorderValue(value); }
+  void SetMuInR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = BorderValue(value); }
 
+  double SumInMuA(HTimingPoint pt);
+  double SumInMuR(HTimingPoint pt);
   double SumOutMuA(HDesign& design, HTimingPoint pt);
   double SumOutMuR(HDesign& design, HTimingPoint pt);
 
   void UpdateOutMuR(HDesign& design, HTimingPoint pt, double multiplier);
+  void UpdateInMuA(HTimingPoint pt, double multiplier);
 
   struct AccumulateMu
   {

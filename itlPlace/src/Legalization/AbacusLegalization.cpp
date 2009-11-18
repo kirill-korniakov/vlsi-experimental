@@ -206,16 +206,17 @@ double GetMultiplier(HCell cell, HDesign& hd)
 void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const double multiplier)
 {
   FindCriticalPaths(hd);
-  for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
+
+  for (HCriticalPaths::EnumeratorW cpIter = hd.CriticalPaths.GetEnumeratorW(); cpIter.MoveNext();)
   {
-    for (HCriticalPath::PointsEnumeratorW pointsEnumW = critPathEnumW.GetEnumeratorW(); pointsEnumW.MoveNext();)
+    for (HCriticalPath::PointsEnumeratorW pIter = cpIter.GetEnumeratorW(); pIter.MoveNext();)
     {
-      HPinWrapper pin  = hd[hd.Get<HTimingPoint::Pin, HPin>(pointsEnumW.TimingPoint())];
-      HNetWrapper netW = hd[pin.Net()];
-      //HCell cell = pin.Cell();
-      for (HNetWrapper::PinsEnumeratorW currPin = netW.GetPinsEnumeratorW(); currPin.MoveNext(); )
+      HPinWrapper pin = hd[hd.Get<HTimingPoint::Pin, HPin>(pIter.TimingPoint())];
+
+      if (hd.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT &&
+        !::IsNull(pin.Cell()))
       {
-        HCell cell = currPin.Cell();
+        HCell cell = pin.Cell();
 
         for (int i = 0; i < nWCells; i++)
         {
@@ -227,11 +228,40 @@ void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const
             break;
           }
         }
-      }      
-      pointsEnumW.MoveNext();
+      }
     }
   }
 }
+
+//void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const double multiplier)
+//{
+//  FindCriticalPaths(hd);
+//  for (HCriticalPaths::EnumeratorW cpIter = hd.CriticalPaths.GetEnumeratorW(); cpIter.MoveNext();)
+//  {
+//    for (HCriticalPath::PointsEnumeratorW pIter = cpIter.GetEnumeratorW(); pIter.MoveNext();)
+//    {
+//      HPinWrapper pin  = hd[hd.Get<HTimingPoint::Pin, HPin>(pIter.TimingPoint())];
+//      HNetWrapper netW = hd[pin.Net()];
+//      //HCell cell = pin.Cell();
+//      for (HNetWrapper::PinsEnumeratorW currPin = netW.GetPinsEnumeratorW(); currPin.MoveNext(); )
+//      {
+//        HCell cell = currPin.Cell();
+//
+//        for (int i = 0; i < nWCells; i++)
+//        {
+//          if (wCells[i].cell == cell)
+//          {
+//            if (wCells[i].weightMultiplier < 1000)
+//              wCells[i].weightMultiplier *= multiplier;
+//            //ALERTFORMAT(("Weight: %f", wCells[i].weightMultiplier));
+//            break;
+//          }
+//        }
+//      }      
+//      pIter.MoveNext();
+//    }
+//  }
+//}
 
 void AbacusLegalization(HDPGrid& grid)
 {
