@@ -390,7 +390,7 @@ inline void CalculateWireDelays(HDesign& design)
 
   DelayCalculationInternals::PointsContainer ptContainer(design.cfg.ValueOf(".initialNetPointsReserve", 90));
 
-  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
     CalculateNetDelays<lmodel, smodel>(design, net, ptContainer);
 
   //ALERT("RC EXTRACTION & DELAY CALCULATION FINISHED");

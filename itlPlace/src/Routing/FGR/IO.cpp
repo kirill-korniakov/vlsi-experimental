@@ -431,7 +431,7 @@ void FGR::parseInputAsLab(HDPGrid& grid)
   double yMax    = grid.RowY(0);
   unsigned nNets = 0;
 
-  for (HNets::NetsEnumeratorW curNet = grid.Design().Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+  for (HNets::ActiveNetsEnumeratorW curNet = grid.Design().Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
   {
     for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
     {
@@ -461,7 +461,7 @@ void FGR::parseInputAsLab(HDPGrid& grid)
   double c_tileHeight = (yMax - yMin) / yTiles;
 
   //for(unsigned i = 0; i < nNets; ++i)
-  for (HNets::NetsEnumeratorW nIter = grid.Design().Nets.GetNetsEnumeratorW(); nIter.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW nIter = grid.Design().Nets.GetActiveNetsEnumeratorW(); nIter.MoveNext(); )
   {
     Net temp;
     unsigned numPins;

@@ -45,6 +45,6 @@ void HPWLRoute(HDesign& aDesign, HNet& aNet)
 
 void HPWLRoute(HDesign &aDesign)
 {
-  for(HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetNetsEnumeratorW(); niter.MoveNext(); )
+  for(HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetActiveNetsEnumeratorW(); niter.MoveNext(); )
     HPWLRoute(aDesign, niter);
 }

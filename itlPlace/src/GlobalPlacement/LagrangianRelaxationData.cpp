@@ -31,7 +31,7 @@ void LRData::UpdateMultipliers(HDesign& hd)
   actualMus->UpdateMus(hd);
 
   int netIdx = 0;
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
     AssignNetLRData(hd, net, netIdx);
     netIdx++;
@@ -44,7 +44,7 @@ void LRData::InitializeNets(HDesign& hd)
 
   //init sink load
   int netIdx = 0;
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
     for (HNet::SinksEnumeratorW sink = net.GetSinksEnumeratorW(); sink.MoveNext(); )
     {

@@ -196,6 +196,6 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
 
 void FLUTERoute(HDesign& aDesign)
 {
-  for (HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetNetsEnumeratorW(); niter.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetActiveNetsEnumeratorW(); niter.MoveNext(); )
     FLUTERoute(aDesign, niter);
 }

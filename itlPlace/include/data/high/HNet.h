@@ -68,7 +68,7 @@ BEGINHCOLLECTION(HNets, HNet)
   NetsEnumerator GetFullEnumerator() const 
     { return NetsEnumerator(m_ld->NetList.nNetsEnd); }
   NetsEnumeratorW GetFullEnumeratorW();
-  ActiveNetsEnumeratorW GetNetsEnumeratorW();
+  ActiveNetsEnumeratorW GetActiveNetsEnumeratorW();
   
   int Count() const
     { return m_ld->NetList.nNetsEnd - 1; }
@@ -161,17 +161,18 @@ BEGINWRAPPER(HNetWrapper, HNets)
 
 ENDWRAPPER(HNetWrapper)
 
-class HNets::ActiveNetsEnumeratorW : public HNets::NetsEnumeratorW
+class HNets::ActiveNetsEnumeratorW : public HEnumeratorW<HNetWrapper, HNets, 1>
 {
+  typedef HEnumeratorW<HNetWrapper, HNets, 1> BaseEnumeratorW;
 public:
   ActiveNetsEnumeratorW(HNets* nt, IDType start, IDType end)
-    : NetsEnumeratorW(nt, start, end)
+    : BaseEnumeratorW(nt, start, end)
   {
   }
 
   bool MoveNext()
   {
-    while(NetsEnumeratorW::MoveNext())
+    while(BaseEnumeratorW::MoveNext())
       if(this->Kind() == NetKind_Active)
         return true;
     return false;
@@ -181,7 +182,7 @@ public:
 inline HNets::NetsEnumeratorW HNets::GetFullEnumeratorW()
   { return NetsEnumeratorW(this, 1, m_ld->NetList.nNetsEnd); }
 
-inline HNets::ActiveNetsEnumeratorW HNets::GetNetsEnumeratorW()
+inline HNets::ActiveNetsEnumeratorW HNets::GetActiveNetsEnumeratorW()
   { return ActiveNetsEnumeratorW(this, 1, m_ld->NetList.nNetsEnd); }
 
 #endif //__HIGH_NET_H__

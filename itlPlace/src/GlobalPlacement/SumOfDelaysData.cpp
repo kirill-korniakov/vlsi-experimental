@@ -8,7 +8,7 @@ void SODData::InitializeNets(HDesign& hd)
 
   //put nets
   int netIdx = 0;
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
     netSODData[netIdx].Lnet = net.LNet();
     netIdx++;

@@ -3,7 +3,7 @@
 
 #include "Index.h"
 
-template <class Item>
+template <class Item, int disambiguation = 0>
 class HEnumerator : public Item
 {
   IDType m_start;
@@ -28,7 +28,7 @@ public:
   }
 };
 
-template <class Item, IDType base>
+template <class Item, IDType base, int disambiguation = 0>
 class HConstEnumerator : public Item
 {
 protected:
@@ -52,7 +52,7 @@ public:
   }
 };
 
-template <class Item, class Collection>
+template <class Item, class Collection, int disambiguation = 0>
 class HEnumeratorW : public Item
 {
 protected:
@@ -78,7 +78,7 @@ public:
   }
 };
 
-template <class Item>
+template <class Item, int disambiguation = 0>
 class HIndexEnumerator : public Item
 {
 protected:
@@ -107,7 +107,7 @@ public:
   }
 };
 
-template <class Item, class Collection>
+template <class Item, class Collection, int disambiguation = 0>
 class HIndexEnumeratorW : public Item
 {
   HIndex& m_Index;

@@ -13,7 +13,7 @@ void AdaptiveRoute(HDesign& aDesign)
 {
   ConfigContext ctx = aDesign.cfg.OpenContext("AdaptiveRoute");
   //ALERT("ADAPTIVE (FLUTE/HPWL) ROUTING STARTED...");
-  for(HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetNetsEnumeratorW(); niter.MoveNext(); )
+  for(HNets::ActiveNetsEnumeratorW niter = aDesign.Nets.GetActiveNetsEnumeratorW(); niter.MoveNext(); )
     AdaptiveRoute(aDesign, niter);
   //ALERT("ADAPTIVE ROUTING FINISHED");
 }

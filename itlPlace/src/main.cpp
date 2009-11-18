@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 
           //double vgSlack = GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
 
-          for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+          for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
           {
             //if (net.Name() == "n_4598")
             {

@@ -726,7 +726,7 @@ void HPlotter::PlotFullWires()
 {
   if (IsEnabled())
   {
-    for ( HNets::NetsEnumeratorW net = m_hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+    for ( HNets::ActiveNetsEnumeratorW net = m_hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
     {
       PlotNet(net);
     }
@@ -737,7 +737,7 @@ void HPlotter::Plot2PinNets()
 {
   if (IsEnabled())
   {
-    for ( HNets::NetsEnumeratorW net = m_hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+    for ( HNets::ActiveNetsEnumeratorW net = m_hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
     {
       if (net.PinsCount() == 2)
       {

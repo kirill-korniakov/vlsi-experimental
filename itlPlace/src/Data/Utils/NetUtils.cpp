@@ -187,7 +187,7 @@ namespace Utils
   {
     int nSkipped = 0;
     ALERT("NETS SKIPPING STARTED...");
-    for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+    for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
     {
       if (IsClockNet(net, hd) || IsPureClearPresetNet(net, hd))
       {

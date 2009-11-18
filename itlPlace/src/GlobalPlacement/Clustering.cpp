@@ -106,7 +106,7 @@ void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
 
   //put nets
   int netIdx = 0;
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
     AssignClusters(hd, ci, net, netIdx);
 
@@ -121,7 +121,7 @@ void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
 //we add terminals and primary pins for LogSumExp calculation
 void InitializeTerminalsAndPrimaryPins(HDesign& hd, ClusteringInformation& ci)
 {
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
     for (HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext(); )
     {

@@ -25,7 +25,7 @@ TileGrid::TileGrid(int nHor, int nVert, HDPGrid& grid): nHorTiles(nHor), nVertTi
   xMax = grid.ColumnX(0);
   yMax = grid.RowY(0);
   
-  for (HNets::NetsEnumeratorW curNet = grid.Design().Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+  for (HNets::ActiveNetsEnumeratorW curNet = grid.Design().Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
   {
         for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
         {
@@ -141,7 +141,7 @@ void TileGrid::GetLinesFromNet(HNet& net, HDesign& _design)
 
 void TileGrid::CalcLinesInTiles(HDesign& _design)
 {
-  for(HNets::ActiveNetsEnumeratorW niter = _design.Nets.GetNetsEnumeratorW(); niter.MoveNext(); )
+  for(HNets::ActiveNetsEnumeratorW niter = _design.Nets.GetActiveNetsEnumeratorW(); niter.MoveNext(); )
     GetLinesFromNet(niter, _design);
 
   std::list<Line>::iterator currLine = lines.begin();
@@ -485,7 +485,7 @@ void TileGrid::DrawCongestionMap(HDesign& hd, int nMaxLines)
 void TileGrid::DrawPinDensity(HDesign& hd, int nMaxPins)
 {
   //calculate number of pins in each tile
-  for (HNets::NetsEnumeratorW curNet = hd.Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+  for (HNets::ActiveNetsEnumeratorW curNet = hd.Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
   {
     for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
     {

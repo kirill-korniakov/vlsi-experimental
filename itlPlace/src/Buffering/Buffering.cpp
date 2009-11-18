@@ -89,7 +89,7 @@ void BufferingAndReport(HDesign& design)
     string header = h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + hh + h9 + f1 + f2 + f3 + f4 + f5 + f6 + f7 + ff;
     string bodyer = b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + bb + b9 + c1 + c2 + c4 + c4 + c5 + c6 + c7 + cc;
     WRITELINE(header.c_str());
-    for(HNets::ActiveNetsEnumeratorW net = design.Nets.GetNetsEnumeratorW(); net.MoveNext(); )
+    for(HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
     {
       NetInfo n = NetInfo::Create(design, net, buf);
       buffers += n.KoptInt();
@@ -154,7 +154,7 @@ void TestBuffering(HDesign& design)
   int i = 0;
   int j = 0;
   bool f = false;
-  for (HNets::NetsEnumeratorW nIter = design.Nets.GetNetsEnumeratorW(); nIter.MoveNext(); i++) 
+  for (HNets::ActiveNetsEnumeratorW nIter = design.Nets.GetActiveNetsEnumeratorW(); nIter.MoveNext(); i++) 
   {
     // (1) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (2)  )
     //{

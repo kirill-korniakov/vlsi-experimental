@@ -47,7 +47,7 @@ void PrintToFastRouterFormat(HDPGrid& grid, const char* fileName)
     double yMax  = grid.RowY(0);
     int    nNets = 0;
 
-    for (HNets::NetsEnumeratorW curNet = grid.Design().Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+    for (HNets::ActiveNetsEnumeratorW curNet = grid.Design().Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
     {
         for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
         {
@@ -74,7 +74,7 @@ void PrintToFastRouterFormat(HDPGrid& grid, const char* fileName)
     fprintf(routerInputFile, "num net %d\n", nNets);
     int netId = 0;
 
-    for (HNets::NetsEnumeratorW nIter = grid.Design().Nets.GetNetsEnumeratorW(); nIter.MoveNext(); )
+    for (HNets::ActiveNetsEnumeratorW nIter = grid.Design().Nets.GetActiveNetsEnumeratorW(); nIter.MoveNext(); )
     {
         fprintf(routerInputFile, "n%s_%d %d %d %d\n", nIter.Name().c_str(), netId, netId++, nIter.PinsCount(), 1);
 
@@ -132,7 +132,7 @@ void PrintToBoxRouterFormat(HDPGrid& grid, const char* fileName)
     double yMax  = grid.RowY(0);
     int    nNets = 0;
 
-    for (HNets::NetsEnumeratorW curNet = grid.Design().Nets.GetNetsEnumeratorW(); curNet.MoveNext();)
+    for (HNets::ActiveNetsEnumeratorW curNet = grid.Design().Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
     {
         for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
         {
@@ -159,7 +159,7 @@ void PrintToBoxRouterFormat(HDPGrid& grid, const char* fileName)
     double tileWidth  = (xMax - xMin) / nHorTiles;
     double tileHeight = (yMax - yMin) / nVertTiles;
 
-    for (HNets::NetsEnumeratorW nIter = grid.Design().Nets.GetNetsEnumeratorW(); nIter.MoveNext(); )
+    for (HNets::ActiveNetsEnumeratorW nIter = grid.Design().Nets.GetActiveNetsEnumeratorW(); nIter.MoveNext(); )
     {
         fprintf(routerInputFile, "n%s_%d %d %d\n", nIter.Name().c_str(), netId, netId++, nIter.PinsCount());
 

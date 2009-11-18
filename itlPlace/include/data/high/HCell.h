@@ -206,17 +206,18 @@ BEGINWRAPPER(HCellWrapper, HCells)
 
 ENDWRAPPER(HCellWrapper)
 
-class HCells::MovableCellsEnumeratorW : public HCells::CellsEnumeratorW
+class HCells::MovableCellsEnumeratorW : public HEnumeratorW<HCellWrapper, HCells, 1>
 {
+  typedef HEnumeratorW<HCellWrapper, HCells, 1> BaseEnumeratorW;
 public:
   MovableCellsEnumeratorW(HCells* cl, IDType start, IDType end)
-    : CellsEnumeratorW(cl, start, end)
+    : BaseEnumeratorW(cl, start, end)
   {
   }
 
   bool MoveNext()
   {
-    while(CellsEnumeratorW::MoveNext())
+    while(BaseEnumeratorW::MoveNext())
       if(this->PlacementStatus() == PlacementStatus_Movable)
         return true;
     return false;
