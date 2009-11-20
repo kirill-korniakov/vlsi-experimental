@@ -185,6 +185,12 @@ void HPlotter::Refresh(WaitTime waitTime)
   }
 }
 
+void HPlotter::Refresh(const string& cfgPath)
+{
+  if (IsEnabled())
+    Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(cfgPath, 1));
+}
+
 Color HPlotter::_GetCellColor(HCell plotCell)
 {
   HCellWrapper cell = m_hd[plotCell];
@@ -555,7 +561,7 @@ void HPlotter::StopVideoWriting()
   }
 }
 
-void HPlotter::PlotCriticalPath(HCriticalPath aPath, string fileName)
+void HPlotter::PlotCriticalPath(HCriticalPath aPath)
 {
   if (IsEnabled())
   {

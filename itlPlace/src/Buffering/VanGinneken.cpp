@@ -7,7 +7,7 @@
 #include "Auxiliary.h"
 #include <math.h>
 #include "Legalization.h"
-
+#include <float.h>
 
 int VanGinneken::FindBufferNumberByIndex(int index)
 {
@@ -952,27 +952,21 @@ void VanGinneken::CreateNetsAndCells(HNet& net)
 
 int VanGinneken::BufferingOfMostCriticalPaths(int nPaths)
 {
-  int nBuf = 0;
-  bool isCompleted = false;
-  int countCP = m_hd.CriticalPaths.Count();
-  std::vector<CriticalPathsCriticality> vecPath(countCP);
-  int idx = 0;
-  for (HCriticalPaths::EnumeratorW criticalPathW = m_hd.CriticalPaths.GetEnumeratorW(); 
-    criticalPathW.MoveNext(); )
-  { 
-    vecPath[idx].criticality = criticalPathW.Criticality();
-    vecPath[idx].path = criticalPathW;
-    idx++;
-  }
-  std::sort(vecPath.begin(), vecPath.end(), NameSortCPC());
-
-  for (int i = 0; (i < countCP) && (!isCompleted); i++)
+  struct PathBuffering
   {
-    if ((nPaths != 0) && (i >= nPaths))
-      isCompleted = true;
-    nBuf += CriticalPathBuffering(vecPath[i].path);
-  }
-  return nBuf;
+    VanGinneken& vg;
+    int bufs;
+    PathBuffering(VanGinneken& VG): vg(VG), bufs(0){}
+
+    void DoIt(HDesign& hd, HCriticalPath path, int n)
+    {
+      bufs += vg.CriticalPathBuffering(path);
+    }
+  };
+
+  PathBuffering pb(*this);
+  Utils::IterateMostCriticalPaths(m_hd, nPaths, Utils::CriticalPathHandler(&pb, &PathBuffering::DoIt));
+  return pb.bufs;
 }
 
 int VanGinneken::CriticalPathBuffering(HCriticalPath aPath)
@@ -1010,50 +1004,48 @@ void VanGinneken::ParseFinalVanLocation(VanGinneken::Comp *com)
 
 int VanGinneken::BufferingTillDegradation()
 {
+  struct PathBuffering
+  {
+    VanGinneken& vg;
+    double tns, wns;
+    int bufs;
+    int pathPack;
+    PathBuffering(VanGinneken& VG, int pp): vg(VG), pathPack(pp), bufs(0), tns(DBL_MAX), wns(DBL_MAX){}
+
+    bool DoIt(HDesign& hd, HCriticalPath path, int n)
+    {
+      bufs += vg.CriticalPathBuffering(path);
+      if ((n % pathPack) == 0)
+      {
+        STA(hd, DO_NOT_REPORT);
+        double tns2 = Utils::TNS(hd);
+        double wns2 = Utils::WNS(hd);
+        if (tns2 > tns && wns2 > wns)
+          return false;
+        tns = tns2;
+        wns = wns2;
+      }
+      return true;
+    }
+  };
+
   WRITELINE("");
   ALERT("BUFFERING STARTED");
 
-  int n = 0;
   int pathPack = m_hd.cfg.ValueOf(".pathPack", 1);
-  if (pathPack != 0)
+  int buffered = 0;
+
+  if (pathPack > 0)
   {
-    int countCP = m_hd.CriticalPaths.Count();
-    std::vector<CriticalPathsCriticality> vecPath(countCP);
-    int idx = 0;
-    for (HCriticalPaths::EnumeratorW criticalPathW = m_hd.CriticalPaths.GetEnumeratorW(); 
-      criticalPathW.MoveNext(); )
-    { 
-      vecPath[idx].criticality = criticalPathW.Criticality();
-      vecPath[idx].path = criticalPathW;
-      idx++;
-    }
-    std::sort(vecPath.begin(), vecPath.end(), NameSortCPC());
-    double tns = 999999, wns = 999999,tns2 = 999999, wns2 = 999999;
-    CriticalPathBuffering(vecPath[0].path);
-    STA(m_hd, DO_NOT_REPORT);
-    tns = Utils::TNS(m_hd);
-    wns = Utils::WNS(m_hd);
-    tns2 = tns; wns2 = wns;
-    int i = 1;
-    while ((tns <= tns2) && (i < idx) && (wns <= wns2) )
-    {
-      n += CriticalPathBuffering(vecPath[i].path);
-      m_hd.Plotter.ShowPlacement();
-      if ((i % pathPack) == 0)
-      {
-        tns2 = tns; wns2 = wns;
-        //FindTopologicalOrder(m_hd);
-        STA(m_hd, DO_NOT_REPORT);
-        tns = Utils::TNS(m_hd);
-        wns = Utils::WNS(m_hd);
-      }
-      i++;
-    }
+    PathBuffering pb(*this, pathPack);
+    Utils::IterateMostCriticalPaths(m_hd, -1, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::DoIt));
+    buffered = pb.bufs;
   }
   else
-    n = BufferingOfMostCriticalPaths();
+    buffered = BufferingOfMostCriticalPaths();
+
   ALERT("BUFFERING FINISHED");
-  return n;
+  return buffered;
 }
 
 /* print list */

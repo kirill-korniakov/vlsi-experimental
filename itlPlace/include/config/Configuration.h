@@ -79,52 +79,9 @@ namespace libconfig
     }
 
     string Name() const { return m_FileName; }
-
-    template<class T>
-    T lookupDefValue(const char *path, const T& def)
-    {
-      T res;
-      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
-      return lookupValue(path, res) ? res : def;
-    }
-
-    template<class T>
-    T lookupDefValue(const std::string& path, const T& def)
-    {
-      return lookupDefValue(path.c_str(), def);
-    }
-
     void LoadConfiguration(const char* file);
-    
     void SetArguments(int argc, char** argv);
-
     void SetCfgValue(const std::string& path, const std::string& value);
-
-    template<class T>
-    T lookforDefValue(const char *path, const T& def)
-    {
-      T res;
-      printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
-      return lookupValue(path, res)
-        ? res
-        : (gCfg.lookupValue(path, res)
-           ? res
-           : def);
-    }
-
-    template<class T>
-    T lookforDefValue(const std::string& path, const T& def)
-    {
-      return lookforDefValue(path.c_str(), def);
-    }
-
-    Setting & lookfor(const char *path) const;
-
-    Setting & lookfor(const std::string& path) const
-    {
-      return lookfor(path.c_str());
-    }
-
     bool IsGlobal() const;
 
     CfgContextCreationHelper OpenContext(const string& name)
@@ -161,12 +118,6 @@ namespace libconfig
 }
 
 extern libconfig::ConfigExt gCfg;
-
-inline libconfig::Setting & libconfig::ConfigExt::lookfor(const char *path) const
-{
-  printf("WARNING: Method \"%s\" is marked as deprecated. It will be removed soon.\n", __FUNCTION__);
-  return exists(path) ? lookup(path) : gCfg.lookup(path);
-}
 
 inline bool libconfig::ConfigExt::IsGlobal() const
 {
@@ -234,9 +185,5 @@ inline bool libconfig::ConfigExt::HasValue(const char* settingName, const T valu
     m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
   return (T)libconfig::Setting::wrapSetting(s) == value;
 }
-
-
-#pragma deprecated(lookupDefValue, lookforDefValue, lookfor)
-
 
 #endif //__CONFIGURATION_H__

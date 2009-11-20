@@ -1,5 +1,6 @@
 
 #include "CellUtils.h"
+#include "CriticalPathUtils.h"
 #include "NetUtils.h"
 #include "MacroTypeUtils.h"
 #include "PinUtils.h"

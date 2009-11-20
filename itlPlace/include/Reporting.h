@@ -28,25 +28,9 @@ void ReportNetPins(HDesign& hd, HNet net);
 void ReportNetPinsCoordinates(HDesign& hd, HNet net);
 void ReportNetTiming(HDesign& design, HNet net);
 
-//timing reports
-struct CriticalPathsCriticality
-{
-  double criticality;
-  HCriticalPath path;
-};
-
-struct NameSortCPC
-{  
-  bool operator()
-    (const CriticalPathsCriticality& a, 
-    const CriticalPathsCriticality& b) 
-    const { return a.criticality  < b.criticality;  }
-};
 void ReportNegativeSlacks(HDesign&);
-void ReportCriticalPathsToLogFile(HDesign&, int n = -1);
-void PlotCriticalPathsAndSaveImages(HDesign&);
-void PlotTopCriticalPathsAndSaveImages(HDesign& design, int n = -1);
 
-void PrintCriticalPaths(HDesign& hd, int nPaths);
+void PlotMostCriticalPaths(HDesign& design, int n = -1);
+void PrintTimingReport(HDesign& hd, int nPaths = -1);
 
 #endif //__REPORTING_H__

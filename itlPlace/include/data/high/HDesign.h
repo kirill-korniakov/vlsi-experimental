@@ -92,6 +92,9 @@ public:
   }
 };
 
+template<typename H>
+inline typename H::WrapperType operator, (H obj, HDesign& design) { return design[obj]; }
+
 #include "HExternalMethods.h"
 
 #endif //__HIGH_DESIGN_H__

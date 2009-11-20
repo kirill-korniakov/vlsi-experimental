@@ -16,6 +16,18 @@ struct HDesignPointer
   IDType __uid;
 };
 
+template<class T, bool h> struct TypesChooser
+{
+  typedef T ElementType;
+  typedef T WrapperType;
+};
+
+template<class T> struct TypesChooser<T, true>
+{
+  typedef typename T::SelfType ElementType;
+  typedef typename T::WrapperType WrapperType;
+};
+
 template<class Element>
 class HBaseCollection
 {
@@ -188,7 +200,8 @@ public: \
 #define ENDWRAPPER(wrapper_type) \
 }; \
 inline wrapper_type wrapper_type::CollectionType::MakeWrapper(wrapper_type::BaseType item) \
-{ return wrapper_type(this, ::ToID(item)); } 
+{ return wrapper_type(this, ::ToID(item)); } \
+inline wrapper_type wrapper_type::CollectionType::NullW() {return MakeWrapper(Null()); }
 
 
 //main design item opening and ending
@@ -223,7 +236,8 @@ public: \
   typedef ItemType::WrapperType WrapperType; \
   \
   WrapperType MakeWrapper(ItemType item); \
-  HDesign& Parent();
+  HDesign& Parent(); \
+  WrapperType NullW();
 
 #define ENDHCOLLECTION(collection_type)\
 };

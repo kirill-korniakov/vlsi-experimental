@@ -33,4 +33,7 @@ inline T max(T a, T b) {return a < b ? b : a; }
 
 #endif
 
+inline int Round(double val) { return int(val > 0.0 ? val + 0.5 : val - 0.5); }
+
+
 #endif //__STDTYPES_H__

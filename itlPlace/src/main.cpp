@@ -130,8 +130,8 @@ int main(int argc, char** argv)
 
         //critical paths finding and printing
         FindCriticalPaths(hd);
-        ReportCriticalPathsToLogFile(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
-        PlotTopCriticalPathsAndSaveImages(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
+        PrintTimingReport(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
+        PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
 
         if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
         {

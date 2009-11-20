@@ -1123,6 +1123,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Data\Utils\CriticalPathUtils.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Data\Utils\MacroTypeUtils.cpp"
 						>
 					</File>
@@ -5510,6 +5514,10 @@
 					>
 					<File
 						RelativePath="..\include\data\Utils\CellUtils.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\data\Utils\CriticalPathUtils.h"
 						>
 					</File>
 					<File

@@ -50,7 +50,7 @@ public:
   void PlotGradients(int nClusters, double* coordinates, double* gradients, double scaling, Color col);
   void PlotCell(HCell cell, Color col);
   void PlotSites();
-  void PlotCriticalPath(HCriticalPath, string fileName);
+  void PlotCriticalPath(HCriticalPath);
   void PlotNetSteinerTree(HNet net, Color color);
   void PlotText(string text, double textSize = -1);
   void PlotNet(HNetWrapper net);
@@ -67,6 +67,7 @@ public:
 
   void Clear();
   void Refresh(WaitTime waitTime = NO_WAIT);
+  void Refresh(const string& cfgPath);
   void SetAutoRefreshMinFrequency(int freq);
   void ResetAutoRefreshFrequency();
 
