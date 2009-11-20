@@ -577,7 +577,8 @@ void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
 
   UpdateLRSpreadingMu(context, hd, 32); //TODO: ISSUE 18 COMMENT 12
 
-  context.LRdata.UpdateMultipliers(hd);
+  if (context.useLR)
+    context.LRdata.UpdateMultipliers(hd);
 }
 
 int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
