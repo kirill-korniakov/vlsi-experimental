@@ -997,7 +997,17 @@ void VanGinneken::ParseFinalVanLocation(VanGinneken::Comp *com)
     if (FindBufferNumberByIndex(com->y) == -1)
     {
       VGItem result;
-        m_BufferIndexes.push_back(com->y);
+      VGNode *node = &m_vgNetSplitted.GetSteinerPoint(com->y, m_vgNetSplitted, result, true);
+      if (node->IsReal())
+        if (node->IsSink())
+         m_BufferIndexes.push_back(com->y - 1);
+        else
+          if (node->IsSource())
+            m_BufferIndexes.push_back(com->y + 1);
+          else
+            m_BufferIndexes.push_back(com->y - 1);
+      else
+          m_BufferIndexes.push_back(com->y);
     }
 }
 

@@ -21,7 +21,7 @@ void NetlistBuffering(HDesign& design)
 
   //buffering  
   VanGinneken vg(design);
-  ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
+  ALERTFORMAT(("Buffer inside = %d", vg.BufferingTillDegradation()));
 
   ALERTFORMAT(("Net candidates for buffering = %d", vg.GetNCandidatesForBuffering()));
   ALERTFORMAT(("Reverts = %d", vg.GetNReverts()));
