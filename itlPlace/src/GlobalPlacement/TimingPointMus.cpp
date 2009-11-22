@@ -135,10 +135,14 @@ void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo
       int idx = 0;
       for (HPinType::ArcsEnumeratorW arc 
         = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(p.Type());
-        arc.MoveNext(); idx++)
+        arc.MoveNext();)
       {
-        if (arc.GetStartPin(p) == pin)
-          todo(*this, point, idx);
+        if (arc.TimingType() == TimingType_Combinational)
+        {
+          if (arc.GetStartPin(p) == pin)
+            todo(*this, point, idx);
+          idx++;
+        }
       }
     }
   }
