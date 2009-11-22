@@ -42,6 +42,7 @@ protected:
 
 public:
   Element Null() const {return Element();}
+  bool IsInitialized() const {return m_initialized; }
 
   template<class Base>
   friend LDesign* ToLow(HBaseCollection<Base>*);

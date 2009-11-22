@@ -5,6 +5,7 @@ namespace Utils
 {
   double TNS(HDesign& design)
   {
+    if (!design.TimingPoints.IsInitialized()) return 0.0;
     double tns = 0.0;
     HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
     for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];
@@ -18,6 +19,7 @@ namespace Utils
 
   double WNS(HDesign& design)
   {
+    if (!design.TimingPoints.IsInitialized()) return 0.0;
     double wns = 0.0;
     HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
     for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];

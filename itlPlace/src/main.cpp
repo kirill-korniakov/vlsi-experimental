@@ -16,40 +16,156 @@
 
 using namespace libconfig;
 
+void InitializeDesign(HDesign& design, int argc, char** argv)
+{
+    design.Initialize();
+
+    design.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
+    design.cfg.SetArguments(argc, argv);
+
+    ParseLEF(design);
+    if (design.cfg.Defined("benchmark.lib"))
+      ParseLIB(design);
+
+    TranslateTechnology(design);
+
+    ParseDEF(design);
+
+    if (design.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
+      Utils::SkipSpecialNets(design);//WARNING: must be called before InitializeTiming
+
+    design.SteinerPoints.Initialize();//initialize routing
+    InitializeTiming(design);
+
+    design.Plotter.Initialize();
+}
+
+void DoRandomPlacementIfRequired(HDesign& hd)
+{
+  if (hd.cfg.ValueOf("DesignFlow.RandomPlacement", false))
+  {
+    RandomPlacement(hd);
+    hd.Plotter.ShowPlacement();
+    hd.Plotter.SaveMilestoneImage("RP");
+  }
+}
+
+void DoGlobalPlacementIfRequired(HDesign& hd)
+{
+  //GLOBAL PLACEMENT
+  if (hd.cfg.ValueOf("DesignFlow.GlobalPlacement", false))
+  {
+    GlobalPlacement(hd, hd.cfg.ValueOf("params.objective"));
+    hd.Plotter.ShowPlacement();
+    hd.Plotter.SaveMilestoneImage("GP");
+  }
+}
+
+void DoLRTimingDrivenPlacementIfRequired(HDesign& hd)
+{
+  //LR-TDP
+  if (hd.cfg.ValueOf("DesignFlow.LR", false))
+  {
+    GlobalPlacement(hd, "LR");
+    hd.Plotter.ShowPlacement();
+    hd.Plotter.SaveMilestoneImage("LR");
+  }
+}
+
+void DoLegalizationIfRequired(HDPGrid& grid)
+{
+  //LEGALIZATION
+  if (grid.Design().cfg.ValueOf("DesignFlow.Legalization", false))
+  {
+    WRITELINE("");
+    ALERT("STA before legalization:");
+    STA(grid.Design());
+
+    Legalization(grid);
+    grid.Design().Plotter.ShowPlacement();
+    grid.Design().Plotter.SaveMilestoneImage("LEG");
+    
+    WRITELINE("");
+    ALERT("STA after legalization:");
+    STA(grid.Design());
+  }
+}
+
+void DoDetailedPlacementIfRequired(HDPGrid& grid)
+{
+  if (grid.Design().cfg.ValueOf("DesignFlow.DetailedPlacement", false))
+  {
+    WRITELINE("");
+    ALERT("STA before detailed placement:");
+    STA(grid.Design());
+
+    DetailedPlacement(grid);
+    grid.Design().Plotter.ShowPlacement();
+    grid.Design().Plotter.SaveMilestoneImage("DP");
+
+    WRITELINE("");
+    ALERT("STA after detailed placement:");
+    STA(grid.Design());
+  }
+}
+
+void DoSTAIfCan(HDesign& hd)
+{
+  if (hd.CanDoTiming())
+  {
+    WRITELINE("");
+    ALERT("Running STA:");
+    STA(hd);
+    FindCriticalPaths(hd);
+    PrintTimingReport(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
+    PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
+  }
+}
+
+void PlotCongestionMapIfRequired(HDPGrid& grid)
+{
+  if (grid.Design().cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
+    PlotCongestionMaps(grid);
+}
+
+void RunFGRRoutingIfRequired(HDPGrid& grid)
+{
+  if (grid.Design().cfg.ValueOf("DesignFlow.FGRRouting", false))
+  {
+    if (grid.Design().cfg.ValueOf("FGRRouting.PrintToRoutersFormats", false))
+    {
+      PrintToFastRouterFormat(grid, grid.Design().cfg.ValueOf("FGRRouting.ISPDFileName",
+                                                     "bench.fr"));
+      
+      PrintToBoxRouterFormat(grid, grid.Design().cfg.ValueOf("FGRRouting.LabyrinthFileName",
+                                                    "bench.br"));
+    }
+    fgr::FGRRouting(grid);
+  }
+}
+
+void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
+{
+  if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
+    if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 1)
+      PrepareNextNetWeightingLoop(hd, iteration);
+}
+
 int main(int argc, char** argv)
 {
   try
   {
-    bool isCyclesEnabled = false;
-    
+    //global initializations
     gCfg.LoadConfiguration("itlVLSI.cfg");
     InitializeLogging();
     PrintRevisionNumber();
+    InitFLUTE();//initialize routing
 
-    InitFLUTE();
-
+    //benchmark initialization
     HDesign hd;
-    hd.Initialize();
-
-    hd.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
-    hd.cfg.SetArguments(argc, argv);
-
-    ParseLEF(hd);
-    if (hd.cfg.Defined("benchmark.lib"))
-      ParseLIB(hd);
-
-    TranslateTechnology(hd);
-
-    ParseDEF(hd);
-
-    if (hd.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
-      Utils::SkipSpecialNets(hd);//WARNING: must be called before InitializeTiming
-	  
-    InitializeTiming(hd);
+    InitializeDesign(hd, argc, argv);
 
     PinPlacement(hd);
-
-    hd.Plotter.Initialize();
     hd.Plotter.ShowPlacement(HPlotter::WAIT_3_SECONDS);
 
     //REPORT CIRCUIT INFO
@@ -58,159 +174,32 @@ int main(int argc, char** argv)
     ReportCellsByMacroFunction(hd);
 
     //START MACROLOOP OF DESIGN
-    for (int i = 0; i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0); i++)
+    for (int i = 0; i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 1); i++)
     {
       if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
         ImportNetWeights(hd, hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName"));
 
-      //RANDOM PLACEMENT
-      if (hd.cfg.ValueOf("DesignFlow.RandomPlacement", false))
-      {
-        RandomPlacement(hd);
-        hd.Plotter.ShowPlacement();
-        hd.Plotter.SaveMilestoneImage("RP");
-      }
+      DoRandomPlacementIfRequired(hd);
+      DoGlobalPlacementIfRequired(hd);
+      DoLRTimingDrivenPlacementIfRequired(hd);
 
-      //GLOBAL PLACEMENT
-      if (hd.cfg.ValueOf("DesignFlow.GlobalPlacement", false))
-      {
-        GlobalPlacement(hd, hd.cfg.ValueOf("params.objective"));
-        hd.Plotter.ShowPlacement();
-        hd.Plotter.SaveMilestoneImage("GP");
-      }
-
-      //LR-TDP
-      if (hd.cfg.ValueOf("DesignFlow.LR", false))
-      {
-        GlobalPlacement(hd, "LR");
-        hd.Plotter.ShowPlacement();
-        hd.Plotter.SaveMilestoneImage("LR");
-      }
-      
       HDPGrid DPGrid(hd);
 
-      //LEGALIZATION
-      if (hd.cfg.ValueOf("DesignFlow.Legalization", false))
+      DoLegalizationIfRequired(DPGrid);
+      DoDetailedPlacementIfRequired(DPGrid);
+
+      DoSTAIfCan(hd);
+
+      PlotCongestionMapIfRequired(DPGrid);
+      RunFGRRoutingIfRequired(DPGrid);
+
+      if (hd.CanDoTiming() && Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
       {
-        WRITELINE("");
-        ALERT("STA before legalization:");
-        STA(hd);
-
-        Legalization(DPGrid);
-        hd.Plotter.ShowPlacement();
-        hd.Plotter.SaveMilestoneImage("LEG");
-        
-        WRITELINE("");
-        ALERT("STA after legalization:");
-        STA(hd);
-      }
-
-      //DETAILED PLACEMENT
-      if (hd.cfg.ValueOf("DesignFlow.DetailedPlacement", false))
-      {
-        WRITELINE("");
-        ALERT("STA before detailed placement:");
-        STA(hd);
-
-        DetailedPlacement(DPGrid);
-        hd.Plotter.ShowPlacement();
-        hd.Plotter.SaveMilestoneImage("DP");
-
-        WRITELINE("");
-        ALERT("STA after detailed placement:");
-        STA(hd);
-      }
-
-      //TIMING
-      if (hd.cfg.ValueOf("DesignFlow.Timing", false))
-      {
-        WRITELINE("");
-        ALERT("Timing:");
-        STA(hd);
-
-        //critical paths finding and printing
-        FindCriticalPaths(hd);
-        PrintTimingReport(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
-        PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
-
-        if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
-        {
-          if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 1)
-          {
-            PrepareNextLoop(hd, argc, argv, i);
-          }
-        }
-
-        //BufferingAndReport(hd);
-        if (0)
-        {
-          ConfigContext ctx = hd.cfg.OpenContext("Buffering");
-          VanGinneken vg(hd);
-          BufferInfo buf = BufferInfo::Create(hd);
-
-          HNetWrapper bufferedNet = hd[hd.Nets.Null()];
-
-          double TNS = Utils::TNS(hd);
-          double WNS = Utils::WNS(hd);
-          ExportDEF(hd, "def_1.def");
-
-          TimingHelper th(hd);
-
-          //double vgSlack = GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-
-          for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
-          {
-            //if (net.Name() == "n_4598")
-            {
-              NetInfo netInfo = NetInfo::Create(hd, net, buf);
-              double before_buffering = th.GetBufferedNetMaxDelay(net, netInfo, buf);
-              if (vg.MathBuffering(net) > 0)
-              {
-                bufferedNet = net;
-                //break;
-              }
-              double after_buffering = th.GetBufferedNetMaxDelay(net, netInfo, buf);
-              WRITELINE("before %.10f", before_buffering);
-              WRITELINE("after  %.10f", after_buffering);
-              break;
-            }
-          }
-
-          STA(hd);
-
-          double TNS1 = Utils::TNS(hd);
-          double WNS1 = Utils::WNS(hd);
-
-          WRITELINE("TNS: %.10f", TNS - TNS1);
-          WRITELINE("WNS: %.10f", WNS - WNS1);
-          ExportDEF(hd, "def_2.def");
-        }
-      }
-
-      if (hd.cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
-      {          
-        PlotCongestionMaps(DPGrid);
-      }
-
-      if (hd.cfg.ValueOf("DesignFlow.FGRRouting", false))
-      {
-        if (hd.cfg.ValueOf("FGRRouting.PrintToRoutersFormats", false))
-        {
-          PrintToFastRouterFormat(DPGrid, hd.cfg.ValueOf("FGRRouting.ISPDFileName",
-                                                         "bench.fr"));
-          
-          PrintToBoxRouterFormat(DPGrid, hd.cfg.ValueOf("FGRRouting.LabyrinthFileName",
-                                                        "bench.br"));
-        }
-        fgr::FGRRouting(DPGrid);
-      }
-
-      if (Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
-      {
-        // Exit the main loop of the placement
         ALERT("We have satisfied the timing constraints");
-        break;
+        break;// Exit the main loop of the placement
       }
+
+      UpdateNetWeightsIfRequired(hd, i);
     }
     
     //BUFFERING

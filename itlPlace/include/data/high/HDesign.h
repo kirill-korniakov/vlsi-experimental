@@ -57,12 +57,12 @@ public:
              CriticalPaths(this),  CriticalPathPoints(this)
   {
     _Design.Tech = 0;
-    isGlobalPlacementDone = false;
   }
 
   HCircuit Circuit;
   HPlotter Plotter;
   libconfig::ConfigExt cfg;
+
   HDESIGNCOLLECTION(Nets, HNets)
   HDESIGNCOLLECTION(MacroTypes, HMacroTypes)
   HDESIGNCOLLECTION(PinTypes, HPinTypes)
@@ -78,19 +78,25 @@ public:
   HDESIGNCOLLECTION(CriticalPaths, HCriticalPaths)
   HDESIGNCOLLECTION(CriticalPathPoints, HCriticalPathPoints)
 
-  bool isGlobalPlacementDone;
-
   void Initialize();
-
   bool HasTechInfo() const {return _Design.Tech != 0;}
-  void SetTechInfo(HDesign* design = 0)
-  {
-    if(!design)
-      _Design.Tech = new LTech();
-    else
-      _Design.Tech = design->_Design.Tech;
-  }
+  void SetTechInfo(HDesign* design = 0);
+  bool CanDoTiming() const;
 };
+
+inline void HDesign::SetTechInfo(HDesign* design)
+{
+  if(!design)
+    _Design.Tech = new LTech();
+  else
+    _Design.Tech = design->_Design.Tech;
+}
+
+inline bool HDesign::CanDoTiming() const
+{
+  return cfg.ValueOf("benchmark.CanDoTiming", false)
+    && TimingArcTypes.IsInitialized();
+}
 
 template<typename H>
 inline typename H::WrapperType operator, (H obj, HDesign& design) { return design[obj]; }

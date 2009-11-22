@@ -203,6 +203,7 @@ void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
 
 void PlotPath(HDesign& design, HCriticalPath path, int pathNumber)
 {
+  ASSERT(design.CanDoTiming());
   char fileName[32];
   char signature[256];
   sprintf(fileName, "critical_path_%d", pathNumber);
@@ -219,6 +220,8 @@ void PlotPath(HDesign& design, HCriticalPath path, int pathNumber)
 
 void PrintTimingReport(HDesign& design, int nPaths)
 {
+  ASSERT(design.CanDoTiming());
+
   WRITELINE("");
   ALERT("Critical paths printing started...");
 

@@ -191,64 +191,7 @@ void GetNewCommandLine(string& newCMD, const string& nwtsFileName, int argc, cha
   printf("new command line is %s\n", newCMD.c_str());
 }
 
-void MakeAnotherLoop(HDesign& hd, int argc, char** argv)
-{
-  STARTUPINFO si;
-  PROCESS_INFORMATION pi;
-  int nIter;  // number of current iteration
-  string nwtsFileName;
-  string defFileName;
-  string newCMD;
-  LPSTR commandLine;
-
-  if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10) > 9)
-  {
-    ALERT("The number of net weights iterations must be less than 10");
-    return;
-  }
-
-  ZeroMemory(&si, sizeof(si));
-  si.cb = sizeof(si);
-  ZeroMemory(&pi, sizeof(pi));
-
-  nIter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));
-  ALERTFORMAT(("Current iteration of net weighting is %d", nIter++));
-
-  nwtsFileName = hd.Circuit.Name() + "_" + IntToString(nIter) + ".nwts";
-  defFileName  = hd.Circuit.Name() + "_" + IntToString(nIter-1) + ".def";
-  ComputeNetWeights(hd);
-  ExportNetWeights(hd, nwtsFileName.c_str());
-  ExportDEF(hd, defFileName);
-  
-  if (nIter == hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0))
-  {
-    ALERT("The specified number of net weights iterations is performed");
-    return;
-  }
-
-  GetNewCommandLine(newCMD, nwtsFileName, argc, argv);
-  commandLine = &(newCMD[0]);
-  if(!CreateProcess(NULL,   // No module name (use command line)
-    commandLine,      // Command line
-    NULL,             // Process handle not inheritable
-    NULL,             // Thread handle not inheritable
-    FALSE,            // Set handle inheritance to FALSE
-    0,                // No creation flags
-    NULL,             // Use parent's environment block
-    NULL,             // Use parent's starting directory
-    &si,              // Pointer to STARTUPINFO structure
-    &pi))             // Pointer to PROCESS_INFORMATION structure
-  {
-    LOGCRITICALFORMAT(("CreateProcess failed for another loop of net weighting(%d)!", GetLastError()));
-    return;
-  }
-
-  // Close process and thread handles
-  CloseHandle(pi.hProcess);
-  CloseHandle(pi.hThread);
-}
-
-void PrepareNextLoop(HDesign& hd, int argc, char** argv, int& nCyclesCounter)
+void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 {
   //int nIter;  // number of current iteration
   int nLoops = hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10);

@@ -15,11 +15,11 @@ namespace AnalyticalGlobalPlacement
     Vec& x, Vec& xl, Vec& xu, 
     TAO_SOLVER& tao, TAO_APPLICATION& taoapp);
   
-  int Relaxation(HDesign& hd, ClusteringInformation& ci);
+  int Relaxation(HDesign& hd, ClusteringInformation& ci, int metaIteration);
   int Interpolation(HDesign& hd, ClusteringInformation& ci);
   
   int Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, TAO_APPLICATION taoapp, 
-    TAO_SOLVER tao, Vec x);
+    TAO_SOLVER tao, Vec x, int metaIteration);
 
   int ReportTerminationReason( int retCode, TAO_SOLVER tao );
 

@@ -4,27 +4,14 @@
 #include "HDesign.h"
 
 void FindTopologicalOrder(HDesign& design);
-
 void PropagateDelays(HDesign& design, double clock_cycle);
 void PropagateDelays(HDesign& design);
-
-
-//void SetStartPointsArrivals(HDesign& design, double clock_cycle);
-//void SetEndPointsRequires(HDesign& design, double clock_cycle);
-//
-//void PropagateArrivals(HDesign& design);
-//void PropagateRequires(HDesign& design);
-
 void FindCriticalPaths(HDesign& design);
 
 void ComputeNetWeights(HDesign& hd);
-
 void ExportNetWeights(HDesign& hd, const char* fileName);
-
 void ImportNetWeights(HDesign& hd, const char* fileName);
-
-void MakeAnotherLoop(HDesign& hd, int argc, char** argv);
-void PrepareNextLoop(HDesign& hd, int argc, char** argv, int& nCyclesCounter);
+void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter);
 
 void GetArrivalRisingArc(HDesign& hd,
                          HTimingPoint startPoint,
@@ -78,7 +65,8 @@ HTimingArcType FindRequiredArc(HDesign& hd,
 
 inline void InitializeTiming(HDesign& design)
 {
-  design.SteinerPoints.Initialize();
+  if (!design.CanDoTiming()) return;
+
   design.Wires.Initialize();
   design.TimingPoints.Initialize();
   FindTopologicalOrder(design);

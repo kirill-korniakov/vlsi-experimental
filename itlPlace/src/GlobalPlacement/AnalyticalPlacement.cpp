@@ -58,19 +58,21 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
   //perform placement of clustered netlist
   //TODO: think about reorganization of loop below
   //it is simply loop between clustering levels, why it is so complex?
-  Relaxation(hd, ci);
+  Relaxation(hd, ci, 1);
 
   ClusteringLogIterator clusteringLogIterator = ci.clusteringLog.rbegin();
   NetListIterator netLevelsIterator = ci.netLevels.rbegin();
   if (netLevelsIterator != ci.netLevels.rend()) 
     ++netLevelsIterator;
 
+  int metaIterationNumber = 2;
   for (; clusteringLogIterator != ci.clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
   {
     ci.netList = *netLevelsIterator;
     UnclusterLevelUp(hd, ci, clusteringLogIterator);
     Interpolation(hd, ci);
-    Relaxation(hd, ci);
+    Relaxation(hd, ci, metaIterationNumber);
+    metaIterationNumber++;
   }
 
   //TODO: consider second v-cycle
@@ -78,8 +80,6 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
   WRITELINE("");
   ALERTFORMAT(("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true)));
   ALERT("ANALYTICAL PLACEMENT FINISHED");
-
-  hd.isGlobalPlacementDone = true;
 }
 
 int TaoInit(const char* taoCmd)
@@ -135,11 +135,11 @@ void AnalyticalGlobalPlacement::PlaceToTheCenterIntially(HDesign& hd, Clustering
 {
   ALERT("SET INITIAL STATE");
 
-  static double minX = hd.Circuit.PlacementMinX();
-  static double maxX = hd.Circuit.PlacementMaxX();
-  static double minY = hd.Circuit.PlacementMinY();
-  static double maxY = hd.Circuit.PlacementMaxY();
-  static double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
+  double minX = hd.Circuit.PlacementMinX();
+  double maxX = hd.Circuit.PlacementMaxX();
+  double minY = hd.Circuit.PlacementMinY();
+  double maxY = hd.Circuit.PlacementMaxY();
+  double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
 
   int clusterIdx = -1;
   while (GetNextActiveClusterIdx(&ci, clusterIdx))
@@ -273,10 +273,10 @@ void AnalyticalGlobalPlacement::GetVariablesValues(ClusteringInformation& ci, Ve
 
 void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
 {
-  static double minX = hd.Circuit.PlacementMinX();
-  static double maxX = hd.Circuit.PlacementMaxX();
-  static double minY = hd.Circuit.PlacementMinY();
-  static double maxY = hd.Circuit.PlacementMaxY();
+  double minX = hd.Circuit.PlacementMinX();
+  double maxX = hd.Circuit.PlacementMaxX();
+  double minY = hd.Circuit.PlacementMinY();
+  double maxY = hd.Circuit.PlacementMaxY();
 
   int    nUnmoved = 0;
   int    nMoved = 0;
@@ -537,7 +537,7 @@ void AnalyticalGlobalPlacement::ReportTimes()
   expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
 }
 
-int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci)
+int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci, int metaIteration)
 {
   Vec             x;          // solution vector
   Vec             xl, xu;     // bounds vectors
@@ -553,7 +553,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   ReportBinGridInfo(context);
 
   //SOLVE THE PROBLEM
-  retCode = Solve(hd, ci, context, taoapp, tao, x); CHKERRQ(retCode);
+  retCode = Solve(hd, ci, context, taoapp, tao, x, metaIteration); CHKERRQ(retCode);
   ReportTimes();
 
   //Free TAO&PETSc data structures
@@ -598,19 +598,12 @@ int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
 }
 
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
-                                     TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x)
+                                     TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
   int retCode;
   double discrepancy = 100.0; //NOTE: dummy big value
-  static int metaIteration = 1;
 
-  static int nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
-  ALERTFORMAT(("hd.isGlobalPlacementDone = %s", hd.isGlobalPlacementDone ? "true" : "false"));
-  if (hd.isGlobalPlacementDone)
-  { // reload the value (we're in the beginning of the GP)
-    nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
-    hd.isGlobalPlacementDone = false;
-  }
+  const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
 
   PlacementQualityAnalyzer* QA = 0;
   if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
@@ -628,7 +621,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   }
 
   int iteration = 1;
-  static double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
+  double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
   while (1)
   {
     //print iteration info
@@ -680,14 +673,12 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       ALERTFORMAT(("Discrepancy achieved"));
       break;
     }
-    if (iteration > nOuterIters)
+    if (iteration > nOuterIters1)
     {
       ALERTFORMAT(("Iterations finished"));
       break;
     }
   }
-
-  metaIteration++;
 
   //QA report
   if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
