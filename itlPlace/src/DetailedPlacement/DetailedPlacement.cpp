@@ -4,12 +4,23 @@
 
 #define NCELLS_TO_REPORT 20
 
+void LegalityControl(HDPGrid& grid)
+{
+  if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
+    || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
+    || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
+    )
+    Legalization(grid);
+}
+
 void DetailedPlacement(HDPGrid& grid)
 {
   ConfigContext ctx = grid.Design().cfg.OpenContext("DetailedPlacement");
 
   WRITELINE("");
   ALERT("DETAILED PLACEMENT STARTED\n");
+
+  LegalityControl(grid);
 
   double wlBeforeDP = Utils::CalculateHPWL(grid.Design(), true);
   double wlBeforeIteration = wlBeforeDP;
@@ -37,11 +48,7 @@ void DetailedPlacement(HDPGrid& grid)
     if (isGS)
     {
       GlobalSwap(grid);
-      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-        )
-        Legalization(grid);
+      LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
       wlAfterGlobalSwap = Utils::CalculateHPWL(grid.Design(), true);
@@ -59,11 +66,7 @@ void DetailedPlacement(HDPGrid& grid)
     if (isVS)
     {
       VerticalSearch(grid);
-      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-        )
-        Legalization(grid);
+      LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
       wlAfterVerticalSearch = Utils::CalculateHPWL(grid.Design(), true);
@@ -81,11 +84,7 @@ void DetailedPlacement(HDPGrid& grid)
     if (isHS)
     {
       HorizontalSearch(grid);
-      if (!CheckGridBoundary(grid, NCELLS_TO_REPORT, true)
-        || !CheckGridConsistency(grid, NCELLS_TO_REPORT, 1e-6, true)
-        || !CheckOverlaps(grid, NCELLS_TO_REPORT, true)
-        )
-        Legalization(grid);
+      LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
       wlAfterHorizontalSearch = Utils::CalculateHPWL(grid.Design(), true);

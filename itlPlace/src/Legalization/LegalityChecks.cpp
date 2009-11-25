@@ -25,7 +25,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
       
       if (errors_count++ < maxCellsToReport)
       {
-        LOGERRORFORMAT(("Cell %s left its site.", cell.Name().c_str()));
+        LOGWARNINGFORMAT(("Cell %s left its site.", cell.Name().c_str()));
       }
       else
         if (!drawMismatchses)
@@ -67,7 +67,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
 
       if (errors_count++ < maxCellsToReport)
       {
-        LOGERRORFORMAT(("Cell %s lays outside of placement grid.", cell.Name().c_str()));
+        LOGWARNINGFORMAT(("Cell %s lays outside of placement grid.", cell.Name().c_str()));
       }
       else
         if (!drawMismatchses)
@@ -107,7 +107,7 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
           overlapped = grid(row, column + i);
           if (errors_count++ < maxCellsToReport)
           {
-            LOGERRORFORMAT(("Cell %s overlaps with %s", cell.Name().c_str(), hd.GetString<HCell::Name>(overlapped).c_str()));
+            LOGWARNINGFORMAT(("Cell %s overlaps with %s", cell.Name().c_str(), hd.GetString<HCell::Name>(overlapped).c_str()));
           }
            else
             if (!drawOverlaps)
