@@ -252,15 +252,21 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
   //PrintDerivatives(nClusterVariables, nBufferVariables, gradient, true, true, false);
 
-  static bool plotGradients = context->hd->cfg.ValueOf("GlobalPlacement.plotGradients", false);
-  if (plotGradients)
+  static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.plotSolverState", false);
+  if (plotSolverState)
   {
-    static double scaling = context->hd->cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
-    static int waitTime = context->hd->cfg.ValueOf("GlobalPlacement.plotWait", 1);
-    context->hd->Plotter.ShowGradients(context->ci->mCurrentNumberOfClusters, 
-      context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, context->ci->netList.size(), 
-      (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient, 
-      scaling, (HPlotter::WaitTime)waitTime);
+    context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
+      context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, 
+      context->ci->netList.size(), 
+      (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient);
+
+    if (context->useSumOfDelays)
+    {//FIXME: think about proper place
+      context->hd->Plotter.ClearHistogram();
+      context->hd->Plotter.PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
+        (double*)solution, Color_Violet);
+      context->hd->Plotter.RefreshHistogram();
+    }
   }
 
   info = VecRestoreArray(X, &solution); CHKERRQ(info);

@@ -14,14 +14,11 @@ protected:
   void* m_data;
   HDesign& m_hd;
   bool m_isDestroyed;
+  bool m_isHistogramDestroyed;
 
 public:
   HPlotter(HDesign& design);
   ~HPlotter();
-
-  void Initialize();
-  void Destroy();
-  bool IsEnabled();
 
   enum WaitTime
   { 
@@ -32,12 +29,20 @@ public:
     WAIT_10_SECONDS = 10000
   };
 
+  //FIXME: think about 2 windows
+  void Initialize();
+  void InitializeHistogramWindow();
+  void Destroy();
+  void DestroyHistogramWindow();
+  void ClearHistogram();
+  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
+  bool IsEnabled();
+
   void ShowPlacement(WaitTime waitTime = NO_WAIT);
   void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
   void ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime = NO_WAIT);
-  void ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNets,
-    double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g,
-    double scaling, WaitTime waitTime = NO_WAIT);
+  void VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
+    double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g);
   void ShowLegalizationState(WaitTime waitTime, bool drawSites);
 
   void DrawTileWires(double x1, double y1, double x2, double y2, int nLines,
@@ -56,9 +61,9 @@ public:
   void PlotNet(HNetWrapper net);
   void PlotFullWires();
   void Plot2PinNets();
-  void PlotKi(int nClusters, int nNets, double* x, Color color);
 
-  void SizeChange(int changeHeight);
+  void PlotKi(int nClusters, int nNets, double* x, Color color);
+  void PlotMu(int tpIdx, int nTP, double mu, Color color);
 
   void DrawLine(double x1, double y1, double x2, double y2, Color col);
   void DrawCircle(double x, double y, int radius, Color col);

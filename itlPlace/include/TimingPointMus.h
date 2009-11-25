@@ -11,6 +11,7 @@ public:
 
   void UpdateMus(HDesign& design);
   void ReportMus(HDesign& design);
+  void PlotMus(HDesign& design);
 
   void GetNetMus(HDesign& design, HNet net,
                  std::vector<double>& cellArcMus, 

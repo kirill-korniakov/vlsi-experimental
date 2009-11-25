@@ -65,6 +65,7 @@ void TimingPointMus::EnforceFlowProperty(HDesign& design)
   }
 
   //ReportMus(design);
+  PlotMus(design);
 }
 
 void TimingPointMus::ReportMus(HDesign& design)
@@ -79,7 +80,36 @@ void TimingPointMus::ReportMus(HDesign& design)
   }
 }
 
-void TimingPointMus::GetMuIn( HDesign& design, HTimingPoint pt, std::vector<double>& inMus)
+void TimingPointMus::PlotMus(HDesign& design)
+{
+  //FIXME: find proper place
+  design.Plotter.InitializeHistogramWindow();
+
+  //FIXME: get proper values
+  int waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+  int nTimingPoints = design._Design.NetList.nPinsLimit;
+
+  design.Plotter.ClearHistogram();
+  int i = 0;
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    !::IsNull(pt.GoNext()); i++)
+  {
+    int count = GetMuInCount(pt);
+    double sum = 0.0;
+    for (int j = 0; j < count; j++)
+    {
+      double muInA = GetMuInA(pt, j);
+      double muInR = GetMuInR(pt, j);
+      sum = sum + muInA + muInR;
+    }
+
+    design.Plotter.PlotMu(i, nTimingPoints, sum, Color_Red);
+  }
+
+  design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
+}
+
+void TimingPointMus::GetMuIn(HDesign& design, HTimingPoint pt, std::vector<double>& inMus)
 {
   inMus.clear();
   for (int i = 0; i < GetMuInCount(pt); i++)

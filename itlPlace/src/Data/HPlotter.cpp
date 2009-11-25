@@ -14,6 +14,9 @@ struct PlotterData
   string windowName;
   CvVideoWriter* vw;
 
+  IplImage* histogramImg;
+  string histogramWindowName;
+
   int autoRefreshStepDefault;
   int autoRefreshStep;
   int drawingsNum;
@@ -36,14 +39,14 @@ static inline int _DesignY2ImageY(double y, PlotterData* data)
   return data->borderSpace + (int)((y + data->y_offset) * data->y_ratio);
 }
 
-static inline int _NormalX2ImageX(double x, PlotterData* data)
+static inline int _NormalX2ImageX(double x, int width)
 {
-  return (int)(x * data->img->width);
+  return (int)(x * width);
 }
 
-static inline int _NormalY2ImageY(double y, PlotterData* data)
+static inline int _NormalY2ImageY(double y, int shiftY, int height)
 {
-  return data->textSpaceHeight + (int)(y * (data->img->height - data->textSpaceHeight));
+  return shiftY + (int)(y * height);
 }
 
 static inline CvScalar GetColor(Color col)
@@ -58,8 +61,10 @@ static inline CvScalar GetColor(Color col)
 #define IMG m_Data->img
 #define DesignX2ImageX(x) _DesignX2ImageX((x), m_Data)
 #define DesignY2ImageY(y) _DesignY2ImageY((y), m_Data)
-#define NormalX2ImageX(x) _NormalX2ImageX((x), m_Data)
-#define NormalY2ImageY(y) _NormalY2ImageY((y), m_Data)
+#define NormalX2ImageX(x) _NormalX2ImageX((x), m_Data->img->width)
+#define NormalY2ImageY(y) _NormalY2ImageY((y), data->textSpaceHeight, m_Data->img->height - m_Data->textSpaceHeight)
+#define HNormalX2ImageX(x) _NormalX2ImageX((x), m_Data->histogramImg->width)
+#define HNormalY2ImageY(y) _NormalY2ImageY((y), 0, m_Data->histogramImg->height)
 
 HPlotter::HPlotter(HDesign& design):
   m_hd(design)
@@ -68,52 +73,84 @@ HPlotter::HPlotter(HDesign& design):
   IMG = 0;
   m_Data->vw = NULL;
   m_isDestroyed = true;
+  m_isHistogramDestroyed = true;
 }
 
 HPlotter::~HPlotter()
 {
   Destroy();
+  DestroyHistogramWindow();
   delete m_Data;
+}
+
+void HPlotter::InitializeHistogramWindow()
+{
+  if (!_IsEnabled() || !m_isHistogramDestroyed)
+    return;
+
+  m_isHistogramDestroyed = false;
+
+  //create window
+  m_Data->histogramWindowName = "itlPlace histogram";
+  cvNamedWindow(m_Data->histogramWindowName.c_str());
+
+  //create image
+  CvSize imgSize;
+  imgSize.height = m_hd.cfg.ValueOf("plotter.histogramWindowHeight", 300);
+  imgSize.width = m_hd.cfg.ValueOf("plotter.histogramWindowWidth", 1000);
+  m_Data->histogramImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
+  m_Data->histogramImg->origin = 1;
+
+  //mark text field
+  CvPoint startTextLine, finishTextLine;
+  startTextLine.x = 0;
+  startTextLine.y = (int)(imgSize.height * 0.9); //FIXME
+  finishTextLine.x = imgSize.width;
+  finishTextLine.y = startTextLine.y;
+  cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
 }
 
 void HPlotter::Initialize()
 {
   if (_IsEnabled())
   {
-    m_Data->windowName = "itlPlace";
-    cvNamedWindow(m_Data->windowName.c_str());
+    m_isDestroyed = false;
 
-    CvSize imgSize;
-	  m_Data->textSpaceHeight = m_hd.cfg.ValueOf("plotter.textSpaceHeight", 200);
     m_Data->drawingsNum = 0;
     m_Data->autoRefreshStep
       = m_Data->autoRefreshStepDefault
       = m_hd.cfg.ValueOf("plotter.autoRefreshStep", 200);
     m_Data->borderSpace = m_hd.cfg.ValueOf("plotter.borderSpace", 5);
-    imgSize.height = m_hd.cfg.ValueOf("plotter.windowHeight", 700) ;
-    imgSize.width = (int)(imgSize.height * m_hd.Circuit.Width() / m_hd.Circuit.Height());
 
-    
-    imgSize.height -= m_Data->textSpaceHeight;
-    m_Data->x_ratio = (imgSize.width - m_Data->borderSpace * 2) / m_hd.Circuit.Width();
-    m_Data->y_ratio = ( imgSize.height - m_Data->borderSpace * 2) / m_hd.Circuit.Height();
+    //create window
+    m_Data->windowName = "itlPlace";
+    cvNamedWindow(m_Data->windowName.c_str());
 
-
-
-    m_Data->x_offset = -m_hd.Circuit.MinX();
-    m_Data->y_offset = -m_hd.Circuit.MinY() + m_Data->textSpaceHeight / m_Data->y_ratio ;
-
-    imgSize.height += m_Data->textSpaceHeight;
+    //create image
+    CvSize imgSize;
+    m_Data->textSpaceHeight = m_hd.cfg.ValueOf("plotter.textSpaceHeight", 200);
+    imgSize.height = m_hd.cfg.ValueOf("plotter.windowHeight", 700);
+    int userHeight = imgSize.height - m_Data->textSpaceHeight;
+    imgSize.width = (int)(userHeight * m_hd.Circuit.Width() / m_hd.Circuit.Height());
     IMG = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
-
     IMG->origin = 1;
-    m_isDestroyed = false;
+
+    //mark text field
     CvPoint startTextLine, finishTextLine;
     startTextLine.x = 0;
     startTextLine.y = m_Data->textSpaceHeight;
     finishTextLine.x = imgSize.width;
     finishTextLine.y = m_Data->textSpaceHeight;
     cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
+
+    //calculate coordinate mapping
+    m_Data->x_ratio = (imgSize.width - m_Data->borderSpace * 2) / m_hd.Circuit.Width();
+    m_Data->y_ratio = (userHeight - m_Data->borderSpace * 2) / m_hd.Circuit.Height();
+
+    m_Data->x_offset = -m_hd.Circuit.MinX();
+    m_Data->y_offset = -m_hd.Circuit.MinY() + m_Data->textSpaceHeight / m_Data->y_ratio ;
+    
+    //start video writing
     if (m_hd.cfg.ValueOf("plotter.createVideo", true) == true)
       StartVideoWriting("", ".\\video\\");
   }
@@ -125,8 +162,21 @@ void HPlotter::Destroy()
   {
     cvReleaseImage(&IMG);
     cvDestroyWindow(m_Data->windowName.c_str());
+
     StopVideoWriting();
+
     m_isDestroyed = true;
+  }
+}
+
+void HPlotter::DestroyHistogramWindow()
+{
+  if (!m_isHistogramDestroyed)
+  {
+    cvReleaseImage(&m_Data->histogramImg);
+    cvDestroyWindow(m_Data->histogramWindowName.c_str());
+
+    m_isHistogramDestroyed = true;
   }
 }
 
@@ -177,9 +227,12 @@ void HPlotter::Refresh(WaitTime waitTime)
   if (IsEnabled())
   {
     cvShowImage(m_Data->windowName.c_str(), IMG);
+
     cvWaitKey(waitTime);
+
     if ((m_hd.cfg.ValueOf("plotter.createVideo", true) == true))
       WriteCurrentFrame();
+    
     if ((m_hd.cfg.ValueOf("plotter.saveImages", true) == true))
       SaveImage("", m_hd.cfg.ValueOf("plotter.pixDirectory"));
   }
@@ -359,45 +412,40 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
 
 void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
 {
-  static double maxKi = m_hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 0.0);
+  double maxKi = m_hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 0.0);
   if (!IsEnabled() || maxKi <= 0.0) 
-    return;    
+    return;
+
+  //FIXME: find proper place
+  InitializeHistogramWindow();
 
   CvPoint start, finish;
-  double parameter = 25.0;
   double meanK = 0.0;
 
   for (int i = 0; i < nNets; i++)
   {
     meanK += x[2*nClusters + i];
-    start.x = NormalX2ImageX((double)i/(double)nNets);
-    start.y = NormalY2ImageY(0.0);
+    start.x = HNormalX2ImageX((double)i/(double)nNets);
+    start.y = HNormalY2ImageY(0.0);
     finish.x = start.x;
-    finish.y = NormalY2ImageY(x[2*nClusters + i] / parameter);
-    cvDrawLine(IMG, start, finish, GetColor(color));
+    finish.y = HNormalY2ImageY(x[2*nClusters + i]/maxKi);
+    cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
   }
 
-  //plot zero
-  start.x  = NormalX2ImageX(0.0);
-  finish.x = NormalX2ImageX(1.0);
-  start.y  = NormalY2ImageY(0.0/parameter);
-  finish.y = NormalY2ImageY(0.0/parameter);
-  cvDrawLine(IMG, start, finish, GetColor(Color_Black), 1);
-
-  //plot one
-  start.x  = NormalX2ImageX(0.0);
-  finish.x = NormalX2ImageX(1.0);
-  start.y  = NormalY2ImageY(1.0/parameter);
-  finish.y = NormalY2ImageY(1.0/parameter);
-  cvDrawLine(IMG, start, finish, GetColor(Color_Black), 1);
+  //plot one line
+  start.x  = HNormalX2ImageX(0.0);
+  finish.x = HNormalX2ImageX(1.0);
+  start.y  = HNormalY2ImageY(1.0/maxKi);
+  finish.y = HNormalY2ImageY(1.0/maxKi);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(Color_Black), 1);
 
   //plot mean ki
   meanK /= nNets;
-  start.x  = NormalX2ImageX(0.0);
-  finish.x = NormalX2ImageX(1.0);
-  start.y  = NormalY2ImageY(meanK/parameter);
-  finish.y = NormalY2ImageY(meanK/parameter);
-  cvDrawLine(IMG, start, finish, GetColor(Color_Black), 1);
+  start.x  = HNormalX2ImageX(0.0);
+  finish.x = HNormalX2ImageX(1.0);
+  start.y  = HNormalY2ImageY(meanK/maxKi);
+  finish.y = HNormalY2ImageY(meanK/maxKi);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(Color_Black), 1);
 }
 
 void HPlotter::PlotCell(HCell cell, Color col)
@@ -603,19 +651,6 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath)
   }
 }
 
-void HPlotter::SizeChange(int changeHeight)
-{
-  CvSize imgSize;
-  imgSize.height = IMG->height + changeHeight;
-  imgSize.width = (int)(imgSize.height * m_hd.Circuit.Width() / m_hd.Circuit.Height());
-
-  IMG = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
-  IMG->origin = 1;
-
-  cvSet(IMG, cvScalar(255.0, 255.0, 255.0));
-  PlotPlacement();
-}
-
 void HPlotter::PlotText(string text, double textSize)
 {
   if (!IsEnabled())
@@ -782,12 +817,13 @@ void HPlotter::ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, W
   Refresh(waitTime);
 }
 
-void HPlotter::ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNets,
-                             double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g,
-                             double scaling, WaitTime waitTime)
+void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
+                              double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g)
 {
+  double scaling = m_hd.cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
+  int waitTime = m_hd.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+
   Clear();
-  PlotKi(nClusters, nNets, (double*)x, Color_Violet);
   PlotBinGrid(nBinRows, nBinCols);
   PlotPlacement();
   PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
@@ -795,7 +831,7 @@ void HPlotter::ShowGradients(int nClusters, int nBinRows, int nBinCols, int nNet
   PlotGradients(nClusters, (double*)x, gLR, scaling, Color_Pink);
   PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
   PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
-  Refresh(waitTime);
+  Refresh((HPlotter::WaitTime)waitTime);
 }
 
 void HPlotter::ShowLegalizationState(WaitTime waitTime, bool drawSites)
@@ -848,4 +884,37 @@ void HPlotter::DrawTilePins(double x1, double y1, double x2, double y2, int nPin
 
   cvRectangle(IMG, start, finish, resColor, CV_FILLED);
   Refresh();
+}
+
+void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
+{
+  if (!IsEnabled()) 
+    return;
+
+  CvPoint start, finish;
+  start.x = HNormalX2ImageX((double)tpIdx/(double)nTP);
+  start.y = HNormalY2ImageY(0.0);
+  finish.x = start.x;
+  finish.y = HNormalY2ImageY(mu/10.0); //FIXME: choose proper scale
+  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+}
+
+void HPlotter::ClearHistogram()
+{
+  if (IsEnabled())
+  {
+    if (!m_isHistogramDestroyed)
+    {
+      cvSet(m_Data->histogramImg, cvScalar(255.0, 255.0, 255.0));
+    }
+  }
+}
+
+void HPlotter::RefreshHistogram(WaitTime waitTime)
+{
+  if (IsEnabled())
+  {
+    cvShowImage(m_Data->histogramWindowName.c_str(), m_Data->histogramImg);
+    cvWaitKey(waitTime);
+  }
 }
