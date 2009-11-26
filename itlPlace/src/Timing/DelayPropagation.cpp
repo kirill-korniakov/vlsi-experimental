@@ -453,6 +453,7 @@ void PropagateRequires(HDesign& design)
   for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
     pt.GoPrevious() != firstPoint; )
   {
+    CRITICAL_ASSERT(!::IsNull(pt));
     HPin pin = pt.Pin();
     if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
     {//single arc to net source

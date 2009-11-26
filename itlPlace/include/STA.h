@@ -5,6 +5,6 @@
 
 const bool DO_NOT_REPORT = false;
 
-void STA(HDesign& design, bool doReport = true);
+void STA(HDesign& design, bool doReport = true, bool reroute = true);
 
 #endif //__STA_H__

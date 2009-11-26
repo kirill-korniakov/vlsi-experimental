@@ -2,6 +2,7 @@
 #define __GROW_H__
 
 #include <memory.h>
+#include "Configuration.h"
 
 #pragma warning( push )
 #pragma warning(disable:4345)
@@ -18,7 +19,8 @@ void Grow(T** data, int _from, int _to)
     new ((void*)(new_data+i)) T();
   for(int j = up; j < _from; j++)
     (*data)[j].~T();
-  delete [] (char*)(*data);
+  if (_from != 0)
+    delete [] (char*)(*data);
   *data = new_data;
 }
 
@@ -74,8 +76,12 @@ inline int GetNewSize(
                       int minSize,
                       double defGrowPercent)
 {
-  double growPercent = cfg.ValueOf(configSectionName + ".percent", defGrowPercent);
-  int minIncrement = cfg.ValueOf(configSectionName + ".min", (int)0);
+  double growPercent = configSectionName.empty()
+    ? defGrowPercent
+    : cfg.ValueOf(configSectionName + ".percent", defGrowPercent);
+  int minIncrement = configSectionName.empty()
+    ? 0
+    : cfg.ValueOf(configSectionName + ".min", (int)0);
   if(minIncrement < minAjustment)
     minIncrement = minAjustment;
   int new_size = (int)(currentSize * growPercent);

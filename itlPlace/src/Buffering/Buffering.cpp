@@ -21,7 +21,14 @@ void NetlistBuffering(HDesign& design)
 
   //buffering  
   VanGinneken vg(design);
-  ALERTFORMAT(("Buffer inside = %d", vg.BufferingTillDegradation()));
+  //ALERTFORMAT(("Buffer inside = %d", vg.n()));
+  int i = 0;
+  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
+  {
+    i += vg.InsertBuffers(net);
+  }
+  ALERTFORMAT(("Buffer inside = %d", i));
+  return;
 
   ALERTFORMAT(("Net candidates for buffering = %d", vg.GetNCandidatesForBuffering()));
   ALERTFORMAT(("Reverts = %d", vg.GetNReverts()));

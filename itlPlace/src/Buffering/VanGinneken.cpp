@@ -521,23 +521,23 @@ int VanGinneken::InsertBuffers(HNet& net)
   //ƒ¿À‹ÿ≈ Õ¿◊»Õ¿ﬁ“—ﬂ › —œ≈–≈Ã≈Õ“€
   netInfo = NetInfo::Create(m_hd, net, m_AvailableBuffers[0]);
   //ÔÓ‚ÂˇÂÏ ÛÒÎÓ‚ËÂ
-  if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
-  {
-    //—¡Œ– ƒ¿ÕÕ€’ ƒŒ ¡”‘≈–»«¿÷»»:
-    ALERTFORMAT(("net name %s", m_hd.Nets.GetString<HNet::Name>(net).c_str()));
-    ALERT("STA before buffering:");
-    STA(m_hd);
-    double tns = Utils::TNS(m_hd);
-    double wns = Utils::WNS(m_hd);
-    ALERTFORMAT(("maxSlack = %f", netInfo.MaxRealDelay()));
-    ALERTFORMAT(("Pins count = %d", m_hd.Nets.GetInt<HNet::PinsCount>(net)));
-    ALERTFORMAT(("HPWL = %f", netInfo.HPWL()));
-    ALERTFORMAT(("WL = %f", netInfo.WL()));
-    ALERTFORMAT(("Lext = %f", netInfo.Lext()));
-    ALERTFORMAT(("Buffer count = %d", nBuffersInserted));
-  }
-  else
-    return 0;
+  //if ((netInfo.X2opt() < 0) && (netInfo.Xmax() > 0))
+  //{
+  //  //—¡Œ– ƒ¿ÕÕ€’ ƒŒ ¡”‘≈–»«¿÷»»:
+  //  ALERTFORMAT(("net name %s", m_hd.Nets.GetString<HNet::Name>(net).c_str()));
+  //  ALERT("STA before buffering:");
+  //  STA(m_hd);
+  //  double tns = Utils::TNS(m_hd);
+  //  double wns = Utils::WNS(m_hd);
+  //  ALERTFORMAT(("maxSlack = %f", netInfo.MaxRealDelay()));
+  //  ALERTFORMAT(("Pins count = %d", m_hd.Nets.GetInt<HNet::PinsCount>(net)));
+  //  ALERTFORMAT(("HPWL = %f", netInfo.HPWL()));
+  //  ALERTFORMAT(("WL = %f", netInfo.WL()));
+  //  ALERTFORMAT(("Lext = %f", netInfo.Lext()));
+  //  ALERTFORMAT(("Buffer count = %d", nBuffersInserted));
+  //}
+  //else
+  //  return 0;
 
 
   //¡ÀŒ  –≈¿À‹ÕŒ… ¡”‘≈–»«¿÷»»
@@ -547,25 +547,25 @@ int VanGinneken::InsertBuffers(HNet& net)
   {
     m_hd.Nets.Set<HNet::Kind>(net, NetKind_Buffered);
     CreateNetsAndCells(net);
-    ALERTFORMAT(("STA after buffering (real):"));
-    STA(m_hd);
-    double tns2 = Utils::TNS(m_hd);
-    double wns2 = Utils::WNS(m_hd);
-    vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-    ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
-    Utils::RestoreBufferedNet(m_hd, net);
-    ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
+    //ALERTFORMAT(("STA after buffering (real):"));
+    //STA(m_hd);
+    //double tns2 = Utils::TNS(m_hd);
+    //double wns2 = Utils::WNS(m_hd);
+    //vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+    //ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
+    //Utils::RestoreBufferedNet(m_hd, net);
+    //ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
     // (1) –¿— ŒÃ≈Õ“»–Œ¬¿“‹ ≈—À» ¬—“¿¬ ¿ ¡”‘≈–¿ ¬ ƒ–¿…¬≈– Õ≈ Õ”∆Õ¿
     return nBuffersInserted;
   }
   else
   {
-    ALERTFORMAT(("STA after buffering (real):"));
-    STA(m_hd);
-    double tns2 = Utils::TNS(m_hd);
-    double wns2 = Utils::WNS(m_hd);
-    vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
-    ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
+    //ALERTFORMAT(("STA after buffering (real):"));
+    //STA(m_hd);
+    //double tns2 = Utils::TNS(m_hd);
+    //double wns2 = Utils::WNS(m_hd);
+    //vgRSlack =  TimingHelper(m_hd).GetBufferedNetMaxDelay(net, netInfo, m_AvailableBuffers[0]);
+    //ALERTFORMAT(("vgrSlack = %f", vgRSlack ));
     // (2) –¿— ŒÃ≈Õ“»–Œ¬¿“‹ ≈—À» ¬—“¿¬ ¿ ¡”‘≈–¿ ¬ ƒ–¿…¬≈– Õ≈ Õ”∆Õ¿
     return 0;
   }
@@ -703,7 +703,7 @@ void VanGinneken::AddSinks2Net(HCell* insertedBuffers, HNet& subNet, VGNode& nod
         HPin bufferOutput = Utils::FindCellPinByName(m_hd, insertedBuffers[bufferNumber], m_hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferInput], source);
         Utils::InsertNextPoint(m_hd, m_hd.TimingPoints[bufferOutput], m_hd.TimingPoints[bufferInput]);
-        ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
+        //ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(m_hd));
       }
       return;
     }

@@ -86,8 +86,10 @@ BEGINHCOLLECTION(HSteinerPoints, HSteinerPoint)
 
   GETTER(HPin, HSteinerPoint::Pin)
   { 
-    DEBUG_ASSERT(ARGID >= 0);
-		return ::__ConstructPtr<HPin>(arg);
+    if (ARGID >= 0)
+      return ::__ConstructPtr<HPin>(arg);
+    else
+      return ::__ConstructPtr<HPin>(0);
   }
 
   //special setters

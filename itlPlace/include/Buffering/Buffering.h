@@ -7,4 +7,6 @@ void NetlistBuffering(HDesign&);
 void TestBuffering(HDesign&);
 void BufferingAndReport(HDesign& design);
 
+void InsertRepeaters(HDesign& design);
+
 #endif

@@ -19,10 +19,11 @@ private:
   double m_Lbuf;
   double m_Dbuf;
   HMacroType m_BufType;
-  //double tIntrinsic;
+  HPinType m_InPin;
+  HPinType m_OutPin;
 public:
 
-  static const SignalDirection SignalModel = SignalDirection_Average;
+  static const SignalDirection SignalModel = SignalDirection_None;
 
   double Rb() const {return m_R;}
   double Cb() const {return m_C;}
@@ -35,6 +36,8 @@ public:
   double Resistance() {return m_R;}
 
   HMacroType Type() const {return m_BufType;}
+  HPinType InPin() const {return m_InPin; }
+  HPinType OutPin() const {return m_OutPin; }
 
   static BufferInfo Create(HDesign& hd);
 };

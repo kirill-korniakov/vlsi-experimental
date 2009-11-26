@@ -11,7 +11,7 @@ void InitializeLogging();
 void PrintRevisionNumber();
 
 #ifndef LOGGGINGLEVEL
-#define LOGGGINGLEVEL 1
+#define LOGGGINGLEVEL 0
 #endif
 
 //display levels

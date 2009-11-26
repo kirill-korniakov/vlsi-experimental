@@ -35,6 +35,14 @@ namespace Utils
   
   void InsertNextPoint(HDesign& design, HTimingPoint pointToPlace, HTimingPoint afterThisPoint)
   {
+    //bool isStart = design.GetBool<HTimingPoint::IsTimingStartPoint>(afterThisPoint);
+    //bool isEnd = design.GetBool<HTimingPoint::IsTimingEndPoint>(afterThisPoint);
+    //string name = Utils::MakePointFullName(design, afterThisPoint);
+    //string name1 = Utils::MakePointFullName(design, pointToPlace);
+    //ALERTFORMAT(("Inserting [%s] after [%s (%s)]",name1.c_str(), name.c_str(), isStart ? "s" : (isEnd ? "e" : "-")));
+
+    ASSERT(!::IsNull(pointToPlace));
+    ASSERT(!::IsNull(afterThisPoint));
     if (design.GetBool<HTimingPoint::IsTimingStartPoint>(pointToPlace)
       || design.GetBool<HTimingPoint::IsTimingEndPoint>(pointToPlace))
     {
@@ -44,33 +52,25 @@ namespace Utils
     if (!::IsNull(design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointToPlace))
       || !::IsNull(design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointToPlace)))
     {//remove from old position if needed
-      HTimingPoint prev = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(pointToPlace);
-      HTimingPoint next = design.Get<HTimingPoint::NextPoint, HTimingPoint>(pointToPlace);
-      if (design.Get<HTimingPoint::NextPoint, HTimingPoint>(prev) == pointToPlace)
-        design.Set<HTimingPoint::NextPoint>(prev, next);
-      if (design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(next) == pointToPlace)
-        design.Set<HTimingPoint::PreviousPoint>(next, prev);
+      Utils::DeletePointInList(design, pointToPlace);
     }
 
-    bool needRecalc = false;
     if (design.GetBool<HTimingPoint::IsTimingStartPoint>(afterThisPoint))
     {
       afterThisPoint = design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(design.TimingPoints.FirstInternalPoint());
-      needRecalc = true;
-    } else if (design.GetBool<HTimingPoint::IsTimingEndPoint>(afterThisPoint)
+      design._Design.Timing.tpFirstInternalPoint = ::ToID(pointToPlace);
+    }
+    else if (design.GetBool<HTimingPoint::IsTimingEndPoint>(afterThisPoint)
       || afterThisPoint == design.TimingPoints.LastInternalPoint())
     {
       afterThisPoint = design.TimingPoints.LastInternalPoint();
-      needRecalc = true;
+      design._Design.Timing.tpLastInternalPoint = ::ToID(pointToPlace);
     }
 
     design.Set<HTimingPoint::PreviousPoint>(pointToPlace, afterThisPoint);
     design.Set<HTimingPoint::NextPoint>(pointToPlace, design.Get<HTimingPoint::NextPoint, HTimingPoint>(afterThisPoint));
     design.Set<HTimingPoint::PreviousPoint>(design.Get<HTimingPoint::NextPoint, HTimingPoint>(afterThisPoint), pointToPlace);
     design.Set<HTimingPoint::NextPoint>(afterThisPoint, pointToPlace);
-
-    if (needRecalc)
-      design.TimingPoints.CountStartAndEndPoints();//we need only adjust first & last internal points
   }
 
   void DeletePointInList(HDesign& design, HTimingPoint pointDelete)

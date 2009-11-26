@@ -984,6 +984,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Buffering\VanGinneken2.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Buffering\VanGinnekenNode.cpp"
 					>
 				</File>
@@ -5454,6 +5458,10 @@
 					</File>
 					<File
 						RelativePath="..\include\data\auxiliary\Grow.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\data\auxiliary\GrowOnlyArray.h"
 						>
 					</File>
 					<File

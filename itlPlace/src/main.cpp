@@ -201,14 +201,11 @@ int main(int argc, char** argv)
 
       UpdateNetWeightsIfRequired(hd, i);
     }
-    
     //BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
-      if (hd.cfg.ValueOf("Buffering.BufferingType", "Test") == string("Test"))
-        TestBuffering(hd);
-      else
-        NetlistBuffering(hd);
+      InsertRepeaters(hd);
+      STA(hd);
     }
 
     //EXPORT

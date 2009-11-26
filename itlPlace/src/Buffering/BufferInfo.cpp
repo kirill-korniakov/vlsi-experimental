@@ -33,6 +33,8 @@ BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string
   result.m_C = sph;
   result.m_R = dph.R;
   result.m_T = dph.T;
+  result.m_InPin = inPin;
+  result.m_OutPin = outPin;
 
   result.m_Lbuf = Utils::LBuf(dph, sph, hd.RoutingLayers.Physics);
   result.m_Dbuf = Utils::DBuf(dph, sph, hd.RoutingLayers.Physics);
