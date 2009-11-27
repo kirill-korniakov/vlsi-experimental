@@ -104,7 +104,7 @@ void HPlotter::InitializeHistogramWindow()
   //mark text field
   CvPoint startTextLine, finishTextLine;
   startTextLine.x = 0;
-  startTextLine.y = (int)(imgSize.height * 0.9); //FIXME
+  startTextLine.y = (int)(imgSize.height * 0.5); //FIXME
   finishTextLine.x = imgSize.width;
   finishTextLine.y = startTextLine.y;
   cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
@@ -893,6 +893,19 @@ void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
 
   CvPoint start, finish;
   start.x = HNormalX2ImageX((double)tpIdx/(double)nTP);
+  start.y = HNormalY2ImageY(0.0);
+  finish.x = start.x;
+  finish.y = HNormalY2ImageY(mu/10.0); //FIXME: choose proper scale
+  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+}
+
+void HPlotter::PlotMu(double mu, int x, Color color)
+{
+  if (!IsEnabled()) 
+    return;
+
+  CvPoint start, finish;
+  start.x = x;
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
   finish.y = HNormalY2ImageY(mu/10.0); //FIXME: choose proper scale

@@ -1,6 +1,7 @@
 #include "TimingPointMus.h"
 #include "Utils.h"
 #include "STA.h"
+#include "Timing.h"
 
 int CalcNumberOfLRArc(HDesign& design, HNet net)
 {
@@ -15,7 +16,7 @@ int CalcNumberOfLRArc(HDesign& design, HNet net)
   return i;
 }
 
-//FIXME: check if we need to find topological order by ourselves
+//FIXME: check if we need to find topological order by ourselves (as prestage)
 TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0)
 {
   size = design._Design.NetList.nPinsLimit;
@@ -65,7 +66,8 @@ void TimingPointMus::EnforceFlowProperty(HDesign& design)
   }
 
   //ReportMus(design);
-  PlotMus(design);
+  //PlotMusInTopologicalOrder(design);
+  PlotMusInCriticalPathOrder(design);
 }
 
 void TimingPointMus::ReportMus(HDesign& design)
@@ -80,14 +82,18 @@ void TimingPointMus::ReportMus(HDesign& design)
   }
 }
 
-void TimingPointMus::PlotMus(HDesign& design)
+void TimingPointMus::PlotMusInTopologicalOrder(HDesign& design)
 {
   //FIXME: find proper place
   design.Plotter.InitializeHistogramWindow();
 
   //FIXME: get proper values
   int waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
-  int nTimingPoints = design._Design.NetList.nPinsLimit;
+
+  int nTimingPoints = 0;
+  for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
+    !::IsNull(pt.GoNext()); )
+    nTimingPoints++;
 
   design.Plotter.ClearHistogram();
   int i = 0;
@@ -106,6 +112,52 @@ void TimingPointMus::PlotMus(HDesign& design)
     design.Plotter.PlotMu(i, nTimingPoints, sum, Color_Red);
   }
 
+  design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
+}
+
+void TimingPointMus::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
+{
+  static int x = 0;
+  if (pathIdx == 1)
+    x = 0;
+
+  HCriticalPath::PointsEnumeratorW cpoint = (path,design).GetEnumeratorW();
+  HCriticalPathPointWrapper previousSink = design.CriticalPathPoints.NullW();
+  while (cpoint.MoveNext())
+  {
+    HTimingPoint pt = cpoint.TimingPoint();
+
+    int count = GetMuInCount(pt);
+    double sum = 0.0;
+    for (int j = 0; j < count; j++)
+    {
+      double muInA = GetMuInA(pt, j);
+      double muInR = GetMuInR(pt, j);
+      sum = sum + muInA + muInR;
+    }
+
+    if (pathIdx % 2 == 0)
+      design.Plotter.PlotMu(sum, x, Color_Red);
+    else
+      design.Plotter.PlotMu(sum, x, Color_Orange);
+    x++;
+  }
+}
+
+void TimingPointMus::PlotMusInCriticalPathOrder(HDesign& design)
+{
+  //FIXME: find proper place
+  design.Plotter.InitializeHistogramWindow();
+
+  //FIXME: get proper values
+  int waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+
+  STA(design);
+  FindCriticalPaths(design);
+
+  design.Plotter.ClearHistogram();
+  Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, 
+    Utils::CriticalPathHandler(this, &TimingPointMus::PlotPathMus));
   design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
 }
 

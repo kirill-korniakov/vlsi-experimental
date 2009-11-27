@@ -261,7 +261,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
       (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient);
 
     if (context->useSumOfDelays)
-    {//FIXME: think about proper place
+    {
       context->hd->Plotter.ClearHistogram();
       context->hd->Plotter.PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
         (double*)solution, Color_Violet);

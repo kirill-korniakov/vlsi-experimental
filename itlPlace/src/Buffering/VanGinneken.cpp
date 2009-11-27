@@ -1048,7 +1048,7 @@ int VanGinneken::BufferingTillDegradation()
   if (pathPack > 0)
   {
     PathBuffering pb(*this, pathPack);
-    Utils::IterateMostCriticalPaths(m_hd, -1, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::DoIt));
+    Utils::IterateMostCriticalPaths(m_hd, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::DoIt));
     buffered = pb.bufs;
   }
   else

@@ -11,7 +11,10 @@ public:
 
   void UpdateMus(HDesign& design);
   void ReportMus(HDesign& design);
-  void PlotMus(HDesign& design);
+
+  void PlotMusInTopologicalOrder(HDesign& design);
+  void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
+  void PlotMusInCriticalPathOrder(HDesign& design);
 
   void GetNetMus(HDesign& design, HNet net,
                  std::vector<double>& cellArcMus, 
