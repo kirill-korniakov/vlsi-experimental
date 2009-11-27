@@ -7,6 +7,4 @@ void AdaptiveRoute(HDesign&, HNet&);
 
 void AdaptiveRoute(HDesign&);
 
-void RemoveRouting(HDesign&, HNet&);
-
 #endif //__ADAPTIVEROUTE_H__

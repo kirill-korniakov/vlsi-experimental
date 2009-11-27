@@ -2,7 +2,6 @@
 #define __REPORTING_H__
 
 #include "HDesign.h"
-#include "VanGinneken.h"
 
 //macro types reports
 void ReportCellsByMacroFunction(HDesign& design);

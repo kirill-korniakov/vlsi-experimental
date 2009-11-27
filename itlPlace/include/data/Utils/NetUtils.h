@@ -20,6 +20,7 @@ namespace Utils
 
   void CalculateLNets(HDesign& hd);
 
+  void RemoveRouting(HDesign&, HNet&);
 };
 
 #endif //__NETUTILS_H__

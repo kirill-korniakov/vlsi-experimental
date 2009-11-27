@@ -980,15 +980,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Buffering\VanGinneken.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Buffering\VanGinneken2.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Buffering\VanGinnekenNode.cpp"
 					>
 				</File>
 			</Filter>
@@ -5731,14 +5723,6 @@
 				</File>
 				<File
 					RelativePath="..\include\Buffering\NetInfo.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\Buffering\VanGinneken.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\Buffering\VanGinnekenNode.h"
 					>
 				</File>
 			</Filter>

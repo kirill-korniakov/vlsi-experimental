@@ -1,58 +1,7 @@
 #include "Buffering.h"
-#include "VanGinneken.h"
-#include "Utils.h"
-#include "Auxiliary.h"
-#include "STA.h"
-#include "Reporting.h"
-#include "Parser.h"
-
-void NetlistBuffering(HDesign& design)
-{ 
-  ConfigContext ctx = design.cfg.OpenContext("Buffering");
-
-  WRITELINE("");
-  ALERT("BUFFERING STARTED");
-
-  ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA before buffering:");
-  STA(design);
-
-  HDPGrid DPGrid(design);
-
-  //buffering  
-  VanGinneken vg(design);
-  //ALERTFORMAT(("Buffer inside = %d", vg.n()));
-  int i = 0;
-  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
-  {
-    i += vg.InsertBuffers(net);
-  }
-  ALERTFORMAT(("Buffer inside = %d", i));
-  return;
-
-  ALERTFORMAT(("Net candidates for buffering = %d", vg.GetNCandidatesForBuffering()));
-  ALERTFORMAT(("Reverts = %d", vg.GetNReverts()));
-
-  WRITELINE("");
-  ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA after buffering (not legalized):");
-  STA(design);
-  design.Plotter.ShowPlacement();
-  design.Plotter.SaveMilestoneImage("BI");
-
-  //legalization
-  WRITELINE("");
-  Legalization(DPGrid);
-  design.Plotter.ShowPlacement();
-  design.Plotter.SaveMilestoneImage("BI+LEG");
-
-  WRITELINE("");
-  ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA after buffering and legalization:");
-  STA(design);
-
-  ALERT("BUFFERING FINISHED");
-}
+#include "BufferInfo.h"
+#include "NetInfo.h"
+#include "TimingHelpers.h"
 
 void BufferingAndReport(HDesign& design)
 {
@@ -60,7 +9,7 @@ void BufferingAndReport(HDesign& design)
     ConfigContext ctx = design.cfg.OpenContext("Buffering");
 
     BufferInfo buf = BufferInfo::Create(design);
-    VanGinneken vg(design);
+    //VanGinneken vg(design);
 
     WRITELINE("Buffering Parameters:");
     WRITELINE("Rb: %.20f kOhm", buf.Rb());
@@ -102,7 +51,7 @@ void BufferingAndReport(HDesign& design)
       buffers += n.KoptInt();
 
       //vg.__DriverResistance = n.Rd();
-      int vgbufs = vg.InsertBuffers(net);
+      int vgbufs = 0;//vg.InsertBuffers(net);
       vgbuffers += vgbufs;
 
       double bufferedDelay = TimingHelper(design).GetBufferedNetMaxDelay(net, n, buf);
@@ -139,113 +88,4 @@ void BufferingAndReport(HDesign& design)
     WRITELINE("Inserted             %d buffers", buffers);
     WRITELINE("VanGinneken Inserted %d buffers", vgbuffers);
   }
-}
-
-
-void TestBuffering(HDesign& design)
-{
-  ConfigContext ctx = design.cfg.OpenContext("Buffering");
-  WRITELINE("");
-  ALERT("BUFFERING STARTED");
-  //ALERTFORMAT(("HPWL before buffering: %f", Utils::CalculateHPWL(design, true)));
-  //ALERT("STA before buffering:");
-  STA(design, false);
-      
-  //buffering
-  VanGinneken vg(design);
-  HDPGrid DPGrid(design);
-  string name = Aux::CreateCoolFileName("", design.Circuit.Name() + "_Buffered" ,".def");
-
-  //ALERTFORMAT(("Buffer inside = %d", vg.BufferingOfMostCriticalPaths()));
-  int count = design.cfg.ValueOf(".netIter", 0);
-  int i = 0;
-  int j = 0;
-  bool f = false;
-  for (HNets::ActiveNetsEnumeratorW nIter = design.Nets.GetActiveNetsEnumeratorW(); nIter.MoveNext(); i++) 
-  {
-    // (1) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (2)  )
-    //{
-    //if (i <= count)
-    //  continue;
-    //}
-    //Сколько пинов должно быть в нете
-    //if (nIter.PinsCount() != 2) 
-    //	continue;
-    //имя необходимого нета	
-    //if (nIter.Name() != "n_3865")
-    //	continue;
-
-    //Рассматриваются ли неы в которые входят Primary pin
-    //bool isAnyPinPrimary = false;
-    //for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
-    //{
-    //  if (currPin.IsPrimary())
-    //  {
-    //    isAnyPinPrimary = true;
-    //    break;
-    //  }
-    //}
-    //if (isAnyPinPrimary)
-    //{
-    //  continue;
-    //}
-
-    //несколько отчетов до буферизации
-    //WRITELINE("");
-    //ALERTFORMAT(("Buffer insertion into net %s", nIter.Name().c_str()));
-    //ReportNetPinsCoordinates(design, nIter);
-    //STA(design);
-    //ReportNetTiming(design, nIter);
-    //ExportDEF(design, "not_buffered");
-
-    int nBuf = vg.InsertBuffers(nIter);
-    // (2) Раскоментировать если используется скрипт "EWDTS buffering2.py" (такжен нужно расскаментировать (1)  )
-    //if (nBuf != 0)
-    //{
-    //  ALERTFORMAT(("netIter = %d", i));
-    //  f = true;
-    //  j++;
-    //  break;
-    //}
-
-    //несколько отчетов после буферизации
-    //ReportBufferingPhysics(vg);
-    //ExportDEF(design, "buffered");
-    //ALERT("After buffer insertion:");
-    //STA(design);
-    //ReportNetTiming(design, nIter);
-    //ALERT("After legalization:");
-    //Legalization(DPGrid);
-    //STA(design);
-    
-    //break;//раскоментировать если нужен только один нет.
-    
-  }
-
-  //финальные отчеты
-  /*if (!f)
-    ALERTFORMAT(("netIter = %d", i));
-  ALERTFORMAT(("netc = %d", j));*/
-  /*WRITELINE("");
-  //FindTopologicalOrder(design);
-  ALERTFORMAT(("HPWL after buffering (not legalized): %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA after buffering (not legalized):");
-  STA(design);
-  design.Plotter.ShowPlacement();
-  design.Plotter.SaveMilestoneImage("BI");
-
-  //legalization
-  WRITELINE("");
-  ALERT("Legalization after buffering:");
-  Legalization(DPGrid);
-  design.Plotter.ShowPlacement();
-  design.Plotter.SaveMilestoneImage("BI+LEG");
-
-  WRITELINE("");
-  //FindTopologicalOrder(design);
-  ALERTFORMAT(("HPWL after buffering and legalization: %f", Utils::CalculateHPWL(design, true)));
-  ALERT("STA after buffering and legalization:");*/
-  STA(design);
-
-  ALERT("BUFFERING FINISHED");
 }

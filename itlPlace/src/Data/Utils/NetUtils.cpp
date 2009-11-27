@@ -221,7 +221,7 @@ namespace Utils
             RemoveRepeatersTree(design, originalNet, cpin.Net(), sink);
       }
 
-    RemoveRouting(design, netToRemove);
+    Utils::RemoveRouting(design, netToRemove);
     Utils::RemoveNet(design, netToRemove);
   }
 
@@ -248,5 +248,12 @@ namespace Utils
         Utils::GetDriverWorstPhisics(hd, net.Source(), sigDir),
         GetNetLoad(hd, net, sigDir),
         hd.RoutingLayers.Physics));
+  }
+
+  void RemoveRouting(HDesign& aDesign, HNet& aNet)
+  {
+    HWireWrapper wire = aDesign[aDesign.Wires[aNet]];
+    if (wire.RoutingType() != RoutingType_Unrouted)
+      aDesign.SteinerPoints.RemoveSteinerTree(wire.Root());
   }
 }
