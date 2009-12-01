@@ -75,7 +75,7 @@ void ComputeNetWeights(HDesign& hd)
 {
   double maxPathDelay = FindMaxPathDelay(hd);
   double u = 0.3;
-  double beta = 9;
+  double beta = 2;
   double T = (1 - u) * maxPathDelay;
   double sum = 0.0;
 
