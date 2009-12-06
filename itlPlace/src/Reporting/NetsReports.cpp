@@ -1,5 +1,6 @@
 #include "Reporting.h"
 #include "Utils.h"
+#include "AdaptiveRoute.h"
 
 void ReportNetPins(HDesign& design, HNet net)
 {
@@ -95,4 +96,203 @@ void ReportNetTiming(HDesign& design, HNet net)
     ALERTFORMAT(("AAT at %s\t= %.10f", pinName.c_str(), AAT));
     ALERTFORMAT(("NS at %s\t= %.10f", pinName.c_str(), NS));
   }
+}
+
+int SteinerTreeReport(HDesign& design, HNet net, bool isReport)
+{
+  design.Plotter.PlotNetSteinerTree(net, Color_Black);
+  design.Plotter.Refresh(design.Plotter.WAIT_3_SECONDS);
+  design.Plotter.Clear();
+  design.Plotter.ShowPlacement();
+
+  AdaptiveRoute(design, net);
+
+  HNetWrapper netw = design[net];
+  HPinWrapper src =  design[netw.Source()];
+  HSteinerPointWrapper srcPoint = design[design.SteinerPoints[src]];
+  HSteinerPointWrapper nextPoint = srcPoint;
+  double xi1 = 0, yi1 = 0, xi2 = 0, yi2 = 0, xj1 = 0, yj1 = 0, xj2 = 0, yj2 = 0, Ai = 0, Aj = 0, Bi = 0, Bj = 0, x = 0, y =0;
+  bool isBad = false;
+  int crossing = 0, onlyRight = 0, noTree = 0;
+
+  //m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color);
+  if (!(srcPoint.HasLeft() || srcPoint.HasRight()))
+    noTree++;
+
+  TemplateTypes<HSteinerPoint>::stack points;
+  points.push(srcPoint);
+  
+  while (!points.empty())
+  {
+    isBad = false;
+    srcPoint = points.top();
+    xi1 = srcPoint.X();
+    yi1 = srcPoint.Y();
+    points.pop();
+
+    if (srcPoint.HasLeft())
+    {
+      nextPoint = srcPoint.Left();
+      xi2 = nextPoint.X();
+      yi2 = nextPoint.Y();
+      points.push(nextPoint);
+      
+      Ai = (yi2 - yi1)/(xi2 - xi1);
+      Bi = yi1 - Ai * xi1;
+
+
+      //начало1
+      TemplateTypes<HSteinerPoint>::stack points2;
+      HSteinerPointWrapper srcPoint2 = design[design.SteinerPoints[src]];
+      HSteinerPointWrapper nextPoint2 = srcPoint2;
+      points2.push(srcPoint2);
+      while (!points2.empty())
+      {
+        srcPoint2 = points2.top();
+        xj1 = srcPoint2.X();
+        yj1 = srcPoint2.Y();
+        points2.pop();
+
+        if (srcPoint2.HasLeft())
+        {
+          nextPoint2 = srcPoint2.Left();
+          xj2 = nextPoint2.X();
+          yj2 = nextPoint2.Y();
+          points2.push(nextPoint2);
+
+          Aj = (yj2 - yj1)/(xj2 - xj1);
+          Bj = yj1 - Aj * xj1;
+
+          if (srcPoint2.HasRight())
+          {
+            nextPoint2 = srcPoint2.Right();
+            xj2 = nextPoint2.X();
+            yj2 = nextPoint2.Y();
+            points2.push(nextPoint2);
+
+            Aj = (yj2 - yj1)/(xj2 - xj1);
+            Bj = yj1 - Aj * xj1;
+
+          }
+        }
+      }
+      //конец1
+     
+
+
+      if (srcPoint.HasRight())
+      {
+        nextPoint = srcPoint.Right();
+        xi2 = nextPoint.X();
+        yi2 = nextPoint.Y();
+        points.push(nextPoint);
+
+        Ai = (yi2 - yi1)/(xi2 - xi1);
+        Bi = yi1 - Ai * xi1;
+
+        //начало2
+        TemplateTypes<HSteinerPoint>::stack points2;
+        HSteinerPointWrapper srcPoint2 = design[design.SteinerPoints[src]];
+        HSteinerPointWrapper nextPoint2 = srcPoint2;
+        points2.push(srcPoint2);
+        while (!points2.empty())
+        {
+          srcPoint2 = points2.top();
+          xj1 = srcPoint2.X();
+          yj1 = srcPoint2.Y();
+          points2.pop();
+
+          if (srcPoint2.HasLeft())
+          {
+            nextPoint2 = srcPoint2.Left();
+            xj2 = nextPoint2.X();
+            yj2 = nextPoint2.Y();
+            points2.push(nextPoint2);
+
+            Aj = (yj2 - yj1)/(xj2 - xj1);
+            Bj = yj1 - Aj * xj1;
+
+            if (srcPoint2.HasRight())
+            {
+              nextPoint2 = srcPoint2.Right();
+              xj2 = nextPoint2.X();
+              yj2 = nextPoint2.Y();
+              points2.push(nextPoint2);
+
+              Aj = (yj2 - yj1)/(xj2 - xj1);
+              Bj = yj1 - Aj * xj1;
+
+            }
+          }
+        }
+        //конец2
+
+
+      }
+    }
+    else
+    {
+      if (srcPoint.HasRight())
+      {
+        onlyRight++;
+        isBad = true;
+      }
+      //design.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 1, color);
+    }
+    if (!isBad)
+    {
+      x = (Bj - Bi) / (Ai - Aj);
+      y = Ai * x + Bi;
+      if (((((x < xi1) && (x > xi2)) || ((x < xi2) && (x > xi1))) &&
+          (((x < xj1) && (x > xj2)) || ((x < xj2) && (x > xj1)))) &&
+         ((((y < yi1) && (y > yi2)) || ((y < yi2) && (y > yi1))) &&
+          (((y < yj1) && (y > yj2)) || ((y < yj2) && (y > yj1)))))
+      {
+        crossing++;
+      }
+
+    }
+
+
+  }
+  if (isReport)
+  {
+    ALERTFORMAT(("net = %s", netw.Name().c_str()))
+    ALERTFORMAT(("crossing\t=%d", crossing));
+    ALERTFORMAT(("onlyRight\t=%d", onlyRight));
+    ALERTFORMAT(("noTree\t=%d", noTree));
+  }
+  return crossing;
+  //начало
+ /* TemplateTypes<HSteinerPoint>::stack points2;
+  HSteinerPointWrapper srcPoint2 = design[design.SteinerPoints[src]];
+  HSteinerPointWrapper nextPoint2 = srcPoint;
+  while (!points.empty())
+  {
+    srcPoint2 = points2.top();
+    points2.pop();
+
+    if (srcPoint2.HasLeft())
+    {
+      nextPoint2 = srcPoint2.Left();
+      points.push(nextPoint2);
+
+      if (srcPoint2.HasRight())
+      {
+        nextPoint2 = srcPoint2.Right();
+        points2.push(nextPoint2);
+      }
+    }
+  }*/
+  //конец
+  
+
+}
+void SteinerWoodReport(HDesign& design)
+{
+  ALERTFORMAT(("Steiner wood report:"))
+  int crossing = 0; 
+  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
+    crossing += SteinerTreeReport(design, net);  
+  ALERTFORMAT(("crossing = %d", crossing));
 }

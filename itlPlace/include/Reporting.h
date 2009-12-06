@@ -20,6 +20,8 @@ void ReportBenchmarkStatistics(HDesign& design);
 //nets reports
 //распечатка количества двупиновых, трёхпиновых и т.д. нэтов.
 void ReportNetsInfo(HDesign& design);
+int SteinerTreeReport(HDesign& design, HNet net, bool isReport = false);
+void SteinerWoodReport(HDesign& design);
 
 //Информация о количестве нэтов каждого типа (all, skipped, buffered, removed, Active).
 void ReportCountNetsWithTypes(HDesign& design);
