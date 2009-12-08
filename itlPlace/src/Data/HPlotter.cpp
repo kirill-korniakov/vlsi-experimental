@@ -100,14 +100,6 @@ void HPlotter::InitializeHistogramWindow()
   imgSize.width = m_hd.cfg.ValueOf("plotter.histogramWindowWidth", 1000);
   m_Data->histogramImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
   m_Data->histogramImg->origin = 1;
-
-  //mark text field
-  CvPoint startTextLine, finishTextLine;
-  startTextLine.x = 0;
-  startTextLine.y = (int)(imgSize.height * 0.5); //FIXME
-  finishTextLine.x = imgSize.width;
-  finishTextLine.y = startTextLine.y;
-  cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
 }
 
 void HPlotter::Initialize()
@@ -886,6 +878,21 @@ void HPlotter::DrawTilePins(double x1, double y1, double x2, double y2, int nPin
   Refresh();
 }
 
+const double TopologicalScaling = 0.1; //FIXME: choose proper scale
+
+void HPlotter::PlotMuLevel(double level, Color color)
+{
+  if (!IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  start.x = HNormalX2ImageX(0.0);
+  start.y = HNormalY2ImageY(level*TopologicalScaling);
+  finish.x = m_Data->histogramImg->width;
+  finish.y = HNormalY2ImageY(level*TopologicalScaling);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+}
+
 void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
 {
   if (!IsEnabled()) 
@@ -895,7 +902,7 @@ void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
   start.x = HNormalX2ImageX((double)tpIdx/(double)nTP);
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
-  finish.y = HNormalY2ImageY(mu/10.0); //FIXME: choose proper scale
+  finish.y = HNormalY2ImageY(mu*TopologicalScaling);
   cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
 }
 
@@ -908,7 +915,7 @@ void HPlotter::PlotMu(double mu, int x, Color color)
   start.x = x;
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
-  finish.y = HNormalY2ImageY(mu/10.0); //FIXME: choose proper scale
+  finish.y = HNormalY2ImageY(mu/40.0); //FIXME: choose proper scale
   cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
 }
 

@@ -368,7 +368,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
   }
 }
 
-void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution, double* &f)
+void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution, double* f)
 {
   timetype start = GET_TIME_METHOD();
   *f += context->spreadingData.spreadingWeight * SpreadingPenalty(context, solution);

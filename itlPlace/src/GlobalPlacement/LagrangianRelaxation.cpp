@@ -58,7 +58,7 @@ int GetDoiDerivative(AppCtx* context, PetscScalar* solution,
 
 double GetA(AppCtx* context, int netIdx)
 {
-  return context->LRdata.alphaTWL + context->LRdata.c * context->LRdata.netLRData[netIdx].sourceAFactor;
+  return context->LRdata.c * context->LRdata.netLRData[netIdx].sourceAFactor;
 }
 
 double GetBraces(AppCtx* context, PetscScalar* solution, int netIdx)
@@ -109,6 +109,8 @@ int GetClusterNetPinIdx(AppCtx* context, int netIdx, int clusterIdx)
 
 double LR(AppCtx* context, PetscScalar* solution)
 {
+  double termTWL = 0.0;
+  double termTNS = 0.0;
   double LRValue = 0.0;
 
   int netListSize = static_cast<int>(context->ci->netList.size());
@@ -118,9 +120,11 @@ double LR(AppCtx* context, PetscScalar* solution)
     double LSE = CalcNetLSE(context, solution, netIdx);
     double greenTerm = GetGreenTerm(context, solution, netIdx);
 
-    LRValue += braces * LSE + greenTerm;
-    //ALERTFORMAT(("%d LRValue =\t%f", netIdx, LRValue));
+    termTWL += context->LRdata.alphaTWL * LSE;
+    termTNS += braces * LSE + greenTerm;
   }
+  LRValue = termTWL + termTNS;
+  //WRITE("%5f %5f ", termTWL, termTNS);
 
   return LRValue;
 }
@@ -183,7 +187,7 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, Pet
   }
 }
 
-void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*& f)
+void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
 {
   PrecalcExponents(context, solution);
 

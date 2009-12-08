@@ -1,6 +1,6 @@
 #include "Spreading.h"
 
-void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*& f)
+void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
 {
   SpreadingPenalty(context, solution);
   *f += Aux::ScalarProduct(context->spreadingData.muBinsPen, 
@@ -10,7 +10,7 @@ void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
   AddSpreadingPenaltyGradient(context, solution, context->gQS); //FIXME:HACK: use proper gradient
 }
 
-void UpdateLRSpreadingMu(AppCtx& context, HDesign& hd, int iterate)
+void UpdateLRSpreadingMu(HDesign& hd, AppCtx& context, int iterate)
 {
   context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
   context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);

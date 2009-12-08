@@ -575,7 +575,7 @@ void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
   context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
   context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
 
-  UpdateLRSpreadingMu(context, hd, 32); //TODO: ISSUE 18 COMMENT 12
+  UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
 
   if (context.useLR)
     context.LRdata.UpdateMultipliers(hd);

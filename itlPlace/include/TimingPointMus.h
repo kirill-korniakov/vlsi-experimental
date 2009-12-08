@@ -13,6 +13,7 @@ public:
   void ReportMus(HDesign& design);
 
   void PlotMusInTopologicalOrder(HDesign& design);
+
   void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
   void PlotMusInCriticalPathOrder(HDesign& design);
 
@@ -38,11 +39,14 @@ private:
   double GetMuS(HTimingPoint pt) const { return MuS[::ToID(pt)]; }
   double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
   double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }
+  double GetInMuA(HTimingPoint pt);
+  double GetInMuR(HTimingPoint pt);
 
   double BorderValue(double value) { return max(0.01, min(value, 0.99)); }
+  double ZeroBorderValue(double value) { return max(0.01, value); }
   void SetMuS(HTimingPoint pt, double value) { MuS[::ToID(pt)] = BorderValue(value); }
-  void SetMuInA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = BorderValue(value); }
-  void SetMuInR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = BorderValue(value); }
+  void SetMuInA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = ZeroBorderValue(value); }
+  void SetMuInR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = ZeroBorderValue(value); }
 
   double SumInMuA(HTimingPoint pt);
   double SumInMuR(HTimingPoint pt);

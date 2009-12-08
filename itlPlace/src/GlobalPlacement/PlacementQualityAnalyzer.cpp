@@ -98,7 +98,7 @@ bool PlacementQualityAnalyzer::IsNextIterationApproved()
   else
   {
     nIterationsWithoutGain++;
-    static int maxIterationsWithoutGain = m_design.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 3);
+    int maxIterationsWithoutGain = m_design.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 3);
     if (nIterationsWithoutGain > maxIterationsWithoutGain)
     {
       nIterationsWithoutGain = 0;

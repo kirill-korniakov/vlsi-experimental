@@ -65,6 +65,7 @@ public:
   void PlotKi(int nClusters, int nNets, double* x, Color color);
   void PlotMu(int tpIdx, int nTP, double mu, Color color);
   void PlotMu(double mu, int x, Color color);
+  void PlotMuLevel(double level, Color color = Color_Black);
 
   void DrawLine(double x1, double y1, double x2, double y2, Color col);
   void DrawCircle(double x, double y, int radius, Color col);

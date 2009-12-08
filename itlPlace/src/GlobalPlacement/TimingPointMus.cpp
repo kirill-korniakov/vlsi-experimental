@@ -66,8 +66,8 @@ void TimingPointMus::EnforceFlowProperty(HDesign& design)
   }
 
   //ReportMus(design);
-  //PlotMusInTopologicalOrder(design);
-  PlotMusInCriticalPathOrder(design);
+  PlotMusInTopologicalOrder(design);
+  //PlotMusInCriticalPathOrder(design);
 }
 
 void TimingPointMus::ReportMus(HDesign& design)
@@ -80,6 +80,30 @@ void TimingPointMus::ReportMus(HDesign& design)
     for (int i = 0; i < count; i++)
       WRITELINE("MuInA %f    MuInR %f", GetMuInA(pt, i), GetMuInR(pt, i));
   }
+}
+
+double TimingPointMus::GetInMuA(HTimingPoint pt)
+{
+  int count = GetMuInCount(pt);
+  double sum = 0.0;
+  for (int j = 0; j < count; j++)
+  {
+    double muInA = GetMuInA(pt, j);
+    sum = sum + muInA;
+  }
+  return sum;
+}
+
+double TimingPointMus::GetInMuR(HTimingPoint pt)
+{
+  int count = GetMuInCount(pt);
+  double sum = 0.0;
+  for (int j = 0; j < count; j++)
+  {
+    double muInR = GetMuInR(pt, j);
+    sum = sum + muInR;
+  }
+  return sum;
 }
 
 void TimingPointMus::PlotMusInTopologicalOrder(HDesign& design)
@@ -96,20 +120,12 @@ void TimingPointMus::PlotMusInTopologicalOrder(HDesign& design)
     nTimingPoints++;
 
   design.Plotter.ClearHistogram();
+  design.Plotter.PlotMuLevel(1.0);
   int i = 0;
   for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
     !::IsNull(pt.GoNext()); i++)
   {
-    int count = GetMuInCount(pt);
-    double sum = 0.0;
-    for (int j = 0; j < count; j++)
-    {
-      double muInA = GetMuInA(pt, j);
-      double muInR = GetMuInR(pt, j);
-      sum = sum + muInA + muInR;
-    }
-
-    design.Plotter.PlotMu(i, nTimingPoints, sum, Color_Red);
+    design.Plotter.PlotMu(i, nTimingPoints, GetInMuA(pt), Color_Red);
   }
 
   design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
@@ -122,26 +138,18 @@ void TimingPointMus::PlotPathMus(HDesign& design, HCriticalPath path, int pathId
     x = 0;
 
   HCriticalPath::PointsEnumeratorW cpoint = (path,design).GetEnumeratorW();
-  HCriticalPathPointWrapper previousSink = design.CriticalPathPoints.NullW();
+  double sum = 0.0;
   while (cpoint.MoveNext())
   {
     HTimingPoint pt = cpoint.TimingPoint();
-
-    int count = GetMuInCount(pt);
-    double sum = 0.0;
-    for (int j = 0; j < count; j++)
-    {
-      double muInA = GetMuInA(pt, j);
-      double muInR = GetMuInR(pt, j);
-      sum = sum + muInA + muInR;
-    }
-
-    if (pathIdx % 2 == 0)
-      design.Plotter.PlotMu(sum, x, Color_Red);
-    else
-      design.Plotter.PlotMu(sum, x, Color_Orange);
-    x++;
+    sum += GetInMuA(pt) + GetInMuR(pt);
   }
+
+  if (pathIdx % 2 == 0)
+    design.Plotter.PlotMu(sum, x, Color_Red);
+  else
+    design.Plotter.PlotMu(sum, x, Color_Orange);
+  x += 2;
 }
 
 void TimingPointMus::PlotMusInCriticalPathOrder(HDesign& design)

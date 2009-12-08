@@ -191,10 +191,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   timetype start = 0;
   timetype finish = 0;
 
-  double* LRValue = new double;
-  double* QSValue = new double;
-  *LRValue = 0.0;
-  *QSValue = 0.0;
+  double LRValue = 0.0;
+  double QSValue = 0.0;
 
 #pragma omp parallel sections
   {
@@ -212,8 +210,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 
       if (context->useLR)
       {
-        LR_AddObjectiveAndGradient(context, solution, LRValue);
-        *f += *LRValue;
+        LR_AddObjectiveAndGradient(context, solution, &LRValue);
+        *f += LRValue;
       }
     }
 
@@ -221,8 +219,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     {
       if (context->useQuadraticSpreading)
       {
-        QS_AddObjectiveAndGradient(context, solution, QSValue);
-        *f += *QSValue;
+        QS_AddObjectiveAndGradient(context, solution, &QSValue);
+        *f += QSValue;
       }
 
       if (context->useLRSpreading)
@@ -236,6 +234,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   {
     AddBPwithGrad(context, solution, f, gradient);
   }
+
+  //WRITELINE("%5f %5f", QSValue, *f);
 
   //normalize gradients
   if (context->useSumOfDelays)
