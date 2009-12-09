@@ -14,7 +14,7 @@ void HPWLRoute(HDesign& aDesign, HNet& aNet)
     aDesign.SteinerPoints.RemoveSteinerTree(wire.Root());
 
   double wl = 0.0;
-  int pos = 0;
+  int pos = 1;
   HSteinerPointWrapper current = aDesign[wire.Root()];
   current.InheritPinCoordinates();
   double root_x = current.X();

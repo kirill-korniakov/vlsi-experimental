@@ -29,6 +29,7 @@ public:
     m_DefGrowPercent = defGrowPercent;
     m_MinAjustment = minAjustment;
     m_Size = Grow(0, minSize);
+    m_Count = StartIndex;
   }
 
   ~GrowOnlyArray()
@@ -48,6 +49,25 @@ public:
 
   T& operator[] (int index) { return m_Data[index]; }
   const T& operator[] (int index) const { return m_Data[index]; }
+
+  int GetIndex(const T* item) const { return (int)(item - m_Data);}
 };
+
+//#ifndef FIELD_OFFSET
+//#define FIELD_OFFSET(type, field)    ((long)(long*)&(((type *)0)->field))
+//#endif
+//
+//template<class T>
+//class ArrayList
+//{
+//  struct Node
+//  {
+//    int NextNode;
+//    T Item;
+//  }
+//
+//  int m_FreeHead;
+//  GrowOnlyArray<Node, 0> m_Data;
+//};
 
 #endif //__GROWONLYARRAY_H__

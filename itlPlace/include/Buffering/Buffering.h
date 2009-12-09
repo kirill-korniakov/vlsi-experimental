@@ -5,5 +5,6 @@
 
 void BufferingAndReport(HDesign& design);
 void InsertRepeaters(HDesign& design);
+void InsertRepeaters2(HDesign& design);
 
 #endif

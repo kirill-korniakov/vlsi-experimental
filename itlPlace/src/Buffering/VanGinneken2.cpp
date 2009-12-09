@@ -1,80 +1,27 @@
-#include "GrowOnlyArray.h"
-#include "HDesign.h"
-#include "BufferInfo.h"
+#include "VanGinneken.h"
 #include <math.h>
 #include "Utils.h"
+#include "Timing.h"
 
 #define	INFINITY	20000000000.0
-#define EPS	0.000000000000000000000001
 #define MAXBUFFERTYPE 64
 
-#define QM 1
-#define PREDICT 1 /* predictive pruning */
+using namespace Buffering;
+using namespace Internal;
 
-struct InsertedBuffer
+////////////////////////////////////
+///Buffering::Internal::WireTreeEdge
+
+void Buffering::WireTreeEdge::Clear()
 {
-  HPin sink;
-  HPin driver;
-  double coordinate;
+  Parent = 0;
+  LeftEdge = RightEdge = 0;
+  IsStartPointRoot = IsEndPointSink = false;
+  Length = 0.0;
+  InsertedBuffers.clear();
+}
 
-  bool operator<(const InsertedBuffer& ib) const
-  { return coordinate < ib.coordinate; }
-};
-
-struct WireTreeEdges;
-
-class WireTreeEdge
-{
-public:
-  WireTreeEdges* Parent;
-  int LeftEdge;
-  int RightEdge;
-
-  HSteinerPoint Start;
-  HSteinerPoint End;
-  double Length;
-  bool IsStartPointRoot;
-  bool IsEndPointSink;
-  std::vector<InsertedBuffer> InsertedBuffers;
-
-  void Set(WireTreeEdges* parent, HSteinerPoint start, HSteinerPoint end);
-  bool HasLeft();
-  bool HasRight();
-
-  int GetLeftEdge();
-  int GetRightEdge();
-
-  double Xs();
-  double Ys();
-  double Xe();
-  double Ye();
-
-  void Clear()
-  {
-    Parent = 0;
-    LeftEdge = RightEdge = 0;
-    IsStartPointRoot = IsEndPointSink = false;
-    Length = 0.0;
-    InsertedBuffers.clear();
-  }
-};
-
-struct WireTreeEdges
-{
-  GrowOnlyArray<WireTreeEdge> Edges;
-  HDesign& Design;
-
-  WireTreeEdges(HDesign& hd): Design(hd), Edges(200,100,0.1) {}
-  int CreateNewEdge()
-  {
-    int id = Edges.New();
-    Edges[id].Clear();
-    return id;
-  }
-};
-
-
-void WireTreeEdge::Set(WireTreeEdges* parent, HSteinerPoint start, HSteinerPoint end)
+void Buffering::WireTreeEdge::Set(WireTreeEdges* parent, HSteinerPoint start, HSteinerPoint end)
 {
   Parent = parent;
   Start = start;
@@ -92,132 +39,111 @@ void WireTreeEdge::Set(WireTreeEdges* parent, HSteinerPoint start, HSteinerPoint
   HPin endPin = design.Get<HSteinerPoint::Pin, HPin>(end);
   IsStartPointRoot = !::IsNull(startPin) && ((startPin,design).Net(),design).Source() == startPin;
   IsEndPointSink = !::IsNull(endPin) && endPin != startPin;
+
+  if (!IsEndPointSink && !this->HasLeft())
+  {
+    WRITELINE("!@@@@@");
+  }
 }
 
-bool WireTreeEdge::HasLeft()
+bool Buffering::WireTreeEdge::HasLeft()
 {
   return Parent->Design.GetBool<HSteinerPoint::HasLeft>(End);
 }
 
-bool WireTreeEdge::HasRight()
+bool Buffering::WireTreeEdge::HasRight()
 {
   return Parent->Design.GetBool<HSteinerPoint::HasLeft>(End);
 }
 
-int WireTreeEdge::GetLeftEdge()
+//int __declspec(noinline) SetLeftEdge(Buffering::WireTreeEdges*p, int root)
+//{
+//  int left = p->CreateNewEdge();
+//  WireTreeEdge& Root = p->Edges[root];
+//  Root.LeftEdge = left;
+//  p->Edges[left].Set(p, Root.End, p->Design.Get<HSteinerPoint::Left, HSteinerPoint>(Root.End));
+//  return left;
+//}
+//
+//int __declspec(noinline) SetRightEdge(Buffering::WireTreeEdges*p, int root)
+//{
+//  int right = p->CreateNewEdge();
+//  WireTreeEdge& Root = p->Edges[root];
+//  Root.RightEdge = right;
+//  p->Edges[right].Set(p, Root.End, p->Design.Get<HSteinerPoint::Right, HSteinerPoint>(Root.End));
+//  return right;
+//}
+//
+//int Buffering::WireTreeEdge::GetLeftEdge()
+//{
+//  if (LeftEdge != 0) return LeftEdge;
+//
+//  return SetLeftEdge(Parent, Parent->Edges.GetIndex(this));
+//}
+
+#pragma optimize("", off)
+int Buffering::WireTreeEdges::GetLeftEdge(int rootIndex)
 {
-  if (LeftEdge != 0) return LeftEdge;
-  
-  LeftEdge = Parent->CreateNewEdge();
-  Parent->Edges[LeftEdge].Set(Parent, End, Parent->Design.Get<HSteinerPoint::Left, HSteinerPoint>(End));
-  return LeftEdge;
+  if (Edges[rootIndex].LeftEdge != 0) return Edges[rootIndex].LeftEdge;
+  int left = CreateNewEdge();
+  Edges[rootIndex].LeftEdge = left;
+  Edges[left].Set(this, Edges[rootIndex].End, Design.Get<HSteinerPoint::Left, HSteinerPoint>(Edges[rootIndex].End));
+  return left;
 }
 
-int WireTreeEdge::GetRightEdge()
+#pragma optimize("", off)
+int Buffering::WireTreeEdges::GetRightEdge(int rootIndex)
 {
-  if (RightEdge != 0) return RightEdge;
-  
-  RightEdge = Parent->CreateNewEdge();
-  Parent->Edges[RightEdge].Set(Parent, End, Parent->Design.Get<HSteinerPoint::Right, HSteinerPoint>(End));
-  return RightEdge;
+  if (Edges[rootIndex].RightEdge != 0) return Edges[rootIndex].RightEdge;
+  int right = CreateNewEdge();
+  Edges[rootIndex].RightEdge = right;
+  Edges[right].Set(this, Edges[rootIndex].End, Design.Get<HSteinerPoint::Right, HSteinerPoint>(Edges[rootIndex].End));
+  return right;
 }
 
-double WireTreeEdge::Xs() { return Parent->Design.GetDouble<HSteinerPoint::X>(Start); }
-double WireTreeEdge::Ys() { return Parent->Design.GetDouble<HSteinerPoint::Y>(Start); }
-double WireTreeEdge::Xe() { return Parent->Design.GetDouble<HSteinerPoint::X>(End); }
-double WireTreeEdge::Ye() { return Parent->Design.GetDouble<HSteinerPoint::Y>(End); }
+#pragma optimize("", on)
 
-//============================================================================
-//============================================================================
-//============================================================================
-struct VGNode
+//int Buffering::WireTreeEdge::GetRightEdge()
+//{
+//  if (RightEdge != 0) return RightEdge;
+//  return SetRightEdge(Parent, Parent->Edges.GetIndex(this));
+//}
+
+double Buffering::WireTreeEdge::Xs()
 {
-  int EdgeID;
-  double Coordinate;//0.0 <= Coordinate <= 1.0
-#define EDGE edges.Edges[EdgeID]
+  return Parent->Design.GetDouble<HSteinerPoint::X>(Start);
+}
 
-  VGNode(int eid = 0, double coord = 0.0): EdgeID(eid), Coordinate(coord) {}
-
-  double X(WireTreeEdges& edges) const { return EDGE.Xs() + (EDGE.Xe() - EDGE.Xs()) * Coordinate; }
-  double Y(WireTreeEdges& edges) const { return EDGE.Ys() + (EDGE.Ye() - EDGE.Ys()) * Coordinate; }
-
-  bool IsSource(WireTreeEdges& edges) const { return Equals(Coordinate, 0.0) && EDGE.IsStartPointRoot; }
-  bool IsSink(WireTreeEdges& edges) const { return Equals(Coordinate, 1.0) && EDGE.IsEndPointSink; }
-  bool IsInternal(WireTreeEdges& edges) const { return !IsSink(edges) && !IsSource(edges); }
-
-  double SinkCapacitance(WireTreeEdges& edges) const
-  {
-    ASSERT(IsSink(edges));
-    HDesign& hd = edges.Design;
-    return (((EDGE.End,hd).Pin(),hd).Type(),hd).Capacitance();
-  }
-
-  double SinkRequiredTime(WireTreeEdges& edges) const
-  {
-    ASSERT(IsSink(edges));
-    HDesign& hd = edges.Design;
-    return (hd.TimingPoints[(EDGE.End,hd).Pin()],hd).RequiredTime();
-  }
-
-  bool IsNull() const {return EdgeID == 0;}
-
-  VGNode Left(WireTreeEdges& edges) const
-  {
-    if (Equals(Coordinate, 1.0))
-    {
-      if (EDGE.HasLeft())
-        return VGNode(EDGE.GetLeftEdge(), 0.0);//NOTE: if no right edge then can skip 0.0;
-      else
-        return VGNode(0, 0.0);
-    }
-    else if (EDGE.Length < EPS)
-      return VGNode(EdgeID, 1.0);
-    else
-      return VGNode(EdgeID, Coordinate + 0.05);
-  }
-
-  VGNode Right(WireTreeEdges& edges) const
-  {
-    if (Equals(Coordinate, 1.0))
-      return VGNode(EDGE.HasRight() ? EDGE.GetRightEdge() : 0, 0.0);
-    else
-      return VGNode(0, 0.0);
-  }
-#undef EDGE
-};
-
-//============================================================================
-//============================================================================
-//============================================================================
-/* composition node */
-struct Comp
-{ 
-  struct Comp *left;
-  struct Comp *right;
-  BufferInfo* BufferType;
-  /* (x, y) means the buffer is inserted at point with index y with the direction x->y  */
-  VGNode x;
-  VGNode y;
-  int counter;  /* use for comp deletion and comp chare */
-};
-
-//============================================================================
-//============================================================================
-//============================================================================
-/* Ordered list used in Van Ginneken algorithm */
-typedef struct rlnode
+double Buffering::WireTreeEdge::Ys()
 {
-  struct rlnode *next;
-  double DownstreamCapacitance;   /* downstream capacitance */
-  double RequiredTime;  /* required arrival time at the node */
-  Comp *com;    /* buffer location */
-} RLnode;
+  return Parent->Design.GetDouble<HSteinerPoint::Y>(Start);
+}
+
+double Buffering::WireTreeEdge::Xe()
+{
+  return Parent->Design.GetDouble<HSteinerPoint::X>(End);
+}
+
+double Buffering::WireTreeEdge::Ye()
+{
+  return Parent->Design.GetDouble<HSteinerPoint::Y>(End);
+}
+
+/////////////////////////////////////
+///Buffering::Internal::WireTreeEdges
+
+int Buffering::WireTreeEdges::CreateNewEdge()
+{
+  int id = Edges.New();
+  Edges[id].Clear();
+  return id;
+}
 
 //============================================================================
 //============================================================================
 //============================================================================
 
-class VanGinneken2
+class Buffering::VanGinneken2
 {
 private:
   HDesign& design;
@@ -225,9 +151,6 @@ private:
   std::vector<BufferInfo> Buffers;
 
   WireTreeEdges Edges;
-  //Comp* FinalVanLocation;
-  int InsertedBuffersCount;
-  double DriverResistance;
 
   void LoadBuffers()
   {
@@ -244,7 +167,6 @@ public:
   int InsertBuffers(HNet net)
   {
     Edges.Edges.Clear();
-    InsertedBuffersCount = 0;
 
     HPin sourcePin = (net,design).Source();
     HSteinerPointWrapper source = design[design.SteinerPoints[sourcePin]];
@@ -253,214 +175,123 @@ public:
     Edges.Edges[baseEdge].Set(&Edges, source, source.HasRight() ? source : source.Left());
     
     Utils::DriverPhisics dph = Utils::GetDriverTimingPhisics(design, sourcePin, SignalDirection_None);
-    DriverResistance = dph.R;
 
-    list_delete(van(VGNode(baseEdge)));
-
-    if (InsertedBuffersCount > 0)
-      SplitNet(net, baseEdge);
-
-    return InsertedBuffersCount;
+    int insertedBuffersCount = RunVanGinneken(VGNode(baseEdge), dph.R);
+    if (insertedBuffersCount > 0) SplitNet(net, baseEdge);
+    return insertedBuffersCount;
   }
 
 private:
-  RLnode *create_list(VGNode sinkNode)
+  RLnode* CreateList(VGNode& sinkNode)
   {
-    RLnode *last = new RLnode();
-    last->DownstreamCapacitance = sinkNode.SinkCapacitance(Edges);
-    last->RequiredTime = sinkNode.SinkRequiredTime(Edges);
-    last->next = 0;
-    last->com = 0;
-    return last;
+    RLnode *node = new RLnode();
+    node->DownstreamCapacitance = sinkNode.SinkCapacitance(Edges);
+    node->RequiredTime = sinkNode.SinkRequiredTime(Edges);
+    return node;
   }
 
-  void list_delete(RLnode *l)
+  void DeleteList(RLnode *l)
   {
     while (l != 0)
     {
       RLnode *tmp = l->next;
-#if QM
-      if (l->com != 0)
-        l->com->counter--;
-#endif
-      comp_delete(l->com);
+      l->com->Release();
       delete l;
       l = tmp;
     }
   }
 
-  void comp_delete(Comp *com)
-  {
-    if (com == 0) return;
-    if (com->counter == 0)
-    {
-      if (com->left != 0)
-      {
-        com->left->counter--;
-        comp_delete(com->left);
-      }
-      if (com->right != 0)
-      {
-        com->right->counter--;
-        comp_delete(com->right);
-      }
-      delete com;
-    }
-  }
-
-  RLnode *redundent(RLnode *list)
-  {
+  RLnode* RemoveRedundentNodes(RLnode *list)
+  {//list is ordered by DownstreamCapacitance asc
+   //and should be ordeder by RequiredTime asc
     RLnode dummy;
-    double x;
-
-    dummy.DownstreamCapacitance = 0;
-    dummy.RequiredTime = -INFINITY;
-
-    dummy.com = 0;
-    dummy.next = 0;
     dummy.next = list;
+    dummy.RequiredTime = -INFINITY;//WARNING: must be big negative value
 
     RLnode* pred = &dummy;
     RLnode* r = list;
 
-    while (r != 0)
+    for (RLnode* r = pred->next; r != 0; r = pred->next)
     {
-#if PREDICT
-      x = (r->RequiredTime - Buffers[Buffers.size()-1].Rb() * r->DownstreamCapacitance)
-        - (pred->RequiredTime - Buffers[Buffers.size()-1].Rb() * pred->DownstreamCapacitance);
-#else
-      x = r->RequiredTime - pred->RequiredTime;
-#endif
+      double x = r->RequiredTime - pred->RequiredTime;
       if (x < EPS)
       {
         pred->next = r->next;
-#if QM
-        if (r->com != 0)
-          r->com->counter--;
-#endif
-        comp_delete(r->com);
+        r->com->Release();
         delete r;
       } 
       else
         pred = r;
-      r = pred->next;
     }
 
     return dummy.next;
   }
 
-  RLnode *add_buffer(double k /*distance*/, RLnode *list, VGNode px, VGNode py)
+  void AddCurrentSegmentToSolution(RLnode *list, double l)
   {
-    RLnode *z[MAXBUFFERTYPE];
-    ERROR_ASSERT(Buffers.size() < MAXBUFFERTYPE);
-
-    /* if the wire has length 0, then quit */
-#if TREATZERO
-    if (k == 0.0)
-      return list;
-#endif
-
+    if (l <= EPS) return;
     /* get the solution after the edge from the current node to its child */
     for (RLnode* nd = list; nd != 0; nd = nd->next)
     {
-      //WARNING: delays calculation
       nd->RequiredTime = nd->RequiredTime
-        - 0.5 * WirePhisics.RPerDist * WirePhisics.LinearC * k * k //собственная задержка на проводе
-        - WirePhisics.RPerDist * k * nd->DownstreamCapacitance; //задержка на обозреваемой ёмкости
-      nd->DownstreamCapacitance += k * WirePhisics.LinearC; //wire capacitance
-#if !QM
-      Comp* p = new Comp();
-      p->left = nd->com;
-      p->right = 0;
-      if (p->left != 0)
-        p->left->counter++;
-      p->buffertype = 0;
-      p->counter = 0;
-      p->x = px;
-      p->y = py;
-      nd->com = p;
-#endif
+        - 0.5 * WirePhisics.RPerDist * WirePhisics.LinearC * l * l //собственная задержка на проводе
+        - WirePhisics.RPerDist * l * nd->DownstreamCapacitance; //задержка на обозреваемой ёмкости
+      nd->DownstreamCapacitance += l * WirePhisics.LinearC; //wire capacitance
     }
+  }
 
-    RLnode dummy;
-    dummy.next = list;
+  RLnode *AddBuffers(RLnode *list, VGNode& px)
+  {
+    RLnode* z[MAXBUFFERTYPE];
+    ERROR_ASSERT(Buffers.size() < MAXBUFFERTYPE);
 
     /*  consider the buffer solution */
-    for (int i = Buffers.size() - 1; i >= 0; --i)
+    for (size_t i = 0; i < Buffers.size(); ++i)
     {
-      RLnode* y = dummy.next;
-      RLnode* x = 0;
-      BufferInfo* bufType = 0;
+      RLnode* bestNode = 0;
       double qmax = -INFINITY;
 
-      while (y != 0)
+      for (RLnode* y = list; y != 0; y = y->next)
       {
-        //WARNING: delays calculation
         double q = y->RequiredTime 
-          - Buffers[i].Tb() //own delay
+          //- Buffers[i].Tb() //own delay
           - Buffers[i].Rb() * y->DownstreamCapacitance; //driver delay on observed capacitance
         if (q > qmax)
         {
           qmax = q;
-          bufType = &Buffers[i];
-          x = y;
+          bestNode = y;
         }
-        y = y->next;
       }
 
       z[i] = new RLnode();
       z[i]->DownstreamCapacitance = Buffers[i].Cb();
-      z[i]->RequiredTime = qmax;
+      z[i]->RequiredTime = qmax - Buffers[i].Tb();
 
-      Comp* p = new Comp();
-#if QM
-      p->left = x->com;
-      if (p->left != 0)
-        p->left->counter++;
-      p->right = 0;
-      p->counter = 1;
-#else
-      p->left = x->com->left;
-      p->right = x->com->right;
-      if (p->left != 0)
-        p->left->counter++;
-      if (p->right != 0)
-        p->right->counter++;
-      p->counter = 0;
-#endif
-      p->BufferType = bufType;
-      p->x = px;
-      p->y = py;
-      z[i]->com = p;
+      bestNode->com->AddRef();
+      z[i]->com = new Comp(bestNode->com, 0, &Buffers[i], px);
+      z[i]->BufsCount = 1 + bestNode->BufsCount;
     }
 
+    RLnode dummy;
+    dummy.next = list;
     /* add buffer solution answer to the list */
-    for (int j = Buffers.size() - 1; j >= 0; --j)
+    for (int j = (int)Buffers.size() - 1; j >= 0; --j)
     {
-      RLnode* y = dummy.next;
       RLnode* pred = &dummy;
-      while (y != 0)
+      for (RLnode* y = dummy.next; y != 0; pred = y, y = y->next)
       {
-        if (fabs(z[j]->DownstreamCapacitance - y->DownstreamCapacitance) < 1e-10)
+        if (::Equals(z[j]->DownstreamCapacitance, y->DownstreamCapacitance))
         {
           if (z[j]->RequiredTime > y->RequiredTime)
-          {
+          {//replace old node with new
             z[j]->next = y->next;
             pred->next = z[j];
-#if QM
-            if (y->com != 0)
-              y->com->counter--;
-#endif
-            comp_delete(y->com);
+            y->com->Release();
             delete y;
           }
           else
-          {
-#if QM
-            if (z[j]->com != 0)
-              z[j]->com->counter--;
-#endif
-            comp_delete(z[j]->com);
+          {//cancel new node
+            z[j]->com->Release();
             delete z[j];
           }
           break;
@@ -471,17 +302,9 @@ private:
           pred->next = z[j];
           break;
         }
-        else
-        {
-          if (z[j]->DownstreamCapacitance > y->DownstreamCapacitance)
-          {
-            y = y->next;
-            pred = pred->next;
-          }
-        }
       }
       if (y == 0)
-      {
+      {//put at the end of list
         z[j]->next = 0;
         pred->next = z[j];
       }
@@ -490,138 +313,93 @@ private:
     return dummy.next;
   }
 
-  RLnode* MergeLists(RLnode* sleft, RLnode* sright, VGNode t)
+  RLnode* MergeLists(RLnode* slefthead, RLnode* srighthead)
   {
     RLnode dummy;
-    RLnode* s = &dummy;
-    dummy.DownstreamCapacitance = 0.0;
-    dummy.RequiredTime = 0.0;
-    dummy.com = 0;
-    dummy.next = 0;
-    RLnode* slefthead = sleft;
-    RLnode* srighthead = sright;
+    RLnode* merged = &dummy;
+    RLnode* sleft = slefthead;
+    RLnode* sright = srighthead;
 
     while (sleft != 0 && sright != 0)
     {
-      double c = sleft->DownstreamCapacitance + sright->DownstreamCapacitance;
-      double q = sright->RequiredTime;
-      s->next = new RLnode();
-      s = s->next;
+      merged->next = new RLnode();
+      merged = merged->next;
+      merged->DownstreamCapacitance = sleft->DownstreamCapacitance + sright->DownstreamCapacitance;
+
+      if (sright->com == 0)
+      {
+        sleft->com->AddRef();
+        merged->com = sleft->com;
+      }
+      else if (sleft->com == 0)
+      {
+        sright->com->AddRef();
+        merged->com = sright->com;
+      }
+      else
+      {
+        sleft->com->AddRef();
+        sright->com->AddRef();
+        merged->com = new Comp(sleft->com, sright->com, 0);
+      }
+      merged->BufsCount = sleft->BufsCount + sright->BufsCount;
 
       if (sleft->RequiredTime < sright->RequiredTime)
       {
-        q = sleft->RequiredTime;
-        Comp* p = new Comp();
-        p->left = sleft->com;
-        p->right = sright->com;
-        if (p->left != 0)
-          p->left->counter++;
-        if (p->right != 0)
-          p->right->counter++;
-        p->BufferType = 0;
-#if QM
-        p->counter = 1;
-#else
-        p->counter = 0;
-#endif
-        p->x = t;
-        p->y = t;
-        s->com = p;
+        merged->RequiredTime = sleft->RequiredTime;
         sleft = sleft->next;
       }
       else
       {
-        Comp* p = new Comp();
-        p->left = sleft->com;
-        p->right = sright->com;
-        if (p->left != 0)
-          p->left->counter++;
-        if (p->right != 0)
-          p->right->counter++;
-        p->BufferType = 0;    // steiner merge point, indeed no buffer here
-#if QM
-        p->counter = 1;
-#else
-        p->counter = 0;
-#endif
-        p->x=t;
-        p->y=t;
-        s->com = p;
+        merged->RequiredTime = sright->RequiredTime;
         sright = sright->next;
       }
-
-      s->DownstreamCapacitance = c;
-      s->RequiredTime = q;
     }
-    s->next = 0;
+    merged->next = 0;
 
-    list_delete(slefthead);
-    list_delete(srighthead);
+    DeleteList(slefthead);
+    DeleteList(srighthead);
     return dummy.next;
   }
 
-  RLnode *van(VGNode t)
+  RLnode* RecursiveVan(VGNode t)
   {
-    if (t.IsSink(Edges))
-      return create_list(t);
+    ASSERT(t.EdgeID > 0);
+    if (t.IsSink(Edges)) return CreateList(t);
 
-    RLnode* sleft = van(t.Left(Edges));
-    RLnode* sright = 0;
-    double k1 = distance(t, t.Left(Edges));
-    double k2 = 0;
+    VGNode left = t.Left(Edges);
+    RLnode* sleft = RecursiveVan(left);
     if (!t.Right(Edges).IsNull())
-    {
-      sright = van(t.Right(Edges));
-      k2 = distance(t, t.Right(Edges));
-    }
+      sleft = MergeLists(sleft, RecursiveVan(t.Right(Edges)));
 
-    if (t.IsSource(Edges))
-    {
-      double van_answer = -INFINITY;
-      Comp* finalVanLocation = 0;
-      for (RLnode* x = sleft; x != 0; x = x->next)
-      {
-        //WARNING: delays calculation
-        double q = x->RequiredTime //node required time
-          - 0.5 * WirePhisics.RPerDist * WirePhisics.LinearC * k1 * k1 //own segment delay
-          - (WirePhisics.RPerDist * k1 + this->DriverResistance) * x->DownstreamCapacitance //deriver and segment delay on load
-          - this->DriverResistance * k1 * WirePhisics.LinearC; //driver delay on segment
-        if (q > van_answer)
-        {
-          van_answer = q;
-          finalVanLocation = x->com; //WARNING: result returned here
-        }
-      }
-      //WRITELINE("van %10.6f", van_answer);
-      this->InsertedBuffersCount = SaveInsertedBuffers(finalVanLocation);
-      return sleft;
-    }
-    else
-    {
-      if (sright != 0)
-        sleft = MergeLists(sleft, sright, t);
-      sleft = add_buffer(k1, sleft, t, t.Left(Edges));
-      sleft = redundent(sleft);
-      ///* if the node has only one child (default left), only 
-      //return update solution of left child */
-      //if (t.Right(Edges).IsNull())
-      //  return sleft;
-      //else
-      //{
-      //  sright = add_buffer(k2, sright, t, t.Right(Edges));
-      //  sright = redundent(sright);
-      //}
-    }
-    //return MergeLists(sleft, sright, t);
-    return sleft;
+    AddCurrentSegmentToSolution(sleft, t.DistanceTo(left, Edges));
+    return RemoveRedundentNodes(AddBuffers(sleft, t));
   }
 
-  double distance(VGNode& t, VGNode& t1)//only for neighbour nodes
+  int RunVanGinneken(VGNode src, double driverResistance)
   {
-    if (t.EdgeID == t1.EdgeID)
-      return (t1.Coordinate - t.Coordinate) * Edges.Edges[t.EdgeID].Length;
-    else
-      return (1.0 - t.Coordinate) * Edges.Edges[t.EdgeID].Length;
+    ASSERT(src.IsSource(Edges));
+    RLnode* list = RecursiveVan(src);
+
+    double van_answer = -INFINITY;
+    Comp* finalVanLocation = 0;
+
+    //choose best solution
+    for (RLnode* x = list; x != 0; x = x->next)
+    {
+      double q = x->RequiredTime - driverResistance * x->DownstreamCapacitance;
+      if (q > van_answer)
+      {
+        van_answer = q;
+        finalVanLocation = x->com;
+      }
+    }
+
+    //WRITELINE("van %10.6f", van_answer);
+    int insertedBuffers = SaveInsertedBuffers(finalVanLocation);
+    DeleteList(list);
+
+    return insertedBuffers;
   }
 
   void InsertBuffer(BufferInfo* info, const VGNode& point)
@@ -746,7 +524,7 @@ private:
       }
       //2. create new net
       HNetWrapper nnet = design[design.Nets.AllocateNet()];
-      design.Nets.AllocatePins(nnet, newNetPins.size() + 1);
+      design.Nets.AllocatePins(nnet, (int)newNetPins.size() + 1);
       nnet.SetSource(source);
       nnet.SetKind(NetKind_Default);
       nnet.SetName(((source,design).Cell(),design).Name() + "_net");
@@ -785,9 +563,10 @@ private:
         design.SteinerPoints[e.InsertedBuffers[i].sink]);
     }
   }
+
 public:
   void DrawTree(HNet net, Color col)
-  {
+  {return;
     std::stack<HSteinerPoint> points;
     HPinWrapper src = ((net,design).Source(), design);
     design.Plotter.DrawCircle(src.X(), src.Y(), 4, col);
@@ -821,6 +600,38 @@ HTimingPoint getSink(HDesign& hd, HNet net)
   return hd.TimingPoints[sink];
 }
 
+void InsertRepeaters2(HDesign& design)
+{
+  struct PathBuffering
+  {
+    VanGinneken2 VG;
+    int InsertedBuffers;
+
+    PathBuffering(HDesign& design): VG(design), InsertedBuffers(0) {}
+
+    void ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
+    {
+      for (HCriticalPath::PointsEnumeratorW point = (path,design).GetEnumeratorW(); point.MoveNext(); )
+      {
+        HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
+        if (net.Kind() == NetKind_Active)
+        {
+          int ins = VG.InsertBuffers(net);
+          InsertedBuffers += ins;
+          //if (ins > 0) WRITELINE("%30s %d", net.Name().c_str(), ins);
+        }
+      }
+    }
+  };
+
+  STA(design, true, true);
+  FindCriticalPaths(design);
+  PathBuffering pb(design);
+  Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathHandler(&pb, &PathBuffering::ProcessPath));
+  ALERTFORMAT(("Inserted %d buffers", pb.InsertedBuffers));
+  STA(design, true, false);
+}
+
 void InsertRepeaters(HDesign& design)
 {
   VanGinneken2 vg(design);
@@ -834,6 +645,7 @@ void InsertRepeaters(HDesign& design)
   WRITELINE("%10.8f %10.8f %5d", tns, wns, 0);
   for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
   {
+    //if (j++ < 107) continue;
     //if (net.PinsCount() > 2) continue;
     double dr = Utils::GetDriverTimingPhisics(design, net.Source(), SignalDirection_None).R;
     double rtime = (design.TimingPoints[net.Source()],design).RequiredTime() - (design.SteinerPoints[net.Source()],design).ObservedC() * dr;
@@ -854,8 +666,8 @@ void InsertRepeaters(HDesign& design)
       double rtime1 = (design.TimingPoints[net.Source()],design).RequiredTime() - (design.SteinerPoints[net.Source()],design).ObservedC() * dr1;
       //double srtime1 = (getSink(design,net),design).RequiredTime();
       //double sc1 = (design.SteinerPoints[(getSink(design,net),design).Pin()],design).ObservedC();
-      //WRITELINE("rb  %10.6f %10.6f %10.6f %10.6f", rtime1, 0.0, dr1, 0.0);
-      //WRITELINE("r0  %10.6f %10.6f %10.6f %10.6f", rtime, 0.0, dr, 0.0);
+      WRITELINE("rb  %10.6f %10.6f %10.6f %10.6f", rtime1, 0.0, dr1, 0.0);
+      WRITELINE("r0  %10.6f %10.6f %10.6f %10.6f", rtime, 0.0, dr, 0.0);
       //double L = Utils::CalcNetHPWL(design, net);
       //WRITELINE("bb  %10.6f", srtime - (dr*(L*c + sc) + r*L*(L*c/2 + sc)));
       //WRITELINE("ab  %10.6f", srtime - (dr*(L*c/2+buf.Cb()) + r*L/2*(L*c/4+buf.Cb()) + buf.Tb() + buf.Rb()*(L*c/2+sc) + r*L/2*(L*c/4+sc)));

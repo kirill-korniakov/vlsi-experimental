@@ -228,9 +228,11 @@ public: \
 #define BEGINHCOLLECTION(collection_type, base_type) \
 class collection_type: public HBaseCollection<base_type> \
 { \
-public: \
+private: \
+  friend class HDesign; \
   collection_type(HDesign *aHd); \
-  \
+  collection_type(const collection_type&); \
+public: \
   typedef collection_type SelfType; \
   typedef base_type ItemType; \
   typedef HBaseCollection<ItemType> BaseType; \

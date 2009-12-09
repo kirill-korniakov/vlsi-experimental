@@ -35,7 +35,7 @@ inline T max(T a, T b) {return a < b ? b : a; }
 
 inline int Round(double val) { return int(val > 0.0 ? val + 0.5 : val - 0.5); }
 
-inline bool Equals(double v1, double v2, const double eps = 1e-6)
+inline bool Equals(double v1, double v2, const double eps = 1e-8)
 {
   if (v1 >= 0.0)
     if (v2 <= 0.0)
@@ -48,6 +48,12 @@ inline bool Equals(double v1, double v2, const double eps = 1e-6)
     else
       return v1 < v2 ? (v1 - v2 > v1 * eps) : (v2 - v1 > v2 * eps);
   return false;
+}
+
+template<class T>
+inline bool Equals(T v1, T v2)
+{
+  return v1 == v2;
 }
 
 inline double ManhattanLength(double x1, double y1, double x2, double y2)

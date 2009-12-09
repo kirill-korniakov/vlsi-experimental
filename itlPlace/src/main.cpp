@@ -77,17 +77,17 @@ void DoLegalizationIfRequired(HDPGrid& grid)
   //LEGALIZATION
   if (grid.Design().cfg.ValueOf("DesignFlow.Legalization", false))
   {
-    WRITELINE("");
-    ALERT("STA before legalization:");
-    STA(grid.Design());
+    //WRITELINE("");
+    //ALERT("STA before legalization:");
+    //STA(grid.Design());
 
     Legalization(grid);
     grid.Design().Plotter.ShowPlacement();
     grid.Design().Plotter.SaveMilestoneImage("LEG");
     
-    WRITELINE("");
-    ALERT("STA after legalization:");
-    STA(grid.Design());
+    //WRITELINE("");
+    //ALERT("STA after legalization:");
+    //STA(grid.Design());
   }
 }
 
@@ -204,7 +204,11 @@ int main(int argc, char** argv)
     //BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
     {
-      InsertRepeaters(hd);
+      InsertRepeaters2(hd);
+      STA(hd);
+
+      HDPGrid DPGrid(hd);
+      DoLegalizationIfRequired(DPGrid);
       STA(hd);
     }
 
