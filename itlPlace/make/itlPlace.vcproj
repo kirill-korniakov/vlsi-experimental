@@ -797,6 +797,14 @@
 					RelativePath="..\src\DetailedPlacement\VerticalSearch.cpp"
 					>
 				</File>
+				<Filter
+					Name="TDDP"
+					>
+					<File
+						RelativePath="..\src\DetailedPlacement\TDDP\TDDPAlgorithm4.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Routing"
@@ -5623,6 +5631,14 @@
 					RelativePath="..\include\TileGrid.h"
 					>
 				</File>
+				<Filter
+					Name="TDDP"
+					>
+					<File
+						RelativePath="..\include\TDDPAlgorithm4.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="vGlobalPlacement"

@@ -13,6 +13,7 @@
 #include "TileGrid.h"
 #include "FGR.h"
 #include "ExportToRouters.h"
+#include "TDDPAlgorithm4.h"
 
 using namespace libconfig;
 
@@ -89,6 +90,18 @@ void DoLegalizationIfRequired(HDPGrid& grid)
     //ALERT("STA after legalization:");
     //STA(grid.Design());
   }
+}
+
+void DoPlacement4IfRequired(HDesign& hd)
+{
+  //PLACEMENT4
+	if (hd.cfg.ValueOf("DesignFlow.Placement4", false))
+	{
+	  STA(hd);
+    Placement4(hd);
+		hd.Plotter.ShowPlacement();
+		hd.Plotter.SaveMilestoneImage("P4");
+	}
 }
 
 void DoDetailedPlacementIfRequired(HDPGrid& grid)
@@ -186,6 +199,7 @@ int main(int argc, char** argv)
       HDPGrid DPGrid(hd);
 
       DoLegalizationIfRequired(DPGrid);
+      DoPlacement4IfRequired(hd);
       DoDetailedPlacementIfRequired(DPGrid);
 
       DoSTAIfCan(hd);
