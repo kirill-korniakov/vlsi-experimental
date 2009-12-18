@@ -12,14 +12,15 @@ repoPath = "http://svn.software.unn.ru/VLSI/CODE/trunk"
 ispd04   = "ISPD04"
 iwls05   = "IWLS05"
 binDir   = ".\\itlPlace\\bin\\"
+MSBuild  = "c:\\WINDOWS\\Microsoft.NET\\Framework\\v3.5\\MSBuild.exe"
 
 windowTitle = 'Automatic Building Script iltPlace'
 
 def Absolutize(x):
     divisor = x[0]
     if divisor != 0.0:
-	    for i in range(0, len(x)):
-	        x[i] = x[i] / divisor
+        for i in range(0, len(x)):
+            x[i] = x[i] / divisor
     else:
         for i in range(0, len(x)):
             x[i] = 0.0
@@ -37,6 +38,25 @@ def Average(values):
     40.0
     """
     return sum(values) / len(values)
+
+def RemoveDir(dirName):
+        RemovePermissions(dirName)
+        for name in os.listdir(dirName):
+            file = os.path.join(dirName, name)
+            if not os.path.islink(file) and os.path.isdir(file):
+                RemoveDir(file)
+            else:
+                RemovePermissions(file)
+#                print('remove file')
+                os.remove(file)
+        try:
+            os.rmdir(dirName)
+        except WindowsError:
+            pass
+
+def RemovePermissions(filePath) :
+        if (not os.access(filePath, os.W_OK)):
+            os.chmod(filePath, 666)
 
 def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
     fh = open(logName, 'r')
@@ -155,10 +175,6 @@ class DistributionBuilder(QtGui.QWidget):
         self.setGeometry(300, 300, 320, 100)
         self.setWindowTitle(windowTitle)
 
-        #field for PeopleCounter version
-        #lblVersion = QtGui.QLabel('PeopleCounter version', self)
-        #self.teditVersion = QtGui.QLineEdit(version, self)
-
         #field for SVN revision
         lblRev = QtGui.QLabel('SVN Revision (keep empty for HEAD)', self)
         self.teditRev = QtGui.QLineEdit('', self)
@@ -167,23 +183,11 @@ class DistributionBuilder(QtGui.QWidget):
         #lblIssue = QtGui.QLabel('Bugzilla issue (keep empty for empty)', self)
         #self.teditIssue = QtGui.QLineEdit('', self)
 
-        #lbl = QtGui.QLabel('Definitions.h settings:', self)
-
-        #self.cbNoEwc = QtGui.QCheckBox('define NO_EWCLID_FILTER', self)
-        #self.cbNoEwc.toggle();
-
-        #self.cbUK = QtGui.QCheckBox('define USBKEY', self)
-        #self.cbUK.toggle();
-
-        #lblTD = QtGui.QLabel('define TRIAL_DAYS', self)
-
-        #lblTC = QtGui.QLabel('define TRIAL_COUNT', self)
-
         self.cbCheckout = QtGui.QCheckBox('Checkout', self)
-        #self.cbCheckout.toggle();
+        self.cbCheckout.toggle();
 
         self.cbRebuild = QtGui.QCheckBox('Build', self)
-        #self.cbRebuild.toggle();
+        self.cbRebuild.toggle();
 
         self.gridGroupBoxISPD = QtGui.QGroupBox(self.tr(ispd04))
         layoutISPD = QtGui.QGridLayout()
@@ -209,51 +213,20 @@ class DistributionBuilder(QtGui.QWidget):
         self.cbIWLS05isDP.toggle()
         layoutIWLS.addWidget(self.cbIWLS05isDP, 10, 2)
         
-        #layout.setColumnStretch(1, 30)
-        #layout.setColumnStretch(2, 40)
         self.gridGroupBoxISPD.setLayout(layoutISPD)
         self.gridGroupBoxIWLS.setLayout(layoutIWLS)
-        
-        #self.cbISPD04 = QtGui.QCheckBox(ispd04, self)
-        #self.cbISPD04.toggle();
-
-        #self.cbIWLS05 = QtGui.QCheckBox(iwls05, self)
-        #self.cbIWLS05.toggle();
-
-        #self.cbMakeSetupOffice = QtGui.QCheckBox('Make SetupOffice.msi (and pack zip)', self)
-        #self.cbMakeSetupOffice.toggle();
 
         btnMD = QtGui.QPushButton('Run', self)
         btnMD.setFocus()
 
-        #self.teditTD = QtGui.QLineEdit(nTrialDays, self)
-        #self.teditTD.resize(50, 25)
-
-        #self.teditTC = QtGui.QLineEdit(nTrialCount, self)
-        #self.teditTC.resize(50, 25)
-
         grid = QtGui.QGridLayout()
 
-        #grid.addWidget(lblVersion, 0, 0)
-        #grid.addWidget(self.teditVersion, 0, 1)
         grid.addWidget(lblRev, 1, 0)
         grid.addWidget(self.teditRev, 1, 1)
-        #grid.addWidget(lblIssue, 2, 0)
-        #grid.addWidget(self.teditIssue, 2, 1)
-        #grid.addWidget(lbl, 3, 0)
-        #grid.addWidget(self.cbNoEwc, 4, 0)
-        #grid.addWidget(self.cbUK, 4, 1)
-        #grid.addWidget(lblTD, 5, 0)
-        #grid.addWidget(self.teditTD, 5, 1)
-        #grid.addWidget(lblTC, 6, 0)
-        #grid.addWidget(self.teditTC, 6, 1)
         grid.addWidget(self.cbCheckout, 7, 0)
         grid.addWidget(self.cbRebuild, 8, 0)
         grid.addWidget(self.gridGroupBoxISPD, 9, 0)
         grid.addWidget(self.gridGroupBoxIWLS, 10, 0)
-        #grid.addWidget(self.cbISPD04, 9, 0)
-        #grid.addWidget(self.cbIWLS05, 10, 0)
-        #grid.addWidget(self.cbMakeSetupOffice, 11, 0)
         grid.addWidget(btnMD, 12, 1)
 
         self.setLayout(grid)
@@ -263,8 +236,15 @@ class DistributionBuilder(QtGui.QWidget):
 
     def Build(self):
         self.setWindowTitle('Building solution...')
-        subprocess.call(["BuildSolution.bat", "Rebuild"])
+        args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
+        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
 
+    def DeleteSources(self):
+        print('Deleting previous version of itlPlace...')
+        if os.path.exists('.\itlPlace'):
+            RemoveDir('.\itlPlace')
+        print('Done.')
+                
     def CheckOut(self):
         rev = str(self.teditRev.text())
         if rev == '':
@@ -319,22 +299,17 @@ class DistributionBuilder(QtGui.QWidget):
 
     def PrepareAndSendMail(self, pythonOutput, subject, text, attachmentFiles):
         print("Sending mail with " + pythonOutput)
-        # smtpserver = 'smtp.gmail.com'
-        # smtpuser = 'VLSIMailerDaemon@gmail.com'  # for SMTP AUTH, set SMTP username here
-        # smtppass = '22JUL22:19:49'
         smtpserver = 'mail.unn.ru'
-        smtpuser = ''  # for SMTP AUTH, set SMTP username here
+        smtpuser = ''
         smtppass = ''
         print(smtpserver)
-        #subject = "Experiments results on " + setName + " with " + cfgName
+        subject = "Experiments results on " + setName + " with " + cfgName
 
-        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        RECIPIENTS = ['zhivoderov.a@gmail.com']
+        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        #RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
-        #text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
-        #print(text)
-        text += 'TEST!!!'
+        text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
         send_mail(
             SENDER,     # from
             RECIPIENTS, # to
@@ -436,11 +411,7 @@ class DistributionBuilder(QtGui.QWidget):
             fPlacerOutput.close()
             print(benchmark + ' is done...')
             ParseLog(logFileName, benchmark, pythonOutput, setName == iwls05, isDP, isBeforeDP)
-
-        #subject = "Experiments results on " + setName + " with " + cfgName
-        #text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
-        #attachmentFiles = [pythonOutput]
-        #self.PrepareAndSendMail(pythonOutput, subject, text, attachmentFiles)
+        
         return pythonOutput
 
     # the main function
@@ -451,6 +422,7 @@ class DistributionBuilder(QtGui.QWidget):
         print('######################################################')
         print('\n')
         if self.cbCheckout.checkState() == 2:
+            self.DeleteSources()
             self.CheckOut()
         if self.cbRebuild.checkState() == 2:
             self.Build()
@@ -470,4 +442,5 @@ class DistributionBuilder(QtGui.QWidget):
 app = QtGui.QApplication(sys.argv)
 db = DistributionBuilder()
 db.show()
+#db.btnMDClicked()
 app.exec_()
