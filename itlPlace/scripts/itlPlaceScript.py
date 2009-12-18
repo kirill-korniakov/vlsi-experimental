@@ -188,7 +188,7 @@ class DistributionBuilder(QtGui.QWidget):
         self.gridGroupBoxISPD = QtGui.QGroupBox(self.tr(ispd04))
         layoutISPD = QtGui.QGridLayout()
         self.cbISPD04 = QtGui.QCheckBox(ispd04, self)
-        self.cbISPD04.toggle()
+        #self.cbISPD04.toggle()
         layoutISPD.addWidget(self.cbISPD04, 9, 0)
         self.cbISPD04BDP = QtGui.QCheckBox('Collect BeforeDP data', self)
         self.cbISPD04BDP.toggle()
@@ -319,17 +319,22 @@ class DistributionBuilder(QtGui.QWidget):
 
     def PrepareAndSendMail(self, pythonOutput, subject, text, attachmentFiles):
         print("Sending mail with " + pythonOutput)
-        smtpserver = 'smtp.gmail.com'
-        smtpuser = 'VLSIMailerDaemon@gmail.com'  # for SMTP AUTH, set SMTP username here
-        smtppass = '22JUL22:19:49'
+        # smtpserver = 'smtp.gmail.com'
+        # smtpuser = 'VLSIMailerDaemon@gmail.com'  # for SMTP AUTH, set SMTP username here
+        # smtppass = '22JUL22:19:49'
+        smtpserver = 'mail.unn.ru'
+        smtpuser = ''  # for SMTP AUTH, set SMTP username here
+        smtppass = ''
+        print(smtpserver)
         #subject = "Experiments results on " + setName + " with " + cfgName
 
-        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        #RECIPIENTS = ['zhivoderov.a@gmail.com']
+        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
         #text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
         #print(text)
+        text += 'TEST!!!'
         send_mail(
             SENDER,     # from
             RECIPIENTS, # to
@@ -337,10 +342,10 @@ class DistributionBuilder(QtGui.QWidget):
             text,       # text
             attachmentFiles,         # attachment files
             smtpserver, # SMTP server
-            587,        # port
+            25,         # port
             smtpuser,   # login
             smtppass,   # password
-            1)          # TTLS
+            0)          # TTLS
         print('Success!')
     
     def RunTestsOnCfgList(self, setName):
