@@ -19,26 +19,26 @@ using namespace libconfig;
 
 void InitializeDesign(HDesign& design, int argc, char** argv)
 {
-    design.Initialize();
+  design.Initialize();
 
-    design.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
-    design.cfg.SetArguments(argc, argv);
+  design.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
+  design.cfg.SetArguments(argc, argv);
 
-    ParseLEF(design);
-    if (design.cfg.Defined("benchmark.lib"))
-      ParseLIB(design);
+  ParseLEF(design);
+  if (design.cfg.Defined("benchmark.lib"))
+    ParseLIB(design);
 
-    TranslateTechnology(design);
+  TranslateTechnology(design);
 
-    ParseDEF(design);
+  ParseDEF(design);
 
-    if (design.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
-      Utils::SkipSpecialNets(design);//WARNING: must be called before InitializeTiming
+  if (design.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
+    Utils::SkipSpecialNets(design);//WARNING: must be called before InitializeTiming
 
-    design.SteinerPoints.Initialize();//initialize routing
-    InitializeTiming(design);
+  design.SteinerPoints.Initialize();//initialize routing
+  InitializeTiming(design);
 
-    design.Plotter.Initialize();
+  design.Plotter.Initialize();
 }
 
 void DoRandomPlacementIfRequired(HDesign& hd)
@@ -86,22 +86,22 @@ void DoLegalizationIfRequired(HDPGrid& grid)
     grid.Design().Plotter.ShowPlacement();
     grid.Design().Plotter.SaveMilestoneImage("LEG");
     
-    //WRITELINE("");
-    //ALERT("STA after legalization:");
-    //STA(grid.Design());
+    WRITELINE("");
+    ALERT("STA after legalization:");
+    STA(grid.Design());
   }
 }
 
 void DoPlacement4IfRequired(HDesign& hd)
 {
   //PLACEMENT4
-	if (hd.cfg.ValueOf("DesignFlow.Placement4", false))
-	{
-	  STA(hd);
+  if (hd.cfg.ValueOf("DesignFlow.Placement4", false))
+  {
+    STA(hd);
     Placement4(hd);
-		hd.Plotter.ShowPlacement();
-		hd.Plotter.SaveMilestoneImage("P4");
-	}
+    hd.Plotter.ShowPlacement();
+    hd.Plotter.SaveMilestoneImage("P4");
+  }
 }
 
 void DoDetailedPlacementIfRequired(HDPGrid& grid)
