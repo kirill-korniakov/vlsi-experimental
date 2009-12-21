@@ -77,6 +77,9 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
     workTimesADP = []
 
     for line in fh.readlines():
+        idx = line.find('Running itlPlace revision: ')
+        if idx != -1:
+            svnRevision = line[idx + len('Running itlPlace revision: '):-1]
         if isBeforeDP:
             idx = line.find('HPWL after legalization: ')
             if idx != -1:
@@ -167,6 +170,7 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
         po.write(2*';')
     po.close()
     fh.close()
+    return svnRevision
 
 class DistributionBuilder(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -184,10 +188,10 @@ class DistributionBuilder(QtGui.QWidget):
         #self.teditIssue = QtGui.QLineEdit('', self)
 
         self.cbCheckout = QtGui.QCheckBox('Checkout', self)
-        self.cbCheckout.toggle();
+        #self.cbCheckout.toggle();
 
         self.cbRebuild = QtGui.QCheckBox('Build', self)
-        self.cbRebuild.toggle();
+        #self.cbRebuild.toggle();
 
         self.gridGroupBoxISPD = QtGui.QGroupBox(self.tr(ispd04))
         layoutISPD = QtGui.QGridLayout()
@@ -233,11 +237,14 @@ class DistributionBuilder(QtGui.QWidget):
 
         self.connect(btnMD, QtCore.SIGNAL('clicked()'), self.btnMDClicked)
         self.connect(self, QtCore.SIGNAL('closeEmitApp()'), QtCore.SLOT('close()') )
+        
+        svnRevision = ''
 
     def Build(self):
         self.setWindowTitle('Building solution...')
-        args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
-        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
+        #args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
+        #subprocess.Popen(subprocess.list2cmdline(args)).communicate()
+        subprocess.call(["BuildSolution.bat", "Rebuild"])
 
     def DeleteSources(self):
         print('Deleting previous version of itlPlace...')
@@ -302,14 +309,11 @@ class DistributionBuilder(QtGui.QWidget):
         smtpserver = 'mail.unn.ru'
         smtpuser = ''
         smtppass = ''
-        print(smtpserver)
-        subject = "Experiments results on " + setName + " with " + cfgName
 
-        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        #RECIPIENTS = ['zhivoderov.a@gmail.com']
+        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
-        text = cfgComment + '\n\nThis is automatically generated mail. Please do not reply.'
         send_mail(
             SENDER,     # from
             RECIPIENTS, # to
@@ -343,6 +347,7 @@ class DistributionBuilder(QtGui.QWidget):
                 cfgComment = cfgCommentsList[cfgNamesList.index(file)]
                 text += '{0}: {1}\n'.format(outFileName, cfgComment)
             subject = 'Experiments results on {0} with {1}'.format(setName, str(groupOfFiles))
+            text += 'svn rev. ' + self.svnRevision
             text += '\n\nThis is automatically generated mail. Please do not reply.'
             self.PrepareAndSendMail(str(attachmentFiles), subject, text, attachmentFiles)    
         
@@ -410,7 +415,7 @@ class DistributionBuilder(QtGui.QWidget):
             subprocess.call(params, stdout = fPlacerOutput, cwd = binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
-            ParseLog(logFileName, benchmark, pythonOutput, setName == iwls05, isDP, isBeforeDP)
+            self.svnRevision = ParseLog(logFileName, benchmark, pythonOutput, setName == iwls05, isDP, isBeforeDP)
         
         return pythonOutput
 
@@ -442,5 +447,5 @@ class DistributionBuilder(QtGui.QWidget):
 app = QtGui.QApplication(sys.argv)
 db = DistributionBuilder()
 db.show()
-#db.btnMDClicked()
+db.btnMDClicked()
 app.exec_()
