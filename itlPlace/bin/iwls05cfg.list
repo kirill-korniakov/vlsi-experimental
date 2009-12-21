@@ -1,2 +1,2 @@
-WeightedClustering_fullDP.cfg -- A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. Full DP is executed after legalization. Slower growing weighting function is utilized. Rev. 1216
-#WeightedClustering_noDP.cfg -- A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. No DP is executed after legalization. Slower growing weighting function is utilized. Rev. 1216
+WeightedClustering_fullDP.cfg -- A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. Full DP is executed after legalization. Slower growing weighting function is utilized.
+#WeightedClustering_noDP.cfg -- A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. No DP is executed after legalization. Slower growing weighting function is utilized.
