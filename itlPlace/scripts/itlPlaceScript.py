@@ -188,10 +188,10 @@ class DistributionBuilder(QtGui.QWidget):
         #self.teditIssue = QtGui.QLineEdit('', self)
 
         self.cbCheckout = QtGui.QCheckBox('Checkout', self)
-        #self.cbCheckout.toggle();
+        self.cbCheckout.toggle();
 
         self.cbRebuild = QtGui.QCheckBox('Build', self)
-        #self.cbRebuild.toggle();
+        self.cbRebuild.toggle();
 
         self.gridGroupBoxISPD = QtGui.QGroupBox(self.tr(ispd04))
         layoutISPD = QtGui.QGridLayout()
@@ -447,5 +447,5 @@ class DistributionBuilder(QtGui.QWidget):
 app = QtGui.QApplication(sys.argv)
 db = DistributionBuilder()
 db.show()
-db.btnMDClicked()
+#db.btnMDClicked()
 app.exec_()
