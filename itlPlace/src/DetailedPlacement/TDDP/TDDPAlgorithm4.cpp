@@ -270,6 +270,7 @@ void ProcessCriticalNets(HDesign& hd)
   }
 
   PinsStorage pinsStorage(hd);
+  double tmpKoef = 10000.0;
   
   //find all critical nets
   for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext();)
@@ -285,15 +286,18 @@ void ProcessCriticalNets(HDesign& hd)
     NetSensitivity netSensitivity(net, slackByWeight, FOMByWeight);
     netSensitivities.push_back(netSensitivity);
 
-    enumenator += (0 - point.Slack()) * (0 - point.Slack()) * (slackByWeight + A * FOMByWeight)
-                  * (slackByWeight + A * FOMByWeight);
+    double netIncrementSqrt = (0 - point.Slack()) * slackByWeight + A * FOMByWeight;
+    enumenator += tmpKoef * netIncrementSqrt * netIncrementSqrt;
+    //enumenator += (0 - point.Slack()) * (0 - point.Slack()) * (slackByWeight + A * FOMByWeight)
+    //              * (slackByWeight + A * FOMByWeight);
   }
 
   if (enumenator < 0.0001)
       LOGERROR("Too small enumerator of beta");
 
   ALERTFORMAT(("C: %f", C));
-  double B = sqrt(C / enumenator);
+  double B = sqrt(C * tmpKoef / enumenator);
+  ALERTFORMAT(("B: %f", B));
 
   //now calculate new net weights
   for (NetSensitivities::iterator i = netSensitivities.begin();
@@ -304,7 +308,7 @@ void ProcessCriticalNets(HDesign& hd)
     double FOMByWeight   = i->FOMByWeight;
 
     HTimingPointWrapper point = hd[hd.TimingPoints[netSrc]];
-    double deltaW = B * (-1) * point.Slack() * (slackByWeight + A * FOMByWeight);
+    double deltaW = B * ((-1) * point.Slack() * slackByWeight + A * FOMByWeight);
 
     //set new weight
     hd.Set<HNet::Weight>(i->net, i->net.Weight() + deltaW);

@@ -161,7 +161,8 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 {
   if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
     if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 1)
-      PrepareNextNetWeightingLoop(hd, iteration);
+      if (!(hd.cfg.ValueOf("DesignFlow.Placement4", false)))
+        PrepareNextNetWeightingLoop(hd, iteration);
 }
 
 int main(int argc, char** argv)
