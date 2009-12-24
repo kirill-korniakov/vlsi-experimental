@@ -310,8 +310,8 @@ class DistributionBuilder(QtGui.QWidget):
         smtpuser = ''
         smtppass = ''
 
-        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        RECIPIENTS = ['zhivoderov.a@gmail.com']
+        RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+        #RECIPIENTS = ['zhivoderov.a@gmail.com']
         SENDER = 'VLSIMailerDaemon@gmail.com'
 
         send_mail(
