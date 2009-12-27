@@ -161,7 +161,7 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 {
   if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
     if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 1)
-      if (!(hd.cfg.ValueOf("DesignFlow.Placement4", false)))
+      //if (!(hd.cfg.ValueOf("DesignFlow.Placement4", false)))
         PrepareNextNetWeightingLoop(hd, iteration);
 }
 
@@ -200,7 +200,7 @@ int main(int argc, char** argv)
       HDPGrid DPGrid(hd);
 
       DoLegalizationIfRequired(DPGrid);
-      DoPlacement4IfRequired(hd);
+      //DoPlacement4IfRequired(hd);
       DoDetailedPlacementIfRequired(DPGrid);
 
       DoSTAIfCan(hd);

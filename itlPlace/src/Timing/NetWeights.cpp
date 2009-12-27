@@ -1,6 +1,7 @@
 #include "HDesign.h"
 #include "Parser.h"
 #include "Utils.h"
+#include "TDDPAlgorithm4.h"
 #include <math.h>
 #include <string>
 
@@ -73,27 +74,37 @@ double FindMaxPathDelay(HDesign& hd)
 
 void ComputeNetWeights(HDesign& hd)
 {
-  double maxPathDelay = FindMaxPathDelay(hd);
-  double u = 0.3;
-  double beta = 2;
-  double T = (1 - u) * maxPathDelay;
-  double sum = 0.0;
-
-  for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
+  if (hd.cfg.ValueOf("DesignFlow.Placement4", false) == false)
   {
-    for (HCriticalPath::PointsEnumeratorW pointsEnumW = critPathEnumW.GetEnumeratorW(); pointsEnumW.MoveNext();)
-    {
-      HPinWrapper pin  = hd[hd.Get<HTimingPoint::Pin, HPin>(pointsEnumW.TimingPoint())];
-      HNetWrapper netW = hd[pin.Net()];
-      HTimingPointWrapper tp = hd[hd[critPathEnumW.EndPoint()].TimingPoint()];
+    ALERT("Performing net-weighting algorithm implemented by Artem Zhivoderov");
 
-      //netWeight = netW.Weight();
-      hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.FallArrivalTime(), T, beta) - 1));
-      hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.RiseArrivalTime(), T, beta) - 1));
-      //WRITELINE("%f", netW.Weight());
-      pointsEnumW.MoveNext();
+    double maxPathDelay = FindMaxPathDelay(hd);
+    double u = 0.3;
+    double beta = 2;
+    double T = (1 - u) * maxPathDelay;
+    double sum = 0.0;
+
+    for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
+    {
+      for (HCriticalPath::PointsEnumeratorW pointsEnumW = critPathEnumW.GetEnumeratorW(); pointsEnumW.MoveNext();)
+      {
+        HPinWrapper pin  = hd[hd.Get<HTimingPoint::Pin, HPin>(pointsEnumW.TimingPoint())];
+        HNetWrapper netW = hd[pin.Net()];
+        HTimingPointWrapper tp = hd[hd[critPathEnumW.EndPoint()].TimingPoint()];
+
+        //netWeight = netW.Weight();
+        hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.FallArrivalTime(), T, beta) - 1));
+        hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.RiseArrivalTime(), T, beta) - 1));
+        //WRITELINE("%f", netW.Weight());
+        pointsEnumW.MoveNext();
+      }
+      //WRITELINE("\n");
     }
-    //WRITELINE("\n");
+  }
+  else
+  {
+    ALERT("Performing net-weighting algorithm implemented by Alexander Belyakov");
+    ProcessCriticalNets(hd);
   }
 }
 

@@ -258,7 +258,7 @@ void ProcessCriticalNets(HDesign& hd)
   double C = hd.cfg.ValueOf("Placement4.C", 3000.0);  //constraint on total weight increasing
   double A = hd.cfg.ValueOf("Placement4.alpha", 1.0); //balance coefficient between slack and
                                                       //FOM sensitivities
-  double minWeight = hd.cfg.ValueOf("Placement4.minWeight", 1.0); //start weight for each net
+  double minWeight = hd.cfg.ValueOf("Placement4.minWeight", 1.0); //initial weight for each net
 
   double enumenator = 0.0; //enumerator for beta coefficient
   NetSensitivities netSensitivities; //for storing nets

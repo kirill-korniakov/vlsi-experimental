@@ -98,6 +98,7 @@ public:
   unsigned int FindFOMByTForSource(HPinWrapper src); //find FOM sensitivity for source
 };
 
+void ProcessCriticalNets(HDesign& hd);
 void Placement4(HDesign& design);
 
 #endif
