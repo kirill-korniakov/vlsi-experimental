@@ -62,11 +62,6 @@ double FindMaxPathDelay(HDesign& hd)
     {
       maxPathDelay = tp.RiseArrivalTime();
     }
-
-   /* if (maxPathDelay < fabs(i.Criticality()))
-    {
-      maxPathDelay = fabs(i.Criticality());
-    }*/
   }
 
   return maxPathDelay;
@@ -74,15 +69,17 @@ double FindMaxPathDelay(HDesign& hd)
 
 void ComputeNetWeights(HDesign& hd)
 {
-  if (hd.cfg.ValueOf("DesignFlow.Placement4", false) == false)
+  string method = hd.cfg.ValueOf("NetWeighting.method", "APlace");
+
+  if (method == "APlace")
   {
-    ALERT("Performing net-weighting algorithm implemented by Artem Zhivoderov");
+    ALERT("Performing net-weighting algorithm designed and implemented by Artem Zhivoderov");
 
     double maxPathDelay = FindMaxPathDelay(hd);
-    double u = 0.3;
-    double beta = 2;
-    double T = (1 - u) * maxPathDelay;
-    double sum = 0.0;
+    double u    = hd.cfg.ValueOf("NetWeighting.APlace.u", 0.3);
+    double beta = hd.cfg.ValueOf("NetWeighting.APlace.beta", 2.0);
+    double T    = (1 - u) * maxPathDelay;
+    double sum  = 0.0;
 
     for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
     {
@@ -92,18 +89,15 @@ void ComputeNetWeights(HDesign& hd)
         HNetWrapper netW = hd[pin.Net()];
         HTimingPointWrapper tp = hd[hd[critPathEnumW.EndPoint()].TimingPoint()];
 
-        //netWeight = netW.Weight();
         hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.FallArrivalTime(), T, beta) - 1));
         hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.RiseArrivalTime(), T, beta) - 1));
-        //WRITELINE("%f", netW.Weight());
         pointsEnumW.MoveNext();
       }
-      //WRITELINE("\n");
     }
   }
-  else
+  else if (method == "Placement4")
   {
-    ALERT("Performing net-weighting algorithm implemented by Alexander Belyakov");
+    ALERT("Performing net-weighting algorithm designed and implemented by Alexander Belyakov");
     ProcessCriticalNets(hd);
   }
 }
@@ -204,7 +198,6 @@ void GetNewCommandLine(string& newCMD, const string& nwtsFileName, int argc, cha
 
 void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 {
-  //int nIter;  // number of current iteration
   int nLoops = hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10);
   string nwtsFileName;
   string defFileName;
@@ -214,7 +207,6 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   if (nLoops > 9)
   {
     ALERT("The number of net weights iterations must be less than 10");
-    //return;
   }
 
   nCyclesCounter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));

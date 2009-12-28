@@ -92,18 +92,6 @@ void DoLegalizationIfRequired(HDPGrid& grid)
   }
 }
 
-void DoPlacement4IfRequired(HDesign& hd)
-{
-  //PLACEMENT4
-  if (hd.cfg.ValueOf("DesignFlow.Placement4", false))
-  {
-    STA(hd);
-    Placement4(hd);
-    hd.Plotter.ShowPlacement();
-    hd.Plotter.SaveMilestoneImage("P4");
-  }
-}
-
 void DoDetailedPlacementIfRequired(HDPGrid& grid)
 {
   if (grid.Design().cfg.ValueOf("DesignFlow.DetailedPlacement", false))
@@ -161,7 +149,6 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 {
   if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
     if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 1)
-      //if (!(hd.cfg.ValueOf("DesignFlow.Placement4", false)))
         PrepareNextNetWeightingLoop(hd, iteration);
 }
 
@@ -200,7 +187,6 @@ int main(int argc, char** argv)
       HDPGrid DPGrid(hd);
 
       DoLegalizationIfRequired(DPGrid);
-      //DoPlacement4IfRequired(hd);
       DoDetailedPlacementIfRequired(DPGrid);
 
       DoSTAIfCan(hd);
