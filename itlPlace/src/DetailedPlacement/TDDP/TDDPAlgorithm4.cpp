@@ -253,16 +253,16 @@ double GetNetSensitivitySlacByWeight(HNetWrapper net, HDesign& hd)
   return ((-1) * delayByL * lenghtByW);
 }
 
-void ProcessCriticalNets(HDesign& hd)
+void SensitivityGuidedNetWeighting(HDesign& hd)
 {
   //constraint on total weight increasing
-  double C = hd.cfg.ValueOf("NetWeighting.Placement4.C", 3000.0);
+  double C = hd.cfg.ValueOf("NetWeighting.SensitivityGuidedNetWeighting.C", 3227.0);
 
   //balance coefficient between slack and FOM sensitivities
-  double A = hd.cfg.ValueOf("NetWeighting.Placement4.alpha", 0.6);
+  double A = hd.cfg.ValueOf("NetWeighting.SensitivityGuidedNetWeighting.alpha", 0.6);
 
   //initial weight for each net
-  double minWeight = hd.cfg.ValueOf("NetWeighting.Placement4.minWeight", 1.0);
+  double minWeight = hd.cfg.ValueOf("NetWeighting.SensitivityGuidedNetWeighting.minWeight", 1.0);
 
   double denominator = 0.0; //denominator for beta coefficient
   NetSensitivities netSensitivities; //for storing nets
@@ -318,11 +318,4 @@ void ProcessCriticalNets(HDesign& hd)
   }
 
   ALERTFORMAT(("num critical nets: %d", netSensitivities.size()));
-}
-
-void Placement4(HDesign& design)
-{
-  ProcessCriticalNets(design);
-  ExportNetWeights(design, "my_weights.txt");
-  design.cfg.SetCfgValue("NetWeighting.netWeightsImportFileName", "my_weights.txt");
 }

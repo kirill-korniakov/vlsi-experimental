@@ -95,10 +95,10 @@ void ComputeNetWeights(HDesign& hd)
       }
     }
   }
-  else if (method == "Placement4")
+  else if (method == "SensitivityGuidedNetWeighting")
   {
     ALERT("Performing net-weighting algorithm designed and implemented by Alexander Belyakov");
-    ProcessCriticalNets(hd);
+    SensitivityGuidedNetWeighting(hd);
   }
 }
 
