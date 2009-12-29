@@ -197,7 +197,7 @@ double GetNetSensitivityTByL(HNetWrapper net, HDesign& hd)
   double Cr = Utils::GetSinkCapacitance(hd, receiver, SignalDirection_None);
   double Rs = Utils::GetDriverWorstPhisics(hd, net.Source(), SignalDirection_None).R;
 
-  double netHPWL = Utils::CalcNetHPWL(hd, net);
+  double netHPWL = net.HPWL();
   return (r * c * netHPWL + c * Rs + r * Cr);
 }
 
@@ -231,7 +231,7 @@ double GetSinksWeight(HNetWrapper net, HDesign &hd)
 
 double GetNetSensitivityLByWeight(HNetWrapper net, HDesign& hd)
 {
-  double netHPWL     = Utils::CalcNetHPWL(hd, net);
+  double netHPWL     = net.HPWL();
   HPinWrapper source = hd[net.Source()];
   HCellWrapper cell  = hd[source.Cell()];
   double wSrc        = 0.0;
@@ -255,22 +255,27 @@ double GetNetSensitivitySlacByWeight(HNetWrapper net, HDesign& hd)
 
 void ProcessCriticalNets(HDesign& hd)
 {
-  double C = hd.cfg.ValueOf("NetWeighting.Placement4.C", 3000.0);  //constraint on total weight increasing
-  double A = hd.cfg.ValueOf("NetWeighting.Placement4.alpha", 1.0); //balance coefficient between slack and
-                                                                   //FOM sensitivities
-  double minWeight = hd.cfg.ValueOf("NetWeighting.Placement4.minWeight", 1.0); //initial weight for each net
+  //constraint on total weight increasing
+  double C = hd.cfg.ValueOf("NetWeighting.Placement4.C", 3000.0);
 
-  double enumenator = 0.0; //enumerator for beta coefficient
+  //balance coefficient between slack and FOM sensitivities
+  double A = hd.cfg.ValueOf("NetWeighting.Placement4.alpha", 0.6);
+
+  //initial weight for each net
+  double minWeight = hd.cfg.ValueOf("NetWeighting.Placement4.minWeight", 1.0);
+
+  double denominator = 0.0; //denominator for beta coefficient
   NetSensitivities netSensitivities; //for storing nets
 
   for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext();)
   {
     if (net.Weight() <= 0)
-    hd.Set<HNet::Weight>(net, minWeight);
+      hd.Set<HNet::Weight>(net, minWeight);
   }
 
+  Utils::CalculateHPWL(hd, true); //in order to find HPWL for each net and to use net.HPWL()
   PinsStorage pinsStorage(hd);
-  double tmpKoef = 10000.0;
+  double multiplier = 10000.0; //for more precise calculations
   
   //find all critical nets
   for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext();)
@@ -278,7 +283,7 @@ void ProcessCriticalNets(HDesign& hd)
     HPinWrapper netSource = hd[net.Source()];
     HTimingPointWrapper point = hd[hd.TimingPoints[netSource]];
 
-    if (point.Slack() >= 0)  //net is not critical
+    if (point.Slack() >= 0) //net is not critical
       continue;
 
     double slackByWeight = GetNetSensitivitySlacByWeight(net, hd);
@@ -287,16 +292,14 @@ void ProcessCriticalNets(HDesign& hd)
     netSensitivities.push_back(netSensitivity);
 
     double netIncrementSqrt = (0 - point.Slack()) * slackByWeight + A * FOMByWeight;
-    enumenator += tmpKoef * netIncrementSqrt * netIncrementSqrt;
-    //enumenator += (0 - point.Slack()) * (0 - point.Slack()) * (slackByWeight + A * FOMByWeight)
-    //              * (slackByWeight + A * FOMByWeight);
+    denominator += multiplier * netIncrementSqrt * netIncrementSqrt;
   }
 
-  if (enumenator < 0.0001)
-      LOGERROR("Too small enumerator of beta");
+  if (denominator < 0.0001)
+      LOGERROR("Too small denominator of beta");
 
   ALERTFORMAT(("C: %f", C));
-  double B = sqrt(C * tmpKoef / enumenator);
+  double B = sqrt(C * multiplier / denominator);
   ALERTFORMAT(("B: %f", B));
 
   //now calculate new net weights
@@ -312,16 +315,9 @@ void ProcessCriticalNets(HDesign& hd)
 
     //set new weight
     hd.Set<HNet::Weight>(i->net, i->net.Weight() + deltaW);
-    //ALERTFORMAT(("weight delta: %f", deltaW));
   }
 
   ALERTFORMAT(("num critical nets: %d", netSensitivities.size()));
-}
-
-//This function is used only for tests
-//TODO: remove it later
-void TestProcessCriticalNets(HDesign& hd)
-{
 }
 
 void Placement4(HDesign& design)
