@@ -1,7 +1,7 @@
 #include "HDesign.h"
 #include "Parser.h"
 #include "Utils.h"
-#include "TDDPAlgorithm4.h"
+#include "SensitivityGuidedNetWeighting.h"
 #include <math.h>
 #include <string>
 

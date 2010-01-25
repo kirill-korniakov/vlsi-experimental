@@ -1,29 +1,15 @@
 /*  
-* TDDPAlgorithm4.h
+* HPinsStorage.h
 * this is a part of itlAnalyticalPlacer
 * Copyright (C) 2009, ITLab, Belyakov
 * email: alexander.belyakov@mail.itlab.unn.ru
 */
 
-#ifndef __TDDP_ALGORITHM4_H__
-#define __TDDP_ALGORITHM4_H__
+#ifndef __HIGH_PINS_STORAGE_H__
+#define __HIGH_PINS_STORAGE_H__
 
 #include "HDesign.h"
 #include "Utils.h"
-
-HPin FindNextSrc(HPin src, const HDesign& hd);
-
-struct NetSensitivity
-{
-  HNetWrapper net;
-  double slackByWeight;
-  double FOMByWeight;
-
-  NetSensitivity(HNetWrapper _net, double slByW, double FOMByW):
-                 net(_net), slackByWeight(slByW), FOMByWeight(FOMByW) {}
-};
-
-typedef std::list<NetSensitivity> NetSensitivities;
 
 class PinsStorage
 {
@@ -97,7 +83,5 @@ public:
   ~PinsStorage();
   unsigned int FindFOMByTForSource(HPinWrapper src); //find FOM sensitivity for source
 };
-
-void SensitivityGuidedNetWeighting(HDesign& hd);
 
 #endif

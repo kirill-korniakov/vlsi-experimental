@@ -618,7 +618,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Timing\HPinsStorage.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Timing\NetWeights.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Timing\SensitivityGuidedNetWeighting.cpp"
 					>
 				</File>
 				<File
@@ -800,10 +808,6 @@
 				<Filter
 					Name="TDDP"
 					>
-					<File
-						RelativePath="..\src\DetailedPlacement\TDDP\TDDPAlgorithm4.cpp"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -5634,10 +5638,6 @@
 				<Filter
 					Name="TDDP"
 					>
-					<File
-						RelativePath="..\include\TDDPAlgorithm4.h"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -5765,6 +5765,14 @@
 				>
 				<File
 					RelativePath="..\include\DelayCalculation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\HPinsStorage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SensitivityGuidedNetWeighting.h"
 					>
 				</File>
 				<File
