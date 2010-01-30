@@ -13,7 +13,7 @@
 #include "TileGrid.h"
 #include "FGR.h"
 #include "ExportToRouters.h"
-#include "TDDPAlgorithm4.h"
+#include "SensitivityGuidedNetWeighting.h"
 
 using namespace libconfig;
 
