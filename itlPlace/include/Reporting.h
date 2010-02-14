@@ -3,6 +3,14 @@
 
 #include "HDesign.h"
 
+struct CrossingReport
+{
+	string name;
+	int crossing;
+	int onlyRight;
+	int noTree;
+};
+
 //macro types reports
 void ReportCellsByMacroFunction(HDesign& design);
 //количество cell имеющих тип MacroType
@@ -20,8 +28,8 @@ void ReportBenchmarkStatistics(HDesign& design);
 //nets reports
 //распечатка количества двупиновых, трёхпиновых и т.д. нэтов.
 void ReportNetsInfo(HDesign& design);
-int SteinerTreeReport(HDesign& design, HNet net, bool isReport = false);
-void SteinerWoodReport(HDesign& design);
+CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport = false, int intWaitTime = 0);
+void SteinerWoodReport(HDesign& design, bool IsStepReport = false);
 
 //Информация о количестве нэтов каждого типа (all, skipped, buffered, removed, Active).
 void ReportCountNetsWithTypes(HDesign& design);
