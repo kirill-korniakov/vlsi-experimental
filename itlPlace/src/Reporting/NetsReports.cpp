@@ -250,7 +250,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 			}
 		}
 	}
-	if (isReport)
+	if ((isReport) && ((crossing > 0) || (onlyRight > 0) || (noTree > 0)))
 	{
 		ALERTFORMAT(("net = %s", netw.Name().c_str()));
 		ALERTFORMAT(("crossing\t=%d", crossing));
