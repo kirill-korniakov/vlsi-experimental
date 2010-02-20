@@ -39,10 +39,12 @@ SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPin sink, SignalDirectio
 
 DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, SignalDirection ph)
 {
-  ASSERT((design.Get<HPinType::Direction, PinDirection>(driver) == PinDirection_OUTPUT));
-
   DriverPhisics result;
-  result.T = result.R = 0.0;
+  result.C = result.T = result.R = 0.0;
+
+  if (::IsNull(driver)) return result;
+
+  ASSERT((design.Get<HPinType::Direction, PinDirection>(driver) == PinDirection_OUTPUT));
 
   result.C = GetSinkCapacitance(design, driver, ph);
 

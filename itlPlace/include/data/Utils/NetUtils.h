@@ -8,6 +8,7 @@ namespace Utils
   double CalcNetHPWL(HDesign& hd, HNet net);
 
   double CalculateHPWL(HDesign& hd, bool updateCachedValues);
+  double CalculateTWL(HDesign& hd);
   double CalculateWeightedHPWL(HDesign& hd, bool updateCachedValues);
   double CalculateHPWLDiff(HDesign& hd, const HNet* nets, int nNets, bool updateCachedValues);
   double CalculateHPWLDiff(HDesign& hd, const HCell* cells, int nCells, bool updateCachedValues);

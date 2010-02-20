@@ -72,7 +72,7 @@ void HPins::AllocatePins(HCell cell)
   int pc = m_hd->GetInt<HMacroType::PinsCount>(cell_type);
   
   while(m_ld->NetList.nPinsEnd + pc > m_ld->NetList.nPinsLimit)
-    Grow(GetNewSize(m_hd->cfg, m_ld->Tech->nPinsLimit, "data.pinsLimitGrow", 1, m_ld->NetList.nPinsEnd + pc, 1.25));
+    Grow(GetNewSize(m_hd->cfg, m_ld->NetList.nPinsLimit, "data.pinsLimitGrow", 1, m_ld->NetList.nPinsEnd + pc, 1.25));
 
   m_ld->NetList.cellPinStartIdx[::ToID(cell)] = m_ld->NetList.nPinsEnd;
   m_ld->NetList.nPinsEnd += pc;

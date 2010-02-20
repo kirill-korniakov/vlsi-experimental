@@ -36,12 +36,13 @@ SignalModel GetActualSignalModel(HDesign& design)
 
 void STA(HDesign& design, bool doReport, bool reroute)
 {
-  //No timing == No STA
-  if (!design.CanDoTiming()) return;
-
   //1. Route/Reroute
   if (reroute)
     AdaptiveRoute(design);
+
+  //No timing == No STA
+  if (!design.CanDoTiming()) return;
+
   //2. RC Extraction + delays calculation
   CalculateWireDelays(design, GetActualLayersModel(design), GetActualSignalModel(design));
   //3. Arrival & Required time propagation

@@ -829,6 +829,10 @@
 					Name="FLUTE"
 					>
 					<File
+						RelativePath="..\src\Routing\FLUTE\FLArray.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Routing\FLUTE\flute.cpp"
 						>
 						<FileConfiguration

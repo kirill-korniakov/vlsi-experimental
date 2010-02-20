@@ -42,7 +42,7 @@ void Buffering::WireTreeEdge::Set(WireTreeEdges* parent, HSteinerPoint start, HS
 
   if (!IsEndPointSink && !this->HasLeft())
   {
-    WRITELINE("!@@@@@");
+    LOGERROR("Steiner tree corruption detected.");
   }
 }
 
@@ -56,32 +56,6 @@ bool Buffering::WireTreeEdge::HasRight()
   return Parent->Design.GetBool<HSteinerPoint::HasLeft>(End);
 }
 
-//int __declspec(noinline) SetLeftEdge(Buffering::WireTreeEdges*p, int root)
-//{
-//  int left = p->CreateNewEdge();
-//  WireTreeEdge& Root = p->Edges[root];
-//  Root.LeftEdge = left;
-//  p->Edges[left].Set(p, Root.End, p->Design.Get<HSteinerPoint::Left, HSteinerPoint>(Root.End));
-//  return left;
-//}
-//
-//int __declspec(noinline) SetRightEdge(Buffering::WireTreeEdges*p, int root)
-//{
-//  int right = p->CreateNewEdge();
-//  WireTreeEdge& Root = p->Edges[root];
-//  Root.RightEdge = right;
-//  p->Edges[right].Set(p, Root.End, p->Design.Get<HSteinerPoint::Right, HSteinerPoint>(Root.End));
-//  return right;
-//}
-//
-//int Buffering::WireTreeEdge::GetLeftEdge()
-//{
-//  if (LeftEdge != 0) return LeftEdge;
-//
-//  return SetLeftEdge(Parent, Parent->Edges.GetIndex(this));
-//}
-
-#pragma optimize("", off)
 int Buffering::WireTreeEdges::GetLeftEdge(int rootIndex)
 {
   if (Edges[rootIndex].LeftEdge != 0) return Edges[rootIndex].LeftEdge;
@@ -91,7 +65,6 @@ int Buffering::WireTreeEdges::GetLeftEdge(int rootIndex)
   return left;
 }
 
-#pragma optimize("", off)
 int Buffering::WireTreeEdges::GetRightEdge(int rootIndex)
 {
   if (Edges[rootIndex].RightEdge != 0) return Edges[rootIndex].RightEdge;
@@ -100,14 +73,6 @@ int Buffering::WireTreeEdges::GetRightEdge(int rootIndex)
   Edges[right].Set(this, Edges[rootIndex].End, Design.Get<HSteinerPoint::Right, HSteinerPoint>(Edges[rootIndex].End));
   return right;
 }
-
-#pragma optimize("", on)
-
-//int Buffering::WireTreeEdge::GetRightEdge()
-//{
-//  if (RightEdge != 0) return RightEdge;
-//  return SetRightEdge(Parent, Parent->Edges.GetIndex(this));
-//}
 
 double Buffering::WireTreeEdge::Xs()
 {
@@ -592,6 +557,8 @@ public:
 };
 
 #include "STA.h"
+#include "Legalization.h"
+#include "TableFormatter.h"
 
 HTimingPoint getSink(HDesign& hd, HNet net)
 {
@@ -600,17 +567,25 @@ HTimingPoint getSink(HDesign& hd, HNet net)
   return hd.TimingPoints[sink];
 }
 
-void InsertRepeaters2(HDesign& design)
+void InsertRepeaters2(HDesign& design, double slackTreshold)
 {
   struct PathBuffering
   {
     VanGinneken2 VG;
     int InsertedBuffers;
+    double BufferedPercent;
+    double MaxCriticality;
 
-    PathBuffering(HDesign& design): VG(design), InsertedBuffers(0) {}
+    PathBuffering(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(1.0), BufferedPercent(percent) {}
 
-    void ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
+    bool ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
     {
+      if (MaxCriticality > 0.0)
+        MaxCriticality = (path,design).Criticality() * (1.0 - BufferedPercent);
+      
+      if ((path,design).Criticality() > MaxCriticality)
+        return false;
+
       for (HCriticalPath::PointsEnumeratorW point = (path,design).GetEnumeratorW(); point.MoveNext(); )
       {
         HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
@@ -618,20 +593,106 @@ void InsertRepeaters2(HDesign& design)
         {
           int ins = VG.InsertBuffers(net);
           InsertedBuffers += ins;
-          //if (ins > 0) WRITELINE("%30s %d", net.Name().c_str(), ins);
         }
       }
+      return true;
     }
   };
 
   STA(design, true, true);
   FindCriticalPaths(design);
-  PathBuffering pb(design);
-  Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathHandler(&pb, &PathBuffering::ProcessPath));
+  ALERTFORMAT(("TWLbb=%.6f",Utils::CalculateTWL(design)));
+  PathBuffering pb(design, slackTreshold);
+  Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
+  ALERTFORMAT(("TWLab=%.6f",Utils::CalculateTWL(design)));
   ALERTFORMAT(("Inserted %d buffers", pb.InsertedBuffers));
   STA(design, true, false);
 }
 
+void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
+{
+  struct PathBuffering
+  {
+    VanGinneken2 VG;
+    int InsertedBuffers;
+    int PathsBuffered;
+    double BufferedPercent;
+    double MaxCriticality;
+
+    PathBuffering(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(0.0), BufferedPercent(percent) {}
+
+    bool ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
+    {
+      if (MaxCriticality == 0.0)
+        MaxCriticality = (path,design).Criticality() * (1.0 - BufferedPercent);
+      else if ((path,design).Criticality() > MaxCriticality)
+        return false;
+      PathsBuffered++;
+      for (HCriticalPath::PointsEnumeratorW point = (path,design).GetEnumeratorW(); point.MoveNext(); )
+      {
+        HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).Net()];
+        if (net.Kind() == NetKind_Active)
+        {
+          int ins = VG.InsertBuffers(net);
+          InsertedBuffers += ins;
+          //if (ins > 0) WRITELINE("%30s %d", net.Name().c_str(), ins);
+        }
+      }
+      return true;
+    }
+  };
+
+  ConfigContext ctx = design.cfg.OpenContext("Buffering");
+  PathBuffering pb(design, bufferedPercent);
+  TableFormatter tf(6);
+  tf.NewRow();
+  tf.SetCell(0, "#");
+  tf.SetCell(1, "HPWL");
+  tf.SetCell(2, "TNS");
+  tf.SetCell(3, "WNS");
+  tf.SetCell(4, "TWL");
+  tf.SetCell(5, "bufs");
+
+  for(int i = 0; i < iterations; ++i)
+  {
+    pb.MaxCriticality = 0.0;
+    pb.PathsBuffered = 0;
+
+    ALERTFORMAT(("Buffering Iteration %d", i));
+    STA(design, false, true);
+    FindCriticalPaths(design);
+
+    tf.NewRow();
+    tf.SetCell(0, i);
+    tf.SetCell(1, Utils::CalculateHPWL(design, false));
+    tf.SetCell(2, Utils::TNS(design));
+    tf.SetCell(3, Utils::WNS(design));
+    tf.SetCell(4, Utils::CalculateTWL(design));
+    tf.SetCell(5, pb.InsertedBuffers);
+
+    int before = pb.InsertedBuffers;
+    Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
+    ALERTFORMAT(("Inserted %d buffers in %d paths", pb.InsertedBuffers - before, pb.PathsBuffered));
+
+    HDPGrid grid(design);
+    Legalization(grid);
+    grid.Design().Plotter.ShowPlacement();
+    grid.Design().Plotter.SaveMilestoneImage("LEG");
+  }
+  ALERTFORMAT(("Inserted %d buffers", pb.InsertedBuffers));
+
+  STA(design, false, true);
+  tf.NewRow();
+  tf.SetCell(0, iterations);
+  tf.SetCell(1, Utils::CalculateHPWL(design, false));
+  tf.SetCell(2, Utils::TNS(design));
+  tf.SetCell(3, Utils::WNS(design));
+  tf.SetCell(4, Utils::CalculateTWL(design));
+  tf.SetCell(5, pb.InsertedBuffers);
+  tf.Print();
+}
+
+//test method (use only for development)
 void InsertRepeaters(HDesign& design)
 {
   VanGinneken2 vg(design);

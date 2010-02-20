@@ -169,3 +169,8 @@ void __alert_print_fn__(const char* text)
 {
   PRINTALERT;
 }
+
+double GetUptime()
+{
+  return SECONDSELAPSED;
+}

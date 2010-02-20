@@ -47,7 +47,8 @@ private:
   {
     Align TextAlign;
     int Width;
-    Column(): TextAlign(Align_Default), Width(0) {}
+    int Precision;
+    Column(): TextAlign(Align_Default), Width(0), Precision(6) {}
   };
 
   typedef std::list<Row> RowsList;
@@ -56,24 +57,31 @@ private:
   std::vector<Column> m_Columns;
   Row* m_LastRow;
 
-  string ConvertToString(int val)
+  string ConvertToString(int val, int colIdx)
   {
     char buf[12];
     _itoa(val, buf, 10);
     return buf;
   }
 
-  string ConvertToString(string val)
+  string ConvertToString(double val, int colIdx)
+  {
+    char buf[64];
+    sprintf(buf, "%.*f", m_Columns[colIdx].Precision, val);
+    return buf;
+  }
+
+  string ConvertToString(string val, int colIdx)
   {
     return val;
   }
 
-  string ConvertToString(const char* val)
+  string ConvertToString(const char* val, int colIdx)
   {
     return val;
   }
 
-  string ConvertToString(char val)
+  string ConvertToString(char val, int colIdx)
   {
     return string(&val, 1);
   }
@@ -110,7 +118,7 @@ private:
   {
     {//first pass
       for (RowsList::iterator row = m_Rows.begin(); row != m_Rows.end(); ++row)
-        for (int col = 0; col < NumOfColumns(); col += row->Cells[col].Colspan)
+        for (int col = 0; col < row->Size; col += row->Cells[col].Colspan)
         {
           if (row->Cells[col].Colspan + col > NumOfColumns())
             row->Cells[col].Colspan = NumOfColumns() - col;
@@ -121,7 +129,7 @@ private:
     {//second pass
       for (RowsList::iterator row = m_Rows.begin(); row != m_Rows.end(); ++row)
       {
-        for (int col = 0; col < NumOfColumns(); col += row->Cells[col].Colspan)
+        for (int col = 0; col < row->Size; col += row->Cells[col].Colspan)
         {
           int cols = row->Cells[col].Colspan;
           if (cols < 2) continue;
@@ -191,7 +199,7 @@ private:
 
 public:
 
-  TableFormatter(int columnsCount): m_LastRow(0)
+  TableFormatter(int columnsCount = 0): m_LastRow(0)
   {
     m_Columns.resize(columnsCount);
   }
@@ -209,22 +217,52 @@ public:
 
   void SetColumnMinWidth(int colIdx, int width)
   {
-    ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
+    ASSERT(colIdx >= 0);
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      if (m_LastRow != 0)
+        m_LastRow->AllocateCells(colIdx + 1);
+    }
     m_Columns[colIdx].Width = max(m_Columns[colIdx].Width, width);
   }
 
   void SetColumnAlign(int colIdx, Align align)
   {
     ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      if (m_LastRow != 0)
+        m_LastRow->AllocateCells(colIdx + 1);
+    }
     m_Columns[colIdx].TextAlign = align;
+  }
+
+  void SetColumnPrecision(int colIdx, int precision)
+  {
+    ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      if (m_LastRow != 0)
+        m_LastRow->AllocateCells(colIdx + 1);
+    }
+    m_Columns[colIdx].Precision = precision;
   }
 
   template <class T>
   void SetCell(int colIdx, T value, int colspan = 1, Align textAlign = Align_Default)
   {
     if (colIdx == -1) return;
-    ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
-    m_LastRow->Cells[colIdx].Value = ConvertToString(value);
+    ASSERT(colIdx >= 0);
+    ASSERT(m_LastRow != 0);
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      m_LastRow->AllocateCells(colIdx + 1);
+    }
+    m_LastRow->Cells[colIdx].Value = ConvertToString(value, colIdx);
     m_LastRow->Cells[colIdx].TextAlign = textAlign;
     m_LastRow->Cells[colIdx].Colspan = colspan;
   }
@@ -233,8 +271,14 @@ public:
   void SetCell(int colIdx, T value, Align textAlign, int colspan = 1)
   {
     if (colIdx == -1) return;
-    ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
-    m_LastRow->Cells[colIdx].Value = ConvertToString(value);
+    ASSERT(colIdx >= 0);
+    ASSERT(m_LastRow != 0);
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      m_LastRow->AllocateCells(colIdx + 1);
+    }
+    m_LastRow->Cells[colIdx].Value = ConvertToString(value, colIdx);
     m_LastRow->Cells[colIdx].TextAlign = textAlign;
     m_LastRow->Cells[colIdx].Colspan = colspan;
   }

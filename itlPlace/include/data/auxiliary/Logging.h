@@ -24,6 +24,8 @@ void PrintRevisionNumber();
 #define CRITICALERRORLEVEL 5
 #define ALERTLEVEL         6
 
+double GetUptime();
+
 //internal methods
 void __log_print_fn__(int level, const char* file, int line, const char* func, const char* text);
 void __alert_print_fn__(int level, const char* file, int line, const char* func, const char* text);

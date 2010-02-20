@@ -15,6 +15,7 @@ namespace FLUTE
 #pragma warning(push)
 #pragma warning(disable: 4244 4005 4101 4305)
 
+#include "FLUTE\\FLArray.h"
 #include "FLUTE\\flute.cpp"
 
 #pragma warning(pop)
@@ -36,11 +37,11 @@ struct EdgeInfo
 
 //NOTE: these data should be thread private for openmp parallelization
 static int gAccuracy         = DEFAULT_ACCURACY;
-static double gPinX[MAXD]    = {0};//x coordinates for pins
-static double gPinY[MAXD]    = {0};//y coordinates for pins
-static int gPinIndexes[MAXD] = {0};//position index for pins
-static int gPinIds[MAXD]     = {0};//pin's IDs
-static PointInfo gTreePoints[MAX_TREE_NODES(MAXD)];
+static FLUTE::FLArray<double, MAXD> gPinX;//x coordinates for pins
+static FLUTE::FLArray<double, MAXD> gPinY;//y coordinates for pins
+static FLUTE::FLArray<int, MAXD>    gPinIndexes;//position index for pins
+static FLUTE::FLArray<int, MAXD>    gPinIds;//pin's IDs
+static FLUTE::FLArray<PointInfo, MAX_TREE_NODES(MAXD)> gTreePoints;
 
 void InitFLUTE()
 {
@@ -75,18 +76,24 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
   if (wire.RoutingType() != RoutingType_Unrouted)
     aDesign.SteinerPoints.RemoveSteinerTree(wire.Root());
 
+  //DEPRECATED BLOCK
   //check if flute can route this
-  if (numOfPins > MAXD)
+  /*if (numOfPins > MAXD)
   {
     wire.SetRoutingType(RoutingType_Unrouted);
     wire.SetLength(0.0);
     LOGINFOFORMAT(("FLUTE unable to route net %s", aDesign.GetString<HNet::Name>(aNet).c_str()));
     return;
-  }
+  }*/
 
   //initialize input arrays for FLUTE
   //fill indexes to restore pins order after FLUTE
   int pointsCount = MAX_TREE_NODES(numOfPins);
+  ::gPinX.Reserve(numOfPins);
+  ::gPinY.Reserve(numOfPins);
+  ::gPinIds.Reserve(numOfPins);
+  ::gPinIndexes.Reserve(numOfPins);
+  ::gTreePoints.Reserve(pointsCount);
   int pos = 0;
   for (HNet::PinsEnumeratorW i = net.GetPinsEnumeratorW(); i.MoveNext(); pos++)
   {
@@ -111,11 +118,11 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
         minIdx = j;
       }
     } //for (int j = q + 1; j < numOfPins; j++)
-    ::Swap(::gPinIndexes + q, ::gPinIndexes + minIdx);
+    ::Swap(::gPinIndexes.AsArray() + q, ::gPinIndexes.AsArray() + minIdx);
   }// for (int q = 0; q < numOfPins - 1; q++)
 
 
-  FLUTE::Tree flTree = FLUTE::flute(numOfPins, ::gPinX, ::gPinY, ::gAccuracy);
+  FLUTE::Tree flTree = FLUTE::flute(numOfPins, ::gPinX.AsArray(), ::gPinY.AsArray(), ::gAccuracy);
 
   wire.SetLength(flTree.length);
   wire.SetRoutingType(RoutingType_Flute);
@@ -124,7 +131,7 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
   int sourceID = ::ToID(net.Source());
 
   //find all neighbours for each point
-  memset(::gTreePoints, 0, sizeof(PointInfo) * pointsCount);
+  memset(::gTreePoints.AsArray(), 0, sizeof(PointInfo) * pointsCount);
   for (int k = 0; k < pointsCount; k++)
   {
     if (k < numOfPins && ::gPinIds[::gPinIndexes[k]] == sourceID)

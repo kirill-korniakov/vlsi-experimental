@@ -121,13 +121,16 @@ void readLUT()
 
 DTYPE flute_wl(int d, DTYPE x[], DTYPE y[], int acc)
 {
-    DTYPE xs[MAXD], ys[MAXD], minval, l, xu, xl, yu, yl;
-    int s[MAXD];
+    FLArray<DTYPE, MAXD> xs,ys;
+    DTYPE minval, l, xu, xl, yu, yl;
+    FLArray<int, MAXD> s;
     int i, j, k, minidx;
     struct point {
         DTYPE x, y;
         int o;
-    } pt[MAXD], *ptp[MAXD], *tmpp;
+    } /*pt[MAXD], *ptp[MAXD],*/ *tmpp;
+    FLArray<point, MAXD> pt(d+1);
+    FLArray<point*, MAXD> ptp(d+1);
 
     if (d==2)
         l = ADIFF(x[0], x[1]) + ADIFF(y[0], y[1]);
@@ -208,7 +211,7 @@ DTYPE flute_wl(int d, DTYPE x[], DTYPE y[], int acc)
         ys[d-1] = ptp[d-1]->y;
         s[d-1] = ptp[d-1]->o;
         
-        l = flutes_wl(d, xs, ys, s, acc);
+        l = flutes_wl(d, xs.AsArray(), ys.AsArray(), s.AsArray(), acc);
     }
     return l;
 }
@@ -308,13 +311,14 @@ DTYPE flutes_wl_LD(int d, DTYPE xs[], DTYPE ys[], int s[])
 // For medium-degree, i.e., D+1 <= d
 DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
 {
-    DTYPE x1[MAXD], x2[MAXD], y1[MAXD], y2[MAXD];
-    int si[MAXD], s1[MAXD], s2[MAXD];
-    float score[2*MAXD], penalty[MAXD], pnlty, dx, dy;
+    FLArray<DTYPE, MAXD> x1, x2, y1, y2, distx, disty;
+    FLArray<int, MAXD> si, s1, s2;
+    FLArray<float, MAXD> score(2*MAXD), penalty;
+    float /*score[2*MAXD], penalty[MAXD],*/ pnlty, dx, dy;
     DTYPE ll, minl, extral;
     int i, r, p, maxbp, nbp, bp, ub, lb, n1, n2, newacc;
     int ms, mins, maxs, minsi, maxsi;
-    DTYPE distx[MAXD], disty[MAXD], xydiff;
+    DTYPE /*distx[MAXD], disty[MAXD],*/ xydiff;
 
     if (s[0] < s[d-1]) {
         ms = max(s[0], s[1]);
@@ -334,8 +338,8 @@ DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
             for (i=1; i<=d-1-ms; i++)
                 s2[i] = s[i+ms]-ms;
             
-            return flutes_wl_LMD(ms+2, x1, y1, s1, acc)
-                + flutes_wl_LMD(d-ms, xs+ms, ys+ms, s2, acc);
+            return flutes_wl_LMD(ms+2, x1.AsArray(), y1.AsArray(), s1.AsArray(), acc)
+                + flutes_wl_LMD(d-ms, xs+ms, ys+ms, s2.AsArray(), acc);
         }
     }    
     else {  // (s[0] > s[d-1])
@@ -359,8 +363,8 @@ DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
             for (i=1; i<=ms; i++)
                 s2[i] = s[i+d-1-ms];
             
-            return flutes_wl_LMD(d+1-ms, x1, y1, s1, acc)
-                + flutes_wl_LMD(ms+1, xs, ys+d-1-ms, s2, acc);
+            return flutes_wl_LMD(d+1-ms, x1.AsArray(), y1.AsArray(), s1.AsArray(), acc)
+                + flutes_wl_LMD(ms+1, xs, ys+d-1-ms, s2.AsArray(), acc);
         }
     }
     
@@ -495,8 +499,8 @@ DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
                     n1++;  n2++;
                 }
             }
-            ll = extral + flutes_wl_LMD(p+1, xs, y1, s1, newacc)
-                + flutes_wl_LMD(d-p, xs+p, y2, s2, newacc);
+            ll = extral + flutes_wl_LMD(p+1, xs, y1.AsArray(), s1.AsArray(), newacc)
+                + flutes_wl_LMD(d-p, xs+p, y2.AsArray(), s2.AsArray(), newacc);
         }
         else {  // if (!BreakInX(maxbp))
             n1 = n2 = 0;
@@ -528,8 +532,8 @@ DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
                     n1++;  n2++;
                 }
             }
-            ll = extral + flutes_wl_LMD(p+1, x1, ys, s1, newacc)
-                + flutes_wl_LMD(d-p, x2, ys+p, s2, newacc);
+            ll = extral + flutes_wl_LMD(p+1, x1.AsArray(), ys, s1.AsArray(), newacc)
+                + flutes_wl_LMD(d-p, x2.AsArray(), ys+p, s2.AsArray(), newacc);
         }
         if (minl > ll) minl = ll;
     }
@@ -538,13 +542,16 @@ DTYPE flutes_wl_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
 
 Tree flute(int d, DTYPE x[], DTYPE y[], int acc)
 {
-    DTYPE xs[MAXD], ys[MAXD], minval;
-    int s[MAXD];
+    FLArray<DTYPE, MAXD> xs, ys;
+    DTYPE /*xs[MAXD], ys[MAXD],*/ minval;
+    FLArray<int, MAXD> s;
     int i, j, k, minidx;
     struct point {
         DTYPE x, y;
         int o;
-    } pt[MAXD], *ptp[MAXD], *tmpp;
+    } /*pt[MAXD], *ptp[MAXD],*/ *tmpp;
+    FLArray<point, MAXD> pt(d+1);
+    FLArray<point*, MAXD> ptp(d+1);
     Tree t;
     
     if (d==2) {
@@ -616,7 +623,7 @@ Tree flute(int d, DTYPE x[], DTYPE y[], int acc)
         ys[d-1] = ptp[d-1]->y;
         s[d-1] = ptp[d-1]->o;
         
-        t = flutes(d, xs, ys, s, acc);
+        t = flutes(d, xs.AsArray(), ys.AsArray(), s.AsArray(), acc);
     }
     return t;
 }
@@ -809,14 +816,15 @@ Tree flutes_LD(int d, DTYPE xs[], DTYPE ys[], int s[])
 // For medium-degree, i.e., D+1 <= d
 Tree flutes_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
 {
-    DTYPE x1[MAXD], x2[MAXD], y1[MAXD], y2[MAXD];
-    int si[MAXD], s1[MAXD], s2[MAXD];
-    float score[2*MAXD], penalty[MAXD], pnlty, dx, dy;
+    FLArray<DTYPE, MAXD> x1, x2, y1, y2, distx, disty;
+    FLArray<int, MAXD> si, s1, s2;
+    FLArray<float, MAXD> score(2*MAXD), penalty;
+    float /*score[2*MAXD], penalty[MAXD],*/ pnlty, dx, dy;
     DTYPE ll, minl, coord1, coord2;
     int i, r, p, maxbp, bestbp, bp, nbp, ub, lb, n1, n2, nn1, nn2, newacc;
     Tree t, t1, t2, bestt1, bestt2;
     int ms, mins, maxs, minsi, maxsi;
-    DTYPE distx[MAXD], disty[MAXD], xydiff;
+    DTYPE /*distx[MAXD], disty[MAXD],*/ xydiff;
 
     if (s[0] < s[d-1]) {
         ms = max(s[0], s[1]);
@@ -836,8 +844,8 @@ Tree flutes_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
             for (i=1; i<=d-1-ms; i++)
                 s2[i] = s[i+ms]-ms;
 
-            t1 = flutes_LMD(ms+2, x1, y1, s1, acc);
-            t2 = flutes_LMD(d-ms, xs+ms, ys+ms, s2, acc);
+            t1 = flutes_LMD(ms+2, x1.AsArray(), y1.AsArray(), s1.AsArray(), acc);
+            t2 = flutes_LMD(d-ms, xs+ms, ys+ms, s2.AsArray(), acc);
             t = dmergetree(t1, t2);
             free(t1.branch);
             free(t2.branch);
@@ -866,8 +874,8 @@ Tree flutes_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
             for (i=1; i<=ms; i++)
                 s2[i] = s[i+d-1-ms];
             
-            t1 = flutes_LMD(d+1-ms, x1, y1, s1, acc);
-            t2 = flutes_LMD(ms+1, xs, ys+d-1-ms, s2, acc);
+            t1 = flutes_LMD(d+1-ms, x1.AsArray(), y1.AsArray(), s1.AsArray(), acc);
+            t2 = flutes_LMD(ms+1, xs, ys+d-1-ms, s2.AsArray(), acc);
             t = dmergetree(t1, t2);
             free(t1.branch);
             free(t2.branch);
@@ -1010,8 +1018,8 @@ Tree flutes_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
                 }
             }
 
-            t1 = flutes_LMD(p+1, xs, y1, s1, newacc);
-            t2 = flutes_LMD(d-p, xs+p, y2, s2, newacc);
+            t1 = flutes_LMD(p+1, xs, y1.AsArray(), s1.AsArray(), newacc);
+            t2 = flutes_LMD(d-p, xs+p, y2.AsArray(), s2.AsArray(), newacc);
             ll = t1.length + t2.length;
             coord1 = t1.branch[t1.branch[nn1].n].y;
             coord2 = t2.branch[t2.branch[nn2].n].y;
@@ -1040,8 +1048,8 @@ Tree flutes_MD(int d, DTYPE xs[], DTYPE ys[], int s[], int acc)
                 }
             }
 
-            t1 = flutes_LMD(p+1, x1, ys, s1, newacc);
-            t2 = flutes_LMD(d-p, x2, ys+p, s2, newacc);
+            t1 = flutes_LMD(p+1, x1.AsArray(), ys, s1.AsArray(), newacc);
+            t2 = flutes_LMD(d-p, x2.AsArray(), ys+p, s2.AsArray(), newacc);
             ll = t1.length + t2.length;
             coord1 = t1.branch[t1.branch[p].n].x;
             coord2 = t2.branch[t2.branch[0].n].x;
@@ -1273,8 +1281,9 @@ Tree vmergetree(Tree t1, Tree t2)
 void local_refinement(Tree *tp, int p)
 {
     int d, dd, i, ii, j, prev, curr, next, root;
-    int SteinerPin[2*MAXD], index[2*MAXD];
-    DTYPE x[MAXD], xs[D], ys[D];
+    FLArray<int,2*MAXD> SteinerPin, index;
+    FLArray<DTYPE, MAXD> x;
+    DTYPE /*x[MAXD],*/ xs[D], ys[D];
     int ss[D];
     Tree tt;
  

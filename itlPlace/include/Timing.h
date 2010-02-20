@@ -66,8 +66,6 @@ HTimingArcType FindRequiredArc(HDesign& hd,
 inline void InitializeTiming(HDesign& design)
 {
   if (!design.CanDoTiming()) return;
-
-  design.Wires.Initialize();
   design.TimingPoints.Initialize();
   FindTopologicalOrder(design);
 }

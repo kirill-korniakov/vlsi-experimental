@@ -8,7 +8,7 @@ namespace Buffering
   {
     HPin sink;
     HPin driver;
-    double coordinate;
+    double coordinate;//doube in range 0..1. Position inside buffered edge.
   };
 
   inline bool operator <(const InsertedBuffer& ib1, const InsertedBuffer& ib2)
@@ -35,9 +35,6 @@ namespace Buffering
     void Set(WireTreeEdges* parent, HSteinerPoint start, HSteinerPoint end);
     bool HasLeft();
     bool HasRight();
-
-    //int GetLeftEdge();
-    //int GetRightEdge();
 
     double Xs();
     double Ys();

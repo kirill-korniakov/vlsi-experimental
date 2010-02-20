@@ -66,6 +66,15 @@ namespace Utils
     return hpwl;
   }
 
+  double CalculateTWL(HDesign& hd)
+  {
+    double twl = 0.0;
+    for (HNets::NetsEnumerator nIter = hd.Nets.GetFullEnumerator(); nIter.MoveNext(); )
+      if (hd.Get<HNet::Kind, NetKind>(nIter) == NetKind_Active)
+        twl += hd.GetDouble<HWire::Length>(hd.Wires[nIter]);
+    return twl;
+  }
+
   double CalculateWeightedHPWL(HDesign& hd, bool updateCachedValues)
   {
     double hpwl = 0.0;
