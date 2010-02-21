@@ -1,7 +1,7 @@
 #include "DetailedPlacement.h"
 #include <algorithm>
 
-#define MAX_CELL_PINS_COUNT 1024
+#define MAX_CELL_PINS_COUNT 2048
 
 int GetOptimalRowIdx(HDPGrid& grid, HCell cell)
 {

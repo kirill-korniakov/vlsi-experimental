@@ -7,3 +7,4 @@ del .\video\*.avi
 del .\cfg\*.cfg
 del .\*.nwts
 del .\Replicated_*.cfg
+del .\*Warning.log

@@ -35,7 +35,8 @@ namespace Builders
   {
     ERROR_ASSERT(!m_net_started && m_nets_started && !m_nets_finished);
 
-    Utils::CalculateLNets(*m_hd);
+    if (m_hd->CanDoTiming())
+      Utils::CalculateLNets(*m_hd);
 
     m_nets_finished = true;
   }
