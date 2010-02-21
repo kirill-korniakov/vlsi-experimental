@@ -9,14 +9,14 @@ private:
 public:
   FLArray()
   {
-    m_Capacity = initialD;
+    m_Capacity = initialD + D;
     m_Data = 0;
     ::Grow(&m_Data, 0, m_Capacity);
   }
 
   FLArray(int initCap)
   {
-    m_Capacity = initCap;
+    m_Capacity = initCap + D;
     m_Data = 0;
     ::Grow(&m_Data, 0, m_Capacity);
   }
@@ -34,11 +34,11 @@ public:
 
   T& operator[](int idx)
   {
-    if (idx < m_Capacity)
+    if (idx + D < m_Capacity)
       return m_Data[idx];
     else
     {
-      int nCap = m_Capacity + D;
+      int nCap = m_Capacity + D + D;
       if (idx > nCap)
         nCap = idx + 1;
       ::Grow(&m_Data, m_Capacity, nCap);
