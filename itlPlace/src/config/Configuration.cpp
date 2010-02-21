@@ -337,8 +337,9 @@ searchStart:
     switch (type)
     {
     case CONFIG_TYPE_INT:
-    case CONFIG_TYPE_BOOL:
       config_setting_set_int(setting, val.ival);
+    case CONFIG_TYPE_BOOL:
+      config_setting_set_bool(setting, val.ival);
       break;
     case CONFIG_TYPE_INT64:
       config_setting_set_int64(setting, val.llval);
@@ -351,6 +352,26 @@ searchStart:
       break;
     default:
       LOGCRITICAL("Oops!");
+    };
+
+    if (ValueOf("Config.WarnOnChange", false))
+      switch (type)
+    {
+    case CONFIG_TYPE_INT:
+      WRITELINE("Cfg option changed: %s = %d", path.c_str(), (int)ValueOf(path));
+      break;
+    case CONFIG_TYPE_BOOL:
+      WRITELINE("Cfg option changed: %s = %s", path.c_str(), (bool)ValueOf(path) ? "true" : "false");
+      break;
+    case CONFIG_TYPE_INT64:
+      WRITELINE("Cfg option changed: %s = %I64xL", path.c_str(), (__int64)ValueOf(path));
+      break;
+    case CONFIG_TYPE_FLOAT:
+      WRITELINE("Cfg option changed: %s = %f", path.c_str(), (float)ValueOf(path));
+      break;
+    case CONFIG_TYPE_STRING:
+      WRITELINE("Cfg option changed: %s = %s", path.c_str(), (const char *)ValueOf(path));
+      break;
     };
   }
 
