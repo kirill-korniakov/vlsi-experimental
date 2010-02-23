@@ -609,14 +609,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
     QA = new PlacementQualityAnalyzer(hd);
-    if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
-    {
-      QA->SaveCurrentPlacementAsBestAchieved();
-    }
-  }
-
-  if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
-  {
     QA->AnalyzeQuality(0);
   }
 
@@ -658,15 +650,25 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     
     if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
-      QA->AnalyzeQuality(iteration - 1);
+      QA->AnalyzeQuality(iteration - 1, hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+
       if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
-        if (!QA->IsNextIterationApproved())
+      {
+        if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
         {
           QA->RestoreBestAchievedPlacement();
           WriteCellsCoordinates2Clusters(hd, ci);
-          ALERTFORMAT(("Early exit called"));
+          ALERTFORMAT(("Reached maximum tolerant iteration number."));
           break;
         }
+      }
+      if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
+      {
+        QA->RestoreBestAchievedPlacement();
+        WriteCellsCoordinates2Clusters(hd, ci);
+        ALERTFORMAT(("Method converged."));
+        break;
+      }
     }
     if (discrepancy <= targetDiscrepancy)
     {
@@ -681,10 +683,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   }
 
   //QA report
-  if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+  if (QA != 0)
   {
-    if (QA->IsAcceptableImprovementAchieved() || !hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
-      QA->AnalyzeQuality(iteration);
     QA->Report();
     delete QA;
   }

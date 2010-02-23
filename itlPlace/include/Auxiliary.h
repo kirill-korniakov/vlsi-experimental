@@ -6,6 +6,8 @@
 
 namespace Aux
 {
+  void SetOutputFileName(const string& fname);
+
   //linear regression for two variables
   void MNK(const double *index_1,
             const double *index_2,

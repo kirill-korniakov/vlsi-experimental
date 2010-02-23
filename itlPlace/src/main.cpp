@@ -5,6 +5,7 @@
 #include "Timing.h"
 #include "GlobalPlacement.h"
 #include "Reporting.h"
+#include "Auxiliary.h"
 
 using namespace libconfig;
 
@@ -37,6 +38,11 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
   TranslateTechnology(design);
 
   ParseDEF(design);
+
+  Aux::SetOutputFileName(Aux::CreateCoolFileName(
+    "log\\",
+    design.cfg.ValueOf("params.techname", "IWLS") + string("_") + design.Circuit.Name(),
+    "log"));
 
   if (design.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
     Utils::SkipSpecialNets(design);//WARNING: must be called before InitializeTiming

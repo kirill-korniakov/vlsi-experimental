@@ -156,15 +156,16 @@ CPP_FIN:
   CloseHandle(h);
 }
 
+static string gLogName;
 static int AppInit()
 {
   CheckParentProcess();
   
-  string logName = Aux::CreateCoolFileName("log\\", "itlOutput", "log");
+  ::gLogName = Aux::CreateCoolFileName("log\\", "itlOutput", "log");
 
-  logFile = CreateFileA(logName.c_str(),
+  logFile = CreateFileA(::gLogName.c_str(),
     GENERIC_WRITE,
-    FILE_SHARE_WRITE | FILE_SHARE_READ,
+    FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
     NULL,
     OPEN_ALWAYS,
     FILE_ATTRIBUTE_NORMAL,
@@ -175,6 +176,12 @@ static int AppInit()
   adr_WriteFile = (DWORD) WriteFile;
   DuplicateOutput();
   return 0;
+}
+
+void Aux::SetOutputFileName(const string& fname)
+{
+  if (MoveFileA(::gLogName.c_str(), fname.c_str()))
+    ::gLogName = fname;
 }
 
 static int ___app_init___ = AppInit();
