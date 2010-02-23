@@ -322,7 +322,7 @@ searchStart:
       type = CONFIG_TYPE_INT;
       format = CONFIG_FORMAT_HEX;
     }
-    else if (1 == sscanf(value.c_str(), "%g%n", &val, &n) && n == len)
+    else if (1 == sscanf(value.c_str(), "%lg%n", &val, &n) && n == len)
       type = CONFIG_TYPE_FLOAT;
     else if (ParseBool(value.c_str(), (bool*)&val))
       type = CONFIG_TYPE_BOOL;
