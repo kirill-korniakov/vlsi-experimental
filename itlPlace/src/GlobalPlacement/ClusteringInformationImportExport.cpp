@@ -11,11 +11,15 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
     fscanf(resultFile, "%s\n", bmName);
     if (strcmp(bmName, benchName))
     {
-      LOGERROR("Information in clusteringInformationLoadFileName doesn't correspond to the design")
-        return false;
+      LOGERRORFORMAT(("Information in %s doesn't correspond to the design", fileName));
+      return false;
     }
-    fscanf(resultFile, "%d %d %f %d\n", &mClusterRatio, &mDesiredFinalNumberOfClusters, 
-      &mClustersAreaTolerance, &mCurrentNumberOfClusters);
+    if (0 == fscanf(resultFile, "a %d %d %I64X %d\n", &mClusterRatio, &mDesiredFinalNumberOfClusters, 
+      &mClustersAreaTolerance, &mCurrentNumberOfClusters))
+    {
+      LOGERRORFORMAT(("Information in %s doesn't correspond to the design", fileName));
+      return false;
+    }
 
     LoadClustersFromFile(resultFile, hd);
     LoadClusteringLogFromFile(resultFile);
@@ -36,7 +40,7 @@ void ClusteringInformation::LoadClustersFromFile(FILE* rf, HDesign& hd)
 {
   char  buffer[256];
   int   clustersCellsSize;
-  float area;
+  double area;
 
   do
   {
@@ -46,7 +50,7 @@ void ClusteringInformation::LoadClustersFromFile(FILE* rf, HDesign& hd)
 
   for (unsigned int i = 0; i < clusters.size(); ++i)
   {
-    fscanf(rf, "%d : %f %s", &clustersCellsSize, &area, buffer);
+    fscanf(rf, "%d : %I64X %s", &clustersCellsSize, &area, buffer);
     clusters[i].area = area;
     clusters[i].cells.resize(clustersCellsSize);
     if (!strcmp(buffer, "true"))
@@ -107,7 +111,7 @@ void ClusteringInformation::LoadNetListFromFile(FILE* rf, NetList& nl)
   unsigned int netListSize;
   unsigned int clusterIdxsSize;
   int clusterIdx;
-  float weight;
+  double weight;
 
   do
   {
@@ -129,7 +133,7 @@ void ClusteringInformation::LoadNetListFromFile(FILE* rf, NetList& nl)
       fscanf(rf, "\t\t%d\n", &clusterIdx);
       nl[i].clusterIdxs[j] = clusterIdx;
     }
-    fscanf(rf, "\tweight = %f\n", &weight);
+    fscanf(rf, "\tweight = %I64X\n", &weight);
     nl[i].weight = weight;
   }
   // This line should be equal to "}; // NetList"
@@ -199,7 +203,7 @@ void ClusteringInformation::SaveToFile(const char* fileName, const char* benchNa
   if (resultFile)
   {
     fprintf(resultFile, "%s\n", benchName);
-    fprintf(resultFile, "%d %d %f %d\n", mClusterRatio, mDesiredFinalNumberOfClusters, 
+    fprintf(resultFile, "a %d %d %I64X %d\n", mClusterRatio, mDesiredFinalNumberOfClusters, 
       mClustersAreaTolerance, mCurrentNumberOfClusters);
     SaveClustersToFile(resultFile, hd);
     SaveClusteringLogToFile(resultFile);
@@ -225,7 +229,7 @@ void ClusteringInformation::SaveClustersToFile(FILE* rf, HDesign& hd)
   {
     clustersCellsSize = clusters[i].cells.size();
 
-    fprintf(rf, "%u : %.1f", clustersCellsSize, clusters[i].area);
+    fprintf(rf, "%u : %I64X", clustersCellsSize, clusters[i].area);
 
     if (clusters[i].isFake)
       fprintf(rf, " true\n");
@@ -279,7 +283,7 @@ void ClusteringInformation::SaveNetListToFile(FILE* rf, NetList& nl)
     {
       fprintf(rf, "\t\t%d\n", nl[i].clusterIdxs[j]);
     }
-    fprintf(rf, "\tweight = %f\n", nl[i].weight);
+    fprintf(rf, "\tweight = %I64X\n", nl[i].weight);
   }
 
   fputs("\t}; // NetList\n", rf);
