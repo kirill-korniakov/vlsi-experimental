@@ -23,7 +23,7 @@ namespace Builders
 
   void MacroTypesBuilder::MacroTypesStart(int size, int pins_initial_count)
   {
-    ERROR_ASSERT(!m_macrotypes_started);
+    ASSERT(!m_macrotypes_started);
 
     m_hd->MacroTypes.Initialize(size + 1);
     m_hd->PinTypes.Initialize(pins_initial_count + 1);
@@ -33,14 +33,14 @@ namespace Builders
   
   void MacroTypesBuilder::MacroTypesFinished()
   {
-    ERROR_ASSERT(!m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
+    ASSERT(!m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
 
     m_macrotypes_finished = true;
   }
 
   void MacroTypesBuilder::MacroTypeStart()
   {
-    ERROR_ASSERT(!m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
+    ASSERT(!m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
 
     m_CurrMacroType = m_hd->MacroTypes.AllocateMacroType();
 
@@ -50,7 +50,7 @@ namespace Builders
 
   void MacroTypesBuilder::MacroTypeFinished()
   {
-    ERROR_ASSERT(m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
+    ASSERT(m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
     
     if(m_was_pins_added)
       m_hd->PinTypes.SetPinTypes(
@@ -71,7 +71,7 @@ namespace Builders
 
   void MacroTypesBuilder::AllocatePinType()
   {
-    ERROR_ASSERT(m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
+    ASSERT(m_macro_started && m_macrotypes_started && !m_macrotypes_finished);
 
     if(m_was_pins_added)
       m_last_pin = m_hd->PinTypes.AllocatePinType();
@@ -84,19 +84,19 @@ namespace Builders
 
   HMacroTypeWrapper* MacroTypesBuilder::operator->()
   {
-    ERROR_ASSERT(m_macro_started);
+    ASSERT(m_macro_started);
     return &m_CurrMacroType;
   }
 
   HMacroTypeWrapper& MacroTypesBuilder::operator*()
   {
-    ERROR_ASSERT(m_macro_started);
+    ASSERT(m_macro_started);
     return m_CurrMacroType;
   }
 
   HPinTypeWrapper& MacroTypesBuilder::LastPin()
   {
-    ERROR_ASSERT(m_was_pins_added);
+    ASSERT(m_was_pins_added);
     return m_last_pin;
   }
 

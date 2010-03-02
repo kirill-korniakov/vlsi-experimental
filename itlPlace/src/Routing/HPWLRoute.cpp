@@ -5,7 +5,7 @@ void HPWLRoute(HDesign& aDesign, HNet& aNet)
 {
   HNetWrapper net = aDesign[aNet];
   int numOfPins = net.PinsCount();
-  DEBUG_ASSERT(numOfPins > 1);
+  DASSERT(numOfPins > 1);
 
   HWireWrapper wire = aDesign[aDesign.Wires[aNet]];
 

@@ -19,7 +19,7 @@ namespace Builders
 
   void CellsBuilder::CellsStart(int size)
   {
-    ERROR_ASSERT(!m_cells_started);
+    ASSERT(!m_cells_started);
 
     m_hd->Cells.Initialize(size + 1);
 
@@ -28,7 +28,7 @@ namespace Builders
   
   void CellsBuilder::CellsFinished()
   {
-    ERROR_ASSERT(!m_cell_started && m_cells_started && !m_cells_finished);
+    ASSERT(!m_cell_started && m_cells_started && !m_cells_finished);
 
     Utils::NormalizeCellsOrder(*m_hd);
     m_hd->Cells.BuildTerminalsIndex();
@@ -38,7 +38,7 @@ namespace Builders
 
   void CellsBuilder::CellStart()
   {
-    ERROR_ASSERT(!m_cell_started && m_cells_started && !m_cells_finished);
+    ASSERT(!m_cell_started && m_cells_started && !m_cells_finished);
 
     if(::IsNull(m_CurrCell) || !::IsNull(m_CurrCell.Type()))
       m_CurrCell = m_hd->Cells.AllocateCell();
@@ -48,14 +48,14 @@ namespace Builders
 
   void CellsBuilder::CellFinished()
   {
-    ERROR_ASSERT(m_cell_started && m_cells_started && !m_cells_finished);
+    ASSERT(m_cell_started && m_cells_started && !m_cells_finished);
 
     m_cell_started = false;
   }
 
   HCellWrapper* CellsBuilder::operator->()
   {
-    ERROR_ASSERT(m_cell_started);
+    ASSERT(m_cell_started);
     return &m_CurrCell;
   }
 

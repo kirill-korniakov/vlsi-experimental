@@ -25,7 +25,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
       
       if (errors_count++ < maxCellsToReport)
       {
-        LOGWARNINGFORMAT(("Cell %s left its site.", cell.Name().c_str()));
+        GLOGWARNING(LOGINPLACE, "Cell %s left its site.", cell.Name().c_str());
       }
       else
         if (!drawMismatchses)
@@ -34,7 +34,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
   }
   if (errors_count > 0)
   {
-    ALERTFORMAT(("CheckGridConsistency: %d errors found", errors_count));
+    ALERT("CheckGridConsistency: %d errors found", errors_count);
   }
   if (drawMismatchses) 
     hd.Plotter.ResetAutoRefreshFrequency();
@@ -67,7 +67,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
 
       if (errors_count++ < maxCellsToReport)
       {
-        LOGWARNINGFORMAT(("Cell %s lays outside of placement grid.", cell.Name().c_str()));
+        GLOGWARNING(LOGINPLACE, "Cell %s lays outside of placement grid.", cell.Name().c_str());
       }
       else
         if (!drawMismatchses)
@@ -77,7 +77,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
 
   if (errors_count > 0)
   {
-    ALERTFORMAT(("CheckGridBoundary: %d errors found", errors_count));
+    ALERT("CheckGridBoundary: %d errors found", errors_count);
   }
   if (drawMismatchses) 
     hd.Plotter.ResetAutoRefreshFrequency();
@@ -107,7 +107,7 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
           overlapped = grid(row, column + i);
           if (errors_count++ < maxCellsToReport)
           {
-            LOGWARNINGFORMAT(("Cell %s overlaps with %s", cell.Name().c_str(), hd.GetString<HCell::Name>(overlapped).c_str()));
+            GLOGWARNING(LOGINPLACE, "Cell %s overlaps with %s", cell.Name().c_str(), hd.GetString<HCell::Name>(overlapped).c_str());
           }
            else
             if (!drawOverlaps)
@@ -128,7 +128,7 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
 
   if (errors_count > 0)
   {
-    ALERTFORMAT(("CheckOverlaps: %d errors found", errors_count));
+    ALERT("CheckOverlaps: %d errors found", errors_count);
   }
   if (drawOverlaps) 
     hd.Plotter.ResetAutoRefreshFrequency();

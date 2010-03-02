@@ -63,8 +63,8 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold
   m_experiments.push_back(pq);
 
   double improvement = GetLastIterationImprovement();
-  ALERTFORMAT(("HPWL nonlegal  = %f", pq.hpwl));
-  ALERTFORMAT(("HPWL Leg.      = %f", pq.hpwl_legalized));
+  ALERT("HPWL nonlegal  = %f", pq.hpwl);
+  ALERT("HPWL Leg.      = %f", pq.hpwl_legalized);
   if (m_BestMetrics.hpwl_legalized == 0.0)
   {
     ALERT("HPWL Leg. best = N/A");
@@ -72,8 +72,8 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold
   }
   else
   {
-    ALERTFORMAT(("HPWL Leg. best = %f", m_BestMetrics.hpwl_legalized));
-    ALERTFORMAT(("HPWL Leg. gain over the best placement is %.3f%%", improvement * 100.0));
+    ALERT("HPWL Leg. best = %f", m_BestMetrics.hpwl_legalized);
+    ALERT("HPWL Leg. gain over the best placement is %.3f%%", improvement * 100.0);
   }
 
   if (improvement >= 0.0)
@@ -122,9 +122,9 @@ void PlacementQualityAnalyzer::Report()
 
   bool canDoTiming = m_design.CanDoTiming();
 
-  TableFormatter tf;
+  TableFormatter tf("Placement Quality Analyzis Table");
 
-  tf.NewRow();
+  tf.NewHeaderRow();
   if (canDoTiming)
   {
     tf.SetCell(col_wns_leg, "LWNS");
@@ -147,7 +147,7 @@ void PlacementQualityAnalyzer::Report()
   tf.SetColumnPrecision(col_hpwl, 0);
   tf.SetColumnPrecision(col_hpwl_leg, 0);
 
-  tf.NewRow();
+  tf.NewBorderRow();
   tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
 
   for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
@@ -168,7 +168,7 @@ void PlacementQualityAnalyzer::Report()
   }
 
   WRITELINE("");
-  WRITELINE("Placement Quality Analysis Table:");
+  //WRITELINE("Placement Quality Analysis Table:");
   tf.Print();
   WRITELINE("");
 }

@@ -248,6 +248,6 @@ void HorizontalSearch(HDPGrid& grid)
   {
     hswapper.ProcessRow(i);
     grid.Design().Plotter.AutoShowPlacement();
-    //ALERTFORMAT(("Row %d replaced.", i));
+    //ALERT("Row %d replaced.", i));
   }
 }

@@ -208,7 +208,7 @@ private:
   RLnode *AddBuffers(RLnode *list, VGNode& px)
   {
     RLnode* z[MAXBUFFERTYPE];
-    ERROR_ASSERT(Buffers.size() < MAXBUFFERTYPE);
+    ASSERT(Buffers.size() < MAXBUFFERTYPE);
 
     /*  consider the buffer solution */
     for (size_t i = 0; i < Buffers.size(); ++i)
@@ -601,11 +601,11 @@ void InsertRepeaters2(HDesign& design, double slackTreshold)
 
   STA(design, true, true);
   FindCriticalPaths(design);
-  ALERTFORMAT(("TWLbb=%.6f",Utils::CalculateTWL(design)));
+  ALERT("TWLbb=%.6f", Utils::CalculateTWL(design));
   PathBuffering pb(design, slackTreshold);
   Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
-  ALERTFORMAT(("TWLab=%.6f",Utils::CalculateTWL(design)));
-  ALERTFORMAT(("Inserted %d buffers", pb.InsertedBuffers));
+  ALERT("TWLab=%.6f", Utils::CalculateTWL(design));
+  ALERT("Inserted %d buffers", pb.InsertedBuffers);
   STA(design, true, false);
 }
 
@@ -658,7 +658,7 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
     pb.MaxCriticality = 0.0;
     pb.PathsBuffered = 0;
 
-    ALERTFORMAT(("Buffering Iteration %d", i));
+    ALERT("Buffering Iteration %d", i);
     STA(design, false, true);
     FindCriticalPaths(design);
 
@@ -672,14 +672,14 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
 
     int before = pb.InsertedBuffers;
     Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
-    ALERTFORMAT(("Inserted %d buffers in %d paths", pb.InsertedBuffers - before, pb.PathsBuffered));
+    ALERT("Inserted %d buffers in %d paths", pb.InsertedBuffers - before, pb.PathsBuffered);
 
     HDPGrid grid(design);
     Legalization(grid);
     grid.Design().Plotter.ShowPlacement();
     grid.Design().Plotter.SaveMilestoneImage("LEG");
   }
-  ALERTFORMAT(("Inserted %d buffers", pb.InsertedBuffers));
+  ALERT("Inserted %d buffers", pb.InsertedBuffers);
 
   STA(design, false, true);
   tf.NewRow();

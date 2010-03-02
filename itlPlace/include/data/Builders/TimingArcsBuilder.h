@@ -43,13 +43,13 @@ namespace Builders
 
     HMacroType MacroType() const
     {
-      ERROR_ASSERT(m_macrotype_opened);
+      ASSERT(m_macrotype_opened);
       return m_mtype;
     }
 
     HPinType PinType() const
     {
-      ERROR_ASSERT(m_pintype_opened);
+      ASSERT(m_pintype_opened);
       return m_ptype;
     }
   };

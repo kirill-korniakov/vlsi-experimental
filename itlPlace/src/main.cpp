@@ -6,6 +6,7 @@
 #include "GlobalPlacement.h"
 #include "Reporting.h"
 #include "Auxiliary.h"
+#include "Logging.h"
 
 using namespace libconfig;
 
@@ -19,7 +20,7 @@ void RunFlowWrapper(HDesign& hd, TableFormatter& flowMetrics)
   {
     flowMetrics.Print();
 
-    WRITELINE("");
+    WRITELINE();
     ALERT("Thats All!");
   }
 }
@@ -39,7 +40,7 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
 
   ParseDEF(design);
 
-  Aux::SetOutputFileName(Aux::CreateCoolFileName(
+  Logger::RenameDuplicatedFiles(Aux::CreateCoolFileName(
     "log\\",
     design.cfg.ValueOf("params.techname", "IWLS") + string("_") + design.Circuit.Name(),
     "log"));
@@ -61,9 +62,9 @@ int main(int argc, char** argv)
   try
   {
     //global initializations
-    gCfg.LoadConfiguration("itlVLSI.cfg");
-    InitializeLogging();
-    PrintRevisionNumber();
+    ::gCfg.LoadConfiguration("itlVLSI.cfg");
+    Logger::InitializeLogging(::gCfg);
+    Logger::Global.PrintRevisionNumber();
     InitFLUTE();//initialize routing
 
     //benchmark initialization
@@ -78,7 +79,7 @@ int main(int argc, char** argv)
     ReportPlacementArea(hd);
     ReportCellsByMacroFunction(hd);
 
-    TableFormatter flowMetrics;
+    TableFormatter flowMetrics("Placement Flow Stages Table");
     InitFlowMetricsTable(flowMetrics, hd);
 
     RunFlowWrapper(hd, flowMetrics);

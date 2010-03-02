@@ -105,6 +105,6 @@ void AddBorderPenaltyGradient(AppCtx* user, PetscScalar* x, PetscScalar* grad)
 void AddBPwithGrad(AppCtx* context, PetscScalar* solution, double*& f, PetscScalar* gradient )
 {
   *f += context->muBorderPenalty * BorderPenalty(context, solution);
-  //ALERTFORMAT(("BorderPenalty = %f", addValue));
+  //ALERT("BorderPenalty = %f", addValue));
   AddBorderPenaltyGradient(context, solution, gradient);
 }

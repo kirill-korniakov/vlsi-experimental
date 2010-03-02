@@ -1,9 +1,11 @@
-#include "Auxiliary.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include <io.h>
-#include <shlobj.h>
+#include <sys/stat.h>
+
+#include "Auxiliary.h"
+#include "Logging.h"
 
 namespace Aux
 {
@@ -91,22 +93,10 @@ namespace Aux
 	  delete [] A;
   }
 
-  void GetCurrentTimeStamp(char* timeString)
+  void GetApplicationTimeStamp(char* timeString)
   {
-    time_t ltime = time(0);
+    time_t ltime = Logger::GetStartTime();
     strftime(timeString, TIME_STRING_LENGTH, "20%y-%m-%d_%H-%M-%S", localtime(&ltime));
-  }
-
-  void GetTimeStamp(char* timeString)
-  {
-    static char timeStamp[256];
-    static bool onlyOnce = true;
-    if (onlyOnce)
-    {
-      GetCurrentTimeStamp(timeStamp);
-      onlyOnce = false;
-    }
-    strcpy(timeString, timeStamp);
   }
 
   string GetUniqueName(string dirName, char* timeStamp, string fileNameBase, string extension)
@@ -146,7 +136,7 @@ namespace Aux
     //Расширение обязательно
 
     char timeStamp[TIME_STRING_LENGTH];
-    GetTimeStamp(timeStamp);
+    GetApplicationTimeStamp(timeStamp);
 
     if ((extension[0] != '.') && (extension != ""))
       extension = "." + extension;
@@ -160,5 +150,56 @@ namespace Aux
         CreateDirectory(dirName.substr(0, i).c_str(), NULL);
 
     return GetUniqueName(dirName, timeStamp, fileNameBase, extension);
+  }
+
+  string ChangeExtention(const string& filename, const char* newExt)
+  {
+    int pos = (int)filename.length() - 1;
+    while(pos >= 0 && filename[pos] != '.')
+    {
+      if (filename[pos] == '\\' || filename[pos] == '/')
+      {
+        pos = (int)filename.length();
+        break;
+      }
+      pos--;
+    }
+    string result(filename);
+    if (pos < result.length())
+      result.replace(pos + 1, result.length() - pos - 1, newExt[0] == '.' ? newExt + 1 : newExt);
+    else
+      if (newExt[0] == '.')
+        result.append(newExt);
+      else
+      {
+        result.append(".", 1);
+        result.append(newExt);
+      }
+    return result;
+  }
+  
+  bool FileExists(const string& strFilename)
+  {
+    struct stat stFileInfo;
+    bool blnReturn;
+    int intStat;
+
+    // Attempt to get the file attributes
+    intStat = stat(strFilename.c_str(),&stFileInfo);
+    if(intStat == 0) {
+      // We were able to get the file attributes
+      // so the file obviously exists.
+      blnReturn = true;
+    } else {
+      // We were not able to get the file attributes.
+      // This may mean that we don't have permission to
+      // access the folder which contains this file. If you
+      // need to do that level of checking, lookup the
+      // return values of stat which will give you
+      // more details on why stat failed.
+      blnReturn = false;
+    }
+    
+    return(blnReturn);
   }
 }

@@ -23,7 +23,7 @@ void PinPlacement(HDesign& design)
   {
     if (pin.X() == 0.0 && pin.Y() == 0.0)
     {
-      //ALERTFORMAT(("Not placed primary pin"));
+      //ALERT("Not placed primary pin"));
       if (pin.IsPrimaryInput())
       {
         pin.SetOffsetX(design.Circuit.PlacementMinX());

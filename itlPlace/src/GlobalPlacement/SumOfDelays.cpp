@@ -93,6 +93,6 @@ void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
   expTime += finish - start;
 
   *f += SumOfDelays(context, solution);;
-  //ALERTFORMAT(("SOD = %f", addValue));
+  //ALERT("SOD = %f", addValue));
   AddSumOfDelaysGradient(context, solution, context->gSOD);
 }

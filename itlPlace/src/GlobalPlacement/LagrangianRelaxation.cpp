@@ -143,7 +143,7 @@ double GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* sol
   term1 = braces * gLSE;
 
   int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
-  ERROR_ASSERT(clusterPinIdx != -1);
+  ASSERT(clusterPinIdx != -1);
 
   double clusterCoordinate = solution[idxInSolutionVector];
   if (clusterPinIdx != 0)

@@ -228,8 +228,8 @@ void PrintTimingReport(HDesign& design, int nPaths)
   int reported = Utils::IterateMostCriticalPaths(design, nPaths, PrintPath);
   if (reported > 0) WRITELINE("");
 
-  ALERTFORMAT(("Reported %d paths of %d", reported, design.CriticalPaths.Count()));
-  ALERT("Critical paths printing finished!");  
+  ALERT("Reported %d paths of %d", reported, design.CriticalPaths.Count());
+  ALERT("Critical paths printing finished!");
 }
 
 void PlotMostCriticalPaths(HDesign& design, int n)
@@ -240,8 +240,8 @@ void PlotMostCriticalPaths(HDesign& design, int n)
 void ReportNegativeSlacks(HDesign& design)
 {
   ALERT("Reporting: circuit negative slacks");
-  ALERTFORMAT(("  TNS: %f", Utils::TNS(design)));
-  ALERTFORMAT(("  WNS: %f", Utils::WNS(design)));
+  ALERT("  TNS: %f", Utils::TNS(design));
+  ALERT("  WNS: %f", Utils::WNS(design));
 }
 //old report
 //void PrintNetInfo(HDesign& hd, HNet net)

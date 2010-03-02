@@ -27,7 +27,7 @@ SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPinType sink, SignalDire
     return 0.5 * (design.GetDouble<HPinType::RiseCapacitance>(sink) 
       + design.GetDouble<HPinType::FallCapacitance>(sink));
   default:
-    LOGCRITICALFORMAT(("Unknown signal direction: %d", ph));
+    GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
     return 0.0;
   };
 }
@@ -70,7 +70,7 @@ DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, Sig
         result.T = max(result.T, max(arc.TIntrinsicFall(), arc.TIntrinsicRise()));
         break;
       default:
-        LOGCRITICALFORMAT(("Unknown signal direction: %d", ph));
+        GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
         break;
       };
     }
@@ -111,7 +111,7 @@ DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPinType driver, S
         result.T += 0.5 * (arc.TIntrinsicFall() + arc.TIntrinsicRise());
         break;
       default:
-        LOGCRITICALFORMAT(("Unknown signal direction: %d", ph));
+        GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
         break;
       };
       ++arcsCount;
@@ -171,7 +171,7 @@ DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, Signal
     }
     break;
   default:
-    LOGCRITICALFORMAT(("Unknown signal direction: %d", ph));
+    GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
     break;
   };
 
@@ -208,11 +208,11 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, Sign
     }
     else if (PinFunction_Signal == design.Get<HPinType::Function, PinFunction>(pin.Type()))
     {
-      LOGERRORFORMAT(("Unsupported pin direction: %d", pin.Direction()));
+      GLOGERROR(LOGINPLACE, "Unsupported pin direction: %d", pin.Direction());
     }
     else
     {
-      LOGWARNINGFORMAT(("Special pin has net: %d", pin));
+      GLOGWARNING(LOGINPLACE, "Special pin has net: %d", pin);
     }
   }
   return result;
@@ -237,7 +237,7 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HMacroType elementT
     }
     else if (PinFunction_Signal == pin.Function())
     {
-      LOGERRORFORMAT(("Unsupported pin direction: %d", pin.Direction()));
+      GLOGERROR(LOGINPLACE, "Unsupported pin direction: %d", pin.Direction());
     }
   }
   return result;
@@ -267,11 +267,11 @@ DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HCell element, Si
     }
     else if (PinFunction_Signal == design.Get<HPinType::Function, PinFunction>(pin.Type()))
     {
-      LOGERRORFORMAT(("Unsupported pin direction: %d", pin.Direction()));
+      GLOGERROR(LOGINPLACE, "Unsupported pin direction: %d", pin.Direction());
     }
     else
     {
-      LOGWARNINGFORMAT(("Special pin has net: %d", pin));
+      GLOGWARNING(LOGINPLACE, "Special pin has net: %d", pin);
     }
   }
 
@@ -308,7 +308,7 @@ DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HMacroType elemen
     }
     else if (PinFunction_Signal == pin.Function())
     {
-      LOGERRORFORMAT(("Unsupported pin direction: %d", pin.Direction()));
+      GLOGERROR(LOGINPLACE, "Unsupported pin direction: %d", pin.Direction());
     }
   }
 
@@ -330,20 +330,20 @@ static bool VerifyPin(HDesign& design, HPin pin)
 
   if (design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(point.Next()) != point)
   {
-    LOGWARNINGFORMAT(("Point [%s] breaks topological order. Previous point [%s] has [%s] as next.",
+    GLOGWARNING(LOGINPLACE, "Point [%s] breaks topological order. Previous point [%s] has [%s] as next.",
       Utils::MakePointFullName(design, point).c_str(),
       Utils::MakePointFullName(design, point.Next()).c_str(),
       Utils::MakePointFullName(design, design.Get<HTimingPoint::PreviousPoint, HTimingPoint>(point.Next())).c_str()
-      ));
+      );
     return false;
   }
   if (design.Get<HTimingPoint::NextPoint, HTimingPoint>(point.Previous()) != point)
   {
-    LOGWARNINGFORMAT(("Point [%s] breaks topological order. Next point [%s] has [%s] as previous.",
+    GLOGWARNING(LOGINPLACE, "Point [%s] breaks topological order. Next point [%s] has [%s] as previous.",
       Utils::MakePointFullName(design, point).c_str(),
       Utils::MakePointFullName(design, point.Previous()).c_str(),
       Utils::MakePointFullName(design, design.Get<HTimingPoint::NextPoint, HTimingPoint>(point.Previous())).c_str()
-      ));
+      );
     return false;
   }
   return true;
@@ -413,18 +413,18 @@ bool Utils::VerifyTimingCalculationOrder(HDesign& design)
 
   if (sp != design.TimingPoints.FirstInternalPoint())
   {
-    LOGWARNINGFORMAT(("Timing start points are calculated incorrectly. First internal is [%s] instead of [%s].",
+    GLOGWARNING(LOGINPLACE, "Timing start points are calculated incorrectly. First internal is [%s] instead of [%s].",
       Utils::MakePointFullName(design, sp).c_str(),
       Utils::MakePointFullName(design, design.TimingPoints.FirstInternalPoint()).c_str()
-      ));
+      );
     verified = false;
   }
   if (spCount != design.TimingPoints.StartPointsCount())
   {
-    LOGWARNINGFORMAT(("Timing start points are calculated incorrectly. There are %d points instead of %d.",
+    GLOGWARNING(LOGINPLACE, "Timing start points are calculated incorrectly. There are %d points instead of %d.",
       spCount,
       design.TimingPoints.StartPointsCount()
-      ));
+      );
     verified = false;
   }
 
@@ -437,18 +437,18 @@ bool Utils::VerifyTimingCalculationOrder(HDesign& design)
 
   if (ep != design.TimingPoints.LastInternalPoint())
   {
-    LOGWARNINGFORMAT(("Timing end points are calculated incorrectly. Last internal is [%s] instead of [%s].",
+    GLOGWARNING(LOGINPLACE, "Timing end points are calculated incorrectly. Last internal is [%s] instead of [%s].",
       Utils::MakePointFullName(design, ep).c_str(),
       Utils::MakePointFullName(design, design.TimingPoints.LastInternalPoint()).c_str()
-      ));
+      );
     verified = false;
   }
   if (epCount != design.TimingPoints.EndPointsCount())
   {
-    LOGWARNINGFORMAT(("Timing end points are calculated incorrectly. There are %d points instead of %d.",
+    GLOGWARNING(LOGINPLACE, "Timing end points are calculated incorrectly. There are %d points instead of %d.",
       epCount,
       design.TimingPoints.EndPointsCount()
-      ));
+      );
     verified = false;
   }
 
@@ -456,9 +456,9 @@ bool Utils::VerifyTimingCalculationOrder(HDesign& design)
   while (sp.GoNext() != ep)
     if (sp.IsTimingStartPoint() || sp.IsTimingEndPoint())
     {
-      LOGWARNINGFORMAT(("Timing start/end point is placed inside internal points. Point name is [%s].",
+      GLOGWARNING(LOGINPLACE, "Timing start/end point is placed inside internal points. Point name is [%s].",
         Utils::MakePointFullName(design, sp).c_str()
-      ));
+      );
       verified = false;
     }
 

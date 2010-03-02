@@ -78,7 +78,7 @@ void ReportNetTiming(HDesign& design, HNet net)
 	HNetWrapper netW = design[net]; 
 	double RAT, AAT, NS;
 	string pinName;
-	ALERTFORMAT(("Reporting net %s timing", netW.Name().c_str()));
+	ALERT("Reporting net %s timing", netW.Name().c_str());
 
 	for (HNetWrapper::PinsEnumeratorW currPin = netW.GetPinsEnumeratorW(); currPin.MoveNext();)
 	{
@@ -92,9 +92,9 @@ void ReportNetTiming(HDesign& design, HNet net)
 		else
 			pinName = design.Cells.GetString<HCell::Name>(currPin.Cell()) + "." + currPin.Name();
 
-		ALERTFORMAT(("RAT at %s\t= %.10f", pinName.c_str(), RAT));
-		ALERTFORMAT(("AAT at %s\t= %.10f", pinName.c_str(), AAT));
-		ALERTFORMAT(("NS at %s\t= %.10f", pinName.c_str(), NS));
+		ALERT("RAT at %s\t= %.10f", pinName.c_str(), RAT);
+		ALERT("AAT at %s\t= %.10f", pinName.c_str(), AAT);
+		ALERT("NS at %s\t= %.10f", pinName.c_str(), NS);
 	}
 }
 
@@ -252,10 +252,10 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 	}
 	if ((isReport) && ((crossing > 0) || (onlyRight > 0) || (noTree > 0)))
 	{
-		ALERTFORMAT(("net = %s", netw.Name().c_str()));
-		ALERTFORMAT(("crossing\t=%d", crossing));
-		ALERTFORMAT(("onlyRight\t=%d", onlyRight));
-		ALERTFORMAT(("noTree\t=%d", noTree));
+		ALERT("net = %s", netw.Name().c_str());
+		ALERT("crossing\t=%d", crossing);
+		ALERT("onlyRight\t=%d", onlyRight);
+		ALERT("noTree\t=%d", noTree);
 	}
 
 	CrossingReport crossingType;
@@ -282,7 +282,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 }
 void SteinerWoodReport(HDesign& design, bool IsStepReport)
 {
-	ALERTFORMAT(("Steiner wood report:"));
+	ALERT("Steiner wood report:");
 	CrossingReport crossingType;
 	crossingType.name = "";
 	crossingType.crossing = 0;
@@ -303,7 +303,7 @@ void SteinerWoodReport(HDesign& design, bool IsStepReport)
 
 	}
 
-	ALERTFORMAT(("crossing in tree = %d", sum.crossing));
-	ALERTFORMAT(("Tree heve only right  = %d", sum.onlyRight));
-	ALERTFORMAT(("no tree in net = %d", sum.noTree));
+	ALERT("crossing in tree = %d", sum.crossing);
+	ALERT("Tree heve only right  = %d", sum.onlyRight);
+	ALERT("no tree in net = %d", sum.noTree);
 }

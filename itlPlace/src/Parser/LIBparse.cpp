@@ -126,11 +126,11 @@ si2drStringT GetOneName(si2drGroupIdT g2)
 {
   si2drErrorT err;
   si2drNamesIdT names = si2drGroupGetNames(g2, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   si2drStringT str = si2drIterNextName(names, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   si2drIterQuit(names, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   return str;
 }
 
@@ -138,19 +138,19 @@ si2drStringT GetSimpleStringAttributeValue(si2drGroupIdT group, si2drStringT att
 {
   si2drErrorT err;
   si2drAttrIdT attr = si2drGroupFindAttrByName(group, attr_name, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   bool has_attr = !si2drObjectIsNull(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   if (has_attr)
   {
     si2drAttrTypeT at = si2drAttrGetAttrType(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(at == SI2DR_SIMPLE);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(at == SI2DR_SIMPLE);
     si2drValueTypeT vtype = si2drSimpleAttrGetValueType(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_STRING);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_STRING);
     si2drStringT val = si2drSimpleAttrGetStringValue(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     return val;
   }
   else
@@ -161,15 +161,15 @@ si2drStringT GetSingleStringFromAttr(si2drAttrIdT attr)
 {
   si2drErrorT err;
   si2drAttrTypeT at = si2drAttrGetAttrType(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   if (at == SI2DR_SIMPLE)
   {
     si2drValueTypeT vtype = si2drSimpleAttrGetValueType(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_STRING);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_STRING);
     si2drStringT val = si2drSimpleAttrGetStringValue(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     return val;
   }
   else if (at == SI2DR_COMPLEX)
@@ -183,19 +183,19 @@ si2drStringT GetSingleStringFromAttr(si2drAttrIdT attr)
     si2drStringT    val;
     
     si2drValuesIdT vals = si2drComplexAttrGetValues(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
-    ERROR_ASSERT(vtype == SI2DR_STRING);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(vtype == SI2DR_STRING);
     val = string;
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
     si2drIterQuit(vals, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     return val;
   }
@@ -206,9 +206,9 @@ si2drStringT GetStringAttributeValue(si2drGroupIdT group, si2drStringT attr_name
 {
   si2drErrorT err;
   si2drAttrIdT attr = si2drGroupFindAttrByName(group, attr_name, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
+  ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
   bool has_attr =  !si2drObjectIsNull(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   return has_attr ? GetSingleStringFromAttr(attr) : 0;
 }
 
@@ -216,20 +216,20 @@ si2drFloat64T GetSingleFloatFromAttr(si2drAttrIdT attr)
 {
   si2drErrorT err;
   si2drAttrTypeT at = si2drAttrGetAttrType(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   if (at == SI2DR_SIMPLE)
   {
     si2drValueTypeT vtype = si2drSimpleAttrGetValueType(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_FLOAT64 || vtype == SI2DR_INT32);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_FLOAT64 || vtype == SI2DR_INT32);
 
     si2drFloat64T val;
     if (vtype == SI2DR_FLOAT64)
       val = si2drSimpleAttrGetFloat64Value(attr, &err);
     else if (vtype == SI2DR_INT32)
       val = si2drSimpleAttrGetInt32Value(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     return val;
   }
@@ -244,19 +244,19 @@ si2drFloat64T GetSingleFloatFromAttr(si2drAttrIdT attr)
     si2drFloat64T    val;
     
     si2drValuesIdT vals = si2drComplexAttrGetValues(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
-    ERROR_ASSERT(vtype == SI2DR_FLOAT64);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(vtype == SI2DR_FLOAT64);
     val = float64;
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
     si2drIterQuit(vals, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     return val;
   }
@@ -267,9 +267,9 @@ si2drFloat64T GetFloatAttributeValue(si2drGroupIdT group, si2drStringT attr_name
 {
   si2drErrorT err;
   si2drAttrIdT attr = si2drGroupFindAttrByName(group, attr_name, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
+  ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
   bool has_attr =  !si2drObjectIsNull(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   return has_attr ? GetSingleFloatFromAttr(attr) : 0;
 }
 
@@ -277,15 +277,15 @@ si2drBooleanT GetSingleBoolFromAttr(si2drAttrIdT attr)
 {
   si2drErrorT err;
   si2drAttrTypeT at = si2drAttrGetAttrType(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   if (at == SI2DR_SIMPLE)
   {
     si2drValueTypeT vtype = si2drSimpleAttrGetValueType(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_BOOLEAN);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_BOOLEAN);
     si2drBooleanT val = si2drSimpleAttrGetBooleanValue(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     return val;
   }
   else if (at == SI2DR_COMPLEX)
@@ -299,19 +299,19 @@ si2drBooleanT GetSingleBoolFromAttr(si2drAttrIdT attr)
     si2drBooleanT    val;
     
     si2drValuesIdT vals = si2drComplexAttrGetValues(attr, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
-    ERROR_ASSERT(vtype == SI2DR_BOOLEAN);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(vtype == SI2DR_BOOLEAN);
     val = boolval;
 
     si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
-    ERROR_ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
+    ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(vtype == SI2DR_UNDEFINED_VALUETYPE);
     si2drIterQuit(vals, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     return val;
   }
@@ -322,9 +322,9 @@ si2drBooleanT GetBoolAttributeValue(si2drGroupIdT group, si2drStringT attr_name)
 {
   si2drErrorT err;
   si2drAttrIdT attr = si2drGroupFindAttrByName(group, attr_name, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
+  ASSERT(err == SI2DR_NO_ERROR || err == SI2DR_OBJECT_NOT_FOUND);
   bool has_attr =  !si2drObjectIsNull(attr, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
   return has_attr ? GetSingleBoolFromAttr(attr) : si2drBooleanT(0);
 }
 
@@ -354,16 +354,16 @@ LutTable ReadLUT(si2drGroupIdT lut_group, LutTable* lut_template)
     {// read values
       si2drErrorT err;
       si2drAttrIdT attr_values = si2drGroupFindAttrByName(lut_group, "values", &err);
-      ERROR_ASSERT(err == SI2DR_NO_ERROR);
+      ASSERT(err == SI2DR_NO_ERROR);
       bool has_values = !si2drObjectIsNull(attr_values, &err);
-      ERROR_ASSERT(err == SI2DR_NO_ERROR);
+      ASSERT(err == SI2DR_NO_ERROR);
       if (has_values)
       {
         si2drAttrTypeT at = si2drAttrGetAttrType(attr_values, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
-        ERROR_ASSERT(at == SI2DR_COMPLEX);
+        ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(at == SI2DR_COMPLEX);
         si2drValuesIdT vals = si2drComplexAttrGetValues(attr_values, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(err == SI2DR_NO_ERROR);
         si2drValueTypeT vtype;
         si2drInt32T     intgr;
         si2drFloat64T   float64;
@@ -372,19 +372,19 @@ LutTable ReadLUT(si2drGroupIdT lut_group, LutTable* lut_template)
         si2drExprT      *exprp;
 
         si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
-        ERROR_ASSERT(vtype == SI2DR_STRING);
+        ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(vtype == SI2DR_STRING);
 
         while (vtype != SI2DR_UNDEFINED_VALUETYPE)
         {
           res.values.push_back(string);
           si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-          ERROR_ASSERT(err == SI2DR_NO_ERROR);
-          ERROR_ASSERT(vtype == SI2DR_STRING || vtype == SI2DR_UNDEFINED_VALUETYPE);
+          ASSERT(err == SI2DR_NO_ERROR);
+          ASSERT(vtype == SI2DR_STRING || vtype == SI2DR_UNDEFINED_VALUETYPE);
         }
 
         si2drIterQuit(vals, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(err == SI2DR_NO_ERROR);
       }
     }
   }
@@ -463,18 +463,18 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
 {
   si2drErrorT err;
   si2drGroupsIdT groups = si2drGroupGetGroups(timing_group, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);    
+  ASSERT(err == SI2DR_NO_ERROR);    
 
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drStringT template_name = GetOneName(group);
     si2drStringT group_type = si2drGroupGetGroupType(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     
     if (strcmp(group_type, "cell_rise") == 0)
     {
@@ -529,28 +529,28 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
 
     //fetch next item
     group = si2drIterNextGroup(groups, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
   }
   si2drIterQuit(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 }
 
 void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
 {
   si2drErrorT err;
   si2drGroupsIdT groups = si2drGroupGetGroups(timing_group, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);    
+  ASSERT(err == SI2DR_NO_ERROR);    
 
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drStringT template_name = GetOneName(group);
     si2drStringT group_type = si2drGroupGetGroupType(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     
     if (strcmp(group_type, "rise_constraint") == 0)
     {
@@ -599,10 +599,10 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
 
     //fetch next item
     group = si2drIterNextGroup(groups, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
   }
   si2drIterQuit(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 }
 
 void ProcessTimingGroup(si2drGroupIdT timing_group, LIBParserData& data)
@@ -654,7 +654,7 @@ void ProcessTimingGroup(si2drGroupIdT timing_group, LIBParserData& data)
     //ignore these arcs
     break;
   default:
-    WARNING_ASSERT("Unknown arc type detected.");
+    ASSERT("Unknown arc type detected.");
     break;    
   }
 }
@@ -700,28 +700,28 @@ void ProcessPin(si2drGroupIdT pin_group, LIBParserData& data)
 
   si2drErrorT err;
   si2drGroupsIdT groups = si2drGroupGetGroups(pin_group, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drStringT group_type = si2drGroupGetGroupType(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     if (strcmp(group_type, "timing") == 0)
       ProcessTimingGroup(group, data);
 
     //fetch next item
     group = si2drIterNextGroup(groups, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
   }
 
   si2drIterQuit(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   data.ArcsBuilder.ClosePinType();
 }
@@ -733,17 +733,17 @@ void ProcessCell(si2drGroupIdT cell_group, LIBParserData& data)
   data.ArcsBuilder.OpenMacroType(cell_name);
 
   si2drGroupsIdT groups = si2drGroupGetGroups(cell_group, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drStringT group_type = si2drGroupGetGroupType(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     if (strcmp(group_type, "pin") == 0)
       ProcessPin(group, data);
@@ -754,11 +754,11 @@ void ProcessCell(si2drGroupIdT cell_group, LIBParserData& data)
 
     //fetch next item
     group = si2drIterNextGroup(groups, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
   }
 
   si2drIterQuit(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   data.ArcsBuilder.CloseMacroType();
 }
@@ -769,14 +769,14 @@ void ProcessLibraryTopGroups(si2drGroupsIdT groups, LIBParserData& data)
   si2drErrorT err;
 
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     si2drStringT group_type = si2drGroupGetGroupType(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     if (strcmp(group_type, "lu_table_template") == 0)
       data.LutTemplates.push_back(ReadLUT(group, 0));
@@ -785,7 +785,7 @@ void ProcessLibraryTopGroups(si2drGroupsIdT groups, LIBParserData& data)
 
     //fetch next item
     group = si2drIterNextGroup(groups, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
   }
 }
 
@@ -794,12 +794,12 @@ void ReadLibraries(si2drGroupsIdT groups, LIBParserData& data)
   si2drErrorT err;
   
   si2drGroupIdT group = si2drIterNextGroup(groups, &err);
-  ERROR_ASSERT(err == SI2DR_NO_ERROR);
+  ASSERT(err == SI2DR_NO_ERROR);
 
   int libs_count = 0;
   while (!si2drObjectIsNull(group, &err))
   {
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
     
     //check that current library is single available
     libs_count++;
@@ -810,7 +810,7 @@ void ReadLibraries(si2drGroupsIdT groups, LIBParserData& data)
     }
 
     //print library name
-    ALERTFORMAT(("Extracting data from library %s", GetOneName(group)));
+    ALERT("Extracting data from library %s", GetOneName(group));
 
     //ensure that "delay_model : table_lookup;"
     if (strcmp(GetSimpleStringAttributeValue(group, "delay_model"), "table_lookup") != 0)
@@ -828,16 +828,16 @@ void ReadLibraries(si2drGroupsIdT groups, LIBParserData& data)
 
     {//ensure "capacitive_load_unit (UNITS,pf);"
       si2drAttrIdT attr_cload_unit = si2drGroupFindAttrByName(group, "capacitive_load_unit", &err);
-      ERROR_ASSERT(err == SI2DR_NO_ERROR);
+      ASSERT(err == SI2DR_NO_ERROR);
       bool has_cload_unit = !si2drObjectIsNull(attr_cload_unit, &err);
-      ERROR_ASSERT(err == SI2DR_NO_ERROR);
+      ASSERT(err == SI2DR_NO_ERROR);
       if (has_cload_unit)
       {
         si2drAttrTypeT at_cload_unit = si2drAttrGetAttrType(attr_cload_unit, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
-        ERROR_ASSERT(at_cload_unit == SI2DR_COMPLEX);
+        ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(at_cload_unit == SI2DR_COMPLEX);
         si2drValuesIdT vals = si2drComplexAttrGetValues(attr_cload_unit, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(err == SI2DR_NO_ERROR);
         si2drValueTypeT vtype;
         si2drInt32T     intgr;
         si2drFloat64T   float64;
@@ -845,29 +845,29 @@ void ReadLibraries(si2drGroupsIdT groups, LIBParserData& data)
         si2drBooleanT   boolval;
         si2drExprT      *exprp;
         si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
-        ERROR_ASSERT(vtype == SI2DR_INT32);
+        ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(vtype == SI2DR_INT32);
         
         data.capacitance_to_pf_factor = intgr;
 
         si2drIterNextComplexValue(vals, &vtype, &intgr, &float64, &string, &boolval, &exprp, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
-        ERROR_ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
-        ERROR_ASSERT(vtype == SI2DR_STRING);
+        ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(vtype != SI2DR_UNDEFINED_VALUETYPE);
+        ASSERT(vtype == SI2DR_STRING);
         CRITICAL_ASSERT(strcmp(string, "pf") == 0);
         si2drIterQuit(vals, &err);
-        ERROR_ASSERT(err == SI2DR_NO_ERROR);
+        ASSERT(err == SI2DR_NO_ERROR);
       }
     }
 
     //process subitems (table templates and cells)
     si2drGroupsIdT gs2 = si2drGroupGetGroups(group, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     ProcessLibraryTopGroups(gs2, data);
 
     si2drIterQuit(gs2, &err);
-    ERROR_ASSERT(err == SI2DR_NO_ERROR);
+    ASSERT(err == SI2DR_NO_ERROR);
 
     //fetch next library
     group = si2drIterNextGroup(groups, &err);
@@ -879,12 +879,12 @@ void ParseLIB(HDesign& design)
   ConfigContext ctx = design.cfg.OpenContext("LIBParser");
 
   si2drErrorT err;
-  ALERTFORMAT(("Lib file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.lib")));
+  ALERT("Lib file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.lib"));
   si2drPIInit(&err);
   si2drReadLibertyFile((char*)(const char*)design.cfg.ValueOf("benchmark.lib"), &err);
   if(err == SI2DR_INVALID_NAME )
   {
-    LOGCRITICALFORMAT(("COULD NOT OPEN %s for parsing", (const char*)design.cfg.ValueOf("benchmark.lib")));
+    GLOGCRITICAL(LOGINPLACE, "COULD NOT OPEN %s for parsing", (const char*)design.cfg.ValueOf("benchmark.lib"));
   }
   else if (err == SI2DR_SYNTAX_ERROR )
   {

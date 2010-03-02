@@ -294,7 +294,7 @@ void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
   ConfigContext ctx = design.cfg.OpenContext("DEFExport");
 
   WRITELINE("");
-  ALERTFORMAT(("DEF export"));
+  ALERT("DEF export");
 
   FILE * fout;
   if ((fout = fopen(defName.c_str(), "w")) == 0)
@@ -308,7 +308,7 @@ void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
   userData.useOriginalNames = useOriginalNames;
 
   int status = defwInitCbk(fout);
-  ERROR_ASSERT(status == DEFW_OK);
+  ASSERT(status == DEFW_OK);
 
   defwSetVersionCbk(versionCB);
   defwSetDesignCbk(designCB);
@@ -321,11 +321,11 @@ void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
   defwSetDesignEndCbk(designendCB);
 
   status = defwWrite(fout, defName.c_str(), (void*)(&userData));
-  ERROR_ASSERT(status == DEFW_OK);
+  ASSERT(status == DEFW_OK);
 
   fclose(fout);
   
-  ALERTFORMAT(("DEF is written to %s", defName.c_str()));
+  ALERT("DEF is written to %s", defName.c_str());
 }
 
 void ExportDEF(HDesign& design, const string& defName)

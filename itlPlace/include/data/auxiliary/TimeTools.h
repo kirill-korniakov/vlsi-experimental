@@ -1,4 +1,4 @@
-
+#pragma once
 #ifdef	_MSC_VER
 typedef __int64		i64_time_t;
 #else

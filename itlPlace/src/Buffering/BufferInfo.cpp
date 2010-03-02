@@ -22,8 +22,8 @@ BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string
   if (::IsNull(inPin) || ::IsNull(outPin))
     return BufferInfo();
 
-  ERROR_ASSERT((hd.Get<HPinType::Direction, PinDirection>(inPin) == PinDirection_INPUT));
-  ERROR_ASSERT((hd.Get<HPinType::Direction, PinDirection>(outPin) == PinDirection_OUTPUT));
+  ASSERT((hd.Get<HPinType::Direction, PinDirection>(inPin) == PinDirection_INPUT));
+  ASSERT((hd.Get<HPinType::Direction, PinDirection>(outPin) == PinDirection_OUTPUT));
 
   Utils::DriverPhisics dph = Utils::GetDriverAveragePhisics(hd, outPin, SignalModel);
   Utils::SinkPhisics sph = Utils::GetSinkCapacitance(hd, inPin, SignalModel);

@@ -25,7 +25,7 @@ namespace Builders
 
   void TimingArcsBuilder::TimingArcsStart(int size)
   {
-    ERROR_ASSERT(!m_timingarcs_started);
+    ASSERT(!m_timingarcs_started);
 
     m_hd->TimingArcTypes.Initialize(size + 1);
 
@@ -34,7 +34,7 @@ namespace Builders
   
   void TimingArcsBuilder::TimingArcsFinished()
   {
-    ERROR_ASSERT(!m_arc_started
+    ASSERT(!m_arc_started
       && !m_pintype_opened
       && !m_macrotype_opened
       && m_timingarcs_started
@@ -45,7 +45,7 @@ namespace Builders
 
   HTimingArcTypeWrapper* TimingArcsBuilder::operator->()
   {
-    ERROR_ASSERT(m_arc_started);
+    ASSERT(m_arc_started);
     return &m_arc;
   }
 
@@ -62,17 +62,17 @@ namespace Builders
 
   void TimingArcsBuilder::OpenMacroType(const string& name)
   {
-    ERROR_ASSERT(!m_macrotype_opened && m_timingarcs_started);
+    ASSERT(!m_macrotype_opened && m_timingarcs_started);
 
     m_mtype = Utils::FindMacroTypeByName(*m_hd, name);
-    ERROR_ASSERT(!::IsNull(m_mtype));
+    ASSERT(!::IsNull(m_mtype));
 
     m_macrotype_opened = true;
   }
   
   void TimingArcsBuilder::CloseMacroType()
   {
-    ERROR_ASSERT(m_macrotype_opened && !m_pintype_opened);
+    ASSERT(m_macrotype_opened && !m_pintype_opened);
     
     m_mtype = m_hd->MacroTypes.Null();
     
@@ -81,17 +81,17 @@ namespace Builders
 
   void TimingArcsBuilder::OpenPinType(const string& name)
   {
-    ERROR_ASSERT(m_macrotype_opened && !m_pintype_opened);
+    ASSERT(m_macrotype_opened && !m_pintype_opened);
 
     m_ptype = Utils::FindMacroTypePinByName(*m_hd, m_mtype, name);
-    ERROR_ASSERT(!::IsNull(m_ptype));
+    ASSERT(!::IsNull(m_ptype));
 
     m_pintype_opened = true;
   }
 
   void TimingArcsBuilder::ClosePinType()
   {
-    ERROR_ASSERT(m_pintype_opened && !m_arc_started);
+    ASSERT(m_pintype_opened && !m_arc_started);
     
     m_ptype = m_hd->PinTypes.Null();
     
@@ -100,20 +100,20 @@ namespace Builders
 
   void TimingArcsBuilder::AddNewArc(const string& relatedPinName)
   {
-    ERROR_ASSERT(m_pintype_opened && !m_arc_started);
+    ASSERT(m_pintype_opened && !m_arc_started);
 
     HPinType start_pin = Utils::FindMacroTypePinByName(*m_hd, m_mtype, relatedPinName);
-    ERROR_ASSERT(!::IsNull(start_pin));
+    ASSERT(!::IsNull(start_pin));
 
     m_arc = m_hd->TimingArcTypes.AddNextArcToPinType(start_pin, m_ptype);
-    ERROR_ASSERT(!::IsNull(m_arc));
+    ASSERT(!::IsNull(m_arc));
 
     m_arc_started = true;
   }
   
   void TimingArcsBuilder::ArcFinished()
   {
-    ERROR_ASSERT(m_arc_started);
+    ASSERT(m_arc_started);
 
     m_arc = m_hd->TimingArcTypes.Null();
 

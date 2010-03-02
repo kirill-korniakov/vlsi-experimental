@@ -29,7 +29,7 @@ namespace Utils
     case TimingSense_NonUnate:
       return "non_unate";
     default:
-      LOGERRORFORMAT(("Unknown timing sense: %d", sense));
+      GLOGERROR(LOGINPLACE, "Unknown timing sense: %d", sense);
       return "unknown";
     }
   }
@@ -113,7 +113,7 @@ namespace Utils
     case TimingType_NochangeLow:
       return "nochange_low";
     default:
-      LOGERRORFORMAT(("Unknown timing type: %d", ttype));
+      GLOGERROR(LOGINPLACE, "Unknown timing type: %d", ttype);
       return "unknown";
     }
   }

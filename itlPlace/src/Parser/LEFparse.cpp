@@ -326,10 +326,10 @@ void ParseLEF(HDesign& design)
   FILE* lefFile = fopen(design.cfg.ValueOf("benchmark.lef"),"r");
   CRITICAL_ASSERT(lefFile != NULL);
 
-  ALERTFORMAT(("LEF file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.lef")));
+  ALERT("LEF file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.lef"));
 
   int lefReaderStatus = lefrRead(lefFile, design.cfg.ValueOf("benchmark.lef"), (void*)(&userData));
-  ERROR_ASSERT(lefReaderStatus == PARSE_OK);
+  ASSERT(lefReaderStatus == PARSE_OK);
 
   fclose(lefFile);
 

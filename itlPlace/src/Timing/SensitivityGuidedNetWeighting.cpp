@@ -146,9 +146,9 @@ void SensitivityGuidedNetWeighting(HDesign& hd)
   if (denominator < 0.0001)
       LOGERROR("Too small denominator of beta");
 
-  ALERTFORMAT(("C: %f", C));
+  ALERT("C: %f", C);
   double B = sqrt(C * multiplier / denominator);
-  ALERTFORMAT(("B: %f", B));
+  ALERT("B: %f", B);
 
   //now calculate new net weights
   for (NetSensitivities::iterator i = netSensitivities.begin();
@@ -165,5 +165,5 @@ void SensitivityGuidedNetWeighting(HDesign& hd)
     hd.Set<HNet::Weight>(i->net, i->net.Weight() + deltaW);
   }
 
-  ALERTFORMAT(("num critical nets: %d", netSensitivities.size()));
+  ALERT("num critical nets: %d", netSensitivities.size());
 }

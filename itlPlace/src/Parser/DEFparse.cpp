@@ -134,7 +134,7 @@ int componentCB(defrCallbackType_e c, defiComponent *comp, defiUserData ud)
 
   HMacroType type = Utils::FindMacroTypeByName(design, comp->name());
   if(::IsNull(type))
-    LOGWARNINGFORMAT(("Macro %s has unknown type: %s", comp->id(), comp->name()));
+    GLOGWARNING(LOGINPLACE, "Macro %s has unknown type: %s", comp->id(), comp->name());
 
   cb->SetType(type);
   if(comp->isFixed())
@@ -269,7 +269,7 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
       if(!::IsNull(pin))
         net_pins.push(pin);
       else
-        LOGWARNINGFORMAT(("Pin \"%s %s\" not found.", net->instance(i), net->pin(i)));
+        GLOGWARNING(LOGINPLACE, "Pin \"%s %s\" not found.", net->instance(i), net->pin(i));
     }
     else
     {
@@ -279,7 +279,7 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
 
       if(::IsNull(primary))
       {
-        LOGWARNINGFORMAT(("Primary Pin \"%s %s\" not found.", net->instance(i), net->pin(i)));
+        GLOGWARNING(LOGINPLACE, "Primary Pin \"%s %s\" not found.", net->instance(i), net->pin(i));
       }
       else
         net_pins.push(primary);
@@ -288,7 +288,7 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
 
   if(net_pins.size() < 2)
   {
-    LOGWARNINGFORMAT(("Net %s has less then 2 pins. Net is skipped.", net->name()));
+    GLOGWARNING(LOGINPLACE, "Net %s has less then 2 pins. Net is skipped.", net->name());
     return PARSE_OK;
   }
 
@@ -315,7 +315,7 @@ int netCB(defrCallbackType_e c, defiNet *net, defiUserData ud)
       if(!nb.CanAddSink() && !nb.IsSourceAdded())
         if(design.Get<HPin::Direction, PinDirection>(net_pins.front()) == PinDirection_INPUT)
         {
-          LOGERRORFORMAT(("Net %s has no source.", net->name()));
+          GLOGERROR(LOGINPLACE, "Net %s has no source.", net->name());
           design.Set<HPin::Direction>(net_pins.front(), PinDirection_OUTPUT);
         }
     }
@@ -489,10 +489,10 @@ void ParseDEF(HDesign& design)
   FILE* defFile = fopen(design.cfg.ValueOf("benchmark.def"), "r");
   CRITICAL_ASSERT(defFile != NULL);
 
-  ALERTFORMAT(("DEF file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.def")));
+  ALERT("DEF file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.def"));
   
   int defReaderStatus = defrRead(defFile, design.cfg.ValueOf("benchmark.def"), (void*)(&userData), 0);
-  ERROR_ASSERT(defReaderStatus == PARSE_OK);
+  ASSERT(defReaderStatus == PARSE_OK);
 
   fclose(defFile);
 

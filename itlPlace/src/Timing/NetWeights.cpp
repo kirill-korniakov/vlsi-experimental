@@ -110,7 +110,7 @@ void ExportNetWeights(HDesign& hd, const char* fileName)
   netWeightsFile = fopen(fileName, "w");
   if (netWeightsFile)
   {
-    ALERTFORMAT(("Exporting net-weights to %s", fileName));
+    ALERT("Exporting net-weights to %s", fileName);
 
     for (HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW(); netW.MoveNext(); )
     {
@@ -134,7 +134,7 @@ void ImportNetWeights(HDesign& hd, const char* fileName)
   netWeightsFile = fopen(fileName, "r");
   if (netWeightsFile)
   {
-    ALERTFORMAT(("Importing net-weights from %s", fileName));
+    ALERT("Importing net-weights from %s", fileName);
 
     for (i = 1; i < nNetsEnd; ++i)
     {
@@ -146,7 +146,7 @@ void ImportNetWeights(HDesign& hd, const char* fileName)
     fclose(netWeightsFile);
   }
   else
-    ALERTFORMAT(("Error opening import net-weights file %s", fileName));
+    ALERT("Error opening import net-weights file %s", fileName);
 }
 
 int GetnIter(const char* nwtsFileName)
@@ -210,7 +210,7 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   }
 
   nCyclesCounter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));
-  ALERTFORMAT(("Current iteration of net weighting is %d", nCyclesCounter));
+  ALERT("Current iteration of net weighting is %d", nCyclesCounter);
 
   nwtsFileName = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter+1) + ".nwts";
   defFileName  = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter) + ".def";
@@ -221,7 +221,7 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 
   if (nCyclesCounter+1 == nLoops)
   {
-    ALERTFORMAT(("The specified number of net weights iterations (%d) is performed", nLoops));
+    ALERT("The specified number of net weights iterations (%d) is performed", nLoops);
     return;
   }
 

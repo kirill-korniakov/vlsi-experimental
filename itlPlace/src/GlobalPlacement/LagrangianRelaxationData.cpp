@@ -22,7 +22,7 @@ void LRData::AssignNetLRData(HDesign& hd, HNetWrapper net, int netIdx)
   actualMus->GetNetMus(hd, net, cellArcMus, netLRData[netIdx].netArcMus);
 
   HPinType sourceType = hd.Get<HPin::Type, HPinType>(net.Source());
-  //ALERTFORMAT(("Net %s", net.Name().c_str()));
+  //ALERT("Net %s", net.Name().c_str()));
   netLRData[netIdx].sourceAFactor = CalcSourceAFactor(hd, sourceType, cellArcMus);
 }
 

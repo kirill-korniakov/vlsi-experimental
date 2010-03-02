@@ -15,7 +15,7 @@
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
 {
-  fmt.NewRow();
+  fmt.NewHeaderRow();
   if (design.CanDoTiming())
   {
     fmt.SetCell(7, "WNS(ns)");
@@ -36,7 +36,7 @@ void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
   fmt.SetColumnPrecision(5, 0);
   fmt.SetColumnPrecision(2, 3);
 
-  fmt.NewRow();
+  fmt.NewBorderRow();
   fmt.SetCell(0, "-",fmt.NumOfColumns(), TableFormatter::Align_Fill);
 }
 
@@ -46,7 +46,7 @@ void WriteFlowMetrics(TableFormatter& fmt, HDesign& design, const char* stageNam
   fmt.NewRow();
   fmt.SetCell(0, stageName);
   fmt.SetCell(1, tag);
-  fmt.SetCell(2, ::GetUptime());
+  fmt.SetCell(2, Logger::GetUptime());
   fmt.SetCell(3, design.Cells.CellsCount());
   fmt.SetCell(4, Utils::CalculateHPWL(design, true));
   fmt.SetCell(5, Utils::CalculateTWL(design));
@@ -107,10 +107,10 @@ bool DoLRTimingDrivenPlacementIfRequired(HDesign& hd)
   return false;
 }
 
-bool DoLegalizationIfRequired(HDPGrid& grid)
+bool DoLegalizationIfRequired(HDPGrid& grid, const char* cfgOptName)
 {
   //LEGALIZATION
-  if (grid.Design().cfg.ValueOf("DesignFlow.Legalization", false))
+  if (grid.Design().cfg.ValueOf(cfgOptName, false))
   {
     Legalization(grid);
     grid.Design().Plotter.ShowPlacement();
@@ -124,9 +124,9 @@ bool DoLegalizationIfRequired(HDPGrid& grid)
   return false;
 }
 
-bool DoDetailedPlacementIfRequired(HDPGrid& grid)
+bool DoDetailedPlacementIfRequired(HDPGrid& grid, const char* cfgOptName)
 {
-  if (grid.Design().cfg.ValueOf("DesignFlow.DetailedPlacement", false))
+  if (grid.Design().cfg.ValueOf(cfgOptName, false))
   {
     DetailedPlacement(grid);
     grid.Design().Plotter.ShowPlacement();
@@ -199,9 +199,9 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
     HDPGrid DPGrid(hd);
 
-    if (DoLegalizationIfRequired(DPGrid))
+    if (DoLegalizationIfRequired(DPGrid, "DesignFlow.Legalization"))
       WriteFlowMetrics(flowMetrics, hd, "Legalization", i + 1);
-    if (DoDetailedPlacementIfRequired(DPGrid))
+    if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.DetailedPlacement"))
       WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", i + 1);
 
     DoSTAIfCan(hd);
@@ -227,15 +227,15 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     else
       InsertRepeaters2(hd, hd.cfg.ValueOf("Buffering.Percent", 0.70));
     STA(hd);
-    //ALERTFORMAT(("TWLbl=%.6f",Utils::CalculateTWL(hd)));
+
     WriteFlowMetrics(flowMetrics, hd, "Buffering", "");
 
     HDPGrid DPGrid(hd);
-    if (DoLegalizationIfRequired(DPGrid))
+    if (DoLegalizationIfRequired(DPGrid, "DesignFlow.LegalizationBuf"))
       WriteFlowMetrics(flowMetrics, hd, "Legalization", "buf");
-    //STA(hd);
-    DoSTAIfCan(hd);
-    ALERTFORMAT(("TWLal=%.6f",Utils::CalculateTWL(hd)));
+
+    if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.DetailedPlacementBuf"))
+      WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "buf");
   }
 
   //EXPORT

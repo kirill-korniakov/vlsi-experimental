@@ -85,7 +85,7 @@ public:
         return BoolType(false, true);
       return BoolType(false);
     default:
-      LOGERRORFORMAT(("Unknown timing sense: %d", arcSense));
+      GLOGERROR(LOGINPLACE, "Unknown timing sense: %d", arcSense);
       return BoolType(false);
     }//switch (arc.TimingSense())
   }
@@ -262,7 +262,7 @@ public:
     case TimingSense_NonUnate:
       return BoolType(false);
     default:
-      LOGERRORFORMAT(("Unknown timing sense: %d", arcSense));
+      GLOGERROR(LOGINPLACE, "Unknown timing sense: %d", arcSense);
       return BoolType(false);
     }//switch (arc.TimingSense())
   }
@@ -851,7 +851,7 @@ HTimingArcType FindArrivalArc(HDesign& hd,
   case SignalDirection_None:
     return FindArc<1>(hd, arcEndPoint, ArrivalArcSelector1D(), arcTime, isInversed);
   default:
-    LOGCRITICALFORMAT(("Unsupported signal direction: %d", dir));
+    GLOGCRITICAL(LOGINPLACE, "Unsupported signal direction: %d", dir);
     return hd.TimingArcTypes.Null();
   };
 }
@@ -885,7 +885,7 @@ HTimingArcType FindRequiredArc(HDesign& hd,
   case SignalDirection_None:
     return FindArc<1>(hd, arcStartPoint, RequiredArcSelector1D(), arcTime, isInversed);
   default:
-    LOGCRITICALFORMAT(("Unsupported signal direction: %d", dir));
+    GLOGCRITICAL(LOGINPLACE, "Unsupported signal direction: %d", dir);
     return hd.TimingArcTypes.Null();
   };
 }

@@ -36,7 +36,7 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
 
   WRITELINE("");
   ALERT("ANALYTICAL PLACEMENT STARTED");
-  ALERTFORMAT(("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true)));
+  ALERT("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true));
 
   ClusteringInformation ci(hd);
   ci.affinityFunction = Affinity;
@@ -53,7 +53,7 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
   {
     WriteCellsCoordinates2Clusters(hd, ci);
   }
-  ALERTFORMAT(("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true)));
+  ALERT("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true));
 
   //perform placement of clustered netlist
   //TODO: think about reorganization of loop below
@@ -78,7 +78,7 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
   //TODO: consider second v-cycle
 
   WRITELINE("");
-  ALERTFORMAT(("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true)));
+  ALERT("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true));
   ALERT("ANALYTICAL PLACEMENT FINISHED");
 }
 
@@ -302,8 +302,8 @@ void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
   }
 
   averageMovement /= static_cast<double>(nUnmoved + nMoved);
-  ALERTFORMAT(("Number of unmoved clusters %d", nUnmoved));
-  ALERTFORMAT(("Average movement %f", averageMovement));
+  ALERT("Number of unmoved clusters %d", nUnmoved);
+  ALERT("Average movement %f", averageMovement);
 }
 
 void PrintReason(TaoTerminateReason reason)
@@ -340,7 +340,7 @@ void PrintReason(TaoTerminateReason reason)
     strcpy(message, "(unrecognized error)");  
     break;
   }
-  ALERTFORMAT(("TAO termination reason = %d %s", reason, message));
+  ALERT("TAO termination reason = %d %s", reason, message);
 }
 
 
@@ -453,23 +453,23 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
 
 void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& context)
 {
-  ALERTFORMAT(("Bin grid: %d x %d", 
+  ALERT("Bin grid: %d x %d", 
     context.spreadingData.binGrid.nBinRows, 
-    context.spreadingData.binGrid.nBinCols));
-  ALERTFORMAT(("Bin width: %f\tBin height: %f", 
+    context.spreadingData.binGrid.nBinCols);
+  ALERT("Bin width: %f\tBin height: %f", 
     context.spreadingData.binGrid.binWidth, 
-    context.spreadingData.binGrid.binHeight));
-  ALERTFORMAT(("Potential radius X: %f\tPotential radius Y: %f", 
+    context.spreadingData.binGrid.binHeight);
+  ALERT("Potential radius X: %f\tPotential radius Y: %f", 
     context.spreadingData.potentialRadiusX, 
-    context.spreadingData.potentialRadiusY));
+    context.spreadingData.potentialRadiusY);
 }
 
 void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, AppCtx& user)
 {
   WRITELINE("");
-  ALERTFORMAT(("RELAXATION ITERATION STARTED"));
-  ALERTFORMAT(("Number of clusters: %d", ci.mCurrentNumberOfClusters));
-  ALERTFORMAT(("Number of nets: %d", ci.netList.size()));
+  ALERT("RELAXATION ITERATION STARTED");
+  ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
+  ALERT("Number of nets: %d", ci.netList.size());
 }
 
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
@@ -528,12 +528,12 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
 
 void AnalyticalGlobalPlacement::ReportTimes()
 {
-  ALERTFORMAT(("EXP Calc time = %f", GETSECONDSFROMTIME(expTime)));
-  ALERTFORMAT(("lseTime = %f", GETSECONDSFROMTIME(lseTime)));
-  ALERTFORMAT(("lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime)));
-  ALERTFORMAT(("calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime)));
-  ALERTFORMAT(("quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading)));
-  ALERTFORMAT(("quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime)));
+  ALERT("EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
+  ALERT("lseTime = %f", GETSECONDSFROMTIME(lseTime));
+  ALERT("lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
+  ALERT("calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
+  ALERT("quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
+  ALERT("quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
   expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
 }
 
@@ -618,12 +618,12 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   {
     //print iteration info
     WRITELINE("");
-    ALERTFORMAT(("TAO iteration %d.%d", metaIteration, iteration++));
+    ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
     if (context.useQuadraticSpreading)
-      ALERTFORMAT(("spreadingWeight = %.20f", context.spreadingData.spreadingWeight));
+      ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
     if (context.useBorderPenalty)
-      ALERTFORMAT(("muBorderPenalty = %.20f", context.muBorderPenalty));
-    ALERTFORMAT(("HPWL initial   = %f", Utils::CalculateHPWL(hd, true)));
+      ALERT("muBorderPenalty = %.20f", context.muBorderPenalty);
+    ALERT("HPWL initial   = %f", Utils::CalculateHPWL(hd, true));
 
     hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
       context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
@@ -645,8 +645,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     UpdateWeights(context, hd, 32);
 
     //print iteration info
-    ALERTFORMAT(("discrepancy = %f", discrepancy));
-    ALERTFORMAT(("Sum of Ki = %f", CalculateSumOfK(hd, ci)));
+    ALERT("discrepancy = %f", discrepancy);
+    ALERT("Sum of Ki = %f", CalculateSumOfK(hd, ci));
     
     if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
@@ -658,7 +658,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         {
           QA->RestoreBestAchievedPlacement();
           WriteCellsCoordinates2Clusters(hd, ci);
-          ALERTFORMAT(("Reached maximum tolerant iteration number."));
+          ALERT("Reached maximum tolerant iteration number.");
           break;
         }
       }
@@ -666,18 +666,18 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       {
         QA->RestoreBestAchievedPlacement();
         WriteCellsCoordinates2Clusters(hd, ci);
-        ALERTFORMAT(("Method converged."));
+        ALERT("Method converged.");
         break;
       }
     }
     if (discrepancy <= targetDiscrepancy)
     {
-      ALERTFORMAT(("Discrepancy achieved"));
+      ALERT("Discrepancy achieved");
       break;
     }
     if (iteration > nOuterIters1)
     {
-      ALERTFORMAT(("Iterations finished"));
+      ALERT("Iterations finished");
       break;
     }
   }

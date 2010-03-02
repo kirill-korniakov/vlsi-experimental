@@ -11,7 +11,20 @@
 
 
 static DWORD adr_WriteFile;
-static HANDLE logFile;
+static HANDLE logFile = INVALID_HANDLE_VALUE;
+
+static inline BOOL VLSIWriteFile(
+           __in        HANDLE hFile,
+           __in_bcount(nNumberOfBytesToWrite) LPCVOID lpBuffer,
+           __in        DWORD nNumberOfBytesToWrite,
+           __out_opt   LPDWORD lpNumberOfBytesWritten,
+           __inout_opt LPOVERLAPPED lpOverlapped
+           )
+{
+  return ((BOOL (__stdcall*)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED ))adr_WriteFile)
+    (hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
+}
+
 
 BOOL
 WINAPI
@@ -25,17 +38,14 @@ _WriteFile(
 {
   if(hFile == GetStdHandle(STD_OUTPUT_HANDLE) || hFile == GetStdHandle(STD_ERROR_HANDLE))
   {
-    BOOL result = ((BOOL (__stdcall*)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED ))adr_WriteFile)
-      (hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
+    BOOL result = VLSIWriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 
     DWORD written;
-    ((BOOL (__stdcall*)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED ))adr_WriteFile)
-      (logFile, lpBuffer, nNumberOfBytesToWrite, &written, lpOverlapped);
+    VLSIWriteFile(logFile, lpBuffer, nNumberOfBytesToWrite, &written, lpOverlapped);
 
     return result;
   }
-  return ((BOOL (__stdcall*)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED ))adr_WriteFile)
-    (hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
+  return VLSIWriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 }
 
 // Смещение + База = Виртуальный Адрес
@@ -156,34 +166,37 @@ CPP_FIN:
   CloseHandle(h);
 }
 
-static string gLogName;
-static int AppInit()
+void DuplicateConsoleOutput(const string& fileName)
 {
-  CheckParentProcess();
-  
-  ::gLogName = Aux::CreateCoolFileName("log\\", "itlOutput", "log");
+  if (logFile != INVALID_HANDLE_VALUE) return;
 
-  logFile = CreateFileA(::gLogName.c_str(),
+  logFile = CreateFileA(fileName.c_str(),
     GENERIC_WRITE,
     FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
     NULL,
     OPEN_ALWAYS,
     FILE_ATTRIBUTE_NORMAL,
     NULL);
+
+  if (logFile == INVALID_HANDLE_VALUE) return;//failed
+
   SetFilePointer(logFile, 0, 0, FILE_END);
-  //DWORD written;
-  //WriteFile(logFile, "***Output dumping started***\n\n\n", 31, &written, NULL);
+
   adr_WriteFile = (DWORD) WriteFile;
   DuplicateOutput();
+}
+
+//static string gLogName;
+static int AppInit()
+{
+  CheckParentProcess();
   return 0;
 }
 
-void Aux::SetOutputFileName(const string& fname)
-{
-  if (MoveFileA(::gLogName.c_str(), fname.c_str()))
-    ::gLogName = fname;
-}
-
 static int ___app_init___ = AppInit();
-
+#else
+void DuplicateConsoleOutput(const string& fileName) 
+{
+  printf("Console output duplication is not implemented for current platform.");
+}
 #endif

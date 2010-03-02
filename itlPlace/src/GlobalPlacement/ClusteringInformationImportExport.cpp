@@ -11,13 +11,13 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
     fscanf(resultFile, "%s\n", bmName);
     if (strcmp(bmName, benchName))
     {
-      LOGERRORFORMAT(("Information in %s doesn't correspond to the design", fileName));
+      GLOGERROR(LOGINPLACE, "Information in %s doesn't correspond to the design", fileName);
       return false;
     }
     if (0 == fscanf(resultFile, "a %d %d %I64X %d\n", &mClusterRatio, &mDesiredFinalNumberOfClusters, 
       &mClustersAreaTolerance, &mCurrentNumberOfClusters))
     {
-      LOGERRORFORMAT(("Information in %s doesn't correspond to the design", fileName));
+      GLOGERROR(LOGINPLACE, "Information in %s doesn't correspond to the design", fileName);
       return false;
     }
 
@@ -31,8 +31,8 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
   }
   else
   {
-    ALERT("Error during opening clustering information import file")
-      return false;
+    ALERT("Error during opening clustering information import file");
+    return false;
   }
 }
 
@@ -56,7 +56,7 @@ void ClusteringInformation::LoadClustersFromFile(FILE* rf, HDesign& hd)
     if (!strcmp(buffer, "true"))
     {
       clusters[i].isFake = true;
-    } 
+    }
     else
     {
       clusters[i].isFake = false;
@@ -214,7 +214,7 @@ void ClusteringInformation::SaveToFile(const char* fileName, const char* benchNa
   }
   else
   {
-    LOGCRITICAL("Error during opening clustering information export file")
+    LOGCRITICAL("Error during opening clustering information export file");
   }
 }
 

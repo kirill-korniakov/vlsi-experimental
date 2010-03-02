@@ -21,6 +21,6 @@ void RandomPlacement(HDesign& design)
     i.SetY(rndY);
   }
 
-  ALERTFORMAT(("HPWL after random placement: %f", Utils::CalculateHPWL(design, true)));
+  ALERT("HPWL after random placement: %f", Utils::CalculateHPWL(design, true));
   ALERT("RANDOM PLACEMENT FINISHED");
 }

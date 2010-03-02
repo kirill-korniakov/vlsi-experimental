@@ -38,7 +38,7 @@ namespace Builders
 
     bool IsSourceAdded() const 
     { 
-      WARNING_ASSERT(m_net_started);
+      ASSERT(m_net_started);
       return m_source_added; 
     }
 

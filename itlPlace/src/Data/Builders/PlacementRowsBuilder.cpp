@@ -22,7 +22,7 @@ namespace Builders
 
   void PlacementRowsBuilder::RowsStart(int size)
   {
-    ERROR_ASSERT(!m_rows_started);
+    ASSERT(!m_rows_started);
 
     m_hd->PlacementRows.Initialize(size + 1);
 
@@ -31,14 +31,14 @@ namespace Builders
   
   void PlacementRowsBuilder::RowsFinished()
   {
-    ERROR_ASSERT(!m_row_started && m_rows_started && !m_rows_finished);
+    ASSERT(!m_row_started && m_rows_started && !m_rows_finished);
 
     m_rows_finished = true;
   }
 
   void PlacementRowsBuilder::RowStart()
   {
-    ERROR_ASSERT(!m_row_started && m_rows_started && !m_rows_finished);
+    ASSERT(!m_row_started && m_rows_started && !m_rows_finished);
 
     m_CurrRow = m_hd->PlacementRows.AllocateRow();
 
@@ -47,7 +47,7 @@ namespace Builders
 
   void PlacementRowsBuilder::RowFinished()
   {
-    ERROR_ASSERT(m_row_started && m_rows_started && !m_rows_finished);
+    ASSERT(m_row_started && m_rows_started && !m_rows_finished);
 
     if (!::IsNull(m_PrevRow) && m_CurrRow.Site() == m_PrevRow.Site())
     {
@@ -85,7 +85,7 @@ namespace Builders
 
   HPlacementRowWrapper* PlacementRowsBuilder::operator->()
   {
-    ERROR_ASSERT(m_row_started);
+    ASSERT(m_row_started);
     return &m_CurrRow;
   }
 

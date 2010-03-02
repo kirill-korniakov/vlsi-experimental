@@ -15,7 +15,7 @@ LayersModel GetActualLayersModel(HDesign& design)
   case 2:
     return LayersModel_TwoDirections;
   default:
-    LOGERRORFORMAT(("Unsupported layers number: %d", design.cfg.ValueOf("Timing.RCE.LayersUsed", 2)));
+    GLOGERROR(LOGINPLACE, "Unsupported layers number: %d", design.cfg.ValueOf("Timing.RCE.LayersUsed", 2));
     return LayersModel_TwoDirections;
   }
 }
@@ -29,7 +29,7 @@ SignalModel GetActualSignalModel(HDesign& design)
   case 2:
     return SignalModel_RiseFall;
   default:
-    LOGERRORFORMAT(("Unsupported number of signal directions: %d", design.cfg.ValueOf("Timing.SignalDirectionsUsed", 2)));
+    GLOGERROR(LOGINPLACE, "Unsupported number of signal directions: %d", design.cfg.ValueOf("Timing.SignalDirectionsUsed", 2));
     return SignalModel_RiseFall;
   }
 }
@@ -112,7 +112,7 @@ void CalculateDelaysNoWires(HDesign& design, SignalModel sm)
     CalculateDelaysNoWires<SignalModel_RiseFall>(design);
     return;
   default:
-    LOGERRORFORMAT(("Unsupported signal direction: %d", sm));
+    GLOGERROR(LOGINPLACE, "Unsupported signal direction: %d", sm);
     CalculateDelaysNoWires<SignalModel_RiseFall>(design);
     return;
   }

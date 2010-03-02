@@ -13,14 +13,14 @@ void Legalization(HDPGrid& grid)
 
   double wlBeforeL = Utils::CalculateHPWL(grid.Design(), false);
   if (doReport)
-    ALERTFORMAT(("HPWL before legalization: %f", wlBeforeL));
+    ALERT("HPWL before legalization: %f", wlBeforeL);
 
   AbacusLegalization(grid);
   double wlAfterL = Utils::CalculateHPWL(grid.Design(), false);
   if (doReport)
   {
-    ALERTFORMAT(("HPWL after legalization: %f", wlAfterL));
-    ALERTFORMAT(("Improvement after legalization: %f%%", 100.0 * (1.0 - wlAfterL/wlBeforeL) ));
+    ALERT("HPWL after legalization: %f", wlAfterL);
+    ALERT("Improvement after legalization: %f%%", 100.0 * (1.0 - wlAfterL/wlBeforeL));
 
     ALERT("LEGALIZATION FINISHED");
   }

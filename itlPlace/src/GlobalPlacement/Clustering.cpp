@@ -139,7 +139,7 @@ void InitializeTerminalsAndPrimaryPins(HDesign& hd, ClusteringInformation& ci)
 
 void PrintClusteringInfo(HDesign& hd, ClusteringInformation& ci, int nClusters)
 {
-  ALERTFORMAT(("Currently there are %d clusters", ci.mCurrentNumberOfClusters));
+  ALERT("Currently there are %d clusters", ci.mCurrentNumberOfClusters);
 
   int upLimit = ci.mCurrentNumberOfClusters;
   if (nClusters >= 0)
@@ -147,7 +147,7 @@ void PrintClusteringInfo(HDesign& hd, ClusteringInformation& ci, int nClusters)
 
   for (int i = 0; i<upLimit; i++)
   {
-    ALERTFORMAT(("cluster %d:\t", i));
+    ALERT("cluster %d:\t", i);
     if (ci.clusters[i].isFake)
     {
       ALERT("FAKE");
@@ -542,7 +542,7 @@ void UpdateNetList(std::vector<ConnectionsVector>& currTableOfAdjacentNets, NetL
     iter = find(netList[netIdx].clusterIdxs.begin(), netList[netIdx].clusterIdxs.end(), secondClusterIdx);
     if (iter == netList[netIdx].clusterIdxs.end())
     {
-      LOGERRORFORMAT(("can't find cluster in net. Cluster index: %d, Net index: %d", secondClusterIdx, netIdx));
+      GLOGERROR(LOGINPLACE, "can't find cluster in net. Cluster index: %d, Net index: %d", secondClusterIdx, netIdx);
     }
     (*iter) = firstClusterIdx;
 
@@ -701,10 +701,10 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
   //delete duplicated nets
   if (hd.cfg.ValueOf("Clustering.deleteDuplicatingNets", true))
   {
-    ALERTFORMAT(("NetList size before duplicates removing: %d", ci.netList.size()));
+    ALERT("NetList size before duplicates removing: %d", ci.netList.size());
     netListIterator = unique(ci.netList.begin(), ci.netList.end(), IsEqualNetListBinaryPredicate);
     ci.netList.resize(netListIterator - ci.netList.begin());
-    ALERTFORMAT(("NetList size after duplicates removing: %d", ci.netList.size()));
+    ALERT("NetList size after duplicates removing: %d", ci.netList.size());
   }
 
   //delete nets with less than 2 clusters
@@ -712,7 +712,7 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
   while (netListIterator->clusterIdxs.size() < 2) 
     ++netListIterator;
   ci.netList.erase(ci.netList.begin(), netListIterator);
-  ALERTFORMAT(("NetList size after one cluster nets removing: %d", ci.netList.size()));
+  ALERT("NetList size after one cluster nets removing: %d", ci.netList.size());
 }
 
 void EraseZeroScorePairs(std::list<MergeCandidate>& mergeCandidates)
@@ -893,7 +893,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
     PrintClusteringInfo(hd, ci, 0);
   }
   ALERT("CLUSTERING FINISHED");
-  ALERTFORMAT(("The number of levels is %u", ci.netLevels.size()));
+  ALERT("The number of levels is %u", ci.netLevels.size());
 
   //EXPORT CLUSTERING
   string fileName = GetClusteringInformationFileName(hd);

@@ -18,7 +18,7 @@ namespace Builders
 
   void SitesBuilder::SitesStart(int size)
   {
-    ERROR_ASSERT(!m_sites_started);
+    ASSERT(!m_sites_started);
 
     m_hd->Sites.Initialize(size + 1);
 
@@ -27,14 +27,14 @@ namespace Builders
   
   void SitesBuilder::SitesFinished()
   {
-    ERROR_ASSERT(!m_site_started && m_sites_started && !m_sites_finished);
+    ASSERT(!m_site_started && m_sites_started && !m_sites_finished);
 
     m_sites_finished = true;
   }
 
   void SitesBuilder::SiteStart()
   {
-    ERROR_ASSERT(!m_site_started && m_sites_started && !m_sites_finished);
+    ASSERT(!m_site_started && m_sites_started && !m_sites_finished);
 
     m_CurrSite = m_hd->Sites.AllocateSite();
 
@@ -43,14 +43,14 @@ namespace Builders
 
   void SitesBuilder::SiteFinished()
   {
-    ERROR_ASSERT(m_site_started && m_sites_started && !m_sites_finished);
+    ASSERT(m_site_started && m_sites_started && !m_sites_finished);
 
     m_site_started = false;
   }
 
   HSiteWrapper* SitesBuilder::operator->()
   {
-    ERROR_ASSERT(m_site_started);
+    ASSERT(m_site_started);
     return &m_CurrSite;
   }
 

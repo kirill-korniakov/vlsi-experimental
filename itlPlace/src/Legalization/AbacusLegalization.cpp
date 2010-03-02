@@ -68,7 +68,7 @@ class WeightedAbacus
     res.TotalWeight = m_grid.SiteWidth() * m_grid.SiteWidth() * res.TotalWidth * res.TotalWidth
                                                                                * wCell.weightMultiplier;
     if (wCell.weightMultiplier > 1)
-      int qq = 1;//ALERTFORMAT(("Weight: %f", wCell.weightMultiplier));
+      int qq = 1;//ALERT("Weight: %f", wCell.weightMultiplier));
     double cellX = m_design.GetDouble<HCell::X>(wCell.cell);
     res.Q = cellX * res.TotalWeight;
     res.X = m_grid.FindColumn(cellX);
@@ -224,7 +224,7 @@ void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const
           {
             if (wCells[i].weightMultiplier < 1000)
               wCells[i].weightMultiplier *= multiplier;
-            //ALERTFORMAT(("Weight: %f", wCells[i].weightMultiplier));
+            //ALERT("Weight: %f", wCells[i].weightMultiplier));
             break;
           }
         }
@@ -253,7 +253,7 @@ void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const
 //          {
 //            if (wCells[i].weightMultiplier < 1000)
 //              wCells[i].weightMultiplier *= multiplier;
-//            //ALERTFORMAT(("Weight: %f", wCells[i].weightMultiplier));
+//            //ALERT("Weight: %f", wCells[i].weightMultiplier));
 //            break;
 //          }
 //        }
@@ -288,7 +288,7 @@ void AbacusLegalization(HDPGrid& grid)
   }
   ASSERT(pos == design.Cells.PlaceableCellsCount());
   double multiplier = design.cfg.ValueOf(".weightMultiplier", 1);
-  ALERTFORMAT(("weight multiplier: %f", multiplier));
+  ALERT("weight multiplier: %f", multiplier);
 
   if (design.cfg.ValueOf(".useWeights", false))
     InitialiseCellsWeights(wCells, pos, design, multiplier);

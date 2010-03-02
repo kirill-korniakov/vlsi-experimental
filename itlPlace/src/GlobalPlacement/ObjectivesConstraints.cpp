@@ -26,12 +26,12 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
     SOD_AddObjectiveAndGradient(context, x, criteriaValue);
   else if (context->useLR)
     LR_AddObjectiveAndGradient(context, x, criteriaValue);
-  //ALERTFORMAT(("criteriaValue = %f", criteriaValue));
+  //ALERT("criteriaValue = %f", criteriaValue));
 
   //calculate penalty value
   double penaltyValue  = 0.0;
   penaltyValue = SpreadingPenalty(context, x);
-  //ALERTFORMAT(("penaltyValue = %f", penaltyValue));
+  //ALERT("penaltyValue = %f", penaltyValue));
 
   //calculate mu value
   context->spreadingData.spreadingWeightInitial = spreadingWeightInitialMultiplier * (*criteriaValue) / penaltyValue;

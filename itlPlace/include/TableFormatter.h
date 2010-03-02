@@ -17,6 +17,12 @@ public:
     Align_Fill
   };
 private:
+  enum RowType
+  {
+    RowType_Header,
+    RowType_Border,
+    RowType_Default
+  };
   struct Cell
   {
     string Value;
@@ -29,7 +35,8 @@ private:
   {
     Cell* Cells;
     int Size;
-    Row() : Cells(0), Size(0) {}
+    RowType RType;
+    Row() : Cells(0), Size(0), RType(RowType_Default) {}
 
     void AllocateCells(int count)
     {
@@ -67,7 +74,9 @@ private:
   string ConvertToString(double val, int colIdx)
   {
     char buf[64];
+    setlocale(LC_ALL, "");
     sprintf(buf, "%.*f", m_Columns[colIdx].Precision, val);
+    setlocale(LC_ALL, "C");
     return buf;
   }
 
@@ -188,22 +197,79 @@ private:
     };
   }
 
-  void PrintRow(const Row& row)
+  void PrintRow(const Row& row, Logger* logger)
   {
+    if (logger->HasHTMLStream())
+      logger->WriteToHTMLStream(false, "<tr>");
     for (int col = 0; col < row.Size; col += row.Cells[col].Colspan)
     {
-      WRITE(col == 0 ? "%s" : " %s", GetAlignedText(row, col).c_str());
+      if (logger->HasHTMLStream() && row.RType != RowType_Border)
+      {
+        const char* tag = row.RType == RowType_Header ? "th" : "td";
+        if (row.Cells[col].Colspan > 1)
+        {
+          switch(GetCellAlign(row, col))
+          {
+          case Align_Right:
+            logger->WriteToHTMLStream(false, "<%s colspan=\"%d\" align=\"right\">", tag, row.Cells[col].Colspan);
+            break;
+          case Align_Fill:
+            logger->WriteToHTMLStream(false, "<%s colspan=\"%d\" align=\"center\">", tag, row.Cells[col].Colspan);
+            break;
+          case Align_Left:
+          default:
+            logger->WriteToHTMLStream(false, "<%s colspan=\"%d\">", tag, row.Cells[col].Colspan);
+            break;
+          }
+        }
+        else
+        {
+          switch(GetCellAlign(row, col))
+          {
+          case Align_Right:
+            logger->WriteToHTMLStream(false, "<%s align=\"right\">", tag);
+            break;
+          case Align_Fill:
+            logger->WriteToHTMLStream(false, "<%s align=\"center\">", tag);
+            break;
+          case Align_Left:
+          default:
+            logger->WriteToHTMLStream(false, "<%s>", tag);
+            break;
+          }
+        }
+      }
+
+      if (row.RType == RowType_Border)
+        logger->WriteIgnoringHTML(col == 0 ? "%s" : " %s", GetAlignedText(row, col).c_str());
+      else
+        logger->Write(col == 0 ? "%s" : " %s", GetAlignedText(row, col).c_str());
+
+      if (logger->HasHTMLStream() && row.RType != RowType_Border)
+        logger->WriteToHTMLStream(false, row.RType == RowType_Header ? "</th>" : "</td>");
     }
-    WRITELINE("");
+    if (logger->HasHTMLStream() && row.RType != RowType_Border)
+      logger->WriteToHTMLStream(false, "</tr>\n");
+    logger->WriteLine();
   }
 
 public:
 
+  //public fields
+  string Caption;
+
+  //constructors
   TableFormatter(int columnsCount = 0): m_LastRow(0)
   {
     m_Columns.resize(columnsCount);
   }
 
+  TableFormatter(const string& caption, int columnsCount = 0): m_LastRow(0), Caption(caption)
+  {
+    m_Columns.resize(columnsCount);
+  }
+
+  //methods
   int NumOfColumns() const {return (int)m_Columns.size();}
 
   void NewRow()
@@ -213,6 +279,18 @@ public:
     m_LastRow->AllocateCells(NumOfColumns());
     for (int i = 0; i < m_LastRow->Size; ++i)
       m_LastRow->Cells[i].TextAlign = m_Columns[i].TextAlign;
+  }
+
+  void NewHeaderRow()
+  {
+    NewRow();
+    m_LastRow->RType = RowType_Header;
+  }
+
+  void NewBorderRow()
+  {
+    NewRow();
+    m_LastRow->RType = RowType_Border;
   }
 
   void SetColumnMinWidth(int colIdx, int width)
@@ -283,11 +361,35 @@ public:
     m_LastRow->Cells[colIdx].Colspan = colspan;
   }
 
-  void Print()
+  void Print(Logger* logger = 0)
   {
     UpdateLayout();
+
+    if (logger == 0) logger = &Logger::Global;
+    
+    if (logger->HasHTMLStream())
+      logger->WriteToHTMLStream(false, "<div class=\"tableFormatter\"><table class=\"tbl\">\n");
+
+    if (!Caption.empty())
+    {
+      if (logger->HasHTMLStream())
+        logger->WriteToHTMLStream(false, "<caption>");
+
+      logger->Write("%s", Caption.c_str());
+      logger->WriteLine();
+
+      if (logger->HasHTMLStream())
+        logger->WriteToHTMLStream(false, "</caption>");
+    }
+
+    if (logger->HasHTMLStream())
+      logger->WriteToHTMLStream(false, "<tbody>\n");
+
     for (RowsList::iterator row = m_Rows.begin(); row != m_Rows.end(); ++row)
-      PrintRow(*row);
+      PrintRow(*row, logger);
+
+    if (logger->HasHTMLStream())
+      logger->WriteToHTMLStream(false, "</tbody>\n</table>\n</div>");
   }
 
 };

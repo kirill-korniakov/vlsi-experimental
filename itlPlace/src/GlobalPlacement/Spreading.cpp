@@ -229,8 +229,8 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
       totalPotential += binGrid.bins[i][j].sumPotential;
     }
   }
-  //ALERTFORMAT(("Total Potential   = %f", totalPotential));
-  //ALERTFORMAT(("Desired Potential = %f", 
+  //ALERT("Total Potential   = %f", totalPotential));
+  //ALERT("Desired Potential = %f", 
   //  context->desiredCellsAreaAtEveryBin * context->binGrid.nBins));
 }
 
@@ -372,7 +372,7 @@ void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution, double*
 {
   timetype start = GET_TIME_METHOD();
   *f += context->spreadingData.spreadingWeight * SpreadingPenalty(context, solution);
-  //ALERTFORMAT(("SPR = %f", addValue));
+  //ALERT("SPR = %f", addValue));
   timetype finish = GET_TIME_METHOD();
   quadraticSpreading += finish - start;
 

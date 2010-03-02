@@ -20,7 +20,7 @@ namespace Builders
 
   void PinsBuilder::PinsStart(int size)
   {
-    ERROR_ASSERT(!m_pins_started);
+    ASSERT(!m_pins_started);
 
     m_hd->Pins.Initialize(size, 2 * size + 1);
 
@@ -29,7 +29,7 @@ namespace Builders
   
   void PinsBuilder::PinsFinished()
   {
-    ERROR_ASSERT(!m_pp_started && m_pins_started && !m_pins_finished);
+    ASSERT(!m_pp_started && m_pins_started && !m_pins_finished);
 
     Utils::AllocatePinsForAllCells(*m_hd, m_PercentToReserve);
 
@@ -38,7 +38,7 @@ namespace Builders
 
   void PinsBuilder::PrimaryPinStart()
   {
-    ERROR_ASSERT(!m_pp_started && m_pins_started && !m_pins_finished);
+    ASSERT(!m_pp_started && m_pins_started && !m_pins_finished);
 
     m_CurrPin = m_hd->Pins.AllocatePrimaryPin();
 
@@ -47,14 +47,14 @@ namespace Builders
 
   void PinsBuilder::PinFinished()
   {
-    ERROR_ASSERT(m_pp_started && m_pins_started && !m_pins_finished);
+    ASSERT(m_pp_started && m_pins_started && !m_pins_finished);
 
     m_pp_started = false;
   }
 
   HPinWrapper* PinsBuilder::operator->()
   {
-    ERROR_ASSERT(m_pp_started);
+    ASSERT(m_pp_started);
     return &m_CurrPin;
   }
 

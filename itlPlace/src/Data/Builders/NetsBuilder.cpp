@@ -24,7 +24,7 @@ namespace Builders
 
   void NetsBuilder::NetsStart(int size)
   {
-    ERROR_ASSERT(!m_nets_started);
+    ASSERT(!m_nets_started);
 
     m_hd->Nets.Initialize(size + 1);
 
@@ -33,7 +33,7 @@ namespace Builders
   
   void NetsBuilder::NetsFinished()
   {
-    ERROR_ASSERT(!m_net_started && m_nets_started && !m_nets_finished);
+    ASSERT(!m_net_started && m_nets_started && !m_nets_finished);
 
     if (m_hd->CanDoTiming())
       Utils::CalculateLNets(*m_hd);
@@ -43,7 +43,7 @@ namespace Builders
 
   void NetsBuilder::NetStart(int pinsCount)
   {
-    ERROR_ASSERT(!m_net_started && m_nets_started && !m_nets_finished);
+    ASSERT(!m_net_started && m_nets_started && !m_nets_finished);
 
     m_CurrNet = m_hd->Nets.AllocateNet(true);
     m_hd->Nets.AllocatePins(m_CurrNet, pinsCount);
@@ -58,11 +58,11 @@ namespace Builders
 
   void NetsBuilder::AddSink(HPin pin)
   {
-    ERROR_ASSERT(m_net_started && m_nets_started && !m_nets_finished);
+    ASSERT(m_net_started && m_nets_started && !m_nets_finished);
     CRITICAL_ASSERT(m_sinks_expected > 0);
 
     bool res = m_SEn.MoveNext();
-    ERROR_ASSERT(res);
+    ASSERT(res);
 
     m_hd->Nets.AssignPin(m_CurrNet, m_SEn, pin);
 
@@ -71,7 +71,7 @@ namespace Builders
 
   void NetsBuilder::SetSource(HPin pin)
   {
-    ERROR_ASSERT(m_net_started && m_nets_started && !m_nets_finished);
+    ASSERT(m_net_started && m_nets_started && !m_nets_finished);
     CRITICAL_ASSERT(m_sinks_expected >= 0);
 
     m_CurrNet.SetSource(pin);
@@ -81,17 +81,17 @@ namespace Builders
 
   void NetsBuilder::NetFinished()
   {
-    ERROR_ASSERT(m_net_started && m_nets_started && !m_nets_finished);
-    WARNING_ASSERT(m_sinks_expected == 0);
+    ASSERT(m_net_started && m_nets_started && !m_nets_finished);
+    ASSERT(m_sinks_expected == 0);
 
-    ERROR_ASSERT(m_source_added || !::IsNull(m_CurrNet.Source()));
+    ASSERT(m_source_added || !::IsNull(m_CurrNet.Source()));
 
     m_net_started = false;
   }
 
   HNetWrapper* NetsBuilder::operator->()
   {
-    ERROR_ASSERT(m_net_started);
+    ASSERT(m_net_started);
     return &m_CurrNet;
   }
 

@@ -173,7 +173,7 @@ double LogSumExp(void* data, PetscScalar* coordinates)
   for (int i = 0; i < netListSize; ++i)
   {
     logSumExp += CalcNetLSE(context, coordinates, i) * context->ci->netList[i].weight;
-    //ALERTFORMAT(("%d logSumExp =\t%f", i, logSumExp));
+    //ALERT("%d logSumExp =\t%f", i, logSumExp));
   }
 
   return logSumExp;
@@ -208,7 +208,7 @@ void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
 
   start = GET_TIME_METHOD();
   *f += LogSumExp(context, solution);
-  //ALERTFORMAT(("LSE = %f", addValue));
+  //ALERT("LSE = %f", addValue));
   finish = GET_TIME_METHOD();
   lseTime += finish - start;
 

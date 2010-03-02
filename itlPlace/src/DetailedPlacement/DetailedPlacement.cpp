@@ -34,8 +34,8 @@ void DetailedPlacement(HDPGrid& grid)
   double wlAfterVerticalSearch = 0.0;
   double wlAfterHorizontalSearch = 0.0;
   
-  ALERTFORMAT(("%5s %5s %25s %11s %11s", "Iter", "Stage", "WireLength", "Ratio", "DPRatio"));
-  ALERTFORMAT(("%5d %5s %25f %11s %11s\n", 1, "-", wlBeforeDP, "-", "-"));
+  ALERT("%5s %5s %25s %11s %11s", "Iter", "Stage", "WireLength", "Ratio", "DPRatio");
+  ALERT("%5d %5s %25f %11s %11s\n", 1, "-", wlBeforeDP, "-", "-");
 
   int iteration = 0;
   double stoppingCriteriaValue = grid.Design().cfg.ValueOf(".StoppingCriteria", 0.001);
@@ -52,12 +52,12 @@ void DetailedPlacement(HDPGrid& grid)
       grid.Design().Plotter.Refresh();
 
       wlAfterGlobalSwap = Utils::CalculateHPWL(grid.Design(), true);
-      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+      ALERT("%5d %5s %25f %10f%% %10f%%",
         iteration,
         "GS", 
         wlAfterGlobalSwap,
         (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeIteration * 100.0,
-        (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeDP * 100.0));
+        (wlBeforeIteration - wlAfterGlobalSwap) / wlBeforeDP * 100.0);
     }
     else
       wlAfterGlobalSwap = wlBeforeIteration;
@@ -70,12 +70,12 @@ void DetailedPlacement(HDPGrid& grid)
       grid.Design().Plotter.Refresh();
 
       wlAfterVerticalSearch = Utils::CalculateHPWL(grid.Design(), true);
-      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+      ALERT("%5d %5s %25f %10f%% %10f%%",
         iteration,
         "VS",
         wlAfterVerticalSearch,
         (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeIteration * 100.0,
-        (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeDP * 100.0));
+        (wlAfterGlobalSwap - wlAfterVerticalSearch) / wlBeforeDP * 100.0);
     }
     else
       wlAfterVerticalSearch = wlAfterGlobalSwap;
@@ -88,12 +88,12 @@ void DetailedPlacement(HDPGrid& grid)
       grid.Design().Plotter.Refresh();
 
       wlAfterHorizontalSearch = Utils::CalculateHPWL(grid.Design(), true);
-      ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%",
+      ALERT("%5d %5s %25f %10f%% %10f%%",
         iteration,
         "HS",
         wlAfterHorizontalSearch,
         (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeIteration * 100.0,
-        (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeDP * 100.0));
+        (wlAfterVerticalSearch - wlAfterHorizontalSearch) / wlBeforeDP * 100.0);
     }
 
     if (isHS)
@@ -104,17 +104,17 @@ void DetailedPlacement(HDPGrid& grid)
       wlAfterIteration = wlAfterGlobalSwap;
 
     //wlAfterIteration = wlAfterHorizontalSearch;
-    ALERTFORMAT(("%5d %5s %25f %10f%% %10f%%\n",
+    ALERT("%5d %5s %25f %10f%% %10f%%\n",
       iteration,
       "",
       wlAfterIteration,
       (wlBeforeIteration - wlAfterIteration) / wlBeforeIteration * 100.0,
-      (wlBeforeIteration - wlAfterIteration) / wlBeforeDP * 100.0));
+      (wlBeforeIteration - wlAfterIteration) / wlBeforeDP * 100.0);
   } while ((1.0 - wlAfterIteration / wlBeforeIteration) > stoppingCriteriaValue);
 
-  ALERTFORMAT(("HPWL before detailed placement: %f", wlBeforeDP));
-  ALERTFORMAT(("HPWL after  detailed placement: %f", wlAfterIteration));
-  ALERTFORMAT(("Improvement after detailed placement: %f%%", 100.0 * (1.0 - wlAfterIteration / wlBeforeDP) ));
+  ALERT("HPWL before detailed placement: %f", wlBeforeDP);
+  ALERT("HPWL after  detailed placement: %f", wlAfterIteration);
+  ALERT("Improvement after detailed placement: %f%%", 100.0 * (1.0 - wlAfterIteration / wlBeforeDP));
   
   ALERT("DETAILED PLACEMENT FINISHED");
 }

@@ -53,7 +53,7 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
 {
   HNetWrapper net = aDesign[aNet];
   int numOfPins = net.PinsCount();
-  DEBUG_ASSERT(numOfPins > 1);
+  DASSERT(numOfPins > 1);
 
   HWireWrapper wire = aDesign[aDesign.Wires[aNet]];
   //2-pins nets can be simply routed
@@ -190,7 +190,7 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
           aDesign.SteinerPoints.RemoveSteinerTree(wire.Root());
           wire.SetRoutingType(RoutingType_Unrouted);
           wire.SetLength(0.0);
-          LOGERRORFORMAT(("Not A-tree from FLUTE. Net: %s", net.Name().c_str()));
+          GLOGERROR(LOGINPLACE, "Not A-tree from FLUTE. Net: %s", net.Name().c_str());
           return;
         }
         edgesNum++;

@@ -253,7 +253,7 @@ bool VerticalSwapper::TryToMoveCellTowardsOptimalRegion()
         if (TryToMoveWithoutShifting(rowIdx, maxFreeSpaceOrigin))
         {
           //m_Grid.Design().Plotter.PlotCell(m_Cell);
-          //ALERTFORMAT(("- %s\t", cellName.c_str()));
+          //ALERT("- %s\t", cellName.c_str()));
           return true;
         }
       }
@@ -262,7 +262,7 @@ bool VerticalSwapper::TryToMoveCellTowardsOptimalRegion()
         if (TryToMoveWithShifting(rowIdx))
         {
           //m_Grid.Design().Plotter.PlotCell(m_Cell);
-          //ALERTFORMAT(("+ %s\t", cellName.c_str()));
+          //ALERT("+ %s\t", cellName.c_str()));
           return true;
         }
       }
@@ -446,7 +446,7 @@ void VerticalSwapper::ProcessCell(HCell cell)
   //skip cell if it already belongs to its optimal region
   if (IsAlreadyInOptimalRow())
   {
-    //ALERTFORMAT(("! %s\t", cellName.c_str()));
+    //ALERT("! %s\t", cellName.c_str()));
     return;
   }
 
@@ -457,11 +457,11 @@ void VerticalSwapper::ProcessCell(HCell cell)
   //try to exchange it with a cell from the optimal region
   if (TryToExchangeWithCell())
   {
-    //ALERTFORMAT(("* %s\t", cellName.c_str()));
+    //ALERT("* %s\t", cellName.c_str()));
     return;
   }
 
-  //ALERTFORMAT(("# %s\t", cellName.c_str()));
+  //ALERT("# %s\t", cellName.c_str()));
 
   return;
 }

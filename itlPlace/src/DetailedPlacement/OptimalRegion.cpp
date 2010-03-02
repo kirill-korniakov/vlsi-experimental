@@ -7,9 +7,9 @@ int GetOptimalRowIdx(HDPGrid& grid, HCell cell)
 {
   HDesign& design = grid.Design();
 
-  ERROR_ASSERT(design.GetInt<HCell::PinsCount>(cell) <= MAX_CELL_PINS_COUNT);
+  ASSERT(design.GetInt<HCell::PinsCount>(cell) <= MAX_CELL_PINS_COUNT);
   if (design.GetInt<HCell::PinsCount>(cell) > MAX_CELL_PINS_COUNT)
-    LOGERRORFORMAT(("pins count %d.", design.GetInt<HCell::PinsCount>(cell)));
+    GLOGERROR(LOGINPLACE, "pins count %d.", design.GetInt<HCell::PinsCount>(cell));
   double ySeries[2 * MAX_CELL_PINS_COUNT];
   int nSeries = 0;
 
@@ -23,7 +23,7 @@ int GetOptimalRowIdx(HDPGrid& grid, HCell cell)
 
     double top, bottom;
     HNet::PinsEnumeratorW netPins = design.Get<HNet::Pins, HNet::PinsEnumeratorW>(net);
-    DEBUG_ASSERT(design.GetInt<HNet::PinsCount>(net) > 1);
+    DASSERT(design.GetInt<HNet::PinsCount>(net) > 1);
     do 
     {
       netPins.MoveNext();
@@ -57,7 +57,7 @@ void GetOptimalPosition(HDPGrid& grid, HCell cell, int& rowIdx, int& columnIdx)
 {
   HDesign& design = grid.Design();
 
-  ERROR_ASSERT(design.GetInt<HCell::PinsCount>(cell) <= MAX_CELL_PINS_COUNT);
+  ASSERT(design.GetInt<HCell::PinsCount>(cell) <= MAX_CELL_PINS_COUNT);
   double ySeries[2 * MAX_CELL_PINS_COUNT];
   double xSeries[2 * MAX_CELL_PINS_COUNT];
   int nSeries = 0;
@@ -73,7 +73,7 @@ void GetOptimalPosition(HDPGrid& grid, HCell cell, int& rowIdx, int& columnIdx)
     double top, bottom;
     double left, right;
     HNet::PinsEnumeratorW netPins = design.Get<HNet::Pins, HNet::PinsEnumeratorW>(net);
-    DEBUG_ASSERT(design.GetInt<HNet::PinsCount>(net) > 1);
+    DASSERT(design.GetInt<HNet::PinsCount>(net) > 1);
     do 
     {
       netPins.MoveNext();

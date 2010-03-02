@@ -123,7 +123,7 @@ void FindTopologicalOrder(HDesign& design)
       if (cycle_idx > 0)
       {//break detected cycle
         HCell cycle_cell = ::__ConstructPtr<HCell>(cycle_idx);
-        LOGWARNINGFORMAT(("Cycle detected. This cycle will be broken on cell %s", design.GetString<HCell::Name>(cycle_cell).c_str()));
+        GLOGWARNING(LOGINPLACE, "Cycle detected. This cycle will be broken on cell %s", design.GetString<HCell::Name>(cycle_cell).c_str());
         activePinsCountForCell[cycle_idx] = 0;
         ready_cells.push(cycle_cell);
       }

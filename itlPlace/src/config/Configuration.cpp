@@ -18,7 +18,7 @@ namespace libconfig
   {
     if (depth > m_MaxSearchDepth)
     {
-      LOGERRORFORMAT(("Too deep (%d) recucsion resolving path. [%s]", depth, path));
+      GLOGERROR(LOGINPLACE, "Too deep (%d) recucsion resolving path. [%s]", depth, path);
       throw SearchStackOverflowException(path);
     }
 
@@ -107,7 +107,7 @@ searchStart:
       ++start;
       if (start[1] == 0)
       {
-        LOGERRORFORMAT(("Invalid path expression: %s", path));
+        GLOGERROR(LOGINPLACE, "Invalid path expression: %s", path);
         throw ConfigException();
       }
     }
@@ -118,7 +118,7 @@ searchStart:
     {
       if (start[i] == 0)
       {
-        LOGERRORFORMAT(("Invalid path expression: %s", path));
+        GLOGERROR(LOGINPLACE, "Invalid path expression: %s", path);
         throw ConfigException();
       }
       if (start[i] == '$' || start[i] == '(')
@@ -131,7 +131,7 @@ searchStart:
           def_pos = i;
         else
         {
-          LOGERRORFORMAT(("Invalid path expression: %s", path));
+          GLOGERROR(LOGINPLACE, "Invalid path expression: %s", path);
           throw ConfigException();
         }
       ++i;
@@ -146,7 +146,7 @@ searchStart:
         newPath.append(start + def_pos + 1, i - def_pos - 1);
       else
       {
-        LOGERRORFORMAT(("Unable to resolve variable: $(%s)", varPath.c_str()));
+        GLOGERROR(LOGINPLACE, "Unable to resolve variable: $(%s)", varPath.c_str());
         throw ConfigException();
       }
     else
@@ -176,17 +176,17 @@ searchStart:
     
     if (m_Trace)
     {
-      ALERTFORMAT(("cfgtrace - Context: %s   Path: %s", m_Context.Context().c_str(), path));
+      ALERT("cfgtrace - Context: %s   Path: %s", m_Context.Context().c_str(), path);
     }
     config_setting_t* result = FindSetting((m_Context.Context() + (path + startDotsCount)).c_str(), dotsCount, 0);
     if (m_Trace)
       if (result == 0)
       {
-        ALERTFORMAT(("cfgtrace - NotFound %s", path));
+        ALERT("cfgtrace - NotFound %s", path);
       }
       else
       {
-        ALERTFORMAT(("cfgtrace - Found %s at %s", path, GetFullName(result).c_str()));
+        ALERT("cfgtrace - Found %s at %s", path, GetFullName(result).c_str());
       }
 
     return result;
@@ -201,7 +201,7 @@ searchStart:
 
       if (!fp)
       {
-        LOGCRITICALFORMAT(("Unable to open %s\n", file));
+        GLOGCRITICAL(LOGINPLACE, "Unable to open %s\n", file);
       }
 
       try
@@ -401,7 +401,7 @@ searchStart:
     {
       if (config_setting_type(setting) != CONFIG_TYPE_GROUP)
       {
-        LOGERRORFORMAT(("Unable to override non-group setting: [%s]", GetFullName(setting).c_str()));
+        GLOGERROR(LOGINPLACE, "Unable to override non-group setting: [%s]", GetFullName(setting).c_str());
         return 0;
       }
 
@@ -410,7 +410,7 @@ searchStart:
         nextSetting = config_setting_add(setting, currentPath.c_str() + startPos, CONFIG_TYPE_GROUP);
         if (nextSetting == 0)
         {
-          LOGERRORFORMAT(("Unable to create setting [%s.%s]", GetFullName(setting).c_str(), currentPath.c_str() + startPos));
+          GLOGERROR(LOGINPLACE, "Unable to create setting [%s.%s]", GetFullName(setting).c_str(), currentPath.c_str() + startPos);
           return 0;
         }
         setting = nextSetting;
@@ -428,7 +428,7 @@ searchStart:
       nextSetting = config_setting_add(setting, currentPath.c_str() + startPos, type);
       if (nextSetting == 0)
       {
-        LOGERRORFORMAT(("Unable to create setting [%s.%s]", GetFullName(setting).c_str(), currentPath.c_str() + startPos));
+        GLOGERROR(LOGINPLACE, "Unable to create setting [%s.%s]", GetFullName(setting).c_str(), currentPath.c_str() + startPos);
         return 0;
       }
       setting = nextSetting;
@@ -436,7 +436,7 @@ searchStart:
 
     if (config_setting_is_aggregate(setting) && type != config_setting_type(setting))
     {
-      LOGERRORFORMAT(("Overriding aggregate setting with value is not allowed. Path: %s", path.c_str()));
+      GLOGERROR(LOGINPLACE, "Overriding aggregate setting with value is not allowed. Path: %s", path.c_str());
       return 0;
     }
 

@@ -131,7 +131,7 @@ NetInfo NetInfo::Create(HDesign& hd, HNet net, BufferInfo& buf)
   n.m_Name = hd.GetString<HNet::Name>(net);
 
   HPin source = hd.Get<HNet::Source, HPin>(net);
-  ERROR_ASSERT(!::IsNull(source));
+  ASSERT(!::IsNull(source));
 
   HTimingPoint sourceTP = hd.TimingPoints[source];
   //get worst timing arc

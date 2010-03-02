@@ -39,7 +39,7 @@ namespace Utils
     //bool isEnd = design.GetBool<HTimingPoint::IsTimingEndPoint>(afterThisPoint);
     //string name = Utils::MakePointFullName(design, afterThisPoint);
     //string name1 = Utils::MakePointFullName(design, pointToPlace);
-    //ALERTFORMAT(("Inserting [%s] after [%s (%s)]",name1.c_str(), name.c_str(), isStart ? "s" : (isEnd ? "e" : "-")));
+    //ALERT("Inserting [%s] after [%s (%s)]",name1.c_str(), name.c_str(), isStart ? "s" : (isEnd ? "e" : "-")));
 
     ASSERT(!::IsNull(pointToPlace));
     ASSERT(!::IsNull(afterThisPoint));

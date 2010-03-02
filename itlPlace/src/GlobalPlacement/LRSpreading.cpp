@@ -6,7 +6,7 @@ void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
   *f += Aux::ScalarProduct(context->spreadingData.muBinsPen, 
     context->spreadingData.binsPenaltyValues, 
     context->spreadingData.binGrid.nBins);
-  //ALERTFORMAT(("LRS = %f", addValue));
+  //ALERT("LRS = %f", addValue));
   AddSpreadingPenaltyGradient(context, solution, context->gQS); //FIXME:HACK: use proper gradient
 }
 

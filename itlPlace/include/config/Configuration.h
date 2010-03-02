@@ -139,7 +139,7 @@ inline T libconfig::ConfigExt::ValueOf(const char* settingName, const T def) con
   {
     if (m_WarnMissingOptions)
     {
-      LOGWARNINGFORMAT(("Value for [%s%s] is not found", m_Context.Context().c_str(), settingName));
+      GLOGWARNING(LOGINPLACE, "Value for [%s%s] is not found", m_Context.Context().c_str(), settingName);
     }
     if (s != 0 && m_Replicate)
       m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), def);
@@ -150,7 +150,7 @@ inline T libconfig::ConfigExt::ValueOf(const char* settingName, const T def) con
   libconfig::Setting& st = libconfig::Setting::wrapSetting(s);
   if (m_WarnNondefaultOptions && IsValueDifferent(st, def))
   {
-    LOGWARNINGFORMAT(("Value for [%s%s] differs from default", m_Context.Context().c_str(), settingName));
+    GLOGWARNING(LOGINPLACE, "Value for [%s%s] differs from default", m_Context.Context().c_str(), settingName);
   }
   return st;
 }

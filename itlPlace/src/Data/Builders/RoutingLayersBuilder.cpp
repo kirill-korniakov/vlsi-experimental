@@ -19,7 +19,7 @@ namespace Builders
 
   void RoutingLayersBuilder::LayersStart(int size)
   {
-    ERROR_ASSERT(!m_layers_started);
+    ASSERT(!m_layers_started);
 
     m_hd->RoutingLayers.Initialize(size + 1);
 
@@ -28,14 +28,14 @@ namespace Builders
   
   void RoutingLayersBuilder::LayersFinished()
   {
-    ERROR_ASSERT(!m_layer_started && m_layers_started && !m_layers_finished);
+    ASSERT(!m_layer_started && m_layers_started && !m_layers_finished);
 
     m_layers_finished = true;
   }
 
   void RoutingLayersBuilder::LayerStart()
   {
-    ERROR_ASSERT(!m_layer_started && m_layers_started && !m_layers_finished);
+    ASSERT(!m_layer_started && m_layers_started && !m_layers_finished);
 
     m_CurrLayer = m_hd->RoutingLayers.AllocateLayer();
 
@@ -44,14 +44,14 @@ namespace Builders
 
   void RoutingLayersBuilder::LayerFinished()
   {
-    ERROR_ASSERT(m_layer_started && m_layers_started && !m_layers_finished);
+    ASSERT(m_layer_started && m_layers_started && !m_layers_finished);
 
     m_layer_started = false;
   }
 
   HRoutingLayerWrapper* RoutingLayersBuilder::operator->()
   {
-    ERROR_ASSERT(m_layer_started);
+    ASSERT(m_layer_started);
     return &m_CurrLayer;
   }
 

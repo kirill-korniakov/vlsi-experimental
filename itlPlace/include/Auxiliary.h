@@ -1,12 +1,13 @@
 #ifndef __AUXILIARY_H__
 #define __AUXILIARY_H__
 
-#include "HDesign.h"
 #include "math.h"
+#include "stdTypes.h"
 
 namespace Aux
 {
-  void SetOutputFileName(const string& fname);
+  string ChangeExtention(const string& filename, const char* newExt);
+  bool FileExists(const string& strFilename);
 
   //linear regression for two variables
   void MNK(const double *index_1,
