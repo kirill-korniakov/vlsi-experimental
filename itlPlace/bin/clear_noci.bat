@@ -1,4 +1,4 @@
-del .\ClusteringInformation\*.ci
+::del .\ClusteringInformation\*.ci
 del .\ExportDEF\*.def
 del .\log\*.log
 del .\log\*.htm

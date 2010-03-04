@@ -97,9 +97,9 @@ void Logger::InitializeLogging(libconfig::ConfigExt& cfg)
 {
   ConfigContext ctx = cfg.OpenContext("Logger");
 
-  ms_MaxWarningsToDisplay = cfg.ValueOf(".maximumDisplayWarnings", (unsigned)-1);
-  ms_MaxErrorsToDisplay =   cfg.ValueOf(".maximumDisplayErrors", (unsigned)-1);
-  ms_MaxErrorsAllowed =     cfg.ValueOf(".maximumErrors", 3);
+  ms_MaxWarningsToDisplay = (unsigned)cfg.ValueOf<int>(".maximumDisplayWarnings", -1);
+  ms_MaxErrorsToDisplay =   (unsigned)cfg.ValueOf<int>(".maximumDisplayErrors", -1);
+  ms_MaxErrorsAllowed =     (unsigned)cfg.ValueOf<int>(".maximumErrors", 3);
   ms_ExitOnAssert =         cfg.ValueOf(".exitOnAssert", true);
   ms_LogFileName =          cfg.ValueOf(".logFile", string("stdout"));
   ms_DuplicateOutput =      cfg.ValueOf(".duplicateConsoleOutput", true);

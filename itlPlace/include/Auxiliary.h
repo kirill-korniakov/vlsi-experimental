@@ -8,6 +8,7 @@ namespace Aux
 {
   string ChangeExtention(const string& filename, const char* newExt);
   bool FileExists(const string& strFilename);
+  string Format(const char* format, ...);
 
   //linear regression for two variables
   void MNK(const double *index_1,

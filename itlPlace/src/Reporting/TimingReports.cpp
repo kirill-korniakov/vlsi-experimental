@@ -53,12 +53,12 @@ void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
   tf.SetColumnAlign(ColSep1, TableFormatter::Align_Fill);
   tf.SetColumnAlign(ColNetName, TableFormatter::Align_Left);
   //first header row
-  tf.NewRow();
+  tf.NewHeaderRow();
   tf.SetCell(ColGate, "Delay[ps]", 2, TableFormatter::Align_Left);
   tf.SetCell(ColCap, "Cap", TableFormatter::Align_Left);
   tf.SetCell(ColFanout, "Fan-", TableFormatter::Align_Left);
   //second header row
-  tf.NewRow();
+  tf.NewHeaderRow();
   tf.SetCell(ColAAT, "AAT", TableFormatter::Align_Left);
   tf.SetCell(ColRAT, "RAT", TableFormatter::Align_Left);
   tf.SetCell(ColGate, "Gate", TableFormatter::Align_Left);
@@ -67,7 +67,7 @@ void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
   tf.SetCell(ColFanout, "out", TableFormatter::Align_Left);
   tf.SetCell(ColArcName, "Info", TableFormatter::Align_Left, 1000);
   //separator
-  tf.NewRow();
+  tf.NewBorderRow();
   tf.SetCell(ColAAT, "-", TableFormatter::Align_Fill);
   tf.SetCell(ColRAT, "-", TableFormatter::Align_Fill);
   tf.SetCell(ColGate, "-", TableFormatter::Align_Fill);
@@ -176,7 +176,7 @@ void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
 
 
   //printing
-  WRITELINE("================================================================================");
+  Logger::Global.WriteIgnoringHTML("================================================================================");
   WRITELINE("");
   HPinWrapper firstPin = design[design[design[design[path].StartPoint()].TimingPoint()].Pin()];
   HPinWrapper lastPin = design[design[design[design[path].EndPoint()].TimingPoint()].Pin()];
@@ -184,7 +184,7 @@ void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
   HCellWrapper firstCell = design[firstPin.Cell()];
   HCellWrapper lastCell = design[lastPin.Cell()];
 
-  WRITELINE("Path #%d %10s %s %s %8s %s %s", 
+  tf.Caption = Aux::Format("Path #%d %10s %s %s %8s %s %s",
     pathNumber, 
     "From   ",
     firstPin.IsPrimary() ? "PIN" : firstCell.Name().c_str(),

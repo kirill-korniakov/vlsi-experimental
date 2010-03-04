@@ -36,7 +36,9 @@ private:
     Cell* Cells;
     int Size;
     RowType RType;
-    Row() : Cells(0), Size(0), RType(RowType_Default) {}
+    bool PrintedToConsole;
+    bool PrintedToHTML;
+    Row() : Cells(0), Size(0), RType(RowType_Default), PrintedToConsole(false), PrintedToHTML(false) {}
 
     void AllocateCells(int count)
     {
@@ -197,13 +199,13 @@ private:
     };
   }
 
-  void PrintRow(const Row& row, Logger* logger)
+  void PrintRow(Row& row, Logger* logger, bool writeToConsole, bool writeToHTML)
   {
-    if (logger->HasHTMLStream())
-      logger->WriteToHTMLStream(false, "<tr>");
+    writeToHTML &= logger->HasHTMLStream() && row.RType != RowType_Border;
+    if (writeToHTML) logger->WriteToHTMLStream(false, "<tr>");
     for (int col = 0; col < row.Size; col += row.Cells[col].Colspan)
     {
-      if (logger->HasHTMLStream() && row.RType != RowType_Border)
+      if (writeToHTML)
       {
         const char* tag = row.RType == RowType_Header ? "th" : "td";
         if (row.Cells[col].Colspan > 1)
@@ -240,17 +242,28 @@ private:
         }
       }
 
-      if (row.RType == RowType_Border)
+      if (writeToConsole)
         logger->WriteIgnoringHTML(col == 0 ? "%s" : " %s", GetAlignedText(row, col).c_str());
-      else
-        logger->Write(col == 0 ? "%s" : " %s", GetAlignedText(row, col).c_str());
 
-      if (logger->HasHTMLStream() && row.RType != RowType_Border)
+      if (writeToHTML)
+      {
+        if (row.Cells[col].Value.empty())
+          logger->WriteToHTMLStream(false, "&nbsp;");
+        else
+          logger->WriteToHTMLStream(true, "%s", GetAlignedText(row, col).c_str());
         logger->WriteToHTMLStream(false, row.RType == RowType_Header ? "</th>" : "</td>");
+      }
     }
-    if (logger->HasHTMLStream() && row.RType != RowType_Border)
+    if (writeToHTML)
+    {
       logger->WriteToHTMLStream(false, "</tr>\n");
-    logger->WriteLine();
+      row.PrintedToHTML = true;
+    }
+    if (writeToConsole)
+    {
+      logger->WriteLine();
+      row.PrintedToConsole = true;
+    }
   }
 
 public:
@@ -361,35 +374,75 @@ public:
     m_LastRow->Cells[colIdx].Colspan = colspan;
   }
 
-  void Print(Logger* logger = 0)
+  template <class T>
+  void SetCell(int colIdx, T value, const string& prefix, const string& suffix, int colspan = 1, Align textAlign = Align_Default)
+  {
+    if (colIdx == -1) return;
+    ASSERT(colIdx >= 0);
+    ASSERT(m_LastRow != 0);
+    if (colIdx >= NumOfColumns())
+    {
+      m_Columns.resize(colIdx + 1);
+      m_LastRow->AllocateCells(colIdx + 1);
+    }
+    m_LastRow->Cells[colIdx].Value = prefix + ConvertToString(value, colIdx) + suffix;
+    m_LastRow->Cells[colIdx].TextAlign = textAlign;
+    m_LastRow->Cells[colIdx].Colspan = colspan;
+  }
+
+  void Print(Logger* logger = 0, bool writeToConsole = true, bool writeToHTML = true)
   {
     UpdateLayout();
 
     if (logger == 0) logger = &Logger::Global;
     
-    if (logger->HasHTMLStream())
+    if (writeToHTML && logger->HasHTMLStream())
       logger->WriteToHTMLStream(false, "<div class=\"tableFormatter\"><table class=\"tbl\">\n");
 
     if (!Caption.empty())
     {
-      if (logger->HasHTMLStream())
+      if (writeToHTML && logger->HasHTMLStream())
+      {
         logger->WriteToHTMLStream(false, "<caption>");
-
-      logger->Write("%s", Caption.c_str());
-      logger->WriteLine();
-
-      if (logger->HasHTMLStream())
+        logger->WriteToHTMLStream(true, "%s", Caption.c_str());
         logger->WriteToHTMLStream(false, "</caption>");
+      }
+      if (writeToConsole)
+      {
+        logger->WriteIgnoringHTML("%s", Caption.c_str());
+        logger->WriteLine();
+      }
     }
 
-    if (logger->HasHTMLStream())
-      logger->WriteToHTMLStream(false, "<tbody>\n");
+    bool headClosed = true;
+    if (writeToHTML && logger->HasHTMLStream())
+      if (m_Rows.front().RType == RowType_Header)
+      {
+        logger->WriteToHTMLStream(false, "<thead>\n");
+        headClosed = false;
+      }
+      else
+        logger->WriteToHTMLStream(false, "<tbody>\n");
 
     for (RowsList::iterator row = m_Rows.begin(); row != m_Rows.end(); ++row)
-      PrintRow(*row, logger);
+    {
+      if (!headClosed && writeToHTML && logger->HasHTMLStream() && row->RType != RowType_Header)
+      {
+        logger->WriteToHTMLStream(false, "</thead>\n<tfoot></tfoot>\n<tbody>\n");
+        headClosed = true;
+      }
+      PrintRow(*row, logger, writeToConsole && !row->PrintedToConsole, writeToHTML && !row->PrintedToHTML);
+    }
 
-    if (logger->HasHTMLStream())
+    if (writeToHTML && logger->HasHTMLStream())
       logger->WriteToHTMLStream(false, "</tbody>\n</table>\n</div>");
+  }
+
+  void FlushLastRow(bool toConsole = true, bool toHTML = false, Logger* logger = 0)
+  {
+    UpdateLayout();
+    if (logger == 0) logger = &Logger::Global;
+    PrintRow(*m_LastRow, logger, toConsole, toHTML);
   }
 
 };

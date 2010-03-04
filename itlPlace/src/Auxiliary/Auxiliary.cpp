@@ -202,4 +202,18 @@ namespace Aux
     
     return(blnReturn);
   }
+
+  string Format(const char* format, ...)
+  {
+    va_list  argList;
+    va_start(argList, format);
+
+    int len = vsnprintf(0, 0, format, argList);
+    string result(len, 0);
+    vsnprintf((char*)result.c_str(), len + 1, format, argList);
+
+    va_end(argList);
+
+    return result;
+  }
 }

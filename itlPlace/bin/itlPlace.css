@@ -10,7 +10,9 @@ body > span.text{padding-left:7.5em;}
 .location dd{margin-left:10em;}
 .tbl{background:none repeat scroll 0 0 #FFFFFF;border-collapse:collapse;font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;font-size:14px;margin:20px;text-align:left;width:480px;margin-left: auto;margin-right: auto;white-space:nowrap;}
 .tbl span{display:block;white-space:nowrap;}
-.tbl th{border-bottom:2px solid #6678B1;color:#003399;font-size:16px;font-weight:normal;padding:10px 8px;}
-.tbl td{border-bottom:1px solid #CCCCCC;color:#666699;padding:6px 8px;}
+.tbl thead tr:last-child th {padding-bottom:5px;}
+.tbl tbody tr:first-child td {border-top:2px solid #6678B1;}
+.tbl th{color:#003399;font-size:16px;font-weight:normal;white-space:nowrap;padding:3px 10px;}
+.tbl td{border-bottom:1px solid #CCCCCC;color:#666699;padding:6px 8px;white-space:nowrap;}
 .tbl tbody tr:hover td{color:#000099;}
 .tbl caption{font:italic 16px "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;padding:0 0 5px;text-align:right;}
