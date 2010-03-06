@@ -199,8 +199,16 @@ namespace Aux
       // more details on why stat failed.
       blnReturn = false;
     }
-    
     return(blnReturn);
+  }
+
+  unsigned GetFileSize(const string& strFilename)
+  {
+    struct stat stFileInfo;
+    int intStat = stat(strFilename.c_str(), &stFileInfo);
+    if (intStat == 0)
+      return (unsigned)stFileInfo.st_size;
+    return 0;
   }
 
   string Format(const char* format, ...)

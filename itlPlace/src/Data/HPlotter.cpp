@@ -7,6 +7,7 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include "AdaptiveRoute.h"
+#include "Base64.h"
 
 struct PlotterData
 {
@@ -562,8 +563,48 @@ void HPlotter::SaveImage(string fileName, string dirName)
 
 void HPlotter::SaveMilestoneImage(string fileSuffix)
 {
+  if (!IsEnabled())
+    return;
+
   if (m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
-    SaveImage(m_hd.Circuit.Name() + "_" + fileSuffix, m_hd.cfg.ValueOf("plotter.milestonePixDirectory"));
+  {
+    string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "jpg");
+    cvSaveImage(fileName.c_str(), m_Data->img);
+    if (Logger::Global.HasHTMLStream())
+    {
+      bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
+      Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");
+      Logger::Global.WriteToHTMLStream(true, "%s", fileName.c_str());
+      if (embeed && Aux::FileExists(fileName))
+      {
+        int fsize = Aux::GetFileSize(fileName);
+        unsigned char* buffer = new unsigned char[fsize];
+        try
+        {
+          FILE* fimg = fopen(fileName.c_str(), "rb");
+          if (fimg != 0)
+          {
+            fsize = fread(buffer, 1, fsize, fimg);
+            fclose(fimg);
+          }
+          Logger::Global.WriteToHTMLStream(false, "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", Base64::Encode(buffer, fsize).c_str());
+        }
+        catch(...)
+        {
+          delete[] buffer;
+          throw;
+        }
+        delete[] buffer;
+      }
+      else
+      {
+        for (size_t i = 0; i < fileName.length(); ++i)
+          if (fileName[i] == '\\')
+            fileName[i] = '/';
+        Logger::Global.WriteToHTMLStream(false, "\" src=\"../%s\" /></div>\n", fileName.c_str());
+      }
+    }
+  }
 }
 
 void HPlotter::StartVideoWriting(string fileName, string dirName)
