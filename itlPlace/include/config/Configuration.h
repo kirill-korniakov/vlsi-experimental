@@ -6,8 +6,8 @@
 #include "libconfig.h++"
 #pragma warning( pop )
 
-#include "Logging.h"
 #include "ConfigContext.h"
+#include "Logging.h"
 
 namespace libconfig
 {
@@ -54,7 +54,7 @@ namespace libconfig
     void ReplicateSetting(const char* path, const unsigned value)
     { ReplicateSetting(path, (long)value); }
 
-    config_setting_t* FindInContext(const char* path) const;
+    config_setting_t* FindInContext(const string& path) const;
 
   public:
     ConfigExt() : Config()
@@ -89,15 +89,9 @@ namespace libconfig
       return CfgContextCreationHelper(m_Context, name);
     }
 
-    Setting& ValueOf(const char* settingName) const;
-    Setting& ValueOf(const string& settingName) const 
-      { return ValueOf(settingName.c_str()); }
-
+    Setting& ValueOf(const string& settingName) const;
     template<class T>
-    T ValueOf(const char* settingName, const T def) const;
-    template<class T>
-    T ValueOf(const string& settingName, const T def) const
-      { return ValueOf(settingName.c_str(), def); }
+    T ValueOf(const string& settingName, const T def) const;
 
     bool Exists(const char* settingName) const;
     bool Exists(string settingName) const
@@ -132,25 +126,21 @@ inline bool IsValueDifferent(libconfig::Setting& s, const char* val) { return st
 
 
 template<class T>
-inline T libconfig::ConfigExt::ValueOf(const char* settingName, const T def) const
+inline T libconfig::ConfigExt::ValueOf(const string& settingName, const T def) const
 {
   config_setting_t *s = FindInContext(settingName);
   if(!s || config_setting_is_aggregate(s))
   {
     if (m_WarnMissingOptions)
     {
-      GLOGWARNING(LOGINPLACE, "Value for [%s%s] is not found", m_Context.Context().c_str(), settingName);
+      GLOGWARNING(LOGINPLACE, "Value for [%s%s] is not found", m_Context.Context().c_str(), settingName.c_str());
     }
-    if (s != 0 && m_Replicate)
-      m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), def);
     return def;
   }
-  if (s != 0 && m_Replicate)
-    m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
   libconfig::Setting& st = libconfig::Setting::wrapSetting(s);
   if (m_WarnNondefaultOptions && IsValueDifferent(st, def))
   {
-    GLOGWARNING(LOGINPLACE, "Value for [%s%s] differs from default", m_Context.Context().c_str(), settingName);
+    GLOGWARNING(LOGINPLACE, "Value for [%s%s] differs from default", m_Context.Context().c_str(), settingName.c_str());
   }
   return st;
 }
@@ -158,16 +148,12 @@ inline T libconfig::ConfigExt::ValueOf(const char* settingName, const T def) con
 inline bool libconfig::ConfigExt::Exists(const char* settingName) const
 {
   config_setting_t *s = FindInContext(settingName);
-  if (s != 0 && m_Replicate)
-    m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
   return s != 0;
 }
 
 inline bool libconfig::ConfigExt::Defined(const char* settingName) const
 {
   config_setting_t *s = FindInContext(settingName);
-  if (s != 0 && m_Replicate)
-    m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
   return s != 0 && !config_setting_is_aggregate(s);
 }
 
@@ -177,12 +163,10 @@ inline bool libconfig::ConfigExt::HasValue(const char* settingName, const T valu
   config_setting_t *s = FindInContext(settingName);
   if (s == 0)
   {
-    if (m_Replicate)
-      m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), value);
+    //if (m_Replicate)
+      //m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), value);
     return returnTrueIfNotDefined;
   }
-  else if (m_Replicate)
-    m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
   return (T)libconfig::Setting::wrapSetting(s) == value;
 }
 

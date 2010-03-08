@@ -635,20 +635,47 @@ void Logger::FatalError(const LogCortege& lcort, const char* pattern, ...)
   exit(1);
 }
 
-extern long RevisionNumber;
+namespace Revision
+{
+extern long        RevisionNumber;
+extern const char* RevisionDate;
+extern const char* RevisionRange;
+extern const char* RepositoryURL;
+extern bool        HasLocalModifications;
+extern bool        HasMixedRevisions;
+extern bool        HasVersionControl;
+}
+
 void Logger::PrintRevisionNumber()
 {
   if (!Verbose) return;
-  if (RevisionNumber != 0)
-  {
-    fprintf(ms_LogFile, "Running itlPlace revision: %d\n", RevisionNumber);
-    WriteToHTMLStream(false, "<div class=\"revision\">itlPlace Revision: %d</div>\n", RevisionNumber);
+  WriteToHTMLStream("<div class=\"revision\">");
+
+  if (!Revision::HasVersionControl || Revision::RevisionNumber == 0)
+  {//1. No version control
+    fprintf(ms_LogFile, "Running UNVERSIONED itlPlace\n", Revision::RepositoryURL, Revision::RevisionRange);
+    WriteToHTMLStream("<span class=\"norev\">Running UNVERSIONED itlPlace</span>");
+  }
+  else if (Revision::HasMixedRevisions)
+  {//2. Mixed revision range
+    fprintf(ms_LogFile, "Running mixed revisions %s of itlPlace [%s]\n", Revision::RevisionRange, Revision::RepositoryURL);
+    WriteToHTMLStream(false, "Running <span class=\"revMixed\">mixed revisions %s</span> of <a href=\"%s\">itlPlace</a>",
+      Revision::RevisionRange, Revision::RepositoryURL);
+  }
+  else if (Revision::HasLocalModifications)
+  {//3. With local modifications
+    fprintf(ms_LogFile, "Running locally modified itlPlace [%s] Revision %d (%s)\n", Revision::RepositoryURL, Revision::RevisionNumber, Revision::RevisionDate);
+    WriteToHTMLStream(false, "Running <span class=\"revLocalMod\">locally modified</span> <a href=\"%s\">itlPlace</a> <a href=\"http://redmine.software.unn.ru/projects/vlsi/repository/revisions/%d\">Revision %d (%s)</a>",
+       Revision::RepositoryURL, Revision::RevisionNumber, Revision::RevisionNumber, Revision::RevisionDate);
   }
   else
-  {
-    fprintf(ms_LogFile, "Running unknown revision of itlPlace\n");
-    WriteToHTMLStream("<div class=\"revision\">itlPlace Revision: UNKNOWN</div>\n");
+  {//4. Clear
+    fprintf(ms_LogFile, "Running itlPlace [%s] Revision %d (%s)\n", Revision::RepositoryURL, Revision::RevisionNumber, Revision::RevisionDate);
+    WriteToHTMLStream(false, "Running <a href=\"%s\">itlPlace</a> <a href=\"http://redmine.software.unn.ru/projects/vlsi/repository/revisions/%d\">Revision %d (%s)</a>",
+       Revision::RepositoryURL, Revision::RevisionNumber, Revision::RevisionNumber, Revision::RevisionDate);
   }
+
+  WriteToHTMLStream("</div>\n");
 }
 
 void Logger::RenameDuplicatedFiles(const string& newName)
@@ -677,7 +704,13 @@ void Logger::WriteHTMLHeader()
   WriteToHTMLStream("<!DOCTYPE HTML>\n");
   WriteToHTMLStream("<html>\n<head>\n");
   WriteToHTMLStream("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=us-ascii\">\n");
-  Global.WriteToHTMLStream(false, "<title>itlPlace Log - Revision %d</title>\n", ::RevisionNumber);
+  if (Revision::HasVersionControl)
+    if(Revision::HasMixedRevisions)
+      Global.WriteToHTMLStream(false, "<title>itlPlace Log - Revisions %s</title>\n", Revision::RevisionRange);
+    else
+      Global.WriteToHTMLStream(false, "<title>itlPlace Log - Revision %d</title>\n", Revision::RevisionNumber);
+  else
+    WriteToHTMLStream("<title>itlPlace Log - UNKNOWN Revision</title>\n");
   if (!ms_EmbeedCSS || !Aux::FileExists(ms_CSSFileName))
   {
     Global.WriteToHTMLStream(false, "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", ms_CSSFileName.c_str());

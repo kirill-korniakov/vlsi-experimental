@@ -5,12 +5,10 @@ libconfig::ConfigExt gCfg;
 
 namespace libconfig
 {
-  Setting& ConfigExt::ValueOf(const char* settingName) const
+  Setting& ConfigExt::ValueOf(const string& settingName) const
   {
     config_setting_t *s = FindInContext(settingName);
-    if (!s) throw SettingNotFoundException(settingName);
-    if (m_Replicate)
-      m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
+    if (!s) throw SettingNotFoundException(settingName.c_str());
     return Setting::wrapSetting(s);
   }
 
@@ -165,28 +163,46 @@ searchStart:
     return result;
   }
 
-  config_setting_t* ConfigExt::FindInContext(const char* path) const
+  config_setting_t* ConfigExt::FindInContext(const string& path) const
   {
     int startDotsCount = 0;
     while (path[startDotsCount] == '.') ++startDotsCount;
 
     int dotsCount = startDotsCount;
-    for (int i = startDotsCount; path[i] != 0; ++i)
-      if (path[i] == '.') ++dotsCount;
+    int sz = startDotsCount;
+    for (; path[sz] != 0; ++sz)
+      if (path[sz] == '.') ++dotsCount;
     
     if (m_Trace)
     {
-      ALERT("cfgtrace - Context: %s   Path: %s", m_Context.Context().c_str(), path);
+      ALERT("cfgtrace - Context: %s   Path: %s", m_Context.Context().c_str(), path.c_str());
     }
-    config_setting_t* result = FindSetting((m_Context.Context() + (path + startDotsCount)).c_str(), dotsCount, 0);
+    config_setting_t* result = 0;
+#ifndef NO_CONFIG_CACHE
+    ConfigCache::iterator chr = m_Context.CurrentCache().find(path);
+    if (chr != m_Context.CurrentCache().end())
+      result = chr->second;
+    else
+    {
+#endif
+      result = FindSetting((m_Context.Context() + (path.c_str() + startDotsCount)).c_str(), dotsCount, 0);
+      if (result != 0 && m_Replicate)
+        m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), path.c_str()).c_str(), result);
+#ifndef NO_CONFIG_CACHE
+      if (result != 0)
+      {
+        m_Context.CurrentCache()[path] = result;
+      }
+    }
+#endif
     if (m_Trace)
       if (result == 0)
       {
-        ALERT("cfgtrace - NotFound %s", path);
+        ALERT("cfgtrace - NotFound %s", path.c_str());
       }
       else
       {
-        ALERT("cfgtrace - Found %s at %s", path, GetFullName(result).c_str());
+        ALERT("cfgtrace - Found %s at %s", path.c_str(), GetFullName(result).c_str());
       }
 
     return result;
@@ -528,12 +544,10 @@ searchStart:
     config_setting_t *s = FindInContext(settingName);
     if (s == 0)
     {
-      if (m_Replicate)
-        m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), value);
+      //if (m_Replicate)
+        //m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), value);
       return returnTrueIfNotDefined;
     }
-    else if (m_Replicate)
-      m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), s);
     return strcmp((const char*)libconfig::Setting::wrapSetting(s), value) == 0;
   }
 }

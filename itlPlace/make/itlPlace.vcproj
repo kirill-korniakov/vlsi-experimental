@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP2"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO;..\include\3dParty"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -131,7 +131,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -223,7 +223,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -315,7 +315,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -404,7 +404,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP2"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -492,7 +492,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -6227,6 +6227,10 @@
 					Name="config"
 					>
 					<File
+						RelativePath="..\include\config\ConfigCache.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\config\ConfigContext.h"
 						>
 					</File>
@@ -6715,6 +6719,50 @@
 						>
 						<File
 							RelativePath="..\include\TAO\src\tao_impl.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="google"
+					>
+					<File
+						RelativePath="..\include\3dParty\google\dense_hash_map"
+						>
+					</File>
+					<File
+						RelativePath="..\include\3dParty\google\dense_hash_set"
+						>
+					</File>
+					<File
+						RelativePath="..\include\3dParty\google\sparse_hash_map"
+						>
+					</File>
+					<File
+						RelativePath="..\include\3dParty\google\sparse_hash_set"
+						>
+					</File>
+					<File
+						RelativePath="..\include\3dParty\google\sparsetable"
+						>
+					</File>
+					<File
+						RelativePath="..\include\3dParty\google\type_traits.h"
+						>
+					</File>
+					<Filter
+						Name="sparsehash"
+						>
+						<File
+							RelativePath="..\include\3dParty\google\sparsehash\densehashtable.h"
+							>
+						</File>
+						<File
+							RelativePath="..\include\3dParty\google\sparsehash\sparseconfig.h"
+							>
+						</File>
+						<File
+							RelativePath="..\include\3dParty\google\sparsehash\sparsehashtable.h"
 							>
 						</File>
 					</Filter>

@@ -1,9 +1,9 @@
-#include "HPlotter.h"
-#include "HDesign.h"
-#include "OpenCV/cv.h"
-#include "OpenCV/highgui.h"
 #include <time.h>
 #include <io.h>
+#include "OpenCV/cv.h"
+#include "OpenCV/highgui.h"
+
+#include "HPlotter.h"
 #include "Utils.h"
 #include "Auxiliary.h"
 #include "AdaptiveRoute.h"
@@ -50,7 +50,7 @@ static inline int _NormalY2ImageY(double y, int shiftY, int height)
   return shiftY + (int)(y * height);
 }
 
-static inline CvScalar GetColor(Color col)
+static inline CvScalar GetCvColor(Color col)
 {
   CvScalar res;
   ::ToRGB(col, res.val[2], res.val[1], res.val[0]);
@@ -134,7 +134,7 @@ void HPlotter::Initialize()
     startTextLine.y = m_Data->textSpaceHeight;
     finishTextLine.x = imgSize.width;
     finishTextLine.y = m_Data->textSpaceHeight;
-    cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
+    cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
 
     //calculate coordinate mapping
     m_Data->x_ratio = (imgSize.width - m_Data->borderSpace * 2) / m_hd.Circuit.Width();
@@ -350,7 +350,7 @@ void HPlotter::PlotPlacement()
   startTextLine.y = m_Data->textSpaceHeight;
   finishTextLine.x = IMG->width;
   finishTextLine.y = m_Data->textSpaceHeight;
-  cvLine(IMG, startTextLine, finishTextLine, GetColor(Color_Black), 1);
+  cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
 }
 
 void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
@@ -397,8 +397,8 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
       start.y = DesignY2ImageY(coordinates[2*i+1]);
       finish.x = DesignX2ImageX(coordinates[2*i+0] + scaling*gradients[2*i+0]);
       finish.y = DesignY2ImageY(coordinates[2*i+1] + scaling*gradients[2*i+1]);
-      cvDrawLine(IMG, start, finish, GetColor(color));
-      cvDrawCircle(IMG, finish, 1, GetColor(color));
+      cvDrawLine(IMG, start, finish, GetCvColor(color));
+      cvDrawCircle(IMG, finish, 1, GetCvColor(color));
     }
   }
 }
@@ -422,7 +422,7 @@ void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
     start.y = HNormalY2ImageY(0.0);
     finish.x = start.x;
     finish.y = HNormalY2ImageY(x[2*nClusters + i]/maxKi);
-    cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
   }
 
   //plot one line
@@ -430,7 +430,7 @@ void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
   finish.x = HNormalX2ImageX(1.0);
   start.y  = HNormalY2ImageY(1.0/maxKi);
   finish.y = HNormalY2ImageY(1.0/maxKi);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(Color_Black), 1);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
 
   //plot mean ki
   meanK /= nNets;
@@ -438,7 +438,7 @@ void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
   finish.x = HNormalX2ImageX(1.0);
   start.y  = HNormalY2ImageY(meanK/maxKi);
   finish.y = HNormalY2ImageY(meanK/maxKi);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(Color_Black), 1);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
 }
 
 void HPlotter::PlotCell(HCell cell, Color col)
@@ -460,7 +460,7 @@ void HPlotter::PlotCell(HCell cell, Color col)
   //fill the cell
   start.x++; start.y++;
   finish.x--; finish.y--;
-  CvScalar fillColor = GetColor(col);
+  CvScalar fillColor = GetCvColor(col);
   if (start.x <= finish.x && start.y <= finish.y)
   {
     cvRectangle(IMG, start, finish, fillColor, CV_FILLED);
@@ -498,7 +498,7 @@ void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col)
     start.y = DesignY2ImageY(y1);
     finish.x = DesignX2ImageX(x2);
     finish.y = DesignY2ImageY(y2);
-    cvLine(IMG, start, finish, GetColor(col), 1);
+    cvLine(IMG, start, finish, GetCvColor(col), 1);
     _AutoRefresh();
   }
 }
@@ -510,7 +510,7 @@ void HPlotter::DrawCircle(double x, double y, int radius, Color col)
     CvPoint center;
     center.x = DesignX2ImageX(x);
     center.y = DesignY2ImageY(y);
-    cvCircle(IMG, center, radius, GetColor(col), 2);
+    cvCircle(IMG, center, radius, GetCvColor(col), 2);
     _AutoRefresh();
   }
 }
@@ -524,7 +524,7 @@ void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color c
     start.y = DesignY2ImageY(y1);
     finish.x = DesignX2ImageX(x2);
     finish.y = DesignY2ImageY(y2);
-    cvRectangle(IMG, start, finish, GetColor(col), 1);
+    cvRectangle(IMG, start, finish, GetCvColor(col), 1);
     _AutoRefresh();
   }
 }
@@ -538,11 +538,35 @@ void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col)
     start.y = DesignY2ImageY(y1);
     finish.x = DesignX2ImageX(x2);
     finish.y = DesignY2ImageY(y2);
-    cvRectangle(IMG, start, finish, GetColor(col), CV_FILLED);
+    cvRectangle(IMG, start, finish, GetCvColor(col), CV_FILLED);
     _AutoRefresh();
   }
 }
 
+static void SavePlotterImage(libconfig::ConfigExt& cfg, const std::string& fileName, const CvArr* image, bool compress, int paletteSize)
+{
+  const char* compressor = cfg.ValueOf("plotter.PNGCompressor", "pngquant.exe");
+  if (compress && (0 == fileName.compare(fileName.length() - 4, 4, ".png")) && Aux::FileExists(compressor))
+  {
+    cvSaveImage("temp.png", image);
+    char cmdline[128];
+    sprintf(cmdline, "%s  -force -quiet %d temp.png", compressor, paletteSize);
+    system(cmdline);
+    if (0 != rename("temp-fs8.png", fileName.c_str()))
+    {
+      if (0 != rename("temp.png", fileName.c_str()))
+      {
+        remove("temp.png");
+        cvSaveImage(fileName.c_str(), image);
+      }
+      remove("temp-fs8.png");
+    }
+    else
+      remove("temp.png");
+  }
+  else
+    cvSaveImage(fileName.c_str(), image);
+}
 
 void HPlotter::SaveImage(string fileName, string dirName)
 {
@@ -552,13 +576,16 @@ void HPlotter::SaveImage(string fileName, string dirName)
   string ImageFileName;
   if (fileName == "")
   {
-    ImageFileName = Aux::CreateCoolFileName(dirName, m_hd.Circuit.Name(), "jpg");
+    ImageFileName = Aux::CreateCoolFileName(dirName, m_hd.Circuit.Name(), "png");
   }
   else
   {
-    ImageFileName = Aux::CreateCoolFileName(dirName, fileName, "jpg");
+    ImageFileName = Aux::CreateCoolFileName(dirName, fileName, "png");
   }
-  cvSaveImage(ImageFileName.c_str(), m_Data->img);
+  //cvSaveImage(ImageFileName.c_str(), m_Data->img);
+  SavePlotterImage(m_hd.cfg, ImageFileName, m_Data->img,
+    m_hd.cfg.ValueOf("plotter.CompressImages", false),
+    m_hd.cfg.ValueOf("plotter.ImagesPaletteSize", 256));
 }
 
 void HPlotter::SaveMilestoneImage(string fileSuffix)
@@ -568,8 +595,12 @@ void HPlotter::SaveMilestoneImage(string fileSuffix)
 
   if (m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
   {
-    string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "jpg");
-    cvSaveImage(fileName.c_str(), m_Data->img);
+    string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "png");
+    //cvSaveImage(fileName.c_str(), m_Data->img);
+    SavePlotterImage(m_hd.cfg, fileName, m_Data->img,
+      m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
+      m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
+
     if (Logger::Global.HasHTMLStream())
     {
       bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
@@ -660,7 +691,7 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath)
     HPinWrapper pin1 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())];
     start.x = DesignX2ImageX(pin1.X());
     start.y = DesignY2ImageY(pin1.Y());
-    cvCircle(IMG, start, 3, GetColor(Color_Peru), 3);
+    cvCircle(IMG, start, 3, GetCvColor(Color_Peru), 3);
     int index = 0;
     for(; i.MoveNext(); index++)
     {
@@ -672,13 +703,13 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath)
       finish.y = DesignY2ImageY(pin2.Y());
 
       if (i.SignalDirection() == SignalDirection_Fall)
-        cvLine(IMG, start, finish, GetColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+        cvLine(IMG, start, finish, GetCvColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
       else
-        cvLine(IMG, start, finish, GetColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+        cvLine(IMG, start, finish, GetCvColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
       if (index <=1 )
-        cvCircle(IMG, finish, 2, GetColor(Color_Plum), 2);
+        cvCircle(IMG, finish, 2, GetCvColor(Color_Plum), 2);
       else
-        cvCircle(IMG, finish, 2, GetColor(Color_Yellow), 2);
+        cvCircle(IMG, finish, 2, GetCvColor(Color_Yellow), 2);
       pin1 = pin2;
     }
   }
@@ -729,7 +760,7 @@ void HPlotter::PlotText(string text, double textSize)
       }
       point.x = DesignX2ImageX(10);
       point.y = int(m_Data->textSpaceHeight - 30 * t * textSize);
-      cvPutText(IMG, str, point, &font, GetColor(Color_Black));
+      cvPutText(IMG, str, point, &font, GetCvColor(Color_Black));
       start = i+1;
       t++;
     }
@@ -744,15 +775,15 @@ void HPlotter::PlotNet(HNetWrapper net)
 	HPinWrapper pin1 = m_hd[net.Source()];
 	start.x = DesignX2ImageX(pin1.X());
 	start.y = DesignY2ImageY(pin1.Y());
-	cvCircle(IMG, start, 1, GetColor(Color_Peru), 3);
+	cvCircle(IMG, start, 1, GetCvColor(Color_Peru), 3);
 	for (HNet::SinksEnumeratorW sew = net.GetSinksEnumeratorW(); sew.MoveNext(); )
 	{
 		start.x = DesignX2ImageX(pin1.X());
 		start.y = DesignY2ImageY(pin1.Y());
 		finish.x = DesignX2ImageX(sew.X());
 		finish.y = DesignY2ImageY(sew.Y());
-		cvCircle(IMG, finish, 1, GetColor(Color_Yellow), 2);
-		cvLine(IMG, start, finish, GetColor(Color_Red), 1, 1);
+		cvCircle(IMG, finish, 1, GetCvColor(Color_Yellow), 2);
+		cvLine(IMG, start, finish, GetCvColor(Color_Red), 1, 1);
 	}
 }
 
@@ -931,7 +962,7 @@ void HPlotter::PlotMuLevel(double level, Color color)
   start.y = HNormalY2ImageY(level*TopologicalScaling);
   finish.x = m_Data->histogramImg->width;
   finish.y = HNormalY2ImageY(level*TopologicalScaling);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
 }
 
 void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
@@ -944,7 +975,7 @@ void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
   finish.y = HNormalY2ImageY(mu*TopologicalScaling);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
 }
 
 void HPlotter::PlotMu(double mu, int x, Color color)
@@ -957,7 +988,7 @@ void HPlotter::PlotMu(double mu, int x, Color color)
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
   finish.y = HNormalY2ImageY(mu/40.0); //FIXME: choose proper scale
-  cvDrawLine(m_Data->histogramImg, start, finish, GetColor(color));
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
 }
 
 void HPlotter::ClearHistogram()
