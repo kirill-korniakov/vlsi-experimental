@@ -849,7 +849,14 @@ string GetClusteringInformationFileName(HDesign& hd)
   string fileName = hd.cfg.ValueOf("Clustering.clusteringInformationLoadFileName");
   if (fileName == "")
   {
-    fileName = ".\\ClusteringInformation\\" + hd.Circuit.Name() + ".ci";
+    fileName = Aux::Format(".\\ClusteringInformation\\%s_%d.ci", hd.Circuit.Name().c_str(), hd.Cells.CellsCount());
+    if (!Aux::FileExists(fileName))
+    {
+      string fileNameOld = ".\\ClusteringInformation\\" + hd.Circuit.Name() + ".ci";
+      if (Aux::FileExists(fileNameOld))// TODO: remove from future versions
+        if (0 != rename(fileNameOld.c_str(), fileName.c_str()))
+          fileName = fileNameOld;
+    }
   }
   return fileName;
 }
@@ -869,6 +876,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
     {
       InitializeTerminalsAndPrimaryPins(hd, ci);
       ALERT("CLUSTERING INFORMATION LOADED");
+      goto ClusteringExport;
       return OK;
     }
   }
@@ -895,6 +903,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
   ALERT("CLUSTERING FINISHED");
   ALERT("The number of levels is %u", ci.netLevels.size());
 
+ClusteringExport:
   //EXPORT CLUSTERING
   string fileName = GetClusteringInformationFileName(hd);
   ci.SaveToFile(fileName.c_str(), hd.Circuit.Name().c_str(), hd);

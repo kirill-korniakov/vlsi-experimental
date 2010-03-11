@@ -294,7 +294,7 @@ void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
   ConfigContext ctx = design.cfg.OpenContext("DEFExport");
 
   WRITELINE("");
-  ALERT("DEF export");
+  //ALERT("DEF export");
 
   FILE * fout;
   if ((fout = fopen(defName.c_str(), "w")) == 0)

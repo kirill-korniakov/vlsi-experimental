@@ -79,7 +79,7 @@ public:
   void ResetAutoRefreshFrequency();
 
   void SaveImage(string fileName = "", string dirName = ""); 
-  void SaveMilestoneImage(string fileSuffix);
+  void SaveMilestoneImage(string fileSuffix, bool addToHtmlLog = true);
 
   void StartVideoWriting(string fileName = "", string dirName = ""); 
   void WriteCurrentFrame();

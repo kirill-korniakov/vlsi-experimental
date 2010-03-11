@@ -14,8 +14,16 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
       GLOGERROR(LOGINPLACE, "Information in %s doesn't correspond to the design", fileName);
       return false;
     }
-    if (0 == fscanf(resultFile, "a %d %d %I64X %d\n", &mClusterRatio, &mDesiredFinalNumberOfClusters, 
-      &mClustersAreaTolerance, &mCurrentNumberOfClusters))
+
+    int lClusterRatio;
+    int lDesiredFinalNumberOfClusters;
+    double lClustersAreaTolerance;
+
+    if (0 == fscanf(resultFile, "a %d %d %I64X %d\n", &lClusterRatio, &lDesiredFinalNumberOfClusters, 
+      &lClustersAreaTolerance, &mCurrentNumberOfClusters)
+      || lClusterRatio != mClusterRatio
+      || lDesiredFinalNumberOfClusters != mDesiredFinalNumberOfClusters
+      || lClustersAreaTolerance != mClustersAreaTolerance)
     {
       GLOGERROR(LOGINPLACE, "Information in %s doesn't correspond to the design", fileName);
       return false;

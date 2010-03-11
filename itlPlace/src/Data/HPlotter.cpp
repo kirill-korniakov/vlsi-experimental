@@ -588,7 +588,7 @@ void HPlotter::SaveImage(string fileName, string dirName)
     m_hd.cfg.ValueOf("plotter.ImagesPaletteSize", 256));
 }
 
-void HPlotter::SaveMilestoneImage(string fileSuffix)
+void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
 {
   if (!IsEnabled())
     return;
@@ -601,7 +601,7 @@ void HPlotter::SaveMilestoneImage(string fileSuffix)
       m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
       m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
 
-    if (Logger::Global.HasHTMLStream())
+    if (Logger::Global.HasHTMLStream() && addToHtmlLog)
     {
       bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
       Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");

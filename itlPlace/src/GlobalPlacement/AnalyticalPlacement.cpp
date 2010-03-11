@@ -670,6 +670,14 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         break;
       }
     }
+
+    if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
+    {
+      hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
+        context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
+      hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
+    }
+
     if (discrepancy <= targetDiscrepancy)
     {
       ALERT("Discrepancy achieved");

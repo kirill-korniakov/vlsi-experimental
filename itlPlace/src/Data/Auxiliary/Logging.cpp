@@ -735,6 +735,15 @@ void Logger::WriteHTMLHeader()
     }
     WriteToHTMLStream("</style>\n");
   }
+  if (true)//add js includes
+  {
+    WriteToHTMLStream(
+" <!--[if IE]><script language=\"javascript\" type=\"text/javascript\" src=\"http://bugzilla.software.unn.ru/itlPlace/excanvas.min.js\"></script><![endif]-->\n"
+" <script type=\"text/javascript\" src=\"http://bugzilla.software.unn.ru/itlPlace/jquery.js\"></script>\n"
+" <script type=\"text/javascript\" src=\"http://bugzilla.software.unn.ru/itlPlace/jquery.flot.js\"></script>\n"
+" <script type=\"text/javascript\" src=\"http://bugzilla.software.unn.ru/itlPlace/jquery.graphTable-0.2.js\"></script>\n"
+" <script type=\"text/javascript\" src=\"http://bugzilla.software.unn.ru/itlPlace/plotQAgraphs.js\"></script>\n");
+  }
   WriteToHTMLStream("</head>\n<body>\n");
 }
 

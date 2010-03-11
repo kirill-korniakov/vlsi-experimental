@@ -642,7 +642,7 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
     }
   };
 
-  ConfigContext ctx = design.cfg.OpenContext("Buffering");
+  //ConfigContext ctx = design.cfg.OpenContext("Buffering");
   PathBuffering pb(design, bufferedPercent);
   TableFormatter tf(6);
   tf.NewRow();
