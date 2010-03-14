@@ -10,9 +10,20 @@ const int OK = 0;
 const int SHIFT_NUMBER_FOR_TERMINALS = 1000000; 
 const int SHIFT_NUMBER_FOR_PRIMARY_PINS = 2000000;
 
-bool IsMovableCell(int idx);
-bool IsTerminal(int idx);
-bool IsPrimaryPin(int idx);
+inline bool IsMovableCell(int idx)
+{
+  return idx < SHIFT_NUMBER_FOR_TERMINALS;
+}
+
+inline bool IsTerminal(int idx)
+{
+  return idx >= SHIFT_NUMBER_FOR_TERMINALS && idx < SHIFT_NUMBER_FOR_PRIMARY_PINS;
+}
+
+inline bool IsPrimaryPin(int idx)
+{
+  return idx >= SHIFT_NUMBER_FOR_PRIMARY_PINS;
+}
 
 class ClusteringInformation
 {

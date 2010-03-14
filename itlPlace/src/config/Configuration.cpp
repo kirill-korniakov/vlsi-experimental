@@ -20,7 +20,7 @@ namespace libconfig
       throw SearchStackOverflowException(path);
     }
 
-    string realPath = ExpandVariables(path, depth + 1);
+    string realPath = ExpandVariables(path, depth + 1, 0);
     char* currentPath = (char*)realPath.c_str();
     
     int dotsCount = 0;
@@ -34,13 +34,12 @@ namespace libconfig
     for (;;)
     {
       config_setting_t* setting = StrictFindSetting(this, Root(), currentPath, depth + 1);
-      if (setting != 0) return setting;
-
-      if (!IsGlobal())
+      if (setting == 0 && !IsGlobal())
       {
         setting = StrictFindSetting(this, gCfg.Root(), currentPath, depth + 1);
-        if (setting != 0) return setting;
       }
+
+      if (setting != 0) return setting;
 
       if (dotsCount >= segmentsRequired)
       {
@@ -81,10 +80,36 @@ namespace libconfig
 
       if (config_setting_type(setting) == CONFIG_TYPE_STRING)
       {
-        const char *val = config_setting_get_string(setting);
+        const char* val = config_setting_get_string(setting);
+        if (val[0] == '#')//calculate
+        {
+          string computed = initialCfg->ExpandVariables(val+1, depth+1, path);
+          setting = initialCfg->SetCfgValue(setting, computed);
+          if (config_setting_type(setting) == CONFIG_TYPE_STRING)
+            val = config_setting_get_string(setting);
+          else
+            return setting;
+        }
         if (val[0] == '@')
         {
-          setting = initialCfg->FindSetting(val + 1, 0, depth + 1);
+          switch(val[1])
+          {
+          case '>':
+            setting = initialCfg->FindInContext(val + 2, depth + 1);
+            break;
+          case '~':
+            {
+              const char* rp = strrchr(path, '.');
+              if (rp == 0)
+                setting = initialCfg->FindInContext(val + 2, depth + 1);
+              else
+                setting = initialCfg->FindInContext((string(path, rp - path +1) + (val + 2)).c_str(), depth + 1);
+            }
+            break;
+          default:
+            setting = initialCfg->FindSetting(val + 1, 0, depth + 1);
+            break;
+          }
           if (setting == 0) return 0;
         }
       }
@@ -92,7 +117,7 @@ namespace libconfig
     return setting;
   }
 
-  string ConfigExt::ExpandVariables(const char* path, int depth) const
+  string ConfigExt::ExpandVariables(const char* path, int depth, const char* originalPath) const
   {
     const char* start = strchr(path, '$');
     
@@ -112,6 +137,7 @@ searchStart:
     
     int i = 2; //skip "$("
     int def_pos = 0;
+    int ask_pos = 0;
     while (start[i] != ')')
     {
       if (start[i] == 0)
@@ -124,6 +150,16 @@ searchStart:
         start += i;
         goto searchStart;
       }
+      if (start[i] == '?')
+      {
+        if (ask_pos == 0)
+          ask_pos = i;
+        else
+        {
+          GLOGERROR(LOGINPLACE, "Invalid path expression: %s", path);
+          throw ConfigException();
+        }
+      }
       if (start[i] == ':')
         if (def_pos == 0)
           def_pos = i;
@@ -135,11 +171,31 @@ searchStart:
       ++i;
     }
 
-    string varPath(start, 2, def_pos == 0 ? i - 2 : def_pos - 2);
-    config_setting_t* setting = FindSetting(varPath.c_str(), 0, depth + 1);
+    string varPath(start, 2, ask_pos == 0 ? (def_pos == 0 ? i - 2 : def_pos - 2) : ask_pos - 2);
+    config_setting_t* setting = 0;
+    switch (varPath[0])
+    {
+    case '>':
+      setting = FindInContext(varPath.c_str() + 1, depth + 1);
+      break;
+    case '~':
+      if (originalPath == 0)
+        setting = FindSetting(varPath.c_str() + 1, 0, depth + 1);
+      else
+      {
+        const char* rp = strrchr(originalPath, '.');
+        if (rp == 0)
+          setting = FindInContext(varPath.c_str() + 1, depth + 1);
+        else
+          setting = FindInContext((string(originalPath, rp - originalPath +1) + (varPath.c_str() + 1)).c_str(), depth + 1);
+      }
+      break;
+    default:
+      setting = FindSetting(varPath.c_str(), 0, depth + 1);
+    };
     string newPath(path, 0, start - path);
 
-    if (setting == 0 || config_setting_type(setting) != CONFIG_TYPE_STRING)
+    if (setting == 0)
       if (def_pos != 0)//default value
         newPath.append(start + def_pos + 1, i - def_pos - 1);
       else
@@ -147,11 +203,18 @@ searchStart:
         GLOGERROR(LOGINPLACE, "Unable to resolve variable: $(%s)", varPath.c_str());
         throw ConfigException();
       }
+    else if (config_setting_type(setting) == CONFIG_TYPE_BOOL && ask_pos != 0 && def_pos != 0)
+    {
+      if (config_setting_get_bool(setting))
+        newPath.append(start + ask_pos + 1, def_pos - ask_pos - 1);
+      else
+        newPath.append(start + def_pos + 1, i - def_pos - 1);
+    }
     else
       newPath += config_setting_get_string(setting);
     newPath += start + i + 1;
 
-    return ExpandVariables(newPath.c_str(), depth + 1);
+    return ExpandVariables(newPath.c_str(), depth + 1, originalPath);
   }
 
   string GetFullName(config_setting_t* s)
@@ -163,7 +226,7 @@ searchStart:
     return result;
   }
 
-  config_setting_t* ConfigExt::FindInContext(const string& path) const
+  config_setting_t* ConfigExt::FindInContext(const string& path, int depth) const
   {
     int startDotsCount = 0;
     while (path[startDotsCount] == '.') ++startDotsCount;
@@ -185,14 +248,12 @@ searchStart:
     else
     {
 #endif
-      result = FindSetting((m_Context.Context() + (path.c_str() + startDotsCount)).c_str(), dotsCount, 0);
+      string fullPath = (m_Context.Context() + (path.c_str() + startDotsCount));
+      result = FindSetting(fullPath.c_str(), dotsCount, depth);
       if (result != 0 && m_Replicate)
-        m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), path.c_str()).c_str(), result);
+        m_Replicant->ReplicateSetting(fullPath.c_str(), result);
 #ifndef NO_CONFIG_CACHE
-      if (result != 0)
-      {
-        m_Context.CurrentCache()[path] = result;
-      }
+      m_Context.CurrentCache()[path] = result;
     }
 #endif
     if (m_Trace)
@@ -234,7 +295,7 @@ searchStart:
 
       m_Trace = ValueOf("Config.Trace", m_Trace);
       m_MaxSearchDepth = ValueOf("Config.MaxSearchDepth", m_MaxSearchDepth);
-      {//must go together and before any warning keys
+      {
         m_Replicate = ValueOf("Config.Replicate", m_Replicate);
         if (m_Replicate && m_Replicant == 0)
           m_Replicant = new ConfigExt();
@@ -242,26 +303,23 @@ searchStart:
       m_WarnNondefaultOptions = ValueOf("Config.WarnNondefaultOptions", m_WarnNondefaultOptions);
       m_WarnMissingOptions = ValueOf("Config.WarnMissingOptions", m_WarnMissingOptions);
       
-
-      
-
       return;
     }
     catch(ParseException& ex)
     {
-      printf("Configuration error on line %d: %s\n", ex.getLine(), ex.getError());
+      GLOGERROR(LOGINPLACE, "Configuration error on line %d: %s\n", ex.getLine(), ex.getError());
     }
     catch(SettingNotFoundException nfex)
     {
-      printf("Configuration setting not found: %s\n", nfex.getPath());
+      GLOGERROR(LOGINPLACE, "Configuration setting not found: %s\n", nfex.getPath());
     }
     catch(ConfigException& cex)
     {
-      printf("Unknown configuration exception!\n");
+      GLOGERROR(LOGINPLACE, "Unknown configuration exception!\n");
     }
     catch(std::exception ex)
     {
-       printf("Unable to read %s\n", file);
+       GLOGERROR(LOGINPLACE, "Unable to read %s\n", file);
     }
     exit(1);
   }
@@ -276,7 +334,7 @@ searchStart:
       size_t pos = name.find('=', 2);
       if(pos == -1) continue;
 
-      SetCfgValue(name.substr(2, pos - 2), name.substr(pos + 1));
+      SetCfgValue(name.substr(2, pos - 2), name.substr(pos + 1), true);
     }
   }
 
@@ -308,7 +366,73 @@ searchStart:
     return false;
   }
 
-  void ConfigExt::SetCfgValue(const std::string& path, const std::string& value)
+  config_setting_t* ConfigExt::SetCfgValue(config_setting_t* setting, const std::string& value)
+  {
+    if (setting == 0) return 0;
+    //parse value
+    config_value_t val;
+    short type = CONFIG_TYPE_NONE;
+    short format = CONFIG_FORMAT_DEFAULT;
+    int n;
+    int len = (int)value.length();
+    if (1 == sscanf(value.c_str(), "%I64dL%n", &val, &n) && n == len)
+      type = CONFIG_TYPE_INT64;
+    else if ((1 == sscanf(value.c_str(), "%I64XL%n", &val, &n) && n == len)
+      || (1 == sscanf(value.c_str(), "%I64xL%n", &val, &n) && n == len))
+    {
+      type = CONFIG_TYPE_INT64;
+      format = CONFIG_FORMAT_HEX;
+    }
+    else if (1 == sscanf(value.c_str(), "%ld%n", &val, &n) && n == len)
+      type = CONFIG_TYPE_INT;
+    else if ((1 == sscanf(value.c_str(), "%lX%n", &val, &n) && n == len)
+      || (1 == sscanf(value.c_str(), "%lx%n", &val, &n) && n == len))
+    {
+      type = CONFIG_TYPE_INT;
+      format = CONFIG_FORMAT_HEX;
+    }
+    else if (1 == sscanf(value.c_str(), "%lg%n", &val, &n) && n == len)
+      type = CONFIG_TYPE_FLOAT;
+    else if (ParseBool(value.c_str(), (bool*)&val))
+      type = CONFIG_TYPE_BOOL;
+    else
+      type = CONFIG_TYPE_STRING;
+
+    if (config_setting_type(setting) != type)
+    {
+      config_setting_t* parent = config_setting_parent(setting);
+      const char* sname = config_setting_name(setting);
+      setting->name = 0;
+      config_setting_remove(parent, sname);
+      setting = config_setting_add(parent, sname, type);
+      free((void*)sname);
+    }
+
+    switch (type)
+    {
+    case CONFIG_TYPE_INT:
+      config_setting_set_int(setting, val.ival);
+      config_setting_set_format(setting, format);
+      break;
+    case CONFIG_TYPE_BOOL:
+      config_setting_set_bool(setting, val.ival);
+      break;
+    case CONFIG_TYPE_INT64:
+      config_setting_set_int64(setting, val.llval);
+      config_setting_set_format(setting, format);
+      break;
+    case CONFIG_TYPE_FLOAT:
+      config_setting_set_float(setting, val.fval);
+      break;
+    case CONFIG_TYPE_STRING:
+      config_setting_set_string(setting, value.c_str());
+      break;
+    default:
+      LOGCRITICAL("Oops!");
+    };
+    return setting;
+  }
+  void ConfigExt::SetCfgValue(const std::string& path, const std::string& value, bool pathIsRooted)
   {
     if (path.length() == 0)
     {
@@ -346,7 +470,8 @@ searchStart:
       type = CONFIG_TYPE_STRING;
 
     //find/create setting
-    config_setting_t* setting = FindOrCreate(path, type);
+    string fpath = pathIsRooted ? path : MakeLongName(m_Context.Context(), path.c_str());
+    config_setting_t* setting = FindOrCreate(fpath, type);
     
     if (setting == 0) return;
 
@@ -354,11 +479,14 @@ searchStart:
     {
     case CONFIG_TYPE_INT:
       config_setting_set_int(setting, val.ival);
+      config_setting_set_format(setting, format);
+      break;
     case CONFIG_TYPE_BOOL:
       config_setting_set_bool(setting, val.ival);
       break;
     case CONFIG_TYPE_INT64:
       config_setting_set_int64(setting, val.llval);
+      config_setting_set_format(setting, format);
       break;
     case CONFIG_TYPE_FLOAT:
       config_setting_set_float(setting, val.fval);
@@ -374,19 +502,19 @@ searchStart:
       switch (type)
     {
     case CONFIG_TYPE_INT:
-      WRITELINE("Cfg option changed: %s = %d", path.c_str(), (int)ValueOf(path));
+      WRITELINE("Cfg option changed: %s = %d", fpath.c_str(), (int)ValueOf(path));
       break;
     case CONFIG_TYPE_BOOL:
-      WRITELINE("Cfg option changed: %s = %s", path.c_str(), (bool)ValueOf(path) ? "true" : "false");
+      WRITELINE("Cfg option changed: %s = %s", fpath.c_str(), (bool)ValueOf(path) ? "true" : "false");
       break;
     case CONFIG_TYPE_INT64:
-      WRITELINE("Cfg option changed: %s = %I64xL", path.c_str(), (__int64)ValueOf(path));
+      WRITELINE("Cfg option changed: %s = %I64xL", fpath.c_str(), (__int64)ValueOf(path));
       break;
     case CONFIG_TYPE_FLOAT:
-      WRITELINE("Cfg option changed: %s = %f", path.c_str(), (float)ValueOf(path));
+      WRITELINE("Cfg option changed: %s = %f", fpath.c_str(), (float)ValueOf(path));
       break;
     case CONFIG_TYPE_STRING:
-      WRITELINE("Cfg option changed: %s = %s", path.c_str(), (const char *)ValueOf(path));
+      WRITELINE("Cfg option changed: %s = %s", fpath.c_str(), (const char *)ValueOf(path));
       break;
     };
   }
@@ -400,6 +528,7 @@ searchStart:
     config_setting_t* setting = Root();
     do
     {
+      //get next path segment
       startPos = pos;
       pos = currentPath.find('.', startPos);
       if (pos != string::npos)
@@ -431,6 +560,7 @@ searchStart:
         }
         setting = nextSetting;
 
+        //get next path segment
         startPos = pos;
         pos = currentPath.find('.', startPos);
         if (pos != string::npos)
@@ -537,17 +667,5 @@ searchStart:
   {
     config_setting_t* setting = FindOrCreate(path, CONFIG_TYPE_STRING);
     config_setting_set_string(setting, value.c_str());
-  }
-
-  bool ConfigExt::HasValue(const char* settingName, const char* value, bool returnTrueIfNotDefined) const
-  {
-    config_setting_t *s = FindInContext(settingName);
-    if (s == 0)
-    {
-      //if (m_Replicate)
-        //m_Replicant->ReplicateSetting(MakeLongName(m_Context.Context(), settingName).c_str(), value);
-      return returnTrueIfNotDefined;
-    }
-    return strcmp((const char*)libconfig::Setting::wrapSetting(s), value) == 0;
   }
 }

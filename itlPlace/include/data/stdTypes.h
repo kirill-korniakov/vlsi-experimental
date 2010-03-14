@@ -23,6 +23,13 @@ public:
   typedef std::vector<T> vector;
 };
 
+typedef std::vector<int> IntVector;
+typedef std::vector<double> DblVector;
+typedef std::vector<int>::iterator IntIterator;
+typedef std::vector<int>::const_iterator IntCIterator;
+typedef std::vector<double>::iterator DblIterator;
+typedef std::vector<double>::const_iterator DblCIterator;
+
 #ifdef NOMINMAX
 
 template<typename T> 

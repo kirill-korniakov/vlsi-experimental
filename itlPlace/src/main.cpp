@@ -88,15 +88,23 @@ int main(int argc, char** argv)
   }
   catch(ParseException& ex)
   {
-    printf("Configuration error on line %d: %s\n", ex.getLine(), ex.getError());
+    GLOGCRITICAL(LOGINPLACE, "Configuration error on line %d: %s\n", ex.getLine(), ex.getError());
   }
-  catch(SettingNotFoundException nfex)
+  catch(SettingNotFoundException& nfex)
   {
-    printf("Configuration setting not found: %s\n", nfex.getPath());
+    GLOGCRITICAL(LOGINPLACE, "Configuration setting not found: %s\n", nfex.getPath());
+  }
+  catch(SettingTypeException& stex)
+  {
+    GLOGCRITICAL(LOGINPLACE, "Configuration satting has invalid type: %s\n", stex.getPath());
+  }
+  catch(SettingException& sex)
+  {
+    GLOGCRITICAL(LOGINPLACE, "Configuration setting error: %s\n", sex.getPath());
   }
   catch(ConfigException& cex)
   {
-    printf("Configuration exception!\n%s\n", cex.what());
+    GLOGCRITICAL(LOGINPLACE, "Configuration exception!\n%s\n", cex.what());
   }
 
   return 1;
