@@ -77,9 +77,11 @@ def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBefo
     workTimesADP = []
 
     for line in fh.readlines():
-        idx = line.find('Running itlPlace revision: ')
+        idx = line.find('Running locally modified itlPlace')
         if idx != -1:
-            svnRevision = line[idx + len('Running itlPlace revision: '):-1]
+            idx = line.find('Revision ') + len('Revision ')
+            svnRevision = line[idx:idx + 4]
+            print('svnRevision = ' + svnRevision)
         if isBeforeDP:
             idx = line.find('HPWL after legalization: ')
             if idx != -1:
