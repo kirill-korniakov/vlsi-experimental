@@ -374,10 +374,10 @@ void UpdateNetList(std::vector<ConnectionsVector>& currTableOfAdjacentNets, NetL
     netList[netIdx].clusterIdxs.resize(iter - netList[netIdx].clusterIdxs.begin());
 
     //clear net if it is totally inside cluster
-    if (netList[netIdx].clusterIdxs.size() == 1)
+    /*if (netList[netIdx].clusterIdxs.size() == 1)
     {
       netList[netIdx].clusterIdxs.clear();
-    }
+    }*/
   }
 }
 
@@ -514,27 +514,63 @@ void CalculateScores(HDesign& hd, ClusteringInformation& ci,
   }
 }
 
+NetList::iterator FindInVector(NetList::iterator start, 
+                               NetList::iterator end, 
+                               ClusteredNet item)
+{
+  NetList::iterator iter = start;
+  while (iter != end && !IsEqualNetListBinaryPredicate(*iter, item))
+  {
+    ++iter;
+  }
+  return iter;
+}
+
 void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
 {
-  NetList::iterator netListIterator;
+  // Points to where the unique vector ends (and the duplicating part starts)
+  NetList::iterator uniqueVecIter;
 
   sort(ci.netList.begin(), ci.netList.end(), PredicateNetListLess);
 
+  ALERT("NetList size before one cluster nets removing: %d", ci.netList.size());
+  //delete nets with less than 2 clusters
+  uniqueVecIter = ci.netList.begin();
+  while (uniqueVecIter->clusterIdxs.size() < 2) 
+    ++uniqueVecIter;
+  ci.netList.erase(ci.netList.begin(), uniqueVecIter);
+  ALERT("NetList size after  one cluster nets removing: %d", ci.netList.size());
+
   //delete duplicated nets
-  if (hd.cfg.ValueOf("Clustering.deleteDuplicatingNets", true))
+  if (hd.cfg.ValueOf(".Clustering.deleteDuplicatingNets", true))
   {
-    ALERT("NetList size before duplicates removing: %d", ci.netList.size());
-    netListIterator = unique(ci.netList.begin(), ci.netList.end(), IsEqualNetListBinaryPredicate);
-    ci.netList.resize(netListIterator - ci.netList.begin());
+    //ALERT("NetList size before duplicates removing: %d", ci.netList.size());
+    uniqueVecIter = unique(ci.netList.begin(), ci.netList.end(), 
+                           IsEqualNetListBinaryPredicate);
+    sort(uniqueVecIter, ci.netList.end(), PredicateNetListLess);
+    
+    NetList::iterator uniqueNetIter = ci.netList.begin();
+    NetList::iterator foundDuplicate;
+    for (NetList::iterator iter = uniqueVecIter; iter != ci.netList.end(); ++iter)
+    {
+    	foundDuplicate = FindInVector(uniqueNetIter, uniqueVecIter, *iter);
+      if (foundDuplicate != uniqueVecIter)
+      {
+        while (iter != ci.netList.end() && 
+               IsEqualNetListBinaryPredicate(*iter, *foundDuplicate))
+        {
+          foundDuplicate->weight += iter->weight - 1;
+          ++iter;
+        }
+        if (iter == ci.netList.end())
+          break;
+        uniqueNetIter = foundDuplicate;
+        ++uniqueNetIter;
+      } 
+    }
+    ci.netList.resize(uniqueVecIter - ci.netList.begin());
     ALERT("NetList size after duplicates removing: %d", ci.netList.size());
   }
-
-  //delete nets with less than 2 clusters
-  netListIterator = ci.netList.begin();
-  while (netListIterator->clusterIdxs.size() < 2) 
-    ++netListIterator;
-  ci.netList.erase(ci.netList.begin(), netListIterator);
-  ALERT("NetList size after one cluster nets removing: %d", ci.netList.size());
 }
 
 void EraseZeroScorePairs(std::list<MergeCandidate>& mergeCandidates)
@@ -607,7 +643,8 @@ void MergeClusters(HDesign& hd, ClusteringInformation& ci)
     if (ci.clusters[currClusterIdx].isValid && 
         IsMergedAreaAcceptable(ci, currClusterIdx, bestNeighborIdx, maxClusterArea)) 
     {//merge
-      MergePairOfClusters(currClusterIdx, bestNeighborIdx, ci.clusters, ci.netList, ci.tableOfAdjacentNets);
+      MergePairOfClusters(currClusterIdx, bestNeighborIdx, ci.clusters, 
+                          ci.netList, ci.tableOfAdjacentNets);
       mergedCount++;
 
       //save merge info to the log
@@ -669,7 +706,7 @@ void MarkClustersAsValid(ClusteringInformation& ci)
 
 string GetClusteringInformationFileName(HDesign& hd)
 {
-  string fileName = hd.cfg.ValueOf("Clustering.clusteringInformationLoadFileName");
+  string fileName = hd.cfg.ValueOf(".Clustering.clusteringInformationLoadFileName");
   if (fileName == "")
   {
     fileName = Aux::Format(".\\ClusteringInformation\\%s_%d.ci", hd.Circuit.Name().c_str(), hd.Cells.CellsCount());
