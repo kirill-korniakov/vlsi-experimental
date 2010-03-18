@@ -101,6 +101,9 @@ inline bool HDesign::CanDoTiming() const
 template<typename H>
 inline typename H::WrapperType operator, (H obj, HDesign& design) { return design[obj]; }
 
+template<typename H>
+inline typename H::WrapperType operator, (HDesign& design, H obj) { return design[obj]; }
+
 #include "HExternalMethods.h"
 
 #endif //__HIGH_DESIGN_H__

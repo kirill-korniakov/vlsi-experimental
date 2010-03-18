@@ -14,6 +14,8 @@ LayersModel GetActualLayersModel(HDesign& design)
     return LayersModel_OneDirection;
   case 2:
     return LayersModel_TwoDirections;
+  case 3:
+    return LayersModel_Hippocrate;
   default:
     GLOGERROR(LOGINPLACE, "Unsupported layers number: %d", design.cfg.ValueOf("Timing.RCE.LayersUsed", 2));
     return LayersModel_TwoDirections;

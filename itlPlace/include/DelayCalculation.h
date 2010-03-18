@@ -1,8 +1,9 @@
 #ifndef __DELAY_CALCULATION_H__
 #define __DELAY_CALCULATION_H__
 
-#include "HDesign.h"
 #include <math.h>
+#include "HDesign.h"
+#include "Utils.h"
 
 namespace DelayCalculationInternals
 {
@@ -114,6 +115,40 @@ namespace DelayCalculationInternals
           aPhysics.LinearC * l);
       aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint,
           aPhysics.RPerDist * l);
+    }
+  };
+
+  class HippocrateRCExtractor
+  {
+  public:
+    void CalculateWireExtractedRC(HDesign& aDesign, HSteinerPoint aFirstPoint, HSteinerPoint aSecondPoint) const
+    {
+      HWirePhysicalParams& aPhysics = aDesign.RoutingLayers.Physics;
+
+      if (!(aDesign,aFirstPoint).IsInternal())
+      {
+        HPin src = (aDesign,aFirstPoint).Pin();
+        if (((aDesign,src).Net(),aDesign).Source() == src)//net source detected :)
+        {
+          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, aPhysics.LinearC * Utils::CalcNetHPWL(aDesign, (aDesign,src).Net()));
+        }
+      }
+
+      if (!(aDesign,aSecondPoint).IsInternal())
+      {
+        HPin sink = (aDesign,aSecondPoint).Pin();
+        HPin src = ((aDesign,sink).Net(),aDesign).Source();
+        if (src != sink)//net sink detected :)
+        {
+          double l = abs((aDesign,sink).X() - (aDesign,src).X())
+            + abs((aDesign,sink).Y() - (aDesign,src).Y());
+
+          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint,
+            aPhysics.LinearC * l);
+          aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint,
+            aPhysics.RPerDist * l);
+        }
+      }
     }
   };
 
@@ -289,7 +324,8 @@ enum LayersModel
 {
   LayersModel_OneDirection,
   LayersModel_TwoDirections,
-  LayersModel_Lumped
+  LayersModel_Lumped,
+  LayersModel_Hippocrate
 };
 
 enum SignalModel
@@ -302,6 +338,32 @@ template<LayersModel lmodel, SignalModel smodel>
 inline void CalculateNetDelays(HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
 {
   This_method_should_not_be_instantiated;
+}
+
+template<>
+inline void CalculateNetDelays<LayersModel_Hippocrate, SignalModel_Universal>
+  (HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
+{
+  DelayCalculationInternals::CalcNetDelays(
+    design,
+    net,
+    ptContainer,
+    DelayCalculationInternals::HippocrateRCExtractor(),
+    DelayCalculationInternals::OneDirectionalDelaysCalculator()
+  );
+}
+
+template<>
+inline void CalculateNetDelays<LayersModel_Hippocrate, SignalModel_RiseFall>
+  (HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
+{
+  DelayCalculationInternals::CalcNetDelays(
+    design,
+    net,
+    ptContainer,
+    DelayCalculationInternals::HippocrateRCExtractor(),
+    DelayCalculationInternals::TwoDirectionalDelaysCalculator()
+  );
 }
 
 template<>
@@ -421,6 +483,11 @@ inline void CalculateWireDelays(HDesign& design, LayersModel lmodel, SignalModel
       CalculateWireDelays<LayersModel_Lumped, SignalModel_Universal>(design);
     else
       CalculateWireDelays<LayersModel_Lumped, SignalModel_RiseFall>(design);
+  else if (lmodel == LayersModel_Hippocrate)
+    if (smodel == SignalModel_Universal)
+      CalculateWireDelays<LayersModel_Hippocrate, SignalModel_Universal>(design);
+    else
+      CalculateWireDelays<LayersModel_Hippocrate, SignalModel_RiseFall>(design);
   else
   {
     LOGCRITICAL("Unsupported Layers Model");

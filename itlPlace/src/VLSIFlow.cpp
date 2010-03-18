@@ -257,6 +257,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
     if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
       WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
+
+    DoSTAIfCan(hd);
   }
 
   //EXPORT
