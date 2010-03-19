@@ -49,8 +49,9 @@ struct MergedCluster
   size_t nCellsInCluster1;
 };
 
-struct ClusteredNet
+class ClusteredNet
 {
+public:
   std::vector<int> clusterIdxs;
   
   double weight;
@@ -59,6 +60,14 @@ struct ClusteredNet
   ClusteredNet()
   {
     weight = 1.0;
+    k      = 1;
+  }
+  ClusteredNet& operator=(const ClusteredNet& cn)
+  {
+    this->weight      = cn.weight;
+    this->k           = cn.k;
+    this->clusterIdxs = cn.clusterIdxs;
+    return *this;
   }
 };
 

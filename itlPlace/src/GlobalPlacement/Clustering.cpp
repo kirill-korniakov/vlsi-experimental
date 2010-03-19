@@ -526,49 +526,68 @@ NetList::iterator FindInVector(NetList::iterator start,
   return iter;
 }
 
+void Swap(NetList::iterator i1, NetList::iterator i2)
+{
+  ClusteredNet tmp;
+  tmp = *i1;
+  *i1 = *i2;
+  *i2 = tmp;
+}
+
 void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
 {
   // Points to where the unique vector ends (and the duplicating part starts)
-  NetList::iterator uniqueVecIter;
+  NetList::iterator netListIter;
+  string aggregationMethod = hd.cfg.ValueOf(".NetWeighting.APlace.aggregationMethod", "max");
 
   sort(ci.netList.begin(), ci.netList.end(), PredicateNetListLess);
-
   ALERT("NetList size before one cluster nets removing: %d", ci.netList.size());
   //delete nets with less than 2 clusters
-  uniqueVecIter = ci.netList.begin();
-  while (uniqueVecIter->clusterIdxs.size() < 2) 
-    ++uniqueVecIter;
-  ci.netList.erase(ci.netList.begin(), uniqueVecIter);
+  netListIter = ci.netList.begin();
+  while (netListIter->clusterIdxs.size() < 2) 
+    ++netListIter;
+  ci.netList.erase(ci.netList.begin(), netListIter);
   ALERT("NetList size after  one cluster nets removing: %d", ci.netList.size());
 
   //delete duplicated nets
   if (hd.cfg.ValueOf(".Clustering.deleteDuplicatingNets", true))
   {
-    //ALERT("NetList size before duplicates removing: %d", ci.netList.size());
-    uniqueVecIter = unique(ci.netList.begin(), ci.netList.end(), 
-                           IsEqualNetListBinaryPredicate);
-    sort(uniqueVecIter, ci.netList.end(), PredicateNetListLess);
-    
-    NetList::iterator uniqueNetIter = ci.netList.begin();
-    NetList::iterator foundDuplicate;
-    for (NetList::iterator iter = uniqueVecIter; iter != ci.netList.end(); ++iter)
+    // This will point to the last element of unique part of the vector
+    NetList::iterator lastUniqueIdx = ci.netList.begin();
+    if (aggregationMethod == "sum")
     {
-    	foundDuplicate = FindInVector(uniqueNetIter, uniqueVecIter, *iter);
-      if (foundDuplicate != uniqueVecIter)
+      for (netListIter = ci.netList.begin(); netListIter != ci.netList.end(); ++netListIter)
       {
-        while (iter != ci.netList.end() && 
-               IsEqualNetListBinaryPredicate(*iter, *foundDuplicate))
+        while (netListIter != ci.netList.end() && 
+               IsEqualNetListBinaryPredicate(*netListIter, *lastUniqueIdx))
         {
-          foundDuplicate->weight += iter->weight - 1;
-          ++iter;
+          lastUniqueIdx->weight += netListIter->weight - 1;
+          ++netListIter;
         }
-        if (iter == ci.netList.end())
+        if (netListIter != ci.netList.end())
+        {
+          Swap(++lastUniqueIdx, netListIter);
+        } else
           break;
-        uniqueNetIter = foundDuplicate;
-        ++uniqueNetIter;
-      } 
+      }
+      /* Now lastUniqueIdx points to the last unique value, for instance for vector<int>
+         was:
+         4 5 5 5 5 5 5 6 7 7 7 7 7 9 9 9 9
+         now:
+         4 5 6 7 9 5 5 5 5 7 7 7 7 5 9 9 9
+                 ^
+                 |
+           lastUniqueIdx
+         so we need to increment it
+      */
+      ++lastUniqueIdx;
+    } else
+      /* In this case the net with maximum weight will be inherited */
+    {
+      lastUniqueIdx = unique(ci.netList.begin(), ci.netList.end(),
+                             IsEqualNetListBinaryPredicate);
     }
-    ci.netList.resize(uniqueVecIter - ci.netList.begin());
+    ci.netList.resize(lastUniqueIdx - ci.netList.begin());
     ALERT("NetList size after duplicates removing: %d", ci.netList.size());
   }
 }

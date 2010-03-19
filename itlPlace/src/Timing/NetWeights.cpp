@@ -219,7 +219,7 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   ExportDEF(hd, defFileName);
   ReportTNSWNSSequence(hd, tnsStr, wnsStr);
 
-  if (nCyclesCounter+1 == nLoops)
+  if (nCyclesCounter == nLoops)
   {
     ALERT("The specified number of net weights iterations (%d) is performed", nLoops);
     return;
