@@ -566,7 +566,7 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
         }
         if (netListIter != ci.netList.end())
         {
-          Swap(++lastUniqueIdx, netListIter);
+          *(++lastUniqueIdx) = *netListIter;
         } else
           break;
       }
@@ -574,7 +574,7 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
          was:
          4 5 5 5 5 5 5 6 7 7 7 7 7 9 9 9 9
          now:
-         4 5 6 7 9 5 5 5 5 7 7 7 7 5 9 9 9
+         4 5 6 7 9 5 5 6 7 7 7 7 7 9 9 9 9
                  ^
                  |
            lastUniqueIdx
