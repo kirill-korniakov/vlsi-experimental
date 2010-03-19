@@ -434,7 +434,7 @@ class DistributionBuilder(QtGui.QWidget):
         if self.cbRebuild.checkState() == 2:
             self.Build()
         if self.cbISPD04.checkState() == 2:
-            subprocess.call([binDir + "rar.exe", "x", "-u", "ISPD04.rar"], cwd = binDir)
+            subprocess.call([binDir + "UnRar.exe", "x", "-u", "ISPD04.rar"], cwd = binDir)
             self.RunTestsOnCfgList(ispd04)
         if self.cbIWLS05.checkState() == 2:
             self.RunTestsOnCfgList(iwls05)
