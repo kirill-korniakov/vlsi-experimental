@@ -554,8 +554,9 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
   {
     // This will point to the last element of unique part of the vector
     NetList::iterator lastUniqueIdx = ci.netList.begin();
-    if (aggregationMethod == "sum")
+    if (aggregationMethod == "sum-1")
     {
+      ALERT("Aggregation method for net weights inheritance is SUM-1");
       for (netListIter = ci.netList.begin(); netListIter != ci.netList.end(); ++netListIter)
       {
         while (netListIter != ci.netList.end() && 
@@ -581,9 +582,38 @@ void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
          so we need to increment it
       */
       ++lastUniqueIdx;
+    } else if (aggregationMethod == "sum")
+    {
+      ALERT("Aggregation method for net weights inheritance is SUM");
+      for (netListIter = ci.netList.begin(); netListIter != ci.netList.end(); ++netListIter)
+      {
+        while (netListIter != ci.netList.end() && 
+               IsEqualNetListBinaryPredicate(*netListIter, *lastUniqueIdx))
+        {
+          lastUniqueIdx->weight += netListIter->weight;
+          ++netListIter;
+        }
+        if (netListIter != ci.netList.end())
+        {
+          *(++lastUniqueIdx) = *netListIter;
+        } else
+          break;
+      }
+      /* Now lastUniqueIdx points to the last unique value, for instance for vector<int>
+         was:
+         4 5 5 5 5 5 5 6 7 7 7 7 7 9 9 9 9
+         now:
+         4 5 6 7 9 5 5 6 7 7 7 7 7 9 9 9 9
+                 ^
+                 |
+           lastUniqueIdx
+         so we need to increment it
+      */
+      ++lastUniqueIdx;
     } else
       /* In this case the net with maximum weight will be inherited */
     {
+      ALERT("Aggregation method for net weights inheritance is MAX");
       lastUniqueIdx = unique(ci.netList.begin(), ci.netList.end(),
                              IsEqualNetListBinaryPredicate);
     }

@@ -546,13 +546,35 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   TAO_APPLICATION taoapp;     // TAO application context
   int             retCode;    // used to check for functions returning nonzero
 
+  NetList::iterator netListIter;
+  int i;
+
   //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
+  /*for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
+  {
+    ALERT("%f", netListIter->weight);
+  }
+  ALERT("");*/
   context.Initialize(hd, ci);
+  /*for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
+  {
+    ALERT("%f", netListIter->weight);
+  }
+  ALERT("");*/
   retCode = InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp); CHKERRQ(retCode);
   ReportIterationInfo(ci, context);
   ReportBinGridInfo(context);
 
   //SOLVE THE PROBLEM
+  FILE* resultFile = fopen("Before relax", "a");
+  for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
+  {
+    //ALERT("%f", netListIter->weight);
+    fprintf(resultFile, "%f\n", netListIter->weight);
+  }
+  fprintf(resultFile, "END\n");
+  fclose(resultFile);
+
   retCode = Solve(hd, ci, context, taoapp, tao, x, metaIteration); CHKERRQ(retCode);
   ReportTimes();
 

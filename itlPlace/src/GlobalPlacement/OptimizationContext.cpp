@@ -21,7 +21,6 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
     else
       clusterIdx2solutionIdxLUT[i] = -1;
   }
-
   //x,y,ki
   int nVariables = 2 * ci->mCurrentNumberOfClusters + ci->netList.size();
 
@@ -35,7 +34,7 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
 
   netListSizes = new int[ci->netList.size()];
   CalculateNetListSizes(ci->netList, netListSizes);
-
+  
   useNetWeights         = ahd.cfg.ValueOf("NetWeighting.useNetWeights", false);
   useLogSumExp          = ahd.cfg.ValueOf("GlobalPlacement.useLogSumExp", false);
   useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);

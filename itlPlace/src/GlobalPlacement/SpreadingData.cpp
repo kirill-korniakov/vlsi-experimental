@@ -124,15 +124,15 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     context.spreadingData.totalCellArea / binGrid.nBins;
 
   //if (useNetWeights)
-  {
-    int nNets = context.ci->netList.size();//hd.Nets.Count();
-    HNets::ActiveNetsEnumeratorW netW = hd.Nets.GetActiveNetsEnumeratorW();
+  //{
+  //  int nNets = context.ci->netList.size();//hd.Nets.Count();
+  //  HNets::ActiveNetsEnumeratorW netW = hd.Nets.GetActiveNetsEnumeratorW();
 
-    for (int i = 0; i < nNets && netW.MoveNext(); ++i)
-    {
-      context.ci->netList[i].weight = netW.Weight();
-    }
-  }
+  //  for (int i = 0; i < nNets && netW.MoveNext(); ++i)
+  //  {
+  //    context.ci->netList[i].weight = netW.Weight();
+  //  }
+  //}
   if (context.useLRSpreading)
   {
     context.borderPenaltyVal    = 0.0;
