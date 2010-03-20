@@ -1,3 +1,5 @@
+#include <list>
+#include "Auxiliary.h"
 #ifdef WIN32
 
 #pragma warning(disable:4311 4312 4018)
@@ -5,10 +7,6 @@
 #include <windows.h>
 #include "psapi.h"
 #include <tlhelp32.h>
-#include <list>
-
-#include "Auxiliary.h"
-
 
 static DWORD adr_WriteFile;
 static HANDLE logFile = INVALID_HANDLE_VALUE;

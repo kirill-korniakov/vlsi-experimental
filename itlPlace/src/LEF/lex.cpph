@@ -22,7 +22,7 @@
 #include "lefiDebug.hpp"
 #include "lefrReader.hpp"
 #include "lefrCallBacks.hpp"
-#ifdef WIN32
+#ifdef _WIN32
 #   include <direct.h>
 #else /* not WIN32 */
 #   include <unistd.h>
@@ -82,7 +82,7 @@ extern int lefiDeltaNumberLines;
 
 /************Some simple file reading routines since ungetc() proves ****/
 /************to be quite slow, and we don't need multiple chars of pushback */
-#ifndef WIN32
+#ifndef _WIN32
 #   include <unistd.h>
 #endif
 

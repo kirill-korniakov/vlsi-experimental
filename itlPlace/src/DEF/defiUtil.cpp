@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef WIN32
+#ifdef _WIN32
 #   include <time.h>
 #else /* not WIN32 */
 #   include <sys/time.h>

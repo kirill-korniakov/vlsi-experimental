@@ -22,7 +22,7 @@
 #include <ctype.h>
 #include "lex.h"
 #include "defrCallBacks.hpp"
-#ifdef WIN32
+#ifdef _WIN32
 #   include <direct.h>
 #else /* not WIN32 */
 #   include <unistd.h>
@@ -81,7 +81,7 @@ extern char* defkywd(int num);
 
 /************Some simple file reading routines since ungetc() proves ****/
 /************to be quite slow, and we don't need multiple chars of pushback */
-#ifndef WIN32
+#ifndef _WIN32
 #   include <unistd.h>
 #endif
 

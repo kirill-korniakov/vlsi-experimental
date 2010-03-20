@@ -166,7 +166,7 @@ lef_make_stringtab(enum table_alloc we_alloc, const char *comment,
     htab->nleft = 0;		// and no bytes left
     htab->alloc = we_alloc;
     if (ignore_case == TABLE_IGNORE_CASE) {
-#ifdef WIN32
+#ifdef _WIN32
 	htab->cmp_fn = ( int (*)(const char *, const char *)) lefcasecmp;
 #else
 #ifdef NOSTRCASECMP

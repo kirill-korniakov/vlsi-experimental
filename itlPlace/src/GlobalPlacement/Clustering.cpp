@@ -758,14 +758,10 @@ string GetClusteringInformationFileName(HDesign& hd)
   string fileName = hd.cfg.ValueOf(".Clustering.clusteringInformationLoadFileName");
   if (fileName == "")
   {
-    fileName = Aux::Format(".\\ClusteringInformation\\%s_%d.ci", hd.Circuit.Name().c_str(), hd.Cells.CellsCount());
-    if (!Aux::FileExists(fileName))
-    {
-      string fileNameOld = ".\\ClusteringInformation\\" + hd.Circuit.Name() + ".ci";
-      if (Aux::FileExists(fileNameOld))// TODO: remove from future versions
-        if (0 != rename(fileNameOld.c_str(), fileName.c_str()))
-          fileName = fileNameOld;
-    }
+    fileName = Aux::Format(".\\ClusteringInformation\\%s_%s_%d.ci",
+      (const char*)hd.cfg.ValueOf("params.techname", "IWLS"),
+      hd.Circuit.Name().c_str(),
+      hd.Cells.CellsCount());
   }
   return fileName;
 }

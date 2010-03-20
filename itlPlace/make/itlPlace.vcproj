@@ -11,6 +11,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -553,6 +556,551 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO;..\include\3dParty"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				EnablePREfast="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctaod.lib GlobExpSolver.lib"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN64;_WIN64;NOMINMAX"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="2"
+				WarnAsError="false"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctao.lib GlobExpSolver.lib"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="release_gotoblas|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctao_goto.lib GlobExpSolver.lib"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="release_mpich2|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctao_mpich2.lib GlobExpSolver.lib &quot;C:\Program Files\MPICH2\lib\mpi.lib&quot;"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="debug_mpich2|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				EnablePREfast="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctaod_mpich2.lib GlobExpSolver.lib &quot;C:\Program Files\MPICH2\lib\mpi.lib&quot;"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="release_mpich2_gotoblas|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				Description="Getting revision number"
+				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;&quot;C:\Program Files\MPICH2\include&quot;;..\include\TAO"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				OpenMP="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="2"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="psapi.lib cv.lib cxcore.lib highgui.lib petsctao_goto_mpich2.lib GlobExpSolver.lib &quot;C:\Program Files\MPICH2\lib\mpi.lib&quot;"
+				OutputFile="..\bin\$(ProjectName)$(ConfigurationName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
+				FixedBaseAddress="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -891,6 +1439,54 @@
 								Name="VCCLCompilerTool"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Routing\FLUTE\flute.h"
@@ -937,6 +1533,54 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							ExcludedFromBuild="true"
 							>
 							<Tool
@@ -1251,6 +1895,54 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\config\grammar.c"
@@ -1297,6 +1989,54 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1355,6 +2095,54 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\config\libconfigcpp.cc"
@@ -1407,6 +2195,54 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\config\scanner.c"
@@ -1453,6 +2289,54 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1521,6 +2405,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\def_keywords.cpp"
@@ -1572,6 +2510,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1637,6 +2629,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiAssertion.cpp"
@@ -1688,6 +2734,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1753,6 +2853,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiComponent.cpp"
@@ -1804,6 +2958,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1869,6 +3077,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiFill.cpp"
@@ -1920,6 +3182,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1985,6 +3301,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiGroup.cpp"
@@ -2036,6 +3406,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2101,6 +3525,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiMisc.cpp"
@@ -2152,6 +3630,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2217,6 +3749,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiNonDefault.cpp"
@@ -2268,6 +3854,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2333,6 +3973,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiPath.cpp"
@@ -2384,6 +4078,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2449,6 +4197,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiPinProp.cpp"
@@ -2500,6 +4302,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2565,6 +4421,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiPropType.cpp"
@@ -2616,6 +4526,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2681,6 +4645,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiRowTrack.cpp"
@@ -2732,6 +4750,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2797,6 +4869,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiSite.cpp"
@@ -2848,6 +4974,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2913,6 +5093,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiTimingDisable.cpp"
@@ -2964,6 +5198,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3029,6 +5317,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defiVia.cpp"
@@ -3080,6 +5422,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3145,6 +5541,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defwWriter.cpp"
@@ -3203,6 +5653,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\DEF\defwWriterCalls.cpp"
@@ -3254,6 +5758,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3322,6 +5880,72 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3401,6 +6025,72 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\DEF"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -3456,6 +6146,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3521,6 +6265,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\FEF_stringhash.cpp"
@@ -3572,6 +6370,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3637,6 +6489,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lef_keywords.cpp"
@@ -3688,6 +6594,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3753,6 +6713,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiCrossTalk.cpp"
@@ -3804,6 +6818,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3869,6 +6937,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiLayer.cpp"
@@ -3920,6 +7042,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -3985,6 +7161,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiMisc.cpp"
@@ -4036,6 +7266,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4101,6 +7385,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiProp.cpp"
@@ -4152,6 +7490,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4217,6 +7609,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiTBExt.cpp"
@@ -4268,6 +7714,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4333,6 +7833,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefiVia.cpp"
@@ -4384,6 +7938,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4449,6 +8057,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefrReader.cpp"
@@ -4500,6 +8162,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4565,6 +8281,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\LEF\lefwWriterCalls.cpp"
@@ -4616,6 +8386,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\LEF"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4685,6 +8509,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\group_lookup.c"
@@ -4736,6 +8614,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4801,6 +8733,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\liberty_parser.c"
@@ -4852,6 +8838,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -4917,6 +8957,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\libstrtab.c"
@@ -4968,6 +9062,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -5033,6 +9181,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\PI.c"
@@ -5084,6 +9286,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -5149,6 +9405,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\syntax_checks.c"
@@ -5200,6 +9510,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -5265,6 +9629,60 @@
 								WarningLevel="0"
 							/>
 						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\src\Liberty\token.c"
@@ -5316,6 +9734,60 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories="..\include\Liberty"
+								WarningLevel="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"

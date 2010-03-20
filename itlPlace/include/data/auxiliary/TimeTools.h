@@ -45,7 +45,7 @@ static inline cpuclock_t	get_cpuclock();		// get CPU clocks stamp
 	#endif
 	}
 
-#elif defined _WIN32
+#elif defined(_WIN32)
 
 	#include <windows.h>
 
@@ -62,6 +62,9 @@ static inline cpuclock_t	get_cpuclock();		// get CPU clocks stamp
 		return (usec_t)( ((double)counter / perf_freq) * 1000000.0 ); // convert to usec
 	}
 
+#if defined ( _AMD64_ ) && defined ( _MSC_VER )
+#pragma intrinsic(__rdtsc)
+#endif
 
 	static inline 
 	cpuclock_t	get_cpuclock()
@@ -81,6 +84,8 @@ static inline cpuclock_t	get_cpuclock();		// get CPU clocks stamp
 		}
 
 		return ( ( (cpuclock_t) hi << 32) | lo );
+  #elif defined ( _AMD64_ ) && defined ( _MSC_VER )
+    return ( ( cpuclock_t )__rdtsc() );
 	#else 
 		#error "unsuppoted platform by timing.h"
 	#endif	

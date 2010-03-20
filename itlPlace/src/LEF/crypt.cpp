@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef WIN32
+#ifdef _WIN32
 #   include <io.h>
 #else /* not WIN32 */
 #   include <unistd.h>
