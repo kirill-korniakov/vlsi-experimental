@@ -1,5 +1,10 @@
-import itlPlaceCoreFuctions
-from itlPlaceCoreFuctions import *
+
+
+##import sys
+##sys.path.append('.\CoreScripts')
+##import CoreFunctions
+##from CoreScripts.CoreFunctions import *
+
 
 ##import datetime
 ##from datetime import date

@@ -6,15 +6,16 @@ import datetime
 from datetime import date
 import time
 
-from itlPlaceEmail import send_mail
+from Emailer import *
+from SvnWorker import *
 
-import itlPlaceCoreFuctions
-from itlPlaceCoreFuctions import *
+import CoreFunctions
+from CoreFunctions import *
 
-import itlPlaceParameters
-from itlPlaceParameters import *
+import Parameters
+from Parameters import *
 
-class itlPlaceTestRunner:
+class TestRunner:
     svnRevision = ''
     parameters = TestRunnerParameters()
 
@@ -37,7 +38,7 @@ class itlPlaceTestRunner:
         workTimesADP = []
 
         for line in fh.readlines():
-            idx = line.find('http://svn.software.unn.ru/VLSI/CODE/trunk/itlPlace')
+            idx = line.find(GeneralParameters.repoPath)
             if idx != -1:
                 idx = line.find('Revision ') + len('Revision ')
                 svnRevision = line[idx:idx + 4]
@@ -134,27 +135,16 @@ class itlPlaceTestRunner:
         fh.close()
         return svnRevision
 
-    def Build(self):
+    def BuildSln(self, slnPath, mode = "Rebuild"):
         print('Building solution...')
         #args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
         #subprocess.Popen(subprocess.list2cmdline(args)).communicate()
-        subprocess.call(["BuildSolution.bat", "Rebuild"])
+        subprocess.call(["BuildSolution.bat", slnPath, mode])
 
-    def DeleteSources(self):
-        print('Deleting previous version of itlPlace...')
-        if os.path.exists('.\itlPlace'):
-            RemoveDir('.\itlPlace')
-        print('Done.')
-
-    def CheckOut(self):
-        rev = str(self.parameters.revision)
-        if rev == '':
-            print('Checking out HEAD revision')
-            cmdline = 'svn co ' + itlPlaceParameters.repoPath + '/itlPlace/ .\itlPlace'
-            subprocess.call(cmdline)
-        else :
-            self.setWindowTitle('Checking out revision ' + rev)
-            subprocess.call('svn co -r ' + rev + ' ' + itlPlaceParameters.repoPath + '/itlPlace/ .\itlPlace')
+##    def BuildSln(slnPath, mode = "Rebuild"):
+##        print('Building solution...')
+##        args = [Tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
+##        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
 
     def GetPythonOutput(self, setName, cfgName):
         (path, cfgFileName) = os.path.split(cfgName)
@@ -239,9 +229,9 @@ class itlPlaceTestRunner:
             self.PrepareAndSendMail(str(attachmentFiles), subject, text, attachmentFiles)
 
     def RunTestsOnCfgList(self, setName):
-        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(itlPlaceParameters.binDir + setName + 'cfg.list')
+        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(GeneralParameters.binDir + setName + 'cfg.list')
         #print(str(filesListInGroups))
-        if setName == itlPlaceParameters.iwls05:
+        if setName == GeneralParameters.iwls05:
             isDP = self.parameters.doIWLS05DP
             isBeforeDP = self.parameters.doIWLS05BeforeDP
         else:
@@ -256,7 +246,7 @@ class itlPlaceTestRunner:
             self.GroupAndSendFiles(filesListInGroups, setName, cfgNamesList, cfgCommentsList)
 
     def RunSet(self, setName, cfgName = '', cfgComment = '', isDP = True, isBeforeDP = True):
-        testSet, comments, fake = self.OpenFilesList(itlPlaceParameters.binDir + setName + ".list")
+        testSet, comments, fake = self.OpenFilesList(GeneralParameters.binDir + setName + ".list")
         defaultCfgName = setName + ".cfg"
         if cfgName == "":
             cfgName = defaultCfgName
@@ -266,7 +256,7 @@ class itlPlaceTestRunner:
         print("Performing tests on the following set of benchmarks: " + ", ".join(testSet))
 
         po = open(pythonOutput, 'w')
-        if setName == itlPlaceParameters.ispd04:
+        if setName == GeneralParameters.ispd04:
             printStr = ';'
             nColumnSets = 0
             if isBeforeDP:
@@ -301,25 +291,25 @@ class itlPlaceTestRunner:
         po.close()
 
         for benchmark in testSet:
-            logFileName = itlPlaceParameters.binDir + setName + "\\" + benchmark + ".log"
+            logFileName = GeneralParameters.binDir + setName + "\\" + benchmark + ".log"
             fPlacerOutput = open(logFileName, 'w');
 
-            params = [itlPlaceParameters.binDir + "itlPlaceRelease.exe", cfgName,
+            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", cfgName,
                       "--params.def=.\\" + setName + "\\" + benchmark + ".def"]
 
-            if setName == itlPlaceParameters.ispd04:
+            if setName == GeneralParameters.ispd04:
                 params.append("--params.lef=.\\" + setName + "\\" + benchmark + ".lef")
 
-            if setName == itlPlaceParameters.iwls05:
+            if setName == GeneralParameters.iwls05:
                 params.append("--DesignFlow.Timing=true")
 
             if not isDP:
                 params.append("--DesignFlow.DetailedPlacement=false")
 
-            subprocess.call(params, stdout = fPlacerOutput, cwd = itlPlaceParameters.binDir)
+            subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
-            self.svnRevision = self.ParseLog(logFileName, benchmark, pythonOutput, setName == itlPlaceParameters.iwls05, isDP, isBeforeDP)
+            self.svnRevision = self.ParseLog(logFileName, benchmark, pythonOutput, setName == Parameters.iwls05, isDP, isBeforeDP)
             #def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
 
         return pythonOutput
@@ -328,23 +318,41 @@ class itlPlaceTestRunner:
         cp = CoolPrinter()
 
         cp.CoolPrint('Start')
+
+        svn = SvnWorker()
+
         if self.parameters.doCheckout:
             cp.CoolPrint('Delete sources and Checkout')
-            self.DeleteSources()
-            self.CheckOut()
+            svn.DeleteSources(GeneralParameters.checkoutPath)
+            #TODO: implement non HEAD revision
+            svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
+
         if self.parameters.doBuild:
-            self.Build()
+            cp.CoolPrint('Build')
+            self.BuildSln(GeneralParameters.slnPath)
+
         if self.parameters.useISPD04:
-            archiver = itlPlaceParameters.binDir + itlPlaceParameters.UnRar
-            subprocess.call([archiver, "x", "-u", "ISPD04.rar"], cwd = itlPlaceParameters.binDir)
-            self.RunTestsOnCfgList(itlPlaceParameters.ispd04)
+            cp.CoolPrint('ISPD04 experiments')
+            if self.parameters.doISPD04Checkout:
+                #TODO: implement non HEAD revision
+                svn.CheckOut(RepoParameters.benchRepoPath, GeneralParameters.benchmarkCheckoutPath)
+                archiver = GeneralParameters.binDir + Tools.UnRar
+                subprocess.call([archiver, "x", "-y", "ISPD04.zip"], cwd = GeneralParameters.benchmarkCheckoutPath)
+            self.RunTestsOnCfgList(GeneralParameters.ispd04)
+
         if self.parameters.useIWLS05:
-            self.RunTestsOnCfgList(itlPlaceParameters.iwls05)
+            cp.CoolPrint('ISPD04 experiments')
+            if self.parameters.doISPD04Checkout:
+                #TODO: implement non HEAD revision
+                svn.CheckOut(RepoParameters.benchRepoPath, GeneralParameters.benchmarkCheckoutPath)
+                archiver = GeneralParameters.binDir + Tools.UnRar
+                subprocess.call([archiver, "x", "-y", "IWLS05.zip"], cwd = GeneralParameters.benchmarkCheckoutPath)
+            self.RunTestsOnCfgList(GeneralParameters.iwls05)
 
         cp.CoolPrint('Finish')
 
 def main():
-    testRunner = itlPlaceTestRunner()
+    testRunner = TestRunner()
     testRunner.RunAll()
 
 main()
