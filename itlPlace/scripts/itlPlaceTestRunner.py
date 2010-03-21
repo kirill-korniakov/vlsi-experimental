@@ -1,22 +1,24 @@
-class TestRunnerParameters:
-    doCheckout = False
-    doBuild    = False
+import subprocess
+import sys
+import os
 
-    useISPD04  = True
-    doISPD04BeforeDP = True
-    doISPD04DP = True
+import datetime
+from datetime import date
+import time
 
-    useIWLS05  = False
-    doIWLS05BeforeDP = True
-    doIWLS05DP = True
+from itlPlaceEmail import send_mail
 
-    revision = ''
+import itlPlaceCoreFuctions
+from itlPlaceCoreFuctions import *
+
+import itlPlaceParameters
+from itlPlaceParameters import *
 
 class itlPlaceTestRunner:
-
+    svnRevision = ''
     parameters = TestRunnerParameters()
 
-    def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
+    def ParseLog(self, logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
         fh = open(logName, 'r')
         po = open(pythonOutput, 'a')
         po.write('\n' + benchmark + ';')    # set the benchmark name
@@ -35,7 +37,7 @@ class itlPlaceTestRunner:
         workTimesADP = []
 
         for line in fh.readlines():
-            idx = line.find('Running locally modified itlPlace')
+            idx = line.find('http://svn.software.unn.ru/VLSI/CODE/trunk/itlPlace')
             if idx != -1:
                 idx = line.find('Revision ') + len('Revision ')
                 svnRevision = line[idx:idx + 4]
@@ -221,20 +223,7 @@ class itlPlaceTestRunner:
             0)          # TTLS
         print('Success!')
 
-    def RunTestsOnCfgList(self, setName):
-        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(itlPlaceParameters.binDir + setName + 'cfg.list')
-        #print(str(filesListInGroups))
-        if (setName == itlPlaceParameters.iwls05):
-            isDP = self.parameters.doIWLS05DP
-            isBeforeDP = self.parameters.doIWLS05BeforeDP
-        else:
-            isDP = self.parameters.doISPD04DP
-            isBeforeDP = self.parameters.doISPD04BeforeDP
-
-        # Run all tests
-        for idx in range(0, len(cfgNamesList)):
-            outFileName = self.RunSet(setName, cfgNamesList[idx], cfgCommentsList[idx], isDP, isBeforeDP)
-
+    def GroupAndSendFiles(self, filesListInGroups, setName, cfgNamesList, cfgCommentsList):
         # Collect all output files, group and send via e-mail
         for groupOfFiles in filesListInGroups:
             attachmentFiles = list()
@@ -248,6 +237,23 @@ class itlPlaceTestRunner:
             text += 'svn rev. ' + self.svnRevision
             text += '\n\nThis is automatically generated mail. Please do not reply.'
             self.PrepareAndSendMail(str(attachmentFiles), subject, text, attachmentFiles)
+
+    def RunTestsOnCfgList(self, setName):
+        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(itlPlaceParameters.binDir + setName + 'cfg.list')
+        #print(str(filesListInGroups))
+        if setName == itlPlaceParameters.iwls05:
+            isDP = self.parameters.doIWLS05DP
+            isBeforeDP = self.parameters.doIWLS05BeforeDP
+        else:
+            isDP = self.parameters.doISPD04DP
+            isBeforeDP = self.parameters.doISPD04BeforeDP
+
+        # Run all tests
+        for idx in range(0, len(cfgNamesList)):
+            outFileName = self.RunSet(setName, cfgNamesList[idx], cfgCommentsList[idx], isDP, isBeforeDP)
+
+        if self.parameters.doSendMail:
+            self.GroupAndSendFiles(filesListInGroups, setName, cfgNamesList, cfgCommentsList)
 
     def RunSet(self, setName, cfgName = '', cfgComment = '', isDP = True, isBeforeDP = True):
         testSet, comments, fake = self.OpenFilesList(itlPlaceParameters.binDir + setName + ".list")
@@ -313,17 +319,17 @@ class itlPlaceTestRunner:
             subprocess.call(params, stdout = fPlacerOutput, cwd = itlPlaceParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
-            self.svnRevision = ParseLog(logFileName, benchmark, pythonOutput, setName == itlPlaceParameters.iwls05, isDP, isBeforeDP)
+            self.svnRevision = self.ParseLog(logFileName, benchmark, pythonOutput, setName == itlPlaceParameters.iwls05, isDP, isBeforeDP)
+            #def ParseLog(logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
 
         return pythonOutput
 
     def RunAll(self):
-        print('\n')
-        print('######################################################')
-        print('####### S T A R T ####################################')
-        print('######################################################')
-        print('\n')
+        cp = CoolPrinter()
+
+        cp.CoolPrint('Start')
         if self.parameters.doCheckout:
+            cp.CoolPrint('Delete sources and Checkout')
             self.DeleteSources()
             self.CheckOut()
         if self.parameters.doBuild:
@@ -335,12 +341,7 @@ class itlPlaceTestRunner:
         if self.parameters.useIWLS05:
             self.RunTestsOnCfgList(itlPlaceParameters.iwls05)
 
-        self.setWindowTitle(itlPlaceParameters.windowTitle)
-        print('\n')
-        print('######################################################')
-        print('####### F I N I S H ##################################')
-        print('######################################################')
-        print('\n')
+        cp.CoolPrint('Finish')
 
 def main():
     testRunner = itlPlaceTestRunner()

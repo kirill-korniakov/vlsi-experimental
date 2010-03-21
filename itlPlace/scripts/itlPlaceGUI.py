@@ -1,19 +1,13 @@
 import subprocess
 import sys
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import os
+
 import datetime
 from datetime import date
 import time
-import os
 
-from itlPlaceEmail import send_mail
-
-import itlPlaceParameters
-from itlPlaceParameters import *
-
-import itlPlaceCoreFuctions
-from itlPlaceCoreFuctions import *
+from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 import itlPlaceTestRunner
 from itlPlaceTestRunner import *
@@ -83,8 +77,6 @@ class DistributionBuilder(QtGui.QWidget):
 
         self.connect(btnMD, QtCore.SIGNAL('clicked()'), self.btnMDClicked)
         self.connect(self, QtCore.SIGNAL('closeEmitApp()'), QtCore.SLOT('close()') )
-
-        svnRevision = ''
 
     # the main function
     def btnMDClicked(self):

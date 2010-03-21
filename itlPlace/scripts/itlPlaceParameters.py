@@ -11,3 +11,18 @@ class itlPlaceParameters:
 	MSBuild  = "c:\\WINDOWS\\Microsoft.NET\\Framework\\v3.5\\MSBuild.exe"
 	UnRar = "UnRar.exe"
 
+class TestRunnerParameters:
+    doCheckout = False
+    doBuild    = False
+
+    useISPD04        = True
+    doISPD04BeforeDP = True
+    doISPD04DP       = True
+
+    useIWLS05        = True
+    doIWLS05BeforeDP = True
+    doIWLS05DP       = True
+
+    doSendMail = True
+
+    revision = ''

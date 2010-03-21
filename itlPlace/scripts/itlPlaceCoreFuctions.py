@@ -1,3 +1,25 @@
+import datetime
+from datetime import date
+import time
+
+class CoolPrinter:
+    startTime = 0
+
+    def __init__(self):
+        self.startTime = time.time()
+
+    def PrintWorkTime(self):
+        runTime = time.time() - self.startTime
+        print("RUNTIME %2.2i:%2.2i" % (int(runTime/60), int(runTime%60)))
+
+    def CoolPrint(self, message):
+        print('\n')
+        print('######################################################')
+        print('####### ' + message)
+        print('######################################################')
+        self.PrintWorkTime()
+        print('\n')
+
 def Absolutize(x):
     divisor = x[0]
     if divisor != 0.0:
