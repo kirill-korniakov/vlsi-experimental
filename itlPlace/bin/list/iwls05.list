@@ -1,0 +1,9 @@
+#s298
+#pci_spoci_ctrl
+b18
+b17
+b22
+b21
+ac97_ctrl
+tv80
+des_perf

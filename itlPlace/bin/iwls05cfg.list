@@ -1,2 +1,0 @@
-#Config_for_night_experiments_alt_weighting.cfg --A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. Full DP is executed after legalization. This implementation uses brand new net-weighting algorithm implemented by A. Belyakov.
-Config_for_night_experiments_aplace_weighting.cfg -- A testrun which consists of 9 weighted iterations utilizing so called weighted clustering. Full DP is executed after legalization. APlace weighting algorithm is used in this implementation.
