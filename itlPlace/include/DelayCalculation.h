@@ -125,15 +125,6 @@ namespace DelayCalculationInternals
     {
       HWirePhysicalParams& aPhysics = aDesign.RoutingLayers.Physics;
 
-      if (!(aDesign,aFirstPoint).IsInternal())
-      {
-        HPin src = (aDesign,aFirstPoint).Pin();
-        if (((aDesign,src).Net(),aDesign).Source() == src)//net source detected :)
-        {
-          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, aPhysics.LinearC * Utils::CalcNetHPWL(aDesign, (aDesign,src).Net()));
-        }
-      }
-
       if (!(aDesign,aSecondPoint).IsInternal())
       {
         HPin sink = (aDesign,aSecondPoint).Pin();
@@ -148,6 +139,20 @@ namespace DelayCalculationInternals
           aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint,
             aPhysics.RPerDist * l);
         }
+      }
+      else if (!(aDesign,aFirstPoint).IsInternal())
+      {
+        HPin src = (aDesign,aFirstPoint).Pin();
+        if (((aDesign,src).Net(),aDesign).Source() == src)//net source detected :)
+        {
+          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, aPhysics.LinearC * Utils::CalcNetHPWL(aDesign, (aDesign,src).Net()));
+          aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint, 0.0);
+        }
+      }
+      else
+      {
+        aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, 0.0);
+        aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint, 0.0);
       }
     }
   };
