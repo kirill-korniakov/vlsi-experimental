@@ -1657,6 +1657,14 @@
 					RelativePath="..\src\Buffering\VanGinneken2.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Buffering\VanGinnekenAlgorithm.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Buffering\VanGinnekenDate.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Data"
@@ -10245,6 +10253,14 @@
 				</File>
 				<File
 					RelativePath="..\include\Buffering\VanGinneken.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Buffering\VanGinnekenAlgorithm.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\Buffering\VanGinnekenData.h"
 					>
 				</File>
 				<File
