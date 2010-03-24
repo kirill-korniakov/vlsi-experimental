@@ -1,16 +1,15 @@
 class TestRunnerParameters:
+    svnRevision = ''
+
     doCheckout = False
     doBuild    = False
 
+    cfg = 'c:/Kornyakov/itlPlace/bin/cfg/hpwl_ispd04.cfg'
     useISPD04        = True
     doISPD04Checkout = True
     doISPD04BeforeDP = True
     doISPD04DP       = True
-    benchmarks = 'd:/Kornyakov/.VLSI/TRUNK/Benchmarks/ISPD04.list'
-
-    useIWLS05        = True
-    doIWLS05BeforeDP = True
-    doIWLS05DP       = True
+    benchmarks = 'c:/Kornyakov/Benchmarks/ISPD04/fast.list'
 
     doSendMail = True
     recipients = ['kirill.kornyakov@gmail.com']
@@ -20,8 +19,6 @@ class TestRunnerParameters:
     smtpuser   = ''
     smtppass   = ''
     sender     = 'VLSIMailerDaemon@gmail.com'
-
-    revision = ''
 
 class RepoParameters:
 	repoPath = 'http://svn.software.unn.ru/VLSI/CODE/trunk'

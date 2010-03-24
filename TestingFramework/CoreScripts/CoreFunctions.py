@@ -22,6 +22,9 @@ class CoolPrinter:
         self.PrintWorkTime()
         print('\n')
 
+def GetTimeStamp():
+    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
 def Absolutize(x):
     divisor = x[0]
     if divisor != 0.0:
