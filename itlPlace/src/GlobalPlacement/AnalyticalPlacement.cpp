@@ -630,7 +630,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
   PlacementQualityAnalyzer* QA = 0;
   if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
-    QA = new PlacementQualityAnalyzer(hd);
+    QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
+        PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricHPWLleg)));
     QA->AnalyzeQuality(0);
   }
 

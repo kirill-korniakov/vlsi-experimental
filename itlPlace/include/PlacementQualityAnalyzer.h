@@ -8,7 +8,24 @@
 class PlacementQualityAnalyzer
 {
 public:
-  PlacementQualityAnalyzer(HDesign& design);
+  enum QualityMetrics
+  {
+    MetricHPWL    = 0,
+    MetricHPWLleg = 1,
+    MetricTWL     = 2,
+    MetricTWLleg  = 3,
+    MetricTNS     = 4,
+    MetricTNSleg  = 5,
+    MetricWNS     = 6,
+    MetricWNSleg  = 7,
+    __MetricLast
+  };
+
+  static QualityMetrics GetMetric(const string& metric);
+  static const char* GetMetric(QualityMetrics metric);
+
+  PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod);
+  PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
   ~PlacementQualityAnalyzer();
 
   void AnalyzeQuality(int id, double improvementTreshold = 0.0);
@@ -51,12 +68,15 @@ private:
         && wns == q.wns && wns_legalized == q.wns_legalized;
     }
     bool operator != (const PlacementQuality& q) { return !(*this == q); }
+
+    double GetMetric(PlacementQualityAnalyzer::QualityMetrics qm);
   };
   typedef TemplateTypes<PlacementQuality>::list QualityList;
 
   HDPGrid* m_grid;
   HDesign& m_design;
   QualityList m_experiments;
+  QualityMetrics m_metric;
 
   int m_NumIterationsWithoutGain;
   PlacementQuality m_BestMetrics;

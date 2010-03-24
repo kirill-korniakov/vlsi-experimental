@@ -13,6 +13,7 @@
 #include "Parser.h"
 #include "Buffering.h"
 #include "Auxiliary.h"
+#include "PlacementQualityAnalyzer.h"
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
 {
@@ -178,39 +179,50 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 {
   //START MACROLOOP OF DESIGN
-  for (int i = 0; i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0); i++)
+  if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 0)
   {
-    if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false) && i > 0)
-      ImportNetWeights(hd, hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName"));
+    ConfigContext ctx = hd.cfg.OpenContext("MacroLoop");
+    PlacementQualityAnalyzer QA = PlacementQualityAnalyzer(hd, hd.cfg.ValueOf(".QAcriteria",
+        PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricTNSleg)));
 
-    if (DoRandomPlacementIfRequired(hd, "DesignFlow.LoopRandomPlacement"))
-      WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", Aux::Format("RND%d", i + 1));
-    if (DoGlobalPlacementIfRequired(hd, "DesignFlow.LoopGlobalPlacement"))
-      WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", Aux::Format("GP%d", i + 1));
-    if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.LoopLR"))
-      WriteFlowMetrics(flowMetrics, hd, "LRPlacement", Aux::Format("LR%d", i + 1));
-
-    HDPGrid DPGrid(hd);
-
-    if (DoLegalizationIfRequired(DPGrid, "DesignFlow.LoopLegalization"))
-      WriteFlowMetrics(flowMetrics, hd, "Legalization",  Aux::Format("LEG%d", i + 1));
-    if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.LoopDetailedPlacement"))
-      WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DP%d", i + 1));
-
-    DoSTAIfCan(hd);
-
-    if (hd.CanDoTiming() && Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
+    for (int i = 0; i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0); i++)
     {
-      ALERT("We have satisfied the timing constraints");
-      break;// Exit the main loop of the placement
+      if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false) && i > 0)
+        ImportNetWeights(hd, hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName"));
+
+      if (DoRandomPlacementIfRequired(hd, "DesignFlow.LoopRandomPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", Aux::Format("RND%d", i + 1));
+      if (DoGlobalPlacementIfRequired(hd, "DesignFlow.LoopGlobalPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", Aux::Format("GP%d", i + 1));
+      if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.LoopLR"))
+        WriteFlowMetrics(flowMetrics, hd, "LRPlacement", Aux::Format("LR%d", i + 1));
+
+      HDPGrid DPGrid(hd);
+
+      if (DoLegalizationIfRequired(DPGrid, "DesignFlow.LoopLegalization"))
+        WriteFlowMetrics(flowMetrics, hd, "Legalization",  Aux::Format("LEG%d", i + 1));
+      if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.LoopDetailedPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DP%d", i + 1));
+
+      DoSTAIfCan(hd);
+
+      if (hd.CanDoTiming() && Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
+      {
+        ALERT("We have satisfied the timing constraints");
+        break;// Exit the main loop of the placement
+      }
+
+      QA.AnalyzeQuality(i);//i must be zero based!
+
+      if (i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0))
+        UpdateNetWeightsIfRequired(hd, i);
     }
 
-    if (i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0))
-      UpdateNetWeightsIfRequired(hd, i);
+    QA.RestoreBestAchievedPlacement();
+    QA.Report();
   }
 
   //PLACEMENT
-
   if (DoRandomPlacementIfRequired(hd, "DesignFlow.RandomPlacement"))
     WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RND");
   if (DoGlobalPlacementIfRequired(hd, "DesignFlow.GlobalPlacement"))

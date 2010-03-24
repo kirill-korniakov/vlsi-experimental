@@ -18,11 +18,20 @@ void PlacementQualityAnalyzer::RestoreBestAchievedPlacement()
   m_experiments.push_back(m_BestMetrics);
 }
 
-PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design)
+PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod)
   : m_design(design), m_grid(0), m_experiments(), m_BestMetrics(),
   m_NumIterationsWithoutGain(0)
 {
   m_grid = new HDPGrid(m_design);
+  m_metric = GetMetric(GetMetric(qmethod));
+}
+
+PlacementQualityAnalyzer::PlacementQualityAnalyzer(HDesign& design, const string& qmethod)
+  : m_design(design), m_grid(0), m_experiments(), m_BestMetrics(),
+  m_NumIterationsWithoutGain(0)
+{
+  m_grid = new HDPGrid(m_design);
+  m_metric = GetMetric(qmethod);
 }
 
 PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
@@ -63,17 +72,28 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold
   m_experiments.push_back(pq);
 
   double improvement = GetLastIterationImprovement();
+
   ALERT("HPWL nonlegal  = %f", pq.hpwl);
   ALERT("HPWL Leg.      = %f", pq.hpwl_legalized);
-  if (m_BestMetrics.hpwl_legalized == 0.0)
+  if (m_design.CanDoTiming())
   {
-    ALERT("HPWL Leg. best = N/A");
-    ALERT("HPWL Leg. gain over best placement is N/A");
+    ALERT("%-14s = %f", GetMetric(MetricTWL), pq.GetMetric(MetricTWL));
+    ALERT("%-14s = %f", GetMetric(MetricTWLleg), pq.GetMetric(MetricTWLleg));
+    ALERT("%-14s = %f", GetMetric(MetricTNS), pq.GetMetric(MetricTNS));
+    ALERT("%-14s = %f", GetMetric(MetricTNSleg), pq.GetMetric(MetricTNSleg));
+    ALERT("%-14s = %f", GetMetric(MetricWNS), pq.GetMetric(MetricWNS));
+    ALERT("%-14s = %f", GetMetric(MetricWNSleg), pq.GetMetric(MetricWNSleg));
+  }
+
+  if (m_experiments.size() <= 1)
+  {
+    ALERT("%s best = N/A", GetMetric(m_metric));
+    ALERT("%s gain over best placement is N/A", GetMetric(m_metric));
   }
   else
   {
-    ALERT("HPWL Leg. best = %f", m_BestMetrics.hpwl_legalized);
-    ALERT("HPWL Leg. gain over the best placement is %.3f%%", improvement * 100.0);
+    ALERT("%s best = %f", GetMetric(m_metric), m_BestMetrics.GetMetric(m_metric));
+    ALERT("%s gain over the best placement is %.3f%%", GetMetric(m_metric), improvement * 100.0);
   }
 
   if (improvement >= 0.0)
@@ -90,8 +110,8 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold
 
 double PlacementQualityAnalyzer::GetLastIterationImprovement()
 {
-  if (!m_experiments.empty() && m_BestMetrics.hpwl_legalized != 0.0)
-    return 1.0 - m_experiments.back().hpwl_legalized / m_BestMetrics.hpwl_legalized;
+  if (!m_experiments.empty() && m_BestMetrics.GetMetric(m_metric) != 0.0)
+    return 1.0 - m_experiments.back().GetMetric(m_metric) / m_BestMetrics.GetMetric(m_metric);
   else
     return 1.0;
 }
@@ -168,7 +188,64 @@ void PlacementQualityAnalyzer::Report()
   }
 
   WRITELINE("");
-  //WRITELINE("Placement Quality Analysis Table:");
   tf.Print();
   WRITELINE("");
+}
+
+PlacementQualityAnalyzer::QualityMetrics PlacementQualityAnalyzer::GetMetric(const string& metric)
+{
+  for (int i = 0; i < PlacementQualityAnalyzer::__MetricLast; ++i)
+    if (metric == GetMetric((PlacementQualityAnalyzer::QualityMetrics)i))
+      return (PlacementQualityAnalyzer::QualityMetrics)i;
+  return PlacementQualityAnalyzer::MetricHPWLleg;
+}
+
+const char* PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::QualityMetrics metric)
+{
+  switch(metric)
+  {
+  case MetricHPWL:
+    return "HPWL";
+  case MetricHPWLleg:
+    return "HPWL leg.";
+  case MetricTWL:
+    return "TWL";
+  case MetricTWLleg:
+    return "TWL leg.";
+  case MetricTNS:
+    return "TNS";
+  case MetricTNSleg:
+    return "TNS leg.";
+  case MetricWNS:
+    return "WNS";
+  case MetricWNSleg:
+    return "WNS leg.";
+  default:
+    return GetMetric(PlacementQualityAnalyzer::MetricHPWLleg);
+  }
+}
+
+double PlacementQualityAnalyzer::PlacementQuality::GetMetric(PlacementQualityAnalyzer::QualityMetrics qm)
+{
+  switch(qm)
+  {
+  case MetricHPWL:
+    return this->hpwl;
+  case MetricHPWLleg:
+    return this->hpwl_legalized;
+  case MetricTWL:
+    return this->twl;
+  case MetricTWLleg:
+    return this->twl_legalized;
+  case MetricTNS:
+    return this->tns;
+  case MetricTNSleg:
+    return this->tns_legalized;
+  case MetricWNS:
+    return this->wns;
+  case MetricWNSleg:
+    return this->wns_legalized;
+  default:
+    return this->hpwl_legalized;
+  }
 }

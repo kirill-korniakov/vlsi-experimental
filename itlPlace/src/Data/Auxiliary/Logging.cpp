@@ -68,7 +68,7 @@ void SetConsoleTextColor(Color col)
 
 void RestoreConsoleColor()
 {
-  SetConsoleTextColor(15);
+  SetConsoleTextColor(7);
 }
 
 unsigned Logger::ms_ErrorCounter         = 0;
