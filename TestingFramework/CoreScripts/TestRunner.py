@@ -17,7 +17,10 @@ from Parameters import *
 
 class TestRunner:
     svnRevision = ''
-    parameters = TestRunnerParameters()
+    parameters = ''
+
+    def __init__(self, parameters = TestRunnerParameters()):
+        self.parameters = parameters
 
     def ParseLog(self, logName, benchmark, pythonOutput, isTimingUsed, isDP = True, isBeforeDP = True):
         fh = open(logName, 'r')
@@ -137,14 +140,10 @@ class TestRunner:
 
     def BuildSln(self, slnPath, mode = "Rebuild"):
         print('Building solution...')
+        subprocess.call(["BuildSolution.bat", slnPath, mode])
+        #TODO: try another option (next two lines), without bat-file
         #args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
         #subprocess.Popen(subprocess.list2cmdline(args)).communicate()
-        subprocess.call(["BuildSolution.bat", slnPath, mode])
-
-##    def BuildSln(slnPath, mode = "Rebuild"):
-##        print('Building solution...')
-##        args = [Tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
-##        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
 
     def GetPythonOutput(self, setName, cfgName):
         (path, cfgFileName) = os.path.split(cfgName)
@@ -157,8 +156,10 @@ class TestRunner:
         filesListInGroups = list(list())
         cfgCommentsList = []
         stringsList  = (open(listName).read()).split('\n')
-        # Perform filtering:
+
+        # Perform filtering of commented by # benchmarks
         stringsList = [x for x in stringsList if not x.strip().startswith('#')]
+
         for idx, str in enumerate(stringsList):
             str = str.expandtabs()
             if str.startswith(' '):
@@ -187,30 +188,24 @@ class TestRunner:
                     cfgCommentsList.append(splittedLine[1])
                 else:
                     cfgCommentsList.append('')
+
         return filesList, cfgCommentsList, filesListInGroups
 
     def PrepareAndSendMail(self, pythonOutput, subject, text, attachmentFiles):
         print("Sending mail with " + pythonOutput)
-        smtpserver = 'mail.unn.ru'
-        smtpuser = ''
-        smtppass = ''
-
-        RECIPIENTS = ['kirill.kornyakov@gmail.com']
-        #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
-        #RECIPIENTS = ['zhivoderov.a@gmail.com']
-        SENDER = 'VLSIMailerDaemon@gmail.com'
 
         send_mail(
-            SENDER,     # from
-            RECIPIENTS, # to
-            subject,    # subject
-            text,       # text
-            attachmentFiles,         # attachment files
-            smtpserver, # SMTP server
-            25,         # port
-            smtpuser,   # login
-            smtppass,   # password
-            0)          # TTLS
+            parameters.sender,     # from
+            parameters.recipients, # to
+            subject,               # subject
+            text,                  # text
+            attachmentFiles,       # attachment files
+            parameters.smtpserver, # SMTP server
+            25,                    # port
+            parameters.smtpuser,   # login
+            parameters.smtppass,   # password
+            0)                     # TTLS
+
         print('Success!')
 
     def GroupAndSendFiles(self, filesListInGroups, setName, cfgNamesList, cfgCommentsList):
@@ -229,7 +224,8 @@ class TestRunner:
             self.PrepareAndSendMail(str(attachmentFiles), subject, text, attachmentFiles)
 
     def RunTestsOnCfgList(self, setName):
-        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(GeneralParameters.binDir + setName + 'cfg.list')
+        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(self.parameters.benchmarks)
+
         #print(str(filesListInGroups))
         if setName == GeneralParameters.iwls05:
             isDP = self.parameters.doIWLS05DP
@@ -245,16 +241,7 @@ class TestRunner:
         if self.parameters.doSendMail:
             self.GroupAndSendFiles(filesListInGroups, setName, cfgNamesList, cfgCommentsList)
 
-    def RunSet(self, setName, cfgName = '', cfgComment = '', isDP = True, isBeforeDP = True):
-        testSet, comments, fake = self.OpenFilesList(GeneralParameters.binDir + setName + ".list")
-        defaultCfgName = setName + ".cfg"
-        if cfgName == "":
-            cfgName = defaultCfgName
-        isTimingPresent = False
-        pythonOutput = self.GetPythonOutput(setName, cfgName)
-        print('Config name = %s' % cfgName)
-        print("Performing tests on the following set of benchmarks: " + ", ".join(testSet))
-
+    def CreateEmptyTable(self, pythonOutput):
         po = open(pythonOutput, 'w')
         if setName == GeneralParameters.ispd04:
             printStr = ';'
@@ -290,6 +277,18 @@ class TestRunner:
             po.write(printStr)
         po.close()
 
+    def RunSet(self, setName, cfgName = '', cfgComment = '', isDP = True, isBeforeDP = True):
+        testSet, comments, fake = self.OpenFilesList(self.parameters.benchmarks)
+        defaultCfgName = setName + ".cfg"
+        if cfgName == "":
+            cfgName = defaultCfgName
+        isTimingPresent = False
+        pythonOutput = self.GetPythonOutput(setName, cfgName)
+        print('Config name = %s' % cfgName)
+        print("Performing tests on the following set of benchmarks: " + ", ".join(testSet))
+
+        self.CreateEmptyTable(pythonOutput)
+
         for benchmark in testSet:
             logFileName = GeneralParameters.binDir + setName + "\\" + benchmark + ".log"
             fPlacerOutput = open(logFileName, 'w');
@@ -316,10 +315,9 @@ class TestRunner:
 
     def RunAll(self):
         cp = CoolPrinter()
+        svn = SvnWorker()
 
         cp.CoolPrint('Start')
-
-        svn = SvnWorker()
 
         if self.parameters.doCheckout:
             cp.CoolPrint('Delete sources and Checkout')
@@ -333,21 +331,16 @@ class TestRunner:
 
         if self.parameters.useISPD04:
             cp.CoolPrint('ISPD04 experiments')
-            if self.parameters.doISPD04Checkout:
-                #TODO: implement non HEAD revision
-                svn.CheckOut(RepoParameters.benchRepoPath, GeneralParameters.benchmarkCheckoutPath)
-                archiver = GeneralParameters.binDir + Tools.UnRar
-                subprocess.call([archiver, "x", "-y", "ISPD04.zip"], cwd = GeneralParameters.benchmarkCheckoutPath)
             self.RunTestsOnCfgList(GeneralParameters.ispd04)
 
-        if self.parameters.useIWLS05:
-            cp.CoolPrint('ISPD04 experiments')
-            if self.parameters.doISPD04Checkout:
-                #TODO: implement non HEAD revision
-                svn.CheckOut(RepoParameters.benchRepoPath, GeneralParameters.benchmarkCheckoutPath)
-                archiver = GeneralParameters.binDir + Tools.UnRar
-                subprocess.call([archiver, "x", "-y", "IWLS05.zip"], cwd = GeneralParameters.benchmarkCheckoutPath)
-            self.RunTestsOnCfgList(GeneralParameters.iwls05)
+##        if self.parameters.useIWLS05:
+##            cp.CoolPrint('IWLS05 experiments')
+##            if self.parameters.doISPD04Checkout:
+##                #TODO: implement non HEAD revision
+##                svn.CheckOut(RepoParameters.benchRepoPath, GeneralParameters.benchmarkCheckoutPath)
+##                archiver = GeneralParameters.binDir + Tools.UnRar
+##                subprocess.call([archiver, "x", "-y", "IWLS05.zip"], cwd = GeneralParameters.benchmarkCheckoutPath)
+##            self.RunTestsOnCfgList(GeneralParameters.iwls05)
 
         cp.CoolPrint('Finish')
 

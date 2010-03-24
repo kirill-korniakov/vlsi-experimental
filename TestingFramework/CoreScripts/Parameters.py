@@ -6,12 +6,20 @@ class TestRunnerParameters:
     doISPD04Checkout = True
     doISPD04BeforeDP = True
     doISPD04DP       = True
+    benchmarks = 'd:/Kornyakov/.VLSI/TRUNK/Benchmarks/ISPD04.list'
 
     useIWLS05        = True
     doIWLS05BeforeDP = True
     doIWLS05DP       = True
 
     doSendMail = True
+    recipients = ['kirill.kornyakov@gmail.com']
+    #RECIPIENTS = ['itlab.vlsi@www.software.unn.ru']
+    #RECIPIENTS = ['zhivoderov.a@gmail.com']
+    smtpserver = 'mail.unn.ru'
+    smtpuser   = ''
+    smtppass   = ''
+    sender     = 'VLSIMailerDaemon@gmail.com'
 
     revision = ''
 
