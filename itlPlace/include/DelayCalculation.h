@@ -143,9 +143,14 @@ namespace DelayCalculationInternals
       else if (!(aDesign,aFirstPoint).IsInternal())
       {
         HPin src = (aDesign,aFirstPoint).Pin();
-        if (((aDesign,src).Net(),aDesign).Source() == src)//net source detected :)
+        HNetWrapper net = ((aDesign,src).Net(),aDesign);
+        if (net.Source() == src)//net source detected :)
         {
-          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, aPhysics.LinearC * Utils::CalcNetHPWL(aDesign, (aDesign,src).Net()));
+          double L = Utils::CalcNetHPWL(aDesign, net);
+          for (HNet::SinksEnumeratorW sink = net.GetSinksEnumeratorW(); sink.MoveNext(); )
+            L -= abs(aDesign.GetDouble<HPin::X>(src) - sink.X()) + abs(aDesign.GetDouble<HPin::Y>(src) - sink.Y());
+
+          aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint, L * aPhysics.LinearC);
           aDesign.Set<HSteinerPoint::ExtractedR>(aSecondPoint, 0.0);
         }
       }
@@ -156,7 +161,6 @@ namespace DelayCalculationInternals
       }
     }
   };
-
 
   class TwoDirectionalDelaysCalculator
   {
