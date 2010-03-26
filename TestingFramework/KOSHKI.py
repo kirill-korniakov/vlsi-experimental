@@ -2,12 +2,12 @@ import datetime
 from datetime import date
 import time
 
-print()
+#print()
 
 ##import sys
 ##sys.path.append('.\CoreScripts')
-##import CoreFunctions
-##from CoreScripts.CoreFunctions import *
+import CoreScripts.CoreFunctions
+from CoreScripts.CoreFunctions import *
 
 
 ##import datetime
@@ -42,4 +42,4 @@ def main():
     time.sleep(2)
     cp.CoolPrint("2")
 
-#main()
+main()

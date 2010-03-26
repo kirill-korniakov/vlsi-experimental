@@ -149,16 +149,15 @@ class TestRunner:
         os.mkdir(logFolder)
 
         for benchmark in benchmarks:
-            logFileName = logFolder + "\\" + benchmark + ".log" # + "\\" +
+            logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w');
 
-            defFile = "--params.def=" + os.path.dirname(benchmarksListPath) + "\\" + benchmark + ".def"
-            lefFile = "--params.lef=" + os.path.dirname(benchmarksListPath) + "\\" + benchmark + ".lef"
-            params = [GeneralParameters.binDir + "itlPlaceRelease.exe",
-                      cfgName, defFile, lefFile]
+            defFile = "--params.def=" + os.path.dirname(benchmarksListPath) + "/" + benchmark + ".def"
+            lefFile = "--params.lef=" + os.path.dirname(benchmarksListPath) + "/" + benchmark + ".lef"
+            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", cfgName, defFile, lefFile]
             #params.append()
 
-            #subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+            subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
             self.svnRevision = self.reporter.ParseLog(logFileName, benchmark, pythonOutput)
