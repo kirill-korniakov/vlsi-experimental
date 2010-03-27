@@ -1,6 +1,7 @@
 #include "HDesign.h"
 #include "Parser.h"
 #include "Utils.h"
+#include "Auxiliary.h"
 #include "SensitivityGuidedNetWeighting.h"
 #include <math.h>
 #include <string>
@@ -37,13 +38,9 @@ void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr)
 double D(double s, double T, double beta)
 {
   if (s < 0)
-  {
     return pow(1 - s / T, beta);
-  } 
   else
-  {
     return 1.0;
-  }
 }
 
 double FindMaxPathDelay(HDesign& hd)
@@ -55,16 +52,29 @@ double FindMaxPathDelay(HDesign& hd)
     HTimingPointWrapper tp = hd[hd[i.EndPoint()].TimingPoint()];
 
     if (maxPathDelay < tp.FallArrivalTime())
-    {
       maxPathDelay = tp.FallArrivalTime();
-    }
     if (maxPathDelay < tp.RiseArrivalTime())
-    {
       maxPathDelay = tp.RiseArrivalTime();
-    }
   }
 
   return maxPathDelay;
+}
+
+double ComputeSumOfWeights(HDesign& hd)
+{
+  double sum = 0.0;
+  for (HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW(); netW.MoveNext(); )
+    sum += netW.Weight();
+
+  return sum;
+}
+
+void NormalizeWeights(HDesign& hd)
+{
+  double sumOfWeights = ComputeSumOfWeights(hd);
+
+  for (HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW(); netW.MoveNext(); )
+    hd.Set<HNet::Weight>(netW, netW.Weight() * hd.Nets.Count() / sumOfWeights);
 }
 
 void ComputeNetWeights(HDesign& hd)
@@ -79,7 +89,8 @@ void ComputeNetWeights(HDesign& hd)
     double u    = hd.cfg.ValueOf("NetWeighting.APlace.u", 0.3);
     double beta = hd.cfg.ValueOf("NetWeighting.APlace.beta", 2.0);
     double T    = (1 - u) * maxPathDelay;
-    double sum  = 0.0;
+    double fatWeight;  // FallArrivalTime part of weight
+    double ratWeight;  // RiseArrivalTime part of weight
 
     for (HCriticalPaths::EnumeratorW critPathEnumW = hd.CriticalPaths.GetEnumeratorW(); critPathEnumW.MoveNext();)
     {
@@ -89,8 +100,11 @@ void ComputeNetWeights(HDesign& hd)
         HNetWrapper netW = hd[pin.Net()];
         HTimingPointWrapper tp = hd[hd[critPathEnumW.EndPoint()].TimingPoint()];
 
-        hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.FallArrivalTime(), T, beta) - 1));
-        hd.Set<HNet::Weight>(netW, netW.Weight() + 0.5 * (D(T - tp.RiseArrivalTime(), T, beta) - 1));
+        fatWeight = netW.Weight() + 0.5 * (D(T - tp.FallArrivalTime(), T, beta) - 1);
+        ratWeight = fatWeight     + 0.5 * (D(T - tp.RiseArrivalTime(), T, beta) - 1);
+        
+        hd.Set<HNet::Weight>(netW, fatWeight);
+        hd.Set<HNet::Weight>(netW, ratWeight);
         pointsEnumW.MoveNext();
       }
     }
@@ -100,23 +114,27 @@ void ComputeNetWeights(HDesign& hd)
     ALERT("Performing net-weighting algorithm designed and implemented by Alexander Belyakov");
     SensitivityGuidedNetWeighting(hd);
   }
+
+  if (hd.cfg.ValueOf("NetWeighting.normalize", false))
+  {
+    NormalizeWeights(hd);
+  }
 }
 
 void ExportNetWeights(HDesign& hd, const char* fileName)
 {
   FILE *netWeightsFile;
-  char currString[128];
 
   netWeightsFile = fopen(fileName, "w");
   if (netWeightsFile)
   {
-    ALERT("Exporting net-weights to %s", fileName);
+    ALERT("Exporting net-weights to .\\%s", fileName);
 
     for (HNets::NetsEnumeratorW netW = hd.Nets.GetFullEnumeratorW(); netW.MoveNext(); )
-    {
-      sprintf(currString, "%s\t%f\n", netW.Name().c_str(), netW.Weight());
-      fputs(currString, netWeightsFile);
-    }
+      fputs(Aux::Format("%s\t%f\n", 
+                        netW.Name().c_str(),
+                        netW.Weight()).c_str(), 
+            netWeightsFile);
 
     fclose(netWeightsFile);
   }
@@ -134,7 +152,7 @@ void ImportNetWeights(HDesign& hd, const char* fileName)
   netWeightsFile = fopen(fileName, "r");
   if (netWeightsFile)
   {
-    ALERT("Importing net-weights from %s", fileName);
+    ALERT("Importing net-weights from .\\%s", fileName);
 
     for (i = 1; i < nNetsEnd; ++i)
     {
@@ -154,14 +172,10 @@ int GetnIter(const char* nwtsFileName)
   char tmp[2];
 
   if (nwtsFileName == "")
-  {
     tmp[0] = '0';
-  } 
   else
-  {
     // We assume that we make not more than 9 iterations
     tmp[0] = nwtsFileName[strlen(nwtsFileName) - 6];
-  }
   tmp[1] = 0;
   
   return atoi(tmp);
@@ -186,13 +200,9 @@ void GetNewCommandLine(string& newCMD, const string& nwtsFileName, int argc, cha
   }
 
   if (argc == 1)
-  {
     newCMD += "default.cfg ";
-  }
   if (flagNW)
-  {
     newCMD += "--NetWeighting.netWeightsImportFileName=" + nwtsFileName;
-  }
   printf("new command line is %s\n", newCMD.c_str());
 }
 
@@ -205,14 +215,11 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   static string wnsStr = "";
 
   if (nLoops > 9)
-  {
     ALERT("The number of net weights iterations must be less than 10");
-  }
 
-  nCyclesCounter = GetnIter(hd.cfg.ValueOf("NetWeighting.netWeightsImportFileName", ""));
   ALERT("Current iteration of net weighting is %d", nCyclesCounter);
 
-  nwtsFileName = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter+1) + ".nwts";
+  nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
   defFileName  = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter) + ".def";
   ComputeNetWeights(hd);
   ExportNetWeights(hd, nwtsFileName.c_str());
