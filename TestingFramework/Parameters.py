@@ -1,13 +1,3 @@
-class EmailerParameters:
-    #recipients = ['itlab.vlsi@www.software.unn.ru']
-    #recipients = ['zhivoderov.a@gmail.com']
-    recipients = ['kirill.kornyakov@gmail.com']
-
-    smtpserver = 'mail.unn.ru'
-    smtpuser   = ''
-    smtppass   = ''
-    sender     = 'VLSIMailerDaemon@gmail.com'
-
 class TestRunnerParameters:
     doCheckout = False
     doBuild    = False
@@ -25,6 +15,16 @@ class GeneralParameters:
 	binDir  = checkoutPath + "bin/"
 	slnPath = checkoutPath + "make/itlPlace.sln"
 	benchmarkCheckoutPath = "../Benchmarks/"
+
+class EmailerParameters:
+    #recipients = ['itlab.vlsi@www.software.unn.ru']
+    #recipients = ['zhivoderov.a@gmail.com']
+    recipients = ['kirill.kornyakov@gmail.com']
+
+    smtpserver = 'mail.unn.ru'
+    smtpuser   = ''
+    smtppass   = ''
+    sender     = 'VLSIMailerDaemon@gmail.com'
 
 class Tools:
 	MSBuild  = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"

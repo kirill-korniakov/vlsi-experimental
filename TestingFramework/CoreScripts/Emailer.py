@@ -37,7 +37,6 @@ class Emailer:
             self.parameters.smtpuser,   # login
             self.parameters.smtppass,   # password
             0)                          # TTLS
-        print('Success!')
 
     def send_mail(self,
         sender,               # from e-mail address
@@ -85,7 +84,6 @@ class Emailer:
         s = msg.as_string()
         server.sendmail(sender, to, s)
         server.quit()
-
 
 def test():
     print("Send test mail")

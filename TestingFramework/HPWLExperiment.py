@@ -1,7 +1,3 @@
-import sys
-sys.path.append('CoreScripts')
-print(sys.path)
-
 import CoreScripts
 from CoreScripts import *
 
@@ -9,11 +5,6 @@ import Parameters
 from Parameters import *
 
 class HPWLExperiment(BaseExperiment):
-    def __init__(self):
-        self.name = 'ISPD04 experiment'
-        self.cfg = GeneralParameters.binDir + 'cfg/hpwl_ispd04.cfg'
-        self.benchmarks = GeneralParameters.benchmarkCheckoutPath + 'ISPD04.list'
-
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
         po.write('Benchmark;HPWL;Time')
@@ -54,7 +45,8 @@ class HPWLExperiment(BaseExperiment):
         return svnRevision
 
 def test():
-    e = HPWLExperiment()
+    #e = HPWLExperiment('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    e = HPWLExperiment('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05/fast.list')
 
     testRunner = TestRunner()
     testRunner.parameters.experiments.append(e)

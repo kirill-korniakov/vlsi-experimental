@@ -55,11 +55,9 @@ class TestRunner:
             fPlacerOutput = open(logFileName, 'w');
 
             defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"
-            lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
-            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg), defFile, lefFile]
+            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg), defFile]
             #params.append()
 
-            #FIXME: uncomment
             subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')

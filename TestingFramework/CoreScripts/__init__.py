@@ -1,3 +1,6 @@
+import sys
+sys.path.append('CoreScripts')
+
 import BaseExperiment
 from BaseExperiment import *
 
