@@ -186,7 +186,28 @@ void PlacementQualityAnalyzer::Report()
       tf.SetCell(col_wns_leg, i->wns_legalized);
     }
   }
+/*
+  //TODO: embed properly
+  //This code shows improvement in percents, but right now there are problems with formatting.
+  QualityList::iterator initial = m_experiments.begin();
 
+  for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
+  {
+	  tf.NewRow();
+	  tf.SetCell(col_id, i->id);
+	  tf.SetCell(col_hpwl, i->hpwl / initial->hpwl * 100);
+	  tf.SetCell(col_hpwl_leg, i->hpwl_legalized / initial->hpwl_legalized * 100);
+	  if (canDoTiming)
+	  {
+		  tf.SetCell(col_twl, i->twl / initial->twl * 100);
+		  tf.SetCell(col_twl_leg, i->twl_legalized / initial->twl_legalized * 100);
+		  tf.SetCell(col_tns, i->tns / initial->tns * 100);
+		  tf.SetCell(col_tns_leg, i->tns_legalized / initial->tns_legalized * 100);
+		  tf.SetCell(col_wns, i->wns / initial->wns * 100);
+		  tf.SetCell(col_wns_leg, i->wns_legalized / initial->wns_legalized * 100);
+	  }
+  }
+*/
   WRITELINE("");
   tf.Print();
   WRITELINE("");

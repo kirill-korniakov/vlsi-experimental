@@ -262,13 +262,22 @@ void TimingPointMus::UpdateMus(HDesign& design)
 
   double wns = Utils::WNS(design);
   double ns = 0.0;
+  double r;
+  double gamma = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.gamma", 0.0);
+  double theta = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.theta", 2.0);
   double factor;
 
   for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()]; 
        !::IsNull(sp.GoNext()); )
   {
     ns = sp.NegativeSlack();
-    factor = (ns / wns) * (ns / wns);
+    r = ns / wns * (1 - gamma);
+
+	if (r < 1.0)
+		factor = pow(r, theta);
+	else
+		factor = 2.0 - 1.0/pow(r, theta);
+
     for (int i = 0; i < GetMuInCount(sp); i++)
     {
       SetMuInA(sp, i, GetMuInA(sp, i) * factor);
