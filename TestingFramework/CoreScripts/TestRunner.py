@@ -6,9 +6,9 @@ import datetime
 from datetime import date
 import time
 
-from Emailer    import *
-from SvnWorker  import *
-from Reporter   import *
+from Emailer import *
+from SvnWorker import *
+from ReportCreator import *
 
 import CoreFunctions
 from CoreFunctions import *
@@ -19,110 +19,15 @@ from Parameters import *
 class TestRunner:
     svnRevision = ''
     parameters = ''
-    reporter = 0
 
     def __init__(self, parameters = TestRunnerParameters()):
         self.parameters = parameters
-        self.reporter = Reporter()
+        self.parameters.experiments = []
 
     def BuildSln(self, slnPath, mode = "Rebuild"):
         print('Building solution...')
-        subprocess.call(["BuildSolution.bat", slnPath, mode])
-        #TODO: try another option (next two lines), without bat-file
-        #args = [MSBuild, '.\itlPlace\make\itlPlace.sln', '/t:' + 'Rebuild', '/p:Configuration=Release']
-        #subprocess.Popen(subprocess.list2cmdline(args)).communicate()
-
-    def OpenFilesList(self, listName):
-        filesList = []
-        groupNames = []
-        group = []
-        filesListInGroups = list(list())
-        cfgCommentsList = []
-        stringsList  = (open(listName).read()).split('\n')
-
-        # Perform filtering of commented by # benchmarks
-        stringsList = [x for x in stringsList if not x.strip().startswith('#')]
-
-        for idx, str in enumerate(stringsList):
-            str = str.expandtabs()
-            if str.startswith(' '):
-                continue  # skip all cfg names in a group because they have already been processed
-            if str.endswith(':'):
-                groupNames.append(str)
-                idx += 1
-                if idx < len(stringsList):
-                    while stringsList[idx].expandtabs().startswith(' '):
-                        splittedLine = [piece.strip() for piece in stringsList[idx].split('--')]
-                        filesList.append(splittedLine[0])
-                        group.append(splittedLine[0])
-                        if len(splittedLine) > 1:
-                            cfgCommentsList.append(splittedLine[1])
-                        else:
-                            cfgCommentsList.append('')
-                        idx += 1
-                        if idx >= len(stringsList):
-                            break;
-                filesListInGroups.append(group)
-            else:
-                splittedLine = [piece.strip() for piece in str.split('--')]
-                filesList.append(splittedLine[0])
-                filesListInGroups.append([splittedLine[0]])
-                if len(splittedLine) > 1:
-                    cfgCommentsList.append(splittedLine[1])
-                else:
-                    cfgCommentsList.append('')
-
-        return filesList, cfgCommentsList, filesListInGroups
-
-    def PrepareAndSendMail(self, pythonOutput, subject, text, attachmentFiles):
-        print("Sending mail with " + pythonOutput)
-
-        send_mail(
-            parameters.sender,     # from
-            parameters.recipients, # to
-            subject,               # subject
-            text,                  # text
-            attachmentFiles,       # attachment files
-            parameters.smtpserver, # SMTP server
-            25,                    # port
-            parameters.smtpuser,   # login
-            parameters.smtppass,   # password
-            0)                     # TTLS
-
-        print('Success!')
-
-    def GroupAndSendFiles(self, filesListInGroups, setName, cfgNamesList, cfgCommentsList):
-        # Collect all output files, group and send via e-mail
-        for groupOfFiles in filesListInGroups:
-            attachmentFiles = list()
-            text = ''
-            for file in groupOfFiles:
-                outFileName = self.GetPythonOutput(setName, file)
-                attachmentFiles.append(outFileName)
-                cfgComment = cfgCommentsList[cfgNamesList.index(file)]
-                text += '{0}: {1}\n'.format(outFileName, cfgComment)
-            subject = 'Experiments results on {0} with {1}'.format(setName, str(groupOfFiles))
-            text += 'svn rev. ' + self.svnRevision
-            text += '\n\nThis is automatically generated mail. Please do not reply.'
-            self.PrepareAndSendMail(str(attachmentFiles), subject, text, attachmentFiles)
-
-    def RunTestsOnCfgList(self, setName):
-        cfgNamesList, cfgCommentsList, filesListInGroups = self.OpenFilesList(self.parameters.benchmarks)
-
-        #print(str(filesListInGroups))
-        if setName == GeneralParameters.iwls05:
-            isDP = self.parameters.doIWLS05DP
-            isBeforeDP = self.parameters.doIWLS05BeforeDP
-        else:
-            isDP = self.parameters.doISPD04DP
-            isBeforeDP = self.parameters.doISPD04BeforeDP
-
-        # Run all tests
-        for idx in range(0, len(cfgNamesList)):
-            outFileName = self.RunSet(setName, cfgNamesList[idx], cfgCommentsList[idx], isDP, isBeforeDP)
-
-        if self.parameters.doSendMail:
-            self.GroupAndSendFiles(filesListInGroups, setName, cfgNamesList, cfgCommentsList)
+        args = [Tools.MSBuild, slnPath, '/t:' + mode, '/p:Configuration=Release']
+        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
 
     def ExtractBenchmarkList(self, benchmarksListPath):
         benchmarks = (open(benchmarksListPath).read()).split('\n')
@@ -133,40 +38,39 @@ class TestRunner:
 
         return benchmarks
 
-    def RunSet(self, cfgName, benchmarksListPath):
-        benchmarks = self.ExtractBenchmarkList(benchmarksListPath)
+    def RunExperiment(self, experiment):
+        benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
 
-        pythonOutput = self.reporter.GetPythonOutput(cfgName)
-        print('Config name = %s' % cfgName)
+        print('Config name = %s' % experiment.cfg)
         print("Performing tests on the following set of benchmarks:\n" + ", ".join(benchmarks))
 
-        self.reporter.CreateEmptyTable(pythonOutput)
+        reportCreator = ReportCreator()
+        logFolder = reportCreator.CreateLogFolder(experiment.cfg)
+        reportTable = reportCreator.GetReportTableName(experiment.cfg)
 
-        logFolder = os.path.basename(cfgName)
-        if os.path.exists(logFolder):
-            newFolderName = logFolder + "_backup_from_" + GetTimeStamp()
-            os.rename(logFolder, newFolderName)
-        os.mkdir(logFolder)
+        experiment.CreateEmptyTable(reportTable)
 
         for benchmark in benchmarks:
             logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w');
 
-            defFile = "--params.def=" + os.path.dirname(benchmarksListPath) + "/" + benchmark + ".def"
-            lefFile = "--params.lef=" + os.path.dirname(benchmarksListPath) + "/" + benchmark + ".lef"
-            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", cfgName, defFile, lefFile]
+            defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"
+            lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
+            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg), defFile, lefFile]
             #params.append()
 
+            #FIXME: uncomment
             subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
-            self.svnRevision = self.reporter.ParseLog(logFileName, benchmark, pythonOutput)
+            self.svnRevision = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
-        return pythonOutput
+        return reportTable
 
-    def RunAll(self):
+    def Run(self):
         cp = CoolPrinter()
         svn = SvnWorker()
+        emailer = Emailer()
 
         cp.CoolPrint('Start')
 
@@ -180,16 +84,10 @@ class TestRunner:
             cp.CoolPrint('Build')
             self.BuildSln(GeneralParameters.slnPath)
 
-        if self.parameters.useISPD04:
-            cp.CoolPrint('ISPD04 experiments')
-            #self.RunTestsOnCfgList(GeneralParameters.ispd04)
-            print(self.parameters.benchmarks)
-            self.RunSet(self.parameters.cfg, self.parameters.benchmarks)
+        for experiment in self.parameters.experiments:
+            cp.CoolPrint(experiment.name)
+            reportTable = self.RunExperiment(experiment)
+            cp.CoolPrint("Sending mail with " + reportTable)
+            emailer.SendResults(experiment, reportTable)
 
         cp.CoolPrint('Finish')
-
-def main():
-    testRunner = TestRunner()
-    testRunner.RunAll()
-
-main()
