@@ -710,7 +710,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     if (discrepancy <= targetDiscrepancy)
     {
       ALERT("Discrepancy achieved");
-      break;
+      //break;
     }
     if (iteration > nOuterIters1)
     {
