@@ -14,6 +14,7 @@
 #include "Buffering.h"
 #include "Auxiliary.h"
 #include "PlacementQualityAnalyzer.h"
+#include "VanGinnekenAlgorithm.h"
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
 {
@@ -255,6 +256,33 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     STA(hd);
 
     WriteFlowMetrics(flowMetrics, hd, "Buffering", "BUF");
+
+    if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
+      WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");
+    if (DoGlobalPlacementIfRequired(hd, "DesignFlow.BufGlobalPlacement"))
+      WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", "GPB");
+    if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.BufLR"))
+      WriteFlowMetrics(flowMetrics, hd, "LRPlacement", "LRB");
+
+    HDPGrid DPGrid(hd);
+    if (DoLegalizationIfRequired(DPGrid, "DesignFlow.BufLegalization"))
+      WriteFlowMetrics(flowMetrics, hd, "Legalization", "LEGB");
+
+    if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
+      WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
+
+    DoSTAIfCan(hd);
+  }
+
+  //New_BUFFERING
+  if (hd.cfg.ValueOf("DesignFlow.New_Buffering", false))
+  {
+    ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+    VGAlgorithm buf(hd);
+    buf.BufferingPlacement();
+    STA(hd);
+
+    WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");
 
     if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
       WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");

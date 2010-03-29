@@ -2,17 +2,7 @@
 
 using namespace Utils;
 
-class CriticalPathComparator
-{
-  HDesign& design;
-public:
-  CriticalPathComparator(HDesign& hd): design(hd) {}
 
-  bool operator() (HCriticalPath path1, HCriticalPath path2) const
-  { return design.GetDouble<HCriticalPath::Criticality>(path1)
-    < design.GetDouble<HCriticalPath::Criticality>(path2);
-  }
-};
 
 int Utils::IterateMostCriticalPaths(HDesign& hd, int nPaths, CriticalPathHandler action)
 {

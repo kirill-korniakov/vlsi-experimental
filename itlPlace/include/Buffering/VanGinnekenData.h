@@ -9,135 +9,136 @@ class VanGinnekenTree;
 class VanGinnekenTreeNode
 {
 protected:
-	double x,y; //координаты узла дерев
-	int type; // тип звена: 0 - source; 1 - sink; 2 - точка ветвления; 3 - кандидат на вставку буфера
-	HSteinerPoint sPoint;
-	VanGinnekenTreeNode* left;
-	VanGinnekenTreeNode* right;
-	int index;
-	VanGinnekenTree* tree;
+  double x,y; //координаты узла дерев
+  int type; // тип звена: 0 - source; 1 - sink; 2 - точка ветвления; 3 - кандидат на вставку буфера
+  HSteinerPoint sPoint;
+  VanGinnekenTreeNode* left;
+  VanGinnekenTreeNode* right;
+  int index;
+  VanGinnekenTree* tree;
 
 public:
-	VanGinnekenTreeNode();
-	bool isSource();
-	bool isSink();
-	bool isBranchPoint();
-	bool isCandidate();
-	bool HasRight();
-	HSteinerPoint GetSteinerPoint();  
-	double GetX();
-	double GetY();
-	VanGinnekenTreeNode GetLeft();
-	VanGinnekenTreeNode GetRight();
-	int GetIndex();
-	VanGinnekenTree* GetTree();
+  VanGinnekenTreeNode();
+  bool isSource();
+  bool isSink();
+  bool isBranchPoint();
+  bool isCandidate();
+  bool HasLeft();
+  bool HasRight();
+  HSteinerPoint GetSteinerPoint();  
+  double GetX();
+  double GetY();
+  VanGinnekenTreeNode* GetLeft();
+  VanGinnekenTreeNode* GetRight();
+  int GetIndex();
+  VanGinnekenTree* GetTree();
 
-	double GetRAT();//RAT in sinc
-	double GetC();//capacity in sinc
-	double GetR();//resistance in source
+  double GetRAT();//RAT in sinc
+  double GetC();//capacity in sinc
+  double GetR();//resistance in source
 
-	void SetSteinerPoint(HSteinerPoint sp);  
-	void SetX(double value);
-	void SetY(double value);
-	void SetLeft(VanGinnekenTreeNode* node);
-	void SetRight(VanGinnekenTreeNode* node);
-	void SetType(int t);
-	void SetIndex(int i);
-	void SetTree(VanGinnekenTree* t);
+  void SetSteinerPoint(HSteinerPoint sp);  
+  void SetX(double value);
+  void SetY(double value);
+  void SetLeft(VanGinnekenTreeNode* node);
+  void SetRight(VanGinnekenTreeNode* node);
+  void SetType(int t);
+  void SetIndex(int i);
+  void SetTree(VanGinnekenTree* t);
 
-	~VanGinnekenTreeNode()
-	{
-		int ui = 0;
-	}
+  ~VanGinnekenTreeNode()
+  {
+    //delete [] tree;
+  }
 };
 
 class VanGinnekenTree
 {
 protected:
-	VanGinnekenTreeNode* vGTree;
-	int partitionPointCount;
-	int treeSize;
+  VanGinnekenTreeNode* vGTree;
+  int partitionPointCount;
+  int treeSize;
 
-	void CreateTree(HSteinerPoint& source);
-	VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  void CreateTree(HSteinerPoint& source);
+  VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 public:
 
-	HDesign& design;
+  HDesign& design;
 
-	VanGinnekenTree(HDesign& hd);
-	VanGinnekenTree(HDesign& hd, int partitionCount);
-	VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source);
+  VanGinnekenTree(HDesign& hd);
+  VanGinnekenTree(HDesign& hd, int partitionCount);
+  VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source);
 
-	void SetEdgePartitionCount(int partitionCount);
+  void SetEdgePartitionCount(int partitionCount);
 
-	VanGinnekenTreeNode GetSource();
-	double GetR();
-	
-	int TreeSize()
-	{
-		return treeSize;
-	}
+  VanGinnekenTreeNode GetSource();
+  double GetR();
 
-	~VanGinnekenTree()
-	{
-		int i = 0;
-	}
-	
+  int TreeSize()
+  {
+    return treeSize;
+  }
+
+  ~VanGinnekenTree()
+  {
+    int i = 0;
+  }
+
 
 };
 class BufferPositions
 {
 protected:
-VanGinnekenTreeNode* position;
-BufferInfo* bufferInfo;
-int index;
+  VanGinnekenTreeNode* position;
+  BufferInfo* bufferInfo;
+  int index;
 public:
-BufferPositions();
-BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
+  BufferPositions();
+  BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
 
-bool operator > (BufferPositions& element);
-bool operator < (BufferPositions& element);
+  bool operator > (BufferPositions& element);
+  bool operator < (BufferPositions& element);
 
-VanGinnekenTreeNode* GetPosition();
-BufferInfo* GetBufferInfo();
-int GetIndex();
+  VanGinnekenTreeNode* GetPosition();
+  BufferInfo* GetBufferInfo();
+  int GetIndex();
 
-void SetPosition(VanGinnekenTreeNode* pos);
-void SetBufferInfo(BufferInfo* bufInfo);
-void SetIndex(int i);
+  void SetPosition(VanGinnekenTreeNode* pos);
+  void SetBufferInfo(BufferInfo* bufInfo);
+  void SetIndex(int i);
 };
 
 class VGVariantsListElement
 {
 
 protected:
-	double RAT;
-	double c;
-	TemplateTypes<BufferPositions>::list bufferPositions;
-	int positionCount;
-	int index;
+  double RAT;
+  double c;
+  TemplateTypes<BufferPositions>::list bufferPositions;
+  int positionCount;
+  int index;
 public:
 
-	VGVariantsListElement();
+  VGVariantsListElement();
 
-	bool operator > (VGVariantsListElement& element);
-	bool operator < (VGVariantsListElement& element);
-	VGVariantsListElement& operator = (VGVariantsListElement& element);
-	void SortBufferPosition();
+  bool operator > (VGVariantsListElement& element);
+  bool operator < (VGVariantsListElement& element);
+  VGVariantsListElement& operator = (VGVariantsListElement& element);
+  void SortBufferPosition();
 
-	double GetRAT();
-	double GetC();
-	BufferPositions GetStartBufferPosition();
-	BufferPositions GetEndBufferPosition();
-	BufferPositions GetNextBufferPosition();
-	BufferPositions GetbufferPosition(int i);
-	int GetPositionCount();
-	TemplateTypes<BufferPositions>::list GetBufferPosition();
+  double GetRAT();
+  double GetC();
+  BufferPositions GetStartBufferPosition();
+  BufferPositions GetEndBufferPosition();
+  BufferPositions GetNextBufferPosition();
+  BufferPositions GetbufferPosition(int i);
+  int GetPositionCount();
+  TemplateTypes<BufferPositions>::list* GetBufferPosition();
 
-	void SetBufferPosition(BufferPositions position);
-	void SetBufferPosition(TemplateTypes<BufferPositions>::list position);
-	void SetRAT(double rat);
-	void SetC(double capacity);
+  void SetBufferPosition(BufferPositions position);
+  void SetBufferPosition(TemplateTypes<BufferPositions>::list position);
+  void SetRAT(double rat);
+  void SetC(double capacity);
 
 
 };
