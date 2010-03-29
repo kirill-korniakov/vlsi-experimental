@@ -600,7 +600,10 @@ void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
   UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
 
   if (context.useLR)
+  {
     context.LRdata.UpdateMultipliers(hd);
+    context.LRdata.alphaTWL *= hd.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.alphaTWLMultiplier", 1.0);
+  }
 }
 
 int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
@@ -646,6 +649,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
     if (context.useBorderPenalty)
       ALERT("muBorderPenalty = %.20f", context.muBorderPenalty);
+    if (context.useLR)
+      ALERT("alphaTWL = %.20f", context.LRdata.alphaTWL);
+
     ALERT("HPWL initial   = %f", Utils::CalculateHPWL(hd, true));
 
     hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
