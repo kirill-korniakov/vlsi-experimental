@@ -1280,6 +1280,10 @@
 						RelativePath="..\src\GlobalPlacement\TimingPointMus.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\TimingPointMusPlotting.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Spreading"

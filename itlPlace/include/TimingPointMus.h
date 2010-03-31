@@ -3,6 +3,24 @@
 
 #include "HDesign.h"
 
+class TimingPointMus;
+
+class MuReporter
+{
+public:
+    MuReporter(HDesign& design);
+    void Report(HDesign& design, TimingPointMus* mus);
+
+private:
+    TimingPointMus* mus;
+    int waitTime;
+
+    void ReportMus(HDesign& design);
+    void PlotMusInTopologicalOrder(HDesign& design);
+    void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
+    void PlotMusInCriticalPathOrder(HDesign& design);
+};
+
 class TimingPointMus
 {
 public:
@@ -10,22 +28,25 @@ public:
   ~TimingPointMus();
 
   void UpdateMus(HDesign& design);
-  void ReportMus(HDesign& design);
 
-  void PlotMusInTopologicalOrder(HDesign& design);
-
-  void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
-  void PlotMusInCriticalPathOrder(HDesign& design);
 
   void GetNetMus(HDesign& design, HNet net,
                  std::vector<double>& cellArcMus, 
                  std::vector<double>& netArcMus);
+
+  int GetMuInCount(HTimingPoint pt) const { return MuIn[::ToID(pt)].size() / 2; }
+  double GetMuS(HTimingPoint pt) const { return MuS[::ToID(pt)]; }
+  double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
+  double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }
+  double GetInMuA(HTimingPoint pt);
+  double GetInMuR(HTimingPoint pt);
 
 private:
 
   double* MuS;
   std::vector<double>* MuIn;
   int size;
+  MuReporter* reporter;
 
   void EnforceFlowProperty(HDesign& design);
   void EnforceArrivalFlowProperty(HDesign& design, HTimingPoint pt);
@@ -33,14 +54,6 @@ private:
 
   void GetMuIn(HDesign& design, HTimingPoint pt, std::vector<double>& inMus);
   void GetMuOut(HDesign& design, HTimingPoint pt, std::vector<double>& outMus);
-
-  int GetMuInCount(HTimingPoint pt) const { return MuIn[::ToID(pt)].size() / 2; }
-
-  double GetMuS(HTimingPoint pt) const { return MuS[::ToID(pt)]; }
-  double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
-  double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }
-  double GetInMuA(HTimingPoint pt);
-  double GetInMuR(HTimingPoint pt);
 
   double BorderValue(double value) { return max(0.01, min(value, 0.99)); }
   double ZeroBorderValue(double value) { return max(0.01, value); }
