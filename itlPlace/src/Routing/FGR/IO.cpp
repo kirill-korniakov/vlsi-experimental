@@ -400,7 +400,7 @@ void FGR::parseInputAsLab(HDPGrid& grid)
       LOGCRITICAL("Pitch of layer2 was not found");
     }
 
-    vcap = (1 - powerTracsPerRow * Pitch / rowHeight) * 2 * rowHeight / Pitch;
+    vcap = (unsigned)((1 - powerTracsPerRow * Pitch / rowHeight) * 2 * rowHeight / Pitch);
     hcap = vcap;
   }
 
@@ -1179,7 +1179,7 @@ void FGR::plotXPM(const string &filename, unsigned nPix)
 {
   const unsigned numColors   = 64;
   const unsigned nGoodColors = 55; //colors used to draw not overflowed tiles
-  unsigned multiplier = floor((double)nPix / xTiles); //num of pixels in tile's edge 
+  unsigned multiplier = (unsigned)floor((double)nPix / xTiles); //num of pixels in tile's edge 
 
   string fullfilename = filename + string(".xpm");
 
@@ -1302,7 +1302,7 @@ void FGR::plotEdgesXPM(const string &filename, unsigned nPix)
 {
   const unsigned numColors   = 64;
   const unsigned nGoodColors = 55;
-  unsigned multiplier = floor((double)nPix / xTiles); 
+  unsigned multiplier = (unsigned)floor((double)nPix / xTiles); 
 
   string fullfilename = filename + string("edges.xpm");
 
@@ -1364,24 +1364,36 @@ void FGR::plotEdgesXPM(const string &filename, unsigned nPix)
         horizLine.push_back(totalRatio);
       
       //----remember right edge--------------------
-      unsigned i1 = 0;
+      unsigned j1 = 0;
 
-      for (; i1 < multiplier / 4; i1++)
-        vertEdgeLine.push_back(x1Ratio); //add pixels for right edge
-      
-      for (; i1 < multiplier; i1++)
+      while (j1 < multiplier / 4)
+      {
+        vertEdgeLine.push_back(x1Ratio); //add pixels for right edge;
+        j1++;
+      }
+
+      while (j1 < multiplier)
+      {
         vertEdgeLine.push_back(0);       //add pixels for space
+        j1++;
+      }
       //--------------------------------------
     } //for(unsigned i = 0; i < xTiles; ++i)
 
     //---add right edge-----------------------
-    unsigned i11 = 0;
+    unsigned j2 = 0;
 
-    for (; i11 < multiplier / 4; i11++)
+    while (j2 < multiplier / 4)
+    {
       image.push_back(horizLine);
-    
-    for (; i11 < multiplier; i11++)
+      j2++;
+    }
+
+    while (j2 < multiplier)
+    {
       image.push_back(vertEdgeLine);
+      j2++;
+    }
     //----------------------------------------
   } //for(unsigned rj = 1; rj <= yTiles; ++rj)
   
@@ -1422,7 +1434,7 @@ void FGR::plotColorsXPM(const string &filename, unsigned nVertPix)
   const unsigned numColors   = 64;
   const unsigned nGoodColors = 55;
   const unsigned nHorPix     = 1000;
-  unsigned multiplier = floor((double)nVertPix / numColors);
+  unsigned multiplier = (unsigned) floor((double)nVertPix / numColors);
 
   string fullfilename = filename + string(".xpm");
 
@@ -1479,7 +1491,7 @@ void FGR::plotColorsXPM(const string &filename, unsigned nVertPix)
 
     for(unsigned i = 0; i < nHorPix; ++i)
     {
-      unsigned index = image[j][i];
+      unsigned index = (unsigned) image[j][i];
       xpmFile<<Colors[index];
     }
 

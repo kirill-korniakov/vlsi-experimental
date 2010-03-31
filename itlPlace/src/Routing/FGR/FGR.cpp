@@ -1384,7 +1384,7 @@ void FGR::redoTree(IdType netId, bool allowOverflow, bool bboxConstrain, const C
     nets[netId].subnets.push_back(stemp);
   }
 
-  // route this new tree
+  //route this new tree
   for(unsigned i = 0; i < bestTreeSegs.size(); ++i)
   {
     for(unsigned j = 0; j < bestTreeSegs[i].size(); ++j)

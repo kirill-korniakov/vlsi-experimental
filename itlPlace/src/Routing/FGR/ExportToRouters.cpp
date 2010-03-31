@@ -165,8 +165,8 @@ void PrintToBoxRouterFormat(HDPGrid& grid, const char* fileName)
 
         for (HNetWrapper::PinsEnumeratorW currPin = nIter.GetPinsEnumeratorW(); currPin.MoveNext();)
         {
-            int horTileInd  = (currPin.X() - xMin) / tileWidth;
-            int vertTileInd = (currPin.Y() - yMin) / tileHeight;
+            int horTileInd  = (int)((currPin.X() - xMin) / tileWidth);
+            int vertTileInd = (int)((currPin.Y() - yMin) / tileHeight);
             fprintf(routerInputFile, "%d %d\n", horTileInd, vertTileInd);
         }
     }
