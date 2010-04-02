@@ -1,3 +1,4 @@
+#include "MuReporter.h"
 #include "TimingPointMus.h"
 #include "Utils.h"
 #include "STA.h"
@@ -6,6 +7,7 @@
 MuReporter::MuReporter(HDesign& design)
 {
   design.Plotter.InitializeHistogramWindow();
+  scaling = 0.01;  //TODO: choose proper scale
   waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
 }
 
@@ -13,11 +15,14 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus)
 {
   this->mus = mus;
 
+  //TODO: move reporter settings to the config
+
   //ReportMus(design);
 
   design.Plotter.ClearHistogram();
-  PlotMusInTopologicalOrder(design);
-  //PlotMusInCriticalPathOrder(design);
+  //PlotMusInTopologicalOrder(design);
+  PlotMusInCriticalPathOrder(design);
+  design.Plotter.PlotMuLevel(1.0, scaling); //TODO: probably better to get initial mu
   design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
 }
 
@@ -40,12 +45,11 @@ void MuReporter::PlotMusInTopologicalOrder(HDesign& design)
     !::IsNull(pt.GoNext()); )
     nTimingPoints++;
 
-  design.Plotter.PlotMuLevel(1.0);
   int i = 0;
   for (HTimingPointWrapper pt = design[design.TimingPoints.TopologicalOrderRoot()];
     !::IsNull(pt.GoNext()); i++)
   {
-    design.Plotter.PlotMu(i, nTimingPoints, mus->GetInMuA(pt), Color_Red);
+    design.Plotter.PlotMu(i, nTimingPoints, mus->GetInMuA(pt), scaling, Color_Red);
   }
 }
 
@@ -57,17 +61,19 @@ void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
 
   HCriticalPath::PointsEnumeratorW cpoint = (path,design).GetEnumeratorW();
   double sum = 0.0;
+  int nTP = 0;
   while (cpoint.MoveNext())
   {
     HTimingPoint pt = cpoint.TimingPoint();
     sum += mus->GetInMuA(pt) + mus->GetInMuR(pt);
+    nTP++;
   }
 
   if (pathIdx % 2 == 0)
-    design.Plotter.PlotMu(sum, x, Color_Red);
+    design.Plotter.PlotMu(sum, x, scaling / nTP, Color_Red);
   else
-    design.Plotter.PlotMu(sum, x, Color_Orange);
-  x += 2;
+    design.Plotter.PlotMu(sum, x, scaling / nTP, Color_Orange);
+  x += 1;
 }
 
 void MuReporter::PlotMusInCriticalPathOrder(HDesign& design)

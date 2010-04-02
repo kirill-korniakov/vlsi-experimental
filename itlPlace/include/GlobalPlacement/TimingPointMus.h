@@ -2,24 +2,7 @@
 #define __TIMING_POINT_MUS__
 
 #include "HDesign.h"
-
-class TimingPointMus;
-
-class MuReporter
-{
-public:
-    MuReporter(HDesign& design);
-    void Report(HDesign& design, TimingPointMus* mus);
-
-private:
-    TimingPointMus* mus;
-    int waitTime;
-
-    void ReportMus(HDesign& design);
-    void PlotMusInTopologicalOrder(HDesign& design);
-    void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
-    void PlotMusInCriticalPathOrder(HDesign& design);
-};
+#include "MuReporter.h"
 
 class TimingPointMus
 {

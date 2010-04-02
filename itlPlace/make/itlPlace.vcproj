@@ -1277,11 +1277,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\TimingPointMus.cpp"
+						RelativePath="..\src\GlobalPlacement\MuReporter.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\GlobalPlacement\TimingPointMusPlotting.cpp"
+						RelativePath="..\src\GlobalPlacement\TimingPointMus.cpp"
 						>
 					</File>
 				</Filter>
@@ -10196,6 +10196,10 @@
 					</File>
 					<File
 						RelativePath="..\include\GlobalPlacement\LagrangianRelaxationData.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\GlobalPlacement\MuReporter.h"
 						>
 					</File>
 					<File

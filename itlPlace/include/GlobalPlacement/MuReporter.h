@@ -1,0 +1,25 @@
+#ifndef __MU_REPORTER__
+#define __MU_REPORTER__
+
+#include "HDesign.h"
+
+class TimingPointMus;
+
+class MuReporter
+{
+public:
+    MuReporter(HDesign& design);
+    void Report(HDesign& design, TimingPointMus* mus);
+
+private:
+    TimingPointMus* mus;
+    double scaling;
+    int waitTime;
+
+    void ReportMus(HDesign& design);
+    void PlotMusInTopologicalOrder(HDesign& design);
+    void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
+    void PlotMusInCriticalPathOrder(HDesign& design);
+};
+
+#endif

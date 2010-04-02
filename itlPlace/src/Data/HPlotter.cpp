@@ -720,18 +720,16 @@ void HPlotter::PlotText(string text, double textSize)
   if (!IsEnabled())
     return;
 
-  CvPoint point;
-
-  CvFont font;
-  string bufText = text + text;
   if (textSize == -1)
     textSize = m_hd.cfg.ValueOf("plotter.textSize", 1.0);
   
+  CvFont font;  
   cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, textSize, textSize , 0.0, 1, 1);
+
   int start = 0;
   int t = 1;
   char* str = new char[text.length() * 4];
-
+  string bufText = text + text;
   for (unsigned int i = 0; i < text.length(); i++)
   {
     if ((text[i] == '\n') || (i == text.length() - 1))
@@ -739,8 +737,8 @@ void HPlotter::PlotText(string text, double textSize)
       for (unsigned int j = start; j <= i; j++)
         bufText[j - start] = text[j];
       bufText[i - start + 1] = '\0';
-      int j2 = 0;
 
+      int j2 = 0;
       for (unsigned int j = 0; j < bufText.length(); j++)
       {
         if (bufText[j] == '\t')
@@ -752,12 +750,13 @@ void HPlotter::PlotText(string text, double textSize)
           str[j2] = ' ';
           j2++;
           str[j2] = ' ';
-
         }
         else
           str[j2] = bufText[j];
         j2++;
       }
+
+      CvPoint point;
       point.x = DesignX2ImageX(10);
       point.y = int(m_Data->textSpaceHeight - 30 * t * textSize);
       cvPutText(IMG, str, point, &font, GetCvColor(Color_Black));
@@ -766,7 +765,7 @@ void HPlotter::PlotText(string text, double textSize)
     }
   }
 
-  delete []str;
+  delete [] str;
 }
 
 void HPlotter::PlotNet(HNetWrapper net)
@@ -950,35 +949,36 @@ void HPlotter::DrawTilePins(double x1, double y1, double x2, double y2, int nPin
   Refresh();
 }
 
-const double TopologicalScaling = 0.1; //FIXME: choose proper scale
-
-void HPlotter::PlotMuLevel(double level, Color color)
+void HPlotter::PlotMuLevel(double level, double scaling, Color color)
 {
   if (!IsEnabled())
     return;
 
   CvPoint start, finish;
   start.x = HNormalX2ImageX(0.0);
-  start.y = HNormalY2ImageY(level*TopologicalScaling);
+  start.y = HNormalY2ImageY(level * scaling);
   finish.x = m_Data->histogramImg->width;
-  finish.y = HNormalY2ImageY(level*TopologicalScaling);
+  finish.y = HNormalY2ImageY(level * scaling);
   cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+  
+  //print mu level value
+  CvFont font;
+  cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, 0.5, 0.5);
+  char value[256];
+  sprintf(value, "%.1f", level);
+  cvPutText(m_Data->histogramImg, value, start, &font, GetCvColor(Color_Black));
 }
 
-void HPlotter::PlotMu(int tpIdx, int nTP, double mu, Color color)
+void HPlotter::PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color)
 {
   if (!IsEnabled()) 
     return;
 
-  CvPoint start, finish;
-  start.x = HNormalX2ImageX((double)tpIdx/(double)nTP);
-  start.y = HNormalY2ImageY(0.0);
-  finish.x = start.x;
-  finish.y = HNormalY2ImageY(mu*TopologicalScaling);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+  int x = HNormalX2ImageX((double)tpIdx/(double)nTP);
+  PlotMu(mu, x, scaling, color);
 }
 
-void HPlotter::PlotMu(double mu, int x, Color color)
+void HPlotter::PlotMu(double mu, int x, double scaling, Color color)
 {
   if (!IsEnabled()) 
     return;
@@ -987,7 +987,7 @@ void HPlotter::PlotMu(double mu, int x, Color color)
   start.x = x;
   start.y = HNormalY2ImageY(0.0);
   finish.x = start.x;
-  finish.y = HNormalY2ImageY(mu/40.0); //FIXME: choose proper scale
+  finish.y = HNormalY2ImageY(mu * scaling);
   cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
 }
 
