@@ -39,33 +39,35 @@ PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
   delete m_grid;
 }
 
-void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold)
+void PlacementQualityAnalyzer::AnalyzeQuality(int id, double objectiveValue, double improvementTreshold)
 {
   PlacementQuality pq;
   pq.id = id;
-  pq.hpwl = Utils::CalculateHPWL(m_design, false);
+
+  pq.metrics[MetricObjective] = objectiveValue;
+  pq.metrics[MetricHPWL] = Utils::CalculateHPWL(m_design, false);
 
   if (m_design.CanDoTiming())
   {
     //timing 1
     STA(m_design, DO_NOT_REPORT);
-    pq.tns = Utils::TNS(m_design);
-    pq.wns = Utils::WNS(m_design);
-    pq.twl = Utils::CalculateTWL(m_design);
+    pq.metrics[MetricTNS] = Utils::TNS(m_design);
+    pq.metrics[MetricWNS] = Utils::WNS(m_design);
+    pq.metrics[MetricTWL] = Utils::CalculateTWL(m_design);
   }
 
   //legalization
   m_Placement.SavePlacement(m_design);
   AbacusLegalization(*m_grid);
-  pq.hpwl_legalized = Utils::CalculateHPWL(m_design, false);
+  pq.metrics[MetricHPWLleg] = Utils::CalculateHPWL(m_design, false);
 
   if (m_design.CanDoTiming())
   {
     //timing 2
     STA(m_design, DO_NOT_REPORT);
-    pq.tns_legalized = Utils::TNS(m_design);
-    pq.wns_legalized = Utils::WNS(m_design);
-    pq.twl_legalized = Utils::CalculateTWL(m_design);
+    pq.metrics[MetricTNSleg] = Utils::TNS(m_design);
+    pq.metrics[MetricWNSleg] = Utils::WNS(m_design);
+    pq.metrics[MetricTWLleg] = Utils::CalculateTWL(m_design);
   }
 
   m_Placement.RestorePlacement(m_design);
@@ -73,8 +75,8 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, double improvementTreshold
 
   double improvement = GetLastIterationImprovement();
 
-  ALERT("HPWL nonlegal  = %f", pq.hpwl);
-  ALERT("HPWL Leg.      = %f", pq.hpwl_legalized);
+  ALERT("HPWL nonlegal  = %f", pq.metrics[MetricHPWL]);
+  ALERT("HPWL Leg.      = %f", pq.metrics[MetricHPWLleg]);
   if (m_design.CanDoTiming())
   {
     ALERT("%-14s = %f", GetMetric(MetricTWL), pq.GetMetric(MetricTWL));
@@ -130,15 +132,16 @@ int PlacementQualityAnalyzer::GetConvergeIterationsNumber()
 
 void PlacementQualityAnalyzer::Report()
 {
-  const int col_id = 0;
-  const int col_hpwl = 1;
-  const int col_hpwl_leg = 2;
-  const int col_twl = 3;
-  const int col_twl_leg = 4;
-  const int col_tns = 5;
-  const int col_tns_leg = 6;
-  const int col_wns = 7;
-  const int col_wns_leg = 8;
+  const int col_id       = 0;
+  const int col_objective = 1;
+  const int col_hpwl     = 2;
+  const int col_hpwl_leg = 3;
+  const int col_twl      = 4;
+  const int col_twl_leg  = 5;
+  const int col_tns      = 6;
+  const int col_tns_leg  = 7;
+  const int col_wns      = 8;
+  const int col_wns_leg  = 9;
 
   bool canDoTiming = m_design.CanDoTiming();
 
@@ -162,8 +165,10 @@ void PlacementQualityAnalyzer::Report()
   }
 
   tf.SetCell(col_id, "ID");
+  tf.SetCell(col_objective, "Objective");
   tf.SetCell(col_hpwl, "HPWL");
   tf.SetCell(col_hpwl_leg, "LHPWL");
+  tf.SetColumnPrecision(col_objective, 2);
   tf.SetColumnPrecision(col_hpwl, 0);
   tf.SetColumnPrecision(col_hpwl_leg, 0);
 
@@ -174,16 +179,17 @@ void PlacementQualityAnalyzer::Report()
   {
     tf.NewRow();
     tf.SetCell(col_id, i->id);
-    tf.SetCell(col_hpwl, i->hpwl);
-    tf.SetCell(col_hpwl_leg, i->hpwl_legalized);
+    tf.SetCell(col_objective, i->metrics[MetricObjective]);
+    tf.SetCell(col_hpwl, i->metrics[MetricHPWL]);
+    tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg]);
     if (canDoTiming)
     {
-      tf.SetCell(col_twl, i->twl);
-      tf.SetCell(col_twl_leg, i->twl_legalized);
-      tf.SetCell(col_tns, i->tns);
-      tf.SetCell(col_tns_leg, i->tns_legalized);
-      tf.SetCell(col_wns, i->wns);
-      tf.SetCell(col_wns_leg, i->wns_legalized);
+      tf.SetCell(col_twl, i->metrics[MetricTWL]);
+      tf.SetCell(col_twl_leg, i->metrics[MetricTWLleg]);
+      tf.SetCell(col_tns, i->metrics[MetricTNS]);
+      tf.SetCell(col_tns_leg, i->metrics[MetricTNSleg]);
+      tf.SetCell(col_wns, i->metrics[MetricWNS]);
+      tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg]);
     }
   }
 /*
@@ -195,16 +201,17 @@ void PlacementQualityAnalyzer::Report()
   {
 	  tf.NewRow();
 	  tf.SetCell(col_id, i->id);
-	  tf.SetCell(col_hpwl, i->hpwl / initial->hpwl * 100);
-	  tf.SetCell(col_hpwl_leg, i->hpwl_legalized / initial->hpwl_legalized * 100);
+	  tf.SetCell(col_objective, i->metrics[MetricObjective] / initial->metrics[MetricObjective] * 100);
+	  tf.SetCell(col_hpwl, i->metrics[MetricHPWL] / initial->metrics[MetricHPWL] * 100);
+	  tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg] / initial->metrics[MetricHPWLleg] * 100);
 	  if (canDoTiming)
 	  {
-		  tf.SetCell(col_twl, i->twl / initial->twl * 100);
-		  tf.SetCell(col_twl_leg, i->twl_legalized / initial->twl_legalized * 100);
-		  tf.SetCell(col_tns, i->tns / initial->tns * 100);
-		  tf.SetCell(col_tns_leg, i->tns_legalized / initial->tns_legalized * 100);
-		  tf.SetCell(col_wns, i->wns / initial->wns * 100);
-		  tf.SetCell(col_wns_leg, i->wns_legalized / initial->wns_legalized * 100);
+		  tf.SetCell(col_twl, i->metrics[MetricTWL] / initial->metrics[MetricTWL] * 100);
+		  tf.SetCell(col_twl_leg, i->metrics[MetricTWLleg] / initial->metrics[MetricTWLleg] * 100);
+		  tf.SetCell(col_tns, i->metrics[MetricTNS] / initial->metrics[MetricTNS] * 100);
+		  tf.SetCell(col_tns_leg, i->metrics[MetricTNSleg] / initial->metrics[MetricTNSleg] * 100);
+		  tf.SetCell(col_wns, i->metrics[MetricWNS] / initial->metrics[MetricWNS] * 100);
+		  tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg] / initial->metrics[MetricWNSleg] * 100);
 	  }
   }
 */
@@ -215,16 +222,18 @@ void PlacementQualityAnalyzer::Report()
 
 PlacementQualityAnalyzer::QualityMetrics PlacementQualityAnalyzer::GetMetric(const string& metric)
 {
-  for (int i = 0; i < PlacementQualityAnalyzer::__MetricLast; ++i)
-    if (metric == GetMetric((PlacementQualityAnalyzer::QualityMetrics)i))
-      return (PlacementQualityAnalyzer::QualityMetrics)i;
-  return PlacementQualityAnalyzer::MetricHPWLleg;
+  for (int i = 0; i < __MetricsNum; ++i)
+    if (metric == GetMetric((QualityMetrics)i))
+      return (QualityMetrics)i;
+  return MetricHPWLleg;
 }
 
-const char* PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::QualityMetrics metric)
+const char* PlacementQualityAnalyzer::GetMetric(QualityMetrics metric)
 {
   switch(metric)
   {
+  case MetricObjective:
+    return "Objective";
   case MetricHPWL:
     return "HPWL";
   case MetricHPWLleg:
@@ -242,31 +251,14 @@ const char* PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::Qualit
   case MetricWNSleg:
     return "WNS leg.";
   default:
-    return GetMetric(PlacementQualityAnalyzer::MetricHPWLleg);
+    return GetMetric(MetricHPWLleg);
   }
 }
 
-double PlacementQualityAnalyzer::PlacementQuality::GetMetric(PlacementQualityAnalyzer::QualityMetrics qm)
+double PlacementQualityAnalyzer::PlacementQuality::GetMetric(QualityMetrics qm)
 {
-  switch(qm)
-  {
-  case MetricHPWL:
-    return this->hpwl;
-  case MetricHPWLleg:
-    return this->hpwl_legalized;
-  case MetricTWL:
-    return this->twl;
-  case MetricTWLleg:
-    return this->twl_legalized;
-  case MetricTNS:
-    return this->tns;
-  case MetricTNSleg:
-    return this->tns_legalized;
-  case MetricWNS:
-    return this->wns;
-  case MetricWNSleg:
-    return this->wns_legalized;
-  default:
-    return this->hpwl_legalized;
-  }
+  if (qm == __MetricsNum)
+    return -1.0;
+  else
+    return metrics[qm];
 }

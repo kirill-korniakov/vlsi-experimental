@@ -22,7 +22,6 @@ struct AppCtx
   LSEData   LSEdata;
   SODData   SODdata;
   LRData    LRdata;
-    
   SpreadingData spreadingData;
   
   double    muBorderPenalty;
@@ -33,6 +32,7 @@ struct AppCtx
 
   int*      netListSizes;
 
+  double    criteriaValue;
   double*   gLSE;
   double*   gSOD;
   double*   gLR;

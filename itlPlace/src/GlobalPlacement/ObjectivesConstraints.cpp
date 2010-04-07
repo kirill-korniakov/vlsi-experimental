@@ -235,6 +235,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     AddBPwithGrad(context, solution, f, gradient);
   }
 
+  context->criteriaValue = *f;
   //WRITELINE("%5f %5f", QSValue, *f);
 
   //normalize gradients

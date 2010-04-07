@@ -10,15 +10,16 @@ class PlacementQualityAnalyzer
 public:
   enum QualityMetrics
   {
-    MetricHPWL    = 0,
-    MetricHPWLleg = 1,
-    MetricTWL     = 2,
-    MetricTWLleg  = 3,
-    MetricTNS     = 4,
-    MetricTNSleg  = 5,
-    MetricWNS     = 6,
-    MetricWNSleg  = 7,
-    __MetricLast
+    MetricObjective = 0,
+    MetricHPWL      = 1,
+    MetricHPWLleg   = 2,
+    MetricTWL       = 3,
+    MetricTWLleg    = 4,
+    MetricTNS       = 5,
+    MetricTNSleg    = 6,
+    MetricWNS       = 7,
+    MetricWNSleg    = 8,
+    __MetricsNum
   };
 
   static QualityMetrics GetMetric(const string& metric);
@@ -28,7 +29,7 @@ public:
   PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
   ~PlacementQualityAnalyzer();
 
-  void AnalyzeQuality(int id, double improvementTreshold = 0.0);
+  void AnalyzeQuality(int id, double objectiveValue = 0.0, double improvementTreshold = 0.0);
   void Report();
 
   void SaveCurrentPlacementAsBestAchieved();
@@ -42,30 +43,31 @@ private:
   struct PlacementQuality
   {
     int id;
-    double hpwl;
-    double hpwl_legalized;
-    double tns;
-    double tns_legalized;
-    double wns;
-    double wns_legalized;
-    double twl;
-    double twl_legalized;
+    double metrics[__MetricsNum];
 
     PlacementQuality()
     {
       id = 0;
-      hpwl = hpwl_legalized = 0.0;
-      tns = tns_legalized = 0.0;
-      wns = wns_legalized = 0.0;
-      twl = twl_legalized = 0.0;
+      for (int i = 0; i < __MetricsNum; i++)
+      {
+        metrics[i] = 0.0;
+      }
     }
 
     bool operator == (const PlacementQuality& q)
     {
-      return hpwl == q.hpwl && hpwl_legalized == q.hpwl_legalized
-        && twl == q.twl && twl_legalized == q.twl_legalized
-        && tns == q.tns && tns_legalized == q.tns_legalized
-        && wns == q.wns && wns_legalized == q.wns_legalized;
+      bool isEqual = true;
+      //NOTE: we start from 1 because we do not interesting in objective value
+      //TODO: actually we have to compare with epsilon tolerance
+      for (int i = 1; i < __MetricsNum; i++)
+      {
+        if (metrics[i] != q.metrics[i])
+        {
+          isEqual = false;
+          break;
+        }
+      }
+      return isEqual;
     }
     bool operator != (const PlacementQuality& q) { return !(*this == q); }
 

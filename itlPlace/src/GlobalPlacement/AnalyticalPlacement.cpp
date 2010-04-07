@@ -679,7 +679,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     
     if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
-      QA->AnalyzeQuality(iteration - 1, hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+      QA->AnalyzeQuality(iteration - 1, context.criteriaValue, 
+        hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
 
       if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
       {
