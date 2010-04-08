@@ -180,6 +180,13 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 {
   //START MACROLOOP OF DESIGN
+  
+  if (hd.cfg.ValueOf("Logger.PrintStartInformations", false))
+  {
+    DoSTAIfCan(hd);
+    WriteFlowMetrics(flowMetrics, hd, "START", "START");
+  }
+
   if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 0)
   {
     ConfigContext ctx = hd.cfg.OpenContext("MacroLoop");

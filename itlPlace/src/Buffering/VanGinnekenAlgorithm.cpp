@@ -54,7 +54,7 @@ int VGAlgorithm::BufferingPlacement()
 int VGAlgorithm::BufferingNen(HNet& net)
 {
   VanGinnekenTree vGTree(design, 3, design.SteinerPoints[(net, design).Source()]);
-  printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
+  //printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
   VGVariantsListElement* best = Algorithm(&vGTree);
   int bufCount = best->GetPositionCount();
   if (bufCount > 0)
@@ -91,7 +91,7 @@ VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
       best = &(*i);
     }
   }
-  printf("%d\t%f\n", best->GetPositionCount(), tMax);
+  //printf("%d\t%f\n", best->GetPositionCount(), tMax);
   return best;
 }
 
