@@ -15,6 +15,7 @@
 #include "Auxiliary.h"
 #include "PlacementQualityAnalyzer.h"
 #include "VanGinnekenAlgorithm.h"
+#include "HippocratePlacement.h"
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
 {
@@ -148,6 +149,65 @@ void DoSTAIfCan(HDesign& hd)
   }
 }
 
+bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
+{
+	HDPGrid grid(hd);	
+	if (grid.Design().cfg.ValueOf(cfgOptName, false))
+	{
+		grid.FindCellsPositions();
+		HippocratePlacementInit();
+
+		bool LogEveryIteration;
+		if(hd.cfg.ValueOf("HippocratePlacement.LogEveryIteration", false))
+			LogEveryIteration=true;
+		else LogEveryIteration=false;
+
+		TimingHPWLWatcher thpwlWatcher(hd, LogEveryIteration);
+		StatisticsAnalyser stat;
+
+		ALERT("STA before Legalization Hippocrate placement:");     
+		STA(hd,true);
+
+		if (!CheckGridBoundary(grid, 2, true)|| !CheckGridConsistency(grid, 2, 1e-6, true)|| !CheckOverlaps(grid,2, true))
+		{
+			ALERT("NOT LEGALIZED before hippocrate!!");
+			Legalization(grid);
+		}else ALERT("Legalized before Hippocrate");
+
+		ALERT("STA before Hippocrate placement:");     
+		STA(hd,true);
+		double oldTNS=Utils::TNS(hd);
+		double oldWNS=Utils::WNS(hd);
+		ALERT("HPWL before Hippocrate placement: %f", Utils::CalculateHPWL(hd, true));
+
+		DoHippocratePlacement(grid, hd, stat, thpwlWatcher);
+
+		if (!CheckGridBoundary(grid, 2, true)|| !CheckGridConsistency(grid, 2, 1e-6, true)|| !CheckOverlaps(grid, 2, true))
+		{
+			ALERT("Not Legalized after!");
+		}
+		else ALERT("!!!Legalized after!");
+		hd.Plotter.ShowPlacement();
+
+		ALERT("STA after Hippocrate placement:");     
+		STA(hd,true);
+		ALERT("HPWL after Hippocrate placement: %f", Utils::CalculateHPWL(hd, true));
+
+		HippocratePlacementFinalize();
+
+		stat.doReport();
+
+		//DetailedPlacement(grid);
+
+		//WRITELINE("");
+		//if (grid.Design().CanDoTiming()) ALERT("STA after detailed placement:");
+		//STA(grid.Design());
+		return true;
+	}
+	return false;
+}
+
+
 void PlotCongestionMapIfRequired(HDPGrid& grid)
 {
   if (grid.Design().cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
@@ -244,6 +304,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     WriteFlowMetrics(flowMetrics, hd, "Legalization",  "LEG");
   if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.DetailedPlacement"))
     WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DP");
+	if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
+		WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
 
   DoSTAIfCan(hd);
 
