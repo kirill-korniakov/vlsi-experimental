@@ -192,7 +192,7 @@ void PlacementQualityAnalyzer::Report()
       tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg]);
     }
   }
-/*
+
   //TODO: embed properly
   //This code shows improvement in percents, but right now there are problems with formatting.
   QualityList::iterator initial = m_experiments.begin();
@@ -214,7 +214,7 @@ void PlacementQualityAnalyzer::Report()
 		  tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg] / initial->metrics[MetricWNSleg] * 100);
 	  }
   }
-*/
+
   WRITELINE("");
   tf.Print();
   WRITELINE("");

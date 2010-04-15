@@ -22,7 +22,7 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
       clusterIdx2solutionIdxLUT[i] = -1;
   }
   //x,y,ki
-  int nVariables = 2 * ci->mCurrentNumberOfClusters + ci->netList.size();
+  nVariables = 2 * ci->mCurrentNumberOfClusters + ci->netList.size();
 
   gLSE = new double[4*nVariables];
   gSOD = gLSE + nVariables;
@@ -42,7 +42,6 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   useQuadraticSpreading = ahd.cfg.ValueOf("GlobalPlacement.useQuadraticSpreading", false);
   useUnidirectSpreading = ahd.cfg.ValueOf("GlobalPlacement.useUnidirectSpreading", false);
   useLRSpreading        = ahd.cfg.ValueOf("GlobalPlacement.useLRSpreading", false);
-  useBorderPenalty      = ahd.cfg.ValueOf("GlobalPlacement.useBorderPenalty", false);
   useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)

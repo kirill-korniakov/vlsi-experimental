@@ -172,7 +172,6 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 
   int nClusterVariables = 2 * context->ci->mCurrentNumberOfClusters;
   int nBufferVariables = context->ci->netList.size();
-  int nVariables = nClusterVariables + nBufferVariables;
 
   //get pointers to vector data
   int info;
@@ -181,15 +180,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   info = VecGetArray(G, &gradient); CHKERRQ(info);
 
   *f = 0.0;
-  SetGradientToZero((double*)gradient, nVariables);
-  SetGradientToZero(context->gLSE, nVariables);
-  SetGradientToZero(context->gSOD, nVariables);
-  SetGradientToZero(context->gLR,  nVariables);
-  SetGradientToZero(context->gQS,  nVariables);
-
-  //timing
-  timetype start = 0;
-  timetype finish = 0;
+  SetGradientToZero((double*)gradient, context->nVariables);
+  SetGradientToZero(context->gLSE, context->nVariables);
+  SetGradientToZero(context->gSOD, context->nVariables);
+  SetGradientToZero(context->gLR,  context->nVariables);
+  SetGradientToZero(context->gQS,  context->nVariables);
 
   double LRValue = 0.0;
   double QSValue = 0.0;
@@ -230,19 +225,13 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     }
   }
 
-  if (context->useBorderPenalty)
-  {
-    AddBPwithGrad(context, solution, f, gradient);
-  }
-
   context->criteriaValue = *f;
-  //WRITELINE("%5f %5f", QSValue, *f);
 
   //normalize gradients
   if (context->useSumOfDelays)
-    ScaleBufferGradients(nClusterVariables, nVariables, context);
+    ScaleBufferGradients(nClusterVariables, context->nVariables, context);
 
-  for (int i = 0; i < nVariables; i++)
+  for (int i = 0; i < context->nVariables; i++)
   {
     gradient[i] += context->gLSE[i];
     gradient[i] += context->gSOD[i];

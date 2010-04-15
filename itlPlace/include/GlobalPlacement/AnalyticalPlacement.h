@@ -32,7 +32,7 @@ namespace AnalyticalGlobalPlacement
   void GetClusterCoordinates(ClusteringInformation& ci, Vec x);
   void SetKValues(ClusteringInformation& ci, Vec& x);
   void GetKValues(ClusteringInformation& ci, Vec x);
-  void SetBounds(HDesign& hd, ClusteringInformation& ci, Vec& xl, Vec& xu);
+  void SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx &context, Vec& xl, Vec& xu);
 
   double CalculateSumOfK(HDesign& hd, ClusteringInformation& ci);
 

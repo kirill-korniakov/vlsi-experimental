@@ -19,6 +19,8 @@ struct AppCtx
   HDesign*                hd;
   ClusteringInformation*  ci;
 
+  int nVariables;
+
   LSEData   LSEdata;
   SODData   SODdata;
   LRData    LRdata;
@@ -44,10 +46,9 @@ struct AppCtx
 
   bool useQuadraticSpreading;
   bool useLRSpreading;
-
-  bool useBorderPenalty;
-  bool useBorderBounds;
   bool useUnidirectSpreading;
+
+  bool useBorderBounds;
 
   bool useNetWeights;
 };

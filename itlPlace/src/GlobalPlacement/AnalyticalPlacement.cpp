@@ -196,11 +196,10 @@ void AnalyticalGlobalPlacement::SetVariablesValues(ClusteringInformation & ci, V
   SetKValues(ci, x);
 }
 
-void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci, Vec& xl, Vec& xu)
+void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx &context, Vec& xl, Vec& xu)
 {
-  int nVariables = 2 * ci.mCurrentNumberOfClusters + ci.netList.size();
-  PetscScalar* initValues = new PetscScalar[nVariables];
-  int* idxs = InitIdxs(nVariables, 0);
+  PetscScalar* initValues = new PetscScalar[context.nVariables];
+  int* idxs = InitIdxs(context.nVariables, 0);
   int idx;
   int clusterIdx;
 
@@ -220,11 +219,11 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
     initValues[2*idx+1] = hd.Circuit.PlacementMinY() + siteHeight2;
     idx++;
   }
-  for (int i = 2*idx; i < nVariables; i++)
+  for (int i = 2*idx; i < context.nVariables; i++)
   {//set lower borders for ki variables
     initValues[i] = 0.0;
   }
-  VecSetValues(xl, nVariables, idxs, initValues, INSERT_VALUES);
+  VecSetValues(xl, context.nVariables, idxs, initValues, INSERT_VALUES);
 
   idx = 0;
   clusterIdx = -1;
@@ -234,11 +233,11 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
     initValues[2*idx+1] = hd.Circuit.PlacementMaxY() - siteHeight2;
     idx++;
   }
-  for (int i = 2*idx; i < nVariables; i++)
+  for (int i = 2*idx; i < context.nVariables; i++)
   {//set upper borders for ki variables
     initValues[i] = hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 100.0); //TODO: set correct upper bound
   }
-  VecSetValues(xu, nVariables, idxs, initValues, INSERT_VALUES);
+  VecSetValues(xu, context.nVariables, idxs, initValues, INSERT_VALUES);
 
   delete [] initValues;
   delete [] idxs;
@@ -484,8 +483,7 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   info = TaoApplicationCreate(PETSC_COMM_SELF, &taoapp); CHKERRQ(info);
 
   // Allocate vectors for the solution and gradient
-  int nVariables = 2*ci.mCurrentNumberOfClusters + ci.netList.size();
-  info = VecCreateSeq(PETSC_COMM_SELF, nVariables, &x); CHKERRQ(info);
+  info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &x); CHKERRQ(info);
   // Set solution vec and an initial guess
   SetVariablesValues(ci, x);
 
@@ -497,9 +495,9 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   //set bounds
   if (context.useBorderBounds)
   {
-    info = VecCreateSeq(PETSC_COMM_SELF, nVariables, &xl); CHKERRQ(info);
-    info = VecCreateSeq(PETSC_COMM_SELF, nVariables, &xu); CHKERRQ(info);
-    SetBounds(hd, ci, xl, xu);
+    info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xl); CHKERRQ(info);
+    info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xu); CHKERRQ(info);
+    SetBounds(hd, ci, context, xl, xu);
     info = TaoAppSetVariableBounds(taoapp, xl, xu);
   }
 
@@ -521,8 +519,8 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   PetscScalar* solution;
   VecGetArray(x, &solution);
   CalcMuInitial(solution, &context);
-  VecRestoreArray(x, &solution);  
-  
+  VecRestoreArray(x, &solution);
+ 
   return info;
 }
 
@@ -626,16 +624,19 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
   int retCode;
-  double discrepancy = 100.0; //NOTE: dummy big value
 
   const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
 
   PlacementQualityAnalyzer* QA = 0;
   if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
+    Vec g;
+    int info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g); CHKERRQ(info);
+    AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValue, g, &context);
+
     QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
         PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricHPWLleg)));
-    QA->AnalyzeQuality(0);
+    QA->AnalyzeQuality(0, context.criteriaValue);
   }
 
   int iteration = 1;
@@ -647,8 +648,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
     if (context.useQuadraticSpreading)
       ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
-    if (context.useBorderPenalty)
-      ALERT("muBorderPenalty = %.20f", context.muBorderPenalty);
     if (context.useLR)
       ALERT("alphaTWL = %.20f", context.LRdata.alphaTWL);
 
@@ -668,13 +667,11 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     {
       GetVariablesValues(ci, x);
       UpdateCellsCoordinates(hd, ci);
-      discrepancy = CalculateDiscrepancy(x, &context);
     }
 
     UpdateWeights(context, hd, 32);
 
     //print iteration info
-    ALERT("discrepancy = %f", discrepancy);
     ALERT("Sum of Ki = %f", CalculateSumOfK(hd, ci));
     
     if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
@@ -708,11 +705,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
     }
 
-    if (discrepancy <= targetDiscrepancy)
-    {
-      ALERT("Discrepancy achieved");
-      //break;
-    }
     if (iteration > nOuterIters1)
     {
       ALERT("Iterations finished");

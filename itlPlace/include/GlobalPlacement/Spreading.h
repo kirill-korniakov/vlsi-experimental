@@ -8,7 +8,6 @@ void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* 
 void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f);
 void UpdateLRSpreadingMu(HDesign& hd, AppCtx& context, int iterate);
 
-double CalculateDiscrepancy(Vec& x, void* data);
 double SpreadingPenalty(AppCtx* user, PetscScalar* x);
 
 int CalcMaxAffectedArea(double potentialSize, double binSize);
