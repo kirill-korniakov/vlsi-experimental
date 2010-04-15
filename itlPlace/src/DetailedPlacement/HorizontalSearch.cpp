@@ -3,8 +3,8 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 
-HorizontalSwapper::HorizontalSwapper(HDPGrid& g, unsigned int quant_size)
-  : m_Grid(g)
+HorizontalSwapper::HorizontalSwapper(HDPGrid& g, unsigned int quant_size,
+  ConstraintsController* _checker): m_Grid(g), checker(_checker)
 {
   m_GroupSize = quant_size;
   nextColumnIdx = -1;
@@ -184,7 +184,7 @@ void HorizontalSwapper::ProcessRow(int rowIdx)
       //TODO: fix problem with terminals      
       PlaceCellsOnTheLeft();
       double diff2 = Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false);
-      if (diff2 < best_diff)
+      if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize, best_diff))
       {
           best_diff = diff2;
           SaveCurrentPositionAsBest();
@@ -194,7 +194,7 @@ void HorizontalSwapper::ProcessRow(int rowIdx)
       {
         ImplementEquidistantPermutation();
         double diff1 = Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false);
-        if (diff1 < best_diff)
+        if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize, best_diff))
         {
             best_diff = diff1;
             SaveCurrentPositionAsBest();
@@ -202,7 +202,7 @@ void HorizontalSwapper::ProcessRow(int rowIdx)
 
         PlaceCellsOnTheRight();
         double diff3 = Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false);
-        if (diff3 < best_diff)
+        if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize, best_diff))
         {
             best_diff = diff3;
             SaveCurrentPositionAsBest();
@@ -236,11 +236,11 @@ void HorizontalSwapper::DetermineDirection()
   iterationNumber++;
 }
 
-void HorizontalSearch(HDPGrid& grid)
+void HorizontalSearch(HDPGrid& grid, ConstraintsController* checker)
 {
   ConfigContext ctx = grid.Design().cfg.OpenContext("HorizontalSearch");
 
-  HorizontalSwapper hswapper(grid, grid.Design().cfg.ValueOf(".horizontalGroupSize", 4));
+  HorizontalSwapper hswapper(grid, grid.Design().cfg.ValueOf(".horizontalGroupSize", 4), checker);
 
   hswapper.DetermineDirection();
 

@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <conio.h>
 
-GlobalSwapper::GlobalSwapper(HDPGrid& g, int optimalRegionHalfWidth, int optimalRegionHalfHeight)
-: m_Grid(g), m_OptimalRegionHalfWidth(optimalRegionHalfWidth), m_OptimalRegionHalfHeight(optimalRegionHalfHeight)
+GlobalSwapper::GlobalSwapper(HDPGrid& g, int optimalRegionHalfWidth, int optimalRegionHalfHeight,
+  ConstraintsController* _checker): m_Grid(g), m_OptimalRegionHalfWidth(optimalRegionHalfWidth),
+  m_OptimalRegionHalfHeight(optimalRegionHalfHeight), checker(_checker)
 {
   //NOTE: maximum possible number of considered cells = 1 + OptimalRegionWidth()
   //(current cell + number of sites along optimal region)
@@ -123,7 +124,7 @@ bool GlobalSwapper::TryToMoveWithoutShifting(int rowIdx, int siteIdx)
   m_ConsideredGroupOfCells[0] = m_Cell;
   m_GroupSize = 1;
 
-  if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+  if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
   {//accept move
     m_Grid.PutCell(m_Cell, rowIdx, siteIdx);
     Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, true);
@@ -222,7 +223,7 @@ bool GlobalSwapper::TryToMoveWithShifting(int rowIdx)
 
   ReleaseSpaceForCell(rowIdx, firstFreeSiteIdx, nCandidatesForShifting);
 
-  if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+  if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
   {//put cells to the better position found (probably initial position)
     for (unsigned int j = 0; j < m_GroupSize; ++j)
       m_Grid.PutCell(m_ConsideredGroupOfCells[j], rowIdx, BestPositions[j]);
@@ -412,7 +413,7 @@ bool GlobalSwapper::TryToExchangeWithCell()
           m_Grid.PutCellFast(m_Cell, m_Grid.CellRow(trialCell), site4Current);
           m_Grid.PutCellFast(trialCell, m_Grid.CellRow(m_Cell), site4Trial);
 
-          if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+          if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
           {
             //put cells to the better position found
             m_Grid.PutCell(trialCell, m_Grid.CellRow(m_Cell), site4Trial);
@@ -494,13 +495,14 @@ void GlobalSwapper::ProcessCell(HCell cell)
   return;
 }
 
-void GlobalSwap(HDPGrid& grid)
+void GlobalSwap(HDPGrid& grid, ConstraintsController* checker)
 {
   ConfigContext ctx = grid.Design().cfg.OpenContext("GlobalSwap");
 
   GlobalSwapper gswapper(grid, 
     grid.Design().cfg.ValueOf(".optimalRegionHalfWidth", 14),
-    grid.Design().cfg.ValueOf(".optimalRegionHalfHeight", 2));
+    grid.Design().cfg.ValueOf(".optimalRegionHalfHeight", 2),
+    checker);
 
   HCells::PlaceableCellsEnumeratorW pCell = grid.Design().Cells.GetPlaceableCellsEnumeratorW();
   for (; pCell.MoveNext();)

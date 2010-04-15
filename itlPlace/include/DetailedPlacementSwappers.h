@@ -1,15 +1,19 @@
 #ifndef __DETAILED_PLACEMENT_SWAPPERS_H__
 #define __DETAILED_PLACEMENT_SWAPPERS_H__
 
+#include "ConstraintsController.h"
+
 class GlobalSwapper
 {
 public:
-  GlobalSwapper(HDPGrid& g, int optimalRegionHalfWidth, int optimalRegionHalfHeight);
+  GlobalSwapper(HDPGrid& g, int optimalRegionHalfWidth, int optimalRegionHalfHeight,
+                ConstraintsController* _checker);
   ~GlobalSwapper();
   void ProcessCell(HCell cell);
 
 private:
   HDPGrid& m_Grid;
+  ConstraintsController* checker;
   HCell m_Cell;
   unsigned int m_GroupSize;
   HCell* m_ConsideredGroupOfCells;
@@ -47,7 +51,7 @@ private:
 class HorizontalSwapper
 {
 public:
-  HorizontalSwapper(HDPGrid& g, unsigned int quant_size);
+  HorizontalSwapper(HDPGrid& g, unsigned int quant_size, ConstraintsController* _checker);
   ~HorizontalSwapper();
   void ProcessRow(int rowIdx);
   void DetermineDirection();
@@ -61,6 +65,7 @@ private:
   } Direction;
 
   HDPGrid& m_Grid;
+  ConstraintsController* checker;
   int RowIdx;
   unsigned int m_GroupSize;
   HCell* m_ConsideredGroupOfCells;
@@ -87,12 +92,14 @@ private:
 class VerticalSwapper
 {
 public:
-  VerticalSwapper(HDPGrid& g, int searchZoneSize, int nRowsToSearch);
+  VerticalSwapper(HDPGrid& g, int searchZoneSize, int nRowsToSearch,
+                  ConstraintsController* _checker);
   ~VerticalSwapper();
   void ProcessCell(HCell cell);
 
 private:
   HDPGrid& m_Grid;
+  ConstraintsController* checker;
   HCell m_Cell;
   unsigned int m_GroupSize;
   HCell* m_ConsideredGroupOfCells;

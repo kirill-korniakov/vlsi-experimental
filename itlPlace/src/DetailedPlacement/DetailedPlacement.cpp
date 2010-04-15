@@ -67,6 +67,16 @@ void DetailedPlacement(HDPGrid& grid)
   dpt.SetCell(col_DPRatio, "-");
   dpt.FlushLastRow();
 
+  ConstraintsController* checker; //for checking criteria
+
+  //----Init checker-------------------
+  if (!(grid.Design().cfg.ValueOf("DetailedPlacement.useConstraints", false)))
+    checker = new HPWLChecker(grid); //check only hpwl chanhe
+
+  else
+    checker = new HippocrateChecker(grid); //check Hippocrate constraints also
+  //------------------------------------
+
   int iteration = 0;
   double stoppingCriteriaValue = grid.Design().cfg.ValueOf(".StoppingCriteria", 0.001);
   do
@@ -81,7 +91,7 @@ void DetailedPlacement(HDPGrid& grid)
     //GLOBAL SWAP
     if (isGS)
     {
-      GlobalSwap(grid);
+      GlobalSwap(grid, checker);
       LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
@@ -102,7 +112,7 @@ void DetailedPlacement(HDPGrid& grid)
     //VERTICAL SEARCH
     if (isVS)
     {
-      VerticalSearch(grid);
+      VerticalSearch(grid, checker);
       LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
@@ -123,7 +133,7 @@ void DetailedPlacement(HDPGrid& grid)
     //HORIZONTAL SEARCH
     if (isHS)
     {
-      HorizontalSearch(grid);
+      HorizontalSearch(grid, checker);
       LegalityControl(grid);
       grid.Design().Plotter.Refresh();
 
@@ -158,6 +168,7 @@ void DetailedPlacement(HDPGrid& grid)
   } while ((1.0 - wlAfterIteration / wlBeforeIteration) > stoppingCriteriaValue);
 
   dpt.Print(0, false, true);
+  delete checker;
   WRITELINE();
 
   ALERT("HPWL before detailed placement: %f", wlBeforeDP);

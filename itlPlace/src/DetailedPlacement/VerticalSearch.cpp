@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <conio.h>
 
-VerticalSwapper::VerticalSwapper(HDPGrid& g, int searchZoneSize, int nRowsToSearch)
-: m_Grid(g), m_searchZoneSize(searchZoneSize), m_nRowsToSearch(nRowsToSearch)
+VerticalSwapper::VerticalSwapper(HDPGrid& g, int searchZoneSize, int nRowsToSearch,
+  ConstraintsController* _checker): m_Grid(g), m_searchZoneSize(searchZoneSize),
+  m_nRowsToSearch(nRowsToSearch), checker(_checker)
 {
   int maxCellWidthInSites = 0;
   int currWidth;
@@ -102,7 +103,7 @@ bool VerticalSwapper::TryToMoveWithoutShifting(int rowIdx, int siteIdx)
   m_ConsideredGroupOfCells[0] = m_Cell;
   m_GroupSize = 1;
 
-  if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+  if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
   {//accept move
     m_Grid.PutCell(m_Cell, rowIdx, siteIdx);
     Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, true);
@@ -202,7 +203,7 @@ bool VerticalSwapper::TryToMoveWithShifting(int rowIdx)
 
   ReleaseSpaceForCell(rowIdx, firstFreeSiteIdx, nCandidatesForShifting);
 
-  if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+  if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
   {//put cells to the better position found (probably initial position)
     for (unsigned int j = 0; j < m_GroupSize; ++j)
       m_Grid.PutCell(m_ConsideredGroupOfCells[j], rowIdx, BestPositions[j]);
@@ -389,7 +390,7 @@ bool VerticalSwapper::TryToExchangeWithCell()
           m_Grid.PutCellFast(m_Cell, m_Grid.CellRow(trialCell), site4Current);
           m_Grid.PutCellFast(trialCell, m_Grid.CellRow(m_Cell), site4Trial);
 
-          if (Utils::CalculateHPWLDiff(m_Grid.Design(), m_ConsideredGroupOfCells, m_GroupSize, false) < 0.0)
+          if (checker->CheckCriteria(m_ConsideredGroupOfCells, m_GroupSize))
           {
             //put cells to the better position found
             m_Grid.PutCell(trialCell, m_Grid.CellRow(m_Cell), site4Trial);
@@ -466,13 +467,14 @@ void VerticalSwapper::ProcessCell(HCell cell)
   return;
 }
 
-void VerticalSearch(HDPGrid& grid)
+void VerticalSearch(HDPGrid& grid, ConstraintsController* checker)
 {
   ConfigContext ctx = grid.Design().cfg.OpenContext("VerticalSearch");
 
   VerticalSwapper hswapper(grid, 
     grid.Design().cfg.ValueOf(".searchZoneSize", 7),
-    grid.Design().cfg.ValueOf(".nRowsToSearch", 6));
+    grid.Design().cfg.ValueOf(".nRowsToSearch", 6),
+    checker);
 
   HCells::PlaceableCellsEnumeratorW pCell = grid.Design().Cells.GetPlaceableCellsEnumeratorW();
   for (; pCell.MoveNext();)
