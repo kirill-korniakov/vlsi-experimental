@@ -4,7 +4,7 @@ from CoreScripts import *
 import Parameters
 from Parameters import *
 
-class HPWLExperiment(BaseExperiment):
+class ExperimentHPWL(BaseExperiment):
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
         po.write('Benchmark;HPWL;Time')
@@ -45,11 +45,12 @@ class HPWLExperiment(BaseExperiment):
         return svnRevision
 
 def test():
-    #e = HPWLExperiment('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
-    e = HPWLExperiment('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05/fast.list')
-
     testRunner = TestRunner()
+
+    #e = ExperimentHPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    e = ExperimentHPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
     testRunner.parameters.experiments.append(e)
+
     testRunner.Run()
 
-#test()
+test()

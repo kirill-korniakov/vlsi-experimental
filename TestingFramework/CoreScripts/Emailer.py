@@ -88,22 +88,14 @@ class Emailer:
 def test():
     print("Send test mail")
 
-    ep = EmailerParameters()
-    ep.recipients = ['kirill.kornyakov@gmail.com']
-    #ep.sender = 'from@gmail.com'
-    #ep.smtpserver = 'smtp.gmail.com'
-    #AUTHREQUIRED = 1                     # if you need to use SMTP AUTH set to 1
-    #ep.smtpuser = 'VLSIMailerDaemon@gmail.com'  # for SMTP AUTH, set SMTP username here
-    #ep.smtppass = '22JUL22:19:49'
-
-    emailer = Emailer(ep)
-
     subject = "Test Mail"
     text = "This is automatically generated mail. Please do not reply."
+    attachmentFiles = []
 
-    emailer.PrepareAndSendMail(
-        subject,    # subject
-        text,       # text
-        [])         # attachment files
+    ep = EmailerParameters()
+    ep.recipients = ['kirill.kornyakov@gmail.com']
+    emailer = Emailer(ep)
+
+    emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
 #test()

@@ -10,7 +10,7 @@ from Parameters import *
 
 class ReportCreator:
     def GetLogFolderName(self, cfgName):
-        return 'LOG_' + os.path.basename(cfgName)
+        return ReportParameters.logFolder + os.path.basename(cfgName)
 
     def GetReportTableName(self, cfgName):
         (path, cfgFileName) = os.path.split(cfgName)
@@ -21,5 +21,8 @@ class ReportCreator:
         if os.path.exists(logFolder):
             newFolderName = logFolder + "_backup_from_" + GetTimeStamp()
             os.rename(logFolder, newFolderName)
+        if os.path.exists(ReportParameters.logFolder) != True:
+            os.mkdir(ReportParameters.logFolder)
         os.mkdir(logFolder)
+
         return logFolder
