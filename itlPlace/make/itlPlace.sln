@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cfg", "cfg", "{8528EEF8-E5D
 		..\bin\Config_for_night_experiments.cfg = ..\bin\Config_for_night_experiments.cfg
 		..\bin\cfg\hpwl_ispd04.cfg = ..\bin\cfg\hpwl_ispd04.cfg
 		..\bin\cfg\hpwl_iwls05.cfg = ..\bin\cfg\hpwl_iwls05.cfg
+		..\bin\cfg\kirill_buffering.cfg = ..\bin\cfg\kirill_buffering.cfg
 		..\bin\cfg\LR.cfg = ..\bin\cfg\LR.cfg
 	EndProjectSection
 EndProject
