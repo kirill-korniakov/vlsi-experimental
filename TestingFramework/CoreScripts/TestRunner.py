@@ -17,7 +17,6 @@ import Parameters
 from Parameters import *
 
 class TestRunner:
-    svnRevision = ''
     parameters = ''
 
     def __init__(self, parameters = TestRunnerParameters()):
@@ -61,7 +60,7 @@ class TestRunner:
             subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             print(benchmark + ' is done...')
-            self.svnRevision = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+            experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
         return reportTable
 

@@ -12,7 +12,7 @@ class BaseExperiment:
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
 
     def CreateEmptyTable(self, reportTable):
-        print('ERROR')
+        print('ERROR: you can\'t use BaseExperiment class itself!')
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        print('ERROR')
+        print('ERROR: you can\'t use BaseExperiment class itself!')
