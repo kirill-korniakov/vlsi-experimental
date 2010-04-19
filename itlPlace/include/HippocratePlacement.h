@@ -126,19 +126,22 @@ __inline double GetNetWeight(HDesign& hd, HNet& net);
 
 double CalculateDiffWTWL(HDesign& hd, std::vector<HNet>& netvector, bool updateCachedValues);
 
-void GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell, LWindow& curWnd);				// Нужно для MOVE, SWAP
+std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);// Нужно для MOVE, SWAP
 BBox GetCurrentBBox(HDPGrid& hdpp, HDesign& hd, const HCriticalPath::PointsEnumeratorW&);// Нужно для CENTER, COMPACT
 
 bool ControlOfConstraints(HDPGrid& hdpp, HDesign& hd, HNet net, int oldRow, int oldCol, HCell& curCell); //проверка ограничений
 
-std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, LWindow& curWnd);//по окну LWindow возвращает вектор дырок в нем
+std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellsWindow);//по окну LWindow возвращает вектор дырок в нем// moded
 std::vector<PossiblePos> getVPossibleHorizontalPos(HDPGrid& hdpp, HCell curCell);
 std::vector<HCell> getSpecialWindow(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox);//window for COMPACT
 std::vector<PseudoCell> getPseudoCellsFromSpecWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellInSpWind);//вход - упорядоченный вектор элементов(окно от левого верхнего к правому нижнему), выход - вектор дырок в нем
 PossiblePos GetCenterNearestPos (HCell& NetCell, std::vector<PseudoCell>& VGap);
 
 SpecWindow getSpecWindForCell(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox );
-std::vector<PseudoCell> getGapsForCell(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox );
+std::vector<PseudoCell> getGapsForCell(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox, bool InsideGaps );
+std::vector<HPinWrapper> CellsInPath(HDesign& hd, HCriticalPath path);
+BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin);
+std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);	// Вернуть окно элемента // moded
 
 
 //void DoAllMethodsWithPath(HDesign&, HCriticalPath, int);
@@ -152,11 +155,11 @@ void DoAllMethodsWithPath(HDesign&, HCriticalPath, int);
 
 
 //============= ПРЕОБРАЗОВАНИЯ ===================
-void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, /*int numOfPath,int numOfPoint, */HCell& curCell, LWindow& curWnd, StatisticsAnalyser& stat);
+void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, /*int numOfPath,int numOfPoint, */HCell& curCell, std::vector<HCell>& currentWnd, StatisticsAnalyser& stat);
 void HippocratePlacementCOMPACT(HDPGrid& hdpp, HDesign& hd, HCell& curCell, BBox curBBox, StatisticsAnalyser& stat);
 void HippocratePlacementLOCALMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, StatisticsAnalyser& stat);
-void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, LWindow& curWnd, StatisticsAnalyser& stat);
-void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, LWindow& curWnd, StatisticsAnalyser& stat);
+void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::vector<HCell>& currentWnd, StatisticsAnalyser& stat);
+void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::vector<HCell>& currentWnd, StatisticsAnalyser& stat);
 //================================================
 
 void DoHippocratePlacement(HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat, TimingHPWLWatcher& thpwlWatcher);
