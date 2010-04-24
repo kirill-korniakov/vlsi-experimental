@@ -5,6 +5,7 @@
 #include "TableFormatter.h"
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design);
+void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design);
 void RunFlow(HDesign& hd, TableFormatter& flowMetrics);
 
 #endif //__VLSIFLOW_H__

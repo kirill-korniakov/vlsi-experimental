@@ -40,8 +40,10 @@ class TestRunner:
     def RunExperiment(self, experiment):
         benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
 
-        print('Config name = %s' % experiment.cfg)
-        print("Performing tests on the following set of benchmarks:\n" + ", ".join(benchmarks))
+        print('Config: %s' % experiment.cfg)
+        print('List:   %s' % experiment.benchmarks)
+        print("Benchmarks:\n" + ", ".join(benchmarks))
+        print("\n")
 
         reportCreator = ReportCreator()
         logFolder = reportCreator.CreateLogFolder(experiment.cfg)

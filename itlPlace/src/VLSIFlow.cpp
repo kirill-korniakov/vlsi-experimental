@@ -17,6 +17,12 @@
 #include "VanGinnekenAlgorithm.h"
 #include "HippocratePlacement.h"
 
+void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design)
+{
+	fmt.NewBorderRow();
+	fmt.SetCell(0, "-",fmt.NumOfColumns(), TableFormatter::Align_Fill);
+}
+
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
 {
     fmt.NewHeaderRow();
@@ -40,8 +46,7 @@ void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
     fmt.SetColumnPrecision(5, 0);
     fmt.SetColumnPrecision(2, 3);
 
-    fmt.NewBorderRow();
-    fmt.SetCell(0, "-",fmt.NumOfColumns(), TableFormatter::Align_Fill);
+    FlowMetricsTableAddBorder(fmt, design);
 }
 
 void WriteFlowMetrics(TableFormatter& fmt, HDesign& design, const char* stageName, const string& tag)
@@ -371,6 +376,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
         DoSTAIfCan(hd);
     }
+
+	FlowMetricsTableAddBorder(flowMetrics, hd);
 
     //EXPORT
     hd.Plotter.ShowPlacement();

@@ -40,6 +40,10 @@ class GeneralParameters:
 	slnPath = checkoutPath + "make/itlPlace.sln"
 	benchmarkCheckoutPath = "../Benchmarks/"
 
+class LogParserParameters:
+    tableHeader = 'Placement Flow Stages Table'
+    borderPattern = '-----'
+
 class Tools:
 	MSBuild  = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"
 	UnRar = "7z.exe"
