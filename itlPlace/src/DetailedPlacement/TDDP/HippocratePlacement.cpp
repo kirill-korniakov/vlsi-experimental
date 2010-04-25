@@ -82,9 +82,7 @@ void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 	int oldCurRow = hdpp.CellRow(curCell);
 	int oldCurCol = hdpp.CellColumn(curCell);
 	std::vector<PseudoCell> VHole=getPseudoCellsFromWindow(hdpp, hd, currentWnd);
-	//ALERTFORMAT(("holes %d",VHole.size()));
-	ALERT("----------------------------------------------------");
-	ALERT("Gap count %d",VHole.size());
+	
 	for (unsigned int i = 0; i < VHole.size(); i++) 
 	{		
 		if(hdpp.CellSitesNum(curCell) <= VHole[i].GapSize) //мен€ем два элемента местами
@@ -95,7 +93,7 @@ void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 
 				//дл€ каждого изменЄнного соединени€ провер€ем выполнение ограничений
 				bool constraintsOK = true;
-				double deltaWTWL = 0;
+ 				double deltaWTWL = 0;
 
 				//for(int j = 0; j < curNets.size(); j++) {
 					//if(!ControlOfConstraints(hdpp, hd, curNets[j], oldCurRow, oldCurCol, curCell))
@@ -104,7 +102,7 @@ void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 					if(!CheckHippocrateConstraint(hd, curCell)) 
 					{constraintsOK = false;}
 				
-					if(constraintsOK) { ALERT("constraintsOK");//если выполнены ограничени€
+					if(constraintsOK) { //ALERT("constraintsOK");//если выполнены ограничени€
 					//находим изменение WTWL (deltaWTWL)
 					deltaWTWL = CalculateDiffWTWL(hd, curNets, false);
 					if (deltaWTWL < maxIncrOfWTWL){
@@ -498,7 +496,9 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 				if(curNets[j]==Nets[m]&&(!::IsNull(curNets[j]))) {
 					dubNet = curNets[j];
 					isConnected = true;
+					
 				}
+		//if(isConnected) continue;
 
 		int oldRow = hdpp.CellRow(*iter);
 		int oldCol = hdpp.CellColumn(*iter);
@@ -530,7 +530,7 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 			}
 			hdpp.PutCell(curCell, oldRow, oldCol-delta2);						
 			hdpp.PutCell(*iter, oldCurRow, oldCurCol-delta1);						
-
+			
 			//дл€ каждого изменЄнного соединени€ провер€ем выполнение ограничений
 			bool constraintsOK = true;
 			double deltaWTWL = 0, RdeltaWTWL = 0;
@@ -970,8 +970,11 @@ int FindFirstLeftCell(int row, int column, int R, HDPGrid& hdpp)	// Ќайти первый
 	}	
 	if(col < 0)		
 			col = 0;
-	while(!isCellExists(hdpp, row, col))
-			col++;
+	while(((!isCellExists(hdpp, row, col))&&(col<hdpp.NumCols())))
+	{
+		col++;
+	}
+	if (col==hdpp.NumCols()) col=-1;
 	return col;	
 }
 
@@ -986,7 +989,7 @@ std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell)	// ¬ерн
 	int column = hdpp.CellColumn(curCell);  // номер сайта текущего cell'а
 
 	int x_min = FindFirstLeftCell(row, column, R, hdpp);
-
+	
 	while(x_min < column)
 	{
 			if(isCellExists(hdpp, row, x_min)) {
@@ -1013,9 +1016,12 @@ std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell)	// ¬ерн
 
 	int temp = 0;
 	for(int i = y_min; i <= y_max; i++)	{	
-			//ALERTFORMAT(("-- before FindFirstLeftCell"));
+			//ALERT("-- before FindFirstLeftCell %d",cellCounter);
+			//if ((pathNumber==5)&&(cellCounter==10))
+				//int qweerrrr=0;
 		x_min = FindFirstLeftCell(i, column, R, hdpp);///////////HERE
-			//ALERTFORMAT(("-- after FindFirstLeftCell"));
+		if (x_min==-1) continue;
+			//ALERT("-- after FindFirstLeftCell");
 		temp += RightCounting(i, x_min, R, RL, hcell + temp, hdpp);	
 		
 	}
@@ -1408,7 +1414,9 @@ std::vector<HPinWrapper> CellsInPath(HDesign& hd, HCriticalPath path)
 
 void PathCallback::ProcessPath2(HDesign& hd, HCriticalPath path, int pathNumber)// moded
 {
+	//ALERT("path %d:", pathNumber);
 	std::vector<HPinWrapper> myPins = CellsInPath(hd, path);
+
 	for (std::vector<HPinWrapper>::iterator Iter = myPins.begin(); Iter < myPins.end(); Iter++)
 	{
 		if(hd.cfg.ValueOf("HippocratePlacement.SWAP", false)){
@@ -1419,7 +1427,7 @@ void PathCallback::ProcessPath2(HDesign& hd, HCriticalPath path, int pathNumber)
 			BBox curBBox = GetCurrentBBox3(hdpp, hd, *Iter);
 			HippocratePlacementCOMPACT(hdpp, hd, Iter->Cell(), curBBox, stat);						
 		}
-		if(hd.cfg.ValueOf("HippocratePlacement.MOVE", false)){
+		if(hd.cfg.ValueOf("HippocratePlacement.MOVE",false)){
 			std::vector<HCell> curWnd = GetCurrentWindow(hdpp, RADIUS_OF_WINDOW,Iter->Cell());
 			HippocratePlacementMOVE(hdpp, hd, Iter->Cell(), curWnd, stat);
 		}
