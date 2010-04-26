@@ -479,7 +479,7 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 	int oldCurRow = hdpp.CellRow(curCell);
 	int oldCurCol = hdpp.CellColumn(curCell);
 	int i=0;
-   	for(std::vector<HCell>::iterator iter=currentWnd.begin();iter!=currentWnd.end();iter++)
+  for(std::vector<HCell>::iterator iter=currentWnd.begin();iter!=currentWnd.end();iter++)
 	{
 		if ((*iter,hd).IsSequential()) continue;
 		std::vector<HNet> Nets; //соединения, в которых участвует элемент из окна
@@ -528,14 +528,17 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 					delta2 = maxNS - RightFreeSpace - minNS;
 				}	
 			}
+			
 			hdpp.PutCell(curCell, oldRow, oldCol-delta2);						
-			hdpp.PutCell(*iter, oldCurRow, oldCurCol-delta1);						
+			hdpp.PutCell(*iter, oldCurRow, oldCurCol-delta1);	
 			
 			//для каждого изменённого соединения проверяем выполнение ограничений
 			bool constraintsOK = true;
 			double deltaWTWL = 0, RdeltaWTWL = 0;
 			
-			if(!(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, *iter))) constraintsOK = false;
+			constraintsOK = false;
+			if(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, *iter)) constraintsOK = true;
+			//if(!(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, *iter))) constraintsOK = false;
 			
 			if(constraintsOK) { //если выполнены ограничения
 				//находим изменение WTWL (deltaWTWL)
@@ -551,6 +554,7 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 			//меняем обратно
 			hdpp.PutCell(*iter, oldRow, oldCol);		
 			hdpp.PutCell(curCell, oldCurRow, oldCurCol);
+
 			stat.incrementAttempts(SWAP);
 		}	
 		i++;
@@ -745,7 +749,6 @@ BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin)//GetCurrent
 
 	BBox tBBox;
 
-	//for (;pinsEnumW.MoveNext();)
 	while(pinsEnumW.MoveNext())
 	{
 
@@ -758,8 +761,7 @@ BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin)//GetCurrent
 		if((tBBox.cells.size()==0)||(tBBox.cells.back()!=cell)){
 			if (!::IsNull(cell))
 				tBBox.cells.push_back(cell);
-			else 
-				ALERT("Cell is null in CurBBox");
+			//else ALERT("Cell is null in CurBBox");
 			int c=hdpp.CellColumn(cell);
 			int r=hdpp.CellRow(cell);
 			if (c>cmax) cmax=c;
@@ -875,9 +877,6 @@ void DoHippocratePlacement( HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat
 	}
 	if(hd.cfg.ValueOf("HippocratePlacement.CENTER", false)){
 		ALERT("-------CENTER ENABLED");
-	}
-	if(hd.cfg.ValueOf("HippocratePlacement.SECCOMPACT", false)){
-		ALERT("-------SECCOMPACT ENABLED");	
 	}
 	if(hd.cfg.ValueOf("HippocratePlacement.LOCALMOVE", false)){
 		ALERT("-------LOCALMOVE ENABLED");	
