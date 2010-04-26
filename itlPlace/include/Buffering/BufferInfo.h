@@ -40,6 +40,7 @@ public:
   HPinType OutPin() const {return m_OutPin; }
 
   static BufferInfo Create(HDesign& hd);
+  static TemplateTypes<BufferInfo>::vector CreateVector(HDesign& hd);
 };
 
 #endif //__BUFFERINFO_H__

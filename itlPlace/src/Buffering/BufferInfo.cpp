@@ -5,9 +5,30 @@
 BufferInfo BufferInfo::Create(HDesign& hd)
 {
   return Create(hd,
-    hd.cfg.ValueOf("Buffering.DefaultBuffer.Macro", "INVX1"),
-    hd.cfg.ValueOf("Buffering.DefaultBuffer.InputPin", "A"),
-    hd.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
+    hd.cfg.ValueOf("DefaultBuffer.Macro", "INVX1"),
+    hd.cfg.ValueOf("DefaultBuffer.InputPin", "A"),
+    hd.cfg.ValueOf("DefaultBuffer.OutputPin", "Y"));
+}
+
+TemplateTypes<BufferInfo>::vector BufferInfo::CreateVector(HDesign& hd)
+{
+  TemplateTypes<BufferInfo>::vector buffervector;
+  for (HMacroTypes::EnumeratorW macroTypeEW = hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
+    if (macroTypeEW.Type() == MacroType_BUF)
+    {
+      string macro = macroTypeEW.Name();
+      string inputPinName; 
+      string outputPinName;
+      for (HMacroType::PinsEnumeratorW pin = macroTypeEW.GetEnumeratorW(); pin.MoveNext();)
+      {
+        if(pin.Direction() == PinDirection_INPUT) inputPinName = pin.Name();
+        if(pin.Direction() == PinDirection_OUTPUT) outputPinName = pin.Name();
+      }   
+      BufferInfo buf = Create(hd, macro, inputPinName, outputPinName);
+      buffervector.push_back(buf);
+    }
+    return buffervector;
+    
 }
 
 BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string outputPin)

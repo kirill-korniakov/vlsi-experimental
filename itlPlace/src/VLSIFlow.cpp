@@ -353,11 +353,12 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     //New_BUFFERING
     if (hd.cfg.ValueOf("DesignFlow.New_Buffering", false))
     {
+        ALERT("NEW BUFFERING STARTED");
         ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
         VGAlgorithm buf(hd);
         buf.BufferingPlacement();
         STA(hd);
-
+        ALERT("NEW BUFFERING FINISHED");
         WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");
 
         if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))

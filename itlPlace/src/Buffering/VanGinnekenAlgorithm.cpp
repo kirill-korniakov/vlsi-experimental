@@ -5,8 +5,20 @@
 
 void VGAlgorithm::LoadBuffers()
 {
-  BufferInfo buf = BufferInfo::Create(design);
-  Buffers.push_back(buf);
+  if (design.cfg.ValueOf("UseOnlyDefaultBuffer", false))
+  {
+    BufferInfo buf = BufferInfo::Create(design);    
+    Buffers.push_back(buf);
+    ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, buf.Type()).Name().c_str(),
+      (design, buf.InPin()).Name().c_str(), (design, buf.OutPin()).Name().c_str());
+  }
+  else
+  {
+    Buffers = BufferInfo::CreateVector(design);
+    for (int i = 0; i < Buffers.size(); i++)
+      ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, Buffers[i].Type()).Name().c_str(),
+      (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
+  }
 }
 
 VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
@@ -16,16 +28,8 @@ VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.
 
 int VGAlgorithm::BufferingPlacement()
 {
-  /*for (HNets::ActiveNetsEnumeratorW inw = design.Nets.GetActiveNetsEnumeratorW(); inw.MoveNext();)
-  {
-  //if (inw.Name() == "n_10626")
-  {
-  BufferingNen(inw);
-  string s = design.Nets.GetString<HNet::Name>(inw);
-  //break;
-  }
-  }*/
-
+  
+  
   std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
   int idx = 0;
   for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
@@ -42,19 +46,20 @@ int VGAlgorithm::BufferingPlacement()
       {
 
         //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_10713"))
-
+        
         bufferCount += BufferingNen(net);
       }
     }
-
-
-    return bufferCount;
+  ALERT("Buffers inserted: %d", bufferCount);
+  
+  return bufferCount;
 }
 
 int VGAlgorithm::BufferingNen(HNet& net)
 {
-  VanGinnekenTree vGTree(design, 3, design.SteinerPoints[(net, design).Source()]);
-  //printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
+  int partitionCount = design.cfg.ValueOf("Interval", 1);
+  VanGinnekenTree vGTree(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
+  printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
   VGVariantsListElement* best = Algorithm(&vGTree);
   int bufCount = best->GetPositionCount();
   if (bufCount > 0)
@@ -91,7 +96,7 @@ VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
       best = &(*i);
     }
   }
-  //printf("%d\t%f\n", best->GetPositionCount(), tMax);
+  printf("%d\t%f\n", best->GetPositionCount(), tMax);
   return best;
 }
 
