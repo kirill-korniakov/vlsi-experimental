@@ -30,8 +30,10 @@ int fgr::FGRRouting(HDPGrid& grid)
                       + clock() / CLOCKS_PER_SEC; //not to take into account the
                                                   //time used before router started
   
-  string tmpstr = grid.Design().cfg.ValueOf("FGRRouting.FGROutputFile", "bench.fgr");
-  int pos = 0;
+  //string tmpstr = grid.Design().cfg.ValueOf("FGRRouting.FGROutputFile", "bench.fgr");
+	string tmpstr = grid.Design().Circuit.Name() +  string("_") + grid.Design().cfg.ValueOf("FGRRouting.FGROutputFile", "bench.fgr");
+  
+	int pos = 0;
   
   while (tmpstr[pos] != '.')
     pos++;
@@ -104,5 +106,7 @@ int fgr::FGRRouting(HDPGrid& grid)
   unsigned int imageSize = grid.Design().cfg.ValueOf("FGRRouting.ImageSize", 900);
   fgr.plotXPM(parms.outputFile, imageSize);
   fgr.plotEdgesXPM(parms.outputFile, imageSize);
+	//fgr.plotColorsXPM(parms.outputFile, imageSize);
+
   return 0;
 }

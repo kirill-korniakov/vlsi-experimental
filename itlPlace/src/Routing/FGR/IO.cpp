@@ -425,9 +425,12 @@ void FGR::parseInputAsLab(HDPGrid& grid)
   halfWidth = 0;
   halfHeight = 0;
 
-  double xMin    = grid.ColumnX(grid.NumCols());
-  double yMin    = grid.RowY(grid.NumRows());
-  double xMax    = grid.ColumnX(0);
+  //double xMin    = grid.ColumnX(grid.NumCols());
+  //double yMin    = grid.RowY(grid.NumRows());
+	double xMin    = grid.ColumnX(grid.NumCols()-1) + grid.SiteWidth();
+	double yMin    = grid.RowY(grid.NumRows()-1) + grid.SiteHeight();
+	
+	double xMax    = grid.ColumnX(0);
   double yMax    = grid.RowY(0);
   unsigned nNets = 0;
 
@@ -1147,23 +1150,20 @@ void FGR::writeRoutes(const string &filename)
 
 const char* coolMap[] = {
 /* columns rows colors chars-per-pixel */
-"a c #ffffff", "b c #00009f", "c c #0000af", "d c #0000bf",
-"e c #0000cf", "f c #0000df", "g c #0000ef", "h c #0000ff",
-"i c #000fff", "j c #001fff", "k c #002fff", "l c #003fff",
-"m c #004fff", "n c #005fff", "o c #006fff", "p c #007fff",
-"q c #008fff", "r c #009fff", "s c #00afff", "t c #00bfff",
-"u c #00cfff", "v c #00dfff", "w c #00efff", "x c #00ffff",
-"y c #0fffef", "z c #1fffdf", "A c #2fffcf", "B c #3fffbf",
-"C c #4fffaf", "D c #5fff9f", "E c #6fff8f", "F c #7fff7f",
-"G c #8fff6f", "H c #9fff5f", "I c #afff4f", "J c #bfff3f",
-"K c #cfff2f", "L c #dfff1f", "M c #efff0f", "N c #ffff00",
-"O c #ffef00", "P c #ffdf00", "Q c #ffcf00", "R c #ffbf00",
-"S c #ffaf00", "T c #ff9f00", "U c #ff8f00", "V c #ff7f00",
-"W c #ff6f00", "X c #ff5f00", "Y c #ff4f00", "Z c #ff3f00",
-"0 c #ff2f00", "1 c #ff1f00", "2 c #ff0f00", "3 c #ff0000",
-"4 c #ef0000", "5 c #df0000", "6 c #cf0000", "7 c #bf0000",
-"8 c #af0000", "9 c #9f0000", ", c #8f0000", ". c #7f0000"};
-
+"a c #ffffff", "b c #0000af", "c c #0000bf", "d c #0000cf", "e c #0000ef", 
+"f c #0000ff", "g c #002bff", "h c #004bff", "i c #006bff", "j c #007bff", 
+"k c #008bff", "l c #009bff", "m c #00abff", "n c #00bbff", "o c #00dbff", 
+"p c #00ebff", "q c #00fbff", "r c #00fcff", "s c #00fffa", "t c #00fff5",
+"u c #00fff1", "v c #00fff3", "w c #00ffe3", "x c #00ffd3", "y c #00ffc3", 
+"z c #00ffb3", "A c #00ffa3", "B c #00ff93", "C c #00ff73", "D c #00ff63", 
+"E c #00ff43", "F c #00ff2e", "G c #00ff13", "H c #00ff0c", "I c #0dff00", 
+"J c #3aff00", "K c #4dff00", "L c #7dff00", "M c #adff00", "N c #bdff00",
+"O c #cdff00", "P c #ddff00", "Q c #edff00", "R c #feff00", "S c #fdff00", 
+"T c #fff100", "U c #fff200", "V c #ffe100", "W c #ffd100", "X c #ffcd00",
+"Y c #ffb600", "Z c #ffb100", "0 c #ffa100", "1 c #ff8100", "2 c #ff7100",
+"3 c #ff001e", "4 c #ff002e", "5 c #df0000", "6 c #cf0000", "7 c #bf0000",
+"8 c #af0000", "9 c #9f0000", ", c #8f0000", ". c #7f0000"	
+};
 
 const char* Colors[] = {
 "a", "b", "c", "d", "e", "f", "g", "h",
