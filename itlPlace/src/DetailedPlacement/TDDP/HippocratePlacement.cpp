@@ -466,8 +466,7 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 {	
 	if ((curCell,hd).IsSequential()) return;
 	Utils::CalculateHPWL(hd, true);
-	//double oldWTWL = Utils::CalculateWeightedHPWL(hd,true);
-
+	
 	std::vector<HNet> curNets;//соединения, в которых участвует текущий элемент
 	for(HCell::PinsEnumeratorW pin=hd.Get<HCell::Pins, HCell::PinsEnumeratorW>(curCell); pin.MoveNext(); )
 	{
@@ -475,134 +474,97 @@ void HippocratePlacementSWAP(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 		if(!::IsNull(net)) curNets.push_back(net);
 	}
 	double maxIncrOfWTWL = 0;  //максимальное уменьшение WTWL
-	int k = 0;  //номер эл-та из окна, для которого достиг. максимальное уменьшение WTWL
+	int BestCurCol=-1;
+	int BestCurRow=-1;
+	int BestIterCol=-1;
+	int BestIterRow=-1;
+	bool BestFound=false;
+	HCell BestSwappingCell;
+	HCell BestCurCell;
+
 	int oldCurRow = hdpp.CellRow(curCell);
 	int oldCurCol = hdpp.CellColumn(curCell);
-	int i=0;
-  for(std::vector<HCell>::iterator iter=currentWnd.begin();iter!=currentWnd.end();iter++)
+
+	for(std::vector<HCell>::iterator iterSwappingCells=currentWnd.begin();iterSwappingCells!=currentWnd.end();iterSwappingCells++)
 	{
-		if ((*iter,hd).IsSequential()) continue;
+		if ((*iterSwappingCells,hd).IsSequential()) continue;
 		std::vector<HNet> Nets; //соединения, в которых участвует элемент из окна
-		for(HCell::PinsEnumeratorW pin=hd.Get<HCell::Pins, HCell::PinsEnumeratorW>(*iter); pin.MoveNext(); )
+		for(HCell::PinsEnumeratorW pin=hd.Get<HCell::Pins, HCell::PinsEnumeratorW>(*iterSwappingCells); pin.MoveNext(); )
 		{
 			HNet net=hd.Get<HPin::Net,HNet>(pin);
 			if(!::IsNull(net)) Nets.push_back(net);
 		}
 
 		HNet dubNet; //нет, в котором участвуют текущий эл-т и эл-т из окна (если есть)
-		bool isConnected = false; 
 		for(int m=0; m<Nets.size(); m++)
 			for(int j=0; j<curNets.size(); j++)
 				if(curNets[j]==Nets[m]&&(!::IsNull(curNets[j]))) {
 					dubNet = curNets[j];
-					isConnected = true;
-					
 				}
-		//if(isConnected) continue;
 
-		int oldRow = hdpp.CellRow(*iter);
-		int oldCol = hdpp.CellColumn(*iter);
+				int oldRow = hdpp.CellRow(*iterSwappingCells);
+				int oldCol = hdpp.CellColumn(*iterSwappingCells);
 
-		int row = oldCurRow, //текущий эл-т меньше
-			col = oldCurCol; 
-		int minNS = hdpp.CellSitesNum(curCell);
-		int maxNS = hdpp.CellSitesNum(*iter);
-		if( minNS > maxNS ) {
-			minNS = hdpp.CellSitesNum(*iter);
-			maxNS = hdpp.CellSitesNum(curCell);
-			row = oldRow; //эл-т из окна меньше
-			col = oldCol;						 
-		}
-		//ищем свободное место слева и справа от меньшего эл-та
-		int LeftFreeSpace = GetLeftFreeSpace(hdpp(row, col), hdpp);
-		int RightFreeSpace = GetRightFreeSpace(hdpp(row, col), hdpp);
-		if( (LeftFreeSpace + RightFreeSpace + minNS) >= maxNS ) //меняем два элемента местами
-		{
-			int delta1 = 0;
-			int delta2 = 0;
-			if( (RightFreeSpace + minNS) < maxNS ) { //меняем со сдвигом влево
-				if(curCell==hdpp(row, col)) { //текущий меньше
-					delta1 = maxNS - RightFreeSpace - minNS;
+				int row = oldCurRow, //текущий эл-т меньше
+					col = oldCurCol; 
+				int minNS = hdpp.CellSitesNum(curCell);
+				int maxNS = hdpp.CellSitesNum(*iterSwappingCells);
+				if( minNS > maxNS ) {
+					minNS = hdpp.CellSitesNum(*iterSwappingCells);
+					maxNS = hdpp.CellSitesNum(curCell);
+					row = oldRow; //эл-т из окна меньше
+					col = oldCol;						 
 				}
-				else { //текущий больше
-					delta2 = maxNS - RightFreeSpace - minNS;
+				//ищем свободное место слева и справа от меньшего эл-та
+				int LeftFreeSpace = GetLeftFreeSpace(hdpp(row, col), hdpp);
+				int RightFreeSpace = GetRightFreeSpace(hdpp(row, col), hdpp);
+				if( (LeftFreeSpace + RightFreeSpace + minNS) >= maxNS ) //меняем два элемента местами
+				{
+					int delta1 = 0;
+					int delta2 = 0;
+					if( (RightFreeSpace + minNS) < maxNS ) { //меняем со сдвигом влево
+						if(curCell==hdpp(row, col)) { //текущий меньше
+							delta1 = maxNS - RightFreeSpace - minNS;
+						}
+						else { //текущий больше
+							delta2 = maxNS - RightFreeSpace - minNS;
+						}	
+					}
+
+					HCell swappingCell=*iterSwappingCells;
+					hdpp.PutCell(curCell, oldRow, oldCol-delta2);						
+					hdpp.PutCell(swappingCell, oldCurRow, oldCurCol-delta1);	
+
+					double deltaWTWL = CalculateDiffWTWL(hd, curNets, false) + CalculateDiffWTWL(hd, Nets, false) - GetNetWeight(hd, dubNet)*Utils::CalculateHPWLDiff(hd, &dubNet, 1, false);
+					if(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, swappingCell)&&(deltaWTWL < maxIncrOfWTWL)){
+
+						maxIncrOfWTWL = deltaWTWL;
+						BestSwappingCell=swappingCell;
+						BestCurCell=curCell;
+						BestCurRow=oldRow;
+						BestCurCol=oldCol-delta2;
+						BestIterRow=oldCurRow;
+						BestIterCol=oldCurCol-delta1;
+						BestFound=true;
+					}
+					//меняем обратно
+					hdpp.PutCell(swappingCell, oldRow, oldCol);		
+					hdpp.PutCell(curCell, oldCurRow, oldCurCol);
+
+					stat.incrementAttempts(SWAP);
 				}	
-			}
-			
-			hdpp.PutCell(curCell, oldRow, oldCol-delta2);						
-			hdpp.PutCell(*iter, oldCurRow, oldCurCol-delta1);	
-			
-			//для каждого изменённого соединения проверяем выполнение ограничений
-			bool constraintsOK = true;
-			double deltaWTWL = 0, RdeltaWTWL = 0;
-			
-			constraintsOK = false;
-			if(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, *iter)) constraintsOK = true;
-			//if(!(CheckHippocrateConstraint(hd, curCell)&&CheckHippocrateConstraint(hd, *iter))) constraintsOK = false;
-			
-			if(constraintsOK) { //если выполнены ограничения
-				//находим изменение WTWL (deltaWTWL)
-				deltaWTWL = CalculateDiffWTWL(hd, curNets, false) + CalculateDiffWTWL(hd, Nets, false);
-				deltaWTWL = deltaWTWL - GetNetWeight(hd, dubNet)*Utils::CalculateHPWLDiff(hd, &dubNet, 1, false);
-				//RdeltaWTWL = Utils::CalculateWeightedHPWL(hd,false) - oldWTWL;
-
-				if (deltaWTWL < maxIncrOfWTWL){
-					maxIncrOfWTWL = deltaWTWL;
-					k = i;
-				}
-			}
-			//меняем обратно
-			hdpp.PutCell(*iter, oldRow, oldCol);		
-			hdpp.PutCell(curCell, oldCurRow, oldCurCol);
-
-			stat.incrementAttempts(SWAP);
-		}	
-		i++;
-		//ALERTFORMAT(("%d",i));
 	}
-	if (maxIncrOfWTWL < 0) { //если длина проводов уменьшилась
-		int row = hdpp.CellRow(curCell), //текущий эл-т меньше
-			col = hdpp.CellColumn(curCell); 
-		int minNS = hdpp.CellSitesNum(curCell);
-		int maxNS = hdpp.CellSitesNum(currentWnd[k]);
-		if( minNS > maxNS ) {
-			minNS = hdpp.CellSitesNum(currentWnd[k]);
-			maxNS = hdpp.CellSitesNum(curCell);
-			row = hdpp.CellRow(currentWnd[k]);//эл-т из окна меньше
-			col = hdpp.CellColumn(currentWnd[k]);				    		 
-		}
-		//ищем свободное место слева и справа от меньшего эл-та
-		int LeftFreeSpace = GetLeftFreeSpace(hdpp(row, col), hdpp);
-		int RightFreeSpace = GetRightFreeSpace(hdpp(row, col), hdpp);
-		int delta1 = 0;
-		int delta2 = 0;
-		if( (RightFreeSpace + minNS) < maxNS ) { //меняем со сдвигом влево
-			if(curCell==hdpp(row, col)) { //текущий меньше
-				delta1 = maxNS - RightFreeSpace - minNS;
-			}
-			else { //текущий больше
-				delta2 = maxNS - RightFreeSpace - minNS;
-			}	
-		}
-		//меняем эл-ты
-		//hd.Plotter.PlotCell(curCell, Color_Indigo);
-		//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
-		//hd.Plotter.PlotCell(curWnd.cells[k], Color_LemonChiffon);
-		//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);	
-		hdpp.PutCell(curCell, hdpp.CellRow(currentWnd[k]),hdpp.CellColumn(currentWnd[k])-delta2);
-		//hd.Plotter.PlotCell(curCell, Color_Indigo);
-		//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);	
-		hdpp.PutCell(currentWnd[k], oldCurRow, oldCurCol-delta1);
-		//hd.Plotter.PlotCell(curWnd.cells[k], Color_LemonChiffon);
-		//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+
+	if ((maxIncrOfWTWL < 0)&&(BestFound)) { //если длина проводов уменьшилась
+		//if(BestIterRow>=0&&BestIterCol>=0&&BestCurCol>=0&&BestCurRow>=0){
+		hdpp.PutCell(BestCurCell, BestCurRow,BestCurCol);
+		hdpp.PutCell(BestSwappingCell, BestIterRow, BestIterCol);
 
 		stat.incrementAttemptsSuccessful(SWAP);
 
-		//---для уже передвинутых элементов находит лучшее положение в дырке			
-		HippocratePlacementLOCALMOVE(hdpp, hd, curCell, stat);
-		HippocratePlacementLOCALMOVE(hdpp, hd, currentWnd[k], stat);
-		//--------------------------
-	//	STA(hd,false);
+		HippocratePlacementLOCALMOVE(hdpp, hd, BestCurCell, stat);
+		HippocratePlacementLOCALMOVE(hdpp, hd, BestSwappingCell, stat);
+		//}
 	} 
 }
 
