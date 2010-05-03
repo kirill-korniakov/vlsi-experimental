@@ -844,7 +844,7 @@ void DoHippocratePlacement( HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat
 		ALERT("-------LOCALMOVE ENABLED");	
 	}	
 
-	if(hd.cfg.ValueOf("HippocratePlacement.KamaevCheckConstraints", false)){
+	/*if(hd.cfg.ValueOf("HippocratePlacement.KamaevCheckConstraints", false)){
 		ALERT("-------KamaevCheck ENABLED");	
 	}else{
 		ALERT("-------OurCheck ENABLED");	
@@ -854,7 +854,7 @@ void DoHippocratePlacement( HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat
 		ALERT("-------PathInCriticalOrder ENABLED");	
 	}else{
 		ALERT("-------PathInRandomOrder ENABLED");	
-	}
+	}*/
 
 
 	//int pp = 0;
