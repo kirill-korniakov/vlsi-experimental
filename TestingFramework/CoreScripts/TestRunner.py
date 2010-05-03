@@ -45,9 +45,9 @@ class TestRunner:
         print("Benchmarks:\n" + ", ".join(benchmarks))
         print("\n")
 
-        reportCreator = ReportCreator()
-        logFolder = reportCreator.CreateLogFolder(experiment.cfg)
-        reportTable = reportCreator.GetReportTableName(experiment.cfg)
+        reportCreator = ReportCreator(experiment.cfg)
+        logFolder = reportCreator.CreateLogFolder()
+        reportTable = reportCreator.GetReportTableName()
 
         experiment.CreateEmptyTable(reportTable)
 

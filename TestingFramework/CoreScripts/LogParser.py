@@ -10,7 +10,7 @@ class LogParser:
         self.logName = logName
         self.parameters = parameters
 
-    def GetFromPFST(self, stageTag, colIdx):
+    def GetFromPFST(self, stageTag, metricTag):
         log = open(self.logName, 'r')
         lines = log.readlines()
         log.close()
@@ -26,6 +26,15 @@ class LogParser:
         if lineIdx == len(lines):
             print('Table not found')
             return NOT_FOUND
+
+        #find colIdx
+        metrics = lines[lineIdx+1].split()
+        colIdx = 0
+        for metric in metrics:
+            if metrics[colIdx].find(metricTag) == 0:
+                break
+            else:
+                colIdx = colIdx + 1
 
         #parse stages
         lineIdx = lineIdx + 3
