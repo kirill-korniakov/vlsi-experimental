@@ -46,6 +46,7 @@ public:
   TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
   void UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge);
   void AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node);
+  void SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList);
   void InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element);
   double GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2);
   void InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best);

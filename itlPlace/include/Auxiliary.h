@@ -59,10 +59,8 @@ namespace Aux
   }
 
   inline double dtoi(double x)
-  {
-    char tmp[256];
-    sprintf(tmp, "%.0f", x);
-    return atof(tmp);
+  {    
+    return (int)floor(x + 0.5);
   }
 
   inline int cool_dtoi(double x)

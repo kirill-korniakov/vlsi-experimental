@@ -59,7 +59,7 @@ int VGAlgorithm::BufferingNen(HNet& net)
 {
   int partitionCount = design.cfg.ValueOf("Interval", 1);
   VanGinnekenTree vGTree(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
-  printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
+  //printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
   VGVariantsListElement* best = Algorithm(&vGTree);
   int bufCount = best->GetPositionCount();
   if (bufCount > 0)
@@ -96,7 +96,7 @@ VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
       best = &(*i);
     }
   }
-  printf("%d\t%f\n", best->GetPositionCount(), tMax);
+  //printf("%d\t%f\n", best->GetPositionCount(), tMax);
   return best;
 }
 
@@ -127,7 +127,8 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
     {
       TemplateTypes<VGVariantsListElement>::list* newList = CreateVGList(node->GetLeft());
       UpdateValue(newList, GetLength(node, node->GetLeft()));
-      AddBuffer(newList, node);
+      SortVGVariantsListElement(newList);
+      AddBuffer(newList, node);      
       return newList;
     }
 
@@ -204,6 +205,41 @@ void VGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, 
   }
 }
 
+void VGAlgorithm::SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList)
+{
+
+  TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin();
+  TemplateTypes<VGVariantsListElement>::list::iterator j = i;
+  //j++;
+
+  while (i != vGList->end())
+  {
+    j++;
+    if (j == vGList->end())
+      break;
+
+    if ((i->GetRAT() >= j->GetRAT()) && (i->GetC() <= j->GetC()))
+    {
+      //i - ый лучше
+      TemplateTypes<VGVariantsListElement>::list::iterator j1 = j;
+      j++;
+      vGList->erase(j1);
+    }
+    else
+      if ((i->GetRAT() < j->GetRAT()) && (i->GetC() > j->GetC()))
+      {
+        //j - ый лучше
+        TemplateTypes<VGVariantsListElement>::list::iterator i1 = i;
+        ++i;
+        vGList->erase(i1);
+      }
+    i = j;   
+
+  }
+
+}
+
+
 void VGAlgorithm::InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element)
 {
   bool isIns = false;
@@ -231,7 +267,11 @@ void VGAlgorithm::InsertVGVariantsListElement(TemplateTypes<VGVariantsListElemen
         else
           if ((i->GetRAT() < element.GetRAT()) && (i->GetC() < element.GetC()))
           {
-            vGList->insert(i, element);
+            i++;
+            if (i != vGList->end())
+              vGList->insert(i, element);
+            else
+              vGList->push_back(element);
             isIns = true;
           }
           if (i == vGList->begin())

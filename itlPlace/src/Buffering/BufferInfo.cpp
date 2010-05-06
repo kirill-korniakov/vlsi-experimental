@@ -23,9 +23,22 @@ TemplateTypes<BufferInfo>::vector BufferInfo::CreateVector(HDesign& hd)
       {
         if(pin.Direction() == PinDirection_INPUT) inputPinName = pin.Name();
         if(pin.Direction() == PinDirection_OUTPUT) outputPinName = pin.Name();
-      }   
+      }     
       BufferInfo buf = Create(hd, macro, inputPinName, outputPinName);
-      buffervector.push_back(buf);
+
+      bool isIns = false;
+
+      for (TemplateTypes<BufferInfo>::vector::iterator bufIter = buffervector.begin(); bufIter != buffervector.end(); ++bufIter)
+      {
+        if ((bufIter->Tb() >  buf.Tb()) && (bufIter->Cb() > buf.Cb()))
+        {
+          buffervector.insert(bufIter, buf);
+          isIns = true;
+          break;
+        }
+      }
+      if (!isIns)
+        buffervector.push_back(buf);
     }
     return buffervector;
     
