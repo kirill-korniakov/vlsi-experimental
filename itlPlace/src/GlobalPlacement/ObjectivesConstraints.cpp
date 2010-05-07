@@ -174,10 +174,9 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   int nBufferVariables = context->ci->netList.size();
 
   //get pointers to vector data
-  int info;
   PetscScalar *solution, *gradient;
-  info = VecGetArray(X, &solution); CHKERRQ(info);
-  info = VecGetArray(G, &gradient); CHKERRQ(info);
+  iCHKERRQ VecGetArray(X, &solution);
+  iCHKERRQ VecGetArray(G, &gradient);
 
   *f = 0.0;
   SetGradientToZero((double*)gradient, context->nVariables);
@@ -259,8 +258,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     }
   }
 
-  info = VecRestoreArray(X, &solution); CHKERRQ(info);
-  info = VecRestoreArray(G, &gradient); CHKERRQ(info);
+  iCHKERRQ VecRestoreArray(X, &solution);
+  iCHKERRQ VecRestoreArray(G, &gradient);
 
-  return 0;
+  return OK;
 }

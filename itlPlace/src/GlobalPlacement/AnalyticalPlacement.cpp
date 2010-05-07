@@ -119,8 +119,8 @@ int TaoInit(const char* taoCmd)
 
   //int info;       // used to check for functions returning nonzero
   //int size,rank;  // number of processes running
-  //info = MPI_Comm_size(PETSC_COMM_WORLD, &size); CHKERRQ(info);
-  //info = MPI_Comm_rank(PETSC_COMM_WORLD, &rank); CHKERRQ(info);
+  //iCHKERRQ MPI_Comm_size(PETSC_COMM_WORLD, &size);
+  //iCHKERRQ MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
   //if (size > 1) {
   //  if (rank == 0)
@@ -476,44 +476,42 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
 {
   const char* taoCmd = hd.cfg.ValueOf("TAOOptions.commandLine");
   TaoInit(taoCmd);
-  int info;
 
   /* Create TAO solver with desired solution method */
-  info = TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao); CHKERRQ(info);
-  info = TaoApplicationCreate(PETSC_COMM_SELF, &taoapp); CHKERRQ(info);
+  iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao);
+  iCHKERRQ TaoApplicationCreate(PETSC_COMM_SELF, &taoapp);
 
   // Allocate vectors for the solution and gradient
-  info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &x); CHKERRQ(info);
+  iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &x);
   // Set solution vec and an initial guess
   SetVariablesValues(ci, x);
 
   hd.Plotter.ShowGlobalPlacement(false, context.spreadingData.binGrid.nBinRows, 
     context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
 
-  info = TaoAppSetInitialSolutionVec(taoapp, x); CHKERRQ(info);
+  iCHKERRQ TaoAppSetInitialSolutionVec(taoapp, x);
 
   //set bounds
   if (context.useBorderBounds)
   {
-    info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xl); CHKERRQ(info);
-    info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xu); CHKERRQ(info);
+    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xl);
+    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xu);
     SetBounds(hd, ci, context, xl, xu);
-    info = TaoAppSetVariableBounds(taoapp, xl, xu);
+    iCHKERRQ TaoAppSetVariableBounds(taoapp, xl, xu);
   }
 
-  info = TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
-  CHKERRQ(info);
+  iCHKERRQ TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
 
   int nInnerIterations = hd.cfg.ValueOf("TAOOptions.nInnerIterations", 1000);
-  info = TaoSetMaximumIterates(tao, nInnerIterations); CHKERRQ(info);
+  iCHKERRQ TaoSetMaximumIterates(tao, nInnerIterations);
   double fatol = hd.cfg.ValueOf("TAOOptions.fatol", 1.0e-14);
   double frtol = hd.cfg.ValueOf("TAOOptions.frtol", 1.0e-14);
   double catol = hd.cfg.ValueOf("TAOOptions.catol", 1.0e-8);
   double crtol = hd.cfg.ValueOf("TAOOptions.crtol", 1.0e-8);
-  info = TaoSetTolerances(tao, fatol, frtol, catol, crtol); CHKERRQ(info);
+  iCHKERRQ TaoSetTolerances(tao, fatol, frtol, catol, crtol);
 
   /* Check for TAO command line options */
-  info = TaoSetOptions(taoapp, tao); CHKERRQ(info);
+  iCHKERRQ TaoSetOptions(taoapp, tao);
 
   /* Get the mu value */
   PetscScalar* solution;
@@ -521,7 +519,7 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
   CalcMuInitial(solution, &context);
   VecRestoreArray(x, &solution);
  
-  return info;
+  return OK;
 }
 
 void AnalyticalGlobalPlacement::ReportTimes()
@@ -542,7 +540,6 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   AppCtx          context;    // context-defined application context
   TAO_SOLVER      tao;        // TAO_SOLVER solver context
   TAO_APPLICATION taoapp;     // TAO application context
-  int             retCode;    // used to check for functions returning nonzero
 
   NetList::iterator netListIter;
   int i;
@@ -559,7 +556,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     ALERT("%f", netListIter->weight);
   }
   ALERT("");*/
-  retCode = InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp); CHKERRQ(retCode);
+  iCHKERRQ InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp);
   ReportIterationInfo(ci, context);
   ReportBinGridInfo(context);
 
@@ -573,17 +570,17 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
   fprintf(resultFile, "END\n");
   fclose(resultFile);
 
-  retCode = Solve(hd, ci, context, taoapp, tao, x, metaIteration); CHKERRQ(retCode);
+  iCHKERRQ Solve(hd, ci, context, taoapp, tao, x, metaIteration);
   ReportTimes();
 
   //Free TAO&PETSc data structures
-  retCode = TaoDestroy(tao); CHKERRQ(retCode);
-  retCode = TaoAppDestroy(taoapp); CHKERRQ(retCode);
-  retCode = VecDestroy(x); CHKERRQ(retCode);
+  iCHKERRQ TaoDestroy(tao);
+  iCHKERRQ TaoAppDestroy(taoapp);
+  iCHKERRQ VecDestroy(x);
   if (context.useBorderBounds)
   {
-    retCode = VecDestroy(xl); CHKERRQ(retCode);
-    retCode = VecDestroy(xu); CHKERRQ(retCode);
+    iCHKERRQ VecDestroy(xl);
+    iCHKERRQ VecDestroy(xu);
   }
   context.FreeMemory();
 
@@ -606,32 +603,28 @@ void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
 
 int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
 {
-  int retCode = 0;
-
   //Get termination information
   double f;
   double gnorm;
   double cnorm;
   double xdiff;
   TaoTerminateReason reason;  // termination reason
-  retCode = TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason); CHKERRQ(retCode);
+  iCHKERRQ TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason);
   PrintReason(reason);
 
-  return retCode;
+  return OK;
 }
 
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
-  int retCode;
-
   const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
 
   PlacementQualityAnalyzer* QA = 0;
   if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
   {
     Vec g;
-    int info = VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g); CHKERRQ(info);
+    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g);
     AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValue, g, &context);
 
     QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
@@ -657,10 +650,10 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
       context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
 
     // Tao solve the application
-    retCode = TaoSolveApplication(taoapp, tao); CHKERRQ(retCode);
+    iCHKERRQ TaoSolveApplication(taoapp, tao);
     
     int innerTAOIterations = 0;
-    retCode = ReportTerminationReason(tao, innerTAOIterations); CHKERRQ(retCode);
+    iCHKERRQ ReportTerminationReason(tao, innerTAOIterations);
 
     // if found any solution
     if (innerTAOIterations >= 1)
