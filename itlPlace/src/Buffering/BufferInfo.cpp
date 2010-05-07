@@ -10,38 +10,86 @@ BufferInfo BufferInfo::Create(HDesign& hd)
     hd.cfg.ValueOf("DefaultBuffer.OutputPin", "Y"));
 }
 
-TemplateTypes<BufferInfo>::vector BufferInfo::CreateVector(HDesign& hd)
+TemplateTypes<BufferInfo>::vector BufferInfo::CreateVector(HDesign& hd, string* bufferList)
 {
   TemplateTypes<BufferInfo>::vector buffervector;
-  for (HMacroTypes::EnumeratorW macroTypeEW = hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
-    if (macroTypeEW.Type() == MacroType_BUF)
-    {
-      string macro = macroTypeEW.Name();
-      string inputPinName; 
-      string outputPinName;
-      for (HMacroType::PinsEnumeratorW pin = macroTypeEW.GetEnumeratorW(); pin.MoveNext();)
-      {
-        if(pin.Direction() == PinDirection_INPUT) inputPinName = pin.Name();
-        if(pin.Direction() == PinDirection_OUTPUT) outputPinName = pin.Name();
-      }     
-      BufferInfo buf = Create(hd, macro, inputPinName, outputPinName);
 
-      bool isIns = false;
-
-      for (TemplateTypes<BufferInfo>::vector::iterator bufIter = buffervector.begin(); bufIter != buffervector.end(); ++bufIter)
+  string macro;
+  string inputPinName; 
+  string outputPinName;
+  if (bufferList == NULL)
+  {
+    for (HMacroTypes::EnumeratorW macroTypeEW = hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
+      if (macroTypeEW.Type() == MacroType_BUF)
       {
-        if ((bufIter->Tb() >  buf.Tb()) && (bufIter->Cb() > buf.Cb()))
+        macro = macroTypeEW.Name();
+        for (HMacroType::PinsEnumeratorW pin = macroTypeEW.GetEnumeratorW(); pin.MoveNext();)
         {
-          buffervector.insert(bufIter, buf);
-          isIns = true;
-          break;
+          if(pin.Direction() == PinDirection_INPUT) inputPinName = pin.Name();
+          if(pin.Direction() == PinDirection_OUTPUT) outputPinName = pin.Name();
+        }     
+        BufferInfo buf = Create(hd, macro, inputPinName, outputPinName);
+
+        bool isIns = false;
+
+        for (TemplateTypes<BufferInfo>::vector::iterator bufIter = buffervector.begin(); bufIter != buffervector.end(); ++bufIter)
+        {
+          if ((bufIter->Tb() >  buf.Tb()) && (bufIter->Cb() > buf.Cb()))
+          {
+            buffervector.insert(bufIter, buf);
+            isIns = true;
+            break;
+          }
         }
+        if (!isIns)
+          buffervector.push_back(buf);
       }
-      if (!isIns)
-        buffervector.push_back(buf);
+  }
+  else
+  {
+    string macro;
+    string inputPinName; 
+    string outputPinName;
+    int n = hd.cfg.ValueOf("BufferListLength", 0);
+    for (HMacroTypes::EnumeratorW macroTypeEW = hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
+    {
+      if (macroTypeEW.Type() == MacroType_BUF)
+      {
+        macro = macroTypeEW.Name();
+        bool isbuf = false;
+        for (int i = 0; (i < n) && !isbuf; i++)
+          if (macro == bufferList[i])
+            isbuf = true;
+        if (!isbuf)
+          continue;
+
+        for (HMacroType::PinsEnumeratorW pin = hd[macroTypeEW].GetEnumeratorW(); pin.MoveNext();)
+        {
+          if(pin.Direction() == PinDirection_INPUT) inputPinName = pin.Name();
+          if(pin.Direction() == PinDirection_OUTPUT) outputPinName = pin.Name();
+        }
+
+        BufferInfo buf = Create(hd, macro, inputPinName, outputPinName);
+        bool isIns = false;
+
+        for (TemplateTypes<BufferInfo>::vector::iterator bufIter = buffervector.begin(); bufIter != buffervector.end(); ++bufIter)
+        {
+          if ((bufIter->Tb() >  buf.Tb()) && (bufIter->Cb() > buf.Cb()))
+          {
+            buffervector.insert(bufIter, buf);
+            isIns = true;
+            break;
+          }
+        }
+        if (!isIns)
+          buffervector.push_back(buf);
+      }
     }
-    return buffervector;
-    
+  }
+
+
+  return buffervector;
+
 }
 
 BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string outputPin)

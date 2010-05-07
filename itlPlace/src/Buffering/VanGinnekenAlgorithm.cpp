@@ -14,8 +14,28 @@ void VGAlgorithm::LoadBuffers()
   }
   else
   {
-    Buffers = BufferInfo::CreateVector(design);
-    for (int i = 0; i < Buffers.size(); i++)
+    string sBufferList = design.cfg.ValueOf("BufferList", "");
+    unsigned int n = design.cfg.ValueOf("BufferListLength", 0);
+    string* bufferList = NULL;
+    if (n > 0)
+    {
+      bufferList = new string [n];     
+      for (unsigned int i = 0, j = 0, t = 0; (i < sBufferList.length()) && (j < n); i++, t++)
+      {
+        if(sBufferList[i] != ',')
+          bufferList[j].push_back(sBufferList[i]);
+        else
+        {
+          t = -1;
+          //bufferList[j].push_back(0);
+          j++;
+        }
+      }
+      //bufferList[n - 1].push_back(0);
+    }
+
+    Buffers = BufferInfo::CreateVector(design, bufferList);
+    for (unsigned int i = 0; i < Buffers.size(); i++)
       ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, Buffers[i].Type()).Name().c_str(),
       (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
   }
@@ -179,7 +199,7 @@ void VGAlgorithm::UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList
 
 void VGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node)
 {
-  for( int j = 0; j < Buffers.size(); j++)
+  for(unsigned int j = 0; j < Buffers.size(); j++)
   {
     double tMax = -INFINITY;
     double t;
