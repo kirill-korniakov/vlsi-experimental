@@ -49,7 +49,8 @@ VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.
 int VGAlgorithm::BufferingPlacement()
 {
   
-  
+  //design.Plotter.PlotText("START New Buffering!!!");
+  ALERT("Buffering type: %d", design.cfg.ValueOf("TypePartition", 0));
   std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
   int idx = 0;
   for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
@@ -59,17 +60,18 @@ int VGAlgorithm::BufferingPlacement()
 
   int bufferCount = 0;
   for(int j = 0; j < design.CriticalPaths.Count(); j++)
+  {
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
     {
       HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
       if (net.Kind() == NetKind_Active)// && (net.PinsCount() < 360 ))
       {
 
-        //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_10713"))
-        
-        bufferCount += BufferingNen(net);
+        //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_4453"))        
+          bufferCount += BufferingNen(net);
       }
     }
+  }
   ALERT("Buffers inserted: %d", bufferCount);
   
   return bufferCount;
@@ -80,6 +82,8 @@ int VGAlgorithm::BufferingNen(HNet& net)
   int partitionCount = design.cfg.ValueOf("Interval", 1);
   VanGinnekenTree vGTree(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
   //printf("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
+  design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(net));
+  design.Plotter.PlotNetSteinerTree(net, Color_Black);  
   VGVariantsListElement* best = Algorithm(&vGTree);
   int bufCount = best->GetPositionCount();
   if (bufCount > 0)
@@ -88,9 +92,11 @@ int VGAlgorithm::BufferingNen(HNet& net)
     HNet* newNet = new HNet[bufCount + 1];
     InsertsBuffer(newBuffer, best);
     newBuffer.sort();
+    //ALERT("name = %s", (net, design).Name().c_str());
     CreateNets(net, newBuffer, newNet, vGTree.GetSource().GetLeft());
   }
-
+  design.Plotter.ShowPlacement();
+  
   return bufCount;
 }
 

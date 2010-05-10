@@ -1,8 +1,9 @@
 #ifndef __VanGinnekenData_H__
 #define __VanGinnekenData_H__
 
-#include "HDesign.h"
+//#include "HDesign.h"
 #include "BufferInfo.h"
+#include "HDPGrid.h"
 
 class VanGinnekenTree;
 
@@ -57,13 +58,14 @@ class VanGinnekenTree
 protected:
   VanGinnekenTreeNode* vGTree;
   int partitionPointCount;
-  int treeSize;
+  int treeSize;  
 
   void CreateTree(HSteinerPoint& source);
   VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 public:
 
   HDesign& design;
+  HDPGrid DPGrid;
 
   VanGinnekenTree(HDesign& hd);
   VanGinnekenTree(HDesign& hd, int partitionCount);
@@ -79,12 +81,7 @@ public:
     return treeSize;
   }
 
-  ~VanGinnekenTree()
-  {
-    int i = 0;
-  }
-
-
+  ~VanGinnekenTree();
 };
 class BufferPositions
 {
