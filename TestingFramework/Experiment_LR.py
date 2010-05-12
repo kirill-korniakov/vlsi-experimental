@@ -53,23 +53,8 @@ lrWNS%;dpWNS%\n')
 def test():
     testRunner = TestRunner()
 
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-13'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
-    testRunner.parameters.experiments.append(e)
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-12'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
-    testRunner.parameters.experiments.append(e)
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-11'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
-    testRunner.parameters.experiments.append(e)
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-10'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
-    testRunner.parameters.experiments.append(e)
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-9'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
-    testRunner.parameters.experiments.append(e)
-    cmdArgs = '--LR.TAOOptions.frtol=1.0e-8'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS05_GP.list', cmdArgs)
+    cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
+    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS_GP_r1511.list', cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
