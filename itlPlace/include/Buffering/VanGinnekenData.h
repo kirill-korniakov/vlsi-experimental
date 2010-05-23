@@ -59,6 +59,7 @@ protected:
   VanGinnekenTreeNode* vGTree;
   int partitionPointCount;
   int treeSize;  
+  int TypePartition;
 
   void CreateTree(HSteinerPoint& source);
   VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);

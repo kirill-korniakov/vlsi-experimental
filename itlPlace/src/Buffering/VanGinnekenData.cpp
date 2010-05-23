@@ -2,6 +2,9 @@
 #include "Utils.h"
 
 //VanGinnekenTreeNode
+
+class VanGinnekenTreeNode;
+
 VanGinnekenTreeNode::VanGinnekenTreeNode()
 {
   x = 0;
@@ -177,51 +180,18 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
   TemplateTypes<HSteinerPoint>::stack points0;
   int maxPos = partitionPointCount;
   points0.push(srcPoint0);
-  while (!points0.empty())
+  TypePartition = design.cfg.ValueOf("TypePartition", 0);
+  
+  if (TypePartition == 1)
   {
-    srcPoint0 = points0.top();
-    points0.pop();
-
-    if (srcPoint0.HasLeft())
+    while (!points0.empty())
     {
-      nextPoint0 = srcPoint0.Left();
+      srcPoint0 = points0.top();
+      points0.pop();
 
-      double rx,ry,nx,ny;
-      rx = srcPoint0.X();
-      ry = srcPoint0.Y();
-      nx = nextPoint0.X();
-      ny = nextPoint0.Y();
-
-      int rs = DPGrid.FindRow(ry);
-      int rf = DPGrid.FindRow(ny);
-
-      int n = abs(rs - rf);
-      double r = (DPGrid.RowY(rf) - DPGrid.RowY(rs)) / double(n);
-
-      int rowInd = 0;
-      int pointInRowCount = 0;
-      int newPartitionPointCount = 0;
-      if (((partitionPointCount - 1.0) / n) < 1)
+      if (srcPoint0.HasLeft())
       {
-        newPartitionPointCount = n + 1;
-        pointInRowCount = 1;
-      }
-      else
-      {
-        pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
-        newPartitionPointCount = pointInRowCount * n + 1;
-      }
-
-      if (newPartitionPointCount > maxPos)
-        maxPos = newPartitionPointCount;
-
-
-      pointCount++;
-      points0.push(nextPoint0);
-
-      if (srcPoint0.HasRight())
-      {
-        nextPoint0 = srcPoint0.Right();
+        nextPoint0 = srcPoint0.Left();
 
         double rx,ry,nx,ny;
         rx = srcPoint0.X();
@@ -252,18 +222,85 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
         if (newPartitionPointCount > maxPos)
           maxPos = newPartitionPointCount;
 
+
         pointCount++;
         points0.push(nextPoint0);
+
+        if (srcPoint0.HasRight())
+        {
+          nextPoint0 = srcPoint0.Right();
+
+          double rx,ry,nx,ny;
+          rx = srcPoint0.X();
+          ry = srcPoint0.Y();
+          nx = nextPoint0.X();
+          ny = nextPoint0.Y();
+
+          int rs = DPGrid.FindRow(ry);
+          int rf = DPGrid.FindRow(ny);
+
+          int n = abs(rs - rf);
+          double r = (DPGrid.RowY(rf) - DPGrid.RowY(rs)) / double(n);
+
+          int rowInd = 0;
+          int pointInRowCount = 0;
+          int newPartitionPointCount = 0;
+          if (((partitionPointCount - 1.0) / n) < 1)
+          {
+            newPartitionPointCount = n + 1;
+            pointInRowCount = 1;
+          }
+          else
+          {
+            pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
+            newPartitionPointCount = pointInRowCount * n + 1;
+          }
+
+          if (newPartitionPointCount > maxPos)
+            maxPos = newPartitionPointCount;
+
+          pointCount++;
+          points0.push(nextPoint0);
+        }
+      }
+
+      else
+      {
+        //sink
+        pointCount++;
       }
     }
-
-    else
+    maxPos += 2;
+  }
+  else
+  {
+    while (!points0.empty())
     {
-      //sink
-      pointCount++;
+      srcPoint0 = points0.top();
+      points0.pop();
+
+      if (srcPoint0.HasLeft())
+      {
+        nextPoint0 = srcPoint0.Left();
+        pointCount++;
+        points0.push(nextPoint0);
+
+        if (srcPoint0.HasRight())
+        {
+          nextPoint0 = srcPoint0.Right();
+          pointCount++;
+          points0.push(nextPoint0);
+        }
+      }
+
+      else
+      {
+        //sink
+        pointCount++;
+      }
     }
   }
-  maxPos += 2;
+
   TemplateTypes<HSteinerPoint>::stack points;
   TemplateTypes<int>::stack rootIndexs;
   //создаем дерево
@@ -366,7 +403,7 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
     rootIndex = nodeIndex;
-    if (design.cfg.ValueOf("TypePartition", 0) == 0)
+    if (TypePartition == 0)
     { //обычное разбиение ребра
       for (int i = 1; i < (partitionPointCount - 1); i++)
       {

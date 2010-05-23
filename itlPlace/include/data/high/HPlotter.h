@@ -8,6 +8,10 @@
 #include "HNet.h"
 #include "HSteinerPoint.h"
 
+//#include "VanGinnekenData.h"
+
+class VanGinnekenTreeNode;
+
 class HPlotter
 {
 protected:
@@ -57,10 +61,14 @@ public:
   void PlotSites();
   void PlotCriticalPath(HCriticalPath);
   void PlotNetSteinerTree(HNet net, Color color);
+  void PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor = Color_Red);
+  void PlotSteinerForest(Color color);
   void PlotText(string text, double textSize = -1);
   void PlotNet(HNetWrapper net);
   void PlotFullWires();
   void Plot2PinNets();
+  void PlotCircle(double x, double y, int radius, Color col);
+  void PlotLine(double x1, double y1, double x2, double y2, Color col);
 
   void PlotKi(int nClusters, int nNets, double* x, Color color);
   void PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color);
