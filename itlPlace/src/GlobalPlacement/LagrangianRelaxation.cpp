@@ -111,7 +111,6 @@ double LR(AppCtx* context, PetscScalar* solution)
 {
   double termTWL = 0.0;
   double termTNS = 0.0;
-  double LRValue = 0.0;
 
   int netListSize = static_cast<int>(context->ci->netList.size());
   for (int netIdx = 0; netIdx < netListSize; ++netIdx)
@@ -123,10 +122,11 @@ double LR(AppCtx* context, PetscScalar* solution)
     termTWL += context->LRdata.alphaTWL * LSE;
     termTNS += braces * LSE + greenTerm;
   }
-  LRValue = termTWL + termTNS;
+  context->criteriaValues.hpwl += termTWL;
+  context->criteriaValues.lr += termTNS;
   //WRITE("%5f %5f ", termTWL, termTNS);
 
-  return LRValue;
+  return termTWL + termTNS;
 }
 
 double GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solution, int idxInSolutionVector)
@@ -187,11 +187,11 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution, Pet
   }
 }
 
-void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
+void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
   PrecalcExponents(context, solution);
 
-  *f += LR(context, solution);
+  LR(context, solution);
 
   int nClusterVariables = 2 * context->ci->mCurrentNumberOfClusters;
   AddLRGradient(context, nClusterVariables, solution, context->gLR);

@@ -196,7 +196,7 @@ void AddLogSumExpGradient(AppCtx* context, int nCoordinates, PetscScalar* coordi
   }
 }
 
-void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*& f)
+void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
 {
   timetype start;
   timetype finish;

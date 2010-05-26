@@ -32,686 +32,674 @@ using namespace AnalyticalGlobalPlacement;
 
 void GlobalPlacement(HDesign& hd, std::string cfgContext)
 {
-  ConfigContext ctx = hd.cfg.OpenContext(cfgContext);
+    ConfigContext ctx = hd.cfg.OpenContext(cfgContext);
 
-  WRITELINE("");
-  ALERT("ANALYTICAL PLACEMENT STARTED");
-  ALERT("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true));
+    WRITELINE("");
+    ALERT("ANALYTICAL PLACEMENT STARTED");
+    ALERT("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true));
 
-  ClusteringInformation ci(hd);
-  ci.affinityFunction = Affinity;
+    ClusteringInformation ci(hd);
+    ci.affinityFunction = Affinity;
 
-  //clustering
-  Clustering(hd, ci);
-  
-  //set initial placement
-  if (hd.cfg.ValueOf("GlobalPlacement.placeToTheCenter", false))
-  {
-    PlaceToTheCenterIntially(hd, ci);
-  }
-  else
-  {
-    WriteCellsCoordinates2Clusters(hd, ci);
-  }
-  ALERT("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true));
+    //clustering
+    Clustering(hd, ci);
 
-  //perform placement of clustered netlist
-  //TODO: think about reorganization of loop below
-  //it is simply loop between clustering levels, why it is so complex?
-  Relaxation(hd, ci, 1);
+    //set initial placement
+    if (hd.cfg.ValueOf("GlobalPlacement.placeToTheCenter", false))
+    {
+        PlaceToTheCenterIntially(hd, ci);
+    }
+    else
+    {
+        WriteCellsCoordinates2Clusters(hd, ci);
+    }
+    ALERT("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true));
 
-  ClusteringLogIterator clusteringLogIterator = ci.clusteringLog.rbegin();
-  NetListIterator netLevelsIterator = ci.netLevels.rbegin();
-  if (netLevelsIterator != ci.netLevels.rend()) 
-    ++netLevelsIterator;
+    //perform placement of clustered netlist
+    //TODO: think about reorganization of loop below
+    //it is simply loop between clustering levels, why it is so complex?
+    Relaxation(hd, ci, 1);
 
-  int metaIterationNumber = 2;
-  for (; clusteringLogIterator != ci.clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
-  {
-    ci.netList = *netLevelsIterator;
-    UnclusterLevelUp(hd, ci, clusteringLogIterator);
-    Interpolation(hd, ci);
-    Relaxation(hd, ci, metaIterationNumber);
-    metaIterationNumber++;
-  }
+    ClusteringLogIterator clusteringLogIterator = ci.clusteringLog.rbegin();
+    NetListIterator netLevelsIterator = ci.netLevels.rbegin();
+    if (netLevelsIterator != ci.netLevels.rend()) 
+        ++netLevelsIterator;
 
-  //TODO: consider second v-cycle
+    int metaIterationNumber = 2;
+    for (; clusteringLogIterator != ci.clusteringLog.rend(); ++clusteringLogIterator, ++netLevelsIterator)
+    {
+        ci.netList = *netLevelsIterator;
+        UnclusterLevelUp(hd, ci, clusteringLogIterator);
+        Interpolation(hd, ci);
+        Relaxation(hd, ci, metaIterationNumber);
+        metaIterationNumber++;
+    }
 
-  WRITELINE("");
-  ALERT("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true));
-  ALERT("ANALYTICAL PLACEMENT FINISHED");
+    //TODO: consider second v-cycle
+
+    WRITELINE("");
+    ALERT("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true));
+    ALERT("ANALYTICAL PLACEMENT FINISHED");
 }
 
 int TaoInit(const char* taoCmd)
 {
-  int argc = 1;
-  char** argv = 0;
+    int argc = 1;
+    char** argv = 0;
 
-  //calculate number of arguments
-  if (strlen(taoCmd)) 
-  {
-    argc++;  
-    char* ptr = (char*)taoCmd;
-    while(ptr = strchr(ptr+1, ' '))
-      argc++;
-  }
+    //calculate number of arguments
+    if (strlen(taoCmd)) 
+    {
+        argc++;  
+        char* ptr = (char*)taoCmd;
+        while(ptr = strchr(ptr+1, ' '))
+            argc++;
+    }
 
-  //initialize array of arguments
-  argv = new char*[argc+1];
-  int i = 0;
+    //initialize array of arguments
+    argv = new char*[argc+1];
+    int i = 0;
 
-  char path[_MAX_PATH];
-  GetModuleFileName(NULL, path, _MAX_PATH);
-  argv[i++] = path;
+    char path[_MAX_PATH];
+    GetModuleFileName(NULL, path, _MAX_PATH);
+    argv[i++] = path;
 
-  char seps[] = " \n";
-  char *token;  
-  token = strtok((char*)taoCmd, seps);  
-  while (token != NULL)
-  {
-    argv[i++] = token;
-    token = strtok(NULL, seps);
-  }
-  argv[i] = NULL;
+    char seps[] = " \n";
+    char *token;  
+    token = strtok((char*)taoCmd, seps);  
+    while (token != NULL)
+    {
+        argv[i++] = token;
+        token = strtok(NULL, seps);
+    }
+    argv[i] = NULL;
 
-  PetscInitialize(&argc, &argv, (char *)0, NULL);
-  TaoInitialize(&argc, &argv, (char *)0, NULL);
+    PetscInitialize(&argc, &argv, (char *)0, NULL);
+    TaoInitialize(&argc, &argv, (char *)0, NULL);
 
-  //int info;       // used to check for functions returning nonzero
-  //int size,rank;  // number of processes running
-  //iCHKERRQ MPI_Comm_size(PETSC_COMM_WORLD, &size);
-  //iCHKERRQ MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+    //int info;       // used to check for functions returning nonzero
+    //int size,rank;  // number of processes running
+    //iCHKERRQ MPI_Comm_size(PETSC_COMM_WORLD, &size);
+    //iCHKERRQ MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-  //if (size > 1) {
-  //  if (rank == 0)
-  //    PetscPrintf(PETSC_COMM_SELF, "This application is intended for single processor use!\n");
-  //  SETERRQ(1, "Incorrect number of processors");
-  //}
+    //if (size > 1) {
+    //  if (rank == 0)
+    //    PetscPrintf(PETSC_COMM_SELF, "This application is intended for single processor use!\n");
+    //  SETERRQ(1, "Incorrect number of processors");
+    //}
 
-  return OK;
+    return OK;
 }
 
 void AnalyticalGlobalPlacement::PlaceToTheCenterIntially(HDesign& hd, ClusteringInformation& ci)
 {
-  ALERT("SET INITIAL STATE");
+    ALERT("SET INITIAL STATE");
 
-  double minX = hd.Circuit.PlacementMinX();
-  double maxX = hd.Circuit.PlacementMaxX();
-  double minY = hd.Circuit.PlacementMinY();
-  double maxY = hd.Circuit.PlacementMaxY();
-  double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
+    double minX = hd.Circuit.PlacementMinX();
+    double maxX = hd.Circuit.PlacementMaxX();
+    double minY = hd.Circuit.PlacementMinY();
+    double maxY = hd.Circuit.PlacementMaxY();
+    double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
 
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    ci.clusters[clusterIdx].xCoord = (minX + maxX) / 2.0;
-    ci.clusters[clusterIdx].xCoord += 2.0*((double)rand()/(double)RAND_MAX - 0.5)*
-      shufflePercent/100.0*hd.Circuit.PlacementWidth();
-    ci.clusters[clusterIdx].yCoord = (minY + maxY) / 2.0;
-    ci.clusters[clusterIdx].yCoord += 2.0*((double)rand()/(double)RAND_MAX - 0.5)*
-      shufflePercent/100.0*hd.Circuit.PlacementHeight();
-  }
-  UpdateCellsCoordinates(hd, ci);
-  
-  int netListSize = static_cast<int>(ci.netList.size());
-  for (int i = 0; i < netListSize; i++)
-  {
-    ci.netList[i].k = 0.0;
-  }
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        ci.clusters[clusterIdx].xCoord = (minX + maxX) / 2.0;
+        ci.clusters[clusterIdx].xCoord += 2.0*((double)rand()/(double)RAND_MAX - 0.5)*
+            shufflePercent/100.0*hd.Circuit.PlacementWidth();
+        ci.clusters[clusterIdx].yCoord = (minY + maxY) / 2.0;
+        ci.clusters[clusterIdx].yCoord += 2.0*((double)rand()/(double)RAND_MAX - 0.5)*
+            shufflePercent/100.0*hd.Circuit.PlacementHeight();
+    }
+    UpdateCellsCoordinates(hd, ci);
+
+    int netListSize = static_cast<int>(ci.netList.size());
+    for (int i = 0; i < netListSize; i++)
+    {
+        ci.netList[i].k = 0.0;
+    }
 }
 
 int* AnalyticalGlobalPlacement::InitIdxs(int nVariables, int shift)
 {
-  int* idxs = new int[nVariables];
-  for (int i = 0; i < nVariables; ++i)
-  {
-    idxs[i] = shift + i;
-  }
-  return idxs;
+    int* idxs = new int[nVariables];
+    for (int i = 0; i < nVariables; ++i)
+    {
+        idxs[i] = shift + i;
+    }
+    return idxs;
 }
 
 void AnalyticalGlobalPlacement::SetClustersCoords(ClusteringInformation& ci, Vec& x)
 {
-  PetscScalar* initValues = new PetscScalar[2*ci.mCurrentNumberOfClusters];
-  int idx = 0;
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    initValues[2*idx+0] = ci.clusters[clusterIdx].xCoord;
-    initValues[2*idx+1] = ci.clusters[clusterIdx].yCoord;
-    idx++;
-  }
+    PetscScalar* initValues = new PetscScalar[2*ci.mCurrentNumberOfClusters];
+    int idx = 0;
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        initValues[2*idx+0] = ci.clusters[clusterIdx].xCoord;
+        initValues[2*idx+1] = ci.clusters[clusterIdx].yCoord;
+        idx++;
+    }
 
-  int* idxs = InitIdxs(2*ci.mCurrentNumberOfClusters, 0);
+    int* idxs = InitIdxs(2*ci.mCurrentNumberOfClusters, 0);
 
-  VecSetValues(x, 2*ci.mCurrentNumberOfClusters, idxs, initValues, INSERT_VALUES);
+    VecSetValues(x, 2*ci.mCurrentNumberOfClusters, idxs, initValues, INSERT_VALUES);
 
-  delete[] initValues;
-  delete[] idxs;
+    delete[] initValues;
+    delete[] idxs;
 }
 
 void AnalyticalGlobalPlacement::SetVariablesValues(ClusteringInformation & ci, Vec& x)
 {
-  SetClustersCoords(ci, x);
-  SetKValues(ci, x);
+    SetClustersCoords(ci, x);
+    SetKValues(ci, x);
 }
 
 void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx &context, Vec& xl, Vec& xu)
 {
-  PetscScalar* initValues = new PetscScalar[context.nVariables];
-  int* idxs = InitIdxs(context.nVariables, 0);
-  int idx;
-  int clusterIdx;
+    PetscScalar* initValues = new PetscScalar[context.nVariables];
+    int* idxs = InitIdxs(context.nVariables, 0);
+    int idx;
+    int clusterIdx;
 
-  //HPlacementRows::EnumeratorW rIter = hd.PlacementRows.GetEnumeratorW();
-  //rIter.MoveNext();
-  double siteHeight2 = 0.0;//rIter.SiteHeight() * 0.5;
-  double siteWidth2 = 0.0;//rIter.SiteWidth() * 0.5;
+    //HPlacementRows::EnumeratorW rIter = hd.PlacementRows.GetEnumeratorW();
+    //rIter.MoveNext();
+    double siteHeight2 = 0.0;//rIter.SiteHeight() * 0.5;
+    double siteWidth2 = 0.0;//rIter.SiteWidth() * 0.5;
 
-  //TODO: change borders according cluster sizes, we have to calculate width
-  //and height of each cluster and shift slightly borders for each cluster
+    //TODO: change borders according cluster sizes, we have to calculate width
+    //and height of each cluster and shift slightly borders for each cluster
 
-  idx = 0;
-  clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    initValues[2*idx+0] = hd.Circuit.PlacementMinX() + siteWidth2;
-    initValues[2*idx+1] = hd.Circuit.PlacementMinY() + siteHeight2;
-    idx++;
-  }
-  for (int i = 2*idx; i < context.nVariables; i++)
-  {//set lower borders for ki variables
-    initValues[i] = 0.0;
-  }
-  VecSetValues(xl, context.nVariables, idxs, initValues, INSERT_VALUES);
+    idx = 0;
+    clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        initValues[2*idx+0] = hd.Circuit.PlacementMinX() + siteWidth2;
+        initValues[2*idx+1] = hd.Circuit.PlacementMinY() + siteHeight2;
+        idx++;
+    }
+    for (int i = 2*idx; i < context.nVariables; i++)
+    {//set lower borders for ki variables
+        initValues[i] = 0.0;
+    }
+    VecSetValues(xl, context.nVariables, idxs, initValues, INSERT_VALUES);
 
-  idx = 0;
-  clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    initValues[2*idx+0] = hd.Circuit.PlacementMaxX() - siteWidth2;
-    initValues[2*idx+1] = hd.Circuit.PlacementMaxY() - siteHeight2;
-    idx++;
-  }
-  for (int i = 2*idx; i < context.nVariables; i++)
-  {//set upper borders for ki variables
-    initValues[i] = hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 100.0); //TODO: set correct upper bound
-  }
-  VecSetValues(xu, context.nVariables, idxs, initValues, INSERT_VALUES);
+    idx = 0;
+    clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        initValues[2*idx+0] = hd.Circuit.PlacementMaxX() - siteWidth2;
+        initValues[2*idx+1] = hd.Circuit.PlacementMaxY() - siteHeight2;
+        idx++;
+    }
+    for (int i = 2*idx; i < context.nVariables; i++)
+    {//set upper borders for ki variables
+        initValues[i] = hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 100.0); //TODO: set correct upper bound
+    }
+    VecSetValues(xu, context.nVariables, idxs, initValues, INSERT_VALUES);
 
-  delete [] initValues;
-  delete [] idxs;
+    delete [] initValues;
+    delete [] idxs;
 }
 
 void AnalyticalGlobalPlacement::GetClusterCoordinates(ClusteringInformation& ci, Vec x)
 {
-  PetscScalar* values = new PetscScalar[2*ci.mCurrentNumberOfClusters];
-  int* idxs = InitIdxs(2*ci.mCurrentNumberOfClusters, 0);
+    PetscScalar* values = new PetscScalar[2*ci.mCurrentNumberOfClusters];
+    int* idxs = InitIdxs(2*ci.mCurrentNumberOfClusters, 0);
 
-  VecGetValues(x, PetscInt(2*ci.mCurrentNumberOfClusters), idxs, values);
-  int idx = 0;
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    ci.clusters[clusterIdx].xCoord = values[2*idx+0];
-    ci.clusters[clusterIdx].yCoord = values[2*idx+1];
-    idx++;
-  }
+    VecGetValues(x, PetscInt(2*ci.mCurrentNumberOfClusters), idxs, values);
+    int idx = 0;
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        ci.clusters[clusterIdx].xCoord = values[2*idx+0];
+        ci.clusters[clusterIdx].yCoord = values[2*idx+1];
+        idx++;
+    }
 
-  delete[] values;
-  delete[] idxs;
+    delete[] values;
+    delete[] idxs;
 }
 
 
 
 void AnalyticalGlobalPlacement::GetVariablesValues(ClusteringInformation& ci, Vec x)
 {
-  GetClusterCoordinates(ci, x);
-  GetKValues(ci, x);
+    GetClusterCoordinates(ci, x);
+    GetKValues(ci, x);
 }
 
 void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
 {
-  double minX = hd.Circuit.PlacementMinX();
-  double maxX = hd.Circuit.PlacementMaxX();
-  double minY = hd.Circuit.PlacementMinY();
-  double maxY = hd.Circuit.PlacementMaxY();
+    double minX = hd.Circuit.PlacementMinX();
+    double maxX = hd.Circuit.PlacementMaxX();
+    double minY = hd.Circuit.PlacementMinY();
+    double maxY = hd.Circuit.PlacementMaxY();
 
-  int    nUnmoved = 0;
-  int    nMoved = 0;
-  double averageMovement = 0.0;
-  double movement = 0.0;
+    int    nUnmoved = 0;
+    int    nMoved = 0;
+    double averageMovement = 0.0;
+    double movement = 0.0;
 
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    movement = sqrt((ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)*
-                    (ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)+
-                    (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0)*
-                    (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0));
-    if (movement < 0.01) //TODO: use macros for comparison
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
     {
-      nUnmoved++;
+        movement = sqrt((ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)*
+            (ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)+
+            (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0)*
+            (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0));
+        if (movement < 0.01) //TODO: use macros for comparison
+        {
+            nUnmoved++;
+        }
+        else
+        {
+            nMoved++;
+            averageMovement += movement;
+        }
     }
-    else
-    {
-      nMoved++;
-      averageMovement += movement;
-    }
-  }
 
-  averageMovement /= static_cast<double>(nUnmoved + nMoved);
-  ALERT("Number of unmoved clusters %d", nUnmoved);
-  ALERT("Average movement %f", averageMovement);
+    averageMovement /= static_cast<double>(nUnmoved + nMoved);
+    ALERT("Number of unmoved clusters %d", nUnmoved);
+    ALERT("Average movement %f", averageMovement);
 }
 
 void PrintReason(TaoTerminateReason reason)
 {
-  char message[256];
+    char message[256];
 
-  switch(reason)
-  {
-  case 2:
-    strcpy(message, "(residual of optimality conditions <= absolute tolerance)");
-    break;
-  case 3:
-    strcpy(message, "(rtol)"); //residual of optimality conditions / initial residual of optimality conditions <= relative tolerance
-    break;
-  case 4:
-    strcpy(message, "(current trust region size <= trtol)");  
-    break;
-  case 5:
-    strcpy(message, "(function value <= fmin)");  
-    break;
-  case -2:
-    strcpy(message, "(its > maxits)");
-    break;
-  case -4:
-    strcpy(message, "(numerical problems)");
-    break;
-  case -5:
-    strcpy(message, "(number of function evaluations > maximum number of function evaluations)");
-    break;
-  case -6:
-    strcpy(message, "(line search failure)");
-    break;
-  default:
-    strcpy(message, "(unrecognized error)");  
-    break;
-  }
-  ALERT("TAO termination reason = %d %s", reason, message);
+    switch(reason)
+    {
+    case 2:
+        strcpy(message, "(residual of optimality conditions <= absolute tolerance)");
+        break;
+    case 3:
+        strcpy(message, "(rtol)"); //residual of optimality conditions / initial residual of optimality conditions <= relative tolerance
+        break;
+    case 4:
+        strcpy(message, "(current trust region size <= trtol)");  
+        break;
+    case 5:
+        strcpy(message, "(function value <= fmin)");  
+        break;
+    case -2:
+        strcpy(message, "(its > maxits)");
+        break;
+    case -4:
+        strcpy(message, "(numerical problems)");
+        break;
+    case -5:
+        strcpy(message, "(number of function evaluations > maximum number of function evaluations)");
+        break;
+    case -6:
+        strcpy(message, "(line search failure)");
+        break;
+    default:
+        strcpy(message, "(unrecognized error)");  
+        break;
+    }
+    ALERT("TAO termination reason = %d %s", reason, message);
 }
 
 
 void AnalyticalGlobalPlacement::UpdateCellsCoordinates(HDesign& hd, ClusteringInformation& ci)
 {
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    for (int j = 0; j < static_cast<int>(ci.clusters[clusterIdx].cells.size()); ++j)
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
     {
-      HCell cell = ci.clusters[clusterIdx].cells[j]; //Utils::FindCellByName(hd, ci.clusters[clusterIdx].cells[j]);
-      hd.Set<HCell::X>(cell, ci.clusters[clusterIdx].xCoord - hd.GetDouble<HCell::Width>(cell)/2.0);
-      hd.Set<HCell::Y>(cell, ci.clusters[clusterIdx].yCoord - hd.GetDouble<HCell::Height>(cell)/2.0);
+        for (int j = 0; j < static_cast<int>(ci.clusters[clusterIdx].cells.size()); ++j)
+        {
+            HCell cell = ci.clusters[clusterIdx].cells[j]; //Utils::FindCellByName(hd, ci.clusters[clusterIdx].cells[j]);
+            hd.Set<HCell::X>(cell, ci.clusters[clusterIdx].xCoord - hd.GetDouble<HCell::Width>(cell)/2.0);
+            hd.Set<HCell::Y>(cell, ci.clusters[clusterIdx].yCoord - hd.GetDouble<HCell::Height>(cell)/2.0);
+        }
     }
-  }
 }
 
 void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, ClusteringInformation& ci)
 {
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    HCell cell = ci.clusters[clusterIdx].cells[0]; //Utils::FindCellByName(hd, ci.clusters[clusterIdx].cells[0]);
-    ci.clusters[clusterIdx].xCoord = hd.GetDouble<HCell::X>(cell) + hd.GetDouble<HCell::Width>(cell)/2.0;
-    ci.clusters[clusterIdx].yCoord = hd.GetDouble<HCell::Y>(cell) + hd.GetDouble<HCell::Height>(cell)/2.0;
-  }
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    {
+        HCell cell = ci.clusters[clusterIdx].cells[0]; //Utils::FindCellByName(hd, ci.clusters[clusterIdx].cells[0]);
+        ci.clusters[clusterIdx].xCoord = hd.GetDouble<HCell::X>(cell) + hd.GetDouble<HCell::Width>(cell)/2.0;
+        ci.clusters[clusterIdx].yCoord = hd.GetDouble<HCell::Y>(cell) + hd.GetDouble<HCell::Height>(cell)/2.0;
+    }
 }
 
 int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation& ci)
 {
-  //TODO: consider terminals during interpolation??
-  vector<MergeCandidate> clustersData(ci.clusters.size());
-  list<MergeCandidate> clustersDataList;
-  list<MergeCandidate>::iterator clustersDataIterator;
-  bool* isCPoint = new bool[ci.clusters.size()];  // C-point is a cluster which location is fixed during interpolation
-  double part = 0.5;  // part of ci.clusters to be initially fixed during interpolation (part of C-points)
-  int currClusterIdx;
-  int neighborIdx;
-  int netIdx;
-  vector<int> currCPoints;
-  double sumX;
-  double sumY;
-  double area;
+    //TODO: consider terminals during interpolation??
+    vector<MergeCandidate> clustersData(ci.clusters.size());
+    list<MergeCandidate> clustersDataList;
+    list<MergeCandidate>::iterator clustersDataIterator;
+    bool* isCPoint = new bool[ci.clusters.size()];  // C-point is a cluster which location is fixed during interpolation
+    double part = 0.5;  // part of ci.clusters to be initially fixed during interpolation (part of C-points)
+    int currClusterIdx;
+    int neighborIdx;
+    int netIdx;
+    vector<int> currCPoints;
+    double sumX;
+    double sumY;
+    double area;
 
-  int* netListSizes = new int[ci.netList.size()]; //TODO: free this memory
-  CalculateNetListSizes(ci.netList, netListSizes);
+    int* netListSizes = new int[ci.netList.size()]; //TODO: free this memory
+    CalculateNetListSizes(ci.netList, netListSizes);
 
-  CalculateScores(hd, ci, clustersData, netListSizes);
-  int clusterIdx = -1;
-  while (GetNextActiveClusterIdx(&ci, clusterIdx))
-  {
-    isCPoint[clusterIdx] = false;
-  }
-
-  delete[] netListSizes;
-  sort(clustersData.begin(), clustersData.end(), PredicateMergePairGreater);
-
-  for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
-  {
-    if (clustersData[i].score >= 1.5)
-      clustersDataList.push_back(clustersData[i]);
-    else
-      break;
-  }
-  clustersDataIterator = clustersDataList.begin();
-  for (int i = 0; i < static_cast<int>(clustersDataList.size() * part); ++i)
-  {
-    isCPoint[clustersDataIterator->clusterIdx] = true;
-    ++clustersDataIterator;
-  }
-
-  for (int i = static_cast<int>(clustersDataList.size() * part); i < static_cast<int>(clustersDataList.size()); ++i)
-  {
-    currClusterIdx = clustersDataIterator->clusterIdx;
-    currCPoints.clear();
-    for (int j = 0; j < static_cast<int>(ci.tableOfAdjacentNets[currClusterIdx].size()); ++j)
+    CalculateScores(hd, ci, clustersData, netListSizes);
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(&ci, clusterIdx))
     {
-      netIdx = ci.tableOfAdjacentNets[currClusterIdx][j];
-      for (int k = 0; k < static_cast<int>(ci.netList[netIdx].clusterIdxs.size()); ++k)
-      {
-        neighborIdx = ci.netList[netIdx].clusterIdxs[k];
-        //TODO: probably better to consider terminals (primary pins) also
-        if (!IsMovableCell(neighborIdx) || isCPoint[neighborIdx] == false)
-          continue;
-        // remember all placed (fixed) neighbors of current cluster
-        currCPoints.push_back(neighborIdx);
-      }
+        isCPoint[clusterIdx] = false;
     }
-    isCPoint[currClusterIdx] = true;
-    if (currCPoints.size() == 0)
-      continue;
-    sumX = sumY = area = 0.0;
-    for (int j = 0; j < static_cast<int>(currCPoints.size()); ++j)
+
+    delete[] netListSizes;
+    sort(clustersData.begin(), clustersData.end(), PredicateMergePairGreater);
+
+    for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
     {
-      sumX += ci.clusters[currCPoints[j]].area * ci.clusters[currCPoints[j]].xCoord;
-      sumY += ci.clusters[currCPoints[j]].area * ci.clusters[currCPoints[j]].yCoord;
-      area += ci.clusters[currCPoints[j]].area;
+        if (clustersData[i].score >= 1.5)
+            clustersDataList.push_back(clustersData[i]);
+        else
+            break;
     }
-    ci.clusters[currClusterIdx].xCoord = sumX / area;
-    ci.clusters[currClusterIdx].yCoord = sumY / area;
-    ++clustersDataIterator;
-  }
+    clustersDataIterator = clustersDataList.begin();
+    for (int i = 0; i < static_cast<int>(clustersDataList.size() * part); ++i)
+    {
+        isCPoint[clustersDataIterator->clusterIdx] = true;
+        ++clustersDataIterator;
+    }
 
-  UpdateCellsCoordinates(hd, ci);
+    for (int i = static_cast<int>(clustersDataList.size() * part); i < static_cast<int>(clustersDataList.size()); ++i)
+    {
+        currClusterIdx = clustersDataIterator->clusterIdx;
+        currCPoints.clear();
+        for (int j = 0; j < static_cast<int>(ci.tableOfAdjacentNets[currClusterIdx].size()); ++j)
+        {
+            netIdx = ci.tableOfAdjacentNets[currClusterIdx][j];
+            for (int k = 0; k < static_cast<int>(ci.netList[netIdx].clusterIdxs.size()); ++k)
+            {
+                neighborIdx = ci.netList[netIdx].clusterIdxs[k];
+                //TODO: probably better to consider terminals (primary pins) also
+                if (!IsMovableCell(neighborIdx) || isCPoint[neighborIdx] == false)
+                    continue;
+                // remember all placed (fixed) neighbors of current cluster
+                currCPoints.push_back(neighborIdx);
+            }
+        }
+        isCPoint[currClusterIdx] = true;
+        if (currCPoints.size() == 0)
+            continue;
+        sumX = sumY = area = 0.0;
+        for (int j = 0; j < static_cast<int>(currCPoints.size()); ++j)
+        {
+            sumX += ci.clusters[currCPoints[j]].area * ci.clusters[currCPoints[j]].xCoord;
+            sumY += ci.clusters[currCPoints[j]].area * ci.clusters[currCPoints[j]].yCoord;
+            area += ci.clusters[currCPoints[j]].area;
+        }
+        ci.clusters[currClusterIdx].xCoord = sumX / area;
+        ci.clusters[currClusterIdx].yCoord = sumY / area;
+        ++clustersDataIterator;
+    }
 
-  delete[] isCPoint;
+    UpdateCellsCoordinates(hd, ci);
 
-  return OK;
+    delete[] isCPoint;
+
+    return OK;
 }
 
 void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& context)
 {
-  ALERT("Bin grid: %d x %d", 
-    context.spreadingData.binGrid.nBinRows, 
-    context.spreadingData.binGrid.nBinCols);
-  ALERT("Bin width: %f\tBin height: %f", 
-    context.spreadingData.binGrid.binWidth, 
-    context.spreadingData.binGrid.binHeight);
-  ALERT("Potential radius X: %f\tPotential radius Y: %f", 
-    context.spreadingData.potentialRadiusX, 
-    context.spreadingData.potentialRadiusY);
+    ALERT("Bin grid: %d x %d", 
+        context.spreadingData.binGrid.nBinRows, 
+        context.spreadingData.binGrid.nBinCols);
+    ALERT("Bin width: %f\tBin height: %f", 
+        context.spreadingData.binGrid.binWidth, 
+        context.spreadingData.binGrid.binHeight);
+    ALERT("Potential radius X: %f\tPotential radius Y: %f", 
+        context.spreadingData.potentialRadiusX, 
+        context.spreadingData.potentialRadiusY);
 }
 
 void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, AppCtx& user)
 {
-  WRITELINE("");
-  ALERT("RELAXATION ITERATION STARTED");
-  ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
-  ALERT("Number of nets: %d", ci.netList.size());
+    WRITELINE("");
+    ALERT("RELAXATION ITERATION STARTED");
+    ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
+    ALERT("Number of nets: %d", ci.netList.size());
 }
 
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
                                              Vec& x, Vec& xl, Vec& xu, TAO_SOLVER& tao, TAO_APPLICATION& taoapp)
 {
-  const char* taoCmd = hd.cfg.ValueOf("TAOOptions.commandLine");
-  TaoInit(taoCmd);
+    const char* taoCmd = hd.cfg.ValueOf("TAOOptions.commandLine");
+    TaoInit(taoCmd);
 
-  /* Create TAO solver with desired solution method */
-  iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao);
-  iCHKERRQ TaoApplicationCreate(PETSC_COMM_SELF, &taoapp);
+    /* Create TAO solver with desired solution method */
+    iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao);
+    iCHKERRQ TaoApplicationCreate(PETSC_COMM_SELF, &taoapp);
 
-  // Allocate vectors for the solution and gradient
-  iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &x);
-  // Set solution vec and an initial guess
-  SetVariablesValues(ci, x);
+    // Allocate vectors for the solution and gradient
+    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &x);
+    // Set solution vec and an initial guess
+    SetVariablesValues(ci, x);
 
-  hd.Plotter.ShowGlobalPlacement(false, context.spreadingData.binGrid.nBinRows, 
-    context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
+    hd.Plotter.ShowGlobalPlacement(false, context.spreadingData.binGrid.nBinRows, 
+        context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
 
-  iCHKERRQ TaoAppSetInitialSolutionVec(taoapp, x);
+    iCHKERRQ TaoAppSetInitialSolutionVec(taoapp, x);
 
-  //set bounds
-  if (context.useBorderBounds)
-  {
-    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xl);
-    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xu);
-    SetBounds(hd, ci, context, xl, xu);
-    iCHKERRQ TaoAppSetVariableBounds(taoapp, xl, xu);
-  }
+    //set bounds
+    if (context.useBorderBounds)
+    {
+        iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xl);
+        iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &xu);
+        SetBounds(hd, ci, context, xl, xu);
+        iCHKERRQ TaoAppSetVariableBounds(taoapp, xl, xu);
+    }
 
-  iCHKERRQ TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
+    iCHKERRQ TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
 
-  int nInnerIterations = hd.cfg.ValueOf("TAOOptions.nInnerIterations", 1000);
-  iCHKERRQ TaoSetMaximumIterates(tao, nInnerIterations);
-  double fatol = hd.cfg.ValueOf("TAOOptions.fatol", 1.0e-14);
-  double frtol = hd.cfg.ValueOf("TAOOptions.frtol", 1.0e-14);
-  double catol = hd.cfg.ValueOf("TAOOptions.catol", 1.0e-8);
-  double crtol = hd.cfg.ValueOf("TAOOptions.crtol", 1.0e-8);
-  iCHKERRQ TaoSetTolerances(tao, fatol, frtol, catol, crtol);
+    int nInnerIterations = hd.cfg.ValueOf("TAOOptions.nInnerIterations", 1000);
+    iCHKERRQ TaoSetMaximumIterates(tao, nInnerIterations);
+    double fatol = hd.cfg.ValueOf("TAOOptions.fatol", 1.0e-14);
+    double frtol = hd.cfg.ValueOf("TAOOptions.frtol", 1.0e-14);
+    double catol = hd.cfg.ValueOf("TAOOptions.catol", 1.0e-8);
+    double crtol = hd.cfg.ValueOf("TAOOptions.crtol", 1.0e-8);
+    iCHKERRQ TaoSetTolerances(tao, fatol, frtol, catol, crtol);
 
-  /* Check for TAO command line options */
-  iCHKERRQ TaoSetOptions(taoapp, tao);
+    /* Check for TAO command line options */
+    iCHKERRQ TaoSetOptions(taoapp, tao);
 
-  /* Get the mu value */
-  PetscScalar* solution;
-  VecGetArray(x, &solution);
-  CalcMuInitial(solution, &context);
-  VecRestoreArray(x, &solution);
- 
-  return OK;
+    /* Get the mu value */
+    PetscScalar* solution;
+    VecGetArray(x, &solution);
+    CalcMuInitial(solution, &context);
+    VecRestoreArray(x, &solution);
+
+    return OK;
 }
 
 void AnalyticalGlobalPlacement::ReportTimes()
 {
-  ALERT("EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
-  ALERT("lseTime = %f", GETSECONDSFROMTIME(lseTime));
-  ALERT("lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
-  ALERT("calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
-  ALERT("quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
-  ALERT("quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
-  expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
+    ALERT("EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
+    ALERT("lseTime = %f", GETSECONDSFROMTIME(lseTime));
+    ALERT("lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
+    ALERT("calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
+    ALERT("quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
+    ALERT("quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
+    expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
 }
 
 int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci, int metaIteration)
 {
-  Vec             x;          // solution vector
-  Vec             xl, xu;     // bounds vectors
-  AppCtx          context;    // context-defined application context
-  TAO_SOLVER      tao;        // TAO_SOLVER solver context
-  TAO_APPLICATION taoapp;     // TAO application context
+    Vec             x;          // solution vector
+    Vec             xl, xu;     // bounds vectors
+    AppCtx          context;    // context-defined application context
+    TAO_SOLVER      tao;        // TAO_SOLVER solver context
+    TAO_APPLICATION taoapp;     // TAO application context
 
-  NetList::iterator netListIter;
-  int i;
+    NetList::iterator netListIter;
+    int i;
 
-  //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
-  /*for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
-  {
-    ALERT("%f", netListIter->weight);
-  }
-  ALERT("");*/
-  context.Initialize(hd, ci);
-  /*for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
-  {
-    ALERT("%f", netListIter->weight);
-  }
-  ALERT("");*/
-  iCHKERRQ InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp);
-  ReportIterationInfo(ci, context);
-  ReportBinGridInfo(context);
+    //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
+    context.Initialize(hd, ci);
+    iCHKERRQ InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp);
+    ReportIterationInfo(ci, context);
+    ReportBinGridInfo(context);
 
-  //SOLVE THE PROBLEM
-  FILE* resultFile = fopen("Before relax", "a");
-  for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
-  {
-    //ALERT("%f", netListIter->weight);
-    fprintf(resultFile, "%f\n", netListIter->weight);
-  }
-  fprintf(resultFile, "END\n");
-  fclose(resultFile);
+    //SOLVE THE PROBLEM
+    FILE* resultFile = fopen("Before relax", "a");
+    for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
+    {
+        fprintf(resultFile, "%f\n", netListIter->weight);
+    }
+    fprintf(resultFile, "END\n");
+    fclose(resultFile);
 
-  iCHKERRQ Solve(hd, ci, context, taoapp, tao, x, metaIteration);
-  ReportTimes();
+    iCHKERRQ Solve(hd, ci, context, taoapp, tao, x, metaIteration);
+    ReportTimes();
 
-  //Free TAO&PETSc data structures
-  iCHKERRQ TaoDestroy(tao);
-  iCHKERRQ TaoAppDestroy(taoapp);
-  iCHKERRQ VecDestroy(x);
-  if (context.useBorderBounds)
-  {
-    iCHKERRQ VecDestroy(xl);
-    iCHKERRQ VecDestroy(xu);
-  }
-  context.FreeMemory();
+    //Free TAO&PETSc data structures
+    iCHKERRQ TaoDestroy(tao);
+    iCHKERRQ TaoAppDestroy(taoapp);
+    iCHKERRQ VecDestroy(x);
+    if (context.useBorderBounds)
+    {
+        iCHKERRQ VecDestroy(xl);
+        iCHKERRQ VecDestroy(xu);
+    }
+    context.FreeMemory();
 
-  return OK;
+    return OK;
 }
 
 void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
 {
-  context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
+    context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
+    context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
 
-  UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
+    UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
 
-  if (context.useLR)
-  {
-    context.LRdata.UpdateMultipliers(hd);
-    context.LRdata.alphaTWL *= hd.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.alphaTWLMultiplier", 1.0);
-  }
+    if (context.useLR)
+    {
+        context.LRdata.UpdateMultipliers(hd);
+        context.LRdata.alphaTWL *= hd.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.alphaTWLMultiplier", 1.0);
+    }
 }
 
 int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
 {
-  //Get termination information
-  double f;
-  double gnorm;
-  double cnorm;
-  double xdiff;
-  TaoTerminateReason reason;  // termination reason
-  iCHKERRQ TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason);
-  PrintReason(reason);
+    //Get termination information
+    double f;
+    double gnorm;
+    double cnorm;
+    double xdiff;
+    TaoTerminateReason reason;  // termination reason
+    iCHKERRQ TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason);
+    PrintReason(reason);
 
-  return OK;
+    return OK;
 }
 
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
-  const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
+    const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
 
-  PlacementQualityAnalyzer* QA = 0;
-  if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
-  {
-    Vec g;
-    iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g);
-    AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValue, g, &context);
-
-    QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
-        PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricHPWLleg)));
-    QA->AnalyzeQuality(0, context.criteriaValue);
-  }
-
-  int iteration = 1;
-  double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
-  while (1)
-  {
-    //print iteration info
-    WRITELINE("");
-    ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
-    if (context.useQuadraticSpreading)
-      ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
-    if (context.useLR)
-      ALERT("alphaTWL = %.20f", context.LRdata.alphaTWL);
-
-    ALERT("HPWL initial   = %f", Utils::CalculateHPWL(hd, true));
-
-    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
-      context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-
-    // Tao solve the application
-    iCHKERRQ TaoSolveApplication(taoapp, tao);
-    
-    int innerTAOIterations = 0;
-    iCHKERRQ ReportTerminationReason(tao, innerTAOIterations);
-
-    // if found any solution
-    if (innerTAOIterations >= 1)
+    PlacementQualityAnalyzer* QA = 0;
+    if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
-      GetVariablesValues(ci, x);
-      UpdateCellsCoordinates(hd, ci);
+        Vec g;
+        iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g);
+        AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValues.objective, g, &context);
+
+        QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
+            PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricHPWLleg)));
+        QA->AnalyzeQuality(0, &context.criteriaValues);
     }
 
-    UpdateWeights(context, hd, 32);
-
-    //print iteration info
-    ALERT("Sum of Ki = %f", CalculateSumOfK(hd, ci));
-    
-    if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+    int iteration = 1;
+    double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
+    while (1)
     {
-      QA->AnalyzeQuality(iteration - 1, context.criteriaValue, 
-        hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+        //print iteration info
+        WRITELINE("");
+        ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
+        if (context.useQuadraticSpreading)
+            ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
+        if (context.useLR)
+            ALERT("alphaTWL = %.20f", context.LRdata.alphaTWL);
 
-      if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
-      {
-        if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
+        ALERT("HPWL initial   = %f", Utils::CalculateHPWL(hd, true));
+
+        hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
+            context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
+
+        // Tao solve the application
+        iCHKERRQ TaoSolveApplication(taoapp, tao);
+
+        int innerTAOIterations = 0;
+        iCHKERRQ ReportTerminationReason(tao, innerTAOIterations);
+
+        // if found any solution
+        if (innerTAOIterations >= 1)
         {
-          QA->RestoreBestAchievedPlacement();
-          WriteCellsCoordinates2Clusters(hd, ci);
-          ALERT("Reached maximum tolerant iteration number.");
-          break;
+            GetVariablesValues(ci, x);
+            UpdateCellsCoordinates(hd, ci);
         }
-      }
-      if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
-      {
-        QA->RestoreBestAchievedPlacement();
-        WriteCellsCoordinates2Clusters(hd, ci);
-        ALERT("Method converged.");
-        break;
-      }
+
+        UpdateWeights(context, hd, 32);
+
+        //print iteration info
+        ALERT("Sum of Ki = %f", CalculateSumOfK(hd, ci));
+
+        if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+        {
+            QA->AnalyzeQuality(iteration - 1, &context.criteriaValues, 
+                hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+
+            if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
+            {
+                if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
+                {
+                    QA->RestoreBestAchievedPlacement();
+                    WriteCellsCoordinates2Clusters(hd, ci);
+                    ALERT("Reached maximum tolerant iteration number.");
+                    break;
+                }
+            }
+            if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
+            {
+                QA->RestoreBestAchievedPlacement();
+                WriteCellsCoordinates2Clusters(hd, ci);
+                ALERT("Method converged.");
+                break;
+            }
+        }
+
+        if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
+        {
+            hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
+                context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
+            hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
+        }
+
+        if (iteration > nOuterIters1)
+        {
+            ALERT("Iterations finished");
+            break;
+        }
     }
 
-    if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
+    //QA report
+    if (QA != 0)
     {
-      hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
-        context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-      hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
+        QA->Report();
+        delete QA;
     }
 
-    if (iteration > nOuterIters1)
-    {
-      ALERT("Iterations finished");
-      break;
-    }
-  }
-
-  //QA report
-  if (QA != 0)
-  {
-    QA->Report();
-    delete QA;
-  }
-
-  return OK;
+    return OK;
 }
-

@@ -25,7 +25,12 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   else if (context->useSumOfDelays)
     SOD_AddObjectiveAndGradient(context, x, criteriaValue);
   else if (context->useLR)
-    LR_AddObjectiveAndGradient(context, x, criteriaValue);
+  {
+    context->criteriaValues.hpwl = 0.0;
+    context->criteriaValues.lr = 0.0;
+    LR_AddObjectiveAndGradient(context, x);
+    *criteriaValue = context->criteriaValues.hpwl + context->criteriaValues.lr;
+  }
   //ALERT("criteriaValue = %f", criteriaValue));
 
   //calculate penalty value
@@ -178,7 +183,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   iCHKERRQ VecGetArray(X, &solution);
   iCHKERRQ VecGetArray(G, &gradient);
 
-  *f = 0.0;
+  context->criteriaValues.hpwl = 0.0;
+  context->criteriaValues.lr = 0.0;
+  context->criteriaValues.sod = 0.0;
+  context->criteriaValues.spreading = 0.0;
+
   SetGradientToZero((double*)gradient, context->nVariables);
   SetGradientToZero(context->gLSE, context->nVariables);
   SetGradientToZero(context->gSOD, context->nVariables);
@@ -188,43 +197,43 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   double LRValue = 0.0;
   double QSValue = 0.0;
 
-#pragma omp parallel sections
+  #pragma omp parallel sections
   {
-#pragma omp section
+    #pragma omp section
     {
       if (context->useLogSumExp)
       {
-        LSE_AddObjectiveAndGradient(context, solution, f);
+        LSE_AddObjectiveAndGradient(context, solution, &context->criteriaValues.hpwl);
       }
-
       if (context->useSumOfDelays)
       {
-        SOD_AddObjectiveAndGradient(context, solution, f);
+        SOD_AddObjectiveAndGradient(context, solution, &context->criteriaValues.sod);
       }
-
       if (context->useLR)
       {
-        LR_AddObjectiveAndGradient(context, solution, &LRValue);
-        *f += LRValue;
+        LR_AddObjectiveAndGradient(context, solution);
       }
     }
 
-#pragma omp section
+    #pragma omp section
     {
       if (context->useQuadraticSpreading)
       {
-        QS_AddObjectiveAndGradient(context, solution, &QSValue);
-        *f += QSValue;
+        QS_AddObjectiveAndGradient(context, solution, &context->criteriaValues.spreading);
       }
-
       if (context->useLRSpreading)
       {
-        LRS_AddObjectiveAndGradient(context, solution, f);
+        LRS_AddObjectiveAndGradient(context, solution, &context->criteriaValues.spreading);
       }
     }
   }
 
-  context->criteriaValue = *f;
+  context->criteriaValues.objective = context->criteriaValues.hpwl + 
+      context->criteriaValues.lr + 
+      context->criteriaValues.sod + 
+      context->criteriaValues.spreading;
+
+  *f = context->criteriaValues.objective;
 
   //normalize gradients
   if (context->useSumOfDelays)

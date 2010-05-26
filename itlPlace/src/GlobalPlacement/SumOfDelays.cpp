@@ -82,7 +82,7 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
   }
 }
 
-void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*& f)
+void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
 {
   timetype start;
   timetype finish;

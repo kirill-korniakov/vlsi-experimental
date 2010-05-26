@@ -9,6 +9,15 @@
 #include "LagrangianRelaxationData.h"
 #include "SpreadingData.h"
 
+struct CriteriaValues
+{
+    double objective;
+    double hpwl;
+    double sod;
+    double spreading;
+    double lr;
+};
+
 // User-defined TAO application context - contains data needed by the 
 // application-provided call-back routines that evaluate the function and gradient
 struct AppCtx
@@ -34,7 +43,7 @@ struct AppCtx
 
   int*      netListSizes;
 
-  double    criteriaValue;
+  CriteriaValues criteriaValues;
   double*   gLSE;
   double*   gSOD;
   double*   gLR;

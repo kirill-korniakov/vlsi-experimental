@@ -6,6 +6,7 @@
 #include "Legalization.h"
 #include "STA.h"
 #include "TableFormatter.h"
+#include "OptimizationContext.h"
 
 void PlacementQualityAnalyzer::SaveCurrentPlacementAsBestAchieved()
 {
@@ -39,12 +40,28 @@ PlacementQualityAnalyzer::~PlacementQualityAnalyzer()
   delete m_grid;
 }
 
-void PlacementQualityAnalyzer::AnalyzeQuality(int id, double objectiveValue, double improvementTreshold)
+void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaValues, double improvementTreshold)
 {
   PlacementQuality pq;
   pq.id = id;
 
-  pq.metrics[MetricObjective] = objectiveValue;
+  if (criteriaValues)
+  {
+      pq.metrics[MetricObjective] = criteriaValues->objective;
+      pq.metrics[MetricObHPWL] = criteriaValues->hpwl;
+      pq.metrics[MetricObLR] = criteriaValues->lr;
+      pq.metrics[MetricObSOD] = criteriaValues->sod;
+      pq.metrics[MetricObSpreading] = criteriaValues->spreading;
+  }
+  else
+  {
+      pq.metrics[MetricObjective] = -1.0;
+      pq.metrics[MetricObHPWL] = -1.0;
+      pq.metrics[MetricObLR] = -1.0;
+      pq.metrics[MetricObSOD] = -1.0;
+      pq.metrics[MetricObSpreading] = -1.0;
+  }
+
   pq.metrics[MetricHPWL] = Utils::CalculateHPWL(m_design, false);
 
   if (m_design.CanDoTiming())
@@ -132,20 +149,24 @@ int PlacementQualityAnalyzer::GetConvergeIterationsNumber()
 
 void PlacementQualityAnalyzer::Report()
 {
-  const int col_id       = 0;
+  const int col_id        = 0;
   const int col_objective = 1;
-  const int col_hpwl     = 2;
-  const int col_hpwl_leg = 3;
-  const int col_twl      = 4;
-  const int col_twl_leg  = 5;
-  const int col_tns      = 6;
-  const int col_tns_leg  = 7;
-  const int col_wns      = 8;
-  const int col_wns_leg  = 9;
+  const int col_ob_hpwl   = 2;
+  const int col_ob_lr     = 3;
+  const int col_ob_sod    = 4;
+  const int col_ob_spr    = 5;
+  const int col_hpwl     = 6;
+  const int col_hpwl_leg = 7;
+  const int col_twl      = 8;
+  const int col_twl_leg  = 9;
+  const int col_tns      = 10;
+  const int col_tns_leg  = 11;
+  const int col_wns      = 12;
+  const int col_wns_leg  = 13;
 
   bool canDoTiming = m_design.CanDoTiming();
 
-  TableFormatter tf("Placement Quality Analyzis Table");
+  TableFormatter tf("Placement Quality Analysis Table");
 
   tf.NewHeaderRow();
   if (canDoTiming)
@@ -166,6 +187,10 @@ void PlacementQualityAnalyzer::Report()
 
   tf.SetCell(col_id, "ID");
   tf.SetCell(col_objective, "Objective");
+  tf.SetCell(col_ob_hpwl, "ObHPWL");
+  tf.SetCell(col_ob_lr, "ObLR");
+  tf.SetCell(col_ob_sod, "ObSOD");
+  tf.SetCell(col_ob_spr, "ObSpreading");
   tf.SetCell(col_hpwl, "HPWL");
   tf.SetCell(col_hpwl_leg, "LHPWL");
   tf.SetColumnPrecision(col_objective, 2);
@@ -180,6 +205,10 @@ void PlacementQualityAnalyzer::Report()
     tf.NewRow();
     tf.SetCell(col_id, i->id);
     tf.SetCell(col_objective, i->metrics[MetricObjective]);
+    tf.SetCell(col_ob_hpwl, i->metrics[MetricObHPWL]);
+    tf.SetCell(col_ob_lr, i->metrics[MetricObLR]);
+    tf.SetCell(col_ob_sod, i->metrics[MetricObSOD]);
+    tf.SetCell(col_ob_spr, i->metrics[MetricObSpreading]);
     tf.SetCell(col_hpwl, i->metrics[MetricHPWL]);
     tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg]);
     if (canDoTiming)
@@ -202,6 +231,10 @@ void PlacementQualityAnalyzer::Report()
 	  tf.NewRow();
 	  tf.SetCell(col_id, i->id);
 	  tf.SetCell(col_objective, i->metrics[MetricObjective] / initial->metrics[MetricObjective] * 100);
+      tf.SetCell(col_ob_hpwl, i->metrics[MetricObHPWL] / initial->metrics[MetricObHPWL] * 100);
+      tf.SetCell(col_ob_lr, i->metrics[MetricObLR] / initial->metrics[MetricObLR] * 100);
+      tf.SetCell(col_ob_sod, i->metrics[MetricObSOD] / initial->metrics[MetricObSOD] * 100);
+      tf.SetCell(col_ob_spr, i->metrics[MetricObSpreading] / initial->metrics[MetricObSpreading] * 100);
 	  tf.SetCell(col_hpwl, i->metrics[MetricHPWL] / initial->metrics[MetricHPWL] * 100);
 	  tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg] / initial->metrics[MetricHPWLleg] * 100);
 	  if (canDoTiming)
@@ -234,6 +267,14 @@ const char* PlacementQualityAnalyzer::GetMetric(QualityMetrics metric)
   {
   case MetricObjective:
     return "Objective";
+  case MetricObHPWL:
+    return "ObHPWL";
+  case MetricObLR:
+      return "ObLR";
+  case MetricObSOD:
+      return "ObSOD";
+  case MetricObSpreading:
+      return "ObSpr";
   case MetricHPWL:
     return "HPWL";
   case MetricHPWLleg:

@@ -3,6 +3,6 @@
 
 #include "ObjectivesConstraints.h"
 
-void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f);
+void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution);
 
 #endif

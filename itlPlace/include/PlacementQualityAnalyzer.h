@@ -5,20 +5,26 @@
 #include "HDPGrid.h"
 #include "PlacementStorage.h"
 
+struct CriteriaValues;
+
 class PlacementQualityAnalyzer
 {
 public:
   enum QualityMetrics
   {
     MetricObjective = 0,
-    MetricHPWL      = 1,
-    MetricHPWLleg   = 2,
-    MetricTWL       = 3,
-    MetricTWLleg    = 4,
-    MetricTNS       = 5,
-    MetricTNSleg    = 6,
-    MetricWNS       = 7,
-    MetricWNSleg    = 8,
+    MetricObHPWL    = 1,
+    MetricObLR,
+    MetricObSOD,
+    MetricObSpreading,
+    MetricHPWL,
+    MetricHPWLleg,
+    MetricTWL,
+    MetricTWLleg,
+    MetricTNS,
+    MetricTNSleg,
+    MetricWNS,
+    MetricWNSleg,
     __MetricsNum
   };
 
@@ -29,7 +35,7 @@ public:
   PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
   ~PlacementQualityAnalyzer();
 
-  void AnalyzeQuality(int id, double objectiveValue = 0.0, double improvementTreshold = 0.0);
+  void AnalyzeQuality(int id, CriteriaValues* criteriaValues = 0, double improvementTreshold = 0.0);
   void Report();
 
   void SaveCurrentPlacementAsBestAchieved();
@@ -57,9 +63,9 @@ private:
     bool operator == (const PlacementQuality& q)
     {
       bool isEqual = true;
-      //NOTE: we start from 1 because we do not interesting in objective value
+      //NOTE: we start from MetricHPWL because we do not interesting in objective value
       //TODO: actually we have to compare with epsilon tolerance
-      for (int i = 1; i < __MetricsNum; i++)
+      for (int i = MetricHPWL; i < __MetricsNum; i++)
       {
         if (metrics[i] != q.metrics[i])
         {
