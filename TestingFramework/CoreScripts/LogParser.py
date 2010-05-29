@@ -24,7 +24,7 @@ class LogParser:
                 lineIdx = lineIdx + 1
 
         if lineIdx == len(lines):
-            print('Table not found')
+            print(self.parameters.tableHeader + ' not found in log file')
             return NOT_FOUND
 
         #find colIdx
@@ -35,13 +35,17 @@ class LogParser:
                 break
             else:
                 colIdx = colIdx + 1
+        if colIdx == len(metrics):
+            print('Tag ' + metricTag + ' not found')
+            return NOT_FOUND
 
         #parse stages
         lineIdx = lineIdx + 3
-        while (lines[lineIdx].find(self.parameters.borderPattern) == -1):
+        while lines[lineIdx].find(self.parameters.borderPattern) == -1:
             if lines[lineIdx].find(stageTag) != -1:
                 ll = lines[lineIdx].split()
                 return ll[colIdx]
             lineIdx = lineIdx + 1
-            if (lineIdx == len(lines)):
+            if lineIdx == len(lines):
+                print('Stage ' + stageTag + ' not found')
                 return NOT_FOUND

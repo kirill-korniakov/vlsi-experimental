@@ -28,7 +28,8 @@ lrWNS%;dpWNS%\n')
         table = [[0 for col in range(len(metrics))] for row in range(len(stages))]
         for col in range(len(metrics)):
             for row in range(len(stages)):
-                table[row][col] = float(str(parser.GetFromPFST(stages[row], metrics[col])).replace(',', '.'))
+                value = str(parser.GetFromPFST(stages[row], metrics[col]))
+                table[row][col] = float(value.replace(',', '.'))
 
         #print absolute values
         printStr = benchmark + ';'
@@ -54,7 +55,7 @@ def test():
     testRunner = TestRunner()
 
     cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = Experiment_LR('IWLS05 LR experiment', 'LR.cfg', 'IWLS_GP_r1511.list', cmdArgs)
+    e = Experiment_LR('IWLS05 LR after weighting experiment', 'LR.cfg', 'WGHT_large.list', cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
