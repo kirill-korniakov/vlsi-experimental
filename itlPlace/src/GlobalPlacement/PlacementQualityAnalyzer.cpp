@@ -92,8 +92,8 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
 
   double improvement = GetLastIterationImprovement();
 
-  ALERT("HPWL nonlegal  = %f", pq.metrics[MetricHPWL]);
-  ALERT("HPWL Leg.      = %f", pq.metrics[MetricHPWLleg]);
+  ALERT("%-14s = %f", "HPWL", pq.metrics[MetricHPWL]);
+  ALERT("%-14s = %f", "HPWL Leg.", pq.metrics[MetricHPWLleg]);
   if (m_design.CanDoTiming())
   {
     ALERT("%-14s = %f", GetMetric(MetricTWL), pq.GetMetric(MetricTWL));
@@ -106,13 +106,13 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
 
   if (m_experiments.size() <= 1)
   {
-    ALERT("%s best = N/A", GetMetric(m_metric));
-    ALERT("%s gain over best placement is N/A", GetMetric(m_metric));
+    ALERT(Color_White, "%-9s best  = N/A", GetMetric(m_metric));
+    ALERT(Color_White, "%s gain over best placement is N/A", GetMetric(m_metric));
   }
   else
   {
-    ALERT("%s best = %f", GetMetric(m_metric), m_BestMetrics.GetMetric(m_metric));
-    ALERT("%s gain over the best placement is %.3f%%", GetMetric(m_metric), improvement * 100.0);
+    ALERT(Color_White, "%-9s best = %f", GetMetric(m_metric), m_BestMetrics.GetMetric(m_metric));
+    ALERT(Color_White, "%s gain over the best placement is %.3f%%", GetMetric(m_metric), improvement * 100.0);
   }
 
   if (improvement >= 0.0)

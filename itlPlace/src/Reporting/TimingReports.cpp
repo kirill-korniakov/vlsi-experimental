@@ -222,6 +222,9 @@ void PrintTimingReport(HDesign& design, int nPaths)
 {
   ASSERT(design.CanDoTiming());
 
+  if (nPaths < 1)
+      return;
+
   WRITELINE("");
   ALERT("Critical paths printing started...");
 

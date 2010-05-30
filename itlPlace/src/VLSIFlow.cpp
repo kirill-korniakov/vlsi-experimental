@@ -314,7 +314,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
 
-    DoSTAIfCan(hd);
+    //DoSTAIfCan(hd);
 
     PlotCongestionMapIfRequired(DPGrid);
     RunFGRRoutingIfRequired(DPGrid);

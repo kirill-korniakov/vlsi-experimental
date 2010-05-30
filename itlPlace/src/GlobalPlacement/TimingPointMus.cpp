@@ -183,7 +183,7 @@ void TimingPointMus::InitPoint(HDesign& design, HTimingPoint pt)
 
 void TimingPointMus::UpdateMus(HDesign& design)
 {
-    STA(design);
+    STA(design, false);
 
     double wns = Utils::WNS(design);
     double ns = 0.0;

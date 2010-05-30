@@ -288,7 +288,7 @@ void AbacusLegalization(HDPGrid& grid)
   }
   ASSERT(pos == design.Cells.PlaceableCellsCount());
   double multiplier = design.cfg.ValueOf(".weightMultiplier", 1);
-  ALERT("weight multiplier: %f", multiplier);
+  //ALERT("weight multiplier: %f", multiplier);
 
   if (design.cfg.ValueOf(".useWeights", false))
     InitialiseCellsWeights(wCells, pos, design, multiplier);

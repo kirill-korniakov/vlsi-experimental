@@ -9,16 +9,15 @@ MuReporter::MuReporter(HDesign& design)
   design.Plotter.InitializeHistogramWindow();
   scaling = 0.01;  //TODO: choose proper scale
   waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+
+  plotX = 0;
 }
 
 void MuReporter::Report(HDesign& design, TimingPointMus* mus)
 {
   this->mus = mus;
 
-  //TODO: move reporter settings to the config
-
   //ReportMus(design);
-
   design.Plotter.ClearHistogram();
   //PlotMusInTopologicalOrder(design);
   PlotMusInCriticalPathOrder(design);
@@ -55,10 +54,6 @@ void MuReporter::PlotMusInTopologicalOrder(HDesign& design)
 
 void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
 {
-  static int x = 0;
-  if (pathIdx == 1)
-    x = 0;
-
   HCriticalPath::PointsEnumeratorW cpoint = (path,design).GetEnumeratorW();
   double sum = 0.0;
   int nTP = 0;
@@ -70,17 +65,20 @@ void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
   }
 
   if (pathIdx % 2 == 0)
-    design.Plotter.PlotMu(sum, x, scaling / nTP, Color_Red);
+    design.Plotter.PlotMu(sum, plotX, scaling / nTP, Color_Red);
   else
-    design.Plotter.PlotMu(sum, x, scaling / nTP, Color_Orange);
-  x += 1;
+    design.Plotter.PlotMu(sum, plotX, scaling / nTP, Color_Orange);
+  plotX += 1;
 }
 
 void MuReporter::PlotMusInCriticalPathOrder(HDesign& design)
 {
-  STA(design);
+  STA(design, false);
   FindCriticalPaths(design);
   
+  plotX = 0;
   Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, 
       Utils::CriticalPathHandler(this, &MuReporter::PlotPathMus));
+
+  design.Plotter.PlotMu(1.0, plotX, 1.0, Color_Black);
 }

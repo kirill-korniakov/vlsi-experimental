@@ -115,8 +115,12 @@ private:
   static void WriteHTMLHeader();
   static void WriteHTMLFooter();
 
+  void vAlert(const char* pattern, va_list argList);
+  void vAlert(Color col, const char* pattern, va_list argList);
+
   //member functions
   void Initialize(libconfig::ConfigExt* cfg, Logger* parent);//+-
+
 public:
   static Logger Global;
 
@@ -143,7 +147,9 @@ public:
   void __PrintAssert(const LogCortege& lcort, const char* text, bool forceExit = false);//+
 
   void Alert(const char* pattern, ...);//+
+  void Alert(std::string pattern, ...);//+
   void Alert(Color col, const char* pattern, ...);//+
+  void Alert(Color col, std::string pattern, ...);//+
 
   void PrintRevisionNumber();//+
 

@@ -75,10 +75,7 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
         metaIterationNumber++;
     }
 
-    //TODO: consider second v-cycle
-
     WRITELINE("");
-    ALERT("HPWL after analytical placement: %f", Utils::CalculateHPWL(hd, true));
     ALERT("ANALYTICAL PLACEMENT FINISHED");
 }
 
@@ -524,12 +521,13 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
 
 void AnalyticalGlobalPlacement::ReportTimes()
 {
-    ALERT("EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
-    ALERT("lseTime = %f", GETSECONDSFROMTIME(lseTime));
-    ALERT("lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
-    ALERT("calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
-    ALERT("quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
-    ALERT("quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
+    ALERT("Performance counters:");
+    ALERT("  EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
+    ALERT("  lseTime = %f", GETSECONDSFROMTIME(lseTime));
+    ALERT("  lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
+    ALERT("  calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
+    ALERT("  quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
+    ALERT("  quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
     expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
 }
 
@@ -604,6 +602,8 @@ int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
     return OK;
 }
 
+std::string format = "%.3e";
+
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
@@ -628,12 +628,12 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         //print iteration info
         WRITELINE("");
         ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
-        if (context.useQuadraticSpreading)
-            ALERT("spreadingWeight = %.20f", context.spreadingData.spreadingWeight);
-        if (context.useLR)
-            ALERT("alphaTWL = %.20f", context.LRdata.alphaTWL);
 
-        ALERT("HPWL initial   = %f", Utils::CalculateHPWL(hd, true));
+        if (context.useQuadraticSpreading)
+            ALERT("spreadingWeight = " + format, context.spreadingData.spreadingWeight);
+        if (context.useLR)
+            ALERT("alphaTWL = " + format, context.LRdata.alphaTWL);
+        ALERT("HPWL initial = " + format, Utils::CalculateHPWL(hd, true));
 
         hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
             context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
@@ -654,7 +654,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         UpdateWeights(context, hd, 32);
 
         //print iteration info
-        ALERT("Sum of Ki = %f", CalculateSumOfK(hd, ci));
+        ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci));
 
         if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
         {
@@ -675,7 +675,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             {
                 QA->RestoreBestAchievedPlacement();
                 WriteCellsCoordinates2Clusters(hd, ci);
-                ALERT("Method converged.");
+                ALERT("Method converged");
                 break;
             }
         }
@@ -694,7 +694,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         }
     }
 
-    //QA report
     if (QA != 0)
     {
         QA->Report();

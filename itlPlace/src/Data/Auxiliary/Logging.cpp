@@ -475,52 +475,78 @@ void Logger::__PrintAssert(const LogCortege& lcort, const char* text, bool force
   }
 }
 
+void Logger::vAlert(const char* pattern, va_list argList)
+{
+    if (!Verbose) return;
+
+    double secsElapsed = GetUptime();
+
+    fprintf(ms_LogFile, "[%10.3f] ", secsElapsed);
+    vfprintf(ms_LogFile, pattern, argList);
+    fwrite("\n", 1, 1, ms_LogFile);
+
+    if (ms_WriteHtmlLog)
+    {
+        WriteToHTMLStream("<div class=\"alert\">");
+        WriteToHTMLStream(false, "<span class=\"timestamp\">%.3f</span>", secsElapsed);
+        ::WriteToHTMLStream(true, pattern, ms_LogHtmlFile, argList);
+        WriteToHTMLStream("</div>\n");
+    }
+}
+
 void Logger::Alert(const char* pattern, ...)
 {
-  if (!Verbose) return;
-  va_list  argList;
-  va_start(argList, pattern);
-  double secsElapsed = GetUptime();
+    va_list  argList;
+    va_start(argList, pattern);
+    vAlert(pattern, argList);
+    va_end(argList);
+}
 
-  fprintf(ms_LogFile, "[%10.3f] ", secsElapsed);
-  vfprintf(ms_LogFile, pattern, argList);
-  fwrite("\n", 1, 1, ms_LogFile);
+void Logger::Alert(std::string pattern, ...)
+{
+    va_list argList;
+    va_start(argList, pattern);
+    vAlert(pattern.c_str(), argList);
+    va_end(argList);
+}
 
-  if (ms_WriteHtmlLog)
-  {
-    WriteToHTMLStream("<div class=\"alert\">");
-    WriteToHTMLStream(false, "<span class=\"timestamp\">%.3f</span>", secsElapsed);
-    ::WriteToHTMLStream(true, pattern, ms_LogHtmlFile, argList);
-    WriteToHTMLStream("</div>\n");
-  }
+void Logger::vAlert(Color col, const char* pattern, va_list argList)
+{
+    if (!Verbose) return;
 
-  va_end(argList);
+    double secsElapsed = GetUptime();
+
+    SetConsoleTextColor(col);
+    fprintf(ms_LogFile, "[%10.3f] ", secsElapsed);
+    vfprintf(ms_LogFile, pattern, argList);
+    fwrite("\n", 1, 1, ms_LogFile);
+    RestoreConsoleColor();
+
+    if (ms_WriteHtmlLog)
+    {
+        int r,g,b;
+        ToRGB(col, r, g, b);
+        WriteToHTMLStream(false, "<div class=\"alert\" style=\"color:#%02x%02x%02x;\">", r, g, b);
+        WriteToHTMLStream(false, "<span class=\"timestamp\">%.3f</span>", secsElapsed);
+        ::WriteToHTMLStream(true, pattern, ms_LogHtmlFile, argList);
+        WriteToHTMLStream("</div>\n");
+    }
 }
 
 void Logger::Alert(Color col, const char* pattern, ...)
 {
-  if (!Verbose) return;
   va_list  argList;
   va_start(argList, pattern);
-  double secsElapsed = GetUptime();
-
-  SetConsoleTextColor(col);
-  fprintf(ms_LogFile, "[%10.3f] ", secsElapsed);
-  vfprintf(ms_LogFile, pattern, argList);
-  fwrite("\n", 1, 1, ms_LogFile);
-  RestoreConsoleColor();
-
-  if (ms_WriteHtmlLog)
-  {
-    int r,g,b;
-    ToRGB(col, r, g, b);
-    WriteToHTMLStream(false, "<div class=\"alert\" style=\"color:#%02x%02x%02x;\">", r, g, b);
-    WriteToHTMLStream(false, "<span class=\"timestamp\">%.3f</span>", secsElapsed);
-    ::WriteToHTMLStream(true, pattern, ms_LogHtmlFile, argList);
-    WriteToHTMLStream("</div>\n");
-  }
-
+  vAlert(col, pattern, argList);
   va_end(argList);
+}
+
+void Logger::Alert(Color col, std::string pattern, ...)
+{
+    va_list argList;
+    va_start(argList, pattern);
+    vAlert(col, pattern.c_str(), argList);
+    va_end(argList);
 }
 
 static void WriteNotification(bool writeHtml,

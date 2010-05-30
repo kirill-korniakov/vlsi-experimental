@@ -16,6 +16,8 @@ private:
     double scaling;
     int waitTime;
 
+    int plotX;
+
     void ReportMus(HDesign& design);
     void PlotMusInTopologicalOrder(HDesign& design);
     void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
