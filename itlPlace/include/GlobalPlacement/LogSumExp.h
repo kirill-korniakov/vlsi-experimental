@@ -8,7 +8,7 @@ double CalcNetLSEGradient(AppCtx* context, int netIdx, int idxInSolutionVector);
 void GetClusterCoordinates(int clusterIdx, PetscScalar* coordinates, 
                            AppCtx* context, double& x, double& y);
 
-void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f);
+void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution);
 
 void PrecalcExponents(AppCtx* context, PetscScalar* solution);
 

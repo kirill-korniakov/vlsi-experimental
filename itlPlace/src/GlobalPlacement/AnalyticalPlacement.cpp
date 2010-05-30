@@ -607,7 +607,7 @@ std::string format = "%.3e";
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
-    const int nOuterIters1 = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
+    const int nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
 
     PlacementQualityAnalyzer* QA = 0;
     if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
@@ -633,7 +633,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             ALERT("spreadingWeight = " + format, context.spreadingData.spreadingWeight);
         if (context.useLR)
             ALERT("alphaTWL = " + format, context.LRdata.alphaTWL);
-        ALERT("HPWL initial = " + format, Utils::CalculateHPWL(hd, true));
 
         hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
             context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
@@ -655,6 +654,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         //print iteration info
         ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci));
+        ReportMeanGradValues(&context);
 
         if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
         {
@@ -667,7 +667,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
                 {
                     QA->RestoreBestAchievedPlacement();
                     WriteCellsCoordinates2Clusters(hd, ci);
-                    ALERT("Reached maximum tolerant iteration number.");
+                    ALERT(Color_Green, "Reached maximum tolerant iteration number.");
                     break;
                 }
             }
@@ -675,7 +675,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             {
                 QA->RestoreBestAchievedPlacement();
                 WriteCellsCoordinates2Clusters(hd, ci);
-                ALERT("Method converged");
+                ALERT(Color_Green, "Method converged");
                 break;
             }
         }
@@ -687,9 +687,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
         }
 
-        if (iteration > nOuterIters1)
+        if (iteration > nOuterIters)
         {
-            ALERT("Iterations finished");
+            ALERT(Color_Green, "Iterations finished");
             break;
         }
     }

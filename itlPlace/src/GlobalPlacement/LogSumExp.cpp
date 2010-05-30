@@ -196,7 +196,7 @@ void AddLogSumExpGradient(AppCtx* context, int nCoordinates, PetscScalar* coordi
   }
 }
 
-void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
+void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
   timetype start;
   timetype finish;
@@ -207,7 +207,7 @@ void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
   expTime += finish - start;
 
   start = GET_TIME_METHOD();
-  *f += LogSumExp(context, solution);
+  context->criteriaValues.hpwl += LogSumExp(context, solution);
   //ALERT("LSE = %f", addValue));
   finish = GET_TIME_METHOD();
   lseTime += finish - start;

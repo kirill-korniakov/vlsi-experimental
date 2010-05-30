@@ -398,7 +398,7 @@ void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
   {
     CvPoint start, finish;
 
-    CvScalar gridColor = cvScalar(0.0, 255.0, 0.0);
+    Color color = Color_GrayText;
     start.y  = DesignY2ImageY(m_hd.Circuit.PlacementMinY());
     finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMaxY());
 
@@ -407,7 +407,7 @@ void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
     {
       start.x = finish.x
         = DesignX2ImageX(m_hd.Circuit.PlacementMinX() + i * m_hd.Circuit.PlacementWidth() / nBinCols);
-      cvDrawLine(IMG, start, finish, gridColor);
+      cvDrawLine(IMG, start, finish, GetCvColor(color));
     }
 
     start.x  = DesignX2ImageX(m_hd.Circuit.PlacementMinX());
@@ -418,7 +418,7 @@ void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
     {
       start.y = finish.y
         = DesignY2ImageY(m_hd.Circuit.PlacementMinY() + i * m_hd.Circuit.PlacementHeight() / nBinRows);
-      cvDrawLine(IMG, start, finish, gridColor);
+      cvDrawLine(IMG, start, finish, GetCvColor(color));
     }
   }
 }
@@ -1007,7 +1007,7 @@ void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNe
   PlotPlacement();
   PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
   PlotGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
-  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_Pink);
+  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_LimeGreen);
   PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
   PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
   Refresh((HPlotter::WaitTime)waitTime);

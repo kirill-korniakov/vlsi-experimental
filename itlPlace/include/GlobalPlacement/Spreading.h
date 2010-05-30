@@ -3,9 +3,9 @@
 
 #include "ObjectivesConstraints.h"
 
-void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f);
+void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution);
 
-void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f);
+void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution);
 void UpdateLRSpreadingMu(HDesign& hd, AppCtx& context, int iterate);
 
 double SpreadingPenalty(AppCtx* user, PetscScalar* x);

@@ -1,12 +1,11 @@
 #include "Spreading.h"
 
-void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
+void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
   SpreadingPenalty(context, solution);
-  *f += Aux::ScalarProduct(context->spreadingData.muBinsPen, 
+  context->criteriaValues.spreading += Aux::ScalarProduct(context->spreadingData.muBinsPen, 
     context->spreadingData.binsPenaltyValues, 
     context->spreadingData.binGrid.nBins);
-  //ALERT("LRS = %f", addValue));
   AddSpreadingPenaltyGradient(context, solution, context->gQS); //FIXME:HACK: use proper gradient
 }
 

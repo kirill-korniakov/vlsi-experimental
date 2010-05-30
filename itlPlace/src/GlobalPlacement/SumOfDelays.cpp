@@ -73,7 +73,7 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
 
   for (int i = nClusterCoordinates; i < nClusterCoordinates + netListSize; i++)
   {
-    ki = coordinates[i]; //WARNING: this index is correct
+    ki = coordinates[i]; //NOTE: this index is correct
     netIdx = i - nClusterCoordinates;
     gradient[i] = context->SODdata.DbufLbufDifferenceOfSquares + 
       (2 * context->SODdata.netSODData[netIdx].braces * context->SODdata.Lbuf * (ki + 1) - 
@@ -82,7 +82,7 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
   }
 }
 
-void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double* f)
+void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
   timetype start;
   timetype finish;
@@ -92,7 +92,6 @@ void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution, double*
   finish = GET_TIME_METHOD();
   expTime += finish - start;
 
-  *f += SumOfDelays(context, solution);;
-  //ALERT("SOD = %f", addValue));
+  context->criteriaValues.sod += SumOfDelays(context, solution);;
   AddSumOfDelaysGradient(context, solution, context->gSOD);
 }

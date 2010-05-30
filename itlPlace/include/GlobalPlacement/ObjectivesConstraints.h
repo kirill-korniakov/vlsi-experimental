@@ -9,5 +9,6 @@
 
 int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ptr);
 void CalcMuInitial(PetscScalar* x, AppCtx* context);
+void ReportMeanGradValues( AppCtx* context );
 
 #endif

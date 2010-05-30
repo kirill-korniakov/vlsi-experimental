@@ -17,29 +17,37 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
   double spreadingWeightInitialMultiplier = context->hd->cfg.ValueOf("TAOOptions.spreadingWeightInitialMultiplier", 0.1);
   PrecalcExponents(context, x);
 
-  //calculate criteria value
-  double* criteriaValue = new double;
-  *criteriaValue = 0.0;
+  double criteriaValue = 0.0;
+
+  context->criteriaValues.objective = 0.0;
+  context->criteriaValues.hpwl = 0.0;
+  context->criteriaValues.lr = 0.0;
+  context->criteriaValues.sod = 0.0;
+  context->criteriaValues.spreading = 0.0;
+
   if (context->useLogSumExp)
-    LSE_AddObjectiveAndGradient(context, x, criteriaValue);
+  {
+    LSE_AddObjectiveAndGradient(context, x);
+    criteriaValue = context->criteriaValues.hpwl;
+  }
   else if (context->useSumOfDelays)
-    SOD_AddObjectiveAndGradient(context, x, criteriaValue);
+  {
+    SOD_AddObjectiveAndGradient(context, x);
+    criteriaValue = context->criteriaValues.sod;
+  }
   else if (context->useLR)
   {
-    context->criteriaValues.hpwl = 0.0;
-    context->criteriaValues.lr = 0.0;
     LR_AddObjectiveAndGradient(context, x);
-    *criteriaValue = context->criteriaValues.hpwl + context->criteriaValues.lr;
+    criteriaValue = context->criteriaValues.hpwl + context->criteriaValues.lr;
   }
-  //ALERT("criteriaValue = %f", criteriaValue));
 
-  //calculate penalty value
   double penaltyValue  = 0.0;
   penaltyValue = SpreadingPenalty(context, x);
   //ALERT("penaltyValue = %f", penaltyValue));
 
   //calculate mu value
-  context->spreadingData.spreadingWeightInitial = spreadingWeightInitialMultiplier * (*criteriaValue) / penaltyValue;
+  context->spreadingData.spreadingWeightInitial = 
+      spreadingWeightInitialMultiplier * criteriaValue / penaltyValue;
   context->spreadingData.spreadingWeight = context->spreadingData.spreadingWeightInitial;
 
   if (context->useLRSpreading)
@@ -171,6 +179,47 @@ void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& contex
   }
 }
 
+void ReportMeanGradValues( AppCtx* context )
+{
+    double gLSE = 0;
+    double gLR = 0;
+    double gSpreading = 0;
+
+    for (int i = 0; i < context->nVariables; i++)
+    {
+        gLSE += fabs(context->gLSE[i]);
+        gLR += fabs(context->gLR[i]);
+        gSpreading += fabs(context->gQS[i]);
+    }
+    ALERT("Mean LSE gradient value: %.3e", gLSE/context->nVariables);
+    ALERT("Mean LR  gradient value: %.3e", gLR/context->nVariables);
+    ALERT("Mean Spr gradient value: %.3e", gSpreading/context->nVariables);
+}
+
+void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * gradient)
+{
+    //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
+    //PrintDerivatives(nClusterVariables, nBufferVariables, gradient, true, true, false);
+    //ReportMeanGradValues(context);
+
+    static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.plotSolverState", false);
+    if (plotSolverState)
+    {
+        context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
+            context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, 
+            context->ci->netList.size(), 
+            (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient);
+
+        if (context->useSumOfDelays)
+        {
+            context->hd->Plotter.ClearHistogram();
+            context->hd->Plotter.PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
+                (double*)solution, Color_Violet);
+            context->hd->Plotter.RefreshHistogram();
+        }
+    }
+}
+
 int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ctx)
 {
   AppCtx* context = (AppCtx*)ctx;
@@ -194,20 +243,17 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
   SetGradientToZero(context->gLR,  context->nVariables);
   SetGradientToZero(context->gQS,  context->nVariables);
 
-  double LRValue = 0.0;
-  double QSValue = 0.0;
-
   #pragma omp parallel sections
   {
     #pragma omp section
     {
       if (context->useLogSumExp)
       {
-        LSE_AddObjectiveAndGradient(context, solution, &context->criteriaValues.hpwl);
+        LSE_AddObjectiveAndGradient(context, solution);
       }
       if (context->useSumOfDelays)
       {
-        SOD_AddObjectiveAndGradient(context, solution, &context->criteriaValues.sod);
+        SOD_AddObjectiveAndGradient(context, solution);
       }
       if (context->useLR)
       {
@@ -219,11 +265,11 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     {
       if (context->useQuadraticSpreading)
       {
-        QS_AddObjectiveAndGradient(context, solution, &context->criteriaValues.spreading);
+        QS_AddObjectiveAndGradient(context, solution);
       }
       if (context->useLRSpreading)
       {
-        LRS_AddObjectiveAndGradient(context, solution, &context->criteriaValues.spreading);
+        LRS_AddObjectiveAndGradient(context, solution);
       }
     }
   }
@@ -247,28 +293,10 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     gradient[i] += context->gQS[i];
   }
 
-  //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
-  //PrintDerivatives(nClusterVariables, nBufferVariables, gradient, true, true, false);
-
-  static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.plotSolverState", false);
-  if (plotSolverState)
-  {
-    context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
-      context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, 
-      context->ci->netList.size(), 
-      (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient);
-
-    if (context->useSumOfDelays)
-    {
-      context->hd->Plotter.ClearHistogram();
-      context->hd->Plotter.PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
-        (double*)solution, Color_Violet);
-      context->hd->Plotter.RefreshHistogram();
-    }
-  }
-
   iCHKERRQ VecRestoreArray(X, &solution);
   iCHKERRQ VecRestoreArray(G, &gradient);
+
+  ReportDebugInfo(context, solution, gradient);
 
   return OK;
 }
