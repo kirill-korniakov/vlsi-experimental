@@ -199,11 +199,14 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
         nx = nextPoint0.X();
         ny = nextPoint0.Y();
 
-        int rs = DPGrid.FindRow(ry);
-        int rf = DPGrid.FindRow(ny);
+        int rsy = DPGrid.FindRow(ry);
+        int rfy = DPGrid.FindRow(ny);
+        int rsx = DPGrid.FindColumn(rx);
+        int rfx = DPGrid.FindColumn(nx);
 
-        int n = abs(rs - rf);
-        double r = (DPGrid.RowY(rf) - DPGrid.RowY(rs)) / double(n);
+        int RowCount = abs(rsy - rfy);
+        int ColumnCount = abs(rsx - rfx);
+        int n = RowCount + ColumnCount;
 
         int rowInd = 0;
         int pointInRowCount = 0;
@@ -236,11 +239,15 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
           nx = nextPoint0.X();
           ny = nextPoint0.Y();
 
-          int rs = DPGrid.FindRow(ry);
-          int rf = DPGrid.FindRow(ny);
+          int rsy = DPGrid.FindRow(ry);
+          int rfy = DPGrid.FindRow(ny);
+          int rsx = DPGrid.FindColumn(rx);
+          int rfx = DPGrid.FindColumn(nx);
 
-          int n = abs(rs - rf);
-          double r = (DPGrid.RowY(rf) - DPGrid.RowY(rs)) / double(n);
+          int RowCount = abs(rsy - rfy);
+          int ColumnCount = abs(rsx - rfx);
+          int n = RowCount + ColumnCount;
+
 
           int rowInd = 0;
           int pointInRowCount = 0;
@@ -270,7 +277,7 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
         pointCount++;
       }
     }
-    maxPos += 2;
+    maxPos *= 2;
   }
   else
   {
@@ -371,30 +378,6 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
     nx = spw.X();
     ny = spw.Y();
 
-    int rs = DPGrid.FindRow(ry);
-    int rf = DPGrid.FindRow(ny);
-
-    int n = abs(rs - rf);
-
-    double DPGrid_RowY_rf = DPGrid.RowY(rf);
-    double DPGrid_RowY_rs = DPGrid.RowY(rs);
-
-    double r = (DPGrid.RowY(rf) - DPGrid.RowY(rs)) / double(n);
-
-    int rowInd = 0;
-    int pointInRowCount = 0;
-    int newPartitionPointCount = 0;
-    if (((partitionPointCount - 1.0) / n) < 1)
-    {
-      newPartitionPointCount = n + 1;
-      pointInRowCount = 1;
-    }
-    else
-    {
-      pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
-      newPartitionPointCount = pointInRowCount * n + 1;
-    }    
-
     if (isRight)
       vGTree[rootIndex].SetRight(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
     else
@@ -403,8 +386,32 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
     rootIndex = nodeIndex;
-    if (TypePartition == 0)
-    { //обычное разбиение ребра
+
+    if (TypePartition == 1)
+    {
+      int rsy = DPGrid.FindRow(ry);
+      int rfy = DPGrid.FindRow(ny);
+      int rsx = DPGrid.FindColumn(rx);
+      int rfx = DPGrid.FindColumn(nx);
+
+      int RowCount = abs(rsy - rfy);
+      int ColumnCount = abs(rsx - rfx);
+      int n = RowCount + ColumnCount;
+
+      int pointInRowCount = 0;
+      int newPartitionPointCount = 0;
+      if (((partitionPointCount - 1.0) / n) < 1)
+      {
+        newPartitionPointCount = n + 1;
+      }
+      else
+      {
+        pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
+        newPartitionPointCount = pointInRowCount * n + 1;
+      }
+        partitionPointCount = newPartitionPointCount;
+      }
+
       for (int i = 1; i < (partitionPointCount - 1); i++)
       {
         vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
@@ -412,34 +419,6 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
         vGTree[nodeIndex].SetY(ry + (ny - ry) / (partitionPointCount - 1) * i);
         rootIndex = nodeIndex;
       }
-    }
-    else
-      if (design.cfg.ValueOf("TypePartition", 0) == 1)
-      {//новое разбиение
-
-        double y = DPGrid.RowY(rs);
-        for (int i = 1; i < (newPartitionPointCount - 1); i++)
-        {
-
-          vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
-
-          vGTree[nodeIndex].SetY(y);
-          if ((newPartitionPointCount - 1) != 0)
-            vGTree[nodeIndex].SetX(DPGrid.ColumnX(DPGrid.FindColumn(rx + (nx - rx) / (newPartitionPointCount - 1) * i)));
-          else
-          {
-            ALERT("ERROR!!!!!!!!!");
-          }
-
-          rootIndex = nodeIndex;
-          if (((i) % pointInRowCount) == 0)
-          {
-            rowInd++;
-            y = DPGrid_RowY_rs + rowInd * r;
-          }
-        }
-      }
-
 
 
       vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
