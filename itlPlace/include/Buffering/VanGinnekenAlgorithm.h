@@ -34,6 +34,15 @@ protected:
   HWirePhysicalParams& WirePhisics;
   TemplateTypes<BufferInfo>::vector Buffers;
 
+  int partitionCount;
+  bool PlotVGTree;
+  bool PlotNets;
+  bool PrintNetInfo;
+  bool PlotSteinerPoint;
+
+  VGTreeRepository treeRepository;
+  VanGinnekenTree* vGTree;
+
   void LoadBuffers();
 
 public:

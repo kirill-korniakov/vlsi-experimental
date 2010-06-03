@@ -47,10 +47,8 @@ public:
   void SetIndex(int i);
   void SetTree(VanGinnekenTree* t);
 
-  ~VanGinnekenTreeNode()
-  {
-    //delete [] tree;
-  }
+  ~VanGinnekenTreeNode();
+
 };
 
 class VanGinnekenTree
@@ -61,7 +59,8 @@ protected:
   int treeSize;  
   int TypePartition;
 
-  void CreateTree(HSteinerPoint& source);
+  void CreateTree();
+
   VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 public:
 
@@ -72,10 +71,14 @@ public:
   VanGinnekenTree(HDesign& hd, int partitionCount);
   VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source);
 
+  void UpdateTree(HSteinerPoint& source);
+
   void SetEdgePartitionCount(int partitionCount);
 
   VanGinnekenTreeNode GetSource();
   double GetR();
+
+  void ClearTree();
 
   int TreeSize()
   {
@@ -138,6 +141,38 @@ public:
   void SetRAT(double rat);
   void SetC(double capacity);
 
+
+};
+
+class NetId
+{
+public:
+  string name;
+  int id;
+  bool isCreateVGTree;
+  NetId()
+  {
+    name = "";
+    id = -1;
+    isCreateVGTree = false;
+  }
+};
+
+class VGTreeRepository
+{
+protected:
+  int lastId;
+  HDesign& design;
+  int netCount;
+  int partitionCount;
+  TemplateTypes<NetId>::vector NetIdRepository;
+public:
+  VGTreeRepository(HDesign& hd);
+  void CreateVGTree(HNet net);
+  int GetLastId();
+  bool NoVGTree(HNet net);
+  int SetNet(string s, int id);
+  int FindId(string s);
 
 };
 

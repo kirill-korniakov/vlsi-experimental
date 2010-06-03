@@ -41,9 +41,15 @@ void VGAlgorithm::LoadBuffers()
   }
 }
 
-VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
+VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics), treeRepository(hd)
 {
   LoadBuffers();
+  PlotSteinerPoint = design.cfg.ValueOf("PlotSteinerPoint", false);
+  PlotVGTree = design.cfg.ValueOf("PlotVGTree", false);
+  PlotNets = design.cfg.ValueOf("PlotNets", false);
+  PrintNetInfo = design.cfg.ValueOf("PrintNetInfo", false);
+  partitionCount = design.cfg.ValueOf("Interval", 1);
+  vGTree = new VanGinnekenTree(design, partitionCount);
 }
 
 int VGAlgorithm::BufferingPlacement()
@@ -53,22 +59,26 @@ int VGAlgorithm::BufferingPlacement()
   int idx = 0;
   for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
     paths[idx++] = i;
+  design.Plotter.PlotSteinerForest(Color_Black);
 
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(design));
 
   int bufferCount = 0;
+  ALERT("CriticalPaths count = %d", design.CriticalPaths.Count());
   for(int j = 0; j < design.CriticalPaths.Count(); j++)
   {
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
     {
       HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
-      if (net.Kind() == NetKind_Active)// && (net.PinsCount() < 360 ))
+      if (net.Kind() == NetKind_Active) //&& (treeRepository.NoVGTree(net)))//  && (net.PinsCount() >= 50 ))//&& (treeRepository.NoVGTree(net)))//
       {
 
-        //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_9249"))        
+        //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_7347"))  
+        
           bufferCount += BufferingNen(net);
       }
     }
+    //ALERT("CriticalPaths id = %d", j);
   }
   ALERT("Buffers inserted: %d", bufferCount);
   
@@ -77,26 +87,30 @@ int VGAlgorithm::BufferingPlacement()
 
 int VGAlgorithm::BufferingNen(HNet& net)
 {
-  int partitionCount = design.cfg.ValueOf("Interval", 1);
-  VanGinnekenTree vGTree(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
-  if (design.cfg.ValueOf("PrintNetInfo", false) == true)
+  
+  //VanGinnekenTree* vGTree = //(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
+  
+  vGTree->UpdateTree(design.SteinerPoints[(net, design).Source()]);
+  treeRepository.CreateVGTree(net);
+  if (PrintNetInfo)
   {
     ALERT("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
   }
-  if ((design.cfg.ValueOf("PlotSteinerPoint", false) == true) || (design.cfg.ValueOf("PlotNets", false) == true))
+  if ((PlotSteinerPoint) || (PlotNets))
   {
     design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(net));
     design.Plotter.PlotNetSteinerTree(net, Color_Black);  
     design.Plotter.Refresh();
   }
-  if (design.cfg.ValueOf("PlotVGTree", false) == true)
+  if (PlotVGTree)
   {
     design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(net));
-    design.Plotter.PlotVGTree(&vGTree.GetSource(), Color_Black); 
+    design.Plotter.PlotVGTree(&vGTree->GetSource(), Color_Black); 
     design.Plotter.Refresh();
   }
-  VGVariantsListElement* best = Algorithm(&vGTree);
+  VGVariantsListElement* best = Algorithm(vGTree);
   int bufCount = best->GetPositionCount();
+  //ALERT("net: %s\tbufcount = %d",(net, design).Name().c_str(), bufCount );
   if (bufCount > 0)
   {
     TemplateTypes<NewBuffer>::list newBuffer;
@@ -104,9 +118,9 @@ int VGAlgorithm::BufferingNen(HNet& net)
     InsertsBuffer(newBuffer, best);
     newBuffer.sort();
     //ALERT("name = %s", (net, design).Name().c_str());
-    CreateNets(net, newBuffer, newNet, vGTree.GetSource().GetLeft());
+    CreateNets(net, newBuffer, newNet, vGTree->GetSource().GetLeft());
   }
-  if ((design.cfg.ValueOf("PlotSteinerPoint", false) == true) || (design.cfg.ValueOf("PlotVGTree", false) == true) || (design.cfg.ValueOf("PlotNets", false) == true))
+  if ((PlotSteinerPoint) || (PlotVGTree) || (PlotNets))
   {
     design.Plotter.ShowPlacement();
   }
@@ -136,9 +150,9 @@ VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
       best = &(*i);
     }
   }
-  if (design.cfg.ValueOf("PrintNetInfo", false) == true)
+  if (PrintNetInfo)
   {
-    printf("%d\t%f\n", best->GetPositionCount(), tMax);
+    printf("best pos = %d\ttmax = %f\n", best->GetPositionCount(), tMax);
   }
   return best;
 }
@@ -463,6 +477,7 @@ void VGAlgorithm::PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, Te
 
 void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node)
 {
+  int newPinCount = 0;
   int nNewNetPin = 0;
   int nPins = 0;
   char cellIdx[10];
@@ -478,14 +493,14 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
   nPins++;
   nNewNetPin += nPins;
   design.Nets.AllocatePins(subNet, nPins);  
-
+  newPinCount += nPins;
   //init source
   design.Nets.Set<HNet::Source, HPin>(subNet, design[net].Source());
 
   //add other pins
   AddSinks2Net(subNet, node, design[subNet].GetSinksEnumeratorW(), newBuffer);
   
-  if (design.cfg.ValueOf("PlotNets", false) == true)
+  if (PlotNets)
   {
     design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(subNet));
     design.Plotter.PlotNetSteinerTree(subNet, Color_Red);  
@@ -508,6 +523,7 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
     PinsCountCalculation(nodeStart.Positions.GetPosition()->GetLeft(), nPins, newBuffer);
     nPins++;
     nNewNetPin += nPins;
+    newPinCount += nPins;
     design.Nets.AllocatePins(subNet, nPins);
     design.Nets.Set<HNet::Source, HPin>(subNet, j->source);
 
@@ -515,12 +531,16 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
     NewBuffer& nodeStart2 = *j;
     AddSinks2Net(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), design[subNet].GetSinksEnumeratorW(), newBuffer);
 
-    if (design.cfg.ValueOf("PlotNets", false) == true)
+    if (PlotNets)
     {
       design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(subNet));
       design.Plotter.PlotNetSteinerTree(subNet, Color_Red);  
       design.Plotter.Refresh();
     }
   }
+  HNetWrapper netw = design[net];
+  int ttt = (netw.PinsCount() + newBuffer.size() * 2);
+  if ((netw.PinsCount() + newBuffer.size() * 2) != newPinCount)
+    ALERT("ERRORR pin count");
   design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
 }

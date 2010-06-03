@@ -147,6 +147,13 @@ void VanGinnekenTreeNode::SetTree(VanGinnekenTree* t)
 {
   tree = t;
 }
+
+VanGinnekenTreeNode::~VanGinnekenTreeNode()
+{
+  left = NULL;
+  right = NULL;
+  tree = NULL;
+}
 //VanGinnekenTreeNode
 
 //VanGinnekenTree
@@ -158,80 +165,41 @@ VanGinnekenTree::VanGinnekenTree(HDesign& hd): design(hd), DPGrid(hd)
 VanGinnekenTree::VanGinnekenTree(HDesign& hd, int partitionCount): design(hd), DPGrid(hd)
 {
   partitionPointCount = partitionCount;
+  CreateTree();
 }
 
 VanGinnekenTree::VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source): design(hd), DPGrid(hd)
 {
   partitionPointCount = partitionCount;
-  CreateTree(source);
+  UpdateTree(source);
 }
 
-void VanGinnekenTree::SetEdgePartitionCount(int partitionCount)
+void VanGinnekenTree::CreateTree()
 {
-  partitionPointCount = partitionCount;
-}
-
-void VanGinnekenTree::CreateTree(HSteinerPoint& source)
-{
-  HSteinerPointWrapper srcPoint0 = design[source];
-  HSteinerPointWrapper nextPoint0 = srcPoint0;
-  //считаем количество точек дерева штейнера.
-  int pointCount = 0;
-  TemplateTypes<HSteinerPoint>::stack points0;
-  int maxPos = partitionPointCount;
-  points0.push(srcPoint0);
-  TypePartition = design.cfg.ValueOf("TypePartition", 0);
-  
-  if (TypePartition == 1)
+  int maxTree = 0;
+  int treeSize0 = 0;
+  for (HNets::ActiveNetsEnumeratorW netW = design.Nets.GetActiveNetsEnumeratorW(); netW.MoveNext(); )
   {
-    while (!points0.empty())
+
+    HSteinerPointWrapper srcPoint0 = design[design.SteinerPoints[netW.Source()]];
+    HSteinerPointWrapper nextPoint0 = srcPoint0;
+    //считаем количество точек дерева штейнера.
+    int pointCount = 0;
+    TemplateTypes<HSteinerPoint>::stack points0;
+    int maxPos = partitionPointCount;
+    points0.push(srcPoint0);
+    TypePartition = design.cfg.ValueOf("TypePartition", 0);
+
+    if (TypePartition == 1)
     {
-      srcPoint0 = points0.top();
-      points0.pop();
-
-      if (srcPoint0.HasLeft())
+      while (!points0.empty())
       {
-        nextPoint0 = srcPoint0.Left();
+        srcPoint0 = points0.top();
+        points0.pop();
 
-        double rx,ry,nx,ny;
-        rx = srcPoint0.X();
-        ry = srcPoint0.Y();
-        nx = nextPoint0.X();
-        ny = nextPoint0.Y();
-
-        int rsy = DPGrid.FindRow(ry);
-        int rfy = DPGrid.FindRow(ny);
-        int rsx = DPGrid.FindColumn(rx);
-        int rfx = DPGrid.FindColumn(nx);
-
-        int RowCount = abs(rsy - rfy);
-        int ColumnCount = abs(rsx - rfx);
-        int n = RowCount + ColumnCount;
-
-        int rowInd = 0;
-        int pointInRowCount = 0;
-        int newPartitionPointCount = 0;
-        if (((partitionPointCount - 1.0) / n) < 1)
+        if (srcPoint0.HasLeft())
         {
-          newPartitionPointCount = n + 1;
-          pointInRowCount = 1;
-        }
-        else
-        {
-          pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
-          newPartitionPointCount = pointInRowCount * n + 1;
-        }
-
-        if (newPartitionPointCount > maxPos)
-          maxPos = newPartitionPointCount;
-
-
-        pointCount++;
-        points0.push(nextPoint0);
-
-        if (srcPoint0.HasRight())
-        {
-          nextPoint0 = srcPoint0.Right();
+          nextPoint0 = srcPoint0.Left();
 
           double rx,ry,nx,ny;
           rx = srcPoint0.X();
@@ -247,7 +215,6 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
           int RowCount = abs(rsy - rfy);
           int ColumnCount = abs(rsx - rfx);
           int n = RowCount + ColumnCount;
-
 
           int rowInd = 0;
           int pointInRowCount = 0;
@@ -266,53 +233,121 @@ void VanGinnekenTree::CreateTree(HSteinerPoint& source)
           if (newPartitionPointCount > maxPos)
             maxPos = newPartitionPointCount;
 
+
           pointCount++;
           points0.push(nextPoint0);
+
+          if (srcPoint0.HasRight())
+          {
+            nextPoint0 = srcPoint0.Right();
+
+            double rx,ry,nx,ny;
+            rx = srcPoint0.X();
+            ry = srcPoint0.Y();
+            nx = nextPoint0.X();
+            ny = nextPoint0.Y();
+
+            int rsy = DPGrid.FindRow(ry);
+            int rfy = DPGrid.FindRow(ny);
+            int rsx = DPGrid.FindColumn(rx);
+            int rfx = DPGrid.FindColumn(nx);
+
+            int RowCount = abs(rsy - rfy);
+            int ColumnCount = abs(rsx - rfx);
+            int n = RowCount + ColumnCount;
+
+
+            int rowInd = 0;
+            int pointInRowCount = 0;
+            int newPartitionPointCount = 0;
+            if (((partitionPointCount - 1.0) / n) < 1)
+            {
+              newPartitionPointCount = n + 1;
+              pointInRowCount = 1;
+            }
+            else
+            {
+              pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
+              newPartitionPointCount = pointInRowCount * n + 1;
+            }
+
+            if (newPartitionPointCount > maxPos)
+              maxPos = newPartitionPointCount;
+
+            pointCount++;
+            points0.push(nextPoint0);
+          }
         }
-      }
 
-      else
-      {
-        //sink
-        pointCount++;
-      }
-    }
-    maxPos *= 2;
-  }
-  else
-  {
-    while (!points0.empty())
-    {
-      srcPoint0 = points0.top();
-      points0.pop();
-
-      if (srcPoint0.HasLeft())
-      {
-        nextPoint0 = srcPoint0.Left();
-        pointCount++;
-        points0.push(nextPoint0);
-
-        if (srcPoint0.HasRight())
+        else
         {
-          nextPoint0 = srcPoint0.Right();
+          //sink
           pointCount++;
-          points0.push(nextPoint0);
         }
       }
-
-      else
+      maxPos *= 2;
+    }
+    else
+    {
+      while (!points0.empty())
       {
-        //sink
-        pointCount++;
+        srcPoint0 = points0.top();
+        points0.pop();
+
+        if (srcPoint0.HasLeft())
+        {
+          nextPoint0 = srcPoint0.Left();
+          pointCount++;
+          points0.push(nextPoint0);
+
+          if (srcPoint0.HasRight())
+          {
+            nextPoint0 = srcPoint0.Right();
+            pointCount++;
+            points0.push(nextPoint0);
+          }
+        }
+
+        else
+        {
+          //sink
+          pointCount++;
+        }
       }
     }
+    treeSize0 = pointCount * maxPos + pointCount + 1;
+    if (treeSize0 > maxTree)
+      maxTree = treeSize0;
   }
+  treeSize = maxTree;
+  vGTree = new VanGinnekenTreeNode [maxTree];
+
+}
+
+  void VanGinnekenTree::ClearTree()
+  {
+    for (int i = 0; i < treeSize; i++)
+    {
+      vGTree[i].SetLeft(NULL);
+      vGTree[i].SetRight(NULL);
+      vGTree[i].SetType(-1);
+    }
+  }
+
+void VanGinnekenTree::SetEdgePartitionCount(int partitionCount)
+{
+  partitionPointCount = partitionCount;
+}
+
+void VanGinnekenTree::UpdateTree(HSteinerPoint& source)
+{
+  
+  ClearTree();
 
   TemplateTypes<HSteinerPoint>::stack points;
   TemplateTypes<int>::stack rootIndexs;
   //создаем дерево
-  treeSize = pointCount * maxPos + pointCount + 1;
-  vGTree = new VanGinnekenTreeNode [treeSize];
+
   int nodeIndex = 0;
   int rootIndex = 0;
   HSteinerPoint srcPoint = design[source];
@@ -409,42 +444,42 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
         pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
         newPartitionPointCount = pointInRowCount * n + 1;
       }
-        partitionPointCount = newPartitionPointCount;
-      }
+      partitionPointCount = newPartitionPointCount;
+    }
 
-      for (int i = 1; i < (partitionPointCount - 1); i++)
-      {
-        vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
-        vGTree[nodeIndex].SetX(rx + (nx - rx) / (partitionPointCount - 1) * i);
-        vGTree[nodeIndex].SetY(ry + (ny - ry) / (partitionPointCount - 1) * i);
-        rootIndex = nodeIndex;
-      }
-
-
+    for (int i = 1; i < (partitionPointCount - 1); i++)
+    {
       vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
-      vGTree[nodeIndex].SetX(spw.X());
-      vGTree[nodeIndex].SetY(spw.Y());
+      vGTree[nodeIndex].SetX(rx + (nx - rx) / (partitionPointCount - 1) * i);
+      vGTree[nodeIndex].SetY(ry + (ny - ry) / (partitionPointCount - 1) * i);
       rootIndex = nodeIndex;
+    }
 
-      nodeIndex++;
-      vGTree[nodeIndex].SetSteinerPoint(node);
-      vGTree[nodeIndex].SetX(spw.X());
-      vGTree[nodeIndex].SetY(spw.Y());
-      vGTree[rootIndex].SetLeft(&vGTree[nodeIndex]);
-      vGTree[nodeIndex].SetIndex(nodeIndex);
-      vGTree[nodeIndex].SetTree(tree);
 
-      if (!spw.IsInternal())
-      {
-        vGTree[nodeIndex].SetType(1);
-      }
-      else
-      {
-        vGTree[nodeIndex].SetType(type);	
-      }
+    vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
+    vGTree[nodeIndex].SetX(spw.X());
+    vGTree[nodeIndex].SetY(spw.Y());
+    rootIndex = nodeIndex;
 
-      if (nodeIndex >= treeSize)
-        ALERT("ERROR1!!!!!");
+    nodeIndex++;
+    vGTree[nodeIndex].SetSteinerPoint(node);
+    vGTree[nodeIndex].SetX(spw.X());
+    vGTree[nodeIndex].SetY(spw.Y());
+    vGTree[rootIndex].SetLeft(&vGTree[nodeIndex]);
+    vGTree[nodeIndex].SetIndex(nodeIndex);
+    vGTree[nodeIndex].SetTree(tree);
+
+    if (!spw.IsInternal())
+    {
+      vGTree[nodeIndex].SetType(1);
+    }
+    else
+    {
+      vGTree[nodeIndex].SetType(type);	
+    }
+
+    if (nodeIndex >= treeSize)
+      ALERT("ERROR1!!!!!");
 
   }
   if (type == 3)
@@ -659,3 +694,61 @@ void VGVariantsListElement::SetC(double capacity)
 {
   c = capacity;
 }
+//VGVariantsListElement
+
+//VGTreeRepository
+
+VGTreeRepository::VGTreeRepository(HDesign& hd): design(hd)
+{
+  netCount = design.Nets.Count();
+  lastId = 0;
+  //treeRepository = new VanGinnekenTree* [netCount];
+  int i = 0;
+  ALERT("nets count = %d", netCount);
+  NetIdRepository.resize(netCount);
+  for (HNets::ActiveNetsEnumeratorW netW = design.Nets.GetActiveNetsEnumeratorW(); netW.MoveNext(); i++)
+  {    
+    SetNet(netW.Name().c_str(), i);
+    //ALERT("net: %s\t id = %d", netW.Name().c_str(), i);
+  }
+
+  partitionCount = design.cfg.ValueOf("Interval", 1);
+  ALERT("Active nets count = %d", i);
+}
+
+void VGTreeRepository::CreateVGTree(HNet net)
+{
+  lastId = FindId(design.Nets.GetString<HNet::Name>(net));
+  NetIdRepository[lastId].isCreateVGTree = true;
+  
+}
+
+int VGTreeRepository::GetLastId()
+{
+ return lastId;
+}
+
+
+bool VGTreeRepository::NoVGTree(HNet net)
+{
+  lastId = FindId(design.Nets.GetString<HNet::Name>(net));
+  return !NetIdRepository[lastId].isCreateVGTree;
+}
+
+int VGTreeRepository::SetNet(string s, int id)
+{
+  NetIdRepository[id].name = s;
+  NetIdRepository[id].id = id;
+  lastId = id;
+  return lastId;
+}
+
+int VGTreeRepository::FindId(string s)
+{
+  for (int i = 0; i < netCount; i++)
+    if (NetIdRepository[i].name == s)
+      return NetIdRepository[i].id;
+}
+
+
+//VGTreeRepository
