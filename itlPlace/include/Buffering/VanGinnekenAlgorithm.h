@@ -40,7 +40,6 @@ protected:
   bool PrintNetInfo;
   bool PlotSteinerPoint;
 
-  VGTreeRepository treeRepository;
   VanGinnekenTree* vGTree;
 
   void LoadBuffers();
@@ -50,7 +49,7 @@ public:
 
   int BufferingPlacement();
   int BufferingNen(HNet& net);
-  VGVariantsListElement* Algorithm(VanGinnekenTree* vGTree);
+  VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
   TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTreeNode* node);
   TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
   void UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge);

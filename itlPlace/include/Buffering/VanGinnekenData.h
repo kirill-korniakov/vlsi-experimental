@@ -107,6 +107,12 @@ public:
   void SetPosition(VanGinnekenTreeNode* pos);
   void SetBufferInfo(BufferInfo* bufInfo);
   void SetIndex(int i);
+  ~BufferPositions()
+  {
+    position = NULL;
+    bufferInfo = NULL;
+
+  }
 };
 
 class VGVariantsListElement
@@ -143,37 +149,27 @@ public:
 
 
 };
-
-class NetId
-{
-public:
-  string name;
-  int id;
-  bool isCreateVGTree;
-  NetId()
-  {
-    name = "";
-    id = -1;
-    isCreateVGTree = false;
-  }
-};
-
-class VGTreeRepository
+/*
+class VGVariantsList
 {
 protected:
-  int lastId;
-  HDesign& design;
-  int netCount;
-  int partitionCount;
-  TemplateTypes<NetId>::vector NetIdRepository;
+  BufferPositions* bufferPositions;
+  int sizeList;
+  int lastVariantId;
 public:
-  VGTreeRepository(HDesign& hd);
-  void CreateVGTree(HNet net);
-  int GetLastId();
-  bool NoVGTree(HNet net);
-  int SetNet(string s, int id);
-  int FindId(string s);
+
+  VGVariantsList();
+  VGVariantsList(int sizeVariantsList);
+
+  void push_front(VGVariantsListElement element);
+  void push_back(VGVariantsListElement element);
+  void insert(VGVariantsListElement element, int index);
+  void erase(int id);
+  void UpdateVariant(VGVariantsListElement element, int id);
+  bufferPositions GetVariants(int id);
+
+  
 
 };
-
+*/
 #endif //__VanGinnekenData_H__

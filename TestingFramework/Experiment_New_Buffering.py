@@ -7,7 +7,7 @@ from Parameters import *
 class Experiment_New_Buffering(BaseExperiment):
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
-        po.write('Benchmark;bbHPWL;abHPWL;bbTWL;abTWL;bbTNS;abTNS;bbWNS;abWNS;TIME;Cells;%HPWL;%TWL;%TNS;%WNS;%AddBuf\n')
+        po.write('Benchmark;bbHPWL;bbHPWL1;abHPWL;bbTWL;bbTWL1;abTWL;bbTNS;bbTNS1;abTNS;bbWNS;bbWNS1;abWNS;TIME;bTime;Cells;%HPWL;%TWL;%TNS;%WNS;%HPWL1;%TWL1;%TNS1;%WNS1;%AddBuf\n')
         po.close()
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
@@ -22,36 +22,60 @@ class Experiment_New_Buffering(BaseExperiment):
         bbCells = parser.GetFromPFST(tagList[0], metricTagList[3])
         abCells = parser.GetFromPFST(tagList[-1], metricTagList[3])
         abTime = parser.GetFromPFST(tagList[-1], metricTagList[2])
+        abTime1 = parser.GetFromPFST(tagList[1], metricTagList[2])
+        abTime0 = parser.GetFromPFST(tagList[0], metricTagList[2])
         bbHPWL = parser.GetFromPFST(tagList[0], metricTagList[4])
+        bbHPWL1 = parser.GetFromPFST(tagList[1], metricTagList[4])
         abHPWL = parser.GetFromPFST(tagList[-1], metricTagList[4])
         bbTWL = parser.GetFromPFST(tagList[0], metricTagList[5])
+        bbTWL1 = parser.GetFromPFST(tagList[1], metricTagList[5])
         abTWL = parser.GetFromPFST(tagList[-1], metricTagList[5])
         bbTNS = parser.GetFromPFST(tagList[0], metricTagList[6])
+        bbTNS1 = parser.GetFromPFST(tagList[1], metricTagList[6])
         abTNS = parser.GetFromPFST(tagList[-1], metricTagList[6])
         bbWNS = parser.GetFromPFST(tagList[0], metricTagList[7])
+        bbWNS1 = parser.GetFromPFST(tagList[1], metricTagList[7])
         abWNS = parser.GetFromPFST(tagList[-1], metricTagList[7])        
         pHPWL = (1 - float(abHPWL.replace(',', '.')) / float(bbHPWL.replace(',', '.'))) * 100
         pTWL = (1 - float(abTWL.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100 
         pTNS = (1 - float(abTNS.replace(',', '.')) / float(bbTNS.replace(',', '.'))) * 100
         pWNS = (1 - float(abWNS.replace(',', '.')) / float(bbWNS.replace(',', '.'))) * 100
+        
+        pHPWL1 = (1 - float(bbHPWL1.replace(',', '.')) / float(bbHPWL.replace(',', '.'))) * 100
+        pTWL1 = (1 - float(bbTWL1.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100 
+        pTNS1 = (1 - float(bbTNS1.replace(',', '.')) / float(bbTNS.replace(',', '.'))) * 100
+        pWNS1 = (1 - float(bbWNS1.replace(',', '.')) / float(bbWNS.replace(',', '.'))) * 100
+        
+        bTime = float(abTime1.replace(',', '.')) - float(abTime0.replace(',', '.'))
         AddBuf = float(abCells) - float(bbCells)
 
         #print metrics
         printStr = benchmark + ';'
         printStr += str(bbHPWL) + ';'
+        printStr += str(bbHPWL1) + ';'
         printStr += str(abHPWL) + ';'
         printStr += str(bbTWL) + ';'
+        printStr += str(bbTWL1) + ';'
         printStr += str(abTWL) + ';'
         printStr += str(bbTNS) + ';'
+        printStr += str(bbTNS1) + ';'
         printStr += str(abTNS) + ';'
         printStr += str(bbWNS) + ';'
+        printStr += str(bbWNS1) + ';'
         printStr += str(abWNS) + ';'
         printStr += str(abTime) + ';'
+        printStr += str(bTime) + ';'
         printStr += str(bbCells) + ';'
         printStr += str(pHPWL) + ';'
         printStr += str(pTWL) + ';'
         printStr += str(pTNS) + ';'
         printStr += str(pWNS) + ';'
+        
+        printStr += str(pHPWL1) + ';'
+        printStr += str(pTWL1) + ';'
+        printStr += str(pTNS1) + ';'
+        printStr += str(pWNS1) + ';'
+        
         printStr += str(AddBuf) + ';'
         
         printStr += '\n'

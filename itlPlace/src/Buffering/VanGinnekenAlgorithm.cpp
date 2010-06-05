@@ -41,7 +41,7 @@ void VGAlgorithm::LoadBuffers()
   }
 }
 
-VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics), treeRepository(hd)
+VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
 {
   LoadBuffers();
   PlotSteinerPoint = design.cfg.ValueOf("PlotSteinerPoint", false);
@@ -91,7 +91,7 @@ int VGAlgorithm::BufferingNen(HNet& net)
   //VanGinnekenTree* vGTree = //(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
   
   vGTree->UpdateTree(design.SteinerPoints[(net, design).Source()]);
-  treeRepository.CreateVGTree(net);
+//  treeRepository.CreateVGTree(net);
   if (PrintNetInfo)
   {
     ALERT("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
@@ -108,14 +108,14 @@ int VGAlgorithm::BufferingNen(HNet& net)
     design.Plotter.PlotVGTree(&vGTree->GetSource(), Color_Black); 
     design.Plotter.Refresh();
   }
-  VGVariantsListElement* best = Algorithm(vGTree);
-  int bufCount = best->GetPositionCount();
+  VGVariantsListElement best = Algorithm(vGTree);
+  int bufCount = best.GetPositionCount();
   //ALERT("net: %s\tbufcount = %d",(net, design).Name().c_str(), bufCount );
   if (bufCount > 0)
   {
     TemplateTypes<NewBuffer>::list newBuffer;
     HNet* newNet = new HNet[bufCount + 1];
-    InsertsBuffer(newBuffer, best);
+    InsertsBuffer(newBuffer, &best);
     newBuffer.sort();
     //ALERT("name = %s", (net, design).Name().c_str());
     CreateNets(net, newBuffer, newNet, vGTree->GetSource().GetLeft());
@@ -128,11 +128,11 @@ int VGAlgorithm::BufferingNen(HNet& net)
   return bufCount;
 }
 
-VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
+VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
 {
 
   double t = 0;
-  VGVariantsListElement* best;
+  VGVariantsListElement best;
   double tMax = -INFINITY;
 
   TemplateTypes<VGVariantsListElement>::list* vGList = CreateVGList(vGTree->GetSource().GetLeft());
@@ -147,13 +147,14 @@ VGVariantsListElement* VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
     if (t > tMax)
     {
       tMax = t;
-      best = &(*i);
+      best = (*i);
     }
   }
   if (PrintNetInfo)
   {
-    printf("best pos = %d\ttmax = %f\n", best->GetPositionCount(), tMax);
+    printf("best pos = %d\ttmax = %f\n", best.GetPositionCount(), tMax);
   }
+  delete vGList;
   return best;
 }
 
@@ -222,6 +223,8 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::MergeList(TemplateTypes
 
     }
   }
+  delete leftVGList;
+  delete RightVGList;
   return result;
 }
 
@@ -539,7 +542,7 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
     }
   }
   HNetWrapper netw = design[net];
-  int ttt = (netw.PinsCount() + newBuffer.size() * 2);
+  int ttt = (netw.PinsCount() + int(newBuffer.size()) * 2);
   if ((netw.PinsCount() + newBuffer.size() * 2) != newPinCount)
     ALERT("ERRORR pin count");
   design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
