@@ -47,6 +47,8 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
 
   if (design.cfg.ValueOf("DesignFlow.SkipSpecialNets", false))
     Utils::SkipSpecialNets(design);//WARNING: must be called before InitializeTiming
+  if (design.cfg.ValueOf("DesignFlow.SkipBrokenNets", false))
+    Utils::SkipBrokenNets(design);//WARNING: must be called before InitializeTiming
 
   //initialize routing
   design.SteinerPoints.Initialize();

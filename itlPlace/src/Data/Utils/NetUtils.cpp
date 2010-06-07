@@ -207,8 +207,42 @@ namespace Utils
         nSkipped++;
       }
     }
-    ALERT("\tskipped %d nets", nSkipped);
+    ALERT("\tSkipped %d nets", nSkipped);
     ALERT("NETS SKIPPING FINISHED...");
+  }
+
+  int CalcOutputPinsCount(HNetWrapper& net, HDesign& hd)
+  {
+    int count = 0;
+    for(HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext(); )
+      if (pin.Direction() != PinDirection_INPUT)
+        count++;
+    return count;
+  }
+
+  void SkipBrokenNets(HDesign& hd)
+  {
+    int nSkipped = 0;
+    ALERT("BROKEN NETS SKIPPING STARTED...");
+    for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
+    {
+      HPinTypeWrapper ptype = (hd,(net.Source(),hd).Type());
+      bool skip = false;
+      if(::IsNull(ptype))
+        skip = (net.Source(),hd).Direction() != PinDirection_OUTPUT;
+      else
+        skip = ptype.Direction() != PinDirection_OUTPUT;
+      if (skip || net.PinsCount() < 2 || CalcOutputPinsCount(net,hd) > 1)
+      {
+        if (hd.cfg.ValueOf("Timing.reportSkippedNets", false))
+          ReportNetPins(hd, net);
+        SkipNet(hd, net);
+        ALERT("\tNet \"%s\" skipped", net.Name().c_str());
+        nSkipped++;
+      }
+    }
+    ALERT("\tSkipped %d nets", nSkipped);
+    ALERT("BROKEN NETS SKIPPING FINISHED...");
   }
 
   static void RemoveRepeatersTree(HDesign& design, HNet originalNet, HNet netToRemove, HPin bufferInput)
