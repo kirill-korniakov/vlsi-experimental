@@ -163,13 +163,25 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
   BinGrid& binGrid = context->spreadingData.binGrid;
 
   //null the penalties
-  for (int i = 0; i < binGrid.nBinRows; ++i)
-  {
-    for (int j = 0; j < binGrid.nBinCols; ++j)
+
+  if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+    for (int i = 0; i < binGrid.nBinRows; ++i)
     {
-      binGrid.bins[i][j].sumPotential = 0.0;
+      for (int j = 0; j < binGrid.nBinCols; ++j)
+      {
+        binGrid.bins[i][j].sumPotential = binGrid.bins[i][j].sumBufPotential;
+      }
     }
-  }
+  else
+    for (int i = 0; i < binGrid.nBinRows; ++i)
+    {
+      for (int j = 0; j < binGrid.nBinCols; ++j)
+      {
+        binGrid.bins[i][j].sumPotential = 0.0;
+      }
+    }
+
+
 
   // each cell must have total potential equal to its area
   // this variable are needed to control this issue

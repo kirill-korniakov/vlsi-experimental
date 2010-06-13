@@ -831,6 +831,61 @@ void HPlotter::PlotText(string text, double textSize)
   delete [] str;
 }
 
+void HPlotter::PlotTextInPoint(string text, double x, double y, double textSize )
+{
+
+  if (!IsEnabled())
+    return;
+
+  if (textSize == -1)
+    textSize = m_hd.cfg.ValueOf("plotter.textSize", 1.0);
+
+  CvFont font;  
+  cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, textSize, textSize , 0.0, 1, 1);
+
+  int start = 0;
+  int t = 1;
+  char* str = new char[text.length() * 4];
+  string bufText = text + text;
+  for (unsigned int i = 0; i < text.length(); i++)
+  {
+    if ((text[i] == '\n') || (i == text.length() - 1))
+    {
+      for (unsigned int j = start; j <= i; j++)
+        bufText[j - start] = text[j];
+      bufText[i - start + 1] = '\0';
+
+      int j2 = 0;
+      for (unsigned int j = 0; j < bufText.length(); j++)
+      {
+        if (bufText[j] == '\t')
+        {
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+          j2++;
+          str[j2] = ' ';
+        }
+        else
+          str[j2] = bufText[j];
+        j2++;
+      }
+
+      CvPoint point;
+      point.x = DesignX2ImageX(x);
+      point.y = DesignY2ImageY(y) - int(30 * t * textSize);
+      cvPutText(IMG, str, point, &font, GetCvColor(Color_Black));
+      start = i+1;
+      t++;
+    }
+  }
+
+  delete [] str;
+
+}
+
 void HPlotter::PlotNet(HNetWrapper net)
 {
   CvPoint start, finish;
@@ -928,6 +983,7 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
     }
   }
 }
+
 
 void HPlotter::PlotSteinerForest(Color color)
 {

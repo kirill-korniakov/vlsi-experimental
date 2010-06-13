@@ -209,12 +209,12 @@ void VanGinnekenTree::CreateTree()
 
           int rsy = DPGrid.FindRow(ry);
           int rfy = DPGrid.FindRow(ny);
-          int rsx = DPGrid.FindColumn(rx);
-          int rfx = DPGrid.FindColumn(nx);
+          //int rsx = DPGrid.FindColumn(rx);
+          //int rfx = DPGrid.FindColumn(nx);
 
           int RowCount = abs(rsy - rfy);
-          int ColumnCount = abs(rsx - rfx);
-          int n = RowCount + ColumnCount;
+          //int ColumnCount = abs(rsx - rfx);
+          int n = RowCount;
 
           int rowInd = 0;
           int pointInRowCount = 0;
@@ -421,17 +421,17 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
     rootIndex = nodeIndex;
-
+    int pPC = partitionPointCount;
     if (TypePartition == 1)
     {
       int rsy = DPGrid.FindRow(ry);
       int rfy = DPGrid.FindRow(ny);
-      int rsx = DPGrid.FindColumn(rx);
-      int rfx = DPGrid.FindColumn(nx);
+      //int rsx = DPGrid.FindColumn(rx);
+      //int rfx = DPGrid.FindColumn(nx);
 
       int RowCount = abs(rsy - rfy);
-      int ColumnCount = abs(rsx - rfx);
-      int n = RowCount + ColumnCount;
+      //int ColumnCount = abs(rsx - rfx);
+      int n = RowCount; //+ ColumnCount;
 
       int pointInRowCount = 0;
       int newPartitionPointCount = 0;
@@ -444,14 +444,14 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
         pointInRowCount = int(ceil(((partitionPointCount - 1.0) / n)));
         newPartitionPointCount = pointInRowCount * n + 1;
       }
-      partitionPointCount = newPartitionPointCount;
+      pPC = newPartitionPointCount;
     }
 
-    for (int i = 1; i < (partitionPointCount - 1); i++)
+    for (int i = 1; i < (pPC - 1); i++)
     {
       vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
-      vGTree[nodeIndex].SetX(rx + (nx - rx) / (partitionPointCount - 1) * i);
-      vGTree[nodeIndex].SetY(ry + (ny - ry) / (partitionPointCount - 1) * i);
+      vGTree[nodeIndex].SetX(rx + (nx - rx) / (pPC - 1) * i);
+      vGTree[nodeIndex].SetY(ry + (ny - ry) / (pPC - 1) * i);
       rootIndex = nodeIndex;
     }
 

@@ -1,6 +1,7 @@
 #ifndef __VanGinnekenAlgorithm_H__
 #define __VanGinnekenAlgorithm_H__
 #include "VanGinnekenData.h"
+#include "OptimizationContext.h"
 
 #define	INFINITY	20000000000.0
 #define MAXBUFFERTYPE 64
@@ -39,6 +40,7 @@ protected:
   bool PlotNets;
   bool PrintNetInfo;
   bool PlotSteinerPoint;
+  bool PrintVariantsList;
 
   VanGinnekenTree* vGTree;
 
@@ -48,7 +50,9 @@ public:
   VGAlgorithm(HDesign& hd);
 
   int BufferingPlacement();
-  int BufferingNen(HNet& net);
+  VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true);
+  int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
+  int SetBinTableBuffer(AppCtx* context);
   VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
   TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTreeNode* node);
   TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
@@ -59,7 +63,9 @@ public:
   double GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2);
   void InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best);
   void InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer,BufferPositions& position);
-
+  
+  void PrintVariantsNode(VGVariantsListElement* vGE, int i);
+  void PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList);
 
   void AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnum, TemplateTypes<NewBuffer>::list& newBuffer);
 

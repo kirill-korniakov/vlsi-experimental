@@ -22,19 +22,19 @@ class Experiment_New_Buffering(BaseExperiment):
         bbCells = parser.GetFromPFST(tagList[0], metricTagList[3])
         abCells = parser.GetFromPFST(tagList[-1], metricTagList[3])
         abTime = parser.GetFromPFST(tagList[-1], metricTagList[2])
-        abTime1 = parser.GetFromPFST(tagList[1], metricTagList[2])
+        abTime1 = parser.GetFromPFST(tagList[2], metricTagList[2])
         abTime0 = parser.GetFromPFST(tagList[0], metricTagList[2])
         bbHPWL = parser.GetFromPFST(tagList[0], metricTagList[4])
-        bbHPWL1 = parser.GetFromPFST(tagList[1], metricTagList[4])
+        bbHPWL1 = parser.GetFromPFST(tagList[2], metricTagList[4])
         abHPWL = parser.GetFromPFST(tagList[-1], metricTagList[4])
         bbTWL = parser.GetFromPFST(tagList[0], metricTagList[5])
-        bbTWL1 = parser.GetFromPFST(tagList[1], metricTagList[5])
+        bbTWL1 = parser.GetFromPFST(tagList[2], metricTagList[5])
         abTWL = parser.GetFromPFST(tagList[-1], metricTagList[5])
         bbTNS = parser.GetFromPFST(tagList[0], metricTagList[6])
-        bbTNS1 = parser.GetFromPFST(tagList[1], metricTagList[6])
+        bbTNS1 = parser.GetFromPFST(tagList[2], metricTagList[6])
         abTNS = parser.GetFromPFST(tagList[-1], metricTagList[6])
         bbWNS = parser.GetFromPFST(tagList[0], metricTagList[7])
-        bbWNS1 = parser.GetFromPFST(tagList[1], metricTagList[7])
+        bbWNS1 = parser.GetFromPFST(tagList[2], metricTagList[7])
         abWNS = parser.GetFromPFST(tagList[-1], metricTagList[7])        
         pHPWL = (1 - float(abHPWL.replace(',', '.')) / float(bbHPWL.replace(',', '.'))) * 100
         pTWL = (1 - float(abTWL.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100 
@@ -88,7 +88,7 @@ class Experiment_New_Buffering(BaseExperiment):
 
 def test():
     testRunner = TestRunner()
-    e = Experiment_New_Buffering('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS_GP_r1511.list')
+    e = Experiment_New_Buffering('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS05.list')
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()

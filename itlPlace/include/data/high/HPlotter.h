@@ -64,6 +64,7 @@ public:
   void PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor = Color_Red);
   void PlotSteinerForest(Color color);
   void PlotText(string text, double textSize = -1);
+  void PlotTextInPoint(string text, double x, double y, double textSize = -1);
   void PlotNet(HNetWrapper net);
   void PlotFullWires();
   void Plot2PinNets();

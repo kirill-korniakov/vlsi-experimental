@@ -6,11 +6,13 @@ struct Bin
   double xCoord;             /// x coordinates of the bin.
   double yCoord;             /// y coordinates of the bin.
   double sumPotential;
+  double sumBufPotential;
 
   Bin()
   {
     xCoord = 0.0; yCoord = 0.0;
     sumPotential = 0.0;
+    sumBufPotential = 0.0;
   }
 };
 

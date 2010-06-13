@@ -1,7 +1,9 @@
 #include "VanGinnekenAlgorithm.h"
 #include <math.h>
 #include "Utils.h"
+#include "STA.h"
 
+void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 
 void VGAlgorithm::LoadBuffers()
 {
@@ -48,6 +50,7 @@ VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.
   PlotVGTree = design.cfg.ValueOf("PlotVGTree", false);
   PlotNets = design.cfg.ValueOf("PlotNets", false);
   PrintNetInfo = design.cfg.ValueOf("PrintNetInfo", false);
+  PrintVariantsList = design.cfg.ValueOf("PrintVGVariantsList", false);
   partitionCount = design.cfg.ValueOf("Interval", 1);
   vGTree = new VanGinnekenTree(design, partitionCount);
 }
@@ -59,7 +62,7 @@ int VGAlgorithm::BufferingPlacement()
   int idx = 0;
   for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
     paths[idx++] = i;
-  design.Plotter.PlotSteinerForest(Color_Black);
+  //design.Plotter.PlotSteinerForest(Color_Black);
 
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(design));
 
@@ -70,12 +73,12 @@ int VGAlgorithm::BufferingPlacement()
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
     {
       HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
-      if (net.Kind() == NetKind_Active) //&& (treeRepository.NoVGTree(net)))//  && (net.PinsCount() >= 50 ))//&& (treeRepository.NoVGTree(net)))//
+      if (net.Kind() == NetKind_Active) //&& (net.PinsCount() > 5 ))//&& (treeRepository.NoVGTree(net)))//
       {
 
-        //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_7347"))  
+        //if ((net.Kind() == NetKind_Active) && (net.Name() == "G10"))  
         
-          bufferCount += BufferingNen(net);
+          bufferCount += BufferingNen(net).GetPositionCount();
       }
     }
     //ALERT("CriticalPaths id = %d", j);
@@ -85,7 +88,7 @@ int VGAlgorithm::BufferingPlacement()
   return bufferCount;
 }
 
-int VGAlgorithm::BufferingNen(HNet& net)
+VGVariantsListElement VGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering)
 {
   
   //VanGinnekenTree* vGTree = //(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
@@ -115,17 +118,141 @@ int VGAlgorithm::BufferingNen(HNet& net)
   {
     TemplateTypes<NewBuffer>::list newBuffer;
     HNet* newNet = new HNet[bufCount + 1];
-    InsertsBuffer(newBuffer, &best);
-    newBuffer.sort();
-    //ALERT("name = %s", (net, design).Name().c_str());
-    CreateNets(net, newBuffer, newNet, vGTree->GetSource().GetLeft());
+    if (isRealBuffering)
+    {
+      InsertsBuffer(newBuffer, &best);
+      newBuffer.sort();
+      //ALERT("name = %s", (net, design).Name().c_str());
+      CreateNets(net, newBuffer, newNet, vGTree->GetSource().GetLeft());
+    }
   }
   if ((PlotSteinerPoint) || (PlotVGTree) || (PlotNets))
   {
     design.Plotter.ShowPlacement();
   }
   
-  return bufCount;
+  return best;
+}
+
+void DetermineBordersOfBufferPotential(int& min_col, int& max_col, 
+                                        int& min_row, int& max_row,
+                                        BufferPositions& bufferPositions, AppCtx* context)
+{
+  BinGrid& binGrid = context->spreadingData.binGrid;
+
+  min_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() - 
+    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+  max_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() + 
+    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+  min_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() - 
+    context->spreadingData.potentialRadiusY) / binGrid.binHeight));    
+  max_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() + 
+    context->spreadingData.potentialRadiusY) / binGrid.binHeight));
+
+  MoveBinIndexesIntoBorders(context, min_col, min_row, max_col, max_row);
+}
+
+double CalcBellShapedFunction(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
+{
+  double potentialRadiusX = context->spreadingData.potentialRadiusX;
+  double potentialRadiusY = context->spreadingData.potentialRadiusY;
+  BinGrid& binGrid = context->spreadingData.binGrid;
+  double invPSX = context->spreadingData.invPSX;
+  double invPSY = context->spreadingData.invPSY;
+
+  double potX = 0;
+  double potY = 0;
+
+  double dx = bufferPositions.GetPosition()->GetX() - binGrid.bins[rowIdx][colIdx].xCoord;
+  double dy = bufferPositions.GetPosition()->GetY() - binGrid.bins[rowIdx][colIdx].yCoord;
+
+  double fabsdx = fabs(dx);
+  double fabsdy = fabs(dy);
+
+  if (fabsdx > potentialRadiusX || fabsdy > potentialRadiusY)
+  {//bin out of potential
+    return 0;
+  }
+
+  //calculate solution-potential
+  if (fabsdx <= potentialRadiusX/2)
+  {
+    potX = 1 - 2 * dx * dx * invPSX;
+  }
+  else
+  {
+    potX = 2 * (fabsdx - potentialRadiusX) * (fabsdx - potentialRadiusX) * invPSX;
+  }
+
+  //calculate y-potential
+  if (fabsdy <= potentialRadiusY/2)
+  {
+    potY = 1 - 2 * dy * dy * invPSY;
+  }
+  else
+  {
+    potY = 2 * (fabsdy - potentialRadiusY) * (fabsdy - potentialRadiusY) * invPSY;
+  }
+
+  return potX * potY;
+}
+
+int VGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
+{
+  for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); pos != vGVariant.GetBufferPosition()->end(); ++pos)
+  {
+    int min_row, min_col, max_row, max_col; // area affected by cluster potential
+    DetermineBordersOfBufferPotential(min_col, max_col, min_row, max_row, *pos, context);
+
+    for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+    {
+      for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
+      {
+        double bsf = CalcBellShapedFunction(context, colIdx, rowIdx, *pos);
+
+        context->spreadingData.binGrid.bins[rowIdx-min_row][colIdx-min_col].sumBufPotential = bsf;
+      }
+    }// loop over affected bins
+  }
+  return vGVariant.GetPositionCount();
+}
+
+int VGAlgorithm::SetBinTableBuffer(AppCtx* context)
+{
+  STA(design);
+  ALERT("Buffering type: %d", design.cfg.ValueOf("TypePartition", 0));
+  std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
+  int idx = 0;
+  for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
+    paths[idx++] = i;
+
+  std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(design));
+
+  for (int i = 0; i < context->spreadingData.binGrid.nBinRows; ++i)
+  {
+    for (int j = 0; j < context->spreadingData.binGrid.nBinCols; ++j)
+    {
+      context->spreadingData.binGrid.bins[i][j].sumBufPotential = 0.0;
+    }
+  }
+
+  int bufferCount = 0;
+  ALERT("CriticalPaths count = %d", design.CriticalPaths.Count());
+  for(int j = 0; j < design.CriticalPaths.Count(); j++)
+  {
+    for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
+    {
+      HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
+      if (net.Kind() == NetKind_Active) 
+      {        
+        bufferCount += UpdateBinTable(context, BufferingNen(net, false));
+      }
+    }
+    //ALERT("CriticalPaths id = %d", j);
+  }
+  ALERT("Buffers inserted: %d", bufferCount);
+  STA(design);
+  return bufferCount;
 }
 
 VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
@@ -136,6 +263,12 @@ VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   double tMax = -INFINITY;
 
   TemplateTypes<VGVariantsListElement>::list* vGList = CreateVGList(vGTree->GetSource().GetLeft());
+  if (PrintVariantsList)
+  { 
+    ALERT("Result:");
+    PrintVariants(vGList);
+    ALERT("R = %.2f",vGTree->GetR());
+  }
   for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
   {
     double a, b, c;
@@ -152,9 +285,14 @@ VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   }
   if (PrintNetInfo)
   {
-    printf("best pos = %d\ttmax = %f\n", best.GetPositionCount(), tMax);
+    printf("best pos = %d\ttmax = %.2f\n", best.GetPositionCount(), tMax);
   }
   delete vGList;
+  if (PrintVariantsList)
+  {    
+    ALERT("best variants:");
+    PrintVariantsNode(&best, 0);
+  }
   return best;
 }
 
@@ -167,17 +305,31 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
     element.SetC(node->GetC());
     element.SetRAT(node->GetRAT());
     newList->push_back(element);
+    if (PrintVariantsList)
+    { 
+      ALERT("sink id: %d", node->GetIndex());
+      PrintVariants(newList);
+    }
     return newList;
   }
   else
     if (node->isBranchPoint())
     {
       TemplateTypes<VGVariantsListElement>::list* leftVGList = CreateVGList(node->GetLeft());
+      
       TemplateTypes<VGVariantsListElement>::list* RightVGList;
       if (node->HasRight())
       {
         RightVGList = CreateVGList(node->GetRight());
+        if (PrintVariantsList)
+          ALERT("Branch Point id: %d", node->GetIndex());
+
         return MergeList(leftVGList, RightVGList);
+      }
+      if (PrintVariantsList)
+      { 
+        ALERT("BranchPoint id: %d", node->GetIndex());
+        PrintVariants(leftVGList);
       }
       return leftVGList;
     }
@@ -186,7 +338,13 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
       TemplateTypes<VGVariantsListElement>::list* newList = CreateVGList(node->GetLeft());
       UpdateValue(newList, GetLength(node, node->GetLeft()));
       SortVGVariantsListElement(newList);
-      AddBuffer(newList, node);      
+      AddBuffer(newList, node);
+      if (PrintVariantsList)
+      { 
+        ALERT("point id: %d", node->GetIndex());
+        ALERT("Length line %d and %d: %.2f",node->GetIndex(), node->GetLeft()->GetIndex(), GetLength(node, node->GetLeft()));
+        PrintVariants(newList);
+      }
       return newList;
     }
 
@@ -225,6 +383,8 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::MergeList(TemplateTypes
   }
   delete leftVGList;
   delete RightVGList;
+  if (PrintVariantsList)
+    PrintVariants(result);
   return result;
 }
 
@@ -387,6 +547,38 @@ void  VGAlgorithm::InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer, Buffe
   newBuffer.push_back(buf);
 
 
+}
+
+void VGAlgorithm::PrintVariantsNode(VGVariantsListElement* vGE, int i)
+{
+  char* sBuf = new char [256]; 
+  string s;
+  s = "(";
+  sprintf(sBuf, "%.2f", vGE->GetRAT());
+  s += string(sBuf);
+  s += ",\t";
+  sprintf(sBuf, "%.2f", vGE->GetC());
+  s += string(sBuf);
+  s += ",\t{";
+  for (TemplateTypes<BufferPositions>::list::iterator pos = vGE->GetBufferPosition()->begin(); pos != vGE->GetBufferPosition()->end(); ++pos)
+  {
+    sprintf(sBuf, "%d", pos->GetPosition()->GetIndex());
+    s += string(sBuf);
+    s += ",\t";
+  }
+  s += "})";
+  ALERT("variant: %d\t\t%s",i, s.c_str());
+  delete [] sBuf;
+}
+
+void VGAlgorithm::PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList)
+{
+  int ind = 0;
+  for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
+  {
+    PrintVariantsNode(&(*i), ind);
+    ind++;
+  } 
 }
 
 void VGAlgorithm::AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnum, TemplateTypes<NewBuffer>::list& newBuffer)

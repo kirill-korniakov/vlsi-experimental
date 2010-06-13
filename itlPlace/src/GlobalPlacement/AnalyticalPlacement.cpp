@@ -18,6 +18,7 @@
 #include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 #include "AnalyticalPlacement.h"
+#include "VanGinnekenAlgorithm.h"
 
 using namespace std;
 
@@ -651,6 +652,16 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         }
 
         UpdateWeights(context, hd, 32);
+        
+        if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+        {
+          ALERT("NEW BUFFERING STARTED");
+          ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+          VGAlgorithm buf(hd);
+          buf.SetBinTableBuffer(&context);
+          ctx.Close();
+          ALERT("NEW BUFFERING FINISHED");
+        }
 
         //print iteration info
         ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci));
