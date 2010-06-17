@@ -210,7 +210,7 @@ int VGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
       {
         double bsf = CalcBellShapedFunction(context, colIdx, rowIdx, *pos);
 
-        context->spreadingData.binGrid.bins[rowIdx-min_row][colIdx-min_col].sumBufPotential = bsf;
+        context->spreadingData.binGrid.bins[rowIdx][colIdx].sumBufPotential = bsf;
       }
     }// loop over affected bins
   }
