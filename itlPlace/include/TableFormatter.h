@@ -332,6 +332,7 @@ public:
 
   void SetColumnPrecision(int colIdx, int precision)
   {
+    if (colIdx == -1) return;
     ASSERT(colIdx >= 0 && colIdx < NumOfColumns());
     if (colIdx >= NumOfColumns())
     {

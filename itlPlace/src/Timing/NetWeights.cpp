@@ -6,23 +6,6 @@
 #include <math.h>
 #include <string>
 
-string IntToString(int intValue)
-{ 
-  char myBuff[100]; 
-  string strRetVal; 
-
-  // Set it to empty 
-  memset(myBuff, '\0', 100); 
-
-  // Convert to string 
-  _itoa(intValue, myBuff, 10); 
-
-  // Copy the buffer into the string object 
-  strRetVal = myBuff; 
-
-  return(strRetVal); 
-}
-
 void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr)
 {
   char tmpFloat[32];
@@ -220,7 +203,7 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   ALERT("Current iteration of net weighting is %d", nCyclesCounter);
 
   nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
-  defFileName  = hd.Circuit.Name() + "_" + IntToString(nCyclesCounter) + ".def";
+  defFileName  = hd.Circuit.Name() + "_" + Aux::IntToString(nCyclesCounter) + ".def";
   ComputeNetWeights(hd);
   ExportNetWeights(hd, nwtsFileName.c_str());
   ExportDEF(hd, defFileName);

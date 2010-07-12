@@ -21,6 +21,9 @@ namespace AnalyticalGlobalPlacement
   int Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, TAO_APPLICATION taoapp, 
     TAO_SOLVER tao, Vec x, int metaIteration);
 
+  void ReportPreIterationInfo(HDesign &hd, AppCtx &context, int metaIteration, int iteration);
+  void ReportPostIterationInfo( AppCtx &context, HDesign &hd, int metaIteration, int iteration );
+
   int ReportTerminationReason( int retCode, TAO_SOLVER tao );
 
   void SetVariablesValues(ClusteringInformation& ci, Vec& x);

@@ -17,7 +17,7 @@ public:
                  std::vector<double>& cellArcMus, 
                  std::vector<double>& netArcMus);
 
-  int GetMuInCount(HTimingPoint pt) const { return MuIn[::ToID(pt)].size() / 2; }
+  int GetMuInCount(HTimingPoint pt) const { return (int)MuIn[::ToID(pt)].size() / 2; }
   double GetMuS(HTimingPoint pt) const { return MuS[::ToID(pt)]; }
   double GetMuInA(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][index]; }
   double GetMuInR(HTimingPoint pt, int index) const { return MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index]; }

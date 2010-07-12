@@ -152,6 +152,23 @@ namespace Aux
     return GetUniqueName(dirName, timeStamp, fileNameBase, extension);
   }
 
+  string IntToString(int intValue)
+  { 
+      char myBuff[256]; 
+      string strRetVal; 
+
+      // Set it to empty 
+      memset(myBuff, '\0', 256); 
+
+      // Convert to string 
+      _itoa(intValue, myBuff, 10); 
+
+      // Copy the buffer into the string object 
+      strRetVal = myBuff; 
+
+      return(strRetVal); 
+  }
+
   string ChangeExtention(const string& filename, const char* newExt)
   {
     int pos = (int)filename.length() - 1;

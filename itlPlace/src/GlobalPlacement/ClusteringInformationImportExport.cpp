@@ -1,6 +1,19 @@
 #include "Utils.h"
 #include "Clustering.h"
 
+string ClusteringInformation::GetClusteringInformationFileName(HDesign& hd)
+{
+    string fileName = hd.cfg.ValueOf(".Clustering.clusteringInformationLoadFileName");
+    if (fileName == "")
+    {
+        fileName = Aux::Format(".\\ClusteringInformation\\%s_%s_%d.ci",
+            (const char*)hd.cfg.ValueOf("params.techname", "IWLS"),
+            hd.Circuit.Name().c_str(),
+            hd.Cells.CellsCount());
+    }
+    return fileName;
+}
+
 bool ClusteringInformation::LoadFromFile(const char* fileName, const char* benchName, HDesign& hd)
 {
   FILE* resultFile = fopen(fileName, "r");

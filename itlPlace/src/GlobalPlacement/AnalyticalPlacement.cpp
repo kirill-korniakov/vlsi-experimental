@@ -6,6 +6,7 @@
 #include <time.h>
 #include <algorithm>
 #include <vector>
+#include <string>
 #include <list>
 
 
@@ -15,6 +16,7 @@
 #include "GlobalPlacement.h"
 #include "ObjectivesConstraints.h"
 #include "Spreading.h"
+#include "Parser.h"
 #include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 #include "AnalyticalPlacement.h"
@@ -605,6 +607,40 @@ int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
 
 std::string format = "%.3e";
 
+void AnalyticalGlobalPlacement::ReportPreIterationInfo(HDesign &hd, AppCtx &context, int metaIteration, int iteration)
+{
+    //print iteration info
+    WRITELINE("");
+    ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
+
+    if (context.useQuadraticSpreading)
+        ALERT("spreadingWeight = " + format, context.spreadingData.spreadingWeight);
+    if (context.useLR)
+        ALERT("alphaTWL = " + format, context.LRdata.alphaTWL);
+
+    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
+        context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
+}
+
+void AnalyticalGlobalPlacement::ReportPostIterationInfo( AppCtx &context, HDesign &hd, int metaIteration, int iteration ) 
+{
+    //ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci))
+    //PrintClusterCoordinates(&context);
+    
+    //std::string defName = Aux::CreateCoolFileName("GP_Iters/", hd.Circuit.Name() + "_" + Aux::IntToString(iteration - 1), "def");
+    //ExportDEF(hd, defName);
+    
+    //hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
+    //    context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_3_SECONDS);
+
+    if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
+    {
+        hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
+            context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
+        hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration));
+    }
+}
+
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
@@ -626,31 +662,20 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
     while (1)
     {
-        //print iteration info
-        WRITELINE("");
-        ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
-
-        if (context.useQuadraticSpreading)
-            ALERT("spreadingWeight = " + format, context.spreadingData.spreadingWeight);
-        if (context.useLR)
-            ALERT("alphaTWL = " + format, context.LRdata.alphaTWL);
-
-        hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
-            context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-
+        ReportPreIterationInfo(hd, context, metaIteration, iteration);
+        
         // Tao solve the application
         iCHKERRQ TaoSolveApplication(taoapp, tao);
-
         int innerTAOIterations = 0;
         iCHKERRQ ReportTerminationReason(tao, innerTAOIterations);
 
-        // if found any solution
         if (innerTAOIterations >= 1)
-        {
+        {// if found any solution, apply it
             GetVariablesValues(ci, x);
             UpdateCellsCoordinates(hd, ci);
         }
 
+        CalcGradValues(&context);
         UpdateWeights(context, hd, 32);
         
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
@@ -663,13 +688,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
           ALERT("NEW BUFFERING FINISHED");
         }
 
-        //print iteration info
-        ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci));
-        ReportMeanGradValues(&context);
-
         if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
         {
-            QA->AnalyzeQuality(iteration - 1, &context.criteriaValues, 
+            QA->AnalyzeQuality(iteration, &context.criteriaValues, 
                 hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
 
             if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
@@ -691,12 +712,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             }
         }
 
-        if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
-        {
-            hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
-                context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-            hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration-1));
-        }
+        ReportPostIterationInfo(context, hd, metaIteration, iteration);
+        iteration++;
 
         if (iteration > nOuterIters)
         {

@@ -1,6 +1,9 @@
 #ifndef __PLACEMENT_QUALITY_ANALYZER__
 #define __PLACEMENT_QUALITY_ANALYZER__
 
+#include <vector>
+#include <string>
+
 #include "HDesign.h"
 #include "HDPGrid.h"
 #include "PlacementStorage.h"
@@ -10,86 +13,113 @@ struct CriteriaValues;
 class PlacementQualityAnalyzer
 {
 public:
-  enum QualityMetrics
-  {
-    MetricObjective = 0,
-    MetricObHPWL    = 1,
-    MetricObLR,
-    MetricObSOD,
-    MetricObSpreading,
-    MetricHPWL,
-    MetricHPWLleg,
-    MetricTWL,
-    MetricTWLleg,
-    MetricTNS,
-    MetricTNSleg,
-    MetricWNS,
-    MetricWNSleg,
-    __MetricsNum
-  };
+    enum QualityMetrics
+    {
+        MetricObjective = 0,
+        MetricObHPWL    = 1,
+        MetricObLR,
+        MetricObSOD,
+        MetricObSpr,
+        MetricGHPWL,
+        MetricGLR,
+        MetricGSpr,
+        MetricHPWL,
+        MetricHPWLleg,
+        MetricTWL,
+        MetricTWLleg,
+        MetricTNS,
+        MetricTNSleg,
+        MetricWNS,
+        MetricWNSleg,
+        __MetricsNum
+    };
 
-  static QualityMetrics GetMetric(const string& metric);
-  static const char* GetMetric(QualityMetrics metric);
+    struct MetricInfo
+    {
+        std::string Name;
+        int precision;
+        int column;
 
-  PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod);
-  PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
-  ~PlacementQualityAnalyzer();
-
-  void AnalyzeQuality(int id, CriteriaValues* criteriaValues = 0, double improvementTreshold = 0.0);
-  void Report();
-
-  void SaveCurrentPlacementAsBestAchieved();
-  void RestoreBestAchievedPlacement();
-
-  int GetConvergeIterationsNumber();
-  int GetNumIterationsWithoutGain() { return m_NumIterationsWithoutGain; }
-  double GetLastIterationImprovement();
+        MetricInfo(int _column, string _Name, int _precision)
+        {
+            column = _column + 1;
+            Name = _Name;
+            precision = _precision;
+        }
+    };
 
 private:
-  struct PlacementQuality
-  {
-    int id;
-    double metrics[__MetricsNum];
-
-    PlacementQuality()
+    struct PlacementQuality
     {
-      id = 0;
-      for (int i = 0; i < __MetricsNum; i++)
-      {
-        metrics[i] = 0.0;
-      }
-    }
+        int id;
+        double metrics[__MetricsNum];
 
-    bool operator == (const PlacementQuality& q)
-    {
-      bool isEqual = true;
-      //NOTE: we start from MetricHPWL because we do not interesting in objective value
-      //TODO: actually we have to compare with epsilon tolerance
-      for (int i = MetricHPWL; i < __MetricsNum; i++)
-      {
-        if (metrics[i] != q.metrics[i])
+        PlacementQuality()
         {
-          isEqual = false;
-          break;
+            id = 0;
+            for (int i = 0; i < __MetricsNum; i++)
+            {
+                metrics[i] = 0.0;
+            }
         }
-      }
-      return isEqual;
-    }
-    bool operator != (const PlacementQuality& q) { return !(*this == q); }
 
-    double GetMetric(PlacementQualityAnalyzer::QualityMetrics qm);
-  };
-  typedef TemplateTypes<PlacementQuality>::list QualityList;
+        bool operator == (const PlacementQuality& q)
+        {
+            bool isEqual = true;
+            //NOTE: we start from MetricHPWL because we do not interesting in objective value
+            //TODO: actually we have to compare with epsilon tolerance
+            for (int i = MetricHPWL; i < __MetricsNum; i++)
+            {
+                if (metrics[i] != q.metrics[i])
+                {
+                    isEqual = false;
+                    break;
+                }
+            }
+            return isEqual;
+        }
+        bool operator != (const PlacementQuality& q) { return !(*this == q); }
 
-  HDPGrid* m_grid;
-  HDesign& m_design;
-  QualityList m_experiments;
-  QualityMetrics m_metric;
+        double GetMetric(PlacementQualityAnalyzer::QualityMetrics qm);
+    };
 
-  int m_NumIterationsWithoutGain;
-  PlacementQuality m_BestMetrics;
-  PlacementStorage m_Placement;
-  PlacementStorage m_BestPlacement;
+    static MetricInfo metricsInfo[];
+
+public:
+    static QualityMetrics GetMetric(const string& metric);
+    static const char* GetMetric(QualityMetrics metric);
+    void ReorderColumns();
+
+    PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod);
+    PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
+    ~PlacementQualityAnalyzer();
+
+    void AnalyzeQuality(int id, CriteriaValues* criteriaValues = 0, double improvementTreshold = 0.0);
+
+    void PrintMajorCriteria(double improvement);
+    void PrintAllCriterias(PlacementQualityAnalyzer::PlacementQuality &pq);
+
+    void Report();
+
+    void SaveCurrentPlacementAsBestAchieved();
+    void RestoreBestAchievedPlacement();
+
+    int GetConvergeIterationsNumber();
+    int GetNumIterationsWithoutGain() { return m_NumIterationsWithoutGain; }
+    double GetLastIterationImprovement();
+
+private:
+    typedef TemplateTypes<PlacementQuality>::list QualityList;
+
+    HDPGrid* m_grid;
+    HDesign& m_design;
+    QualityList m_experiments;
+    QualityMetrics m_metric;
+
+    int m_NumIterationsWithoutGain;
+    PlacementQuality m_BestMetrics;
+    PlacementStorage m_Placement;
+    PlacementStorage m_BestPlacement;
 };
 
 #endif //__PLACEMENT_QUALITY_ANALYZER__

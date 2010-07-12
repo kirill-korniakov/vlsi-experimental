@@ -57,6 +57,7 @@ void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
   HCriticalPath::PointsEnumeratorW cpoint = (path,design).GetEnumeratorW();
   double sum = 0.0;
   int nTP = 0;
+
   while (cpoint.MoveNext())
   {
     HTimingPoint pt = cpoint.TimingPoint();
@@ -64,10 +65,13 @@ void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
     nTP++;
   }
 
+  Color color;
   if (pathIdx % 2 == 0)
-    design.Plotter.PlotMu(sum, plotX, scaling / nTP, Color_Red);
+    color = Color_Red;
   else
-    design.Plotter.PlotMu(sum, plotX, scaling / nTP, Color_Orange);
+    color = Color_Orange;
+
+  design.Plotter.PlotMu(sum, plotX, scaling / nTP, color);
   plotX += 1;
 }
 

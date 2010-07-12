@@ -12,10 +12,15 @@
 struct CriteriaValues
 {
     double objective;
+
     double hpwl;
     double sod;
     double spreading;
     double lr;
+
+    double gHPWL;
+    double gSpr;
+    double gLR;
 };
 
 // User-defined TAO application context - contains data needed by the 

@@ -74,6 +74,7 @@ namespace Aux
   }
 
   string CreateCoolFileName(string dirName, string fileName, string extension);
+  string IntToString(int intValue);
 
   template<class MultipliersType>
   MultipliersType ScalarProduct(std::vector<MultipliersType> vec1, std::vector<MultipliersType> vec2)

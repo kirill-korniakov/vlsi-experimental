@@ -282,9 +282,9 @@ string GetExportDEFFileName(HDesign& hd, const string& defName)
   string fileName = defName;
 
   if (fileName == "")
-    fileName = Aux::CreateCoolFileName(".\\ExportDEF\\",  hd.Circuit.Name(), ".def");
+    fileName = Aux::CreateCoolFileName("./ExportDEF/",  hd.Circuit.Name(), ".def");
   else
-    fileName = ".\\ExportDef\\" + defName;
+    fileName = "./ExportDEF/" + defName;
 
   return fileName;
 }

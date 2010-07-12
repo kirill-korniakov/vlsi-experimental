@@ -20,7 +20,7 @@ void ReportCellByMacroType(HDesign& design)
   {
     namesMT[j] = enumeratorMT.Name();
     if (maxLen < int(namesMT[j].length()))
-      maxLen = namesMT[j].length();
+      maxLen = (int)namesMT[j].length();
   }
   string name;
   for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
@@ -47,7 +47,7 @@ void ReportCellByMacroType(HDesign& design)
   for (int i = 0; i < design.MacroTypes.Count(); i++)
   {
     string nBlank;
-    for (int j = namesMT[i].length(); j < maxLen; j++)
+    for (int j = (int)namesMT[i].length(); j < maxLen; j++)
       nBlank +=" ";
     WRITELINE("  Number of cells entering in macro type %s %s = %d", 
       namesMT[i].c_str(), nBlank.c_str(), countsCell[i]);

@@ -8,6 +8,33 @@
 #include "TableFormatter.h"
 #include "OptimizationContext.h"
 
+PlacementQualityAnalyzer::MetricInfo PlacementQualityAnalyzer::metricsInfo[] = 
+{
+    MetricInfo(MetricObjective, "Objective", 2), 
+    MetricInfo(MetricObHPWL,    "ObHPWL",    2), 
+    MetricInfo(MetricObLR,      "ObLR",      2), 
+    MetricInfo(MetricObSOD,     "ObSOD",     2), 
+    MetricInfo(MetricObSpr,     "ObSpr",     2), 
+    MetricInfo(MetricGHPWL,     "gHPWL",     8), 
+    MetricInfo(MetricGLR,       "gLR",       8), 
+    MetricInfo(MetricGSpr,      "gSpr",      8), 
+    MetricInfo(MetricHPWL,      "HPWL",      0), 
+    MetricInfo(MetricHPWLleg,   "LHPWL",     0), 
+    MetricInfo(MetricTWL,       "TWL",       0), 
+    MetricInfo(MetricTWLleg,    "LTWL",      0), 
+    MetricInfo(MetricTNS,       "TNS",       4), 
+    MetricInfo(MetricTNSleg,    "LTNS",      4), 
+    MetricInfo(MetricWNS,       "WNS",       4), 
+    MetricInfo(MetricWNSleg,    "LWNS",      4) 
+};
+
+void PlacementQualityAnalyzer::ReorderColumns()
+{
+    metricsInfo[MetricObSOD].column = -1;
+    metricsInfo[MetricTWL].column = -1;
+    metricsInfo[MetricTWLleg].column = -1;
+}
+
 void PlacementQualityAnalyzer::SaveCurrentPlacementAsBestAchieved()
 {
   m_BestPlacement.SavePlacement(m_design);
@@ -48,18 +75,28 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
   if (criteriaValues)
   {
       pq.metrics[MetricObjective] = criteriaValues->objective;
+
       pq.metrics[MetricObHPWL] = criteriaValues->hpwl;
       pq.metrics[MetricObLR] = criteriaValues->lr;
       pq.metrics[MetricObSOD] = criteriaValues->sod;
-      pq.metrics[MetricObSpreading] = criteriaValues->spreading;
+      pq.metrics[MetricObSpr] = criteriaValues->spreading;
+
+      pq.metrics[MetricGHPWL] = criteriaValues->gHPWL;
+      pq.metrics[MetricGLR] = criteriaValues->gLR;
+      pq.metrics[MetricGSpr] = criteriaValues->gSpr;
   }
   else
   {
       pq.metrics[MetricObjective] = -1.0;
+
       pq.metrics[MetricObHPWL] = -1.0;
       pq.metrics[MetricObLR] = -1.0;
       pq.metrics[MetricObSOD] = -1.0;
-      pq.metrics[MetricObSpreading] = -1.0;
+      pq.metrics[MetricObSpr] = -1.0;
+
+      pq.metrics[MetricGHPWL] = -1.0;
+      pq.metrics[MetricGLR] = -1.0;
+      pq.metrics[MetricGSpr] = -1.0;
   }
 
   pq.metrics[MetricHPWL] = Utils::CalculateHPWL(m_design, false);
@@ -92,29 +129,6 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
 
   double improvement = GetLastIterationImprovement();
 
-  ALERT("%-14s = %f", "HPWL", pq.metrics[MetricHPWL]);
-  ALERT("%-14s = %f", "HPWL Leg.", pq.metrics[MetricHPWLleg]);
-  if (m_design.CanDoTiming())
-  {
-    ALERT("%-14s = %f", GetMetric(MetricTWL), pq.GetMetric(MetricTWL));
-    ALERT("%-14s = %f", GetMetric(MetricTWLleg), pq.GetMetric(MetricTWLleg));
-    ALERT("%-14s = %f", GetMetric(MetricTNS), pq.GetMetric(MetricTNS));
-    ALERT("%-14s = %f", GetMetric(MetricTNSleg), pq.GetMetric(MetricTNSleg));
-    ALERT("%-14s = %f", GetMetric(MetricWNS), pq.GetMetric(MetricWNS));
-    ALERT("%-14s = %f", GetMetric(MetricWNSleg), pq.GetMetric(MetricWNSleg));
-  }
-
-  if (m_experiments.size() <= 1)
-  {
-    ALERT(Color_White, "%-9s best  = N/A", GetMetric(m_metric));
-    ALERT(Color_White, "%s gain over best placement is N/A", GetMetric(m_metric));
-  }
-  else
-  {
-    ALERT(Color_White, "%-9s best = %f", GetMetric(m_metric), m_BestMetrics.GetMetric(m_metric));
-    ALERT(Color_White, "%s gain over the best placement is %.3f%%", GetMetric(m_metric), improvement * 100.0);
-  }
-
   if (improvement >= 0.0)
     m_NumIterationsWithoutGain = 0;
   else
@@ -125,6 +139,9 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
     m_BestMetrics = pq;
     SaveCurrentPlacementAsBestAchieved();
   }
+
+  //PrintAllCriterias(pq);
+  PrintMajorCriteria(improvement);
 }
 
 double PlacementQualityAnalyzer::GetLastIterationImprovement()
@@ -147,55 +164,48 @@ int PlacementQualityAnalyzer::GetConvergeIterationsNumber()
   return convIters;
 }
 
+void PlacementQualityAnalyzer::PrintMajorCriteria( double improvement ) 
+{
+    if (m_experiments.size() <= 1)
+    {
+        ALERT(Color_White, "%-9s best  = N/A", GetMetric(m_metric));
+        ALERT(Color_White, "%s gain over best placement is N/A", GetMetric(m_metric));
+    }
+    else
+    {
+        ALERT(Color_White, "%-9s best = %f", GetMetric(m_metric), m_BestMetrics.GetMetric(m_metric));
+        ALERT(Color_White, "%s gain over the best placement is %.3f%%", GetMetric(m_metric), improvement * 100.0);
+    }
+}
+
+void PlacementQualityAnalyzer::PrintAllCriterias( PlacementQualityAnalyzer::PlacementQuality &pq ) 
+{
+    ALERT("%-14s = %f", "HPWL", pq.metrics[MetricHPWL]);
+    ALERT("%-14s = %f", "HPWL Leg.", pq.metrics[MetricHPWLleg]);
+    if (m_design.CanDoTiming())
+    {
+        ALERT("%-14s = %f", GetMetric(MetricTWL), pq.GetMetric(MetricTWL));
+        ALERT("%-14s = %f", GetMetric(MetricTWLleg), pq.GetMetric(MetricTWLleg));
+        ALERT("%-14s = %f", GetMetric(MetricTNS), pq.GetMetric(MetricTNS));
+        ALERT("%-14s = %f", GetMetric(MetricTNSleg), pq.GetMetric(MetricTNSleg));
+        ALERT("%-14s = %f", GetMetric(MetricWNS), pq.GetMetric(MetricWNS));
+        ALERT("%-14s = %f", GetMetric(MetricWNSleg), pq.GetMetric(MetricWNSleg));
+    }
+}
+
 void PlacementQualityAnalyzer::Report()
 {
-  const int col_id        = 0;
-  const int col_objective = 1;
-  const int col_ob_hpwl   = 2;
-  const int col_ob_lr     = 3;
-  const int col_ob_sod    = 4;
-  const int col_ob_spr    = 5;
-  const int col_hpwl     = 6;
-  const int col_hpwl_leg = 7;
-  const int col_twl      = 8;
-  const int col_twl_leg  = 9;
-  const int col_tns      = 10;
-  const int col_tns_leg  = 11;
-  const int col_wns      = 12;
-  const int col_wns_leg  = 13;
-
-  bool canDoTiming = m_design.CanDoTiming();
-
   TableFormatter tf("Placement Quality Analysis Table");
+  ReorderColumns();
 
   tf.NewHeaderRow();
-  if (canDoTiming)
-  {
-    tf.SetCell(col_wns_leg, "LWNS");
-    tf.SetCell(col_wns, "WNS");
-    tf.SetCell(col_tns_leg, "LTNS");
-    tf.SetCell(col_tns, "TNS");
-    tf.SetCell(col_twl_leg, "LTWL");
-    tf.SetCell(col_twl, "TWL");
-    tf.SetColumnPrecision(col_wns, 4);
-    tf.SetColumnPrecision(col_wns_leg, 4);
-    tf.SetColumnPrecision(col_tns, 4);
-    tf.SetColumnPrecision(col_tns_leg, 4);
-    tf.SetColumnPrecision(col_twl, 0);
-    tf.SetColumnPrecision(col_twl_leg, 0);
-  }
+  tf.SetCell(0, "ID");
 
-  tf.SetCell(col_id, "ID");
-  tf.SetCell(col_objective, "Objective");
-  tf.SetCell(col_ob_hpwl, "ObHPWL");
-  tf.SetCell(col_ob_lr, "ObLR");
-  tf.SetCell(col_ob_sod, "ObSOD");
-  tf.SetCell(col_ob_spr, "ObSpreading");
-  tf.SetCell(col_hpwl, "HPWL");
-  tf.SetCell(col_hpwl_leg, "LHPWL");
-  tf.SetColumnPrecision(col_objective, 2);
-  tf.SetColumnPrecision(col_hpwl, 0);
-  tf.SetColumnPrecision(col_hpwl_leg, 0);
+  for (int i = 0; i < __MetricsNum; i++)
+  {
+      tf.SetCell(metricsInfo[i].column, metricsInfo[i].Name.c_str());
+      tf.SetColumnPrecision(metricsInfo[i].column, metricsInfo[i].precision);
+  }
 
   tf.NewBorderRow();
   tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
@@ -203,23 +213,10 @@ void PlacementQualityAnalyzer::Report()
   for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
   {
     tf.NewRow();
-    tf.SetCell(col_id, i->id);
-    tf.SetCell(col_objective, i->metrics[MetricObjective]);
-    tf.SetCell(col_ob_hpwl, i->metrics[MetricObHPWL]);
-    tf.SetCell(col_ob_lr, i->metrics[MetricObLR]);
-    tf.SetCell(col_ob_sod, i->metrics[MetricObSOD]);
-    tf.SetCell(col_ob_spr, i->metrics[MetricObSpreading]);
-    tf.SetCell(col_hpwl, i->metrics[MetricHPWL]);
-    tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg]);
-    if (canDoTiming)
-    {
-      tf.SetCell(col_twl, i->metrics[MetricTWL]);
-      tf.SetCell(col_twl_leg, i->metrics[MetricTWLleg]);
-      tf.SetCell(col_tns, i->metrics[MetricTNS]);
-      tf.SetCell(col_tns_leg, i->metrics[MetricTNSleg]);
-      tf.SetCell(col_wns, i->metrics[MetricWNS]);
-      tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg]);
-    }
+    tf.SetCell(0, i->id);
+
+    for (int idx = 0; idx < __MetricsNum; idx++)
+        tf.SetCell(metricsInfo[idx].column, i->metrics[idx]);
   }
 
   //TODO: embed properly
@@ -229,23 +226,10 @@ void PlacementQualityAnalyzer::Report()
   for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
   {
 	  tf.NewRow();
-	  tf.SetCell(col_id, i->id);
-	  tf.SetCell(col_objective, i->metrics[MetricObjective] / initial->metrics[MetricObjective] * 100);
-      tf.SetCell(col_ob_hpwl, i->metrics[MetricObHPWL] / initial->metrics[MetricObHPWL] * 100);
-      tf.SetCell(col_ob_lr, i->metrics[MetricObLR] / initial->metrics[MetricObLR] * 100);
-      tf.SetCell(col_ob_sod, i->metrics[MetricObSOD] / initial->metrics[MetricObSOD] * 100);
-      tf.SetCell(col_ob_spr, i->metrics[MetricObSpreading] / initial->metrics[MetricObSpreading] * 100);
-	  tf.SetCell(col_hpwl, i->metrics[MetricHPWL] / initial->metrics[MetricHPWL] * 100);
-	  tf.SetCell(col_hpwl_leg, i->metrics[MetricHPWLleg] / initial->metrics[MetricHPWLleg] * 100);
-	  if (canDoTiming)
-	  {
-		  tf.SetCell(col_twl, i->metrics[MetricTWL] / initial->metrics[MetricTWL] * 100);
-		  tf.SetCell(col_twl_leg, i->metrics[MetricTWLleg] / initial->metrics[MetricTWLleg] * 100);
-		  tf.SetCell(col_tns, i->metrics[MetricTNS] / initial->metrics[MetricTNS] * 100);
-		  tf.SetCell(col_tns_leg, i->metrics[MetricTNSleg] / initial->metrics[MetricTNSleg] * 100);
-		  tf.SetCell(col_wns, i->metrics[MetricWNS] / initial->metrics[MetricWNS] * 100);
-		  tf.SetCell(col_wns_leg, i->metrics[MetricWNSleg] / initial->metrics[MetricWNSleg] * 100);
-	  }
+	  tf.SetCell(0, i->id);
+
+      for (int idx = 0; idx < __MetricsNum; idx++)
+          tf.SetCell(metricsInfo[idx].column, i->metrics[MetricObjective] / initial->metrics[MetricObjective] * 100);
   }
 
   WRITELINE("");
@@ -263,37 +247,7 @@ PlacementQualityAnalyzer::QualityMetrics PlacementQualityAnalyzer::GetMetric(con
 
 const char* PlacementQualityAnalyzer::GetMetric(QualityMetrics metric)
 {
-  switch(metric)
-  {
-  case MetricObjective:
-    return "Objective";
-  case MetricObHPWL:
-    return "ObHPWL";
-  case MetricObLR:
-      return "ObLR";
-  case MetricObSOD:
-      return "ObSOD";
-  case MetricObSpreading:
-      return "ObSpr";
-  case MetricHPWL:
-    return "HPWL";
-  case MetricHPWLleg:
-    return "HPWL leg.";
-  case MetricTWL:
-    return "TWL";
-  case MetricTWLleg:
-    return "TWL leg.";
-  case MetricTNS:
-    return "TNS";
-  case MetricTNSleg:
-    return "TNS leg.";
-  case MetricWNS:
-    return "WNS";
-  case MetricWNSleg:
-    return "WNS leg.";
-  default:
-    return GetMetric(MetricHPWLleg);
-  }
+    return metricsInfo[(int)metric].Name.c_str();
 }
 
 double PlacementQualityAnalyzer::PlacementQuality::GetMetric(QualityMetrics qm)
