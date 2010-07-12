@@ -2,10 +2,11 @@
 #include <math.h>
 #include "Utils.h"
 #include "STA.h"
+#include "OptimizationContext.h"
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 
-void VGAlgorithm::LoadBuffers()
+void HVGAlgorithm::LoadBuffers()
 {
   if (design.cfg.ValueOf("UseOnlyDefaultBuffer", false))
   {
@@ -43,23 +44,57 @@ void VGAlgorithm::LoadBuffers()
   }
 }
 
-VGAlgorithm::VGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
+HVGAlgorithm::HVGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
 {
-  LoadBuffers();
-  PlotSteinerPoint = design.cfg.ValueOf("PlotSteinerPoint", false);
-  PlotVGTree = design.cfg.ValueOf("PlotVGTree", false);
-  PlotNets = design.cfg.ValueOf("PlotNets", false);
-  PrintNetInfo = design.cfg.ValueOf("PrintNetInfo", false);
-  PrintVariantsList = design.cfg.ValueOf("PrintVGVariantsList", false);
-  partitionCount = design.cfg.ValueOf("Interval", 1);
-  vGTree = new VanGinnekenTree(design, partitionCount);
+  isInitialize = false;
 }
 
-int VGAlgorithm::BufferingPlacement()
+void HVGAlgorithm::Initialize(bool isAgainInitialize)
 {
+  if (isInitialize && !isAgainInitialize) 
+  {
+    return;
+  }
+  isInitialize = true;
+  LoadBuffers();
+  plotSteinerPoint = design.cfg.ValueOf("PlotSteinerPoint", false);
+  plotVGTree = design.cfg.ValueOf("PlotVGTree", false);
+  plotNets = design.cfg.ValueOf("PlotNets", false);
+  printNetInfo = design.cfg.ValueOf("PrintNetInfo", false);
+  printVariantsList = design.cfg.ValueOf("PrintVGVariantsList", false);
+  partitionCount = design.cfg.ValueOf("Interval", 1);
+  plotterWaitTime = design.cfg.ValueOf("PlotterWaitTime", 1);
+  isInsertInSourceAndSink = design.cfg.ValueOf("IsInsertInSourceAndSink", true);
+  int TypePartition = design.cfg.ValueOf("TypePartition", 0);
+
+  netVisit = new bool [design.Nets.Count() * 2];
+
+  for (int i = 0; i < design.Nets.Count() * 2; i++)
+  {
+    netVisit[i] = false;
+  }
+
+
+  if (TypePartition == 0)
+    vGTree = new VGTreeUniformDistribution(design, partitionCount);
+  if (TypePartition == 1)
+    vGTree = new VGTreeDynamicDistribution(design, partitionCount);
+  if (TypePartition == 2)
+  {
+
+    vGTree = new VGTreeLegalDynamicDistribution(design, partitionCount);
+  }
+
+}
+
+int HVGAlgorithm::BufferingCriticalPath()
+{
+  if (!isInitialize)   Initialize();
   ALERT("Buffering type: %d", design.cfg.ValueOf("TypePartition", 0));
+
   std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
   int idx = 0;
+
   for(HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator(); i.MoveNext();)
     paths[idx++] = i;
   //design.Plotter.PlotSteinerForest(Color_Black);
@@ -73,44 +108,53 @@ int VGAlgorithm::BufferingPlacement()
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
     {
       HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
-      if (net.Kind() == NetKind_Active) //&& (net.PinsCount() > 5 ))//&& (treeRepository.NoVGTree(net)))//
+      if (net.Kind() == NetKind_Active) //&& (net.PinsCount() == 2 ))//&& (treeRepository.NoVGTree(net)))//
       {
 
-        //if ((net.Kind() == NetKind_Active) && (net.Name() == "G10"))  
-        
+
+        if (!netVisit[::ToID(net)])
+        {
+          //if ((net.Kind() == NetKind_Active) && (net.Name() == "busak_n"))  
+          //{
+          //string na = net.Name();
+          //printf("start name = %s\n", na.c_str());
           bufferCount += BufferingNen(net).GetPositionCount();
+          //printf("find name = %s\n", na.c_str());
+          //}
+        }
+
       }
     }
     //ALERT("CriticalPaths id = %d", j);
   }
   ALERT("Buffers inserted: %d", bufferCount);
-  
+
   return bufferCount;
 }
 
-VGVariantsListElement VGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering)
+VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering)
 {
-  
+  if (!isInitialize)   Initialize();
   //VanGinnekenTree* vGTree = //(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
-  
+
+  netVisit[::ToID(net)] = true;
+
   vGTree->UpdateTree(design.SteinerPoints[(net, design).Source()]);
-//  treeRepository.CreateVGTree(net);
-  if (PrintNetInfo)
+  //  treeRepository.CreateVGTree(net);
+  if (printNetInfo)
   {
     ALERT("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
   }
-  if ((PlotSteinerPoint) || (PlotNets))
+  if ((plotSteinerPoint) || (plotNets))
   {
-    design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(net));
-    design.Plotter.PlotNetSteinerTree(net, Color_Black);  
-    design.Plotter.Refresh();
+    design.Plotter.ShowNetSteinerTree(net, Color_Black, true, HPlotter::WaitTime(plotterWaitTime));
   }
-  if (PlotVGTree)
+
+  if (plotVGTree)
   {
-    design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(net));
-    design.Plotter.PlotVGTree(&vGTree->GetSource(), Color_Black); 
-    design.Plotter.Refresh();
+    design.Plotter.ShowVGTree(net, &vGTree->GetSource(), Color_Black, true, HPlotter::WaitTime(plotterWaitTime));
   }
+
   VGVariantsListElement best = Algorithm(vGTree);
   int bufCount = best.GetPositionCount();
   //ALERT("net: %s\tbufcount = %d",(net, design).Name().c_str(), bufCount );
@@ -126,17 +170,18 @@ VGVariantsListElement VGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering)
       CreateNets(net, newBuffer, newNet, vGTree->GetSource().GetLeft());
     }
   }
-  if ((PlotSteinerPoint) || (PlotVGTree) || (PlotNets))
+
+  if ((plotSteinerPoint) || (plotVGTree) || (plotNets))
   {
     design.Plotter.ShowPlacement();
   }
-  
+
   return best;
 }
 
 void DetermineBordersOfBufferPotential(int& min_col, int& max_col, 
-                                        int& min_row, int& max_row,
-                                        BufferPositions& bufferPositions, AppCtx* context)
+                                       int& min_row, int& max_row,
+                                       BufferPositions& bufferPositions, AppCtx* context)
 {
   BinGrid& binGrid = context->spreadingData.binGrid;
 
@@ -197,7 +242,7 @@ double CalcBellShapedFunction(AppCtx* context, int colIdx, int rowIdx, BufferPos
   return potX * potY;
 }
 
-int VGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
+int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
 {
   for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); pos != vGVariant.GetBufferPosition()->end(); ++pos)
   {
@@ -217,8 +262,9 @@ int VGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
   return vGVariant.GetPositionCount();
 }
 
-int VGAlgorithm::SetBinTableBuffer(AppCtx* context)
+int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
 {
+  if (!isInitialize)   Initialize();
   STA(design);
   ALERT("Buffering type: %d", design.cfg.ValueOf("TypePartition", 0));
   std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
@@ -255,7 +301,7 @@ int VGAlgorithm::SetBinTableBuffer(AppCtx* context)
   return bufferCount;
 }
 
-VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
+VGVariantsListElement HVGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
 {
 
   double t = 0;
@@ -263,7 +309,7 @@ VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   double tMax = -INFINITY;
 
   TemplateTypes<VGVariantsListElement>::list* vGList = CreateVGList(vGTree->GetSource().GetLeft());
-  if (PrintVariantsList)
+  if (printVariantsList)
   { 
     ALERT("Result:");
     PrintVariants(vGList);
@@ -283,12 +329,12 @@ VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
       best = (*i);
     }
   }
-  if (PrintNetInfo)
+  if (printNetInfo)
   {
-    printf("best pos = %d\ttmax = %.2f\n", best.GetPositionCount(), tMax);
+    ALERT("best pos = %d\ttmax = %.2f\n", best.GetPositionCount(), tMax);
   }
   delete vGList;
-  if (PrintVariantsList)
+  if (printVariantsList)
   {    
     ALERT("best variants:");
     PrintVariantsNode(&best, 0);
@@ -296,7 +342,7 @@ VGVariantsListElement VGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   return best;
 }
 
-TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnekenTreeNode* node)
+TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList( VanGinnekenTreeNode* node)
 {
   if (node->isSink())
   {
@@ -305,7 +351,7 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
     element.SetC(node->GetC());
     element.SetRAT(node->GetRAT());
     newList->push_back(element);
-    if (PrintVariantsList)
+    if (printVariantsList)
     { 
       ALERT("sink id: %d", node->GetIndex());
       PrintVariants(newList);
@@ -316,17 +362,17 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
     if (node->isBranchPoint())
     {
       TemplateTypes<VGVariantsListElement>::list* leftVGList = CreateVGList(node->GetLeft());
-      
+
       TemplateTypes<VGVariantsListElement>::list* RightVGList;
       if (node->HasRight())
       {
         RightVGList = CreateVGList(node->GetRight());
-        if (PrintVariantsList)
+        if (printVariantsList)
           ALERT("Branch Point id: %d", node->GetIndex());
 
         return MergeList(leftVGList, RightVGList);
       }
-      if (PrintVariantsList)
+      if (printVariantsList)
       { 
         ALERT("BranchPoint id: %d", node->GetIndex());
         PrintVariants(leftVGList);
@@ -338,8 +384,15 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
       TemplateTypes<VGVariantsListElement>::list* newList = CreateVGList(node->GetLeft());
       UpdateValue(newList, GetLength(node, node->GetLeft()));
       SortVGVariantsListElement(newList);
-      AddBuffer(newList, node);
-      if (PrintVariantsList)
+      if (node->isSink() || node->isSource())
+      {
+        if (isInsertInSourceAndSink)
+          AddBuffer(newList, node);
+      }
+      else
+        AddBuffer(newList, node);
+
+      if (printVariantsList)
       { 
         ALERT("point id: %d", node->GetIndex());
         ALERT("Length line %d and %d: %.2f",node->GetIndex(), node->GetLeft()->GetIndex(), GetLength(node, node->GetLeft()));
@@ -350,7 +403,7 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::CreateVGList( VanGinnek
 
 }
 
-TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList)
+TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList)
 {
   TemplateTypes<VGVariantsListElement>::list* result = new TemplateTypes<VGVariantsListElement>::list();
 
@@ -383,12 +436,12 @@ TemplateTypes<VGVariantsListElement>::list* VGAlgorithm::MergeList(TemplateTypes
   }
   delete leftVGList;
   delete RightVGList;
-  if (PrintVariantsList)
+  if (printVariantsList)
     PrintVariants(result);
   return result;
 }
 
-void VGAlgorithm::UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge)
+void HVGAlgorithm::UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge)
 {
   for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
   {
@@ -397,7 +450,7 @@ void VGAlgorithm::UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList
   }
 }
 
-void VGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node)
+void HVGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node)
 {
   for(unsigned int j = 0; j < Buffers.size(); j++)
   {
@@ -425,7 +478,7 @@ void VGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, 
   }
 }
 
-void VGAlgorithm::SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList)
+void HVGAlgorithm::SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList)
 {
 
   TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin();
@@ -453,14 +506,14 @@ void VGAlgorithm::SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>
         ++i;
         vGList->erase(i1);
       }
-    i = j;   
+      i = j;   
 
   }
 
 }
 
 
-void VGAlgorithm::InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element)
+void HVGAlgorithm::InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element)
 {
   bool isIns = false;
   bool stop = false;
@@ -503,13 +556,13 @@ void VGAlgorithm::InsertVGVariantsListElement(TemplateTypes<VGVariantsListElemen
   }
 }
 
-double VGAlgorithm::GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2)
+double HVGAlgorithm::GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2)
 {
 
   return fabs(node1->GetX() - node2->GetX()) + fabs(node1->GetY() - node2->GetY());
 }
 
-void VGAlgorithm::InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best)
+void HVGAlgorithm::InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best)
 {
 
   for (TemplateTypes<BufferPositions>::list::iterator pos = best->GetBufferPosition()->begin(); pos != best->GetBufferPosition()->end(); ++pos)
@@ -522,7 +575,7 @@ void VGAlgorithm::InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVar
 
 }
 
-void  VGAlgorithm::InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer, BufferPositions& position)
+void  HVGAlgorithm::InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer, BufferPositions& position)
 {
   if (position.GetBufferInfo() == 0) return;
 
@@ -549,7 +602,7 @@ void  VGAlgorithm::InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer, Buffe
 
 }
 
-void VGAlgorithm::PrintVariantsNode(VGVariantsListElement* vGE, int i)
+void HVGAlgorithm::PrintVariantsNode(VGVariantsListElement* vGE, int i)
 {
   char* sBuf = new char [256]; 
   string s;
@@ -571,7 +624,7 @@ void VGAlgorithm::PrintVariantsNode(VGVariantsListElement* vGE, int i)
   delete [] sBuf;
 }
 
-void VGAlgorithm::PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList)
+void HVGAlgorithm::PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList)
 {
   int ind = 0;
   for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
@@ -581,57 +634,61 @@ void VGAlgorithm::PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGLi
   } 
 }
 
-void VGAlgorithm::AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnum, TemplateTypes<NewBuffer>::list& newBuffer)
+void HVGAlgorithm::AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnumW, TemplateTypes<NewBuffer>::list& newBuffer)
 {
+
+  //for (HNetWrapper::PinsEnumeratorW subNetPinEnumW = design[subNet].GetSinksEnumeratorW(); subNetPinEnumW.MoveNext();)
+  //  if (::ToID(subNetPinEnumW) == ::ToID(subNetPinEnum))
+  //    break;
 
   NewBuffer* bufferNumber = FindBufferNumberByIndex(node, newBuffer);
 
   //insert sink pin (buffer input) to the subnet
   if (bufferNumber != NULL)
   {
-    
-      HPin bufferInput = bufferNumber->sink;
 
-      subNetPinEnum.MoveNext();
+    HPin bufferInput = bufferNumber->sink;
 
-      design.Nets.AssignPin(subNet, subNetPinEnum, bufferInput);
+    subNetPinEnumW.MoveNext();
 
-      {//update topological order
-        HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(subNet)];
-        //TODO: fix next line
-        HPin bufferOutput = Utils::FindCellPinByName(design, bufferNumber->cell, design.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
-        Utils::InsertNextPoint(design, design.TimingPoints[bufferInput], source);
-        Utils::InsertNextPoint(design, design.TimingPoints[bufferOutput], design.TimingPoints[bufferInput]);
-        //ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(design));
-      }
-      return;
+    design.Nets.AssignPin(subNet, subNetPinEnumW, bufferInput);
+
+    {//update topological order
+      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(subNet)];
+      //TODO: fix next line
+      HPin bufferOutput = Utils::FindCellPinByName(design, bufferNumber->cell, design.cfg.ValueOf("Buffering.DefaultBuffer.OutputPin", "Y"));
+      Utils::InsertNextPoint(design, design.TimingPoints[bufferInput], source);
+      Utils::InsertNextPoint(design, design.TimingPoints[bufferOutput], design.TimingPoints[bufferInput]);
+      //ERROR_ASSERT(Utils::VerifyTimingCalculationOrder(design));
     }
-  
+    return;
+  }
+
 
   //insert pins from left subtree
   if (node->HasLeft())
   {
-    AddSinks2Net(subNet, node->GetLeft(), subNetPinEnum, newBuffer);
+    AddSinks2Net(subNet, node->GetLeft(), subNetPinEnumW, newBuffer);
 
   }
 
   //insert pins from right subtree
   if (node->HasRight())
   {
-    AddSinks2Net(subNet, node->GetRight(), subNetPinEnum, newBuffer);
+    AddSinks2Net(subNet, node->GetRight(), subNetPinEnumW, newBuffer);
   }
 
   //insert sink pin to the final subnets
   if (node->isSink())
   {		
-    subNetPinEnum.MoveNext();
-    design.Nets.AssignPin(subNet, subNetPinEnum, design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(node->GetSteinerPoint()));
+    subNetPinEnumW.MoveNext();
+    design.Nets.AssignPin(subNet, subNetPinEnumW, design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(node->GetSteinerPoint()));
     return;
   }
 }
 
 
-NewBuffer* VGAlgorithm::FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer)
+NewBuffer* HVGAlgorithm::FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer)
 {
   int i = 0;
 
@@ -643,7 +700,7 @@ NewBuffer* VGAlgorithm::FindBufferNumberByIndex(VanGinnekenTreeNode* node, Templ
   }
   return NULL;
 }
-void VGAlgorithm::PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer)
+void HVGAlgorithm::PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer)
 {
   if ((FindBufferNumberByIndex(node, newBuffer) != NULL))
   {
@@ -670,13 +727,13 @@ void VGAlgorithm::PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, Te
 }
 
 
-void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node)
+void HVGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node)
 {
   int newPinCount = 0;
   int nNewNetPin = 0;
   int nPins = 0;
   char cellIdx[10];
- 
+
   HNet subNet = design.Nets.AllocateNet(false);
   newNet[0] = subNet;
   design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
@@ -694,12 +751,10 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
 
   //add other pins
   AddSinks2Net(subNet, node, design[subNet].GetSinksEnumeratorW(), newBuffer);
-  
-  if (PlotNets)
+
+  if (plotNets)
   {
-    design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(subNet));
-    design.Plotter.PlotNetSteinerTree(subNet, Color_Red);  
-    design.Plotter.Refresh();
+    design.Plotter.ShowNetSteinerTree(subNet, Color_Red, true, HPlotter::WaitTime(plotterWaitTime));
   }
 
   int ind = 0;
@@ -726,11 +781,9 @@ void VGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffe
     NewBuffer& nodeStart2 = *j;
     AddSinks2Net(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), design[subNet].GetSinksEnumeratorW(), newBuffer);
 
-    if (PlotNets)
+    if (plotNets)
     {
-      design.Plotter.PlotText(design.Nets.GetString<HNet::Name>(subNet));
-      design.Plotter.PlotNetSteinerTree(subNet, Color_Red);  
-      design.Plotter.Refresh();
+      design.Plotter.ShowNetSteinerTree(subNet, Color_Red, false, HPlotter::WaitTime(plotterWaitTime));
     }
   }
   HNetWrapper netw = design[net];

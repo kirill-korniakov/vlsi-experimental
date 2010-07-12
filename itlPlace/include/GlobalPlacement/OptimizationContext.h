@@ -1,7 +1,7 @@
 #ifndef __OPTIMIZATION_CONTEXT__
 #define __OPTIMIZATION_CONTEXT__
 
-#include "HDesign.h"
+#include "HBaseDesignItem.h"
 
 #include "Clustering.h"
 #include "LogSumExpData.h"

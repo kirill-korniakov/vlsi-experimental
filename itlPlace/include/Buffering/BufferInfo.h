@@ -1,7 +1,9 @@
 #ifndef __BUFFERINFO_H__
 #define __BUFFERINFO_H__
 
-#include "HDesign.h"
+#include "HBaseDesignItem.h"
+#include "HMacroType.h"
+#include "HPinType.h"
 
 class BufferInfo
 {

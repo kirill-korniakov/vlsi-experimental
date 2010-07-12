@@ -355,8 +355,10 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     {
         ALERT("NEW BUFFERING STARTED");
         ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
-        VGAlgorithm buf(hd);
-        buf.BufferingPlacement();
+        //HVGAlgorithm buf(hd);
+        //buf.BufferingCriticalPath();
+        hd.VGAlgorithm.Initialize();
+        hd.VGAlgorithm.BufferingCriticalPath();
         STA(hd);
         ALERT("NEW BUFFERING FINISHED");
         WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");

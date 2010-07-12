@@ -3,8 +3,11 @@
 
 //#include "HDesign.h"
 #include "BufferInfo.h"
-#include "HDPGrid.h"
+#include "HSteinerPoint.h"
+//#include "HDPGrid.h
+#include "PlacementGrid.h"
 
+class HDPGrid;
 class VanGinnekenTree;
 
 class VanGinnekenTreeNode
@@ -59,34 +62,76 @@ protected:
   int treeSize;  
   int TypePartition;
 
-  void CreateTree();
+  virtual void CreateTree() = 0;
+  virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL) = 0;
 
-  VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+
 public:
-
   HDesign& design;
-  HDPGrid DPGrid;
+  HDPGrid* DPGrid;
 
   VanGinnekenTree(HDesign& hd);
   VanGinnekenTree(HDesign& hd, int partitionCount);
   VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source);
 
-  void UpdateTree(HSteinerPoint& source);
+  virtual void UpdateTree(HSteinerPoint& source);
 
-  void SetEdgePartitionCount(int partitionCount);
+  virtual void SetEdgePartitionCount(int partitionCount);
 
-  VanGinnekenTreeNode GetSource();
-  double GetR();
+  virtual VanGinnekenTreeNode GetSource();
+  virtual double GetR();
 
-  void ClearTree();
+  virtual void ClearTree();
 
-  int TreeSize()
-  {
-    return treeSize;
-  }
+  virtual int TreeSize();
 
-  ~VanGinnekenTree();
+
 };
+
+class VGTreeUniformDistribution: public VanGinnekenTree
+{
+protected:
+  virtual void CreateTree();
+  virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+
+public:
+  VGTreeUniformDistribution(HDesign& hd);
+  VGTreeUniformDistribution(HDesign& hd, int partitionCount);
+  VGTreeUniformDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+
+  virtual ~VGTreeUniformDistribution();
+};
+
+class VGTreeDynamicDistribution: public VanGinnekenTree
+{
+protected:
+  virtual void CreateTree();
+  virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+
+public:
+  VGTreeDynamicDistribution(HDesign& hd);
+  VGTreeDynamicDistribution(HDesign& hd, int partitionCount);
+  VGTreeDynamicDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+
+  virtual ~VGTreeDynamicDistribution();
+};
+
+class VGTreeLegalDynamicDistribution: public VanGinnekenTree
+{
+protected:
+  HPlacementGrid pGrid;
+
+  virtual void CreateTree();
+  virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+
+public:
+  VGTreeLegalDynamicDistribution(HDesign& hd);
+  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount);
+  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+
+  virtual ~VGTreeLegalDynamicDistribution();
+};
+
 class BufferPositions
 {
 protected:

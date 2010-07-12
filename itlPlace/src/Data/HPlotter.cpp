@@ -11,6 +11,9 @@
 
 #include "VanGinnekenData.h"
 
+
+
+
 struct PlotterData
 {
   IplImage* img;
@@ -69,6 +72,32 @@ static inline CvScalar GetCvColor(Color col)
 #define HNormalX2ImageX(x) _NormalX2ImageX((x), m_Data->histogramImg->width)
 #define HNormalY2ImageY(y) _NormalY2ImageY((y), 0, m_Data->histogramImg->height)
 
+static void SavePlotterImage(libconfig::ConfigExt& cfg, const std::string& fileName, const CvArr* image, bool compress, int paletteSize)
+{
+  const char* compressor = cfg.ValueOf("plotter.PNGCompressor", "pngquant.exe");
+  if (compress && (0 == fileName.compare(fileName.length() - 4, 4, ".png")) && Aux::FileExists(compressor))
+  {
+    cvSaveImage("temp.png", image);
+    char cmdline[128];
+    sprintf(cmdline, "%s  -force -quiet %d temp.png", compressor, paletteSize);
+    system(cmdline);
+    if (0 != rename("temp-fs8.png", fileName.c_str()))
+    {
+      if (0 != rename("temp.png", fileName.c_str()))
+      {
+        remove("temp.png");
+        cvSaveImage(fileName.c_str(), image);
+      }
+      remove("temp-fs8.png");
+    }
+    else
+      remove("temp.png");
+  }
+  else
+    cvSaveImage(fileName.c_str(), image);
+}
+
+//Org methods 
 HPlotter::HPlotter(HDesign& design):
 m_hd(design)
 {
@@ -84,25 +113,6 @@ HPlotter::~HPlotter()
   Destroy();
   DestroyHistogramWindow();
   delete m_Data;
-}
-
-void HPlotter::InitializeHistogramWindow()
-{
-  if (!_IsEnabled() || !m_isHistogramDestroyed)
-    return;
-
-  m_isHistogramDestroyed = false;
-
-  //create window
-  m_Data->histogramWindowName = "itlPlace histogram";
-  cvNamedWindow(m_Data->histogramWindowName.c_str());
-
-  //create image
-  CvSize imgSize;
-  imgSize.height = m_hd.cfg.ValueOf("plotter.histogramWindowHeight", 300);
-  imgSize.width = m_hd.cfg.ValueOf("plotter.histogramWindowWidth", 1000);
-  m_Data->histogramImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
-  m_Data->histogramImg->origin = 1;
 }
 
 void HPlotter::Initialize()
@@ -151,6 +161,27 @@ void HPlotter::Initialize()
   }
 }
 
+void HPlotter::InitializeHistogramWindow()
+{
+  if (!_IsEnabled() || !m_isHistogramDestroyed)
+    return;
+
+  m_isHistogramDestroyed = false;
+
+  //create window
+  m_Data->histogramWindowName = "itlPlace histogram";
+  cvNamedWindow(m_Data->histogramWindowName.c_str());
+
+  //create image
+  CvSize imgSize;
+  imgSize.height = m_hd.cfg.ValueOf("plotter.histogramWindowHeight", 300);
+  imgSize.width = m_hd.cfg.ValueOf("plotter.histogramWindowWidth", 1000);
+  m_Data->histogramImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 3);
+  m_Data->histogramImg->origin = 1;
+}
+
+
+
 void HPlotter::Destroy()
 {
   if (!m_isDestroyed)
@@ -175,38 +206,29 @@ void HPlotter::DestroyHistogramWindow()
   }
 }
 
+void HPlotter::ClearHistogram()
+{
+  if (IsEnabled())
+  {
+    if (!m_isHistogramDestroyed)
+    {
+      cvSet(m_Data->histogramImg, cvScalar(255.0, 255.0, 255.0));
+    }
+  }
+}
+
+void HPlotter::RefreshHistogram(WaitTime waitTime)
+{
+  if (IsEnabled())
+  {
+    cvShowImage(m_Data->histogramWindowName.c_str(), m_Data->histogramImg);
+    cvWaitKey(waitTime);
+  }
+}
+
 bool HPlotter::IsEnabled()
 {
   return !m_isDestroyed && _IsEnabled();
-}
-
-bool HPlotter::_IsEnabled()
-{
-  return m_hd.cfg.ValueOf("plotter.enabled", false);
-}
-
-void HPlotter::SetAutoRefreshMinFrequency(int freq)
-{
-  if (freq > m_Data->autoRefreshStepDefault)
-    m_Data->autoRefreshStep = freq;
-  m_Data->drawingsNum = 0;
-}
-
-void HPlotter::ResetAutoRefreshFrequency()
-{
-  m_Data->autoRefreshStep = m_Data->autoRefreshStepDefault;
-  Refresh();
-}
-
-void HPlotter::_AutoRefresh()
-{
-  if (!IsEnabled())
-    return;
-
-  if (m_Data->drawingsNum++ % m_Data->autoRefreshStep == 0)
-  {
-    Refresh(NO_WAIT);
-  }
 }
 
 void HPlotter::Clear()
@@ -239,69 +261,235 @@ void HPlotter::Refresh(const string& cfgPath)
     Refresh((HPlotter::WaitTime)m_hd.cfg.ValueOf(cfgPath, 1));
 }
 
-Color HPlotter::_GetCellColor(HCell plotCell)
+void HPlotter::SetAutoRefreshMinFrequency(int freq)
 {
-  HCellWrapper cell = m_hd[plotCell];
-
-  static TemplateTypes<HMacroType>::vector bufferType;
-  static bool onlyOnce = true;
-  if (onlyOnce)
-  {
-    //get types of buffers
-    const char* bufferName = m_hd.cfg.ValueOf("GlobalPlacement.bufferName", (const char*)"INVX1");
-    bufferType.push_back(Utils::FindMacroTypeByName(m_hd, bufferName));
-
-    string sBufferList = m_hd.cfg.ValueOf("New_Buffering.BufferList", "");
-    unsigned int n = m_hd.cfg.ValueOf("New_Buffering.BufferListLength", 0);
-    string* bufferList = NULL;
-    if (n > 0)
-    {
-      bufferList = new string [n];     
-      for (unsigned int i = 0, j = 0, t = 0; (i < sBufferList.length()) && (j < n); i++, t++)
-      {
-        if(sBufferList[i] != ',')
-          bufferList[j].push_back(sBufferList[i]);
-        else
-        {
-          t = -1;
-          j++;
-        }
-      }
-
-      string macro;
-
-      for (HMacroTypes::EnumeratorW macroTypeEW = m_hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
-      {
-        if (macroTypeEW.Type() == MacroType_BUF)
-        {
-          macro = macroTypeEW.Name();
-          bool isbuf = false;
-          for (int i = 0; (i < n) && !isbuf; i++)
-            if (macro == bufferList[i])
-              isbuf = true;
-          if (!isbuf)
-            continue;
-
-          bufferType.push_back(Utils::FindMacroTypeByName(m_hd, macro));
-        }
-      }
-    }
-
-    onlyOnce = false;
-  }
-
-  static Color combCellBackColor = Color_LightBlue;
-  static Color specCellBackColor = Color_LightGreen;
-  static Color seqCellBackColor  = Color_Aqua;
-  static Color bufferColor       = Color_Yellow;
-
-  HMacroType cellType = m_hd.Cells.Get<HCell::MacroType, HMacroType>(cell);
-  if (find(bufferType.begin(), bufferType.end(), cellType) < bufferType.end())
-    return bufferColor;
-  else
-    return cell.IsSpecial() ? specCellBackColor : cell.IsSequential() ? seqCellBackColor :  combCellBackColor;
+  if (freq > m_Data->autoRefreshStepDefault)
+    m_Data->autoRefreshStep = freq;
+  m_Data->drawingsNum = 0;
 }
 
+void HPlotter::ResetAutoRefreshFrequency()
+{
+  m_Data->autoRefreshStep = m_Data->autoRefreshStepDefault;
+  Refresh();
+}
+
+
+void HPlotter::SaveImage(string fileName, string dirName)
+{
+  if (!IsEnabled())
+    return;
+
+  string ImageFileName;
+  if (fileName == "")
+  {
+    ImageFileName = Aux::CreateCoolFileName(dirName, m_hd.Circuit.Name(), "png");
+  }
+  else
+  {
+    ImageFileName = Aux::CreateCoolFileName(dirName, fileName, "png");
+  }
+  //cvSaveImage(ImageFileName.c_str(), m_Data->img);
+  SavePlotterImage(m_hd.cfg, ImageFileName, m_Data->img,
+    m_hd.cfg.ValueOf("plotter.CompressImages", false),
+    m_hd.cfg.ValueOf("plotter.ImagesPaletteSize", 256));
+}
+
+void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
+{
+  if (!IsEnabled())
+    return;
+
+  if (m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
+  {
+    string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "png");
+    //cvSaveImage(fileName.c_str(), m_Data->img);
+    SavePlotterImage(m_hd.cfg, fileName, m_Data->img,
+      m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
+      m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
+
+    if (Logger::Global.HasHTMLStream() && addToHtmlLog)
+    {
+      bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
+      Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");
+      Logger::Global.WriteToHTMLStream(true, "%s", fileName.c_str());
+      if (embeed && Aux::FileExists(fileName))
+      {
+        int fsize = Aux::GetFileSize(fileName);
+        unsigned char* buffer = new unsigned char[fsize];
+        try
+        {
+          FILE* fimg = fopen(fileName.c_str(), "rb");
+          if (fimg != 0)
+          {
+            fsize = fread(buffer, 1, fsize, fimg);
+            fclose(fimg);
+          }
+          Logger::Global.WriteToHTMLStream(false, "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", Base64::Encode(buffer, fsize).c_str());
+        }
+        catch(...)
+        {
+          delete[] buffer;
+          throw;
+        }
+        delete[] buffer;
+      }
+      else
+      {
+        for (size_t i = 0; i < fileName.length(); ++i)
+          if (fileName[i] == '\\')
+            fileName[i] = '/';
+        Logger::Global.WriteToHTMLStream(false, "\" src=\"../%s\" /></div>\n", fileName.c_str());
+      }
+    }
+  }
+}
+
+void HPlotter::StartVideoWriting(string fileName, string dirName)
+{
+  CvSize movieFrameSize = cvSize(m_Data->img->width, m_Data->img->height);
+  string movieFileName;
+  if (fileName == "")
+  { 
+    movieFileName = Aux::CreateCoolFileName(dirName,  m_hd.Circuit.Name() ,".avi");
+  }
+  else
+    movieFileName = Aux::CreateCoolFileName(dirName, fileName, ".avi");
+
+  char codecName[] = "xvid";
+  double fps = m_hd.cfg.ValueOf("plotter.fps", 1.0);
+  m_Data->vw = cvCreateVideoWriter(movieFileName.c_str(), 
+    (CV_FOURCC(codecName[0], codecName[1], codecName[2], codecName[3])),
+    fps, movieFrameSize);
+
+  //TODO: check if writer created
+}
+
+void HPlotter::WriteCurrentFrame()
+{
+  //TODO: check if writer created
+  cvWriteFrame(m_Data->vw, IMG);
+}
+
+
+void HPlotter::StopVideoWriting()
+{
+  if (m_Data->vw)
+  {
+    cvReleaseVideoWriter(&m_Data->vw);
+  }
+}
+
+//Show methods
+void HPlotter::ShowPlacement(WaitTime waitTime)
+{
+  Clear();
+  PlotPlacement();
+  Refresh(waitTime);
+}
+
+void HPlotter::AutoShowPlacement(WaitTime waitTime)
+{
+  if (!IsEnabled())
+    return;
+
+  static int i = 0;
+  if (i++ % m_Data->autoRefreshStep == 0)
+  {
+    ShowPlacement(waitTime);
+  }
+}
+
+void HPlotter::ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime)
+{
+  Clear();
+  PlotBinGrid(nBinRows, nBinCols);
+  if (plotWires)
+    PlotFullWires();
+  PlotPlacement();
+  Refresh(waitTime);
+}
+
+void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
+                              double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g)
+{
+  double scaling = m_hd.cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
+  int waitTime = m_hd.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+
+  Clear();
+  PlotBinGrid(nBinRows, nBinCols);
+  PlotPlacement();
+  PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
+  PlotGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
+  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_LimeGreen);
+  PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
+  PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
+  Refresh((HPlotter::WaitTime)waitTime);
+}
+
+void HPlotter::ShowLegalizationState(WaitTime waitTime, bool drawSites)
+{
+  Clear();
+  if (drawSites)
+    PlotSites();
+  PlotPlacement();
+  Refresh(waitTime);
+}
+
+void HPlotter::ShowSteinerForest(Color color, WaitTime waitTime)
+{
+  if (!IsEnabled()) return;
+
+  for (HNets::ActiveNetsEnumeratorW anew = m_hd.Nets.GetActiveNetsEnumeratorW(); anew.MoveNext();)
+  {
+    AdaptiveRoute(m_hd, anew);
+    PlotNetSteinerTree(anew, color);
+  }
+
+  Refresh(waitTime);
+  SaveMilestoneImage("SteinerForest");
+}
+
+void HPlotter::ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement, WaitTime waitTime, double textSize)
+{
+  if (!IsEnabled()) 
+    return;
+
+  if (isShowPlacement)
+    ShowPlacement();
+
+  PlotText(m_hd.Nets.GetString<HNet::Name>(net), textSize);
+  PlotNetSteinerTree(net, color);  
+  Refresh(waitTime);
+}
+
+void HPlotter::ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement, WaitTime waitTime, Color VGNodeColor, double textSize)
+{  
+  if (!IsEnabled()) 
+    return;
+
+  if (isShowPlacement)
+    ShowPlacement();
+
+  PlotText(m_hd.Nets.GetString<HNet::Name>(net), textSize);
+  PlotVGTree(tree, LineColor, VGNodeColor); 
+  Refresh(waitTime);
+}
+
+void HPlotter::ShowNet(HNet net, bool isShowPlacement, WaitTime waitTime, Color color, double textSize)
+{
+  if (!IsEnabled()) 
+    return;
+
+  if (isShowPlacement)
+    ShowPlacement();
+
+  PlotText(m_hd.Nets.GetString<HNet::Name>(net), textSize);
+  PlotNet(net, color);
+  Refresh(waitTime);
+}
+
+//Plot methods
 void HPlotter::PlotPlacement()
 {
   if (!IsEnabled())
@@ -442,68 +630,6 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
   }
 }
 
-void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
-{
-  double maxKi = m_hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 0.0);
-  if (!IsEnabled() || maxKi <= 0.0) 
-    return;
-
-  //FIXME: find proper place
-  InitializeHistogramWindow();
-
-  CvPoint start, finish;
-  double meanK = 0.0;
-
-  for (int i = 0; i < nNets; i++)
-  {
-    meanK += x[2*nClusters + i];
-    start.x = HNormalX2ImageX((double)i/(double)nNets);
-    start.y = HNormalY2ImageY(0.0);
-    finish.x = start.x;
-    finish.y = HNormalY2ImageY(x[2*nClusters + i]/maxKi);
-    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
-  }
-
-  //plot one line
-  start.x  = HNormalX2ImageX(0.0);
-  finish.x = HNormalX2ImageX(1.0);
-  start.y  = HNormalY2ImageY(1.0/maxKi);
-  finish.y = HNormalY2ImageY(1.0/maxKi);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
-
-  //plot mean ki
-  meanK /= nNets;
-  start.x  = HNormalX2ImageX(0.0);
-  finish.x = HNormalX2ImageX(1.0);
-  start.y  = HNormalY2ImageY(meanK/maxKi);
-  finish.y = HNormalY2ImageY(meanK/maxKi);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
-}
-
-void HPlotter::PlotCircle(double x, double y, int radius, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint center;
-    center.x = DesignX2ImageX(x);
-    center.y = DesignY2ImageY(y);
-    cvCircle(IMG, center, radius, GetCvColor(col), 2);
-  }
-}
-
-void HPlotter::PlotLine(double x1, double y1, double x2, double y2, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint start, finish;
-    start.x = DesignX2ImageX(x1);
-    start.y = DesignY2ImageY(y1);
-    finish.x = DesignX2ImageX(x2);
-    finish.y = DesignY2ImageY(y2);
-    cvLine(IMG, start, finish, GetCvColor(col), 1);
-  }
-}
-
 void HPlotter::PlotCell(HCell cell, Color col)
 {
   if (!IsEnabled())
@@ -552,190 +678,6 @@ void HPlotter::PlotSites()
   }
 }
 
-void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint start, finish;
-    start.x = DesignX2ImageX(x1);
-    start.y = DesignY2ImageY(y1);
-    finish.x = DesignX2ImageX(x2);
-    finish.y = DesignY2ImageY(y2);
-    cvLine(IMG, start, finish, GetCvColor(col), 1);
-    _AutoRefresh();
-  }
-}
-
-void HPlotter::DrawCircle(double x, double y, int radius, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint center;
-    center.x = DesignX2ImageX(x);
-    center.y = DesignY2ImageY(y);
-    cvCircle(IMG, center, radius, GetCvColor(col), 2);
-    _AutoRefresh();
-  }
-}
-
-void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint start, finish;
-    start.x = DesignX2ImageX(x1);
-    start.y = DesignY2ImageY(y1);
-    finish.x = DesignX2ImageX(x2);
-    finish.y = DesignY2ImageY(y2);
-    cvRectangle(IMG, start, finish, GetCvColor(col), 1);
-    _AutoRefresh();
-  }
-}
-
-void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col)
-{
-  if (IsEnabled())
-  {
-    CvPoint start, finish;
-    start.x = DesignX2ImageX(x1);
-    start.y = DesignY2ImageY(y1);
-    finish.x = DesignX2ImageX(x2);
-    finish.y = DesignY2ImageY(y2);
-    cvRectangle(IMG, start, finish, GetCvColor(col), CV_FILLED);
-    _AutoRefresh();
-  }
-}
-
-static void SavePlotterImage(libconfig::ConfigExt& cfg, const std::string& fileName, const CvArr* image, bool compress, int paletteSize)
-{
-  const char* compressor = cfg.ValueOf("plotter.PNGCompressor", "pngquant.exe");
-  if (compress && (0 == fileName.compare(fileName.length() - 4, 4, ".png")) && Aux::FileExists(compressor))
-  {
-    cvSaveImage("temp.png", image);
-    char cmdline[128];
-    sprintf(cmdline, "%s  -force -quiet %d temp.png", compressor, paletteSize);
-    system(cmdline);
-    if (0 != rename("temp-fs8.png", fileName.c_str()))
-    {
-      if (0 != rename("temp.png", fileName.c_str()))
-      {
-        remove("temp.png");
-        cvSaveImage(fileName.c_str(), image);
-      }
-      remove("temp-fs8.png");
-    }
-    else
-      remove("temp.png");
-  }
-  else
-    cvSaveImage(fileName.c_str(), image);
-}
-
-void HPlotter::SaveImage(string fileName, string dirName)
-{
-  if (!IsEnabled())
-    return;
-
-  string ImageFileName;
-  if (fileName == "")
-  {
-    ImageFileName = Aux::CreateCoolFileName(dirName, m_hd.Circuit.Name(), "png");
-  }
-  else
-  {
-    ImageFileName = Aux::CreateCoolFileName(dirName, fileName, "png");
-  }
-  //cvSaveImage(ImageFileName.c_str(), m_Data->img);
-  SavePlotterImage(m_hd.cfg, ImageFileName, m_Data->img,
-    m_hd.cfg.ValueOf("plotter.CompressImages", false),
-    m_hd.cfg.ValueOf("plotter.ImagesPaletteSize", 256));
-}
-
-void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
-{
-  if (!IsEnabled())
-    return;
-
-  if (m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
-  {
-    string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "png");
-    //cvSaveImage(fileName.c_str(), m_Data->img);
-    SavePlotterImage(m_hd.cfg, fileName, m_Data->img,
-      m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
-      m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
-
-    if (Logger::Global.HasHTMLStream() && addToHtmlLog)
-    {
-      bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
-      Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");
-      Logger::Global.WriteToHTMLStream(true, "%s", fileName.c_str());
-      if (embeed && Aux::FileExists(fileName))
-      {
-        int fsize = Aux::GetFileSize(fileName);
-        unsigned char* buffer = new unsigned char[fsize];
-        try
-        {
-          FILE* fimg = fopen(fileName.c_str(), "rb");
-          if (fimg != 0)
-          {
-            fsize = fread(buffer, 1, fsize, fimg);
-            fclose(fimg);
-          }
-          Logger::Global.WriteToHTMLStream(false, "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", Base64::Encode(buffer, fsize).c_str());
-        }
-        catch(...)
-        {
-          delete[] buffer;
-          throw;
-        }
-        delete[] buffer;
-      }
-      else
-      {
-        for (size_t i = 0; i < fileName.length(); ++i)
-          if (fileName[i] == '\\')
-            fileName[i] = '/';
-        Logger::Global.WriteToHTMLStream(false, "\" src=\"../%s\" /></div>\n", fileName.c_str());
-      }
-    }
-  }
-}
-
-void HPlotter::StartVideoWriting(string fileName, string dirName)
-{
-  CvSize movieFrameSize = cvSize(m_Data->img->width, m_Data->img->height);
-  string movieFileName;
-  if (fileName == "")
-  { 
-    movieFileName = Aux::CreateCoolFileName(dirName,  m_hd.Circuit.Name() ,".avi");
-  }
-  else
-    movieFileName = Aux::CreateCoolFileName(dirName, fileName, ".avi");
-
-  char codecName[] = "xvid";
-  double fps = m_hd.cfg.ValueOf("plotter.fps", 1.0);
-  m_Data->vw = cvCreateVideoWriter(movieFileName.c_str(), 
-    (CV_FOURCC(codecName[0], codecName[1], codecName[2], codecName[3])),
-    fps, movieFrameSize);
-
-  //TODO: check if writer created
-}
-
-void HPlotter::WriteCurrentFrame()
-{
-  //TODO: check if writer created
-  cvWriteFrame(m_Data->vw, IMG);
-}
-
-
-void HPlotter::StopVideoWriting()
-{
-  if (m_Data->vw)
-  {
-    cvReleaseVideoWriter(&m_Data->vw);
-  }
-}
-
 void HPlotter::PlotCriticalPath(HCriticalPath aPath)
 {
   if (IsEnabled())
@@ -774,6 +716,86 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath)
       else
         cvCircle(IMG, finish, 2, GetCvColor(Color_Yellow), 2);
       pin1 = pin2;
+    }
+  }
+}
+
+void HPlotter::PlotNetSteinerTree(HNet net, Color color)
+{
+  if (!IsEnabled()) return;
+
+  AdaptiveRoute(m_hd, net);
+
+  HNetWrapper netw = m_hd[net];
+  HPinWrapper src =  m_hd[netw.Source()];
+  HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[src]];
+  HSteinerPointWrapper nextPoint = srcPoint;
+
+  m_hd.Plotter.PlotCircle(srcPoint.X(), srcPoint.Y(), 4, color);
+
+  TemplateTypes<HSteinerPoint>::stack points;
+  points.push(srcPoint);
+  while (!points.empty())
+  {
+    srcPoint = points.top();
+    points.pop();
+
+    if (srcPoint.HasLeft())
+    {
+      nextPoint = srcPoint.Left();
+      m_hd.Plotter.PlotLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+      points.push(nextPoint);
+
+      if (srcPoint.HasRight())
+      {
+        nextPoint = srcPoint.Right();
+        m_hd.Plotter.PlotLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+        points.push(nextPoint);
+      }
+    }
+    else
+    {
+      m_hd.Plotter.PlotCircle(srcPoint.X(), srcPoint.Y(), 1, color);
+    }
+  }
+}
+
+void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor)
+{
+  if (!IsEnabled()) return;
+
+  VanGinnekenTreeNode* srcPoint = tree;
+  VanGinnekenTreeNode* nextPoint = srcPoint;
+
+  m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 4, LineColor);
+
+  TemplateTypes<VanGinnekenTreeNode*>::stack points;
+  points.push(srcPoint);
+  while (!points.empty())
+  {
+    srcPoint = points.top();
+    points.pop();
+
+    if (srcPoint->HasLeft())
+    {
+      nextPoint = srcPoint->GetLeft();
+      m_hd.Plotter.PlotLine(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
+      m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
+      //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
+      points.push(nextPoint);
+
+      if (srcPoint->HasRight())
+      {
+        nextPoint = srcPoint->GetRight();
+        m_hd.Plotter.PlotLine(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
+        m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
+        //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
+        points.push(nextPoint);
+      }
+    }
+    else
+    {
+      m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, LineColor);
     }
   }
 }
@@ -886,14 +908,14 @@ void HPlotter::PlotTextInPoint(string text, double x, double y, double textSize 
 
 }
 
-void HPlotter::PlotNet(HNetWrapper net)
+void HPlotter::PlotNet(HNet net, Color color)
 {
   CvPoint start, finish;
-  HPinWrapper pin1 = m_hd[net.Source()];
+  HPinWrapper pin1 = m_hd[m_hd[net].Source()];
   start.x = DesignX2ImageX(pin1.X());
   start.y = DesignY2ImageY(pin1.Y());
-  cvCircle(IMG, start, 1, GetCvColor(Color_Peru), 3);
-  for (HNet::SinksEnumeratorW sew = net.GetSinksEnumeratorW(); sew.MoveNext(); )
+  cvCircle(IMG, start, 1, GetCvColor(color), 3);
+  for (HNet::SinksEnumeratorW sew = m_hd[net].GetSinksEnumeratorW(); sew.MoveNext(); )
   {
     start.x = DesignX2ImageX(pin1.X());
     start.y = DesignY2ImageY(pin1.Y());
@@ -902,100 +924,6 @@ void HPlotter::PlotNet(HNetWrapper net)
     cvCircle(IMG, finish, 1, GetCvColor(Color_Yellow), 2);
     cvLine(IMG, start, finish, GetCvColor(Color_Red), 1, 1);
   }
-}
-
-void HPlotter::PlotNetSteinerTree(HNet net, Color color)
-{
-  if (!IsEnabled()) return;
-
-  AdaptiveRoute(m_hd, net);
-
-  HNetWrapper netw = m_hd[net];
-  HPinWrapper src =  m_hd[netw.Source()];
-  HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[src]];
-  HSteinerPointWrapper nextPoint = srcPoint;
-
-  m_hd.Plotter.PlotCircle(srcPoint.X(), srcPoint.Y(), 4, color);
-
-  TemplateTypes<HSteinerPoint>::stack points;
-  points.push(srcPoint);
-  while (!points.empty())
-  {
-    srcPoint = points.top();
-    points.pop();
-
-    if (srcPoint.HasLeft())
-    {
-      nextPoint = srcPoint.Left();
-      m_hd.Plotter.PlotLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
-      points.push(nextPoint);
-
-      if (srcPoint.HasRight())
-      {
-        nextPoint = srcPoint.Right();
-        m_hd.Plotter.PlotLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
-        points.push(nextPoint);
-      }
-    }
-    else
-    {
-      m_hd.Plotter.PlotCircle(srcPoint.X(), srcPoint.Y(), 1, color);
-    }
-  }
-}
-
-void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor)
-{
-  if (!IsEnabled()) return;
-
-  VanGinnekenTreeNode* srcPoint = tree;
-  VanGinnekenTreeNode* nextPoint = srcPoint;
-
-  m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 4, LineColor);
-
-  TemplateTypes<VanGinnekenTreeNode*>::stack points;
-  points.push(srcPoint);
-  while (!points.empty())
-  {
-    srcPoint = points.top();
-    points.pop();
-
-    if (srcPoint->HasLeft())
-    {
-      nextPoint = srcPoint->GetLeft();
-      m_hd.Plotter.PlotLine(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
-      m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
-      //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
-      points.push(nextPoint);
-
-      if (srcPoint->HasRight())
-      {
-        nextPoint = srcPoint->GetRight();
-        m_hd.Plotter.PlotLine(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
-        m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
-        //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
-        points.push(nextPoint);
-      }
-    }
-    else
-    {
-      m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, LineColor);
-    }
-  }
-}
-
-
-void HPlotter::PlotSteinerForest(Color color)
-{
-  if (!IsEnabled()) return;
-
-  for (HNets::ActiveNetsEnumeratorW anew = m_hd.Nets.GetActiveNetsEnumeratorW(); anew.MoveNext();)
-  {
-    AdaptiveRoute(m_hd, anew);
-    PlotNetSteinerTree(anew, color);
-  }
-  m_hd.Plotter.Refresh();
-  m_hd.Plotter.SaveMilestoneImage("SteinerForest");
 }
 
 void HPlotter::PlotFullWires()
@@ -1023,122 +951,66 @@ void HPlotter::Plot2PinNets()
   }
 }
 
-void HPlotter::ShowPlacement(WaitTime waitTime)
+void HPlotter::PlotCircle(double x, double y, int radius, Color col)
 {
-  Clear();
-  PlotPlacement();
-  Refresh(waitTime);
-}
-
-void HPlotter::AutoShowPlacement(WaitTime waitTime)
-{
-  if (!IsEnabled())
-    return;
-
-  static int i = 0;
-  if (i++ % m_Data->autoRefreshStep == 0)
+  if (IsEnabled())
   {
-    ShowPlacement(waitTime);
+    CvPoint center;
+    center.x = DesignX2ImageX(x);
+    center.y = DesignY2ImageY(y);
+    cvCircle(IMG, center, radius, GetCvColor(col), 2);
   }
 }
 
-void HPlotter::ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime)
+void HPlotter::PlotLine(double x1, double y1, double x2, double y2, Color col)
 {
-  Clear();
-  PlotBinGrid(nBinRows, nBinCols);
-  if (plotWires)
-    PlotFullWires();
-  PlotPlacement();
-  Refresh(waitTime);
+  if (IsEnabled())
+  {
+    CvPoint start, finish;
+    start.x = DesignX2ImageX(x1);
+    start.y = DesignY2ImageY(y1);
+    finish.x = DesignX2ImageX(x2);
+    finish.y = DesignY2ImageY(y2);
+    cvLine(IMG, start, finish, GetCvColor(col), 1);
+  }
 }
 
-void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
-                              double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g)
+void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
 {
-  double scaling = m_hd.cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
-  int waitTime = m_hd.cfg.ValueOf("GlobalPlacement.plotWait", 1);
-
-  Clear();
-  PlotBinGrid(nBinRows, nBinCols);
-  PlotPlacement();
-  PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
-  PlotGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
-  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_LimeGreen);
-  PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
-  PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
-  Refresh((HPlotter::WaitTime)waitTime);
-}
-
-void HPlotter::ShowLegalizationState(WaitTime waitTime, bool drawSites)
-{
-  Clear();
-  if (drawSites)
-    PlotSites();
-  PlotPlacement();
-  Refresh(waitTime);
-}
-
-void HPlotter::DrawTileWires(double x1, double y1, double x2, double y2, int nLines, int nMaxLines)
-{
-  CvPoint start, finish;
-  start.x = DesignX2ImageX(x1);
-  start.y = DesignY2ImageY(y1);
-  finish.x = DesignX2ImageX(x2);
-  finish.y = DesignY2ImageY(y2);
-  CvScalar minColor = cvScalar(255.0, 255.0, 255.0);
-  CvScalar maxColor = cvScalar(0.0, 0.0, 0.0);
-  CvScalar resColor;
-
-  if (nLines >= nMaxLines)
-    resColor = maxColor;
-  else
-    resColor = cvScalar(255 - 255 * nLines / nMaxLines, 255 - 255 * nLines / nMaxLines,
-    255 - 255 * nLines / nMaxLines);
-  //resColor = cvScalar(255 * nLines / nMaxLines, 255 * nLines / nMaxLines, 255 * nLines / nMaxLines);
-
-  cvRectangle(IMG, start, finish, resColor, CV_FILLED);
-  Refresh();
-}
-
-void HPlotter::DrawTilePins(double x1, double y1, double x2, double y2, int nPins, int nMaxPins)
-{
-  CvPoint start, finish;
-  start.x = DesignX2ImageX(x1);
-  start.y = DesignY2ImageY(y1);
-  finish.x = DesignX2ImageX(x2);
-  finish.y = DesignY2ImageY(y2);
-  CvScalar minColor = cvScalar(255.0, 255.0, 255.0);
-  CvScalar maxColor = cvScalar(0.0, 0.0, 0.0);
-  CvScalar resColor;
-
-  if (nPins >= nMaxPins)
-    resColor = maxColor;
-  else
-    resColor = cvScalar(255 - 255 * nPins / nMaxPins, 255 - 255 * nPins / nMaxPins,
-    255 - 255 * nPins / nMaxPins);
-
-  cvRectangle(IMG, start, finish, resColor, CV_FILLED);
-  Refresh();
-}
-
-void HPlotter::PlotMuLevel(double level, double scaling, Color color)
-{
-  if (!IsEnabled())
+  double maxKi = m_hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 0.0);
+  if (!IsEnabled() || maxKi <= 0.0) 
     return;
 
-  CvPoint start, finish;
-  start.x = HNormalX2ImageX(0.0);
-  start.y = HNormalY2ImageY(level * scaling);
-  finish.x = m_Data->histogramImg->width;
-  finish.y = HNormalY2ImageY(level * scaling);
-  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+  //FIXME: find proper place
+  InitializeHistogramWindow();
 
-  //print mu level value
-  CvFont font;
-  cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, 0.5, 0.5);
-  char value[256];
-  sprintf(value, "%.1f", level);
-  cvPutText(m_Data->histogramImg, value, start, &font, GetCvColor(Color_Black));
+  CvPoint start, finish;
+  double meanK = 0.0;
+
+  for (int i = 0; i < nNets; i++)
+  {
+    meanK += x[2*nClusters + i];
+    start.x = HNormalX2ImageX((double)i/(double)nNets);
+    start.y = HNormalY2ImageY(0.0);
+    finish.x = start.x;
+    finish.y = HNormalY2ImageY(x[2*nClusters + i]/maxKi);
+    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+  }
+
+  //plot one line
+  start.x  = HNormalX2ImageX(0.0);
+  finish.x = HNormalX2ImageX(1.0);
+  start.y  = HNormalY2ImageY(1.0/maxKi);
+  finish.y = HNormalY2ImageY(1.0/maxKi);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
+
+  //plot mean ki
+  meanK /= nNets;
+  start.x  = HNormalX2ImageX(0.0);
+  finish.x = HNormalX2ImageX(1.0);
+  start.y  = HNormalY2ImageY(meanK/maxKi);
+  finish.y = HNormalY2ImageY(meanK/maxKi);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
 }
 
 void HPlotter::PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color)
@@ -1163,22 +1035,205 @@ void HPlotter::PlotMu(double mu, int x, double scaling, Color color)
   cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
 }
 
-void HPlotter::ClearHistogram()
+void HPlotter::PlotMuLevel(double level, double scaling, Color color)
+{
+  if (!IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  start.x = HNormalX2ImageX(0.0);
+  start.y = HNormalY2ImageY(level * scaling);
+  finish.x = m_Data->histogramImg->width;
+  finish.y = HNormalY2ImageY(level * scaling);
+  cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+
+  //print mu level value
+  CvFont font;
+  cvInitFont(&font, CV_FONT_HERSHEY_COMPLEX, 0.5, 0.5);
+  char value[256];
+  sprintf(value, "%.1f", level);
+  cvPutText(m_Data->histogramImg, value, start, &font, GetCvColor(Color_Black));
+}
+
+//Draw methods
+void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col)
 {
   if (IsEnabled())
   {
-    if (!m_isHistogramDestroyed)
-    {
-      cvSet(m_Data->histogramImg, cvScalar(255.0, 255.0, 255.0));
-    }
+    CvPoint start, finish;
+    start.x = DesignX2ImageX(x1);
+    start.y = DesignY2ImageY(y1);
+    finish.x = DesignX2ImageX(x2);
+    finish.y = DesignY2ImageY(y2);
+    cvLine(IMG, start, finish, GetCvColor(col), 1);
+    _AutoRefresh();
   }
 }
 
-void HPlotter::RefreshHistogram(WaitTime waitTime)
+void HPlotter::DrawCircle(double x, double y, int radius, Color col)
 {
   if (IsEnabled())
   {
-    cvShowImage(m_Data->histogramWindowName.c_str(), m_Data->histogramImg);
-    cvWaitKey(waitTime);
+    CvPoint center;
+    center.x = DesignX2ImageX(x);
+    center.y = DesignY2ImageY(y);
+    cvCircle(IMG, center, radius, GetCvColor(col), 2);
+    _AutoRefresh();
   }
+}
+
+void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col)
+{
+  if (IsEnabled())
+  {
+    CvPoint start, finish;
+    start.x = DesignX2ImageX(x1);
+    start.y = DesignY2ImageY(y1);
+    finish.x = DesignX2ImageX(x2);
+    finish.y = DesignY2ImageY(y2);
+    cvRectangle(IMG, start, finish, GetCvColor(col), 1);
+    _AutoRefresh();
+  }
+}
+
+void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col)
+{
+  if (IsEnabled())
+  {
+    CvPoint start, finish;
+    start.x = DesignX2ImageX(x1);
+    start.y = DesignY2ImageY(y1);
+    finish.x = DesignX2ImageX(x2);
+    finish.y = DesignY2ImageY(y2);
+    cvRectangle(IMG, start, finish, GetCvColor(col), CV_FILLED);
+    _AutoRefresh();
+  }
+}
+
+void HPlotter::DrawTileWires(double x1, double y1, double x2, double y2, int nLines, int nMaxLines)
+{
+  if (!IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  start.x = DesignX2ImageX(x1);
+  start.y = DesignY2ImageY(y1);
+  finish.x = DesignX2ImageX(x2);
+  finish.y = DesignY2ImageY(y2);
+  CvScalar minColor = cvScalar(255.0, 255.0, 255.0);
+  CvScalar maxColor = cvScalar(0.0, 0.0, 0.0);
+  CvScalar resColor;
+
+  if (nLines >= nMaxLines)
+    resColor = maxColor;
+  else
+    resColor = cvScalar(255 - 255 * nLines / nMaxLines, 255 - 255 * nLines / nMaxLines,
+    255 - 255 * nLines / nMaxLines);
+  //resColor = cvScalar(255 * nLines / nMaxLines, 255 * nLines / nMaxLines, 255 * nLines / nMaxLines);
+
+  cvRectangle(IMG, start, finish, resColor, CV_FILLED);
+  _AutoRefresh();
+}
+
+void HPlotter::DrawTilePins(double x1, double y1, double x2, double y2, int nPins, int nMaxPins)
+{
+  if (!IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  start.x = DesignX2ImageX(x1);
+  start.y = DesignY2ImageY(y1);
+  finish.x = DesignX2ImageX(x2);
+  finish.y = DesignY2ImageY(y2);
+  CvScalar minColor = cvScalar(255.0, 255.0, 255.0);
+  CvScalar maxColor = cvScalar(0.0, 0.0, 0.0);
+  CvScalar resColor;
+
+  if (nPins >= nMaxPins)
+    resColor = maxColor;
+  else
+    resColor = cvScalar(255 - 255 * nPins / nMaxPins, 255 - 255 * nPins / nMaxPins,
+    255 - 255 * nPins / nMaxPins);
+
+  cvRectangle(IMG, start, finish, resColor, CV_FILLED);
+  _AutoRefresh();
+}
+
+bool HPlotter::_IsEnabled()
+{
+  return m_hd.cfg.ValueOf("plotter.enabled", false);
+}
+
+void HPlotter::_AutoRefresh()
+{
+  if (!IsEnabled())
+    return;
+
+  if (m_Data->drawingsNum++ % m_Data->autoRefreshStep == 0)
+  {
+    Refresh(NO_WAIT);
+  }
+}
+
+Color HPlotter::_GetCellColor(HCell plotCell)
+{
+  HCellWrapper cell = m_hd[plotCell];
+
+  static TemplateTypes<HMacroType>::vector bufferType;
+  static bool onlyOnce = true;
+  if (onlyOnce)
+  {
+    //get types of buffers
+    const char* bufferName = m_hd.cfg.ValueOf("GlobalPlacement.bufferName", (const char*)"INVX1");
+    bufferType.push_back(Utils::FindMacroTypeByName(m_hd, bufferName));
+
+    string sBufferList = m_hd.cfg.ValueOf("New_Buffering.BufferList", "");
+    unsigned int n = m_hd.cfg.ValueOf("New_Buffering.BufferListLength", 0);
+    string* bufferList = NULL;
+    if (n > 0)
+    {
+      bufferList = new string [n];     
+      for (unsigned int i = 0, j = 0, t = 0; (i < sBufferList.length()) && (j < n); i++, t++)
+      {
+        if(sBufferList[i] != ',')
+          bufferList[j].push_back(sBufferList[i]);
+        else
+        {
+          t = -1;
+          j++;
+        }
+      }
+
+      string macro;
+
+      for (HMacroTypes::EnumeratorW macroTypeEW = m_hd.MacroTypes.GetEnumeratorW(); macroTypeEW.MoveNext();)
+      {
+        if (macroTypeEW.Type() == MacroType_BUF)
+        {
+          macro = macroTypeEW.Name();
+          bool isbuf = false;
+          for (int i = 0; (i < n) && !isbuf; i++)
+            if (macro == bufferList[i])
+              isbuf = true;
+          if (!isbuf)
+            continue;
+
+          bufferType.push_back(Utils::FindMacroTypeByName(m_hd, macro));
+        }
+      }
+    }
+
+    onlyOnce = false;
+  }
+
+  static Color combCellBackColor = Color_LightBlue;
+  static Color specCellBackColor = Color_LightGreen;
+  static Color seqCellBackColor  = Color_Aqua;
+  static Color bufferColor       = Color_Yellow;
+
+  HMacroType cellType = m_hd.Cells.Get<HCell::MacroType, HMacroType>(cell);
+  if (find(bufferType.begin(), bufferType.end(), cellType) < bufferType.end())
+    return bufferColor;
+  else
+    return cell.IsSpecial() ? specCellBackColor : cell.IsSequential() ? seqCellBackColor :  combCellBackColor;
 }
