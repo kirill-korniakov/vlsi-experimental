@@ -1241,10 +1241,6 @@
 					Name="ObjectivesConstraints"
 					>
 					<File
-						RelativePath="..\src\GlobalPlacement\BorderPenalty.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\GlobalPlacement\ObjectivesConstraints.cpp"
 						>
 					</File>
@@ -10186,10 +10182,6 @@
 				<Filter
 					Name="ObjectivesConstraints"
 					>
-					<File
-						RelativePath="..\include\GlobalPlacement\BorderPenalty.h"
-						>
-					</File>
 					<File
 						RelativePath="..\include\GlobalPlacement\ObjectivesConstraints.h"
 						>

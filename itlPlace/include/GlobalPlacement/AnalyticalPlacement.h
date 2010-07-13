@@ -16,6 +16,9 @@ namespace AnalyticalGlobalPlacement
     TAO_SOLVER& tao, TAO_APPLICATION& taoapp);
   
   int Relaxation(HDesign& hd, ClusteringInformation& ci, int metaIteration);
+
+  void ExportWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ); 
+
   int Interpolation(HDesign& hd, ClusteringInformation& ci);
   
   int Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, TAO_APPLICATION taoapp, 

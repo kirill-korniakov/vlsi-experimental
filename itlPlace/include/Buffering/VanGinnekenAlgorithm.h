@@ -9,7 +9,7 @@
 #include "HPinType.h"
 #include "HNet.h"
 
-class AppCtx;
+struct AppCtx;
 class HWirePhysicalParams;
 
 #define	INFINITY	20000000000.0

@@ -21,6 +21,8 @@ namespace Aux
             double& a1,
             double& a2);
 
+  double correlation(double* x, double* y, int n);
+
   template<class T>
   T Factorial(T n)
   {

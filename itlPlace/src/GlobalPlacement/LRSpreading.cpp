@@ -12,7 +12,6 @@ void LRS_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 void UpdateLRSpreadingMu(HDesign& hd, AppCtx& context, int iterate)
 {
   context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-  context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
 
   if (context.useLRSpreading)
   {

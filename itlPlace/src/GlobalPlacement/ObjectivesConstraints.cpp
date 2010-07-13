@@ -8,6 +8,14 @@
 #include "time.h"
 #include "omp.h"
 
+void SetGradientToZero(double* gradient, int nComponents)
+{
+    for (int i = 0; i < nComponents; i++)
+    {
+        gradient[i] = 0.0;
+    }
+}
+
 void NullCriteriaValues(AppCtx* context) 
 {
     context->criteriaValues.objective = 0.0;
@@ -18,6 +26,11 @@ void NullCriteriaValues(AppCtx* context)
     context->criteriaValues.gHPWL = 0.0;
     context->criteriaValues.gLR = 0.0;
     context->criteriaValues.gSpr = 0.0;
+
+    SetGradientToZero(context->gLSE, context->nVariables);
+    SetGradientToZero(context->gSOD, context->nVariables);
+    SetGradientToZero(context->gLR,  context->nVariables);
+    SetGradientToZero(context->gQS,  context->nVariables);
 }
 
 //TODO: think about more artificial method
@@ -51,7 +64,6 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
 
     double penaltyValue  = 0.0;
     penaltyValue = SpreadingPenalty(context, x);
-    //ALERT("penaltyValue = %f", penaltyValue));
 
     //calculate mu value
     context->spreadingData.spreadingWeightInitial = 
@@ -64,16 +76,6 @@ void CalcMuInitial(PetscScalar *x, AppCtx* context)
         {
             context->spreadingData.muBinsPen[i] = context->spreadingData.spreadingWeightInitial;
         }
-    }
-
-    context->muBorderPenalty = context->spreadingData.spreadingWeightInitial;
-}
-
-void SetGradientToZero(double* gradient, int nComponents)
-{
-    for (int i = 0; i < nComponents; i++)
-    {
-        gradient[i] = 0;
     }
 }
 
@@ -185,74 +187,14 @@ void CalcGradValues( AppCtx* context )
     //ALERT("Spr gradient value: %.3e", context->criteriaValues.gSpr);
 }
 
-double correlation(double* x, double* y, int n)
-{
-    double result;
-    int i;
-    double xmean;
-    double ymean;
-    double s;
-    double xv;
-    double yv;
-    double t1;
-    double t2;
-
-    xv = 0;
-    yv = 0;
-    if( n<=1 )
-    {
-        result = 0;
-        return result;
-    }
-
-    //
-    // Mean
-    //
-    xmean = 0;
-    ymean = 0;
-    for(i = 0; i <= n-1; i++)
-    {
-        xmean = xmean+x[i];
-        ymean = ymean+y[i];
-    }
-    xmean = xmean/n;
-    ymean = ymean/n;
-
-    //
-    // numerator and denominator
-    //
-    s = 0;
-    xv = 0;
-    yv = 0;
-    for(i = 0; i <= n-1; i++)
-    {
-        t1 = x[i]-xmean;
-        t2 = y[i]-ymean;
-        xv = xv + t1*t1;
-        yv = yv + t2*t2;
-        s = s+t1*t2;
-    }
-    double epsilon = 1.0e-100;
-    if( fabs(xv) < epsilon || fabs(yv) < epsilon )
-    {
-        result = 0;
-    }
-    else
-    {
-        result = s/(sqrt(xv)*sqrt(yv));
-    }
-    return result;
-}
-
 void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * gradient)
 {
     //PrintCoordinates(nClusterVariables, nBufferVariables, solution);
     //PrintDerivatives(nClusterVariables, nBufferVariables, gradient, true, true, false);
-    //ReportGradValues(context);
 
-    //ALERT("Corr gLSE&gLR %f\t", correlation(context->gLSE, context->gLR, context->nVariables));
-    //ALERT("Corr gLSE&gQS %f\t", correlation(context->gLSE, context->gQS, context->nVariables));
-    //ALERT("Corr gLR&gQS %f\t", correlation(context->gLR, context->gQS, context->nVariables));
+    //ALERT("Corr gLSE&gLR %f\t", Aux::correlation(context->gLSE, context->gLR, context->nVariables));
+    //ALERT("Corr gLSE&gQS %f\t", Aux::correlation(context->gLSE, context->gQS, context->nVariables));
+    //ALERT("Corr gLR&gQS %f\t", Aux::correlation(context->gLR, context->gQS, context->nVariables));
 
     static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.plotSolverState", false);
     if (plotSolverState)
@@ -276,21 +218,12 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 {
     AppCtx* context = (AppCtx*)ctx;
 
-    int nClusterVariables = 2 * context->ci->mCurrentNumberOfClusters;
-    int nBufferVariables = context->ci->netList.size();
-
-    //get pointers to vector data
     PetscScalar *solution, *gradient;
     iCHKERRQ VecGetArray(X, &solution);
     iCHKERRQ VecGetArray(G, &gradient);
 
     NullCriteriaValues(context);
-
-    SetGradientToZero((double*)gradient, context->nVariables);
-    SetGradientToZero(context->gLSE, context->nVariables);
-    SetGradientToZero(context->gSOD, context->nVariables);
-    SetGradientToZero(context->gLR,  context->nVariables);
-    SetGradientToZero(context->gQS,  context->nVariables);
+    SetGradientToZero((double*)gradient, context->nVariables);    
 
     #pragma omp parallel sections
     {
@@ -332,7 +265,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 
     //normalize gradients
     if (context->useSumOfDelays)
-        ScaleBufferGradients(nClusterVariables, context->nVariables, context);
+        ScaleBufferGradients(2 * context->ci->mCurrentNumberOfClusters, context->nVariables, context);
 
     for (int i = 0; i < context->nVariables; i++)
     {
@@ -341,6 +274,8 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
         gradient[i] += context->gLR[i];
         gradient[i] += context->gQS[i];
     }
+
+    CalcGradValues(context);
 
     iCHKERRQ VecRestoreArray(X, &solution);
     iCHKERRQ VecRestoreArray(G, &gradient);

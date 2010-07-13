@@ -93,6 +93,66 @@ namespace Aux
 	  delete [] A;
   }
 
+  //NOTE: stolen from alglib-2.6.0.cpp.zip 
+  double correlation(double* x, double* y, int n)
+  {
+      double result;
+      int i;
+      double xmean;
+      double ymean;
+      double s;
+      double xv;
+      double yv;
+      double t1;
+      double t2;
+
+      xv = 0;
+      yv = 0;
+      if( n<=1 )
+      {
+          result = 0;
+          return result;
+      }
+
+      //
+      // Mean
+      //
+      xmean = 0;
+      ymean = 0;
+      for(i = 0; i <= n-1; i++)
+      {
+          xmean = xmean+x[i];
+          ymean = ymean+y[i];
+      }
+      xmean = xmean/n;
+      ymean = ymean/n;
+
+      //
+      // numerator and denominator
+      //
+      s = 0;
+      xv = 0;
+      yv = 0;
+      for(i = 0; i <= n-1; i++)
+      {
+          t1 = x[i]-xmean;
+          t2 = y[i]-ymean;
+          xv = xv + t1*t1;
+          yv = yv + t2*t2;
+          s = s+t1*t2;
+      }
+      double epsilon = 1.0e-100;
+      if( fabs(xv) < epsilon || fabs(yv) < epsilon )
+      {
+          result = 0;
+      }
+      else
+      {
+          result = s/(sqrt(xv)*sqrt(yv));
+      }
+      return result;
+  }
+
   void GetApplicationTimeStamp(char* timeString)
   {
     time_t ltime = Logger::GetStartTime();

@@ -119,10 +119,10 @@ double LR(AppCtx* context, PetscScalar* solution)
         double LSE = CalcNetLSE(context, solution, netIdx);
         double greenTerm = GetGreenTerm(context, solution, netIdx);
 
-        termTWL += context->LRdata.alphaTWL * LSE;
+        termTWL += LSE;
         termTNS += braces * LSE + greenTerm;
     }
-    context->criteriaValues.hpwl += termTWL;
+    context->criteriaValues.hpwl += context->LRdata.alphaTWL * termTWL;
     context->criteriaValues.lr += termTNS;
 
     return termTWL + termTNS;
@@ -194,7 +194,5 @@ void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
     PrecalcExponents(context, solution);
 
     LR(context, solution);
-
-    int nClusterVariables = 2 * context->ci->mCurrentNumberOfClusters;
-    AddLRGradient(context, nClusterVariables, solution);
+    AddLRGradient(context, 2 * context->ci->mCurrentNumberOfClusters, solution);
 }

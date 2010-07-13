@@ -368,6 +368,17 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
     }
 }
 
+void AnalyticalGlobalPlacement::ExportWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ) 
+{
+    FILE* resultFile = fopen("Before relax", "a");
+    for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
+    {
+        fprintf(resultFile, "%f\n", netListIter->weight);
+    }
+    fprintf(resultFile, "END\n");
+    fclose(resultFile);
+}
+
 int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation& ci)
 {
     //TODO: consider terminals during interpolation??
@@ -548,18 +559,12 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
     context.Initialize(hd, ci);
     iCHKERRQ InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp);
+    
     ReportIterationInfo(ci, context);
-    ReportBinGridInfo(context);
+    ReportBinGridInfo(context);   
+    ExportWeights(netListIter, ci, i);
 
     //SOLVE THE PROBLEM
-    FILE* resultFile = fopen("Before relax", "a");
-    for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
-    {
-        fprintf(resultFile, "%f\n", netListIter->weight);
-    }
-    fprintf(resultFile, "END\n");
-    fclose(resultFile);
-
     iCHKERRQ Solve(hd, ci, context, taoapp, tao, x, metaIteration);
     ReportTimes();
 
@@ -580,7 +585,6 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
 void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
 {
     context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-    context.muBorderPenalty *= hd.cfg.ValueOf("TAOOptions.muBorderPenaltyMultiplier", 2.0);
 
     UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
 

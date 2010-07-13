@@ -219,17 +219,15 @@ void PlacementQualityAnalyzer::Report()
         tf.SetCell(metricsInfo[idx].column, i->metrics[idx]);
   }
 
-  //TODO: embed properly
-  //This code shows improvement in percents, but right now there are problems with formatting.
+  //TODO: implement disabling
   QualityList::iterator initial = m_experiments.begin();
-
   for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
   {
 	  tf.NewRow();
 	  tf.SetCell(0, i->id);
 
       for (int idx = 0; idx < __MetricsNum; idx++)
-          tf.SetCell(metricsInfo[idx].column, i->metrics[MetricObjective] / initial->metrics[MetricObjective] * 100);
+          tf.SetCell(metricsInfo[idx].column, i->metrics[idx] / initial->metrics[idx] * 100);
   }
 
   WRITELINE("");

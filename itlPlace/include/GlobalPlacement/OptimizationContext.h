@@ -40,7 +40,6 @@ struct AppCtx
   LRData    LRdata;
   SpreadingData spreadingData;
   
-  double    muBorderPenalty;
   double    borderPenaltyVal;
 
   int*      clusterIdx2solutionIdxLUT;
