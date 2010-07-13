@@ -3,7 +3,6 @@
 #include "SumOfDelays.h"
 #include "LagrangianRelaxation.h"
 #include "Spreading.h"
-#include "BorderPenalty.h"
 
 #include "time.h"
 #include "omp.h"
