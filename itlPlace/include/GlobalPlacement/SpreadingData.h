@@ -26,7 +26,7 @@ struct BinGrid
   int     nBins;
 };
 
-struct SpreadingData
+struct SprData
 {
   BinGrid   binGrid;
 
@@ -38,14 +38,15 @@ struct SpreadingData
   double    invPSX;
   double    invPSY;
 
-  double    spreadingWeightInitial;
-  double    spreadingWeight;
+  double    sprWInitial;
   double*   muBinsPen;
 
   double*   binsPenaltyValues;
   double*   individualBinsDiscrepancy;
 
-  SpreadingData()
+  bool useUnidirectSpreading;
+
+  SprData()
   {
     binGrid.bins = 0;
     clusterPotentialOverBins = 0;

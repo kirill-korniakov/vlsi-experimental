@@ -1226,6 +1226,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\GlobalPlacement\AnalyticalPlacementReporting.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\GlobalPlacement\KiRoutines.cpp"
 					>
 				</File>
@@ -1235,6 +1239,10 @@
 				</File>
 				<File
 					RelativePath="..\src\GlobalPlacement\RandomPlacement.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\GlobalPlacement\WeightsRoutines.cpp"
 					>
 				</File>
 				<Filter

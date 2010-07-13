@@ -13,14 +13,18 @@ struct CriteriaValues
 {
     double objective;
 
-    double hpwl;
-    double sod;
-    double spreading;
-    double lr;
+    double lse; double* gLSE; double gLSENorm; 
+    double sod; double* gSOD;                  
+    double spr; double* gQS;  double gSprNorm; 
+    double lr;  double* gLR;  double gLRNorm;  
+};
 
-    double gHPWL;
-    double gSpr;
-    double gLR;
+struct Weights
+{
+    double lseW;
+    double sodW;
+    double sprW;
+    double lrW;
 };
 
 // User-defined TAO application context - contains data needed by the 
@@ -33,25 +37,18 @@ struct AppCtx
   HDesign*                hd;
   ClusteringInformation*  ci;
 
-  int nVariables;
-
+  int   nVariables;
+  int*  netListSizes;  
+  int*  clusterIdx2solutionIdxLUT;
+  int*  solutionIdx2clusterIdxLUT;
+  
   LSEData   LSEdata;
   SODData   SODdata;
   LRData    LRdata;
-  SpreadingData spreadingData;
-  
-  double    borderPenaltyVal;
-
-  int*      clusterIdx2solutionIdxLUT;
-  int*      solutionIdx2clusterIdxLUT;
-
-  int*      netListSizes;
+  SprData   sprData;
 
   CriteriaValues criteriaValues;
-  double*   gLSE;
-  double*   gSOD;
-  double*   gLR;
-  double*   gQS;
+  Weights weights;
 
   bool useLogSumExp;
   bool useSumOfDelays;
@@ -59,10 +56,10 @@ struct AppCtx
 
   bool useQuadraticSpreading;
   bool useLRSpreading;
-  bool useUnidirectSpreading;
 
   bool useBorderBounds;
 
+  //TODO: possibly we can eliminate this parameter
   bool useNetWeights;
 };
 

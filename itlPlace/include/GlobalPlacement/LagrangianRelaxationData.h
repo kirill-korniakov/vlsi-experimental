@@ -14,7 +14,6 @@ struct NetLRData
 class LRData
 {
  public:
-  double alphaTWL;
   double c;
   double r;
   std::vector<NetLRData> netLRData;

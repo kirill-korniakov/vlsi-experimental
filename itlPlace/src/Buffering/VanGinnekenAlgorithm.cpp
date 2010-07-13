@@ -183,27 +183,27 @@ void DetermineBordersOfBufferPotential(int& min_col, int& max_col,
                                        int& min_row, int& max_row,
                                        BufferPositions& bufferPositions, AppCtx* context)
 {
-  BinGrid& binGrid = context->spreadingData.binGrid;
+  BinGrid& binGrid = context->sprData.binGrid;
 
   min_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() - 
-    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+    context->sprData.potentialRadiusX) / binGrid.binWidth));
   max_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() + 
-    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+    context->sprData.potentialRadiusX) / binGrid.binWidth));
   min_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() - 
-    context->spreadingData.potentialRadiusY) / binGrid.binHeight));    
+    context->sprData.potentialRadiusY) / binGrid.binHeight));    
   max_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() + 
-    context->spreadingData.potentialRadiusY) / binGrid.binHeight));
+    context->sprData.potentialRadiusY) / binGrid.binHeight));
 
   MoveBinIndexesIntoBorders(context, min_col, min_row, max_col, max_row);
 }
 
 double CalcBellShapedFunction(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
 {
-  double potentialRadiusX = context->spreadingData.potentialRadiusX;
-  double potentialRadiusY = context->spreadingData.potentialRadiusY;
-  BinGrid& binGrid = context->spreadingData.binGrid;
-  double invPSX = context->spreadingData.invPSX;
-  double invPSY = context->spreadingData.invPSY;
+  double potentialRadiusX = context->sprData.potentialRadiusX;
+  double potentialRadiusY = context->sprData.potentialRadiusY;
+  BinGrid& binGrid = context->sprData.binGrid;
+  double invPSX = context->sprData.invPSX;
+  double invPSY = context->sprData.invPSY;
 
   double potX = 0;
   double potY = 0;
@@ -255,7 +255,7 @@ int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVaria
       {
         double bsf = CalcBellShapedFunction(context, colIdx, rowIdx, *pos);
 
-        context->spreadingData.binGrid.bins[rowIdx][colIdx].sumBufPotential = bsf;
+        context->sprData.binGrid.bins[rowIdx][colIdx].sumBufPotential = bsf;
       }
     }// loop over affected bins
   }
@@ -274,11 +274,11 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
 
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(design));
 
-  for (int i = 0; i < context->spreadingData.binGrid.nBinRows; ++i)
+  for (int i = 0; i < context->sprData.binGrid.nBinRows; ++i)
   {
-    for (int j = 0; j < context->spreadingData.binGrid.nBinCols; ++j)
+    for (int j = 0; j < context->sprData.binGrid.nBinCols; ++j)
     {
-      context->spreadingData.binGrid.bins[i][j].sumBufPotential = 0.0;
+      context->sprData.binGrid.bins[i][j].sumBufPotential = 0.0;
     }
   }
 

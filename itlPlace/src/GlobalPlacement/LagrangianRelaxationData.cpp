@@ -58,7 +58,6 @@ void LRData::InitializeNets(HDesign& hd)
 
 void LRData::Initialize(HDesign& hd) 
 {
-    alphaTWL = hd.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.alphaTWL", 1.0);
     c = hd.RoutingLayers.Physics.LinearC;
     r = hd.RoutingLayers.Physics.RPerDist;
     actualMus = new TimingPointMus(hd);

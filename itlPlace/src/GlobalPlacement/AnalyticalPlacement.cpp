@@ -270,79 +270,6 @@ void AnalyticalGlobalPlacement::GetVariablesValues(ClusteringInformation& ci, Ve
     GetKValues(ci, x);
 }
 
-void AnalyzeMovementFromInitialPoint(HDesign& hd, ClusteringInformation& ci)
-{
-    double minX = hd.Circuit.PlacementMinX();
-    double maxX = hd.Circuit.PlacementMaxX();
-    double minY = hd.Circuit.PlacementMinY();
-    double maxY = hd.Circuit.PlacementMaxY();
-
-    int    nUnmoved = 0;
-    int    nMoved = 0;
-    double averageMovement = 0.0;
-    double movement = 0.0;
-
-    int clusterIdx = -1;
-    while (GetNextActiveClusterIdx(&ci, clusterIdx))
-    {
-        movement = sqrt((ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)*
-            (ci.clusters[clusterIdx].xCoord - (minX + maxX) / 2.0)+
-            (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0)*
-            (ci.clusters[clusterIdx].yCoord - (minY + maxY) / 2.0));
-        if (movement < 0.01) //TODO: use macros for comparison
-        {
-            nUnmoved++;
-        }
-        else
-        {
-            nMoved++;
-            averageMovement += movement;
-        }
-    }
-
-    averageMovement /= static_cast<double>(nUnmoved + nMoved);
-    ALERT("Number of unmoved clusters %d", nUnmoved);
-    ALERT("Average movement %f", averageMovement);
-}
-
-void PrintReason(TaoTerminateReason reason)
-{
-    char message[256];
-
-    switch(reason)
-    {
-    case 2:
-        strcpy(message, "(residual of optimality conditions <= absolute tolerance)");
-        break;
-    case 3:
-        strcpy(message, "(rtol)"); //residual of optimality conditions / initial residual of optimality conditions <= relative tolerance
-        break;
-    case 4:
-        strcpy(message, "(current trust region size <= trtol)");  
-        break;
-    case 5:
-        strcpy(message, "(function value <= fmin)");  
-        break;
-    case -2:
-        strcpy(message, "(its > maxits)");
-        break;
-    case -4:
-        strcpy(message, "(numerical problems)");
-        break;
-    case -5:
-        strcpy(message, "(number of function evaluations > maximum number of function evaluations)");
-        break;
-    case -6:
-        strcpy(message, "(line search failure)");
-        break;
-    default:
-        strcpy(message, "(unrecognized error)");  
-        break;
-    }
-    ALERT("TAO termination reason = %d %s", reason, message);
-}
-
-
 void AnalyticalGlobalPlacement::UpdateCellsCoordinates(HDesign& hd, ClusteringInformation& ci)
 {
     int clusterIdx = -1;
@@ -368,7 +295,7 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
     }
 }
 
-void AnalyticalGlobalPlacement::ExportWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ) 
+void AnalyticalGlobalPlacement::ExportNetWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ) 
 {
     FILE* resultFile = fopen("Before relax", "a");
     for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
@@ -461,26 +388,6 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
     return OK;
 }
 
-void AnalyticalGlobalPlacement::ReportBinGridInfo(AppCtx& context)
-{
-    ALERT("Bin grid: %d x %d", 
-        context.spreadingData.binGrid.nBinRows, 
-        context.spreadingData.binGrid.nBinCols);
-    ALERT("Bin width: %f\tBin height: %f", 
-        context.spreadingData.binGrid.binWidth, 
-        context.spreadingData.binGrid.binHeight);
-    ALERT("Potential radius X: %f\tPotential radius Y: %f", 
-        context.spreadingData.potentialRadiusX, 
-        context.spreadingData.potentialRadiusY);
-}
-
-void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, AppCtx& user)
-{
-    WRITELINE("");
-    ALERT("RELAXATION ITERATION STARTED");
-    ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
-    ALERT("Number of nets: %d", ci.netList.size());
-}
 
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
                                              Vec& x, Vec& xl, Vec& xu, TAO_SOLVER& tao, TAO_APPLICATION& taoapp)
@@ -497,8 +404,8 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
     // Set solution vec and an initial guess
     SetVariablesValues(ci, x);
 
-    hd.Plotter.ShowGlobalPlacement(false, context.spreadingData.binGrid.nBinRows, 
-        context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
+    hd.Plotter.ShowGlobalPlacement(false, context.sprData.binGrid.nBinRows, 
+        context.sprData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
 
     iCHKERRQ TaoAppSetInitialSolutionVec(taoapp, x);
 
@@ -524,25 +431,12 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
     /* Check for TAO command line options */
     iCHKERRQ TaoSetOptions(taoapp, tao);
 
-    /* Get the mu value */
     PetscScalar* solution;
     VecGetArray(x, &solution);
-    CalcMuInitial(solution, &context);
+    InitWeights(solution, &context);
     VecRestoreArray(x, &solution);
 
     return OK;
-}
-
-void AnalyticalGlobalPlacement::ReportTimes()
-{
-    ALERT("Performance counters:");
-    ALERT("  EXP Calc time = %f", GETSECONDSFROMTIME(expTime));
-    ALERT("  lseTime = %f", GETSECONDSFROMTIME(lseTime));
-    ALERT("  lseGradTime = %f", GETSECONDSFROMTIME(lseGradTime));
-    ALERT("  calcPotentialsTime = %f", GETSECONDSFROMTIME(calcPotentialsTime));
-    ALERT("  quadraticSpreading = %f", GETSECONDSFROMTIME(quadraticSpreading));
-    ALERT("  quadraticSpreadingGradTime = %f", GETSECONDSFROMTIME(quadraticSpreadingGradTime));
-    expTime = lseTime = lseGradTime = calcPotentialsTime = quadraticSpreading = quadraticSpreadingGradTime;
 }
 
 int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci, int metaIteration)
@@ -562,7 +456,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     
     ReportIterationInfo(ci, context);
     ReportBinGridInfo(context);   
-    ExportWeights(netListIter, ci, i);
+    ExportNetWeights(netListIter, ci, i);
 
     //SOLVE THE PROBLEM
     iCHKERRQ Solve(hd, ci, context, taoapp, tao, x, metaIteration);
@@ -580,69 +474,6 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     context.FreeMemory();
 
     return OK;
-}
-
-void UpdateWeights(AppCtx& context, HDesign& hd, int iterate)
-{
-    context.spreadingData.spreadingWeight *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-
-    UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
-
-    if (context.useLR)
-    {
-        context.LRdata.UpdateMultipliers(hd);
-        context.LRdata.alphaTWL *= hd.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.alphaTWLMultiplier", 1.0);
-    }
-}
-
-int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations)
-{
-    //Get termination information
-    double f;
-    double gnorm;
-    double cnorm;
-    double xdiff;
-    TaoTerminateReason reason;  // termination reason
-    iCHKERRQ TaoGetSolutionStatus(tao, &innerTAOIterations, &f, &gnorm, &cnorm, &xdiff, &reason);
-    PrintReason(reason);
-
-    return OK;
-}
-
-std::string format = "%.3e";
-
-void AnalyticalGlobalPlacement::ReportPreIterationInfo(HDesign &hd, AppCtx &context, int metaIteration, int iteration)
-{
-    //print iteration info
-    WRITELINE("");
-    ALERT(Color_LimeGreen, "TAO iteration %d.%d", metaIteration, iteration++);
-
-    if (context.useQuadraticSpreading)
-        ALERT("spreadingWeight = " + format, context.spreadingData.spreadingWeight);
-    if (context.useLR)
-        ALERT("alphaTWL = " + format, context.LRdata.alphaTWL);
-
-    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
-        context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-}
-
-void AnalyticalGlobalPlacement::ReportPostIterationInfo( AppCtx &context, HDesign &hd, int metaIteration, int iteration ) 
-{
-    //ALERT("Sum of Ki = " + format, CalculateSumOfK(hd, ci))
-    //PrintClusterCoordinates(&context);
-    
-    //std::string defName = Aux::CreateCoolFileName("GP_Iters/", hd.Circuit.Name() + "_" + Aux::IntToString(iteration - 1), "def");
-    //ExportDEF(hd, defName);
-    
-    //hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false), 
-    //    context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_3_SECONDS);
-
-    if (hd.cfg.ValueOf("GlobalPlacement.saveTAOmilestones", false))
-    {
-        hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf("GlobalPlacement.plotWires", false),
-            context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols);
-        hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration));
-    }
 }
 
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
@@ -680,7 +511,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         }
 
         CalcGradValues(&context);
-        UpdateWeights(context, hd, 32);
+        UpdateWeights(hd, context, 32);
         
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
@@ -716,7 +547,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             }
         }
 
-        ReportPostIterationInfo(context, hd, metaIteration, iteration);
+        ReportPostIterationInfo(hd, context, metaIteration, iteration);
         iteration++;
 
         if (iteration > nOuterIters)

@@ -18,64 +18,18 @@ void SetGradientToZero(double* gradient, int nComponents)
 void NullCriteriaValues(AppCtx* context) 
 {
     context->criteriaValues.objective = 0.0;
-    context->criteriaValues.hpwl = 0.0;
+    context->criteriaValues.lse = 0.0;
     context->criteriaValues.lr = 0.0;
     context->criteriaValues.sod = 0.0;
-    context->criteriaValues.spreading = 0.0;
-    context->criteriaValues.gHPWL = 0.0;
-    context->criteriaValues.gLR = 0.0;
-    context->criteriaValues.gSpr = 0.0;
+    context->criteriaValues.spr = 0.0;
+    context->criteriaValues.gLSENorm = 0.0;
+    context->criteriaValues.gLRNorm = 0.0;
+    context->criteriaValues.gSprNorm = 0.0;
 
-    SetGradientToZero(context->gLSE, context->nVariables);
-    SetGradientToZero(context->gSOD, context->nVariables);
-    SetGradientToZero(context->gLR,  context->nVariables);
-    SetGradientToZero(context->gQS,  context->nVariables);
-}
-
-//TODO: think about more artificial method
-void CalcMuInitial(PetscScalar *x, AppCtx* context)
-{
-    //The following coefficient greatly affects quality of placement
-    //because it determines initial distribution of cells over bins. 
-    //We have to choose small value to keep good HPWL.
-    double spreadingWeightInitialMultiplier = context->hd->cfg.ValueOf("TAOOptions.spreadingWeightInitialMultiplier", 0.1);
-    PrecalcExponents(context, x);
-
-    double criteriaValue = 0.0;
-
-    NullCriteriaValues(context);
-
-    if (context->useLogSumExp)
-    {
-        LSE_AddObjectiveAndGradient(context, x);
-        criteriaValue = context->criteriaValues.hpwl;
-    }
-    else if (context->useSumOfDelays)
-    {
-        SOD_AddObjectiveAndGradient(context, x);
-        criteriaValue = context->criteriaValues.sod;
-    }
-    else if (context->useLR)
-    {
-        LR_AddObjectiveAndGradient(context, x);
-        criteriaValue = context->criteriaValues.hpwl + context->criteriaValues.lr;
-    }
-
-    double penaltyValue  = 0.0;
-    penaltyValue = SpreadingPenalty(context, x);
-
-    //calculate mu value
-    context->spreadingData.spreadingWeightInitial = 
-        spreadingWeightInitialMultiplier * criteriaValue / penaltyValue;
-    context->spreadingData.spreadingWeight = context->spreadingData.spreadingWeightInitial;
-
-    if (context->useLRSpreading)
-    {
-        for (int i = 0; i < context->spreadingData.binGrid.nBins; ++i)
-        {
-            context->spreadingData.muBinsPen[i] = context->spreadingData.spreadingWeightInitial;
-        }
-    }
+    SetGradientToZero(context->criteriaValues.gLSE, context->nVariables);
+    SetGradientToZero(context->criteriaValues.gSOD, context->nVariables);
+    SetGradientToZero(context->criteriaValues.gLR,  context->nVariables);
+    SetGradientToZero(context->criteriaValues.gQS,  context->nVariables);
 }
 
 void PrintClusterCoordinates(AppCtx* context)
@@ -146,13 +100,13 @@ void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& contex
 
     for (int i = 0; i < nClusterVariables; i++)
     {
-        meanCoordGradient += context->gSOD[i];
+        meanCoordGradient += context->criteriaValues.gSOD[i];
     }
     meanCoordGradient /= double(nClusterVariables);
 
     for (int i = nClusterVariables; i < nVariables; i++)
     {
-        meanBuffGradient += context->gSOD[i];
+        meanBuffGradient += context->criteriaValues.gSOD[i];
     }
     meanBuffGradient /= double(nVariables - nClusterVariables);
 
@@ -160,7 +114,7 @@ void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& contex
 
     for (int i = nClusterVariables; i < nVariables; i++)
     {
-        context->gSOD[i] *= scale;
+        context->criteriaValues.gSOD[i] *= scale;
     }
 }
 
@@ -172,14 +126,14 @@ void CalcGradValues( AppCtx* context )
 
     for (int i = 0; i < context->nVariables; i++)
     {
-        gLSE += context->gLSE[i] * context->gLSE[i];
-        gLR += context->gLR[i] * context->gLR[i];
-        gSpreading += context->gQS[i] * context->gQS[i];
+        gLSE += context->criteriaValues.gLSE[i] * context->criteriaValues.gLSE[i];
+        gLR += context->criteriaValues.gLR[i] * context->criteriaValues.gLR[i];
+        gSpreading += context->criteriaValues.gQS[i] * context->criteriaValues.gQS[i];
     }
 
-    context->criteriaValues.gHPWL = sqrt(gLSE);
-    context->criteriaValues.gLR = sqrt(gLR);
-    context->criteriaValues.gSpr = sqrt(gSpreading);
+    context->criteriaValues.gLSENorm = sqrt(gLSE);
+    context->criteriaValues.gLRNorm = sqrt(gLR);
+    context->criteriaValues.gSprNorm = sqrt(gSpreading);
 
     //ALERT("LSE gradient value: %.3e", context->criteriaValues.gHPWL);
     //ALERT("LR  gradient value: %.3e", context->criteriaValues.gLR);
@@ -199,9 +153,11 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
     if (plotSolverState)
     {
         context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
-            context->spreadingData.binGrid.nBinRows, context->spreadingData.binGrid.nBinCols, 
+            context->sprData.binGrid.nBinRows, context->sprData.binGrid.nBinCols, 
             context->ci->netList.size(), 
-            (double*)solution, context->gLSE, context->gSOD, context->gLR, context->gQS, gradient);
+            (double*)solution, 
+            context->criteriaValues.gLSE, context->criteriaValues.gSOD, context->criteriaValues.gLR, context->criteriaValues.gQS, 
+            gradient);
 
         if (context->useSumOfDelays)
         {
@@ -255,10 +211,10 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
         }
     }
 
-    context->criteriaValues.objective = context->criteriaValues.hpwl + 
+    context->criteriaValues.objective = context->criteriaValues.lse + 
         context->criteriaValues.lr + 
         context->criteriaValues.sod + 
-        context->criteriaValues.spreading;
+        context->criteriaValues.spr;
 
     *f = context->criteriaValues.objective;
 
@@ -268,10 +224,10 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
 
     for (int i = 0; i < context->nVariables; i++)
     {
-        gradient[i] += context->gLSE[i];
-        gradient[i] += context->gSOD[i];
-        gradient[i] += context->gLR[i];
-        gradient[i] += context->gQS[i];
+        gradient[i] += context->criteriaValues.gLSE[i];
+        gradient[i] += context->criteriaValues.gSOD[i];
+        gradient[i] += context->criteriaValues.gLR[i];
+        gradient[i] += context->criteriaValues.gQS[i];
     }
 
     CalcGradValues(context);

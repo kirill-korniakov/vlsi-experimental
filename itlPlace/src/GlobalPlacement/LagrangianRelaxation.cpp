@@ -122,7 +122,7 @@ double LR(AppCtx* context, PetscScalar* solution)
         termTWL += LSE;
         termTNS += braces * LSE + greenTerm;
     }
-    context->criteriaValues.hpwl += context->LRdata.alphaTWL * termTWL;
+    context->criteriaValues.lse += context->weights.lseW * termTWL;
     context->criteriaValues.lr += termTNS;
 
     return termTWL + termTNS;
@@ -140,7 +140,7 @@ void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solut
     double LSE = CalcNetLSE(context, solution, netIdx);
     double gLSE = CalcNetLSEGradient(context, netIdx, idxInSolutionVector);
 
-    term0 = context->LRdata.alphaTWL * gLSE;
+    term0 = context->weights.lseW * gLSE;
     term1 = braces * gLSE;
 
     int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
@@ -171,8 +171,8 @@ void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solut
         }
     }
 
-    context->gLSE[idxInSolutionVector] += term0;
-    context->gLR[idxInSolutionVector] += term1 + term2 + term3;
+    context->criteriaValues.gLSE[idxInSolutionVector] += term0;
+    context->criteriaValues.gLR[idxInSolutionVector] += term1 + term2 + term3;
 }
 
 void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution)

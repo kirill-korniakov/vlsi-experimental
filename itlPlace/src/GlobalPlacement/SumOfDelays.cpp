@@ -93,5 +93,5 @@ void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
   expTime += finish - start;
 
   context->criteriaValues.sod += SumOfDelays(context, solution);;
-  AddSumOfDelaysGradient(context, solution, context->gSOD);
+  AddSumOfDelaysGradient(context, solution, context->criteriaValues.gSOD);
 }

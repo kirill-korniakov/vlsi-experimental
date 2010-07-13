@@ -6,10 +6,15 @@
 
 namespace Aux
 {
+  static const std::string SciFormat = "%.3e";
+
+  string CreateCoolFileName(string dirName, string fileName, string extension);
+  string IntToString(int intValue);
   string ChangeExtention(const string& filename, const char* newExt);
   bool FileExists(const string& strFilename);
   unsigned GetFileSize(const string& strFilename);
   string Format(const char* format, ...);
+  double correlation(double* x, double* y, int n);
 
   //linear regression for two variables
   void MNK(const double *index_1,
@@ -21,8 +26,7 @@ namespace Aux
             double& a1,
             double& a2);
 
-  double correlation(double* x, double* y, int n);
-
+  
   template<class T>
   T Factorial(T n)
   {
@@ -60,11 +64,6 @@ namespace Aux
       ::Swap(hash + 0, hash + 1);
   }
 
-  inline double dtoi(double x)
-  {    
-    return (int)floor(x + 0.5);
-  }
-
   inline int cool_dtoi(double x)
   {
     return (int)floor(x + 0.5);
@@ -74,9 +73,6 @@ namespace Aux
   {
     return x > 0 ? 1 : (x < 0) ? -1 : 0;
   }
-
-  string CreateCoolFileName(string dirName, string fileName, string extension);
-  string IntToString(int intValue);
 
   template<class MultipliersType>
   MultipliersType ScalarProduct(std::vector<MultipliersType> vec1, std::vector<MultipliersType> vec2)

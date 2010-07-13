@@ -24,10 +24,10 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   //x,y,ki
   nVariables = 2 * ci->mCurrentNumberOfClusters + ci->netList.size();
 
-  gLSE = new double[4*nVariables];
-  gSOD = gLSE + nVariables;
-  gLR  = gSOD + nVariables;
-  gQS  = gLR  + nVariables;
+  criteriaValues.gLSE = new double[4*nVariables];
+  criteriaValues.gSOD = criteriaValues.gLSE + nVariables;
+  criteriaValues.gLR  = criteriaValues.gSOD + nVariables;
+  criteriaValues.gQS  = criteriaValues.gLR  + nVariables;
 
   ConstructBinGrid(ahd, *this, 
     ahd.cfg.ValueOf("Clustering.desiredNumberOfClustersAtEveryBin", 10));
@@ -40,44 +40,45 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);
   useLR                 = ahd.cfg.ValueOf("GlobalPlacement.useLR", false);
   useQuadraticSpreading = ahd.cfg.ValueOf("GlobalPlacement.useQuadraticSpreading", false);
-  useUnidirectSpreading = ahd.cfg.ValueOf("GlobalPlacement.useUnidirectSpreading", false);
   useLRSpreading        = ahd.cfg.ValueOf("GlobalPlacement.useLRSpreading", false);
   useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)
-    LSEdata.Initialize(ahd, aci, spreadingData.binGrid.binWidth);
+    LSEdata.Initialize(ahd, aci, sprData.binGrid.binWidth);
   if (useSumOfDelays)
     SODdata.Initialize(ahd);
   if (useLR)
     LRdata.Initialize(ahd);
+
+  sprData.useUnidirectSpreading = ahd.cfg.ValueOf("GlobalPlacement.useUnidirectSpreading", false);
 }
 
 void AppCtx::FreeMemory()
 {
-  for (int j = 0; j < spreadingData.binGrid.nBinRows; ++j)
+  for (int j = 0; j < sprData.binGrid.nBinRows; ++j)
   {
-    delete [] spreadingData.binGrid.bins[j];
+    delete [] sprData.binGrid.bins[j];
   }
-  delete [] spreadingData.binGrid.bins;
+  delete [] sprData.binGrid.bins;
 
-  int maxAffectedRows = CalcMaxAffectedArea(spreadingData.potentialRadiusY, 
-    spreadingData.binGrid.binHeight);
+  int maxAffectedRows = CalcMaxAffectedArea(sprData.potentialRadiusY, 
+    sprData.binGrid.binHeight);
   for (int i = 0; i < maxAffectedRows; ++i)
   {
-    delete [] spreadingData.clusterPotentialOverBins[i];
+    delete [] sprData.clusterPotentialOverBins[i];
   }
-  delete [] spreadingData.clusterPotentialOverBins;
+  delete [] sprData.clusterPotentialOverBins;
 
   if (useLRSpreading)
   {
-    delete [] spreadingData.binsPenaltyValues;
-    delete [] spreadingData.muBinsPen;
-    delete [] spreadingData.individualBinsDiscrepancy;
+    delete [] sprData.binsPenaltyValues;
+    delete [] sprData.muBinsPen;
+    delete [] sprData.individualBinsDiscrepancy;
   }
 
   //TODO: check correctness of memory deletion
   delete[] LSEdata.precalcedExponents;
   delete[] netListSizes;
   delete[] solutionIdx2clusterIdxLUT;
-  delete[] gLSE;
+  delete[] criteriaValues.gLSE;
 }

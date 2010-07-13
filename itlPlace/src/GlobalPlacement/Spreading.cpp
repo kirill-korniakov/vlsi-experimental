@@ -9,7 +9,7 @@ using namespace std;
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row)
 {
-  BinGrid& binGrid = context->spreadingData.binGrid;
+  BinGrid& binGrid = context->sprData.binGrid;
 
   min_col = std::min(std::max(0, min_col), binGrid.nBinCols-1);
   min_row = std::min(std::max(0, min_row), binGrid.nBinRows-1);
@@ -21,16 +21,16 @@ void DetermineBordersOfClusterPotential(int& min_col, int& max_col,
                                         int& min_row, int& max_row,
                                         int i, PetscScalar* x, AppCtx* context)
 {
-  BinGrid& binGrid = context->spreadingData.binGrid;
+  BinGrid& binGrid = context->sprData.binGrid;
 
   min_col = (Aux::cool_dtoi((x[2*i+0] - context->hd->Circuit.PlacementMinX() - 
-    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+    context->sprData.potentialRadiusX) / binGrid.binWidth));
   max_col = (Aux::cool_dtoi((x[2*i+0] - context->hd->Circuit.PlacementMinX() + 
-    context->spreadingData.potentialRadiusX) / binGrid.binWidth));
+    context->sprData.potentialRadiusX) / binGrid.binWidth));
   min_row = (Aux::cool_dtoi((x[2*i+1] - context->hd->Circuit.PlacementMinY() - 
-    context->spreadingData.potentialRadiusY) / binGrid.binHeight));    
+    context->sprData.potentialRadiusY) / binGrid.binHeight));    
   max_row = (Aux::cool_dtoi((x[2*i+1] - context->hd->Circuit.PlacementMinY() + 
-    context->spreadingData.potentialRadiusY) / binGrid.binHeight));
+    context->sprData.potentialRadiusY) / binGrid.binHeight));
 
   MoveBinIndexesIntoBorders(context, min_col, min_row, max_col, max_row);
 }
@@ -38,11 +38,11 @@ void DetermineBordersOfClusterPotential(int& min_col, int& max_col,
 double CalcBellShapedFunction(AppCtx* context, int solutionIdx, int clusterIdx, 
                               int colIdx, int rowIdx, PetscScalar* x)
 {
-  double potentialRadiusX = context->spreadingData.potentialRadiusX;
-  double potentialRadiusY = context->spreadingData.potentialRadiusY;
-  BinGrid& binGrid = context->spreadingData.binGrid;
-  double invPSX = context->spreadingData.invPSX;
-  double invPSY = context->spreadingData.invPSY;
+  double potentialRadiusX = context->sprData.potentialRadiusX;
+  double potentialRadiusY = context->sprData.potentialRadiusY;
+  BinGrid& binGrid = context->sprData.binGrid;
+  double invPSX = context->sprData.invPSX;
+  double invPSY = context->sprData.invPSY;
 
   double potX = 0;
   double potY = 0;
@@ -94,11 +94,11 @@ void CalcBellShapedFuncAndDerivative(AppCtx* context, int solutionIdx, int clust
   gradY = 0;
   double _potY = 0;
 
-  double potentialRadiusX = context->spreadingData.potentialRadiusX;
-  double potentialRadiusY = context->spreadingData.potentialRadiusY;
-  BinGrid& binGrid = context->spreadingData.binGrid;
-  double invPSX = context->spreadingData.invPSX;
-  double invPSY = context->spreadingData.invPSY;
+  double potentialRadiusX = context->sprData.potentialRadiusX;
+  double potentialRadiusY = context->sprData.potentialRadiusY;
+  BinGrid& binGrid = context->sprData.binGrid;
+  double invPSX = context->sprData.invPSX;
+  double invPSY = context->sprData.invPSY;
 
   double dx = solution[2*solutionIdx+0] - binGrid.bins[rowIdx][colIdx].xCoord;
   double dy = solution[2*solutionIdx+1] - binGrid.bins[rowIdx][colIdx].yCoord;
@@ -140,8 +140,8 @@ void CalcBellShapedFuncAndDerivative(AppCtx* context, int solutionIdx, int clust
     _potY = sigy4 * (fabsdy - potentialRadiusY) * invPSY;
   }
 
-  residual = binGrid.bins[rowIdx][colIdx].sumPotential - context->spreadingData.desiredCellsAreaAtEveryBin;
-  if (context->useUnidirectSpreading)
+  residual = binGrid.bins[rowIdx][colIdx].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
+  if (context->sprData.useUnidirectSpreading)
   {
     if (residual > 0.0)
       multiplier = 2 * residual *
@@ -160,7 +160,7 @@ void CalcBellShapedFuncAndDerivative(AppCtx* context, int solutionIdx, int clust
 // calculate every cluster's potential
 void CalculatePotentials(AppCtx* context, PetscScalar* x)
 {
-  BinGrid& binGrid = context->spreadingData.binGrid;
+  BinGrid& binGrid = context->sprData.binGrid;
 
   //null the penalties
 
@@ -209,7 +209,7 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
       {
         double bsf = CalcBellShapedFunction(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x);
 
-        context->spreadingData.clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = bsf;
+        context->sprData.clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = bsf;
         currClusterTotalPotential += bsf;
       }
     }// loop over affected bins
@@ -230,7 +230,7 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
       for (int j = min_col; j <= max_col; ++j)
         binGrid.bins[k][j].sumPotential += 
         context->ci->clusters[clusterIdx].potentialMultiplier * 
-        context->spreadingData.clusterPotentialOverBins[k-min_row][j-min_col];
+        context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
   }
 
   double totalPotential = 0.0;
@@ -257,7 +257,7 @@ double SpreadingPenalty(AppCtx* context, PetscScalar* x)
   double spreadingPenalty = 0.0;
   double residual;
 
-  BinGrid& binGrid = context->spreadingData.binGrid;
+  BinGrid& binGrid = context->sprData.binGrid;
 
   if (context->useLRSpreading)
   {
@@ -268,21 +268,21 @@ double SpreadingPenalty(AppCtx* context, PetscScalar* x)
       for (int j = 0; j < binGrid.nBinCols; ++j)
       {
         binIdx = i * binGrid.nBinCols + j;
-        residual = binGrid.bins[i][j].sumPotential - context->spreadingData.desiredCellsAreaAtEveryBin;
+        residual = binGrid.bins[i][j].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
 
-        if (context->useUnidirectSpreading)
+        if (context->sprData.useUnidirectSpreading)
         {
           if (residual > 0.0)
           {
-            context->spreadingData.binsPenaltyValues[binIdx] = residual * residual;
+            context->sprData.binsPenaltyValues[binIdx] = residual * residual;
           }
         }
         else
         {
-          context->spreadingData.binsPenaltyValues[binIdx] = residual * residual;
+          context->sprData.binsPenaltyValues[binIdx] = residual * residual;
         }
 
-        spreadingPenalty += context->spreadingData.binsPenaltyValues[binIdx];
+        spreadingPenalty += context->sprData.binsPenaltyValues[binIdx];
       }
     } 
   }
@@ -292,8 +292,8 @@ double SpreadingPenalty(AppCtx* context, PetscScalar* x)
     {
       for (int j = 0; j < binGrid.nBinCols; ++j)
       {
-        residual = binGrid.bins[i][j].sumPotential - context->spreadingData.desiredCellsAreaAtEveryBin;
-        if (context->useUnidirectSpreading)
+        residual = binGrid.bins[i][j].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
+        if (context->sprData.useUnidirectSpreading)
         {
           if (residual > 0.0)
           {
@@ -338,7 +338,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
           CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
             gradX, gradY);
 
-          muBinsPen = context->spreadingData.muBinsPen[rowIdx * context->spreadingData.binGrid.nBinCols + colIdx];
+          muBinsPen = context->sprData.muBinsPen[rowIdx * context->sprData.binGrid.nBinCols + colIdx];
           gX += muBinsPen * gradX;
           gY += muBinsPen * gradY;
         }
@@ -369,8 +369,8 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
           double gradY;
           CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
             /*potX,*/ gradX, /*potY,*/ gradY);
-          gX += context->spreadingData.spreadingWeight * gradX;
-          gY += context->spreadingData.spreadingWeight * gradY;
+          gX += context->weights.sprW * gradX;
+          gY += context->weights.sprW * gradY;
         }
       }
 
@@ -383,13 +383,13 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
 void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution)
 {
   timetype start = GET_TIME_METHOD();
-  context->criteriaValues.spreading += 
-      context->spreadingData.spreadingWeight * SpreadingPenalty(context, solution);
+  context->criteriaValues.spr += 
+      context->weights.sprW * SpreadingPenalty(context, solution);
   timetype finish = GET_TIME_METHOD();
   quadraticSpreading += finish - start;
 
   start = GET_TIME_METHOD();
-  AddSpreadingPenaltyGradient(context, solution, context->gQS);
+  AddSpreadingPenaltyGradient(context, solution, context->criteriaValues.gQS);
   finish = GET_TIME_METHOD();
   quadraticSpreadingGradTime += finish - start;
 }

@@ -17,7 +17,7 @@ void DetermineDimensionsOfBinGrid(HDesign& hd, vector<Cluster>& clusters,
   double circuitAspectRatio = (maxX - minX) / (maxY - minY);
 
   binGrid.nBinRows = static_cast<int>(sqrt(circuitAspectRatio * nClusters/desiredNumberOfClustersAtEveryBin));
-  binGrid.nBinCols = static_cast<int>(Aux::dtoi(circuitAspectRatio * binGrid.nBinRows));
+  binGrid.nBinCols = static_cast<int>(Aux::cool_dtoi(circuitAspectRatio * binGrid.nBinRows));
 
   //WARNING: we need odd numbers, because cells will not move otherwise
   if (binGrid.nBinRows % 2 == 0) binGrid.nBinRows++; 
@@ -35,12 +35,12 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   else
     desiredNumberOfClustersAtEveryBin--;
 
-  BinGrid& binGrid = context.spreadingData.binGrid;
-  double& potentialRadiusX = context.spreadingData.potentialRadiusX;
-  double& potentialRadiusY = context.spreadingData.potentialRadiusY;
-  double& invPSX = context.spreadingData.invPSX;
-  double& invPSY = context.spreadingData.invPSY;
-  double**& clusterPotentialOverBins = context.spreadingData.clusterPotentialOverBins;
+  BinGrid& binGrid = context.sprData.binGrid;
+  double& potentialRadiusX = context.sprData.potentialRadiusX;
+  double& potentialRadiusY = context.sprData.potentialRadiusY;
+  double& invPSX = context.sprData.invPSX;
+  double& invPSY = context.sprData.invPSY;
+  double**& clusterPotentialOverBins = context.sprData.clusterPotentialOverBins;
 
   // Calculate current bin grid
   DetermineDimensionsOfBinGrid(hd, context.ci->clusters, context.ci->mCurrentNumberOfClusters, 
@@ -112,16 +112,16 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
 
   binGrid.nBins = binGrid.nBinCols * binGrid.nBinRows;
 
-  context.spreadingData.totalCellArea = 0.0;
+  context.sprData.totalCellArea = 0.0;
   for (int i = 0; i < static_cast<int>(context.ci->clusters.size()); ++i)
   {
     if (context.ci->clusters[i].isFake == false)
     {
-      context.spreadingData.totalCellArea += context.ci->clusters[i].area;
+      context.sprData.totalCellArea += context.ci->clusters[i].area;
     }
   }
-  context.spreadingData.desiredCellsAreaAtEveryBin = 
-    context.spreadingData.totalCellArea / binGrid.nBins;
+  context.sprData.desiredCellsAreaAtEveryBin = 
+    context.sprData.totalCellArea / binGrid.nBins;
 
   //if (useNetWeights)
   //{
@@ -135,11 +135,10 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   //}
   if (context.useLRSpreading)
   {
-    context.borderPenaltyVal    = 0.0;
-    context.spreadingData.binsPenaltyValues   = new double[binGrid.nBins * 3];
-    context.spreadingData.muBinsPen = 
-      context.spreadingData.binsPenaltyValues + binGrid.nBins;
-    context.spreadingData.individualBinsDiscrepancy = 
-      context.spreadingData.binsPenaltyValues + binGrid.nBins*2;
+    context.sprData.binsPenaltyValues   = new double[binGrid.nBins * 3];
+    context.sprData.muBinsPen = 
+      context.sprData.binsPenaltyValues + binGrid.nBins;
+    context.sprData.individualBinsDiscrepancy = 
+      context.sprData.binsPenaltyValues + binGrid.nBins*2;
   }
 }

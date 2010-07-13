@@ -207,14 +207,14 @@ void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
   expTime += finish - start;
 
   start = GET_TIME_METHOD();
-  context->criteriaValues.hpwl += LogSumExp(context, solution);
+  context->criteriaValues.lse += LogSumExp(context, solution);
   //ALERT("LSE = %f", addValue));
   finish = GET_TIME_METHOD();
   lseTime += finish - start;
 
   start = GET_TIME_METHOD();
   int nClusterVariables = 2 * context->ci->mCurrentNumberOfClusters;
-  AddLogSumExpGradient(context, nClusterVariables, solution, context->gLSE);
+  AddLogSumExpGradient(context, nClusterVariables, solution, context->criteriaValues.gLSE);
   finish = GET_TIME_METHOD();
   lseGradTime += finish - start;
 }

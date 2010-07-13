@@ -76,14 +76,14 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
   {
       pq.metrics[MetricObjective] = criteriaValues->objective;
 
-      pq.metrics[MetricObHPWL] = criteriaValues->hpwl;
+      pq.metrics[MetricObHPWL] = criteriaValues->lse;
       pq.metrics[MetricObLR] = criteriaValues->lr;
       pq.metrics[MetricObSOD] = criteriaValues->sod;
-      pq.metrics[MetricObSpr] = criteriaValues->spreading;
+      pq.metrics[MetricObSpr] = criteriaValues->spr;
 
-      pq.metrics[MetricGHPWL] = criteriaValues->gHPWL;
-      pq.metrics[MetricGLR] = criteriaValues->gLR;
-      pq.metrics[MetricGSpr] = criteriaValues->gSpr;
+      pq.metrics[MetricGHPWL] = criteriaValues->gLSENorm;
+      pq.metrics[MetricGLR] = criteriaValues->gLRNorm;
+      pq.metrics[MetricGSpr] = criteriaValues->gSprNorm;
   }
   else
   {
