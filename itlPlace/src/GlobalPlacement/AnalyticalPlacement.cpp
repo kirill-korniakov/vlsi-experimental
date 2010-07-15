@@ -510,7 +510,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             UpdateCellsCoordinates(hd, ci);
         }
 
-        CalcGradValues(&context);
+        CalcGradientsNorms(&context);
         UpdateWeights(hd, context, 32);
         
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))

@@ -369,8 +369,8 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
           double gradY;
           CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
             /*potX,*/ gradX, /*potY,*/ gradY);
-          gX += context->weights.sprW * gradX;
-          gY += context->weights.sprW * gradY;
+          gX += gradX;
+          gY += gradY;
         }
       }
 
@@ -383,8 +383,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
 void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution)
 {
   timetype start = GET_TIME_METHOD();
-  context->criteriaValues.spr += 
-      context->weights.sprW * SpreadingPenalty(context, solution);
+  context->criteriaValues.spr += SpreadingPenalty(context, solution);
   timetype finish = GET_TIME_METHOD();
   quadraticSpreading += finish - start;
 

@@ -23,8 +23,8 @@ struct Weights
 {
     double lseW;
     double sodW;
-    double sprW;
     double lrW;
+    double sprW;
 };
 
 // User-defined TAO application context - contains data needed by the 

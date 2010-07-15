@@ -92,33 +92,7 @@ void PrintDerivatives(int nClusterVariables, int nBufferVariables, double* gradi
     }
 }
 
-void ScaleBufferGradients(int nClusterVariables, int nVariables, AppCtx*& context)
-{
-    double meanCoordGradient = 0.0;
-    double meanBuffGradient = 0.0;
-    double scale = 0.0;
-
-    for (int i = 0; i < nClusterVariables; i++)
-    {
-        meanCoordGradient += context->criteriaValues.gSOD[i];
-    }
-    meanCoordGradient /= double(nClusterVariables);
-
-    for (int i = nClusterVariables; i < nVariables; i++)
-    {
-        meanBuffGradient += context->criteriaValues.gSOD[i];
-    }
-    meanBuffGradient /= double(nVariables - nClusterVariables);
-
-    scale = fabs(context->SODdata.gradientBalance * meanCoordGradient / meanBuffGradient);
-
-    for (int i = nClusterVariables; i < nVariables; i++)
-    {
-        context->criteriaValues.gSOD[i] *= scale;
-    }
-}
-
-void CalcGradValues( AppCtx* context )
+void CalcGradientsNorms( AppCtx* context )
 {
     double gLSE = 0;
     double gLR = 0;
@@ -169,17 +143,9 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
     }
 }
 
-int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ctx)
+void CalculateCostAndGradients(AppCtx* context, double* solution) 
 {
-    AppCtx* context = (AppCtx*)ctx;
-
-    PetscScalar *solution, *gradient;
-    iCHKERRQ VecGetArray(X, &solution);
-    iCHKERRQ VecGetArray(G, &gradient);
-
-    NullCriteriaValues(context);
-    SetGradientToZero((double*)gradient, context->nVariables);    
-
+    NullCriteriaValues(context);  
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -211,17 +177,30 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
         }
     }
 
+    ApplyWeights(context);
+
     context->criteriaValues.objective = context->criteriaValues.lse + 
         context->criteriaValues.lr + 
         context->criteriaValues.sod + 
         context->criteriaValues.spr;
 
+    CalcGradientsNorms(context);
+}
+
+int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ctx)
+{
+    AppCtx* context = (AppCtx*)ctx;
+
+    PetscScalar *solution;
+    iCHKERRQ VecGetArray(X, &solution);
+
+    CalculateCostAndGradients(context, solution);
+
     *f = context->criteriaValues.objective;
 
-    //normalize gradients
-    if (context->useSumOfDelays)
-        ScaleBufferGradients(2 * context->ci->mCurrentNumberOfClusters, context->nVariables, context);
-
+    PetscScalar *gradient;
+    iCHKERRQ VecGetArray(G, &gradient);
+    SetGradientToZero((double*)gradient, context->nVariables);
     for (int i = 0; i < context->nVariables; i++)
     {
         gradient[i] += context->criteriaValues.gLSE[i];
@@ -229,8 +208,6 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
         gradient[i] += context->criteriaValues.gLR[i];
         gradient[i] += context->criteriaValues.gQS[i];
     }
-
-    CalcGradValues(context);
 
     iCHKERRQ VecRestoreArray(X, &solution);
     iCHKERRQ VecRestoreArray(G, &gradient);
