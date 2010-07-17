@@ -7,6 +7,7 @@
 #include "Reporting.h"
 #include "Auxiliary.h"
 #include "Logging.h"
+#include "LRSizing.h"
 
 using namespace libconfig;
 

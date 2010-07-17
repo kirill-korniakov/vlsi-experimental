@@ -16,6 +16,7 @@
 #include "PlacementQualityAnalyzer.h"
 #include "VanGinnekenAlgorithm.h"
 #include "HippocratePlacement.h"
+#include "LRSizing.h"
 
 void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design)
 {
@@ -212,6 +213,22 @@ bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
     return false;
 }
 
+bool DoLRSizingIfRequired(HDPGrid& grid, const char* cfgOptName)
+{
+		if (grid.Design().cfg.ValueOf(cfgOptName, false))
+		{
+				//DetailedPlacement(grid);
+
+				WRITELINE("LRSizing started");
+				//if (grid.Design().CanDoTiming()) ALERT("STA after detailed placement:");
+				//STA(grid.Design());
+				LambdaMatrix lm(grid,grid.Design());
+				WRITELINE("LRSizing finished");
+				return true;
+		}
+		return false;
+}
+
 
 void PlotCongestionMapIfRequired(HDPGrid& grid)
 {
@@ -313,6 +330,10 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DP");
     if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
+		
+		if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
+				/*WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP")*/;
+
 
     //DoSTAIfCan(hd);
 
