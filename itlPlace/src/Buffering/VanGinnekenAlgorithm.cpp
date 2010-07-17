@@ -14,6 +14,7 @@ void HVGAlgorithm::LoadBuffers()
     Buffers.push_back(buf);
     ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, buf.Type()).Name().c_str(),
       (design, buf.InPin()).Name().c_str(), (design, buf.OutPin()).Name().c_str());
+    sizeBuffer = design[buf.Type()].SizeX();
   }
   else
   {
@@ -39,14 +40,20 @@ void HVGAlgorithm::LoadBuffers()
 
     Buffers = BufferInfo::CreateVector(design, bufferList);
     for (unsigned int i = 0; i < Buffers.size(); i++)
+    {
       ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, Buffers[i].Type()).Name().c_str(),
-      (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
+        (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
+      if (design[Buffers[i].Type()].SizeX() > sizeBuffer)
+        sizeBuffer = design[Buffers[i].Type()].SizeX();
+    }
   }
 }
 
 HVGAlgorithm::HVGAlgorithm(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
 {
   isInitialize = false;
+  sizeBuffer = 0;
+  maxIndex = 0;
 }
 
 void HVGAlgorithm::Initialize(bool isAgainInitialize)
@@ -65,10 +72,12 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
   partitionCount = design.cfg.ValueOf("Interval", 1);
   plotterWaitTime = design.cfg.ValueOf("PlotterWaitTime", 1);
   isInsertInSourceAndSink = design.cfg.ValueOf("IsInsertInSourceAndSink", true);
+  typeBufferingAlgorithm = design.cfg.ValueOf("TypeBufferingAlgorithm", 0);
   int TypePartition = design.cfg.ValueOf("TypePartition", 0);
 
   netVisit = new bool [design.Nets.Count() * 2];
-
+  ALERT("Partition type: %d", TypePartition);
+  ALERT("Buffering algorithm type type: %d", typeBufferingAlgorithm);
   for (int i = 0; i < design.Nets.Count() * 2; i++)
   {
     netVisit[i] = false;
@@ -81,8 +90,7 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
     vGTree = new VGTreeDynamicDistribution(design, partitionCount);
   if (TypePartition == 2)
   {
-
-    vGTree = new VGTreeLegalDynamicDistribution(design, partitionCount);
+    vGTree = new VGTreeLegalDynamicDistribution(design, partitionCount, sizeBuffer);
   }
 
 }
@@ -90,7 +98,7 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
 int HVGAlgorithm::BufferingCriticalPath()
 {
   if (!isInitialize)   Initialize();
-  ALERT("Buffering type: %d", design.cfg.ValueOf("TypePartition", 0));
+
 
   std::vector<HCriticalPath> paths(design.CriticalPaths.Count());
   int idx = 0;
@@ -108,13 +116,13 @@ int HVGAlgorithm::BufferingCriticalPath()
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],design).GetEnumeratorW(); point.MoveNext(); )
     {
       HNetWrapper net = design[((point.TimingPoint(),design).Pin(),design).OriginalNet()];
-      if (net.Kind() == NetKind_Active) //&& (net.PinsCount() == 2 ))//&& (treeRepository.NoVGTree(net)))//
+      if (net.Kind() == NetKind_Active)// && (net.PinsCount() == 2 ))//&& (treeRepository.NoVGTree(net)))//
       {
 
 
         if (!netVisit[::ToID(net)])
         {
-          //if ((net.Kind() == NetKind_Active) && (net.Name() == "busak_n"))  
+          //if ((net.Kind() == NetKind_Active) && (net.Name() == "n_891"))  
           //{
           //string na = net.Name();
           //printf("start name = %s\n", na.c_str());
@@ -136,15 +144,16 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
 {
   if (!isInitialize)   Initialize();
   //VanGinnekenTree* vGTree = //(design, partitionCount, design.SteinerPoints[(net, design).Source()]);
+  if (printNetInfo)
+  {
+    ALERT("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
+  }
 
   netVisit[::ToID(net)] = true;
 
   vGTree->UpdateTree(design.SteinerPoints[(net, design).Source()]);
   //  treeRepository.CreateVGTree(net);
-  if (printNetInfo)
-  {
-    ALERT("\t%s\t%d\t", design.Nets.GetString<HNet::Name>(net).c_str(), design.Nets.GetInt<HNet::PinsCount>(net));
-  }
+  //printf("TreeSize = %d\n",vGTree->GetTreeSize());
   if ((plotSteinerPoint) || (plotNets))
   {
     design.Plotter.ShowNetSteinerTree(net, Color_Black, true, HPlotter::WaitTime(plotterWaitTime));
@@ -157,6 +166,7 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
 
   VGVariantsListElement best = Algorithm(vGTree);
   int bufCount = best.GetPositionCount();
+  best.SortBufferPosition();
   //ALERT("net: %s\tbufcount = %d",(net, design).Name().c_str(), bufCount );
   if (bufCount > 0)
   {
@@ -308,7 +318,14 @@ VGVariantsListElement HVGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   VGVariantsListElement best;
   double tMax = -INFINITY;
 
-  TemplateTypes<VGVariantsListElement>::list* vGList = CreateVGList(vGTree->GetSource().GetLeft());
+  TemplateTypes<VGVariantsListElement>::list* vGList = NULL;
+  if (typeBufferingAlgorithm == 0)
+    vGList = CreateVGList(vGTree->GetSource().GetLeft());
+  if (typeBufferingAlgorithm == 1)
+    vGList = CreateVGList(vGTree); 
+  else
+    if (typeBufferingAlgorithm == 2)
+      vGList = CreateVGList2(vGTree); 
   if (printVariantsList)
   { 
     ALERT("Result:");
@@ -333,6 +350,7 @@ VGVariantsListElement HVGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   {
     ALERT("best pos = %d\ttmax = %.2f\n", best.GetPositionCount(), tMax);
   }
+  //PrintVariantsNode(&best, 0);
   delete vGList;
   if (printVariantsList)
   {    
@@ -350,6 +368,8 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList( VanGinne
     VGVariantsListElement element;
     element.SetC(node->GetC());
     element.SetRAT(node->GetRAT());
+    maxIndex++;
+    element.SetIndex(maxIndex);
     newList->push_back(element);
     if (printVariantsList)
     { 
@@ -369,7 +389,6 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList( VanGinne
         RightVGList = CreateVGList(node->GetRight());
         if (printVariantsList)
           ALERT("Branch Point id: %d", node->GetIndex());
-
         return MergeList(leftVGList, RightVGList);
       }
       if (printVariantsList)
@@ -384,7 +403,7 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList( VanGinne
       TemplateTypes<VGVariantsListElement>::list* newList = CreateVGList(node->GetLeft());
       UpdateValue(newList, GetLength(node, node->GetLeft()));
       SortVGVariantsListElement(newList);
-      if (node->isSink() || node->isSource())
+      if (node->isCandidateAndRealPoint())
       {
         if (isInsertInSourceAndSink)
           AddBuffer(newList, node);
@@ -402,6 +421,226 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList( VanGinne
     }
 
 }
+
+TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList(VanGinnekenTree* tree)
+{
+  TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack stackList;
+  int lastIndexTree = tree->GetTreeSize() - 1;
+
+  TemplateTypes<VGVariantsListElement>::list* newList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* currentList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* leftList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* rightList = NULL;
+
+
+  for (int i = lastIndexTree; i > 0; i--)
+  {
+    if (tree->vGTree[i].isSink())
+    {
+      newList = new TemplateTypes<VGVariantsListElement>::list();
+      VGVariantsListElement element;
+      element.SetC(tree->vGTree[i].GetC());
+      element.SetRAT(tree->vGTree[i].GetRAT());
+      maxIndex++;
+      element.SetIndex(maxIndex);
+      newList->push_back(element);
+      if (printVariantsList)
+      { 
+        ALERT("sink id: %d", tree->vGTree[i].GetIndex());
+        PrintVariants(newList);
+      }
+
+      stackList.push(newList);
+      newList = NULL;
+    }
+    else
+      if (tree->vGTree[i].isBranchPoint())
+      {
+        leftList = stackList.top();
+        stackList.pop();
+
+        if (tree->vGTree[i].HasRight())
+        {
+
+          rightList = stackList.top();
+          stackList.pop();
+          if (printVariantsList)
+            ALERT("Branch Point id: %d", tree->vGTree[i].GetIndex());          
+          currentList = MergeList(leftList, rightList);
+          stackList.push(currentList);
+          leftList = NULL;
+          rightList = NULL;
+          currentList = NULL;
+        }
+        else
+        {
+          if (printVariantsList)
+          { 
+            ALERT("BranchPoint id: %d", tree->vGTree[i].GetIndex());
+            PrintVariants(leftList);
+          }
+          stackList.push(leftList);
+          leftList = NULL;
+        }
+      }
+      else
+      {
+        currentList = stackList.top();
+        stackList.pop();
+
+        UpdateValue(currentList, GetLength(&(tree->vGTree[i]), (tree->vGTree[i].GetLeft())));
+        SortVGVariantsListElement(currentList);
+        if (tree->vGTree[i].isCandidateAndRealPoint())
+        {
+          if (isInsertInSourceAndSink)
+            AddBuffer(currentList, &tree->vGTree[i]);
+        }
+        else
+          AddBuffer(currentList, &tree->vGTree[i]);
+
+        if (printVariantsList)
+        { 
+          ALERT("point id: %d", tree->vGTree[i].GetIndex());
+          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].GetIndex(), tree->vGTree[i].GetLeft()->GetIndex(), GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
+          PrintVariants(currentList);
+        }
+        stackList.push(currentList);
+        currentList = NULL;
+      }
+  }
+  if (stackList.size() > 1)
+    ALERT("Error: length stackList > 1");
+
+  newList = stackList.top();
+  stackList.pop();
+  return newList;
+}
+
+TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::CreateVGList2(VanGinnekenTree* tree)
+{
+  TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack stackList;
+  int lastIndexTree = tree->GetTreeSize() - 1;
+
+  TemplateTypes<VGVariantsListElement>::list* newList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* currentList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* leftList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* rightList = NULL;
+
+
+  for (int i = lastIndexTree; i > 0; i--)
+  {
+    if (tree->vGTree[i].isSink())
+    {
+      newList = new TemplateTypes<VGVariantsListElement>::list();
+      VGVariantsListElement element;
+      element.SetC(tree->vGTree[i].GetC());
+      element.SetRAT(tree->vGTree[i].GetRAT());
+      maxIndex++;
+      element.SetIndex(maxIndex);
+      newList->push_back(element);
+      if (printVariantsList)
+      { 
+        ALERT("sink id: %d", tree->vGTree[i].GetIndex());
+        PrintVariants(newList);
+      }
+
+      stackList.push(newList);
+      newList = NULL;
+    }
+    else
+      if (tree->vGTree[i].isBranchPoint())
+      {
+        leftList = stackList.top();
+        stackList.pop();
+
+        if (tree->vGTree[i].HasRight())
+        {
+
+          rightList = stackList.top();
+          stackList.pop();
+          if (printVariantsList)
+            ALERT("Branch Point id: %d", tree->vGTree[i].GetIndex());          
+          currentList = MergeList(leftList, rightList);
+          stackList.push(currentList);
+          leftList = NULL;
+          rightList = NULL;
+          currentList = NULL;
+        }
+        else
+        {
+          if (printVariantsList)
+          { 
+            ALERT("BranchPoint id: %d", tree->vGTree[i].GetIndex());
+            PrintVariants(leftList);
+          }
+          stackList.push(leftList);
+          leftList = NULL;
+        }
+      }
+      else
+      {
+        currentList = stackList.top();
+        stackList.pop();
+        if (tree->vGTree[i].isInternal() || tree->vGTree[i].isCandidateAndRealPoint())
+        {
+          UpdateValue(currentList, GetLength(&(tree->vGTree[i]), (tree->vGTree[i].GetLeft())));
+          SortVGVariantsListElement(currentList);
+        }
+        else
+        {
+          TemplateTypes<VGVariantsListElement>::list copyList(*currentList);
+
+          int currentMaxIndex = maxIndex;
+
+          UpdateValue(&copyList, GetLength(&(tree->vGTree[i]), (tree->vGTree[i].GetLeft())));
+          SortVGVariantsListElement(&copyList);
+
+          if (tree->vGTree[i].isCandidateAndRealPoint())
+          {
+            if (isInsertInSourceAndSink)
+              AddBuffer(&copyList, &tree->vGTree[i]);
+          }
+          else
+            AddBuffer(&copyList, &tree->vGTree[i]);
+          if (currentMaxIndex != maxIndex)
+          {
+            if (copyList.begin()->GetIndex() > currentMaxIndex)
+            {
+              currentList->push_front(*copyList.begin());
+            }
+            else
+            {
+
+              TemplateTypes<VGVariantsListElement>::list::iterator j = currentList->begin();
+              for (TemplateTypes<VGVariantsListElement>::list::iterator k = copyList.begin(); k != copyList.end(); k++)
+              {
+                if ((*k) == (*j))
+                  j++;
+                else
+                  InsertVGVariantsListElement(currentList, *k);
+              }
+            }
+          }
+        }
+
+        if (printVariantsList)
+        { 
+          ALERT("point id: %d", tree->vGTree[i].GetIndex());
+          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].GetIndex(), tree->vGTree[i].GetLeft()->GetIndex(), GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
+          PrintVariants(currentList);
+        }
+        stackList.push(currentList);
+        currentList = NULL;
+      }
+  }
+  if (stackList.size() > 1)
+    ALERT("Error: length stackList > 1");
+
+  newList = stackList.top();
+  stackList.pop();
+  return newList;
+}
+
 
 TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList)
 {
@@ -425,7 +664,7 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::MergeList(TemplateType
         newElement.SetRAT(left->GetRAT());
         left++;
       }
-      else
+      else      
       {
         newElement.SetRAT(right->GetRAT());
         right++;
@@ -434,10 +673,19 @@ TemplateTypes<VGVariantsListElement>::list* HVGAlgorithm::MergeList(TemplateType
 
     }
   }
+  if (printVariantsList)
+  {
+    ALERT("left:\n");
+    PrintVariants(leftVGList);
+    ALERT("right:\n");
+    PrintVariants(RightVGList);
+    ALERT("merge:\n");
+    PrintVariants(result);
+  }
+
   delete leftVGList;
   delete RightVGList;
-  if (printVariantsList)
-    PrintVariants(result);
+
   return result;
 }
 
@@ -473,6 +721,8 @@ void HVGAlgorithm::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList,
     newElement.SetBufferPosition(bp);
     newElement.SetC(Buffers[j].Cb());
     newElement.SetRAT(tMax);
+    maxIndex++;
+    newElement.SetIndex(maxIndex);
 
     InsertVGVariantsListElement(vGList, newElement);
   }
@@ -607,10 +857,10 @@ void HVGAlgorithm::PrintVariantsNode(VGVariantsListElement* vGE, int i)
   char* sBuf = new char [256]; 
   string s;
   s = "(";
-  sprintf(sBuf, "%.2f", vGE->GetRAT());
+  sprintf(sBuf, "%f", vGE->GetRAT());
   s += string(sBuf);
   s += ",\t";
-  sprintf(sBuf, "%.2f", vGE->GetC());
+  sprintf(sBuf, "%f", vGE->GetC());
   s += string(sBuf);
   s += ",\t{";
   for (TemplateTypes<BufferPositions>::list::iterator pos = vGE->GetBufferPosition()->begin(); pos != vGE->GetBufferPosition()->end(); ++pos)
@@ -792,3 +1042,138 @@ void HVGAlgorithm::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuff
     ALERT("ERRORR pin count");
   design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
 }
+//HVGAlgorithm
+
+//HVGA2
+
+HVGA2::HVGA2(HDesign& hd): HVGAlgorithm(hd)
+{
+}
+
+TemplateTypes<VGVariantsListElement>::list* HVGA2::CreateVGList(VanGinnekenTree* tree)
+{
+  TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack stackList;
+  int lastIndexTree = tree->GetTreeSize() - 1;
+
+  TemplateTypes<VGVariantsListElement>::list* newList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* currentList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* leftList = NULL;
+  TemplateTypes<VGVariantsListElement>::list* rightList = NULL;
+
+
+  for (int i = lastIndexTree; i > 0; i--)
+  {
+    if (tree->vGTree[i].isSink())
+    {
+      newList = new TemplateTypes<VGVariantsListElement>::list();
+      VGVariantsListElement element;
+      element.SetC(tree->vGTree[i].GetC());
+      element.SetRAT(tree->vGTree[i].GetRAT());
+      maxIndex++;
+      element.SetIndex(maxIndex);
+      newList->push_back(element);
+      if (printVariantsList)
+      { 
+        ALERT("sink id: %d", tree->vGTree[i].GetIndex());
+        PrintVariants(newList);
+      }
+
+      stackList.push(newList);
+      newList = NULL;
+    }
+    else
+      if (tree->vGTree[i].isBranchPoint())
+      {
+        leftList = stackList.top();
+        stackList.pop();
+
+        if (tree->vGTree[i].HasRight())
+        {
+
+          rightList = stackList.top();
+          stackList.pop();
+          if (printVariantsList)
+            ALERT("Branch Point id: %d", tree->vGTree[i].GetIndex());          
+          currentList = MergeList(leftList, rightList);
+          stackList.push(currentList);
+          leftList = NULL;
+          rightList = NULL;
+          currentList = NULL;
+        }
+        else
+        {
+          if (printVariantsList)
+          { 
+            ALERT("BranchPoint id: %d", tree->vGTree[i].GetIndex());
+            PrintVariants(leftList);
+          }
+          stackList.push(leftList);
+          leftList = NULL;
+        }
+      }
+      else
+      {
+        currentList = stackList.top();
+        stackList.pop();
+        if (tree->vGTree[i].isInternal() || tree->vGTree[i].isCandidateAndRealPoint())
+        {
+          UpdateValue(currentList, GetLength(&(tree->vGTree[i]), (tree->vGTree[i].GetLeft())));
+          SortVGVariantsListElement(currentList);
+        }
+        else
+        {
+          TemplateTypes<VGVariantsListElement>::list copyList(*currentList);
+
+          int currentMaxIndex = maxIndex;
+
+          UpdateValue(&copyList, GetLength(&(tree->vGTree[i]), (tree->vGTree[i].GetLeft())));
+          SortVGVariantsListElement(&copyList);
+
+          if (tree->vGTree[i].isCandidateAndRealPoint())
+          {
+            if (isInsertInSourceAndSink)
+              AddBuffer(&copyList, &tree->vGTree[i]);
+          }
+          else
+            AddBuffer(&copyList, &tree->vGTree[i]);
+          if (currentMaxIndex != maxIndex)
+          {
+            if (copyList.begin()->GetIndex() > currentMaxIndex)
+            {
+              currentList->push_front(*copyList.begin());
+            }
+            else
+            {
+
+              TemplateTypes<VGVariantsListElement>::list::iterator j = currentList->begin();
+              for (TemplateTypes<VGVariantsListElement>::list::iterator k = copyList.begin(); k != copyList.end(); k++)
+              {
+                if ((*k) == (*j))
+                  j++;
+                else
+                  InsertVGVariantsListElement(currentList, *k);
+              }
+            }
+          }
+        }
+
+        if (printVariantsList)
+        { 
+          ALERT("point id: %d", tree->vGTree[i].GetIndex());
+          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].GetIndex(), tree->vGTree[i].GetLeft()->GetIndex(), GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
+          PrintVariants(currentList);
+        }
+        stackList.push(currentList);
+        currentList = NULL;
+      }
+  }
+  if (stackList.size() > 1)
+    ALERT("Error: length stackList > 1");
+
+  newList = stackList.top();
+  stackList.pop();
+  return newList;
+}
+
+
+//HVGA2

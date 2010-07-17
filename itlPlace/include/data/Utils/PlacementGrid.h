@@ -51,10 +51,12 @@ protected:
   double indent_x;
   double indent_y;
 
-
+  double sizeBuffer;
+  int sizeSiteBuffer;
 
 public:
   HPlacementGrid(HDesign& design);
+  HPlacementGrid(HDesign& design, double sizeBuf);
   ~HPlacementGrid();
 
   double GetWidth();
@@ -77,6 +79,7 @@ public:
 
   void Initialize();
   void SetSize();
+  void SetSizeBuffer(double sizeBuf);
   void ClearPath();
   void Clear();
   void UpdateGrid();

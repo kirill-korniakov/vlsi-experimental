@@ -517,8 +517,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         {
           ALERT("NEW BUFFERING STARTED");
           ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
-          hd.VGAlgorithm.Initialize();
-          hd.VGAlgorithm.SetBinTableBuffer(&context);
+          HVGAlgorithm buf(hd);
+          buf.Initialize();
+          buf.SetBinTableBuffer(&context);
           ctx.Close();
           ALERT("NEW BUFFERING FINISHED");
         }

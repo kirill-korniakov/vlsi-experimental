@@ -19,7 +19,6 @@
 #include "HPlotter.h"
 #include "HCriticalPath.h"
 #include "HCriticalPathPoint.h"
-#include "VanGinnekenAlgorithm.h"
 
 #define HDESIGNCOLLECTION(field_name, col_type) \
 public: \
@@ -55,7 +54,7 @@ public:
              Cells(this),          Pins(this),           Nets(this),
              SteinerPoints(this),  Wires(this),          Sites(this),
              PlacementRows(this),  TimingPoints(this),   Plotter(*this),
-             CriticalPaths(this),  CriticalPathPoints(this), VGAlgorithm(*this)
+             CriticalPaths(this),  CriticalPathPoints(this)
   {
     _Design.Tech = 0;
   }
@@ -63,7 +62,6 @@ public:
   HCircuit Circuit;
   HPlotter Plotter;
   libconfig::ConfigExt cfg;
-  HVGAlgorithm VGAlgorithm;
 
   HDESIGNCOLLECTION(Nets, HNets)
   HDESIGNCOLLECTION(MacroTypes, HMacroTypes)

@@ -2,10 +2,8 @@
 #define __VanGinnekenAlgorithm_H__
 
 #include "VanGinnekenData.h"
-//#include "OptimizationContext.h"
 #include "HCell.h"
 #include "HPin.h"
-//#include "HWirePhysicalParams.h"
 #include "HPinType.h"
 #include "HNet.h"
 
@@ -54,6 +52,9 @@ protected:
   int plotterWaitTime;
   bool isInitialize;
   bool isInsertInSourceAndSink;
+  int typeBufferingAlgorithm;
+  double sizeBuffer;
+  int maxIndex;
 
   VanGinnekenTree* vGTree;
 
@@ -61,35 +62,45 @@ protected:
 
   void LoadBuffers();
 
-  VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
-  TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTreeNode* node);
-  TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
-  void UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge);
-  void AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node);
-  void SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList);
-  void InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element);
-  double GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2);
-  void InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best);
-  void InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer,BufferPositions& position);
+  virtual VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
+  virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTreeNode* node);
+  virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree);
+  virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList2(VanGinnekenTree* tree);
+  virtual TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
+  virtual void UpdateValue(TemplateTypes<VGVariantsListElement>::list* vGList, double lengthEdge);
+  virtual void AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node);
+  virtual void SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList);
+  virtual void InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element);
+  virtual double GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2);
+  virtual void InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best);
+  virtual void InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer,BufferPositions& position);
 
-  void PrintVariantsNode(VGVariantsListElement* vGE, int i);
-  void PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList);
+  virtual void PrintVariantsNode(VGVariantsListElement* vGE, int i);
+  virtual void PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList);
 
-  void AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnumW, TemplateTypes<NewBuffer>::list& newBuffer);
+  virtual void AddSinks2Net(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnumW, TemplateTypes<NewBuffer>::list& newBuffer);
 
-  NewBuffer* FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer);
-  void PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer);
-  void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node);
+  virtual NewBuffer* FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer);
+  virtual void PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer);
+  virtual void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node);
 
-  int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
+  virtual int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
 
 public:
   HVGAlgorithm(HDesign& hd);
-  void Initialize(bool isAgainInitialize = false);
+  virtual void Initialize(bool isAgainInitialize = false);
 
-  int BufferingCriticalPath();
-  VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true);
-  int SetBinTableBuffer(AppCtx* context);
+  virtual int BufferingCriticalPath();
+  virtual VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true);
+  virtual int SetBinTableBuffer(AppCtx* context);
+
+};
+
+class HVGA2: public HVGAlgorithm
+{
+public:
+    HVGA2(HDesign& hd);
+    virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree);
 
 };
 

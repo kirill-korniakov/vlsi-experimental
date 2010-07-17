@@ -4,18 +4,18 @@
 #include "Auxiliary.h"
 #include "lef/FEF_util.h"
 
+//#define _CRT_DBG_MAP_ALLOC
+//#include "crtdbg.h"
+
 using namespace Aux;
 
 //PlacementGridNode
 PlacementGridNode::PlacementGridNode()
 {
-  printf("PlacementGridNode0\n");
   x = 0;
   y = 0;
   row = 0;
   column = 0;
-   printf("PlacementGridNode1\n");
-
 }
 
 PlacementGridNode::PlacementGridNode(HCell c)
@@ -81,14 +81,27 @@ void PlacementGridNode::SetCell(HCell c)
 
 HPlacementGrid::HPlacementGrid(HDesign& hd): design(hd)
 {
-  printf("44.1\n");
   grid = NULL;
   cellGrid = NULL;
   siteInRow = NULL;
   path = NULL;
-  printf("44.2\n");
+  nColumns = 0;
+  nRows = 0;
+  sizeSiteBuffer = 0;
   Initialize();
-  printf("45\n");
+}
+
+HPlacementGrid::HPlacementGrid(HDesign& hd, double sizeBuf): design(hd)
+{
+  grid = NULL;
+  cellGrid = NULL;
+  siteInRow = NULL;
+  path = NULL;
+  nColumns = 0;
+  nRows = 0;
+  sizeBuffer = sizeBuf;
+  sizeSiteBuffer = 0;
+  Initialize();
 }
 
 HPlacementGrid::~HPlacementGrid()
@@ -133,12 +146,12 @@ PlacementGridNode* HPlacementGrid::GetNode(int row, int column)
 
 int HPlacementGrid::GetRow(double y)
 {
-  return int (floor((y - indent_y) / height)) - 1;
+  return int (floor((y - indent_y) / height));
 }
 
 int HPlacementGrid::GetColumn(double x)
 {
-  return int (floor((x - indent_x) / width)) - 1;
+  return int (floor((x - indent_x) / width));
 }
 
 PlacementGridNode* HPlacementGrid::GetNode(double x, double y)
@@ -171,6 +184,10 @@ bool HPlacementGrid::IsSiteFree(double x, double y, double width, double height)
   int columnBegin = GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
   int columnEnd = GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
 
+  if ( (rowBegin > 0) && (rowBegin < nRows) &&
+    (rowEnd > 0) && (rowEnd < nRows) &&
+    (columnBegin > 0) && (columnBegin < nColumns) &&
+    (columnEnd > 0) && (columnEnd < nColumns))
   for (int i = rowBegin; i <= rowEnd; i++)
     for (int j = columnBegin; j <= columnEnd; j++)
     {
@@ -183,26 +200,20 @@ bool HPlacementGrid::IsSiteFree(double x, double y, double width, double height)
 
 void HPlacementGrid::Initialize()
 {
-  printf("44.4\n");
   Clear();
-  printf("44.5\n");
   SetSize();
-  printf("44.6\n");
   UpdateGrid();
-  printf("44.7\n");
 }
 
 void HPlacementGrid::SetSize()
 {
-  printf("44.51\n");
+
   int totalRows = design.PlacementRows.Count();
-printf(" totalRows = %d \n", totalRows);
   grid = new PlacementGridNode* [totalRows];
   cellGrid = new PlacementGridNode** [design.Cells.CellsCount()];
   siteInRow = new int [totalRows];
   indent_x = design.Circuit.PlacementMaxX();
   HSite m_SiteType;
-printf("44.52\n");
   int i = 0;
   for (HPlacementRows::EnumeratorW rIter = design.PlacementRows.GetEnumeratorW(); rIter.MoveNext(); i++)
   {
@@ -219,58 +230,49 @@ printf("44.52\n");
     siteInRow[i] = rIter.HorizSitesCount();
     if (indent_x > rIter.X())
       indent_x = rIter.X();
-    printf("lear %d\n", i);
-
   }
 
-  printf("44.53\n");
   nRows = i;
   width = design.GetDouble<HSite::Width>(m_SiteType);
+  if (sizeBuffer < width)
+    sizeSiteBuffer = 1;
+  else
+  {
+    sizeSiteBuffer = int(ceil(sizeBuffer / width));
+  }
+  if (sizeSiteBuffer <= 0)
+    sizeSiteBuffer = 1;
+
   int j = 0;
-  printf("44.531\n");
-  int i1 = 0;
   for (HPlacementRows::EnumeratorW rIter = design.PlacementRows.GetEnumeratorW(); rIter.MoveNext(); j++)
   {
-        printf("lear %d\t", j);
-        i1++;
-        if(i < i1)
-          printf("pppp");
-
     if (!rIter.IsHorizontal())
     {
       continue;
     }
-    printf("44.531%d\t", j);
-    grid[j];
-    printf("grid\t", j);
+
     grid[j] = new PlacementGridNode [nColumns];
-    printf(" poouyy ", j);
+
     for (int k = 0; k < nColumns; k ++)
     {
-      printf(" a ", j);
       grid[j][k].SetRow(j);
-      printf(" b ", j);
       grid[j][k].SetColumn(k);
-      printf(" c ", j);
       grid[j][k].SetX(indent_x + k * width);
-      printf(" d ", j);
       grid[j][k].SetY(rIter.Y());
-      printf(" e ", j);
       grid[j][k].SetCell(design.Cells.Null());
-      printf(" f ", j);
     }
-    printf("kon\n", j);
-
 
   }
-printf("44.54\n");
   indent_y = grid[0][0].GetY();
   height = grid[1][0].GetY() - grid[0][0].GetY();
 
   path = new PlacementGridNode* [nRows * nColumns + 1];
-  printf("44.55\n");
   ClearPath();
-  printf("44.56\n");
+}
+
+void HPlacementGrid::SetSizeBuffer(double sizeBuf)
+{
+  sizeBuffer = sizeBuf;
 }
 
 void HPlacementGrid::ClearPath()
@@ -334,13 +336,17 @@ void HPlacementGrid::SetCell(HCell cell)
   int sizeCell = (rowEnd - rowBegin + 1) * (columnEnd - columnBegin + 1);
   cellGrid[cellId] = new PlacementGridNode* [sizeCell];
   int k = 0;
-  for (int i = rowBegin; i <= rowEnd; i++)
-    for (int j = columnBegin; j <= columnEnd; j++)
-    {
-      grid[i][j].SetCell(cell);
-      cellGrid[cellId][k] = &grid[i][j];
-      k++;
-    }
+  if ( (rowBegin > 0) && (rowBegin < nRows) &&
+    (rowEnd > 0) && (rowEnd < nRows) &&
+    (columnBegin > 0) && (columnBegin < nColumns) &&
+    (columnEnd > 0) && (columnEnd < nColumns))
+    for (int i = rowBegin; i <= rowEnd; i++)
+      for (int j = columnBegin; j <= columnEnd; j++)
+      {
+        grid[i][j].SetCell(cell);
+        cellGrid[cellId][k] = &grid[i][j];
+        k++;
+      }
 }
 
 //PlacementGridNode** HPlacementGrid::GetPath(int &lengthPath, double x1, double y1, double x2, double y2)
@@ -501,8 +507,9 @@ PlacementGridNode** HPlacementGrid::GetPath(int &lengthPath, double x1, double y
     //levelInd = 0;
     for (int j = 0; j <= columnSize; j++)
     {
-      if (((rowBegin + i * incrementRow) >= 0) && ((columnBegin + j * incrementColumn) >=0) && ((columnBegin + j * incrementColumn) <= nColumns) && ((rowBegin + i * incrementRow) <= nRows))
-        if (grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetCell() == design.Cells.Null())
+      if (((rowBegin + i * incrementRow) >= 0) && ((columnBegin + j * incrementColumn) >=0) && ((columnBegin + j * incrementColumn) < nColumns) && ((rowBegin + i * incrementRow) < nRows))
+        if(IsSiteFree(grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetX(), grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetY(), sizeBuffer, height))
+        //if (grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetCell() == design.Cells.Null())
         {
           path[totalPoint] = &grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn];
           totalPoint++;
@@ -511,6 +518,7 @@ PlacementGridNode** HPlacementGrid::GetPath(int &lengthPath, double x1, double y
         }
     }
   }
+  lengthPath = totalPoint;
   return path;
 }
 

@@ -14,7 +14,11 @@ class VanGinnekenTreeNode
 {
 protected:
   double x,y; //координаты узла дерев
-  int type; // тип звена: 0 - source; 1 - sink; 2 - точка ветвлени€; 3 - кандидат на вставку буфера
+  int type; // тип звена: 0 - source; 1 - sink; 2 - точка ветвлени€; 3 - кандидат на вставку буфера; 
+            //4 - кандидат на вставку буфера с координатоми совподающими с source или sink;
+            //5 - кандидат на вставку буфера с координатой совподающей с внутреними точками дерева штейнера
+ // (TO DO: ѕ–»ƒ”ћј“№ Ќќ–ћјЋ№Ќ”ё ‘ќ–ћ”Ћ»–ќ¬ ”)
+
   HSteinerPoint sPoint;
   VanGinnekenTreeNode* left;
   VanGinnekenTreeNode* right;
@@ -27,6 +31,8 @@ public:
   bool isSink();
   bool isBranchPoint();
   bool isCandidate();
+  bool isCandidateAndRealPoint();
+  bool isInternal();
   bool HasLeft();
   bool HasRight();
   HSteinerPoint GetSteinerPoint();  
@@ -57,9 +63,9 @@ public:
 class VanGinnekenTree
 {
 protected:
-  VanGinnekenTreeNode* vGTree;
   int partitionPointCount;
-  int treeSize;  
+  int totalTreeSize;  
+  int treeSize;
   int TypePartition;
 
   virtual void CreateTree() = 0;
@@ -69,6 +75,7 @@ protected:
 public:
   HDesign& design;
   HDPGrid* DPGrid;
+  VanGinnekenTreeNode* vGTree;
 
   VanGinnekenTree(HDesign& hd);
   VanGinnekenTree(HDesign& hd, int partitionCount);
@@ -83,7 +90,7 @@ public:
 
   virtual void ClearTree();
 
-  virtual int TreeSize();
+  virtual int GetTreeSize();
 
 
 };
@@ -127,6 +134,7 @@ protected:
 public:
   VGTreeLegalDynamicDistribution(HDesign& hd);
   VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount);
+  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, double sizeBuffer);
   VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
 
   virtual ~VGTreeLegalDynamicDistribution();
@@ -175,6 +183,7 @@ public:
 
   bool operator > (VGVariantsListElement& element);
   bool operator < (VGVariantsListElement& element);
+  bool operator == (VGVariantsListElement& element);
   VGVariantsListElement& operator = (VGVariantsListElement& element);
   void SortBufferPosition();
 
@@ -186,11 +195,13 @@ public:
   BufferPositions GetbufferPosition(int i);
   int GetPositionCount();
   TemplateTypes<BufferPositions>::list* GetBufferPosition();
+  int GetIndex();
 
   void SetBufferPosition(BufferPositions position);
   void SetBufferPosition(TemplateTypes<BufferPositions>::list position);
   void SetRAT(double rat);
   void SetC(double capacity);
+  void SetIndex(int i);
 
 
 };

@@ -35,7 +35,17 @@ bool VanGinnekenTreeNode::isBranchPoint()
 
 bool VanGinnekenTreeNode::isCandidate()
 {
-  return (type == 3) ? true : false;
+  return ((type == 3) || (type == 4)|| (type == 5)) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isCandidateAndRealPoint()
+{
+  return (type == 4) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isInternal()
+{
+  return (type == 5) ? true : false;  
 }
 
 bool VanGinnekenTreeNode::HasLeft()
@@ -160,14 +170,15 @@ VanGinnekenTreeNode::~VanGinnekenTreeNode()
 //VanGinnekenTree
 VanGinnekenTree::VanGinnekenTree(HDesign& hd): design(hd)
 {
-    DPGrid = new HDPGrid(hd);
-    partitionPointCount = design.cfg.ValueOf("Interval", 1);
-    TypePartition = design.cfg.ValueOf("TypePartition", 0);
+  treeSize = 0;
+  DPGrid = new HDPGrid(hd);
+  partitionPointCount = design.cfg.ValueOf("Interval", 1);
+  TypePartition = design.cfg.ValueOf("TypePartition", 0);
 }
 
 VanGinnekenTree::VanGinnekenTree(HDesign& hd, int partitionCount): design(hd)
 {
-
+  treeSize = 0;
   DPGrid = new HDPGrid(hd);
   partitionPointCount = partitionCount;
   TypePartition = design.cfg.ValueOf("TypePartition", 0);
@@ -176,25 +187,26 @@ VanGinnekenTree::VanGinnekenTree(HDesign& hd, int partitionCount): design(hd)
 
 VanGinnekenTree::VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source): design(hd)
 {
+  treeSize = 0;
   DPGrid = new HDPGrid(hd);
   partitionPointCount = partitionCount;
   TypePartition = design.cfg.ValueOf("TypePartition", 0);
 }
 
-  void VanGinnekenTree::ClearTree()
+void VanGinnekenTree::ClearTree()
+{
+  for (int i = 0; i < totalTreeSize; i++)
   {
-    for (int i = 0; i < treeSize; i++)
-    {
-      vGTree[i].SetLeft(NULL);
-      vGTree[i].SetRight(NULL);
-      vGTree[i].SetType(-1);
-    }
+    vGTree[i].SetLeft(NULL);
+    vGTree[i].SetRight(NULL);
+    vGTree[i].SetType(-1);
   }
+}
 
-  int VanGinnekenTree::TreeSize()
-  {
-    return treeSize;
-  }
+int VanGinnekenTree::GetTreeSize()
+{
+  return treeSize;
+}
 
 void VanGinnekenTree::SetEdgePartitionCount(int partitionCount)
 {
@@ -203,53 +215,108 @@ void VanGinnekenTree::SetEdgePartitionCount(int partitionCount)
 
 void VanGinnekenTree::UpdateTree(HSteinerPoint& source)
 {
-  
+
   ClearTree();
 
   TemplateTypes<HSteinerPoint>::stack points;
   TemplateTypes<int>::stack rootIndexs;
+  TemplateTypes<int>::stack isPoitnsVisits;
   //создаем дерево
 
   int nodeIndex = 0;
   int rootIndex = 0;
+  int isPoitnVisit = 0;
   HSteinerPoint srcPoint = design[source];
   HSteinerPoint nextPoint = srcPoint;
   points.push(srcPoint);	
   rootIndexs.push(0);
+  isPoitnsVisits.push(0);
   CreateNode(srcPoint, 0, nodeIndex, rootIndex, false, this);//, design[design.SteinerPoints.Null()], false, design[design.SteinerPoints.Null()]);
+
+
   while (!points.empty())
   {
     srcPoint = points.top();
     rootIndex = rootIndexs.top();
-    points.pop();	
-    rootIndexs.pop();
-    if (design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
+    isPoitnVisit = isPoitnsVisits.top();
+    //points.pop();	
+    //rootIndexs.pop();
+    isPoitnsVisits.pop();
+    if (isPoitnVisit == 0)
     {
-      nextPoint = design.SteinerPoints.Get<HSteinerPoint::Left, HSteinerPoint>(srcPoint);
-
-      CreateNode(nextPoint, 2, nodeIndex, rootIndex, false, this);
-      rootIndexs.push(nodeIndex);
-      points.push(nextPoint);			
-
-      if (design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
+      if (design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
       {
-        nextPoint = design.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>(srcPoint);
-
-        CreateNode(nextPoint, 2, nodeIndex, rootIndex, true, this);
+        isPoitnVisit = 1;
+        nextPoint = design.SteinerPoints.Get<HSteinerPoint::Left, HSteinerPoint>(srcPoint);
+        CreateNode(nextPoint, 2, nodeIndex, rootIndex, false, this);
         rootIndexs.push(nodeIndex);
         points.push(nextPoint);
+        isPoitnsVisits.push(isPoitnVisit);
+        isPoitnsVisits.push(0);
+      }
+      else
+      {
+        isPoitnVisit = 2;
+        isPoitnsVisits.push(isPoitnVisit);
       }
     }
     else
-    {
-      //sink
-      //CreateNode(&srcPoint, 1, nodeIndex, rootIndex);
-    }
+      if (isPoitnVisit == 1)
+      {
+        isPoitnVisit = 2;
+        isPoitnsVisits.push(isPoitnVisit);  
+        if (design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
+        {
+          nextPoint = design.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>(srcPoint);
+          CreateNode(nextPoint, 2, nodeIndex, rootIndex, true, this);
+          rootIndexs.push(nodeIndex);
+          points.push(nextPoint);
+          isPoitnsVisits.push(0);
+        }    
+      }
+      else
+        if (isPoitnVisit == 2)
+        {
+          points.pop();	
+          rootIndexs.pop();
+        }
   }
+
+
+  /*while (!points.empty())
+  {
+  srcPoint = points.top();
+  rootIndex = rootIndexs.top();
+  points.pop();	
+  rootIndexs.pop();
+  if (design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
+  {
+  nextPoint = design.SteinerPoints.Get<HSteinerPoint::Left, HSteinerPoint>(srcPoint);
+
+  CreateNode(nextPoint, 2, nodeIndex, rootIndex, false, this);
+  rootIndexs.push(nodeIndex);
+  points.push(nextPoint);			
+
+  if (design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
+  {
+  nextPoint = design.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>(srcPoint);
+
+  CreateNode(nextPoint, 2, nodeIndex, rootIndex, true, this);
+  rootIndexs.push(nodeIndex);
+  points.push(nextPoint);
+  }
+  }
+  else
+  {
+  //sink
+  //CreateNode(&srcPoint, 1, nodeIndex, rootIndex);
+  }
+  }*/
   //design.Plotter.PlotVGTree(&vGTree[0], Color_Black);
   //design.Plotter.Refresh();
-  if (nodeIndex >= treeSize)
-    ALERT("ERROR3!!!!! + treeSize = %d\tnodeIndex = %d",treeSize, nodeIndex);
+  treeSize = nodeIndex + 1;
+  if (nodeIndex >= totalTreeSize)
+    ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d",totalTreeSize, nodeIndex);
 }
 
 VanGinnekenTreeNode VanGinnekenTree::GetSource()
@@ -326,7 +393,7 @@ void VGTreeUniformDistribution::CreateTree()
     if (treeSizeTemp > maxTree)
       maxTree = treeSizeTemp;
   }
-  treeSize = maxTree;
+  totalTreeSize = maxTree;
   vGTree = new VanGinnekenTreeNode [maxTree];
 }
 
@@ -359,6 +426,12 @@ VanGinnekenTreeNode* VGTreeUniformDistribution::CreateNode(HSteinerPoint node, i
 
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
+
+    vGTree[nodeIndex].SetType(5);
+
+    if (vGTree[rootIndex].isSource())
+      vGTree[nodeIndex].SetType(4);
+
     rootIndex = nodeIndex;
 
     for (int i = 1; i < (partitionPointCount - 1); i++)
@@ -373,6 +446,14 @@ VanGinnekenTreeNode* VGTreeUniformDistribution::CreateNode(HSteinerPoint node, i
     vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
     vGTree[nodeIndex].SetX(spw.X());
     vGTree[nodeIndex].SetY(spw.Y());
+
+    vGTree[nodeIndex].SetType(5);
+
+    if (!spw.IsInternal())
+    {
+      vGTree[nodeIndex].SetType(4);
+    }
+
     rootIndex = nodeIndex;
 
     nodeIndex++;
@@ -392,7 +473,7 @@ VanGinnekenTreeNode* VGTreeUniformDistribution::CreateNode(HSteinerPoint node, i
       vGTree[nodeIndex].SetType(type);	
     }
 
-    if (nodeIndex >= treeSize)
+    if (nodeIndex >= totalTreeSize)
       ALERT("ERROR2!!!!!");
 
   }
@@ -539,11 +620,11 @@ void VGTreeDynamicDistribution::CreateTree()
     maxPos *= 2;
 
 
-    treeSize = pointCount * maxPos + pointCount + 1;
-    if (treeSize > maxTree)
-      maxTree = treeSize;
+    totalTreeSize = pointCount * maxPos + pointCount + 1;
+    if (totalTreeSize > maxTree)
+      maxTree = totalTreeSize;
   }
-  treeSize = maxTree;
+  totalTreeSize = maxTree;
   vGTree = new VanGinnekenTreeNode [maxTree];
 }
 
@@ -577,6 +658,11 @@ VanGinnekenTreeNode* VGTreeDynamicDistribution::CreateNode(HSteinerPoint node, i
 
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
+    vGTree[nodeIndex].SetType(5);
+
+    if (vGTree[rootIndex].isSource())
+      vGTree[nodeIndex].SetType(4);
+
     rootIndex = nodeIndex;
     int pPC = partitionPointCount;
 
@@ -615,6 +701,12 @@ VanGinnekenTreeNode* VGTreeDynamicDistribution::CreateNode(HSteinerPoint node, i
     vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
     vGTree[nodeIndex].SetX(spw.X());
     vGTree[nodeIndex].SetY(spw.Y());
+    vGTree[nodeIndex].SetType(5);
+    if (!spw.IsInternal())
+    {
+      vGTree[nodeIndex].SetType(4);
+    }
+
     rootIndex = nodeIndex;
 
     nodeIndex++;
@@ -634,7 +726,7 @@ VanGinnekenTreeNode* VGTreeDynamicDistribution::CreateNode(HSteinerPoint node, i
       vGTree[nodeIndex].SetType(type);	
     }
 
-    if (nodeIndex >= treeSize)
+    if (nodeIndex >= totalTreeSize)
       ALERT("ERROR1!!!!!");
 
 
@@ -663,6 +755,11 @@ VGTreeLegalDynamicDistribution::VGTreeLegalDynamicDistribution(HDesign& hd): Van
 }
 
 VGTreeLegalDynamicDistribution::VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount): VanGinnekenTree(hd, partitionCount), pGrid(hd)
+{
+  CreateTree();
+}
+
+VGTreeLegalDynamicDistribution::VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, double sizeBuffer): VanGinnekenTree(hd, partitionCount), pGrid(hd, sizeBuffer)
 {
   CreateTree();
 }
@@ -782,12 +879,12 @@ void VGTreeLegalDynamicDistribution::CreateTree()
     maxPos *= 2;
 
 
-    treeSize = pointCount * maxPos + pointCount + 1;
-    if (treeSize > maxTree)
-      maxTree = treeSize;
+    totalTreeSize = pointCount * maxPos + pointCount + 1;
+    if (totalTreeSize > maxTree)
+      maxTree = totalTreeSize;
   }
 
-  treeSize = maxTree;
+  totalTreeSize = maxTree;
   vGTree = new VanGinnekenTreeNode [maxTree];
 }
 
@@ -821,11 +918,15 @@ VanGinnekenTreeNode* VGTreeLegalDynamicDistribution::CreateNode(HSteinerPoint no
 
     vGTree[nodeIndex].SetX(vGTree[rootIndex].GetX());
     vGTree[nodeIndex].SetY(vGTree[rootIndex].GetY());
+
+    vGTree[nodeIndex].SetType(5);
+
+    if (vGTree[rootIndex].isSource())
+      vGTree[nodeIndex].SetType(4);
+
     rootIndex = nodeIndex;
-
-    int lenPath;
+    int lenPath = 0;
     PlacementGridNode **path = pGrid.GetPath(lenPath, rx, ry, nx, ny);    
-
     for (int i = 0; i < lenPath; i++)
     {
       vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
@@ -834,21 +935,17 @@ VanGinnekenTreeNode* VGTreeLegalDynamicDistribution::CreateNode(HSteinerPoint no
       rootIndex = nodeIndex;
 
     }
-
-    /*for (int i = 1; i < (pPC - 1); i++)
-    {
-      vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
-      vGTree[nodeIndex].SetX(rx + (nx - rx) / (pPC - 1) * i);
-      vGTree[nodeIndex].SetY(ry + (ny - ry) / (pPC - 1) * i);
-      rootIndex = nodeIndex;
-    }*/
-
-    //if(path != NULL)
-    //  delete [] path;
-
     vGTree[rootIndex].SetLeft(CreateNode(tree->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex));
     vGTree[nodeIndex].SetX(spw.X());
     vGTree[nodeIndex].SetY(spw.Y());
+
+    vGTree[nodeIndex].SetType(5);
+
+    if (!spw.IsInternal())
+    {
+      vGTree[nodeIndex].SetType(4);
+    }
+
     rootIndex = nodeIndex;
 
     nodeIndex++;
@@ -868,7 +965,7 @@ VanGinnekenTreeNode* VGTreeLegalDynamicDistribution::CreateNode(HSteinerPoint no
       vGTree[nodeIndex].SetType(type);	
     }
 
-    if (nodeIndex >= treeSize)
+    if (nodeIndex >= totalTreeSize)
       ALERT("ERROR1!!!!!");
 
   }
@@ -974,6 +1071,14 @@ bool VGVariantsListElement::operator < (VGVariantsListElement& element)
     return true;
 }
 
+bool VGVariantsListElement::operator == (VGVariantsListElement& element)
+{
+  if (index == element.index)
+    return true;
+  else
+    return false;
+}
+
 VGVariantsListElement& VGVariantsListElement::operator = (VGVariantsListElement& element)
 {
   if(&element == this )
@@ -1053,6 +1158,11 @@ TemplateTypes<BufferPositions>::list* VGVariantsListElement::GetBufferPosition()
   return &bufferPositions;
 }
 
+int VGVariantsListElement::GetIndex()
+{
+  return index;
+}
+
 void VGVariantsListElement::SetBufferPosition(BufferPositions position)
 {
   bufferPositions.push_back(position);
@@ -1072,5 +1182,11 @@ void VGVariantsListElement::SetC(double capacity)
 {
   c = capacity;
 }
+
+void VGVariantsListElement::SetIndex(int i)
+{
+  index = i;
+}
+
 //VGVariantsListElement
 
