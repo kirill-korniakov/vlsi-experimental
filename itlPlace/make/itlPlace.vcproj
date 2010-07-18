@@ -1381,6 +1381,14 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Sizing"
+					>
+					<File
+						RelativePath="..\src\DetailedPlacement\LRSizing\LRSizing.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Routing"
@@ -10172,6 +10180,14 @@
 					>
 					<File
 						RelativePath="..\include\HippocratePlacement.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Sizing"
+					>
+					<File
+						RelativePath="..\include\LRSizing.h"
 						>
 					</File>
 				</Filter>

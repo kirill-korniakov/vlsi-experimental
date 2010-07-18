@@ -222,7 +222,8 @@ bool DoLRSizingIfRequired(HDPGrid& grid, const char* cfgOptName)
 				WRITELINE("LRSizing started");
 				//if (grid.Design().CanDoTiming()) ALERT("STA after detailed placement:");
 				//STA(grid.Design());
-				LambdaMatrix lm(grid,grid.Design());
+				//LambdaMatrix lm (grid,grid.Design());
+				DoLRSizing(grid, grid.Design());
 				WRITELINE("LRSizing finished");
 				return true;
 		}
