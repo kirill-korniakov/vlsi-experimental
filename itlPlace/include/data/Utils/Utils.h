@@ -10,3 +10,5 @@
 #include "TimingPointUtils.h"
 #include "TimingArcUtils.h"
 #include "TimingUtils.h"
+#include "BufferingUtils.h"
+#include "PlacementGridUtils.h"

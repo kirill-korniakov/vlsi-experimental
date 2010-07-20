@@ -1825,6 +1825,10 @@
 					Name="Utils"
 					>
 					<File
+						RelativePath="..\src\Data\Utils\BufferingUtils.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Data\Utils\CellUtils.cpp"
 						>
 					</File>
@@ -1849,7 +1853,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Data\Utils\PlacementGrid.cpp"
+						RelativePath="..\src\Data\Utils\PlacementGridUtils.cpp"
 						>
 					</File>
 					<File
@@ -10063,6 +10067,10 @@
 					Name="Utils"
 					>
 					<File
+						RelativePath="..\include\data\Utils\BufferingUtils.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\data\Utils\CellUtils.h"
 						>
 					</File>
@@ -10087,7 +10095,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\data\Utils\PlacementGrid.h"
+						RelativePath="..\include\data\Utils\PlacementGridUtils.h"
 						>
 					</File>
 					<File

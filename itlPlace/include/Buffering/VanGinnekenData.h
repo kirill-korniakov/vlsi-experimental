@@ -1,14 +1,15 @@
 #ifndef __VanGinnekenData_H__
 #define __VanGinnekenData_H__
 
-//#include "HDesign.h"
 #include "BufferInfo.h"
 #include "HSteinerPoint.h"
-//#include "HDPGrid.h
-#include "PlacementGrid.h"
+#include "PlacementGridUtils.h"
 
 class HDPGrid;
 class VanGinnekenTree;
+class HWirePhysicalParams;
+
+using namespace Utils;
 
 class VanGinnekenTreeNode
 {
@@ -205,27 +206,79 @@ public:
 
 
 };
-/*
-class VGVariantsList
+
+class VGAlgorithmData
 {
 protected:
-  BufferPositions* bufferPositions;
-  int sizeList;
-  int lastVariantId;
+  int partitionCount;
+  bool plotVGTree;
+  bool plotNets;
+  bool printNetInfo;
+  bool plotSteinerPoint;
+  bool printVariantsList;
+  int plotterWaitTime;
+  bool isInitialize;
+  bool isInsertInSourceAndSink;
+  int typeBufferingAlgorithm;
+  int typePartition;
+  double sizeBuffer;
+  int maxIndex;
+  bool* netVisit;
+  int maxBufferCount;
+  int typeModificationVanGinnekenList;
+
 public:
+  HDesign& design;
+  HWirePhysicalParams& WirePhisics;
+  TemplateTypes<BufferInfo>::vector Buffers;
 
-  VGVariantsList();
-  VGVariantsList(int sizeVariantsList);
+  VanGinnekenTree* vGTree;
 
-  void push_front(VGVariantsListElement element);
-  void push_back(VGVariantsListElement element);
-  void insert(VGVariantsListElement element, int index);
-  void erase(int id);
-  void UpdateVariant(VGVariantsListElement element, int id);
-  bufferPositions GetVariants(int id);
+  VGAlgorithmData(HDesign& hd);
+  ~VGAlgorithmData();
+  void Initialize();
+  void LoadBuffers();
 
-  
+  HDesign& GetDesign();
+  HWirePhysicalParams& GetWirePhisics();
+  TemplateTypes<BufferInfo>::vector GetBuffers();
+  int GetPartitionCount();
+  bool GetPlotVGTree();
+  bool GetPlotNets();
+  bool GetPrintNetInfo();
+  bool GetPlotSteinerPoint();
+  bool GetPrintVariantsList();
+  int GetPlotterWaitTime();
+  bool GetIsInitialize();
+  bool GetIsInsertInSourceAndSink();
+  int GetTypeBufferingAlgorithm();
+  int GetTypePartition();
+  double GetSizeBuffer();
+  int GetMaxIndex();
+  VanGinnekenTree* GetVGTree();
+  bool* GetNetVisit();
+  int GetMaxBufferCount();
+  int GetTypeModificationVanGinnekenList();
+
+  void SetWirePhisics(HWirePhysicalParams& wPP);
+  void SetBuffers(TemplateTypes<BufferInfo>::vector buf);
+  void SetPartitionCount(int pC);
+  void SetPlotVGTree(bool pVGT);
+  void SetPlotNets(bool pN);
+  void SetPrintNetInfo(bool pNI);
+  void SetPlotSteinerPoint(bool pSP);
+  void SetPrintVariantsList(bool pVL);
+  void SetPlotterWaitTime(int pWT);
+  void SetIsInitialize(bool iIL);
+  void SetIsInsertInSourceAndSink(bool iIISAS);
+  void SetTypeBufferingAlgorithm(int tBA);
+  void SetTypePartition(int tP);
+  void SetSizeBuffer(double sB);
+  void SetMaxIndex(int mI);
+  void SetVGTree(VanGinnekenTree* vgT);
+  void SetNetVisit(bool* nV);
+  void SetMaxBufferCount(int mBC);
+  void SetTypeModificationVanGinnekenList(int tMVGL);
 
 };
-*/
 #endif //__VanGinnekenData_H__

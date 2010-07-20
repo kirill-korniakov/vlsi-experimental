@@ -1058,14 +1058,14 @@ VGVariantsListElement::VGVariantsListElement()
 }
 bool VGVariantsListElement::operator > (VGVariantsListElement& element)
 {
-  if ((c < element.c) && (RAT > element.RAT))
+  if ((c > element.c) && (RAT > element.RAT))
     return true;
   else
     return false;
 }
 bool VGVariantsListElement::operator < (VGVariantsListElement& element)
 {
-  if ((c < element.c) && (RAT > element.RAT))
+  if ((c < element.c) && (RAT < element.RAT))
     return false;
   else
     return true;
@@ -1190,3 +1190,300 @@ void VGVariantsListElement::SetIndex(int i)
 
 //VGVariantsListElement
 
+//VGAlgorithmData
+
+VGAlgorithmData::VGAlgorithmData(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
+{
+  partitionCount = 0;
+  plotVGTree = false;
+  plotNets = false;
+  printNetInfo = false;
+  plotSteinerPoint = false;
+  printVariantsList = false;
+  plotterWaitTime = 1;
+  isInitialize = false;
+  isInsertInSourceAndSink =false;
+  typeBufferingAlgorithm = 0;
+  sizeBuffer = 0; 
+  maxIndex = 0;
+  vGTree = NULL;
+  netVisit = NULL;
+  maxBufferCount = 0;
+}
+
+VGAlgorithmData::~VGAlgorithmData()
+{
+  if (netVisit != NULL)
+    delete [] netVisit;
+}
+
+void VGAlgorithmData::Initialize()
+{
+  isInitialize = true;
+  LoadBuffers();
+  plotSteinerPoint = design.cfg.ValueOf("PlotSteinerPoint", false);
+  plotVGTree = design.cfg.ValueOf("PlotVGTree", false);
+  plotNets = design.cfg.ValueOf("PlotNets", false);
+  printNetInfo = design.cfg.ValueOf("PrintNetInfo", false);
+  printVariantsList = design.cfg.ValueOf("PrintVGVariantsList", false);
+  partitionCount = design.cfg.ValueOf("Interval", 1);
+  plotterWaitTime = design.cfg.ValueOf("PlotterWaitTime", 1);
+  isInsertInSourceAndSink = design.cfg.ValueOf("IsInsertInSourceAndSink", true);
+  typeBufferingAlgorithm = design.cfg.ValueOf("TypeBufferingAlgorithm", 0);
+  typePartition = design.cfg.ValueOf("TypePartition", 0);
+
+  netVisit = new bool [design.Nets.Count() * 2];
+  for (int i = 0; i < design.Nets.Count() * 2; i++)
+  {
+    netVisit[i] = false;
+  }
+
+  maxBufferCount = design.cfg.ValueOf("MaxBufferCount", 0);
+  typeModificationVanGinnekenList = design.cfg.ValueOf("TypeModificationVanGinnekenList", 0);
+
+  ALERT("Partition type: %d", typePartition);
+  ALERT("Buffering algorithm type type: %d", typeBufferingAlgorithm);
+  ALERT("Type modification van Ginneken list: %d", typeModificationVanGinnekenList);
+  ALERT("Maximum insert buffer in net: %d", maxBufferCount);
+}
+
+void VGAlgorithmData::LoadBuffers()
+{
+  if (design.cfg.ValueOf("UseOnlyDefaultBuffer", false))
+  {
+    BufferInfo buf = BufferInfo::Create(design);    
+    Buffers.push_back(buf);
+    ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, buf.Type()).Name().c_str(),
+      (design, buf.InPin()).Name().c_str(), (design, buf.OutPin()).Name().c_str());
+    sizeBuffer = design[buf.Type()].SizeX();
+  }
+  else
+  {
+    string sBufferList = design.cfg.ValueOf("BufferList", "");
+    unsigned int n = design.cfg.ValueOf("BufferListLength", 0);
+    string* bufferList = NULL;
+    if (n > 0)
+    {
+      bufferList = new string [n];     
+      for (unsigned int i = 0, j = 0, t = 0; (i < sBufferList.length()) && (j < n); i++, t++)
+      {
+        if(sBufferList[i] != ',')
+          bufferList[j].push_back(sBufferList[i]);
+        else
+        {
+          t = -1;
+          //bufferList[j].push_back(0);
+          j++;
+        }
+      }
+      //bufferList[n - 1].push_back(0);
+    }
+
+    Buffers = BufferInfo::CreateVector(design, bufferList);
+    for (unsigned int i = 0; i < Buffers.size(); i++)
+    {
+      ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, Buffers[i].Type()).Name().c_str(),
+        (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
+      if (design[Buffers[i].Type()].SizeX() > sizeBuffer)
+        sizeBuffer = design[Buffers[i].Type()].SizeX();
+    }
+  }
+}
+
+
+HDesign& VGAlgorithmData::GetDesign()
+{
+  return design;
+}
+
+HWirePhysicalParams& VGAlgorithmData::GetWirePhisics()
+{
+  return WirePhisics;
+}
+
+TemplateTypes<BufferInfo>::vector VGAlgorithmData::GetBuffers()
+{
+  return Buffers;
+}
+
+int VGAlgorithmData::GetPartitionCount()
+{
+  return partitionCount;
+}
+
+bool VGAlgorithmData::GetPlotVGTree()
+{
+  return plotVGTree;
+}
+
+bool VGAlgorithmData::GetPlotNets()
+{
+  return plotNets;
+}
+
+bool VGAlgorithmData::GetPrintNetInfo()
+{
+  return printNetInfo;
+}
+
+bool VGAlgorithmData::GetPlotSteinerPoint()
+{
+  return plotSteinerPoint;
+}
+
+bool VGAlgorithmData::GetPrintVariantsList()
+{
+  return printVariantsList;
+}
+
+int VGAlgorithmData::GetPlotterWaitTime()
+{
+  return plotterWaitTime;
+}
+
+bool VGAlgorithmData::GetIsInitialize()
+{
+  return isInitialize;
+}
+
+bool VGAlgorithmData::GetIsInsertInSourceAndSink()
+{
+  return isInsertInSourceAndSink;
+}
+
+int VGAlgorithmData::GetTypeBufferingAlgorithm()
+{
+  return typeBufferingAlgorithm;
+}
+
+int VGAlgorithmData::GetTypePartition()
+{
+  return typePartition;
+}
+
+double VGAlgorithmData::GetSizeBuffer()
+{
+  return sizeBuffer;
+}
+
+int VGAlgorithmData::GetMaxIndex()
+{
+  return maxIndex;
+}
+
+VanGinnekenTree* VGAlgorithmData::GetVGTree()
+{
+  return vGTree;
+}
+
+bool* VGAlgorithmData::GetNetVisit()
+{
+  return netVisit;
+}
+
+int VGAlgorithmData::GetMaxBufferCount()
+{
+  return maxBufferCount;
+}
+
+int VGAlgorithmData::GetTypeModificationVanGinnekenList()
+{
+  return typeModificationVanGinnekenList;
+}
+
+void VGAlgorithmData::SetWirePhisics(HWirePhysicalParams& wPP)
+{
+  WirePhisics = wPP;
+}
+
+void VGAlgorithmData::SetBuffers(TemplateTypes<BufferInfo>::vector buf)
+{
+  Buffers = buf;
+}
+
+void VGAlgorithmData::SetPartitionCount(int pC)
+{
+  partitionCount = pC;
+}
+
+void VGAlgorithmData::SetPlotVGTree(bool pVGT)
+{
+  plotVGTree = pVGT;
+}
+
+void VGAlgorithmData::SetPlotNets(bool pN)
+{
+  plotNets = pN;
+}
+
+void VGAlgorithmData::SetPrintNetInfo(bool pNI)
+{
+  printNetInfo = pNI;
+}
+
+void VGAlgorithmData::SetPlotSteinerPoint(bool pSP)
+{
+  plotSteinerPoint = pSP;
+}
+
+void VGAlgorithmData::SetPrintVariantsList(bool pVL)
+{
+  printVariantsList = pVL;
+}
+
+void VGAlgorithmData::SetPlotterWaitTime(int pWT)
+{
+  plotterWaitTime = pWT;
+}
+
+void VGAlgorithmData::SetIsInitialize(bool iIL)
+{
+  isInitialize = iIL;
+}
+
+void VGAlgorithmData::SetIsInsertInSourceAndSink(bool iIISAS)
+{
+  isInsertInSourceAndSink = iIISAS;
+}
+
+void VGAlgorithmData::SetTypeBufferingAlgorithm(int tBA)
+{
+  typeBufferingAlgorithm = tBA;
+}
+
+void VGAlgorithmData::SetTypePartition(int tP)
+{
+  typePartition = tP;
+}
+
+void VGAlgorithmData::SetSizeBuffer(double sB)
+{
+  sizeBuffer = sB;
+}
+
+void VGAlgorithmData::SetMaxIndex(int mI)
+{
+  maxIndex = mI;
+}
+
+void VGAlgorithmData::SetVGTree(VanGinnekenTree* vgT)
+{
+  vGTree = vgT;
+}
+
+void VGAlgorithmData::SetNetVisit(bool* nV)
+{
+  netVisit = nV;
+}
+
+void VGAlgorithmData::SetMaxBufferCount(int mBC)
+{
+  maxBufferCount = mBC;
+}
+
+void VGAlgorithmData::SetTypeModificationVanGinnekenList(int tMVGL)
+{
+  typeModificationVanGinnekenList = tMVGL;
+}
+
+//VGAlgorithmData
