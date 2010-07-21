@@ -311,7 +311,7 @@ VGVariantsListElement HVGAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   }
   if (data->GetPrintNetInfo())
   {
-    ALERT("best pos = %d\ttmax = %.2f\n", best.GetPositionCount(), tMax);
+    ALERT("best pos = %d\ttmax = %.20f\n", best.GetPositionCount(), tMax);
   }
   //PrintVariantsNode(&best, 0);
   delete vGList;
@@ -855,7 +855,7 @@ ModificationVanGinnekenListAccountingBorder::MergeList(TemplateTypes<VGVariantsL
   for (TemplateTypes<VGVariantsListElement>::list::iterator left = leftVGList->begin(); left != leftVGList->end(); left++)
     for (TemplateTypes<VGVariantsListElement>::list::iterator right = RightVGList->begin(); right != RightVGList->end(); right++)
     {
-      if (((left->GetPositionCount() + right->GetPositionCount()) >= vGAlgorithm->data->GetMaxBufferCount()) && (vGAlgorithm->data->GetMaxBufferCount() > 0))
+      if (((left->GetPositionCount() + right->GetPositionCount()) > vGAlgorithm->data->GetMaxBufferCount()) && (vGAlgorithm->data->GetMaxBufferCount() > 0))
         continue;
 
       VGVariantsListElement newElement;
@@ -904,6 +904,7 @@ void ModificationVanGinnekenListAccountingBorder::AddBuffer(
     double t;
 
     TemplateTypes<VGVariantsListElement>::list::iterator iOpt;
+    bool findOpt = false;
     for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
     {
       if ((i->GetPositionCount() >= vGAlgorithm->data->GetMaxBufferCount()) && (vGAlgorithm->data->GetMaxBufferCount() > 0))
@@ -915,17 +916,21 @@ void ModificationVanGinnekenListAccountingBorder::AddBuffer(
       {
         tMax = t;
         iOpt = i;
+        findOpt = true;
       }
     }
-    VGVariantsListElement newElement;
-    newElement.SetBufferPosition(*iOpt->GetBufferPosition());
-    BufferPositions bp(node, &vGAlgorithm->data->Buffers[j], 0);
-    newElement.SetBufferPosition(bp);
-    newElement.SetC(vGAlgorithm->data->Buffers[j].Cb());
-    newElement.SetRAT(tMax);    
-    vGAlgorithm->data->SetMaxIndex(vGAlgorithm->data->GetMaxIndex() + 1);
-    newElement.SetIndex(vGAlgorithm->data->GetMaxIndex());
-    InsertVGVariantsListElement(vGList, newElement);
+    if (findOpt)
+    {
+      VGVariantsListElement newElement;
+      newElement.SetBufferPosition(*iOpt->GetBufferPosition());
+      BufferPositions bp(node, &vGAlgorithm->data->Buffers[j], 0);
+      newElement.SetBufferPosition(bp);
+      newElement.SetC(vGAlgorithm->data->Buffers[j].Cb());
+      newElement.SetRAT(tMax);    
+      vGAlgorithm->data->SetMaxIndex(vGAlgorithm->data->GetMaxIndex() + 1);
+      newElement.SetIndex(vGAlgorithm->data->GetMaxIndex());
+      InsertVGVariantsListElement(vGList, newElement);
+    }
   }
 }
 
@@ -945,7 +950,7 @@ TemplateTypes<VGVariantsListElement>::list* ExhaustiveSearch::MergeList(
   for (TemplateTypes<VGVariantsListElement>::list::iterator left = leftVGList->begin(); left != leftVGList->end(); left++)
     for (TemplateTypes<VGVariantsListElement>::list::iterator right = RightVGList->begin(); right != RightVGList->end(); right++)
     {
-      if (( (left->GetPositionCount() + right->GetPositionCount()) >= vGAlgorithm->data->GetMaxBufferCount()) && (vGAlgorithm->data->GetMaxBufferCount() > 0))
+      if (( (left->GetPositionCount() + right->GetPositionCount()) > vGAlgorithm->data->GetMaxBufferCount()) && (vGAlgorithm->data->GetMaxBufferCount() > 0))
         continue;
 
       VGVariantsListElement newElement;
