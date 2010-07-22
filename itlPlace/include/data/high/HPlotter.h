@@ -68,6 +68,7 @@ public:
 
   //Plot methods
   void PlotPlacement();
+  static void PlotPath(HDesign& design, HCriticalPath path, int pathNumber);
   void PlotBinGrid(int nBinRows, int nBinCols);
   void PlotGradients(int nClusters, double* coordinates, double* gradients, double scaling, Color col);
   void PlotCell(HCell cell, Color col);

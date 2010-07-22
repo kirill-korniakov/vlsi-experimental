@@ -405,7 +405,9 @@ void PropagateArrivals(HDesign& design)
     HPin pin = pt.Pin();
     if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
     {//single arc from net source
-      HTimingPoint source = design.TimingPoints[design.Get<HNet::Source, HPin>(design.Get<HPin::Net, HNet>(pin))];
+      HNet net = design.Get<HPin::Net, HNet>(pin);
+      HPin sourcePin = design.Get<HNet::Source, HPin>(net);
+      HTimingPoint source = design.TimingPoints[sourcePin];
       dp.SetArrivalTime(pt, dp.GetSinkArrivalTime(source, design.SteinerPoints[pin]));
       dp.SetArrivalAncestor(pt, source);
     }
@@ -775,11 +777,11 @@ void GetArrivalFallingArc(HDesign& hd,
 }
 
 void GetArrivalArc(HDesign& hd,
-                         HTimingPoint startPoint,
-                         HTimingPoint endPoint,
-                         HTimingArcType* arc,
-                         double* arcTime,
-                         bool* isInversed)
+                   HTimingPoint startPoint,
+                   HTimingPoint endPoint,
+                   HTimingArcType* arc,
+                   double* arcTime,
+                   bool* isInversed)
 {
   *arc = FindArc<1>(hd, endPoint, ArrivalArcSelector1D(), *arcTime, *isInversed);
 }

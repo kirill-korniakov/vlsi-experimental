@@ -580,6 +580,23 @@ void HPlotter::PlotPlacement()
   cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
 }
 
+void HPlotter::PlotPath(HDesign& design, HCriticalPath path, int pathNumber)
+{
+    ASSERT(design.CanDoTiming());
+    char fileName[32];
+    char signature[256];
+    sprintf(fileName, "critical_path_%d", pathNumber);
+    sprintf(signature, "critical path #%d %f", pathNumber, design.GetDouble<HCriticalPath::Criticality>(path));
+
+    design.Plotter.Clear();
+    design.Plotter.PlotPlacement();
+    design.Plotter.PlotCriticalPath(path);
+    design.Plotter.PlotText(signature);
+    design.Plotter.Refresh("CriticalPaths.plotWait");
+    design.Plotter.SaveImage(fileName,
+        design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_critical_path\\");
+}
+
 void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
 {
   if (IsEnabled())

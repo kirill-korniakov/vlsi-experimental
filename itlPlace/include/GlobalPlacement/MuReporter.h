@@ -9,7 +9,9 @@ class MuReporter
 {
 public:
     MuReporter(HDesign& design);
-    void Report(HDesign& design, TimingPointMus* mus);
+    void Report(HDesign& design, TimingPointMus* mus, string msg = "");
+
+    string GetCellPinName(HDesign& design, HTimingPointWrapper pt);
 
 private:
     TimingPointMus* mus;
