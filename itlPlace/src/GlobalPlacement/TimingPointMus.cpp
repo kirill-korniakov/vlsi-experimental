@@ -2,6 +2,13 @@
 #include "Utils.h"
 #include "STA.h"
 #include "Timing.h"
+#include "DelayPropagation.h"
+#include "Reporting.h"
+
+#include "float.h"
+#include <vector>
+
+using namespace std;
 
 const int ONE_FOR_MUA_AND_ONE_FOR_MUR = 2;
 
@@ -18,34 +25,43 @@ int CountLeftArcs(HDesign& design, HNet net)
     return i;
 }
 
-TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0)
+void TimingPointMus::InitMuSOnTSP(HDesign& design, double defaultMu)
+{
+    HTimingPoint startPointsEnd = design.TimingPoints.FirstInternalPoint();
+    for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()];
+        sp.GoNext() != startPointsEnd; )
+    {
+        //WRITELINE("InitMuS at %s", reporter->GetCellPinName(design, sp).c_str());
+        SetMuS(sp, defaultMu);
+    }
+}
+
+void TimingPointMus::InitMusInternalAndTED(HDesign& design, double defaultMu) 
+{
+    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; !::IsNull(tp); tp.GoNext() )
+    {
+        //WRITELINE("InitMus at %s", reporter->GetCellPinName(design, tp).c_str());
+        InitPointMus(design, tp, defaultMu); 
+    }
+}
+
+TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0), reporter(new MuReporter(design))
 {
     size = design._Design.NetList.nPinsLimit;
     ::Grow(&MuS, 0, size);
     ::Grow(&MuIn, 0, size);
 
-    //init internal mus
-    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; !::IsNull(tp); tp.GoNext() )
-    {
-        //WRITELINE("InitMus of %s", reporter->GetCellPinName(design, tp).c_str());
-        InitPointMus(design, tp); 
-        
-        if (tp == design.TimingPoints.LastInternalPoint()) break;
-    }
-            
-    //init mus on timing end points
-    HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
-    for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];
-        ep.GoPrevious() != endPointsEnd; )
-    {
-        //WRITELINE("InitInMus of %s", reporter->GetCellPinName(design, ep).c_str());
-        double defaultMu = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.muLR", 0.99);
-        MuIn[::ToID(ep)].resize(ONE_FOR_MUA_AND_ONE_FOR_MUR, defaultMu);
-    }
+    double defaultMu = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.muLR", 0.99);
 
+    minFactor = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.minFactor", 0.01);
+    referenceValue = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.referenceValue", 100);
+    nIncreased = 0;
+    nDecreased = 0;
+
+    InitMuSOnTSP(design, defaultMu);
+    InitMusInternalAndTED(design, defaultMu);
     EnforceFlowProperty(design);
-
-    reporter = new MuReporter(design);
+    reporter->Report(design, this, "AFTER INITIAL ASSIGNMENT");
 }
 
 TimingPointMus::~TimingPointMus()
@@ -72,7 +88,8 @@ void TimingPointMus::EnforceRequiredFlowProperty(HDesign& design, HTimingPoint p
 
 void TimingPointMus::EnforceFlowProperty(HDesign& design)
 {
-    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; !::IsNull(tp); tp.GoNext() )
+    //go from TSP to the LastInternalPoint because we propagate muR to the right
+    for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()]; !::IsNull(tp.GoNext()); )
     {
         //WRITELINE("EnforceRMus of %s", reporter->GetCellPinName(design, tp).c_str());
         EnforceRequiredFlowProperty(design, tp);
@@ -80,7 +97,8 @@ void TimingPointMus::EnforceFlowProperty(HDesign& design)
         if (tp == design.TimingPoints.LastInternalPoint()) break;
     }
 
-    for (HTimingPointWrapper tp = design[design.TimingPoints.LastInternalPoint()];  !::IsNull(tp); tp.GoPrevious() )
+    //go from TED to the FirstInternalPoint because we propagate muA to the left
+    for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];  !::IsNull(tp.GoPrevious()); )
     {
         //WRITELINE("EnforceAMus of %s", reporter->GetCellPinName(design, tp).c_str());
         EnforceArrivalFlowProperty(design, tp);
@@ -138,6 +156,11 @@ double TimingPointMus::SumOutMuR(HDesign& design, HTimingPoint pt)
     return acc.sum;
 }
 
+void TimingPointMus::ScaleOutMuRByIndex(HDesign& design, HTimingPoint pt, double multiplier, int index)
+{
+    IterateOutMu(design, pt, ScaleMuR(multiplier, index));
+}
+
 void TimingPointMus::ScaleOutMuR(HDesign& design, HTimingPoint pt, double multiplier)
 {
     IterateOutMu(design, pt, ScaleMuR(multiplier));
@@ -147,7 +170,7 @@ void TimingPointMus::ScaleInMuA(HTimingPoint pt, double multiplier)
 {
     for (int i = 0; i < GetMuInCount(pt); i++)
     {
-        SetMuInA(pt, i, GetInMuA(pt, i) * multiplier);
+        SetInMuA(pt, i, GetInMuA(pt, i) * multiplier);
     }
 }
 
@@ -168,19 +191,19 @@ void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo
     {//cell input pin, iterate cell arcs
         HCell cell = design.Get<HPin::Cell, HCell>(pin);
 
-        for (HCell::PinsEnumeratorW p = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(cell); p.MoveNext(); )
+        for (HCell::PinsEnumeratorW pin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(cell); pin.MoveNext(); )
         {
-            if (p.Direction() != PinDirection_OUTPUT || ::IsNull(p.Net())) 
+            if (pin.Direction() != PinDirection_OUTPUT || ::IsNull(pin.Net())) 
                 continue;
 
-            HTimingPoint point = design.TimingPoints[p];
+            HTimingPoint point = design.TimingPoints[pin];
             int idx = 0;
-            for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(p.Type());
+            for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(pin.Type());
                 arc.MoveNext();)
             {
                 if (arc.TimingType() == TimingType_Combinational)
                 {
-                    if (arc.GetStartPin(p) == pin)
+                    if (arc.GetStartPin(pin) == pin)
                         todo(*this, point, idx);
                     idx++;
                 }
@@ -189,10 +212,8 @@ void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo
     }
 }
 
-void TimingPointMus::InitPointMus(HDesign& design, HTimingPoint pt)
+void TimingPointMus::InitPointMus(HDesign& design, HTimingPoint pt, double defaultMu)
 {
-    double defaultMu = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.muLR", 0.99);
-
     SetMuS(pt, defaultMu);
 
     HPin pin = design.Get<HTimingPoint::Pin, HPin>(pt);
@@ -208,13 +229,19 @@ void TimingPointMus::InitPointMus(HDesign& design, HTimingPoint pt)
     }
 }
 
-int nIncreased = 0;
-int nDecreased = 0;
-
-double TimingPointMus::CalculateFactor(double slack, double theta) 
+double TimingPointMus::CalculateLocalFactor(double slack, double theta) 
 {
-    double minFactor = 0.01;
-    double referenceValue = 100;
+    double factor = 0.0;
+
+    double r = (-slack + referenceValue) / referenceValue;
+    factor = pow(r, theta);
+    factor = minFactor + (1.0 - minFactor) * factor;	
+
+    return factor;
+}
+
+double TimingPointMus::CalculateInjectionFactor(double slack, double theta) 
+{
     double factor = 0.0;
 
     double r = (-slack + referenceValue) / referenceValue;
@@ -236,128 +263,156 @@ double TimingPointMus::CalculateFactor(double slack, double theta)
 
 void TimingPointMus::UpdateMuS(HDesign& design, double theta)
 {
-    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; 
-        tp.GoNext() != design.TimingPoints.LastInternalPoint(); )
+    for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()]; !IsNull(tp.GoNext()); )
     {
-        double factor = CalculateFactor(tp.Slack(), theta);
+        double factor = CalculateInjectionFactor(tp.Slack(), theta);
         SetMuS(tp, GetMuS(tp) * factor);
-        //HPinWrapper pin = design[tp.Pin()];
-        //WRITELINE("%10s %f %f", pin.Name().c_str(), factor, GetMuS(tp));
     }
 }
 
-void TimingPointMus::UpdateMuAOnTEP(HDesign& design, double theta)
+void TimingPointMus::UpdateLocalMuA(HDesign& design, double theta)
 {
-    HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
-    for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];
-        ep.GoPrevious() != endPointsEnd; )
+    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; !IsNull(tp.GoNext()); )
     {
-        //WRITELINE("UpdateMuAOnPO of %s", reporter->GetCellPinName(design, ep).c_str());
-        double factor = CalculateFactor(ep.Slack(), theta);
-        SetMuInA(ep, 0, GetInMuA(ep, 0) * factor);
+        size_t nMuIn = GetMuInCount(tp);
+
+        if (nMuIn == 1) continue; //we don't have to estimate criticality of a single arc
+
+        HPin pin = tp.Pin();
+        ASSERT(IsOutputPin(design, pin));
+
+        //obtain input slacks
+        DelayPropagation<1> dp(design);
+        CalcArrivalTimeOnOutputPin(design, pin, dp);
+        ASSERT(nMuIn == dp.checkedArrivals.size());
+
+        //calculate local slacks
+        vector<double> localSlacks;
+        double reqTime = tp.RequiredTime();
+        for (size_t i = 0; i < nMuIn; i++)
+        {
+            localSlacks.push_back(reqTime - dp.checkedArrivals[i]);
+        }
+
+        //find minimum slack
+        double minSlack = DBL_MAX;
+        for (size_t i = 0; i < nMuIn; i++)
+        {
+            if (minSlack > localSlacks[i])
+                minSlack = localSlacks[i];
+        }
+
+        //shift slacks
+        for (size_t i = 0; i < nMuIn; i++)
+        {
+            localSlacks[i] -= minSlack;
+        }
+
+        //in a loop scale the input muA according to their criticality
+        for (size_t i = 0; i < nMuIn; i++)
+        {
+            double factor = CalculateLocalFactor(localSlacks[i], theta);
+            SetInMuA(tp, i, factor * GetInMuA(tp, i));
+        }
+
+        if (tp == design.TimingPoints.LastInternalPoint()) break;
     }
 }
 
-void TimingPointMus::UpdateMuROnTSP(HDesign& design, double theta)
+void TimingPointMus::UpdateLocalMuR(HDesign& design, double theta)
 {
-    HTimingPoint startPointsEnd = design.TimingPoints.FirstInternalPoint();
-    for (HTimingPointWrapper sp = design[design.TimingPoints.TopologicalOrderRoot()];
-        sp.GoNext() != startPointsEnd; )
+    for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()]; !IsNull(tp.GoNext()); )
     {
-        HTimingPointWrapper tp = design[sp];
-        
-        //int sz = GetMuOutCount(design, tp);
-        //ALERT("MuOutCount = %d", sz);
+        size_t nMuOut = GetMuOutCount(design, tp);
+        vector<double> localSlacks;
+        double arrTime = tp.ArrivalTime();
+
+        if (nMuOut == 1) continue; //we don't have to estimate criticality of a single arc
+
+        //obtain output slacks
+        HPin pin = tp.Pin();
+        GetCellPinName(design, tp);
+
+        if (IsInputPin(design, pin))
+        {//this is a cell input pin
+            //collect arrival times
+            DelayPropagation<1> dp(design);
+            CalcRequiredTimeOnInputPins(design, pin, dp);
+            ASSERT(nMuOut == dp.checkedRequireds.size());
+
+            //calculate local slacks
+            for (size_t i = 0; i < nMuOut; i++)
+            {
+                localSlacks.push_back(dp.checkedRequireds[i] - arrTime);
+            }
+        }
+        else
+        {//this is a net source
+            //collect required times
+            HNet net = design.Get<HPin::Net, HNet>(pin);
+            HPin sourcePin = design.Get<HNet::Source, HPin>(net);
+            ASSERT(sourcePin == pin);
+
+            vector<double> requiredTimes;
+            for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(net); sink.MoveNext(); )
+            {
+                HTimingPointWrapper tp = design[design.TimingPoints[sink]];
+                HSteinerPointWrapper stP = design[design.SteinerPoints[sink]];
+                requiredTimes.push_back(tp.RequiredTime() - stP.PathDelay());
+            }
+            ASSERT(nMuOut == requiredTimes.size());
+
+            //calculate local slacks
+            for (size_t i = 0; i < nMuOut; i++)
+            {
+                localSlacks.push_back(requiredTimes[i] - arrTime);
+            }
+        }
+
+        //find minimum slack
+        double minSlack = DBL_MAX;
+        for (size_t i = 0; i < nMuOut; i++)
+        {
+            if (minSlack > localSlacks[i])
+                minSlack = localSlacks[i];
+        }
+
+        //shift slacks
+        for (size_t i = 0; i < nMuOut; i++)
+        {
+            localSlacks[i] -= minSlack;
+        }
+
+        //in a loop scale the input muA according to their criticality
+        for (size_t i = 0; i < nMuOut; i++)
+        {
+            double factor = CalculateLocalFactor(localSlacks[i], theta);
+            ScaleOutMuRByIndex(design, tp, factor, i);
+        }
+
+        if (tp == design.TimingPoints.LastInternalPoint()) break;
     }
 }
-
-//void TimingPointMus::UpdateMuAMuROnPrimaries(HDesign& design, double theta)
-//{
-//    for (HPins::PrimariesEnumeratorW pin = design.Pins.GetEnumeratorW(); pin.MoveNext(); )
-//    {
-//        HTimingPointWrapper tp = design[design.TimingPoints[pin]];
-//        double factor = CalculateFactor(tp.Slack(), theta);
-//
-//        if (pin.IsPrimaryInput())
-//            SetMuInR(tp, 0, GetInMuR(tp, 0) * factor);
-//            
-//        else
-//            SetMuInA(tp, 0, GetInMuA(tp, 0) * factor);
-//    }
-//}
-
-//void TimingPointMus::UpdateLocalMuAMuR(HDesign& design, double theta)
-//{
-//    for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; 
-//        tp.GoNext() != design.TimingPoints.LastInternalPoint(); )
-//    {
-//
-//        HPin pin = tp.Pin();
-//
-//        if (pin.Direction == PinDirection::PinDirection_INPUT)
-//        {//cell input pin, single input arc (do not update), possible several output arcs (update)
-//            double targetSlack = 0.0;
-//
-//
-//        }
-//        else
-//        {//cell output pin, possible several input and output arcs
-//
-//        }
-//
-//
-//        double targetSlackA = 0.0;
-//        
-//
-//        tp.ArrivalAncestor()
-//        tp.
-//
-//        if (tp.IsPrimary())
-//            continue;
-//
-//        GetMuInCount(tp)
-//
-//        double factor = CalculateFactor(tp.Slack(), theta);
-//        SetMuS(tp, GetMuS(tp) * factor);
-//    }
-//
-//    for (HPins::PrimariesEnumeratorW pin = design.Pins.GetEnumeratorW(); pin.MoveNext(); )
-//    {
-//        HTimingPoint tp = design.TimingPoints[pin];
-//        double factor = CalculateFactor(tp.Slack(), theta);
-//
-//        if (pin.IsPrimaryInput())
-//            SetMuInA(tp, 0, GetInMuA(tp, 0) * factor);
-//        else
-//            SetMuInR(tp, 0, GetInMuR(tp, 0) * factor);
-//    }
-//}
 
 void TimingPointMus::UpdateMus(HDesign& design)
 {
     ALERT("Mu Updating");
+    nIncreased = 0;
+    nDecreased = 0;
 
     STA(design, false);
-
-    double theta = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.theta", 2.0);
     
-    reporter->Report(design, this, "BEFORE UPDATING");
+    double theta = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.theta", 2.0);
 
     UpdateMuS(design, theta);
-    reporter->Report(design, this, "UpdateMuS");
-    
-    UpdateMuAOnTEP(design, theta);
-    reporter->Report(design, this, "UpdateMuAOnTEP");
-    
-    UpdateMuROnTSP(design, theta);
-    reporter->Report(design, this, "UpdateMuROnTSP");
-    
-    //UpdateLocalMuAMuR(design, theta);
-    reporter->Report(design, this, "AFTER UPDATING");
+    //reporter->Report(design, this, "UpdateMuS");    
+    UpdateLocalMuA(design, theta);
+    //reporter->Report(design, this, "UpdateLocalMuA");
+    UpdateLocalMuR(design, theta);
+    //reporter->Report(design, this, "UpdateLocalMuR");
 
     EnforceFlowProperty(design);
-
-    reporter->Report(design, this, "AFTER ENFORCING");
+    reporter->Report(design, this, "UPDATED MUS");
 
     ALERT("  Total: %d", nIncreased + nDecreased);
     ALERT("  Increased: %d", nIncreased);

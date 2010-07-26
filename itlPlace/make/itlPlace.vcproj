@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="itlPlace"
 	ProjectGUID="{10EDF02C-5EB0-4A8B-A45D-B00D27F0749D}"
 	RootNamespace="itlPlace"
@@ -1166,6 +1166,10 @@
 				Name="Timing"
 				>
 				<File
+					RelativePath="..\src\Timing\ArcSelectors.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Timing\CriticalPaths.cpp"
 					>
 				</File>
@@ -1731,10 +1735,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Data\HPlacementRow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Data\HPlotter.cpp"
 					>
 				</File>
 				<File
@@ -9838,6 +9838,18 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Plotter"
+				>
+				<File
+					RelativePath="..\src\Plotter\CongestionMaps.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Plotter\HPlotter.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="include"
@@ -10337,6 +10349,10 @@
 				>
 				<File
 					RelativePath="..\include\DelayCalculation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\DelayPropagation.h"
 					>
 				</File>
 				<File

@@ -11,8 +11,6 @@ public:
     MuReporter(HDesign& design);
     void Report(HDesign& design, TimingPointMus* mus, string msg = "");
 
-    string GetCellPinName(HDesign& design, HTimingPointWrapper pt);
-
 private:
     TimingPointMus* mus;
     double scaling;
@@ -21,6 +19,7 @@ private:
     int plotX;
 
     void ReportMus(HDesign& design);
+    void ReportMuHistogram(HDesign& design);
     void PlotMusInTopologicalOrder(HDesign& design);
     void PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx);
     void PlotMusInCriticalPathOrder(HDesign& design);

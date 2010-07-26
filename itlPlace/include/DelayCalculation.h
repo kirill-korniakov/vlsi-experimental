@@ -53,7 +53,7 @@ namespace DelayCalculationInternals
         - aDesign.GetDouble<HSteinerPoint::X>(aSecondPoint));
       double lv = fabs(aDesign.GetDouble<HSteinerPoint::Y>(aFirstPoint)
         - aDesign.GetDouble<HSteinerPoint::Y>(aSecondPoint));
-      //test if horisontal or vertical or diagonal
+      //test if horizontal or vertical or diagonal
       if (lh <= aPhysics.VertPitch)
       {
         aDesign.Set<HSteinerPoint::ExtractedC>(aSecondPoint,

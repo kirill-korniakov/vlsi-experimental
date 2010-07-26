@@ -3,20 +3,11 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include "SensitivityGuidedNetWeighting.h"
+#include "Reporting.h"
+
 #include <math.h>
 #include <string>
 
-void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr)
-{
-  char tmpFloat[32];
-  sprintf(tmpFloat, "%f\t", Utils::TNS(hd));
-  tnsStr += tmpFloat;
-  WRITELINE(("%s", tnsStr.c_str()));
-
-  sprintf(tmpFloat, "%f\t", Utils::WNS(hd));
-  wnsStr += tmpFloat;
-  WRITELINE(("%s", wnsStr.c_str()));
-}
 
 double D(double s, double T, double beta)
 {

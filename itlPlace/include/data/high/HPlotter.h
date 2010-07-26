@@ -9,6 +9,8 @@
 #include "HSteinerPoint.h"
 
 class VanGinnekenTreeNode;
+class HDPGrid;
+class TileGrid;
 
 class HPlotter
 {
@@ -83,6 +85,12 @@ public:
   void Plot2PinNets();
   void PlotCircle(double x, double y, int radius, Color col);
   void PlotLine(double x1, double y1, double x2, double y2, Color col);
+  void PlotMostCriticalPaths(HDesign& design, int n = -1);
+
+  void PlotCongestionMaps(HDPGrid& DPGrid);
+  void DrawCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines);
+  void DrawPinDensity(HDesign& hd, TileGrid& tg, int nMaxPins);
+  void DrawCriticalCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines);
 
   void PlotKi(int nClusters, int nNets, double* x, Color color);
   void PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color);
@@ -98,8 +106,6 @@ public:
     int nMaxLines);
   void DrawTilePins(double x1, double y1, double x2, double y2, int nPins,
     int nMaxPins);
-
-
 
 private:
   bool _IsEnabled();

@@ -219,6 +219,9 @@ void PlacementQualityAnalyzer::Report()
         tf.SetCell(metricsInfo[idx].column, i->metrics[idx]);
   }
 
+  tf.NewBorderRow();
+  tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
+
   //TODO: implement disabling
   QualityList::iterator initial = m_experiments.begin();
   for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)

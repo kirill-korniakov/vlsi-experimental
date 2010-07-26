@@ -32,6 +32,14 @@ namespace Utils
 
     return wns;
   }
+
+  double AverageNS(HDesign& design)
+  {
+      double tns = Utils::TNS(design);
+      int nTEP = design.TimingPoints.EndPointsCount();
+
+      return tns / nTEP;
+  }
   
   void InsertNextPoint(HDesign& design, HTimingPoint pointToPlace, HTimingPoint afterThisPoint)
   {

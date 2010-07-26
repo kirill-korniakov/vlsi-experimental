@@ -10,6 +10,10 @@ public:
     TimingPointMus(HDesign& design);
     ~TimingPointMus();
 
+    void InitMuSOnTSP(HDesign &design, double defaultMu);
+    void InitMusInternalAndTED(HDesign& design, double defaultMu);
+    void InitPointMus(HDesign& design, HTimingPoint pt, double defaultMu);
+
     void UpdateMus(HDesign& design);
 
     void GetNetMus(HDesign& design, HNet net,
@@ -34,17 +38,34 @@ public:
     double SumOutMuR(HDesign& design, HTimingPoint pt);
 
 private:
+    MuReporter* reporter;
     int size;
     double* MuS;
-    std::vector<double>* MuIn;  //this class stores only muS, input muA and muR for the timing point,
-    //out muA and muR are associated with next timing point
+    std::vector<double>* MuIn;  //this class stores only muS, input muA, input muR for the timing point,
+                                //out muA and muR are associated with the next timing point
 
-    MuReporter* reporter;
+    double minFactor;
+    double referenceValue;
+    int nIncreased;
+    int nDecreased;
 
     void UpdateMuS(HDesign& design, double theta);
-    void UpdateMuAOnTEP(HDesign& design, double theta);
-    void UpdateMuROnTSP(HDesign& design, double theta);
-    //void UpdateMuAMuROnPrimaries(HDesign& design, double theta);
+    void UpdateLocalMuA(HDesign& design, double theta);
+    void UpdateLocalMuR(HDesign& design, double theta);
+
+    //TODO: move methods to the pin
+    bool IsOutputPin(HDesign &design, HPin pin) 
+    {
+        return design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT;
+    }
+    bool IsInputPin(HDesign &design, HPin pin) 
+    {
+        return design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT;
+    }
+
+    void UpdateLocalMuB(HDesign& design, double theta);
+    double CalculateInjectionFactor(double slack, double theta);
+    double CalculateLocalFactor(double slack, double theta);
 
     void EnforceFlowProperty(HDesign& design);
     void EnforceArrivalFlowProperty(HDesign& design, HTimingPoint pt);
@@ -56,10 +77,11 @@ private:
     double BorderValue(double value) { return max(0.01, min(value, 0.99)); }
     double ZeroBorderValue(double value) { return max(0.01, value); }
     void SetMuS(HTimingPoint pt, double value) { MuS[::ToID(pt)] = BorderValue(value); }
-    void SetMuInA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = ZeroBorderValue(value); }
-    void SetMuInR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = ZeroBorderValue(value); }
-
+    void SetInMuA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = ZeroBorderValue(value); }
+    void SetInMuR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = ZeroBorderValue(value); }
+    
     void ScaleOutMuR(HDesign& design, HTimingPoint pt, double multiplier);
+    void ScaleOutMuRByIndex(HDesign& design, HTimingPoint pt, double multiplier, int index);
     void ScaleInMuA(HTimingPoint pt, double multiplier);
 
     struct AccumulateMu
@@ -94,12 +116,20 @@ private:
 
     struct ScaleMuR
     {
-        double Multiplier;
-        ScaleMuR(double multiplier):Multiplier(multiplier) {}
+        double Factor;
+        int index;
+        int iterationCounter;
+
+        ScaleMuR(double val, int idx = -1) : Factor(val), index(idx), iterationCounter(0) {}
 
         void operator() (TimingPointMus& pm, HTimingPoint pt, int idx)
         {
-            pm.SetMuInR(pt, idx, Multiplier * pm.GetInMuR(pt, idx));
+            if (index == -1 || index == iterationCounter)
+            {
+                double oldValue = pm.GetInMuR(pt, idx);
+                pm.SetInMuR(pt, idx, Factor * oldValue);
+            }
+            iterationCounter++;
         }
     };
 
@@ -116,9 +146,6 @@ private:
 
     template<class Action>
     void IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo);
-
-    void InitPointMus(HDesign& design, HTimingPoint pt);
-    double CalculateFactor(double slack, double theta);
 };
 
 #endif

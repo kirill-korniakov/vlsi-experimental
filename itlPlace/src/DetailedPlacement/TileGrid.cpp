@@ -5,10 +5,10 @@
 * email: alexander.belyakov@mail.itlab.unn.ru
 */
 
-#include "TileGrid.h"
 #include <stdio.h>
+
+#include "TileGrid.h"
 #include "HCriticalPath.h"
-#include <conio.h>
 
 
 TileGrid::TileGrid(int nHor, int nVert, HDPGrid& grid): nHorTiles(nHor), nVertTiles(nVert)
@@ -463,128 +463,4 @@ void TileGrid::Print()
     currLine->Print();
     currLine++;
   }
-}
-
-void TileGrid::DrawCongestionMap(HDesign& hd, int nMaxLines)
-{
-  CalcLinesInTiles(hd);
-
-  for (int i = 0; i < nHorTiles; i++)
-  {
-    for (int j = 0; j < nVertTiles; j++)
-    {            
-      double x1 = tiles[i][j].GetX();
-      double y1 = tiles[i][j].GetY();
-      double x2 = x1 + tileWidth;
-      double y2 = y1 + tileHeight;
-      hd.Plotter.DrawTileWires(x1, y1, x2, y2, tiles[i][j].GetNWires(), nMaxLines);
-    }
-  }
-}
-
-void TileGrid::DrawPinDensity(HDesign& hd, int nMaxPins)
-{
-  //calculate number of pins in each tile
-  for (HNets::ActiveNetsEnumeratorW curNet = hd.Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
-  {
-    for (HNetWrapper::PinsEnumeratorW currPin = curNet.GetPinsEnumeratorW(); currPin.MoveNext();)
-    {
-      TileIndexes currTileIdxs = FindTileByXY(currPin.X(), currPin.Y());
-      tiles[currTileIdxs.horInd][currTileIdxs.vertInd].IncNPins();
-    }
-  }
-
-  //draw pin density
-  for (int i = 0; i < nHorTiles; i++)
-  {
-    for (int j = 0; j < nVertTiles; j++)
-    {
-      double x1 = tiles[i][j].GetX();
-      double y1 = tiles[i][j].GetY();
-      double x2 = x1 + tileWidth;
-      double y2 = y1 + tileHeight;
-      hd.Plotter.DrawTilePins(x1, y1, x2, y2, tiles[i][j].GetNPins(), nMaxPins);
-    }
-  }
-}
-
-void TileGrid::DrawCriticalCongestionMap(HDesign &hd, int nMaxÑLines)
-{
-  for (HCriticalPaths::EnumeratorW path = hd.CriticalPaths.GetEnumeratorW(); path.MoveNext();)
-  {
-    HCriticalPath::PointsEnumeratorW currPoint = path.GetEnumeratorW();
-    currPoint.MoveNext();
-    int nCriticalPoints = 1;
-    HPinWrapper currPin = hd[hd.Get<HTimingPoint::Pin, HPin>(currPoint.TimingPoint())];
-    double x1 = currPin.X();
-    double y1 = currPin.Y();
-
-    while (currPoint.MoveNext())
-    {
-      nCriticalPoints++;
-      HPinWrapper currPin = hd[hd.Get<HTimingPoint::Pin, HPin>(currPoint.TimingPoint())];
-      //TileIndexes currTileIdxs = FindTileByXY(currPin.X(), currPin.Y());
-      //tiles[currTileIdxs.horInd][currTileIdxs.vertInd].IncNPins();
-      HPinWrapper currentPin = hd[hd.Get<HTimingPoint::Pin, HPin>(currPoint.TimingPoint())];
-      double x2 = currentPin.X();
-      double y2 = currentPin.Y();
-      Line newLine(x1, y1, x2, y2);
-
-      if (newLine.GetLineType() > -1)
-        criticalLines.push_back(newLine);
-      x1 = x2;
-      y1 = y2;
-      currPoint.MoveNext();
-    }
-    
-    if (nCriticalPoints <= 1)
-    {
-      WRITE("only one point in critical path\n");
-    }
-  }
-
-  //draw
-  CalcCriticalWires(hd);
-
-  if (lines.size() != 0)
-  {
-    int nMaxAllLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 10);
-    nMaxÑLines = nMaxAllLines * criticalLines.size() / lines.size();
-  }
-
-  for (int i = 0; i < nHorTiles; i++)
-  {
-    for (int j = 0; j < nVertTiles; j++)
-    {            
-      double x1 = tiles[i][j].GetX();
-      double y1 = tiles[i][j].GetY();
-      double x2 = x1 + tileWidth;
-      double y2 = y1 + tileHeight;
-      hd.Plotter.DrawTileWires(x1, y1, x2, y2, tiles[i][j].GetNCriticalWires(),
-                               nMaxÑLines);
-    }
-  }
-}
-
-void PlotCongestionMaps(HDPGrid& DPGrid)
-{
-  int nHorTiles  = DPGrid.NumRows() / 2;
-  int nVertTiles = nHorTiles;
-  int nMaxLines  = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxLines", 10);
-  int nMaxPins   = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxPins", 10);
-  int nMaxCLines = DPGrid.Design().cfg.ValueOf("CongestionMap.nMaxCLines", 4);
-
-  TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
-
-  tileGrid.DrawCongestionMap(DPGrid.Design(), nMaxLines);
-  ALERT("press any key to continue...");
-  _getch();
-
-  tileGrid.DrawPinDensity(DPGrid.Design(), nMaxPins);
-  ALERT("press any key to continue...");
-  _getch();
-
-  tileGrid.DrawCriticalCongestionMap(DPGrid.Design(), nMaxCLines);
-  ALERT("press any key to continue...");
-  _getch();
 }

@@ -204,7 +204,7 @@ void PrintTimingReport(HDesign& design, int nPaths)
 {
   ASSERT(design.CanDoTiming());
 
-  if (nPaths < 1)
+  if (nPaths == 0)
       return;
 
   WRITELINE("");
@@ -217,14 +217,76 @@ void PrintTimingReport(HDesign& design, int nPaths)
   ALERT("Critical paths printing finished!");
 }
 
-void PlotMostCriticalPaths(HDesign& design, int n)
-{
-    Utils::IterateMostCriticalPaths(design, n, (Utils::CriticalPathHandler)HPlotter::PlotPath);
-}
-
 void ReportNegativeSlacks(HDesign& design)
 {
   ALERT("Reporting: circuit negative slacks");
-  ALERT("  TNS: %f", Utils::TNS(design));
-  ALERT("  WNS: %f", Utils::WNS(design));
+  ALERT("    TNS: %f", Utils::TNS(design));
+  ALERT("    WNS: %f", Utils::WNS(design));
+  ALERT("  AVGNS: %f", Utils::AverageNS(design));
+  //ReportVectorOfSlacks(design);
+}
+
+string GetCellPinName(HDesign& design, HTimingPointWrapper pt)
+{
+    HPinWrapper pin = design[pt.Pin()];
+    HCellWrapper cell = design[pin.Cell()];
+    string cellName = IsNull(cell) ? "PIN" : cell.Name();
+    return cellName + "." + pin.Name();
+}
+
+void ReportVectorOfSlacks(HDesign& design)
+{
+    size_t nCols = 2;
+    size_t idx = 0;
+    size_t colTimingPointName = idx++;
+    size_t colSlacks = idx++;
+
+    TableFormatter tf("TEP Slacks", nCols);
+    //columns
+    tf.SetColumnAlign(colTimingPointName, TableFormatter::Align_Right);
+    tf.SetColumnAlign(colSlacks, TableFormatter::Align_Right);
+    //separator
+    tf.NewBorderRow();
+    tf.SetCell(colTimingPointName, "-", TableFormatter::Align_Fill);
+    tf.SetCell(colSlacks, "-", TableFormatter::Align_Fill);
+    //header row
+    tf.NewHeaderRow();
+    tf.SetCell(colTimingPointName, "Cell.Pin", TableFormatter::Align_Right);
+    tf.SetCell(colSlacks, "Slack", TableFormatter::Align_Right);
+    //separator
+    tf.NewBorderRow();
+    tf.SetCell(colTimingPointName, "-", TableFormatter::Align_Fill);
+    tf.SetCell(colSlacks, "-", TableFormatter::Align_Fill);
+
+    HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
+    for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()];
+        ep.GoPrevious() != endPointsEnd; )
+    {
+        tf.NewRow();
+        tf.SetCell(colTimingPointName, GetCellPinName(design, ep));
+        tf.SetCell(colSlacks, ep.Slack());
+    }
+    //separator
+    tf.NewBorderRow();
+    tf.SetCell(colTimingPointName, "-", TableFormatter::Align_Fill);
+    tf.SetCell(colSlacks, "-", TableFormatter::Align_Fill);
+
+    WRITELINE("");
+
+    tf.Print();
+
+    WRITELINE("");
+    WRITELINE("");
+}
+
+void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr)
+{
+    char tmpFloat[32];
+    sprintf(tmpFloat, "%f\t", Utils::TNS(hd));
+    tnsStr += tmpFloat;
+    WRITELINE(("%s", tnsStr.c_str()));
+
+    sprintf(tmpFloat, "%f\t", Utils::WNS(hd));
+    wnsStr += tmpFloat;
+    WRITELINE(("%s", wnsStr.c_str()));
 }

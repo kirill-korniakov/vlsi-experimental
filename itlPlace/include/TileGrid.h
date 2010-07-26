@@ -11,9 +11,6 @@
 #include "Tile.h"
 #include "HDPGrid.h"
 #include "Line.h"
-#include "HPlotter.h"
-
-void PlotCongestionMaps(HDPGrid& DPGrid);
 
 struct TileIndexes
 {
@@ -39,6 +36,8 @@ private:
   std::list<class Line> criticalLines;
 
 public:
+  friend class HPlotter;
+
   TileGrid(int nHor, int nVert, HDPGrid& _grid);
   ~TileGrid();
   TileIndexes FindTileByXY(double _x, double _y);
@@ -47,9 +46,6 @@ public:
   void CalcLinesInTiles(HDesign& _design);
   void CalcCriticalWires(HDesign& _design);
   void Print();
-  void DrawCongestionMap(HDesign& hd, int nMaxLines);
-  void DrawPinDensity(HDesign& hd, int nMaxPins);
-  void DrawCriticalCongestionMap(HDesign& hd, int nMaxLines);
 };
 
 #endif

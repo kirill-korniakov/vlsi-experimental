@@ -21,7 +21,7 @@
 void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design)
 {
 	fmt.NewBorderRow();
-	fmt.SetCell(0, "-",fmt.NumOfColumns(), TableFormatter::Align_Fill);
+	fmt.SetCell(0, "-", fmt.NumOfColumns(), TableFormatter::Align_Fill);
 }
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
@@ -151,7 +151,7 @@ void DoSTAIfCan(HDesign& hd)
         STA(hd);
         FindCriticalPaths(hd);
         PrintTimingReport(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
-        PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
+        hd.Plotter.PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
     }
 }
 
@@ -234,7 +234,7 @@ bool DoLRSizingIfRequired(HDPGrid& grid, const char* cfgOptName)
 void PlotCongestionMapIfRequired(HDPGrid& grid)
 {
     if (grid.Design().cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
-        PlotCongestionMaps(grid);
+        grid.Design().Plotter.PlotCongestionMaps(grid);
 }
 
 void RunFGRRoutingIfRequired(HDPGrid& grid)

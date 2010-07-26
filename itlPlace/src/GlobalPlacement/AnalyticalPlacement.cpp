@@ -503,6 +503,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         iCHKERRQ TaoSolveApplication(taoapp, tao);
         int innerTAOIterations = 0;
         iCHKERRQ ReportTerminationReason(tao, innerTAOIterations);
+        ALERT("Number of iterations made by TAO = %d", innerTAOIterations);
 
         if (innerTAOIterations >= 1)
         {// if found any solution, apply it

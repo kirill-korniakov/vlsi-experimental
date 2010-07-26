@@ -10,9 +10,8 @@
 #include "Base64.h"
 
 #include "VanGinnekenData.h"
-
-
-
+#include "HDPGrid.h"
+#include "TileGrid.h"
 
 struct PlotterData
 {
@@ -815,6 +814,11 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
       m_hd.Plotter.PlotCircle(srcPoint->GetX(), srcPoint->GetY(), 1, LineColor);
     }
   }
+}
+
+void HPlotter::PlotMostCriticalPaths(HDesign& design, int n)
+{
+    Utils::IterateMostCriticalPaths(design, n, (Utils::CriticalPathHandler)HPlotter::PlotPath);
 }
 
 void HPlotter::PlotText(string text, double textSize)
