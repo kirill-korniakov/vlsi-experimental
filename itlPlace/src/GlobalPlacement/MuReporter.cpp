@@ -11,7 +11,8 @@
 
 MuReporter::MuReporter(HDesign& design)
 {
-    design.Plotter.InitializeHistogramWindow();
+    if (design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.plotMus", false))
+        design.Plotter.InitializeHistogramWindow();
     scaling = 0.01;  //TODO: choose proper scale
     waitTime = design.cfg.ValueOf("GlobalPlacement.plotWait", 1);
 

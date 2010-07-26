@@ -9849,6 +9849,14 @@
 					RelativePath="..\src\Plotter\HPlotter.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Plotter\LagrangianMultipliers.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Plotter\PlotterData.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -93,6 +93,7 @@ public:
   void DrawCriticalCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines);
 
   void PlotKi(int nClusters, int nNets, double* x, Color color);
+
   void PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color);
   void PlotMu(double mu, int x, double scaling, Color color);
   void PlotMuLevel(double level, double scaling, Color color = Color_Black);
@@ -110,6 +111,7 @@ public:
 private:
   bool _IsEnabled();
   void _AutoRefresh();
+  bool CantPlotHistogram();
 
   Color _GetCellColor(HCell cell);
 };
