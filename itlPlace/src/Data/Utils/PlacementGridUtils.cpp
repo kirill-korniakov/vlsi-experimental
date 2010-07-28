@@ -85,6 +85,7 @@ HPlacementGrid::HPlacementGrid(HDesign& hd): design(hd)
   path = NULL;
   nColumns = 0;
   nRows = 0;
+  sizeBuffer = 0;
   sizeSiteBuffer = 0;
   Initialize();
 }
@@ -182,18 +183,151 @@ bool HPlacementGrid::IsSiteFree(double x, double y, double width, double height)
   int columnBegin = GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
   int columnEnd = GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
 
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return false;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return false;
+
+  if (y3 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x4 == grid[0][columnEnd].GetX())
+    columnEnd--;
+
   if ( (rowBegin > 0) && (rowBegin < nRows) &&
     (rowEnd > 0) && (rowEnd < nRows) &&
     (columnBegin > 0) && (columnBegin < nColumns) &&
     (columnEnd > 0) && (columnEnd < nColumns))
-  for (int i = rowBegin; i <= rowEnd; i++)
-    for (int j = columnBegin; j <= columnEnd; j++)
-    {
-      if (grid[i][j].GetCell() != design.Cells.Null())
-        return false;
-    }
-    return true;
+  {
+    for (int i = rowBegin; i <= rowEnd; i++)
+      for (int j = columnBegin; j <= columnEnd; j++)
+      {
+        if (grid[i][j].GetCell() != design.Cells.Null())
+          return false;
+      }
+  }
+  return true;
+}
 
+void HPlacementGrid::CellInZone(double x, double y, double width, double height, int& cellCount, HCell* res)
+{
+
+  double x1 = x, y1 = y, 
+    x2 = x + width, y2 =  y,
+    x3 = x, y3 = y + height,
+    x4 = x + width, y4 = y + height;
+
+
+  int rowBegin = GetRow(y1);//int (floor((y1 - indent_y) / height)) - 1;
+  int rowEnd = GetRow(y3);//int (floor((y3 - indent_y) / height)) - 1;
+  int columnBegin = 1; //GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
+  int columnEnd = nColumns - 2; GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
+
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return;
+
+  if (y3 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x4 == grid[0][columnEnd].GetX())
+    columnEnd--;
+
+  int count = 0;
+  if ( (rowBegin > 0) && (rowBegin < nRows) &&
+    (rowEnd > 0) && (rowEnd < nRows) &&
+    (columnBegin > 0) && (columnBegin < nColumns) &&
+    (columnEnd > 0) && (columnEnd < nColumns))
+  {
+    for (int i = rowBegin; i <= rowEnd; i++)
+      for (int j = columnBegin; j <= columnEnd; j++)
+      {
+        if (grid[i][j].GetCell() != design.Cells.Null())
+        {
+          bool isCellFind = false;
+          for (int k = 0; k < count; k++)
+            if (res[k] == grid[i][j].GetCell())
+              isCellFind = true;
+          if (!isCellFind)
+          {
+            HCellWrapper cw = design[grid[i][j].GetCell()];            
+            double cwx = cw.X(), cwy = cw.Y();
+            double cwWidth = cw.Width();
+            res[count] = grid[i][j].GetCell();
+            count++;
+          }
+        }
+      }
+  }
+  cellCount = count;
+}
+
+void HPlacementGrid::CellInZone(double x, double y, double width, double height, int& cellCount, HCell* res,
+                                double& leftShift, double& rightShift)
+{
+  double x1 = x, y1 = y, 
+    x2 = x + width, y2 =  y,
+    x3 = x, y3 = y + height,
+    x4 = x + width, y4 = y + height,
+    xCenter = x + width / 2.0;
+
+
+  int rowBegin = GetRow(y1);//int (floor((y1 - indent_y) / height)) - 1;
+  int rowEnd = GetRow(y3);//int (floor((y3 - indent_y) / height)) - 1;
+  int columnBegin = GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
+  int columnEnd = GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
+  int columnCenter = GetColumn(xCenter);
+
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return;
+
+  if (y3 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x4 == grid[0][columnEnd].GetX())
+    columnEnd--;
+
+  int count = 0;
+  int freeIsLeft = 0;
+  int freeInRight = 0;
+  if ( (rowBegin > 0) && (rowBegin < nRows) &&
+    (rowEnd > 0) && (rowEnd < nRows) &&
+    (columnBegin > 0) && (columnBegin < nColumns) &&
+    (columnEnd > 0) && (columnEnd < nColumns))
+  {
+    for (int i = rowBegin; i <= rowEnd; i++)
+      for (int j = columnBegin; j <= columnEnd; j++)
+      {
+        if (grid[i][j].GetCell() != design.Cells.Null())
+        {
+          bool isCellFind = false;
+          for (int k = 0; k < count; k++)
+            if (res[k] == grid[i][j].GetCell())
+              isCellFind = true;
+          if (!isCellFind)
+          {
+            HCellWrapper cw = design[grid[i][j].GetCell()];            
+            double cwx = cw.X(), cwy = cw.Y();
+            double cwWidth = cw.Width();
+            res[count] = grid[i][j].GetCell();
+            count++;
+          }
+        }
+      }
+  }
+  cellCount = count;
 }
 
 void HPlacementGrid::Initialize()
@@ -208,7 +342,7 @@ void HPlacementGrid::SetSize()
 
   int totalRows = design.PlacementRows.Count();
   grid = new PlacementGridNode* [totalRows];
-  cellGrid = new PlacementGridNode** [design.Cells.CellsCount()];
+  cellGrid = new PlacementGridNode** [design._Design.NetList.nCellsLimit];
   siteInRow = new int [totalRows];
   indent_x = design.Circuit.PlacementMaxX();
   HSite m_SiteType;
@@ -331,13 +465,30 @@ void HPlacementGrid::SetCell(HCell cell)
   int columnBegin = GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
   int columnEnd = GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
 
+  
   int sizeCell = (rowEnd - rowBegin + 1) * (columnEnd - columnBegin + 1);
   cellGrid[cellId] = new PlacementGridNode* [sizeCell];
   int k = 0;
+
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return;
+
+  if (y3 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x4 == grid[0][columnEnd].GetX())
+    columnEnd--;
+
   if ( (rowBegin > 0) && (rowBegin < nRows) &&
     (rowEnd > 0) && (rowEnd < nRows) &&
     (columnBegin > 0) && (columnBegin < nColumns) &&
     (columnEnd > 0) && (columnEnd < nColumns))
+  {
     for (int i = rowBegin; i <= rowEnd; i++)
       for (int j = columnBegin; j <= columnEnd; j++)
       {
@@ -345,6 +496,58 @@ void HPlacementGrid::SetCell(HCell cell)
         cellGrid[cellId][k] = &grid[i][j];
         k++;
       }
+  }
+}
+
+void HPlacementGrid::ExtractCell(HCell cell)
+{
+  HCellWrapper cellW = design[cell];
+  double x1 = cellW.X(), y1 = cellW.Y(), 
+    x2 = cellW.X() + cellW.Width(), y2 =  cellW.Y(),
+    x3 = cellW.X(), y3 = cellW.Y() + cellW.Height(),
+    x4 = cellW.X() + cellW.Width(), y4 = cellW.Y() + cellW.Height();
+  double cellWWidth = cellW.Width();
+  double cellWHeight = cellW.Height();
+
+  int cellId = ::ToID(cell);
+
+  int rowBegin = GetRow(y1);//int (floor((y1 - indent_y) / height)) - 1;
+  int rowEnd = GetRow(y3);//int (floor((y3 - indent_y) / height)) - 1;
+  int columnBegin = GetColumn(x1);//int (floor((x1 - indent_x) / width)) - 1;
+  int columnEnd = GetColumn(x4);//int (floor((x4 - indent_x) / width)) - 1;
+
+  int sizeCell = (rowEnd - rowBegin + 1) * (columnEnd - columnBegin + 1);
+
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return;
+
+  if (y3 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x4 == grid[0][columnEnd].GetX())
+    columnEnd--;
+
+  if ( (rowBegin > 0) && (rowBegin < nRows) &&
+    (rowEnd > 0) && (rowEnd < nRows) &&
+    (columnBegin > 0) && (columnBegin < nColumns) &&
+    (columnEnd > 0) && (columnEnd < nColumns))
+  {
+    for (int i = rowBegin; i <= rowEnd; i++)
+      for (int j = columnBegin; j <= columnEnd; j++)
+      {
+        grid[i][j].SetCell(design.Cells.Null());
+      }
+  }
+  if (cellGrid[cellId] != NULL)
+  {
+    delete [] cellGrid[cellId];
+    cellGrid[cellId] = NULL;
+  }
 }
 
 //PlacementGridNode** HPlacementGrid::GetPath(int &lengthPath, double x1, double y1, double x2, double y2)
@@ -499,13 +702,26 @@ PlacementGridNode** HPlacementGrid::GetPath(int &lengthPath, double x1, double y
 
   int totalPoint = 0;
 
+  if (rowEnd >= nRows)
+    rowEnd = nRows - 1;
+  if (rowBegin >= nRows)
+    return path;
+  if (columnEnd >= nColumns)
+    columnEnd = nColumns - 1;
+  if (columnBegin >= nColumns)
+    return path;
+
+  if (y2 == grid[rowEnd][0].GetY())
+    rowEnd--;
+  if (x2 == grid[rowBegin][columnEnd].GetX())
+    columnEnd--;
   
   for (int i = 0; i <= rowSize; i++)
   {
     //levelInd = 0;
     for (int j = 0; j <= columnSize; j++)
     {
-      if (((rowBegin + i * incrementRow) >= 0) && ((columnBegin + j * incrementColumn) >=0) && ((columnBegin + j * incrementColumn) < nColumns) && ((rowBegin + i * incrementRow) < nRows))
+      if (((rowBegin + i * incrementRow) > 0) && ((columnBegin + j * incrementColumn) >0) && ((columnBegin + j * incrementColumn) < (nColumns - 1)) && ((rowBegin + i * incrementRow) < (nRows - 1)))
         if(IsSiteFree(grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetX(), grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetY(), sizeBuffer, height))
         //if (grid[rowBegin + i * incrementRow][columnBegin + j * incrementColumn].GetCell() == design.Cells.Null())
         {

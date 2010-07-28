@@ -78,6 +78,8 @@ namespace Utils
 
     PlacementGridNode* NodePosition(double x, double y);
     bool IsSiteFree(double x, double y, double width, double height);
+    void CellInZone(double x, double y, double width, double height, int& cellCount, HCell* res);
+    void CellInZone(double x, double y, double width, double height, int& cellCount, HCell* res, double& leftShift, double& rightShift);
 
     void Initialize();
     void SetSize();
@@ -86,6 +88,7 @@ namespace Utils
     void Clear();
     void UpdateGrid();
     void SetCell(HCell cell);
+    void ExtractCell(HCell cell);
 
     PlacementGridNode** GetPath(int &lengthPath, double x1, double y1, double x2, double y2);
 

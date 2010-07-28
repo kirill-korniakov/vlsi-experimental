@@ -10,6 +10,7 @@
 #include "VanGinnekenData.h"
 #include "HDPGrid.h"
 #include "TileGrid.h"
+#include "OptimizationContext.h"
 
 
 static void SavePlotterImage(libconfig::ConfigExt& cfg, const std::string& fileName, const CvArr* image, bool compress, int paletteSize)
@@ -376,6 +377,18 @@ void HPlotter::ShowNet(HNet net, bool isShowPlacement, WaitTime waitTime, Color 
   Refresh(waitTime);
 }
 
+void HPlotter::ShowFillBinGrid(AppCtx* context, bool isShowPlacement, WaitTime waitTime)
+{
+  if (!IsEnabled()) 
+    return;
+
+  if (isShowPlacement)
+    ShowPlacement();
+
+  PlotFillBinGrid(context);
+  Refresh(waitTime);
+}
+
 //Plot methods
 void HPlotter::PlotPlacement()
 {
@@ -513,6 +526,43 @@ void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
       cvDrawLine(IMG, start, finish, GetCvColor(color));
     }
   }
+}
+void HPlotter::PlotFillBinGrid(AppCtx* context)
+{
+
+  /*
+  CvPoint start, finish;
+  start.x = DesignX2ImageX(x1);
+  start.y = DesignY2ImageY(y1);
+  finish.x = DesignX2ImageX(x2);
+  finish.y = DesignY2ImageY(y2);
+  cvRectangle(IMG, start, finish, GetCvColor(col), 1);
+  */
+
+  if (IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  CvScalar color;
+
+  for (int i = 0; i < context->sprData.binGrid.nBinRows; i++)
+    for (int j = 0; j < context->sprData.binGrid.nBinCols; j++)
+    {
+      start.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord);
+      start.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord);
+      finish.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth);
+      finish.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight);
+      /*color.val[0] = context->sprData.binGrid.bins[i][j].sumPotential;
+      color.val[1] = 0;
+      color.val[2] = 0;
+      color.val[3] = 0;*/
+      color = cvColorToScalar(context->sprData.binGrid.bins[i][j].sumPotential, 1);
+      //cvRectangle(IMG, start, finish, color, 10);
+      char str[255];
+      sprintf(str, "%.1f", context->sprData.binGrid.bins[i][j].sumPotential);
+      PlotTextInPoint(string(str), context->sprData.binGrid.bins[i][j].xCoord, context->sprData.binGrid.bins[i][j].yCoord, 0.5);
+
+    }
 }
 
 void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradients, 

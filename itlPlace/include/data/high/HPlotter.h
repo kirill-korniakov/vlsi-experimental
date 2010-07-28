@@ -9,6 +9,8 @@
 #include "HSteinerPoint.h"
 
 class VanGinnekenTreeNode;
+
+struct AppCtx;
 class HDPGrid;
 class TileGrid;
 
@@ -67,11 +69,13 @@ public:
   void ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
   void ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color VGNodeColor = Color_Red, double textSize = -1);
   void ShowNet(HNet net, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color color = Color_Peru, double textSize = -1);
-
+  void ShowFillBinGrid(AppCtx* context, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT);
+  
   //Plot methods
   void PlotPlacement();
   static void PlotPath(HDesign& design, HCriticalPath path, int pathNumber);
   void PlotBinGrid(int nBinRows, int nBinCols);
+  void PlotFillBinGrid(AppCtx* context);
   void PlotGradients(int nClusters, double* coordinates, double* gradients, double scaling, Color col);
   void PlotCell(HCell cell, Color col);
   void PlotSites();

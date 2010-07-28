@@ -33,6 +33,7 @@ struct SprData
   double    totalCellArea;
   double    desiredCellsAreaAtEveryBin;
   double**  clusterPotentialOverBins;
+  double**  bufferPotentialOverBins;
   double    potentialRadiusX;
   double    potentialRadiusY;
   double    invPSX;
@@ -50,6 +51,7 @@ struct SprData
   {
     binGrid.bins = 0;
     clusterPotentialOverBins = 0;
+    bufferPotentialOverBins = 0;
   }
 };
 

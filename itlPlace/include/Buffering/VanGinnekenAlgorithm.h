@@ -142,6 +142,12 @@ public:
   virtual void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node);
 };
 
+class LegalAdditionNewElement: public StandartAdditionNewElement
+{
+public:
+  LegalAdditionNewElement(HVGAlgorithm* vGA);
+  virtual void InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer,BufferPositions& position);
+};
 
 class HVGAlgorithm
 {

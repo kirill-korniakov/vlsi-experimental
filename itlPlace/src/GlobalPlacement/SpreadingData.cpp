@@ -67,6 +67,15 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     }
     delete [] clusterPotentialOverBins;
   }
+  if (context.sprData.bufferPotentialOverBins)
+  {
+    for (int i = 0; i<binGrid.nBinRows; i++)
+    {
+      if (context.sprData.bufferPotentialOverBins[i])
+        delete [] context.sprData.bufferPotentialOverBins[i];
+    }
+    delete [] context.sprData.bufferPotentialOverBins;
+  }
   if (binGrid.bins)
   {
     for (int j = 0; j < binGrid.nBinRows; ++j)
@@ -82,6 +91,11 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   for (int i = 0; i < maxAffectedRows; i++)
   {
     clusterPotentialOverBins[i] = new double[maxAffectedCols];
+  }
+  context.sprData.bufferPotentialOverBins = new double* [binGrid.nBinRows];
+  for (int j = 0; j < binGrid.nBinRows; ++j)
+  {
+    context.sprData.bufferPotentialOverBins[j] = new double [binGrid.nBinCols];
   }
   binGrid.bins = new Bin*[binGrid.nBinRows];
   for (int j = 0; j < binGrid.nBinRows; ++j)

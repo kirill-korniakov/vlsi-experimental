@@ -19,17 +19,17 @@ void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int&
 
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
                                         int& min_row, int& max_row,
-                                        int i, PetscScalar* x, AppCtx* context)
+                                        double x, double y, AppCtx* context)
 {
   BinGrid& binGrid = context->sprData.binGrid;
 
-  min_col = (Aux::cool_dtoi((x[2*i+0] - context->hd->Circuit.PlacementMinX() - 
+  min_col = (Aux::cool_dtoi((x - context->hd->Circuit.PlacementMinX() - 
     context->sprData.potentialRadiusX) / binGrid.binWidth));
-  max_col = (Aux::cool_dtoi((x[2*i+0] - context->hd->Circuit.PlacementMinX() + 
+  max_col = (Aux::cool_dtoi((x - context->hd->Circuit.PlacementMinX() + 
     context->sprData.potentialRadiusX) / binGrid.binWidth));
-  min_row = (Aux::cool_dtoi((x[2*i+1] - context->hd->Circuit.PlacementMinY() - 
+  min_row = (Aux::cool_dtoi((y - context->hd->Circuit.PlacementMinY() - 
     context->sprData.potentialRadiusY) / binGrid.binHeight));    
-  max_row = (Aux::cool_dtoi((x[2*i+1] - context->hd->Circuit.PlacementMinY() + 
+  max_row = (Aux::cool_dtoi((y - context->hd->Circuit.PlacementMinY() + 
     context->sprData.potentialRadiusY) / binGrid.binHeight));
 
   MoveBinIndexesIntoBorders(context, min_col, min_row, max_col, max_row);
@@ -198,7 +198,7 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
     idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
     currClusterTotalPotential = 0.0;
 
-    DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, idxInSolutionVector, x, context);
+    DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
 
     // loop over affected bins - now we just precalculate potential
     // later we will scale it so that currClusterTotalPotential = cluster area
@@ -324,7 +324,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
       idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
 
       int min_row, min_col, max_row, max_col; // area affected by cluster potential 
-      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, idxInSolutionVector, x, context);
+      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
 
       double gX = 0;
       double gY = 0;
@@ -355,7 +355,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
       idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
 
       int min_row, min_col, max_row, max_col; // area affected by cluster potential 
-      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, idxInSolutionVector, x, context);
+      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
 
       double gX = 0;
       double gY = 0;

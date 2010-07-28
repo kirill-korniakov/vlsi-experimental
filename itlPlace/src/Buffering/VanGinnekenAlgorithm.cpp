@@ -5,11 +5,13 @@
 #include "OptimizationContext.h"
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
-
+void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
+                                        int& min_row, int& max_row,
+                                        double x, double y, AppCtx* context);
 
 HVGAlgorithm::HVGAlgorithm(HDesign& hd)
 {
-  data = new VGAlgorithmData(hd);
+  data = new VGAlgorithmData(hd, this);
   isInitialize = false;
 }
 
@@ -25,12 +27,12 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
   data->Initialize();
 
   if (data->GetTypePartition() == 0)
-    data->vGTree = new VGTreeUniformDistribution(data->design, data->GetPartitionCount());
+    data->vGTree = new VGTreeUniformDistribution(this, data->GetPartitionCount());
   if (data->GetTypePartition() == 1)
-    data->vGTree = new VGTreeDynamicDistribution(data->design, data->GetPartitionCount());
+    data->vGTree = new VGTreeDynamicDistribution(this, data->GetPartitionCount());
   if (data->GetTypePartition() == 2)
   {
-    data->vGTree = new VGTreeLegalDynamicDistribution(data->design, data->GetPartitionCount(), 
+    data->vGTree = new VGTreeLegalDynamicDistribution(this, data->GetPartitionCount(), 
       data->GetSizeBuffer());
   }
 
@@ -48,8 +50,10 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
   if (data->GetTypeModificationVanGinnekenList() == 2)
     modificationVanGinnekenList = new ExhaustiveSearch(this);
 
-  additionNewElement = new StandartAdditionNewElement(this);
-
+  if (data->GetTypeBuferAddition() == 0)
+    additionNewElement = new StandartAdditionNewElement(this);
+  if (data->GetTypeBuferAddition() == 1)
+    additionNewElement = new LegalAdditionNewElement(this);
 }
 
 int HVGAlgorithm::BufferingCriticalPath()
@@ -78,14 +82,14 @@ int HVGAlgorithm::BufferingCriticalPath()
 
         if (!data->GetNetVisit()[::ToID(net)])
         {
-          if ((data->design.cfg.ValueOf("CountPinInBufferingNet", 0) == 0) || (
-            ((net.PinsCount() <= data->design.cfg.ValueOf("CountPinInBufferingNet", 0)) 
-            && (!data->design.cfg.ValueOf("IsTypeLimitationOnCountPinInBufferingNetEquality", false)) ) ||
-            ((net.PinsCount() == data->design.cfg.ValueOf("CountPinInBufferingNet", 0)) 
-            && (data->design.cfg.ValueOf("IsTypeLimitationOnCountPinInBufferingNetEquality", false)))))
+          if ((data->GetCountPinInBufferingNet() == 0) || (
+            ((net.PinsCount() <= data->GetCountPinInBufferingNet()) 
+            && (!data->GetIsTypeLimitationOnCountPinInBufferingNetEquality()) ) ||
+            ((net.PinsCount() == data->GetCountPinInBufferingNet()) 
+            && (data->GetIsTypeLimitationOnCountPinInBufferingNetEquality()))))
           {
-            string netName = data->design.cfg.ValueOf("NameBufferingNet", "");
-            if ((net.Name() != netName) && (netName != ""))
+
+            if ((net.Name() != data->GetNameBufferingNet()) && (data->GetNameBufferingNet() != ""))
               continue;
             //{
             //string na = net.Name();
@@ -114,8 +118,8 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
     ALERT("\t%s\t%d\t", data->design.Nets.GetString<HNet::Name>(net).c_str(), 
       data->design.Nets.GetInt<HNet::PinsCount>(net));
   }
-
-  data->GetNetVisit()[::ToID(net)] = true;
+  if (data->GetTypeBuferAddition() != 1)
+    data->GetNetVisit()[::ToID(net)] = true;
 
   data->vGTree->UpdateTree(data->design.SteinerPoints[(net, data->design).Source()]);
   //  treeRepository.CreateVGTree(net);
@@ -157,86 +161,138 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
   return best;
 }
 
-void DetermineBordersOfBufferPotential(int& min_col, int& max_col, 
-                                       int& min_row, int& max_row,
-                                       BufferPositions& bufferPositions, AppCtx* context)
+double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
 {
+  double binX = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord;
+  double binY = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord;
+  double width = context->sprData.binGrid.binWidth;
+  double height = context->sprData.binGrid.binHeight;
+
+  double binX2 = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord + context->sprData.binGrid.binWidth;
+  double binY2 = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord + context->sprData.binGrid.binHeight;
+
   BinGrid& binGrid = context->sprData.binGrid;
-
-  min_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() - 
-    context->sprData.potentialRadiusX) / binGrid.binWidth));
-  max_col = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetX() - context->hd->Circuit.PlacementMinX() + 
-    context->sprData.potentialRadiusX) / binGrid.binWidth));
-  min_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() - 
-    context->sprData.potentialRadiusY) / binGrid.binHeight));    
-  max_row = (Aux::cool_dtoi((bufferPositions.GetPosition()->GetY() - context->hd->Circuit.PlacementMinY() + 
-    context->sprData.potentialRadiusY) / binGrid.binHeight));
-
-  MoveBinIndexesIntoBorders(context, min_col, min_row, max_col, max_row);
-}
-
-double CalcBellShapedFunction(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
-{
-  double potentialRadiusX = context->sprData.potentialRadiusX;
-  double potentialRadiusY = context->sprData.potentialRadiusY;
-  BinGrid& binGrid = context->sprData.binGrid;
-  double invPSX = context->sprData.invPSX;
-  double invPSY = context->sprData.invPSY;
-
-  double potX = 0;
-  double potY = 0;
 
   double dx = bufferPositions.GetPosition()->GetX() - binGrid.bins[rowIdx][colIdx].xCoord;
   double dy = bufferPositions.GetPosition()->GetY() - binGrid.bins[rowIdx][colIdx].yCoord;
 
-  double fabsdx = fabs(dx);
-  double fabsdy = fabs(dy);
+  double x = bufferPositions.GetPosition()->GetX();
+  double y = bufferPositions.GetPosition()->GetY();
+  double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
+  double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+  double x2 = bufferPositions.GetPosition()->GetX() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
+  double y2 = bufferPositions.GetPosition()->GetY() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+  
+  double xSize = 0;
+  double ySize = 0;
 
-  if (fabsdx > potentialRadiusX || fabsdy > potentialRadiusY)
-  {//bin out of potential
-    return 0;
-  }
-
-  //calculate solution-potential
-  if (fabsdx <= potentialRadiusX/2)
+  if (x > binX) 
   {
-    potX = 1 - 2 * dx * dx * invPSX;
+    if (x > binX2)
+      xSize = 0;
+    {
+      if (x2 < binX2)
+      {
+        xSize = bufWidth;
+      }
+      else
+      {
+        xSize = binX2 - x;
+      }
+    }
   }
   else
   {
-    potX = 2 * (fabsdx - potentialRadiusX) * (fabsdx - potentialRadiusX) * invPSX;
+    if (x2 < binX)
+      xSize = 0;
+    else
+    {
+      if (x2 < binX2)
+      {
+        xSize = x2 - binX;
+      }
+      else
+      {
+        xSize = width;
+      }
+    }
   }
 
-  //calculate y-potential
-  if (fabsdy <= potentialRadiusY/2)
+  if (y > binY) 
   {
-    potY = 1 - 2 * dy * dy * invPSY;
+    if (y > binY2)
+      ySize = 0;
+    {
+      if (y2 < binY2)
+      {
+        ySize = bufHeight;
+      }
+      else
+      {
+        ySize = binY2 - y;
+      }
+    }
   }
   else
   {
-    potY = 2 * (fabsdy - potentialRadiusY) * (fabsdy - potentialRadiusY) * invPSY;
+    if (y2 < binY)
+      ySize = 0;
+    else
+    {
+      if (y2 < binY2)
+      {
+        ySize = y2 - binY;
+      }
+      else
+      {
+        ySize = height;
+      }
+    }
   }
-
-  return potX * potY;
+  return int (fabs(xSize * ySize * bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->GetSizeBufferMultiplier()));
 }
 
 int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
 {
+
   for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); 
     pos != vGVariant.GetBufferPosition()->end(); ++pos)
   {
+    double currBufferTotalPotential = 0;
     int min_row, min_col, max_row, max_col; // area affected by cluster potential
-    DetermineBordersOfBufferPotential(min_col, max_col, min_row, max_row, *pos, context);
+    DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, pos->GetPosition()->GetX(), pos->GetPosition()->GetY(), context);
 
     for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
     {
       for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
       {
-        double bsf = CalcBellShapedFunction(context, colIdx, rowIdx, *pos);
-
-        context->sprData.binGrid.bins[rowIdx][colIdx].sumBufPotential = bsf;
+        double bsf = CalcBufferArea(context, colIdx, rowIdx, *pos);
+        context->sprData.bufferPotentialOverBins[rowIdx][colIdx] = bsf;
+        currBufferTotalPotential = bsf;
       }
     }// loop over affected bins
+
+    double potentialMultiplier = 0;
+
+    if (currBufferTotalPotential != 0)
+    {
+      potentialMultiplier = data->design[pos->GetBufferInfo()->Type()].SizeX() *
+        data->design[pos->GetBufferInfo()->Type()].SizeY() / currBufferTotalPotential;
+    } 
+    else
+    {
+      potentialMultiplier = 0;
+    }
+
+    // add scaled cluster potential 
+    for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+    {
+      for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
+      {
+        context->sprData.binGrid.bins[rowIdx][colIdx].sumBufPotential += 
+         context->sprData.bufferPotentialOverBins[rowIdx][colIdx];
+      }
+    }
   }
   return vGVariant.GetPositionCount();
 }
@@ -258,6 +314,7 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
     for (int j = 0; j < context->sprData.binGrid.nBinCols; ++j)
     {
       context->sprData.binGrid.bins[i][j].sumBufPotential = 0.0;
+      context->sprData.bufferPotentialOverBins[i][j] = 0.0;
     }
   }
 
@@ -270,13 +327,16 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
       HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
       if (net.Kind() == NetKind_Active) 
       {        
-        bufferCount += UpdateBinTable(context, BufferingNen(net, false));
+        if (!data->GetNetVisit()[::ToID(net)])
+          bufferCount += UpdateBinTable(context, BufferingNen(net, false));
       }
     }
     //ALERT("CriticalPaths id = %d", j);
   }
+
   ALERT("Buffers inserted: %d", bufferCount);
   STA(data->design);
+  data->design.Plotter.ShowFillBinGrid(context);
   return bufferCount;
 }
 
@@ -1127,13 +1187,49 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   buffer.SetHeight(vGAlgorithm->data->design.GetDouble<HMacroType::SizeY>(position.GetBufferInfo()->Type()));
   buffer.SetWidth(vGAlgorithm->data->design.GetDouble<HMacroType::SizeX>(position.GetBufferInfo()->Type()));
 
+  /*double drift = vGAlgorithm->data->design.Cells.GetDouble<HCell::Height>(
+    vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(
+    vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(
+    position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))) / 2.0;
+
+  HSteinerPoint sp = position.GetPosition()->GetTree()->GetSource().GetSteinerPoint();
+  HPinWrapper pw = vGAlgorithm->data->design[vGAlgorithm->data->design[sp].Pin()];
+  //vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint())
+  HCellWrapper cell = vGAlgorithm->data->design[pw.Cell()];
+  //vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))
+  double x = cell.X();
+  double y = cell.Y();
+  int ojpjv=0;
+
+  //cell.Height()
+
+  //vGAlgorithm->data->design.Cells.GetDouble<HCell::Height>(vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint())))
+
+  //(*(VGTreeLegalDynamicDistribution*){*}((*((position).position)).tree)).pGrid;
+
+  //position.GetPosition()->GetTree()->
+
+  //vtbl;*/
+//  position.GetPosition()->GetTree()->pGrid.SetCell();
+
   char bufferName[32];
   sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
   buffer.SetName(bufferName);
-  buffer.SetX(position.GetPosition()->GetX() - buffer.Width() * 0.5);
-  buffer.SetY(position.GetPosition()->GetY() - buffer.Height() * 0.5);
+  if ((vGAlgorithm->data->GetTypePartition() == 2) && position.GetPosition()->isCandidate() && 
+    !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
+    buffer.SetX(position.GetPosition()->GetX());
+  else
+    buffer.SetX(position.GetPosition()->GetX() - buffer.Width() * 0.5);
+
+  if ((vGAlgorithm->data->GetTypePartition() == 2) && position.GetPosition()->isCandidate() && 
+    !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
+    buffer.SetY(position.GetPosition()->GetY());
+  else
+    buffer.SetY(position.GetPosition()->GetY() - buffer.Height() * 0.5);
+
   buffer.SetOrientation(Orientation_N);
   vGAlgorithm->data->design.Pins.AllocatePins(buffer);
+  position.GetPosition()->GetTree()->pGrid.SetCell(buffer);
   NewBuffer buf;
   buf.Positions = position;
   buf.cell = buffer;
@@ -1311,3 +1407,121 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
 }
 
 //StandartAdditionNewElement
+
+//LegalAdditionNewElement
+
+LegalAdditionNewElement::LegalAdditionNewElement(HVGAlgorithm* vGA): StandartAdditionNewElement(vGA)
+{
+
+}
+void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBuffer, 
+                                           BufferPositions& position)
+{
+  if (position.GetBufferInfo() == 0) return;
+
+  HCellWrapper buffer = vGAlgorithm->data->design[vGAlgorithm->data->design.Cells.AllocateCell()];
+  buffer.SetType(position.GetBufferInfo()->Type());
+  buffer.SetPlacementStatus(PlacementStatus_Movable);
+  buffer.SetHeight(vGAlgorithm->data->design.GetDouble<HMacroType::SizeY>(position.GetBufferInfo()->Type()));
+  buffer.SetWidth(vGAlgorithm->data->design.GetDouble<HMacroType::SizeX>(position.GetBufferInfo()->Type()));
+
+  /*double drift = vGAlgorithm->data->design.Cells.GetDouble<HCell::Height>(
+  vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(
+  vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(
+  position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))) / 2.0;
+
+  HSteinerPoint sp = position.GetPosition()->GetTree()->GetSource().GetSteinerPoint();
+  HPinWrapper pw = vGAlgorithm->data->design[vGAlgorithm->data->design[sp].Pin()];
+  //vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint())
+  HCellWrapper cell = vGAlgorithm->data->design[pw.Cell()];
+  //vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))
+  double x = cell.X();
+  double y = cell.Y();
+  int ojpjv=0;
+
+  //cell.Height()
+
+  //vGAlgorithm->data->design.Cells.GetDouble<HCell::Height>(vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(position.GetPosition()->GetTree()->GetSource().GetSteinerPoint())))
+
+  //(*(VGTreeLegalDynamicDistribution*){*}((*((position).position)).tree)).pGrid;
+
+  //position.GetPosition()->GetTree()->
+
+  //vtbl;*/
+//  position.GetPosition()->GetTree()->pGrid.SetCell();
+
+  char bufferName[32];
+  sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
+  buffer.SetName(bufferName);
+
+  double x = 0;
+  if ((vGAlgorithm->data->GetTypePartition() == 2) && position.GetPosition()->isCandidate() && 
+    !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
+    x = position.GetPosition()->GetX();
+  else
+    x = position.GetPosition()->GetX() - buffer.Width() * 0.5;
+  int column = position.GetPosition()->GetTree()->pGrid.GetColumn(x);
+  
+  double y = 0;
+  if ((vGAlgorithm->data->GetTypePartition() == 2) && position.GetPosition()->isCandidate() && 
+    !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
+    y = position.GetPosition()->GetY();
+  else
+    y = position.GetPosition()->GetY() - buffer.Height() * 0.5;
+  int row = position.GetPosition()->GetTree()->pGrid.GetRow(y);
+
+  double newX = position.GetPosition()->GetTree()->pGrid.GetNode(row, column)->GetX();
+  double newY = position.GetPosition()->GetTree()->pGrid.GetNode(row, column)->GetY();
+  buffer.SetX(newX);
+  buffer.SetY(newY);
+
+  buffer.SetOrientation(Orientation_N);
+  vGAlgorithm->data->design.Pins.AllocatePins(buffer);
+
+  int interseptCount = 0;
+  double x1 = newX, y1 = newY, 
+    x2 = newX + buffer.Width(), y2 =  newY,
+    x3 = newX, y3 = newY + buffer.Height(),
+    x4 = newX + buffer.Width(), y4 = newY + buffer.Height();
+    double  bufferWidth =  buffer.Width();
+
+  int rowBegin = position.GetPosition()->GetTree()->pGrid.GetRow(y1);
+  int rowEnd = position.GetPosition()->GetTree()->pGrid.GetRow(y3);
+  int columnBegin = position.GetPosition()->GetTree()->pGrid.GetColumn(x1);
+  int columnEnd = position.GetPosition()->GetTree()->pGrid.GetColumn(x4);
+  HCell* intersept = new HCell [abs(rowEnd - rowBegin) * abs(columnEnd - columnBegin)];
+  position.GetPosition()->GetTree()->pGrid.CellInZone(newX, newY, buffer.Width(), buffer.Height(), interseptCount, intersept);
+  double leftShift = 0;
+  double leftRight = 0;
+  for (int i = 0; i < interseptCount; i++)
+  {
+    HCellWrapper cw = vGAlgorithm->data->design[intersept[i]];
+    position.GetPosition()->GetTree()->pGrid.ExtractCell(cw);
+    double cwx = cw.X(), cwy = cw.Y();
+    double cwWidth = cw.Width();
+    if (cw.X() < (newX + buffer.Width() / 2.0))
+    {
+      if (cw.X() > newX) 
+      cw.SetX(newX - cw.Width());
+    }
+    else
+    {
+      cw.SetX(newX + buffer.Width());
+    }
+    position.GetPosition()->GetTree()->pGrid.SetCell(cw);
+  }
+  if (interseptCount > 0)
+    delete [] intersept;
+
+  position.GetPosition()->GetTree()->pGrid.SetCell(buffer);
+  NewBuffer buf;
+  buf.Positions = position;
+  buf.cell = buffer;
+  buf.sink = Utils::FindCellPinByName(vGAlgorithm->data->design, buffer, (position.GetBufferInfo()->InPin(), 
+    vGAlgorithm->data->design).Name());
+  buf.source = Utils::FindCellPinByName(vGAlgorithm->data->design, buffer, 
+    (position.GetBufferInfo()->OutPin(), vGAlgorithm->data->design).Name());
+  newBuffer.push_back(buf);
+}
+
+//LegalAdditionNewElement

@@ -8,7 +8,7 @@
 class HDPGrid;
 class VanGinnekenTree;
 class HWirePhysicalParams;
-
+class HVGAlgorithm;
 using namespace Utils;
 
 class VanGinnekenTreeNode
@@ -74,13 +74,16 @@ protected:
 
 
 public:
-  HDesign& design;
+  //HDesign& design;
+  HVGAlgorithm* vGAlgorithm;
   HDPGrid* DPGrid;
   VanGinnekenTreeNode* vGTree;
+  HPlacementGrid pGrid;
 
-  VanGinnekenTree(HDesign& hd);
-  VanGinnekenTree(HDesign& hd, int partitionCount);
-  VanGinnekenTree(HDesign& hd, int partitionCount, HSteinerPoint& source);
+  VanGinnekenTree(HVGAlgorithm* vGA);
+  VanGinnekenTree(HVGAlgorithm* vGA, int partitionCount);
+  VanGinnekenTree(HVGAlgorithm* vGA, int partitionCount, double sizeBuffer);
+  VanGinnekenTree(HVGAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
   virtual void UpdateTree(HSteinerPoint& source);
 
@@ -103,9 +106,9 @@ protected:
   virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 
 public:
-  VGTreeUniformDistribution(HDesign& hd);
-  VGTreeUniformDistribution(HDesign& hd, int partitionCount);
-  VGTreeUniformDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+  VGTreeUniformDistribution(HVGAlgorithm* vGA);
+  VGTreeUniformDistribution(HVGAlgorithm* vGA, int partitionCount);
+  VGTreeUniformDistribution(HVGAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
   virtual ~VGTreeUniformDistribution();
 };
@@ -117,9 +120,9 @@ protected:
   virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 
 public:
-  VGTreeDynamicDistribution(HDesign& hd);
-  VGTreeDynamicDistribution(HDesign& hd, int partitionCount);
-  VGTreeDynamicDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+  VGTreeDynamicDistribution(HVGAlgorithm* vGA);
+  VGTreeDynamicDistribution(HVGAlgorithm* vGA, int partitionCount);
+  VGTreeDynamicDistribution(HVGAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
   virtual ~VGTreeDynamicDistribution();
 };
@@ -127,16 +130,14 @@ public:
 class VGTreeLegalDynamicDistribution: public VanGinnekenTree
 {
 protected:
-  HPlacementGrid pGrid;
-
   virtual void CreateTree();
   virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 
 public:
-  VGTreeLegalDynamicDistribution(HDesign& hd);
-  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount);
-  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, double sizeBuffer);
-  VGTreeLegalDynamicDistribution(HDesign& hd, int partitionCount, HSteinerPoint& source);
+  VGTreeLegalDynamicDistribution(HVGAlgorithm* vGA);
+  VGTreeLegalDynamicDistribution(HVGAlgorithm* vGA, int partitionCount);
+  VGTreeLegalDynamicDistribution(HVGAlgorithm* vGA, int partitionCount, double sizeBuffer);
+  VGTreeLegalDynamicDistribution(HVGAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
   virtual ~VGTreeLegalDynamicDistribution();
 };
@@ -226,15 +227,21 @@ protected:
   bool* netVisit;
   int maxBufferCount;
   int typeModificationVanGinnekenList;
+  int countPinInBufferingNet;
+  bool isTypeLimitationOnCountPinInBufferingNetEquality;
+  string nameBufferingNet;
+  int typeBuferAddition;
+  double sizeBufferMultiplier;
 
 public:
   HDesign& design;
   HWirePhysicalParams& WirePhisics;
   TemplateTypes<BufferInfo>::vector Buffers;
+  HVGAlgorithm* vGAlgorithm;
 
   VanGinnekenTree* vGTree;
 
-  VGAlgorithmData(HDesign& hd);
+  VGAlgorithmData(HDesign& hd,  HVGAlgorithm* vGA);
   ~VGAlgorithmData();
   void Initialize();
   void LoadBuffers();
@@ -259,6 +266,11 @@ public:
   bool* GetNetVisit();
   int GetMaxBufferCount();
   int GetTypeModificationVanGinnekenList();
+  int GetCountPinInBufferingNet();
+  bool GetIsTypeLimitationOnCountPinInBufferingNetEquality();
+  string GetNameBufferingNet();
+  int GetTypeBuferAddition();
+  double GetSizeBufferMultiplier();
 
   void SetWirePhisics(HWirePhysicalParams& wPP);
   void SetBuffers(TemplateTypes<BufferInfo>::vector buf);
@@ -279,6 +291,11 @@ public:
   void SetNetVisit(bool* nV);
   void SetMaxBufferCount(int mBC);
   void SetTypeModificationVanGinnekenList(int tMVGL);
+  void GetCountPinInBufferingNet(int cPIBN);
+  void GetIsTypeLimitationOnCountPinInBufferingNetEquality(bool iTLCPIBNE);
+  void GetNameBufferingNet(string nBN);
+  void GetTypeBuferAddition(int tBA);
+  void SetSizeBufferMultiplier(double sBM);
 
 };
 #endif //__VanGinnekenData_H__
