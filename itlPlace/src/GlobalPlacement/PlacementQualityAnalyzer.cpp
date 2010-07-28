@@ -141,6 +141,7 @@ void PlacementQualityAnalyzer::AnalyzeQuality(int id, CriteriaValues* criteriaVa
   }
 
   //PrintAllCriterias(pq);
+  ALERT("ALL_TNS = %f", Utils::ALL_TNS(m_design));
   PrintMajorCriteria(improvement);
 }
 
@@ -164,7 +165,7 @@ int PlacementQualityAnalyzer::GetConvergeIterationsNumber()
   return convIters;
 }
 
-void PlacementQualityAnalyzer::PrintMajorCriteria( double improvement ) 
+void PlacementQualityAnalyzer::PrintMajorCriteria(double improvement) 
 {
     if (m_experiments.size() <= 1)
     {

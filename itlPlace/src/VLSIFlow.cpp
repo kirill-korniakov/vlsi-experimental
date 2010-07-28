@@ -76,7 +76,7 @@ bool DoRandomPlacementIfRequired(HDesign& hd, const char* cfgOptName)
         RandomPlacement(hd);
 
         WRITELINE("");
-        ALERT("STA after random placement:");
+        if (hd.CanDoTiming()) ALERT("STA after random placement:");
         STA(hd);
         return true;
     }
@@ -108,6 +108,8 @@ bool DoLRTimingDrivenPlacementIfRequired(HDesign& hd, const char* cfgOptName)
         WRITELINE("");
         if (hd.CanDoTiming()) ALERT("STA after LR placement:");
         STA(hd);
+        //ALERT("No wire STA:");
+        //NoWireDelaySTA(hd);
         return true;
     }
     return false;
@@ -123,6 +125,8 @@ bool DoLegalizationIfRequired(HDPGrid& grid, const char* cfgOptName)
         WRITELINE("");
         if (grid.Design().CanDoTiming()) ALERT("STA after legalization:");
         STA(grid.Design());
+        //ALERT("No wire STA:");
+        //NoWireDelaySTA(grid.Design());
         return true;
     }
     return false;

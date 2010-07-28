@@ -40,6 +40,19 @@ namespace Utils
 
       return tns / nTEP;
   }
+
+  double ALL_TNS(HDesign& design)
+  {
+      if (!design.TimingPoints.IsInitialized()) return 0.0;
+
+      double allTNS = 0.0;
+      for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()]; !IsNull(tp.GoNext()); )
+      {
+          allTNS += tp.NegativeSlack();
+      }
+
+      return allTNS;
+  }
   
   void InsertNextPoint(HDesign& design, HTimingPoint pointToPlace, HTimingPoint afterThisPoint)
   {

@@ -494,10 +494,15 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     }
 
     int iteration = 1;
-    double targetDiscrepancy = hd.cfg.ValueOf("GlobalPlacement.targetDiscrepancy", 2.0);
     while (1)
     {
         ReportPreIterationInfo(hd, context, metaIteration, iteration);
+        //FIXME: finish the try to implement multiple spreading grids
+        //ConstructBinGrid(hd, context, ci.clusters.size() / pow(4.0, (double)iteration));
+        //PetscScalar* solution;
+        //VecGetArray(x, &solution);
+        //InitWeights(solution, &context);
+        //VecRestoreArray(x, &solution);
         
         // Tao solve the application
         iCHKERRQ TaoSolveApplication(taoapp, tao);
