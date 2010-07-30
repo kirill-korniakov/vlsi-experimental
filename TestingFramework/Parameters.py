@@ -9,7 +9,8 @@ class EmailerParameters:
     #recipients = ['itlab.vlsi@itlab.unn.ru']
     #recipients = ['zhivoderov.a@gmail.com']
     #recipients = ['kirill.kornyakov@gmail.com']
-    recipients = ['belyakov.alexander.a@gmail.com']
+    #recipients = ['belyakov.alexander.a@gmail.com']
+    recipients = ''
 
     #sender     = 'VLSIMailerDaemon@gmail.com'
     #smtpserver = 'mail.unn.ru'

@@ -19,15 +19,17 @@ def CompareValues(value1, value2, eps = 0.001):
 
 class HPWLPlacementChecker(Experiment_HPWL):
     masterLogName = '' #TODO: init master log
-       
+
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #define metrics
         HPWL     = 0
         workTime = 0
-        result   = 'OK'
+        result   = ''
 
         #collect metrics
         log = open(logName, 'r')
+        masterLogName = log; #for debugging only
+
         for line in log.readlines():
             idx = line.find('HPWL after  detailed placement: ')
             if idx != -1:
@@ -35,17 +37,17 @@ class HPWLPlacementChecker(Experiment_HPWL):
                 workTime = line[1:11].replace('.', ',') + ';'
                 continue
         log.close()
-        
-        log = open(masterLogName, 'r')
+
+        log = open(logName, 'r') #TODO: master log should be used here
         for line in log.readlines():
             idx = line.find('HPWL after  detailed placement: ')
             if idx != -1:
                 masterHPWL = line[idx + len('HPWL after  detailed placement: '):-1]
                 compare_result = CompareValues(HPWL, masterHPWL)
-                
+
                 if (compare_result == 'notEqual'):
                   result = 'Changed'
-                  
+
                 continue
         log.close()
 
@@ -56,20 +58,18 @@ class HPWLPlacementChecker(Experiment_HPWL):
         printStr += str(HPWL).replace('.', ',') + ';'
         printStr += str(workTime)
         print(printStr)
-        table.write(printStr)
-        
-        if (result == 'Changed'):
-          table.write('Changed;')
-        
+        table.write(printStr)       
+        table.write(result)
+
         table.close()
 
 def test():
     testRunner = TestRunner()
 
-    #e = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
-    e = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
+    e = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    #e = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
 
-test()
+#test()
