@@ -20,19 +20,6 @@ def CompareValues(value1, value2, eps = 0.001):
 class LRPlacementChecker(Experiment_LR):
     masterLogName = '' #TODO: init master log
 
-    def CreateEmptyTable(self, reportTable):
-        po = open(reportTable, 'w')
-        #NOTE: do not format the string below, because it harms table formatting
-        po.write('Benchmark;initHPWL;lrHPWL;dpHPWL;\
-initTWL;lrTWL;dpTWL;\
-initTNS;lrTNS;dpTNS;\
-initWNS;lrWNS;dpWNS;;\
-lrHPWL%;dpHPWL%;\
-lrTWL%;dpTWL%;\
-lrTNS%;dpTNS%;\
-lrWNS%;dpWNS%\n')
-        po.close()
-
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #define metrics
         result   = 'OK'

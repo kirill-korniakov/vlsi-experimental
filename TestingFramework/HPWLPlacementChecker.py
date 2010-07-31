@@ -27,38 +27,24 @@ class HPWLPlacementChecker(Experiment_HPWL):
         result   = ''
 
         #collect metrics
-        log = open(logName, 'r')
-        masterLogName = log; #for debugging only
+        parser = LogParser(logName)
+        HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
 
-        for line in log.readlines():
-            idx = line.find('HPWL after  detailed placement: ')
-            if idx != -1:
-                HPWL = line[idx + len('HPWL after  detailed placement: '):-1]
-                workTime = line[1:11].replace('.', ',') + ';'
-                continue
-        log.close()
+        masterLogName = logName #only for debugging
+        masterParser = LogParser(masterLogName)
+        masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL'))
+        compare_result = CompareValues(HPWL, masterHPWL)
 
-        log = open(logName, 'r') #TODO: master log should be used here
-        for line in log.readlines():
-            idx = line.find('HPWL after  detailed placement: ')
-            if idx != -1:
-                masterHPWL = line[idx + len('HPWL after  detailed placement: '):-1]
-                compare_result = CompareValues(HPWL, masterHPWL)
-
-                if (compare_result == 'notEqual'):
+        if (compare_result == 'notEqual'):
                   result = 'Changed'
-
-                continue
-        log.close()
 
         #print metrics
         table = open(reportTable, 'a')
         table.write('\n')
         printStr = benchmark + ';'
-        printStr += str(HPWL).replace('.', ',') + ';'
-        printStr += str(workTime)
+        printStr += str(HPWL).replace('.', ',')
         print(printStr)
-        table.write(printStr)       
+        table.write(printStr)
         table.write(result)
 
         table.close()
@@ -72,4 +58,4 @@ def test():
 
     testRunner.Run()
 
-#test()
+test()
