@@ -1329,6 +1329,76 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="LRSizing"
+					>
+					<File
+						RelativePath="..\src\GlobalPlacement\LRSizing\LRSizing.cpp"
+						>
+						<FileConfiguration
+							Name="debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="debug_mpich2|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="release_mpich2_gotoblas|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								ObjectFile="$(IntDir)\$(InputName)1.obj"
+								XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\LRSizing\LRSizing.old.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\GlobalPlacement\LRSizing\LRSizing.old.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="DetailedPlacement"
@@ -1384,10 +1454,6 @@
 				<Filter
 					Name="Sizing"
 					>
-					<File
-						RelativePath="..\src\DetailedPlacement\LRSizing\LRSizing.cpp"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -10207,14 +10273,6 @@
 						>
 					</File>
 				</Filter>
-				<Filter
-					Name="Sizing"
-					>
-					<File
-						RelativePath="..\include\LRSizing.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="GlobalPlacement"
@@ -10304,6 +10362,14 @@
 					</File>
 					<File
 						RelativePath="..\include\GlobalPlacement\LogSumExpData.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="LRSizing"
+					>
+					<File
+						RelativePath="..\include\GlobalPlacement\LRSizing.h"
 						>
 					</File>
 				</Filter>
