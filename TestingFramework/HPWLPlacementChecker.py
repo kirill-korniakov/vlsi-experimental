@@ -4,19 +4,6 @@ from Experiment_HPWL import *
 import Parameters
 from Parameters import *
 
-def CompareValues(value1, value2, eps = 0.001):
-
-    if (value1 == value2):
-      return 'same'
-
-    value1 = float(value1)
-    value2 = float(value2)
-
-    if (abs(value1 - value2) < eps):
-      return 'equal'
-
-    return 'notEqual'
-
 class HPWLPlacementChecker(Experiment_HPWL):
     masterLogName = '' #TODO: init master log
 
@@ -30,7 +17,7 @@ class HPWLPlacementChecker(Experiment_HPWL):
         parser = LogParser(logName)
         HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
 
-        masterLogName = logName #only for debugging
+        masterLogName = "../master logs/HPWL/ispd/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
         masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL'))
         compare_result = CompareValues(HPWL, masterHPWL)
@@ -42,10 +29,9 @@ class HPWLPlacementChecker(Experiment_HPWL):
         table = open(reportTable, 'a')
         table.write('\n')
         printStr = benchmark + ';'
-        printStr += str(HPWL).replace('.', ',')
+        printStr += str(HPWL).replace('.', ',') + result
         print(printStr)
         table.write(printStr)
-        table.write(result)
 
         table.close()
 

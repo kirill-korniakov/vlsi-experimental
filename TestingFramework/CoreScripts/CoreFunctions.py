@@ -66,3 +66,16 @@ def RemoveDir(dirName):
 def RemovePermissions(filePath) :
         if (not os.access(filePath, os.W_OK)):
             os.chmod(filePath, 666)
+
+def CompareValues(value1, value2, eps = 0.001):
+
+    if (value1 == value2):
+      return 'same'
+
+    value1 = float(value1)
+    value2 = float(value2)
+
+    if (abs(value1 - value2) < eps):
+      return 'equal'
+
+    return 'notEqual'

@@ -4,19 +4,6 @@ from Experiment_LR import *
 import Parameters
 from Parameters import *
 
-def CompareValues(value1, value2, eps = 0.001):
-
-    if (value1 == value2):
-      return 'same'
-
-    value1 = float(value1)
-    value2 = float(value2)
-
-    if (abs(value1 - value2) < eps):
-      return 'equal'
-
-    return 'notEqual'
-
 class LRPlacementChecker(Experiment_LR):
     masterLogName = '' #TODO: init master log
 
