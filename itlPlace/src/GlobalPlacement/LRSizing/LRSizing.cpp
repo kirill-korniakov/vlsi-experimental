@@ -2,6 +2,8 @@
 #include <math.h>
 
 #define accuracyForLRS_Mu 0.001
+#define DOUBLE_ACCURACY 1e-9
+#define errorBoundForLDP 0.01
 
 int LRSizer::CountLeftArcs(HDesign& design, HNet net)
 {
@@ -275,4 +277,185 @@ bool LRSizer::CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vect
 
 		if (max<accuracy) return true;
 		else return false;
+}
+
+void LRSizer::SOLVE_LDP(HDesign& design, std::vector<HCell>& cells)
+{
+		HDPGrid grid(design);
+		int StepCounter=1;
+
+		InitLambda(design, 1);
+		//InitLambdaMatrix(Lambda, timingPoints);
+		HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
+		for (; !::IsNull(tp); tp.GoNext())
+		{
+				if (!CheckKuhn_Tucker(design,tp)) ALERT("Check KuhnTucker=false on ::toID(tp)=%d",::ToID(tp));
+		}
+
+		bool stop;
+		do{
+				std::vector<double> vX=SOLVE_LRS_mu(design,cells);
+				std::vector<double> arrivalTimes=CalculateArrivalTimes(design);
+				
+				AdjustingLambda(design, StepCounter,arrivalTimes);
+
+				ProjectLambdaMatrix(design);
+				StepCounter++;
+				stop=CheckStopConditionForLDP(design, vX, errorBoundForLDP);
+		}while(!stop);
+		/*
+		TODO
+		*/
+}
+
+double LRSizer::FindOutputLambdaSum(HDesign& design, HTimingPoint point)
+{
+		double sumOfLambda=.0;
+		//Выходные арки
+		HPin pin = design.Get<HTimingPoint::Pin, HPin>(point);
+
+		if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT)
+		{
+				sumOfLambda = LambdaIn[::ToID(point)][0];
+				if (LambdaIn[::ToID(point)].size() > 1) ALERT("Everything is wrong in FindOutputLambdaSum!!!111");
+		}
+		else
+		{//cell input pin, iterate cell arcs
+				HPin& inputPin=pin;
+				HCell cell = design.Get<HPin::Cell, HCell>(inputPin);
+
+				for (HCell::PinsEnumeratorW outputPin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(cell); outputPin.MoveNext(); )
+				{
+						if (outputPin.Direction() != PinDirection_OUTPUT || ::IsNull(outputPin.Net())) 
+								continue;
+						
+						int i=0;
+						HTimingPoint timingPointOfOutputPin = design.TimingPoints[outputPin];
+						for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(outputPin.Type());arc.MoveNext();)
+						{
+								if (arc.TimingType() == TimingType_Combinational)
+								{
+										if (arc.GetStartPin(outputPin) == inputPin)
+										{
+												sumOfLambda+=LambdaIn[::ToID(timingPointOfOutputPin)][i];
+										}
+										i++;
+								}
+						}
+				}
+		}
+
+	return 0;	
+}
+
+double LRSizer::FindInputLambdaSum(HDesign& design, HTimingPoint point)
+{
+		double lambdaSum=.0;
+		for (std::vector<double>::iterator lambda = LambdaIn[::ToID(point)].begin(); lambda != LambdaIn[::ToID(point)].end(); lambda++)
+				lambdaSum+=*lambda;
+
+		return lambdaSum;
+}
+
+bool LRSizer::CheckKuhn_Tucker( HDesign& design, HTimingPoint point)
+{
+		return (FindOutputLambdaSum(design, point)-
+				FindInputLambdaSum(design, point) < DOUBLE_ACCURACY);
+}
+
+std::vector<double> LRSizer::CalculateArrivalTimes( HDesign& design )
+{
+		std::vector<double> arrivalTimes;
+		arrivalTimes.reserve(size);
+		HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
+		for (; tp!=design.TimingPoints.FirstInternalPoint(); tp.GoNext())
+		{
+				//arrivalTimes[::ToID(tp)]=r_i*DownstreamCapacitance
+				;
+		}
+
+		double maxInArrivalTime=7;
+		
+		tp = design[design.TimingPoints.FirstInternalPoint()];
+		for (; tp!=design.TimingPoints.LastInternalPoint(); tp.GoNext())
+		{
+				maxInArrivalTime=0;
+
+				HPin pin = design.Get<HTimingPoint::Pin, HPin>(tp);
+				if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+				{
+						HNet net = design.Get<HPin::Net, HNet>(pin);
+						HPin source = design.Get<HNet::Source, HPin>(net);
+						HTimingPoint point = design.TimingPoints[source];
+						if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
+				}
+				else
+				{
+						if (!design.GetBool<HPin::IsPrimary>(pin))
+						{
+								HNet net = design.Get<HPin::Net, HNet>(pin);
+								HPin source = design[net].Source();
+								HPinType sourceType = design.Get<HPin::Type, HPinType>(source);
+
+								for (HPinType::ArcsEnumeratorW arc = design[sourceType].GetArcsEnumeratorW(); arc.MoveNext(); )
+										if (arc.TimingType() == TimingType_Combinational)
+										{
+												HPin tp_Pin=design.Get<HTimingPoint::Pin, HPin>(tp);
+												HPin startPin = arc.GetStartPin(tp_Pin);
+												HTimingPoint point = design.TimingPoints[startPin];
+												if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
+										}
+						}
+				}
+
+				//arrivalTimes[::ToID(tp)]=maxInArrivalTime+r_i*DownstreamCapacitance;
+		}
+
+		maxInArrivalTime=0;
+		HPin pin = design.Get<HTimingPoint::Pin, HPin>(design.TimingPoints.LastInternalPoint());
+		if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+		{
+				HNet net = design.Get<HPin::Net, HNet>(pin);
+				HPin source = design.Get<HNet::Source, HPin>(net);
+				HTimingPoint point = design.TimingPoints[source];
+				if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
+		}
+		else
+		{
+				if (!design.GetBool<HPin::IsPrimary>(pin))
+				{
+						HNet net = design.Get<HPin::Net, HNet>(pin);
+						HPin source = design[net].Source();
+						HPinType sourceType = design.Get<HPin::Type, HPinType>(source);
+
+						for (HPinType::ArcsEnumeratorW arc = design[sourceType].GetArcsEnumeratorW(); arc.MoveNext(); )
+								if (arc.TimingType() == TimingType_Combinational)
+								{
+										HPin tp_Pin=design.Get<HTimingPoint::Pin, HPin>(tp);
+										HPin startPin = arc.GetStartPin(tp_Pin);
+										HTimingPoint point = design.TimingPoints[startPin];
+										if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
+								}
+				}
+		}
+		//arrivalTimes[::ToID(design.TimingPoints.LastInternalPoint())]=maxInArrivalTime+r_i*DownstreamCapacitance;
+		
+		return arrivalTimes;
+		//throw std::exception("The method or operation is not implemented.");
+}
+
+void LRSizer::AdjustingLambda( HDesign& design, int step, std::vector<double> arrivalTimes )
+{
+		
+//		throw std::exception("The method or operation is not implemented.");
+}
+
+void LRSizer::ProjectLambdaMatrix( HDesign& design )
+{
+		throw std::exception("The method or operation is not implemented.");
+}
+
+bool LRSizer::CheckStopConditionForLDP( HDesign& design, std::vector<double> vX, double errorBound )
+{
+		throw std::exception("The method or operation is not implemented.");
 }

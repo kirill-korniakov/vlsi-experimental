@@ -1,3 +1,4 @@
+#ifdef nothing
 #include <math.h>
 #include <float.h>
 #include "LRSizing.old.h"
@@ -577,3 +578,4 @@ LambdaMatrix::LambdaMatrix(HDesign& design, std::vector<HTimingPoint>& timingPoi
 
 		ALERT("LambdaMatrix Constructed");
 }
+#endif

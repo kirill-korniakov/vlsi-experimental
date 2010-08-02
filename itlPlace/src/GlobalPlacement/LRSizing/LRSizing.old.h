@@ -1,5 +1,4 @@
-#ifndef LRSizing_h
-#define LRSizing_h
+#ifdef nothing
 
 #include "HDesign.h"
 #include "Utils.h"
