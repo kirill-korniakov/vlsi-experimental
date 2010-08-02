@@ -21,7 +21,7 @@ class HPWLPlacementChecker(Experiment_HPWL):
         parser = LogParser(logName)
         HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
 
-        masterLogName = masterLogFolder + "/" + os.path.basename(logName)
+        masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
         masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL'))
         compare_result = CompareValues(HPWL, masterHPWL)
