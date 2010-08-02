@@ -5,7 +5,11 @@ import Parameters
 from Parameters import *
 
 class HPWLPlacementChecker(Experiment_HPWL):
-    masterLogName = '' #TODO: init master log
+    masterLogFolder = ''
+
+    def __init__(self, name, cfg, benchmarks, masterLogFolder = '', cmdLine = ''):
+        Experiment_HPWL.__init__(self, name, cfg, benchmarks, cmdLine)
+        self.masterLogFolder = masterLogFolder
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #define metrics
@@ -17,7 +21,7 @@ class HPWLPlacementChecker(Experiment_HPWL):
         parser = LogParser(logName)
         HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
 
-        masterLogName = "../master logs/HPWL/ispd/" + os.path.basename(logName)
+        masterLogName = masterLogFolder + "/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
         masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL'))
         compare_result = CompareValues(HPWL, masterHPWL)
@@ -38,10 +42,10 @@ class HPWLPlacementChecker(Experiment_HPWL):
 def test():
     testRunner = TestRunner()
 
-    e = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
-    #e = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
+    e = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list', "../master logs/HPWL/ispd")
+    #e = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "../master logs/HPWL/iwls")
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
 
-test()
+#test()

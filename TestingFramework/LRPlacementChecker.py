@@ -5,7 +5,11 @@ import Parameters
 from Parameters import *
 
 class LRPlacementChecker(Experiment_LR):
-    masterLogName = '' #TODO: init master log
+    masterLogFolder = ''
+
+    def __init__(self, name, cfg, benchmarks, masterLogFolder = '', cmdLine = ''):
+        Experiment_LR.__init__(self, name, cfg, benchmarks, cmdLine)
+        self.masterLogFolder = masterLogFolder
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #define metrics
@@ -22,7 +26,8 @@ class LRPlacementChecker(Experiment_LR):
                 table[row][col] = float(value.replace(',', '.'))
 
         #print absolute values
-        masterParser = LogParser(logName) #masterLogName
+        masterLogName = masterLogFolder + "/" + os.path.basename(logName)
+        masterParser = LogParser(masterLogName)
         printStr = benchmark + ';'
         for col in range(len(metrics)):
             for row in range(len(stages)):
@@ -52,7 +57,7 @@ def test():
     testRunner = TestRunner()
 
     cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS05_GP_fast.list', cmdArgs)
+    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS05_GP_fast.list', "../master logs/LR", cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
