@@ -11,7 +11,7 @@ public:
     ~TimingPointMus();
 
     void InitMuSOnTSP(HDesign &design, double defaultMu);
-    void InitMusInternalAndTED(HDesign& design, double defaultMu);
+    void InitMusInternalAndTEP(HDesign& design, double defaultMu);
     void InitPointMus(HDesign& design, HTimingPoint pt, double defaultMu);
 
     void UpdateMus(HDesign& design);

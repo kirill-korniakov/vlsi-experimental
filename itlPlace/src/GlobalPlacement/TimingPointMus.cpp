@@ -36,7 +36,7 @@ void TimingPointMus::InitMuSOnTSP(HDesign& design, double defaultMu)
     }
 }
 
-void TimingPointMus::InitMusInternalAndTED(HDesign& design, double defaultMu) 
+void TimingPointMus::InitMusInternalAndTEP(HDesign& design, double defaultMu) 
 {
     for (HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()]; !::IsNull(tp); tp.GoNext() )
     {
@@ -59,7 +59,7 @@ TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0), reporter(new M
     nDecreased = 0;
 
     InitMuSOnTSP(design, defaultMu);
-    InitMusInternalAndTED(design, defaultMu);
+    InitMusInternalAndTEP(design, defaultMu);
     EnforceFlowProperty(design);
     reporter->Report(design, this, "AFTER INITIAL ASSIGNMENT");
 }
@@ -177,11 +177,11 @@ void TimingPointMus::ScaleInMuA(HTimingPoint pt, double multiplier)
 template<class Action>
 void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo)
 {
-    HPin pin = design.Get<HTimingPoint::Pin, HPin>(pt);
+    HPin _pin = design.Get<HTimingPoint::Pin, HPin>(pt);
 
-    if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT)
+    if (design.Get<HPin::Direction, PinDirection>(_pin) == PinDirection_OUTPUT)
     {//cell output pin, iterate net arcs
-        for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(design.Get<HPin::Net, HNet>(pin));
+        for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(design.Get<HPin::Net, HNet>(_pin));
             sink.MoveNext();)
         {
             todo(*this, design.TimingPoints[sink], 0);
@@ -189,7 +189,7 @@ void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo
     }
     else
     {//cell input pin, iterate cell arcs
-        HCell cell = design.Get<HPin::Cell, HCell>(pin);
+        HCell cell = design.Get<HPin::Cell, HCell>(_pin);
 
         for (HCell::PinsEnumeratorW pin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(cell); pin.MoveNext(); )
         {
@@ -203,7 +203,7 @@ void TimingPointMus::IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo
             {
                 if (arc.TimingType() == TimingType_Combinational)
                 {
-                    if (arc.GetStartPin(pin) == pin)
+                    if (arc.GetStartPin(pin) == _pin)
                         todo(*this, point, idx);
                     idx++;
                 }
