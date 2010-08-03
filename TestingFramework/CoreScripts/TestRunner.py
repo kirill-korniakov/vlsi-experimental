@@ -18,6 +18,7 @@ from Parameters import *
 
 class TestRunner:
     parameters = ''
+    experimentResult = 'Ok'
 
     def __init__(self, parameters = TestRunnerParameters()):
         self.parameters = parameters
@@ -50,6 +51,7 @@ class TestRunner:
         reportTable = reportCreator.GetReportTableName()
 
         experiment.CreateEmptyTable(reportTable)
+        self.experimentResult = 'Ok'
 
         for benchmark in benchmarks:
             logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
@@ -65,7 +67,14 @@ class TestRunner:
             subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
             #print(benchmark + ' DONE')
-            experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+            benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+
+            if (benchmarkResult == 'Failed'):
+                self.experimentResult = 'Failed'
+                break
+
+            if (benchmarkResult == 'Changed'):
+                self.experimentResult = 'Changed'
 
         return reportTable
 
@@ -90,6 +99,6 @@ class TestRunner:
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
             cp.CoolPrint("Sending mail with " + reportTable)
-            emailer.SendResults(experiment, reportTable)
+            emailer.SendResults(experiment, reportTable, self.experimentResult)
 
         cp.CoolPrint('Finish')

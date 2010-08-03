@@ -7,7 +7,7 @@ from Parameters import *
 class Experiment_HPWL(BaseExperiment):
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
-        po.write('Benchmark;HPWL;Time')
+        po.write('Benchmark;HPWL')
         po.close()
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
@@ -30,10 +30,12 @@ class Experiment_HPWL(BaseExperiment):
 def test():
     testRunner = TestRunner()
 
-    e = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    eISPD = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    eIWLS = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05.list')
     #e = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
-    testRunner.parameters.experiments.append(e)
+    testRunner.parameters.experiments.append(eIWLS)
+    testRunner.parameters.experiments.append(eISPD)
 
     testRunner.Run()
 
-#test()
+test()

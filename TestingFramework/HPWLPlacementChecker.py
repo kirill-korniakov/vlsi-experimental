@@ -15,11 +15,14 @@ class HPWLPlacementChecker(Experiment_HPWL):
         #define metrics
         HPWL     = 0
         workTime = 0
-        result   = ''
+        result   = 'OK'
 
         #collect metrics
         parser = LogParser(logName)
         HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
+
+        if (HPWL == str(NOT_FOUND)):
+           return ('Failed')
 
         masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
@@ -33,16 +36,17 @@ class HPWLPlacementChecker(Experiment_HPWL):
         table = open(reportTable, 'a')
         table.write('\n')
         printStr = benchmark + ';'
-        printStr += str(HPWL).replace('.', ',') + result
+        printStr += str(HPWL).replace('.', ',') + ';' + result
         print(printStr)
         table.write(printStr)
 
         table.close()
+        return result
 
 def test():
     testRunner = TestRunner()
 
-    e = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list', "../master logs/HPWL/ispd")
+    e = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04_fast.list', "../master logs/HPWL/ispd")
     #e = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "../master logs/HPWL/iwls")
     testRunner.parameters.experiments.append(e)
 

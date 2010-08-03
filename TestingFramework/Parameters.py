@@ -1,7 +1,7 @@
 class TestRunnerParameters:
-    doCheckout = True
-    doBuild    = True
-    doSendMail = False
+    doCheckout = False
+    doBuild    = False
+    doSendMail = True
 
     experiments = []
 
@@ -9,6 +9,7 @@ class EmailerParameters:
     #recipients = ['itlab.vlsi@itlab.unn.ru']
     #recipients = ['zhivoderov.a@gmail.com']
     #recipients = ['kirill.kornyakov@gmail.com']
+    #recipients = ['kirill.kornyakov@gmail.com', 'belyakov.alexander.a@gmail.com']
     recipients = ['belyakov.alexander.a@gmail.com']
     #recipients = ''
 
