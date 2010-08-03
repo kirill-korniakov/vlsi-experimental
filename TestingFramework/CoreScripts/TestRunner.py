@@ -64,7 +64,7 @@ class TestRunner:
 
             subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             fPlacerOutput.close()
-            print(benchmark + ' is done...')
+            #print(benchmark + ' DONE')
             experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
         return reportTable

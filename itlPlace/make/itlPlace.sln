@@ -12,9 +12,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "itlPlace", "itlPlace.vcproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cfg", "cfg", "{8528EEF8-E5D2-4C4B-9A56-65FC8B70C6BA}"
 	ProjectSection(SolutionItems) = preProject
-		..\bin\Config_for_night_experiments.cfg = ..\bin\Config_for_night_experiments.cfg
+		..\bin\cfg\boris_hippocrate_ALL.cfg = ..\bin\cfg\boris_hippocrate_ALL.cfg
 		..\bin\cfg\hpwl_ispd04.cfg = ..\bin\cfg\hpwl_ispd04.cfg
-		..\bin\cfg\kirill_buffering.cfg = ..\bin\cfg\kirill_buffering.cfg
+		..\bin\cfg\hpwl_iwls05.cfg = ..\bin\cfg\hpwl_iwls05.cfg
 		..\bin\cfg\LR.cfg = ..\bin\cfg\LR.cfg
 		..\bin\cfg\New_buffering.cfg = ..\bin\cfg\New_buffering.cfg
 	EndProjectSection

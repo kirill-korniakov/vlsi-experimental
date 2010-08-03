@@ -68,7 +68,7 @@ void HPlotter::Initialize()
     m_Data->borderSpace = m_hd.cfg.ValueOf("plotter.borderSpace", 5);
 
     //create window
-    m_Data->windowName = "itlPlace";
+    m_Data->windowName = m_hd.cfg.ValueOf("plotter.windowName", "itlPlace");
     cvNamedWindow(m_Data->windowName.c_str());
 
     //create image
