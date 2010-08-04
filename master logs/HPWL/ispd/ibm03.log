@@ -1,14 +1,14 @@
 Placement Flow Stages Table
 StageName         Tag  Time(sec) Cells HPWL(nm)  TWL(nm)
 --------------------------------------------------------
-InitialState      INIT     4.282 27507  8562730        0
-GlobalPlacement   GP      80.372 27507 57317138 61287354
-Legalization      LEG     81.347 27507 63108580 67642540
-DetailedPlacement DP     111.961 27507 55382100 60087010
+InitialState      INIT     3.964 23136  7622760        0
+GlobalPlacement   GP      67.311 23136 48402444 52907873
+Legalization      LEG     68.275 23136 52897320 58025120
+DetailedPlacement DP     103.059 23136 46484090 51727360
 --------------------------------------------------------
 
-[   113.157] Thats All!
-[   113.161] FATAL ERROR PRINT in main (..\src\main.cpp:110)
+[   104.100] Thats All!
+[   104.104] FATAL ERROR PRINT in main (..\src\main.cpp:110)
              Configuration exception!
 FileIOException
 
