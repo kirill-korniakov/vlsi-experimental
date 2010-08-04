@@ -2,7 +2,6 @@
 #include "Utils.h"
 #include "STA.h"
 #include "Timing.h"
-#include "DelayPropagation.h"
 #include "Reporting.h"
 
 #include "float.h"
@@ -11,6 +10,7 @@
 using namespace std;
 
 const int ONE_FOR_MUA_AND_ONE_FOR_MUR = 2;
+const int TIMING_MODEL = 1;
 
 int CountLeftArcs(HDesign& design, HNet net)
 {
@@ -282,7 +282,7 @@ void TimingPointMus::UpdateLocalMuA(HDesign& design, double theta)
         ASSERT(IsOutputPin(design, pin));
 
         //obtain input slacks
-        DelayPropagation<1> dp(design);
+        DelayPropagation<TIMING_MODEL> dp(design);
         CalcArrivalTimeOnOutputPin(design, pin, dp);
         ASSERT(nMuIn == dp.checkedArrivals.size());
 
@@ -335,9 +335,10 @@ void TimingPointMus::UpdateLocalMuR(HDesign& design, double theta)
 
         if (IsInputPin(design, pin))
         {//this is a cell input pin
-            //collect arrival times
-            DelayPropagation<1> dp(design);
-            CalcRequiredTimeOnInputPins(design, pin, dp);
+            //collect required times
+            DelayPropagation<TIMING_MODEL> dp(design);
+            CollectRequireds<TIMING_MODEL> collector(design, dp, tp);
+            IterateOutMu(design, tp, collector);
             ASSERT(nMuOut == dp.checkedRequireds.size());
 
             //calculate local slacks

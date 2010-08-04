@@ -70,16 +70,16 @@ void PropagateArrivals(HDesign& design)
 }
 
 template<int sdNum>
-void CalcRequiredTimeOnInputPins(HDesign& design, HPin pin, DelayPropagation<sdNum>& dp)
+void CalcRequiredTimeOnInputPins(HDesign& design, HPin outPin, DelayPropagation<sdNum>& dp)
 {
-    HPinType ptype = design.Get<HPin::Type, HPinType>(pin);
+    HPinType ptype = design.Get<HPin::Type, HPinType>(outPin);
     if (design.GetInt<HPinType::TimingArcsCount>(ptype) == 0) return;
 
-    HSteinerPoint this_point = design.SteinerPoints[pin];
-    HTimingPoint pt = design.TimingPoints[pin];
+    HSteinerPoint this_point = design.SteinerPoints[outPin];
+    HTimingPoint tp = design.TimingPoints[outPin];
 
     DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
-    DelayPropagation<sdNum>::TimeType ptTime = dp.GetRequiredTime(pt);
+    DelayPropagation<sdNum>::TimeType ptTime = dp.GetRequiredTime(tp);
 
     //apply each arc that gives worst known solution
     for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
@@ -87,12 +87,12 @@ void CalcRequiredTimeOnInputPins(HDesign& design, HPin pin, DelayPropagation<sdN
     {
         if (arc.TimingType() != TimingType_Combinational) continue;
 
-        HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
+        HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(outPin)];
 
         DelayPropagation<sdNum>::BoolType inversed;
         DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, ptTime, inversed);
 
-        dp.AccumulateWorstRequiredOnPin(startPoint, time, inversed, pt);
+        dp.AccumulateWorstRequiredOnPin(startPoint, time, inversed, tp);
     }//for (HPinType::ArcsEnumeratorW arc
 }
 

@@ -3,6 +3,7 @@
 
 #include "HDesign.h"
 #include "MuReporter.h"
+#include "DelayPropagation.h"
 
 class TimingPointMus
 {
@@ -144,6 +145,36 @@ private:
         }
     };
 
+    template<int sdNum>
+    struct CollectRequireds
+    {
+        HTimingPoint start;
+        DelayPropagation<sdNum>& dp;
+        HDesign& design;
+        
+        CollectRequireds(HDesign& _design, DelayPropagation<sdNum>& _dp, HTimingPoint _start) : 
+            design(_design), 
+            start(_start),
+            dp(_dp) {}
+
+        void operator() (TimingPointMus& pm, HTimingPoint tp, int idx)
+        {
+            HPin endPin = design.Get<HTimingPoint::Pin, HPin>(tp);
+            HPin startPin = design.Get<HTimingPoint::Pin, HPin>(start);
+            HPinType spType = design.Get<HPin::Type, HPinType>(startPin);
+            HPinType epType = design.Get<HPin::Type, HPinType>(endPin);
+
+            HSteinerPoint inPinSP = design.SteinerPoints[startPin];
+            DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(inPinSP);
+
+            DelayPropagation<sdNum>::TimeType endReqTime = dp.GetRequiredTime(tp);
+            DelayPropagation<sdNum>::BoolType inversed;
+            HTimingArcTypeWrapper arc = design[FindTimingArc(design, spType, epType)];
+            DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, endReqTime, inversed);
+            dp.AccumulateWorstRequiredOnPin(start, time, inversed, tp);
+        }
+    };
+    
     template<class Action>
     void IterateOutMu(HDesign& design, HTimingPoint pt, Action& todo);
 };
