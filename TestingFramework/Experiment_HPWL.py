@@ -31,11 +31,11 @@ def test():
     testRunner = TestRunner()
 
     eISPD = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
-    eIWLS = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05.list')
+    eIWLS = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
     #e = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
     testRunner.parameters.experiments.append(eIWLS)
     testRunner.parameters.experiments.append(eISPD)
 
     testRunner.Run()
 
-test()
+#test()

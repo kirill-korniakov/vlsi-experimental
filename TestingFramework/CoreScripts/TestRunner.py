@@ -19,6 +19,7 @@ from Parameters import *
 class TestRunner:
     parameters = ''
     experimentResult = 'Ok'
+    failedList = ''
 
     def __init__(self, parameters = TestRunnerParameters()):
         self.parameters = parameters
@@ -71,9 +72,9 @@ class TestRunner:
 
             if (benchmarkResult == 'Failed'):
                 self.experimentResult = 'Failed'
-                break
+                self.failedList += ' ' + benchmark + ';'
 
-            if (benchmarkResult == 'Changed'):
+            if ((benchmarkResult == 'Changed') and (self.experimentResult != 'Failed')):
                 self.experimentResult = 'Changed'
 
         return reportTable
@@ -82,6 +83,10 @@ class TestRunner:
         cp = CoolPrinter()
         svn = SvnWorker()
         emailer = Emailer()
+
+        subject = ''
+        text    = ''
+        attachmentFiles = []
 
         cp.CoolPrint('Start')
 
@@ -96,9 +101,24 @@ class TestRunner:
             self.BuildSln(GeneralParameters.slnPath)
 
         for experiment in self.parameters.experiments:
+            self.experimentResult = 'Ok'
+            self.failedList = ''
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
             cp.CoolPrint("Sending mail with " + reportTable)
-            emailer.SendResults(experiment, reportTable, self.experimentResult)
+
+            subject += ' ' + experiment.name
+            text += experiment.name + ': ' + self.experimentResult
+
+            if (self.experimentResult == 'Failed'):
+               text += ' on' + self.failedList
+
+            text += '\n'
+
+            if (self.experimentResult == 'Changed'):
+                attachmentFiles.append(reportTable)
+            #emailer.SendResults(experiment, reportTable, self.experimentResult)
+            
+        emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
         cp.CoolPrint('Finish')
