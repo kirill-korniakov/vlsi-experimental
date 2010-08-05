@@ -410,7 +410,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         DoSTAIfCan(hd);
     }
 
-	FlowMetricsTableAddBorder(flowMetrics, hd);
+    FlowMetricsTableAddBorder(flowMetrics, hd);
 
     //EXPORT
     hd.Plotter.ShowPlacement();
