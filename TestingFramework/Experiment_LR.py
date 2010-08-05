@@ -21,7 +21,7 @@ lrWNS%;dpWNS%\n')
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #define metrics
         metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
-        stages = ['INIT', 'LEG', 'DP']
+        stages = ['INIT', 'LEG']#, 'DP']
 
         #read numbers
         parser = LogParser(logName)
@@ -41,9 +41,11 @@ lrWNS%;dpWNS%\n')
         #print percents
         for col in range(len(metrics)):
             for row in range(1, len(stages)):
-                percent = 100.0 * (table[row][col]/table[0][col] - 1.0)
+                if table[0][col] != 0.0:
+                    percent = 100.0 * (table[row][col]/table[0][col] - 1.0)
+                else:
+                    percent = -1.0
                 printStr += "%.2f;" % percent
-        printStr = printStr + '\n'
         print(printStr)
 
         #write metrics to the file
@@ -54,8 +56,8 @@ lrWNS%;dpWNS%\n')
 def test():
     testRunner = TestRunner()
 
-    cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = Experiment_LR('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS05_GP_fast.list', cmdArgs)
+    cmdArgs = ''#--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
+    e = Experiment_LR('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
