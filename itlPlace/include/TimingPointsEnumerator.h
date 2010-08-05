@@ -97,7 +97,7 @@ namespace TOInternal
   class ForvardEnumerator<BaseEnumeratorType, true> : public BaseEnumeratorType
   {
   public:
-    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {}
+    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
 
     bool MoveNext()
     {
@@ -113,7 +113,7 @@ namespace TOInternal
   {
     //typedef typename BaseEnumeratorType BaseEnumeratorType;
   public:
-    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {}
+    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
 
     bool MoveNext()
     {
@@ -129,7 +129,7 @@ namespace TOInternal
   class BackvardEnumerator<BaseEnumeratorType, true> : public BaseEnumeratorType
   {
   public:
-    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {}
+    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
 
     bool MoveNext()
     {
@@ -144,7 +144,7 @@ namespace TOInternal
   class BackvardEnumerator<BaseEnumeratorType, false> : public BaseEnumeratorType
   {
   public:
-    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {}
+    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
 
     bool MoveNext()
     {
