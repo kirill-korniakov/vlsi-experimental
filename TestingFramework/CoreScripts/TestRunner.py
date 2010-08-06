@@ -84,7 +84,7 @@ class TestRunner:
         svn = SvnWorker()
         emailer = Emailer()
 
-        subject = ''
+        subject = 'Night experiments'
         text    = ''
         attachmentFiles = []
 
@@ -107,7 +107,7 @@ class TestRunner:
             reportTable = self.RunExperiment(experiment)
             cp.CoolPrint("Sending mail with " + reportTable)
 
-            subject += ' ' + experiment.name
+            #subject += ' ' + experiment.name
             text += experiment.name + ': ' + self.experimentResult
 
             if (self.experimentResult == 'Failed'):

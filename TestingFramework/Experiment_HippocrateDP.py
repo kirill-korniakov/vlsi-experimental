@@ -72,7 +72,7 @@ class Experiment_HippocrateDP(BaseExperiment):
 
 def test():
     testRunner = TestRunner()
-    e = Experiment_HPWL('HippocrateDP experiment', 'HippocrateDP.cfg', 'gp.list')
+    e = Experiment_HippocrateDP('HippocrateDP experiment', 'HippocrateDP.cfg', 'ISPD04_fast.list')
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
