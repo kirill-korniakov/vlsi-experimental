@@ -1,0 +1,118 @@
+package Optimize version 0.0.7 {
+
+  /* By labeling a method 'optional', I mean that the implementation can be
+     an empty function (returning an int if necessary), not that the function
+     doesn't need to exist.  */
+  interface OptimizationModel {
+
+
+    /** 
+     * Optional --
+     * initialize() will be called from the Optimization Solver 
+     * before solving in order to set up any data.
+     */
+    int initialize();
+
+    /**
+     * Optional --
+     * finalize() will be called from the Opimization Solver
+     * when it through using the model (ie, when solver is deleted)
+     */
+    int finalize();
+
+
+    /**
+     * Required --
+     * getNumberVariables()  lets the Optimization Solver know how much 
+     * space to allocate for the various vectors and matrices.
+     */
+    int getNumberVariables();
+
+
+
+    /** 
+     * Required --
+     * evaluateObjectiveFunction(...) should be straightforward.
+     * If you wish to only implement evaluateObjectiveAndGradient(), then
+     * this function should allocate a dummy gradient vector and call
+     * evaluateObjectiveAndGradient() explicitly.
+     */
+    void evaluateObjectiveFunction(in array<double,1> x, out double f);
+    
+    /** 
+     * Required --
+     * evaluateGradient(...) should be straightforward.
+     * If you wish to only implement evaluateObjectiveAndGradient(), then
+     * this function should call it explicitly. 
+     */
+    void evaluateGradient(in array<double,1> x, in array<double,1> g);
+
+
+    /**
+     * Required --
+     * evaluateObjectiveAndGradient(...) should be straightforward.
+     * If you wish to implement the function and gradient evaluation routines
+     * separately, then this method should do so explicitly.
+     */
+    void evaluateObjectiveAndGradient(in array<double,1> x,
+				      out double f, 
+				      in array<double,1> g);
+
+    /**
+     * Optional --
+     * evaluateHessian() is only necessary if using second derivative methods for
+     * solving the model. 
+     */
+    void evaluateHessian(in array<double,1> x, in array<double,2> H);
+
+    /** 
+     * Optional -- Used only by LMVM and BLMVM solvers with the right option is set.
+     * hessianSolve(...) solve linear system involved exact or approximate Hessian.
+     */
+
+    void hessianSolve(in array<double,1> v, in array<double,1> w);
+    void hessianSolve2(in array<double,1> x, in array<double,1> v, in array<double,1> w);
+
+    /**
+     * Optional --
+     * getVariableBounds() is only necessary if any of the variable bounds are 
+     * not at (-inf, inf).    If a solution method
+     * is selected that does not use variable bounds, then this function
+     * will not be called.
+     */
+    void getVariableBounds(in array<double,1> xl, in array<double,1> xu);
+
+    /** 
+     * Optional --
+     * initializeVariables() is called from the Optimization Solver to
+     * sets the solution vector to an initial value.
+     */
+    void initializeVariables(in array<double,1> x); 
+
+    /** 
+     * Optional --
+     * monitor() is called from TAO at every iteration.
+     * If the application programmer wants to perform some kind of
+     * visualization or other output throughout the solve, then this
+     * method should be implemented.
+     */
+    void monitor();
+
+
+    /**
+     * Optional --
+     * checkConvergence() is called from TAO at every iteration.
+     * If the application wishes to perform a convergence test, then
+     * implement this method to set the flag to nonconverged, 0 for 
+     * not converged.
+     * The flag is an inout variable to avoid the need for implementing the
+     * method if its utilization is not required (ie, 0 is passed in, so if
+     * nothing is implemented, then 0 is passed back out).
+     */
+    void checkConvergence(inout int flag);
+  
+
+  };
+
+};
+

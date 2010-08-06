@@ -1,0 +1,5 @@
+package TAO version 0.3 {
+  class Environment implements-all Solver.ProjectState {};
+  class Solver implements-all Solver.OptimizationSolver {};
+
+}

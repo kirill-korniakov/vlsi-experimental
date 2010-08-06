@@ -1,0 +1,2 @@
+static const char *petscconfigureruntime = "Mon Jul  6 14:58:11 2009";
+static const char *petscconfigureoptions = "--with-mpi-include=\"/cygdrive/c/Program Files/MPICH2/include\" --with-mpi-lib=\"/cygdrive/c/Program Files/MPICH2/lib/mpi.lib\" --download-c-blas-lapack=1 --with-cc=\"win32fe cl --nodetect\" --with-cxx=\"win32fe cl --nodetect\" --AR=\"win32fe lib\" CPPFFLAGS=-D_CRT_SECURE_NO_DEPRECATE --with-fortran=0 --with-clanguage=C++ --with-x=0 --with-debugging=1 --useThreads=0 --with-timer=nt --with-log=1 --with-info=1 --useThreads=0 --with-shared=0";

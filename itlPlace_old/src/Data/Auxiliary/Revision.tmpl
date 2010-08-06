@@ -1,0 +1,10 @@
+namespace Revision
+{
+long        RevisionNumber         = $WCREV$;
+const char* RevisionDate           = "$WCDATE$";
+const char* RevisionRange          = "$WCRANGE$";
+const char* RepositoryURL          = "$WCURL$";
+bool        HasLocalModifications  = $WCMODS?true:false$;
+bool        HasMixedRevisions      = $WCMIXED?true:false$;
+bool        HasVersionControl      = $WCINSVN?true:false$;
+}
