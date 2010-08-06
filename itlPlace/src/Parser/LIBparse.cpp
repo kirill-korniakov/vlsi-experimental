@@ -71,7 +71,7 @@ void ParseNumbers(si2drStringT str, double* storage, int size)
 
 void ExtractPhisicsFromLUT(LutTable& tbl, double& a0, double& a1, double& a2)
 {
-  if (tbl.index_1 != 0 && tbl.index_2 != 0 && tbl.index_3 == 0)
+  if (tbl.index_1 != 0 && tbl.index_2 != 0 /*&& tbl.index_3 == 0*/)
   {
     int idx1_size = 1;
     for (char* pos1 = tbl.index_1; *pos1 != 0; ++pos1)
@@ -98,7 +98,7 @@ void ExtractPhisicsFromLUT(LutTable& tbl, double& a0, double& a1, double& a2)
   }
   else
   {
-    LOGCRITICAL("Unsuppoted lut table. Unable to extract phisical parameters.");
+    LOGCRITICAL("Unsupported LUT. Unable to extract phisical parameters.");
   }
 }
 
@@ -479,8 +479,7 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
     if (strcmp(group_type, "cell_rise") == 0)
     {
       LutTable tbl = ReadLUT(group, data.GetLutTemplateByName(template_name));
-
-      double t,r,a;
+      
       ASSERT(tbl.variable_1
         && tbl.variable_2
         && (strcmp(tbl.variable_1, "input_net_transition") == 0
@@ -489,6 +488,7 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
           && strcmp(tbl.variable_2, "input_net_transition") == 0)
         );
       
+      double t,r,a;
       ExtractPhisicsFromLUT(tbl, t, r, a);
       
       if (strcmp(tbl.variable_1, "input_net_transition") == 0)
@@ -505,7 +505,6 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
     {
       LutTable tbl = ReadLUT(group, data.GetLutTemplateByName(template_name));
 
-      double t,r,a;
       ASSERT(tbl.variable_1
         && tbl.variable_2
         && (strcmp(tbl.variable_1, "input_net_transition") == 0
@@ -514,6 +513,7 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
           && strcmp(tbl.variable_2, "input_net_transition") == 0)
         );
       
+      double t,r,a;
       ExtractPhisicsFromLUT(tbl, t, r, a);
       
       if (strcmp(tbl.variable_1, "input_net_transition") == 0)
@@ -556,15 +556,14 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
     {
       LutTable tbl = ReadLUT(group, data.GetLutTemplateByName(template_name));
 
-      double t,x1,x2;
-      ASSERT(tbl.variable_1
-        && tbl.variable_2
-        && (strcmp(tbl.variable_1, "constrained_pin_transition") == 0
+      ASSERT(tbl.variable_1 && tbl.variable_2
+          && (strcmp(tbl.variable_1, "constrained_pin_transition") == 0
           && strcmp(tbl.variable_2, "related_pin_transition") == 0
           || strcmp(tbl.variable_1, "related_pin_transition") == 0
           && strcmp(tbl.variable_2, "constrained_pin_transition") == 0)
         );
       
+      double t,x1,x2;
       ExtractPhisicsFromLUT(tbl, t, x1, x2);
       
       t = max(t, 0.0);
@@ -577,8 +576,7 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
     else if (strcmp(group_type, "fall_constraint") == 0)
     {
       LutTable tbl = ReadLUT(group, data.GetLutTemplateByName(template_name));
-
-      double t,x1,x2;
+      
       ASSERT(tbl.variable_1
         && tbl.variable_2
         && (strcmp(tbl.variable_1, "constrained_pin_transition") == 0
@@ -587,6 +585,7 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
           && strcmp(tbl.variable_2, "constrained_pin_transition") == 0)
         );
 
+      double t,x1,x2;
       ExtractPhisicsFromLUT(tbl, t, x1, x2);
       
       t = max(t, 0.0);

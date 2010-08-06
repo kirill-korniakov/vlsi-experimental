@@ -66,6 +66,8 @@ namespace Builders
 
     m_mtype = Utils::FindMacroTypeByName(*m_hd, name);
     ASSERT(!::IsNull(m_mtype));
+    if (::IsNull(m_mtype))
+        ALERT("%s MacroType not found", name.c_str());
 
     m_macrotype_opened = true;
   }
