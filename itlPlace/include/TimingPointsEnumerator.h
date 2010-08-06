@@ -54,7 +54,7 @@ namespace TOInternal
   {
   protected:
     RootStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { *this = Design().TimingPoints.TopologicalOrderRoot(); }
+    void Reset() { this->operator*() = Design().TimingPoints.TopologicalOrderRoot(); }
   };
 
   template<class EnumeratorBase>
@@ -62,7 +62,7 @@ namespace TOInternal
   {
   protected:
     FIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { *this = Design().TimingPoints.FirstInternalPoint(); }
+    void Reset() { this->operator*() = Design().TimingPoints.FirstInternalPoint(); }
   };
 
   template<class EnumeratorBase>
@@ -70,7 +70,7 @@ namespace TOInternal
   {
   protected:
     BeforeFIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { *this = Design().TimingPoints.FirstInternalPoint(); this->GoPrevious(); }
+    void Reset() { this->operator*() = Design().TimingPoints.FirstInternalPoint(); this->GoPrevious(); }
   };
 
   template<class EnumeratorBase>
@@ -78,7 +78,7 @@ namespace TOInternal
   {
   protected:
     LIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { *this = Design().TimingPoints.LastInternalPoint(); }
+    void Reset() { this->operator*() = Design().TimingPoints.LastInternalPoint(); }
   };
 
   template<class EnumeratorBase>
@@ -86,7 +86,7 @@ namespace TOInternal
   {
   protected:
     AfterLIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { *this = Design().TimingPoints.LastInternalPoint(); this->GoNext(); }
+    void Reset() { this->operator*() = Design().TimingPoints.LastInternalPoint(); this->GoNext(); }
   };
 
 
