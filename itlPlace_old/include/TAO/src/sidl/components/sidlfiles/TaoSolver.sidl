@@ -1,4 +1,0 @@
-package TaoSolver version 0.0.3 {
-  class Component 
-    implements-all gov.cca.Component, OptimizationPorts.SolverPort {};
-};
