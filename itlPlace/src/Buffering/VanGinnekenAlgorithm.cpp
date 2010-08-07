@@ -163,13 +163,14 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
 
 double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
 {
-  double binX = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord;
-  double binY = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord;
   double width = context->sprData.binGrid.binWidth;
   double height = context->sprData.binGrid.binHeight;
 
-  double binX2 = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord + context->sprData.binGrid.binWidth;
-  double binY2 = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord + context->sprData.binGrid.binHeight;
+  double binX = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord - width / 2.0;
+  double binY = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord - height / 2.0;
+
+  double binX2 = binX + context->sprData.binGrid.binWidth;
+  double binY2 = binY + context->sprData.binGrid.binHeight;
 
   BinGrid& binGrid = context->sprData.binGrid;
 
@@ -249,7 +250,9 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
       }
     }
   }
-  return int (fabs(xSize * ySize * bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->GetSizeBufferMultiplier()));
+
+  double sizeBufferMultiplier = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->GetSizeBufferMultiplier();
+  return int (fabs(xSize * ySize * sizeBufferMultiplier));
 }
 
 int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
@@ -272,19 +275,7 @@ int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVaria
       }
     }// loop over affected bins
 
-    double potentialMultiplier = 0;
 
-    if (currBufferTotalPotential != 0)
-    {
-      potentialMultiplier = data->design[pos->GetBufferInfo()->Type()].SizeX() *
-        data->design[pos->GetBufferInfo()->Type()].SizeY() / currBufferTotalPotential;
-    } 
-    else
-    {
-      potentialMultiplier = 0;
-    }
-
-    // add scaled cluster potential 
     for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
     {
       for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
@@ -302,6 +293,13 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
   if (!isInitialize)   Initialize();
   STA(data->design);
   ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
+  ALERT("context->sprData.binGrid.binWidth = %f",context->sprData.binGrid.binWidth);
+  ALERT("context->sprData.binGrid.binHeight = %f",context->sprData.binGrid.binHeight);
+  if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
+    data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
+      data->GetSizeBuffer()) / 100.0, 1.0));
+  ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
+  ALERT("NewSizeBufferMultiplier = %f", data->GetSizeBufferMultiplier());
   std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
   int idx = 0;
   for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)

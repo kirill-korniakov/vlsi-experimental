@@ -1272,6 +1272,12 @@ void VGAlgorithmData::Initialize()
   ALERT("Type modification van Ginneken list: %d", typeModificationVanGinnekenList);
   ALERT("Maximum insert buffer in net: %d", maxBufferCount);
   ALERT("Type bufer addition: %d", typeBuferAddition);
+  ALERT("Size buffer multiplier: %f", sizeBufferMultiplier);
+  ALERT("design.Circuit.Width() = %f",design.Circuit.Width());
+  ALERT("design.Circuit.Height() = %f",design.Circuit.Height());
+  ALERT("design[Buffers[0].Type()].SizeX() = %f",design[Buffers[0].Type()].SizeX());
+  ALERT("design[Buffers[0].Type()].SizeY() = %f",design[Buffers[0].Type()].SizeY());
+  
 }
 
 void VGAlgorithmData::LoadBuffers()
@@ -1282,7 +1288,7 @@ void VGAlgorithmData::LoadBuffers()
     Buffers.push_back(buf);
     ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, buf.Type()).Name().c_str(),
       (design, buf.InPin()).Name().c_str(), (design, buf.OutPin()).Name().c_str());
-    sizeBuffer = design[buf.Type()].SizeX();
+    sizeBuffer = design[buf.Type()].SizeX() * design[buf.Type()].SizeY();
   }
   else
   {
@@ -1311,8 +1317,8 @@ void VGAlgorithmData::LoadBuffers()
     {
       ALERT("Buffer type: %s\t input pin: %s\t output pin: %s", (design, Buffers[i].Type()).Name().c_str(),
         (design, Buffers[i].InPin()).Name().c_str(), (design, Buffers[i].OutPin()).Name().c_str());
-      if (design[Buffers[i].Type()].SizeX() > sizeBuffer)
-        sizeBuffer = design[Buffers[i].Type()].SizeX();
+      if ((design[Buffers[i].Type()].SizeX() * design[Buffers[i].Type()].SizeY()) > sizeBuffer)
+        sizeBuffer = design[Buffers[i].Type()].SizeX() * design[Buffers[i].Type()].SizeY();
     }
   }
 }
