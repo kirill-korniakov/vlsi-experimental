@@ -159,6 +159,23 @@ void DoSTAIfCan(HDesign& hd)
     }
 }
 
+bool IsPlaced(HDesign& hd, double eps = 0.001)
+{
+  HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW();
+  cell.MoveNext(); //get first cell
+  double startCellX = cell.X();
+  double startCellY = cell.Y();
+
+  while (cell.MoveNext())
+  {
+    //if coords of current cell are not equal to coord of start cell
+    if ((fabs(cell.X() - startCellX) >= eps) || (fabs(cell.X() - startCellX) >= eps))
+      return true; //not all elements are placed to the same place
+  }
+
+  return false; //all elements are placed to the same place
+}
+
 bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
 {
     HDPGrid grid(hd);	
@@ -271,7 +288,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 {
     //START MACROLOOP OF DESIGN
 
-    if (hd.cfg.ValueOf("Logger.PrintStartInformations", false))
+    if ((hd.cfg.ValueOf("Logger.PrintStartInformations", false)) && IsPlaced(hd))
     {
         WRITELINE("");
         ALERT(Color_White, "INITIAL STATE");
