@@ -15,7 +15,7 @@ class LRPlacementChecker(Experiment_LR):
         #define metrics
         result   = 'OK'
         metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
-        stages = ['INIT', 'LEG', 'DP']
+        stages = ['INIT', 'LEG']#, 'DP']
 
         #read numbers
         parser = LogParser(logName)
@@ -23,10 +23,14 @@ class LRPlacementChecker(Experiment_LR):
         for col in range(len(metrics)):
             for row in range(len(stages)):
                 value = str(parser.GetFromPFST(stages[row], metrics[col]))
+
+                if (value == str(NOT_FOUND)):
+                   return ('Failed')
+                
                 table[row][col] = float(value.replace(',', '.'))
 
         #print absolute values
-        masterLogName = masterLogFolder + "/" + os.path.basename(logName)
+        masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
         printStr = benchmark + ';'
         for col in range(len(metrics)):
@@ -42,7 +46,10 @@ class LRPlacementChecker(Experiment_LR):
         #print percents
         for col in range(len(metrics)):
             for row in range(1, len(stages)):
-                percent = 100.0 * (table[row][col]/table[0][col] - 1.0)
+                if table[0][col] != 0.0:
+                    percent = 100.0 * (table[row][col]/table[0][col] - 1.0)
+                else:
+                    percent = -1.0
                 printStr += "%.2f;" % percent
         printStr = printStr + result + ';'
         printStr = printStr + '\n'
@@ -57,9 +64,9 @@ def test():
     testRunner = TestRunner()
 
     cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS05_GP_fast.list', "../master logs/LR", cmdArgs)
+    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP_fast.list', "../master logs/LR", cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
 
-test()
+#test()

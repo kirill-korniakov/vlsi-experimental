@@ -105,7 +105,7 @@ class TestRunner:
             self.failedList = ''
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
-            cp.CoolPrint("Sending mail with " + reportTable)
+            #cp.CoolPrint("Sending mail with " + reportTable)
 
             #subject += ' ' + experiment.name
             text += experiment.name + ': ' + self.experimentResult
@@ -119,6 +119,7 @@ class TestRunner:
                 attachmentFiles.append(reportTable)
             #emailer.SendResults(experiment, reportTable, self.experimentResult)
             
-        emailer.PrepareAndSendMail(subject, text, attachmentFiles)
+        if (self.parameters.doSendMail == True):
+            emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
         cp.CoolPrint('Finish')
