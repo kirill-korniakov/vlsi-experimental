@@ -151,7 +151,7 @@ double LRSizer::GetObservedC(HTimingPoint tp)
     double sum = (design.SteinerPoints[pin],design).ObservedC();
     for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
     {
-      sum += 0 /*c*x_sink+f*/ - (sink.Type(),design).Capacitance();//TODO: implement formulas
+      sum += 0 /*c*x_sink+f*/ - (sink.Type(),design).Capacitance();//TODO: implement formulas// убрать "-" 
     }
     return sum;
   }
@@ -445,10 +445,10 @@ std::vector<double> LRSizer::CalculateArrivalTimes()
     ;
   }
 
-  double maxInArrivalTime=7;
+  double maxInArrivalTime;
 
   tp = design[design.TimingPoints.FirstInternalPoint()];
-  for (; tp!=design.TimingPoints.LastInternalPoint(); tp.GoNext())
+  for (; !::IsNull(tp); tp.GoNext())
   {
     maxInArrivalTime=0;
 
@@ -462,7 +462,7 @@ std::vector<double> LRSizer::CalculateArrivalTimes()
     }
     else
     {
-      if (!design.GetBool<HPin::IsPrimary>(pin))
+      if (!design.GetBool<HPin::IsPrimary>(pin))//??
       {
         HNet net = design.Get<HPin::Net, HNet>(pin);
         HPin source = design[net].Source();
@@ -481,52 +481,61 @@ std::vector<double> LRSizer::CalculateArrivalTimes()
 
     //arrivalTimes[::ToID(tp)]=maxInArrivalTime+r_i*DownstreamCapacitance;
   }
-
-  maxInArrivalTime=0;
-  HPin pin = design.Get<HTimingPoint::Pin, HPin>(design.TimingPoints.LastInternalPoint());
-  if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
-  {
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    HTimingPoint point = design.TimingPoints[source];
-    if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
-  }
-  else
-  {
-    if (!design.GetBool<HPin::IsPrimary>(pin))
-    {
-      HNet net = design.Get<HPin::Net, HNet>(pin);
-      HPin source = design[net].Source();
-      HPinType sourceType = design.Get<HPin::Type, HPinType>(source);
-
-      for (HPinType::ArcsEnumeratorW arc = design[sourceType].GetArcsEnumeratorW(); arc.MoveNext(); )
-        if (arc.TimingType() == TimingType_Combinational)
-        {
-          HPin tp_Pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-          HPin startPin = arc.GetStartPin(tp_Pin);
-          HTimingPoint point = design.TimingPoints[startPin];
-          if (arrivalTimes[::ToID(point)] > maxInArrivalTime) maxInArrivalTime=arrivalTimes[::ToID(point)];
-        }
-    }
-  }
-  //arrivalTimes[::ToID(design.TimingPoints.LastInternalPoint())]=maxInArrivalTime+r_i*DownstreamCapacitance;
-
+   
   return arrivalTimes;
   //throw std::exception("The method or operation is not implemented.");
 }
 
 void LRSizer::AdjustLambda( int step, std::vector<double> arrivalTimes )
 {
-
-  //		throw std::exception("The method or operation is not implemented.");
+  throw std::exception("The method or operation is not implemented.");
 }
 
 void LRSizer::ProjectLambdaMatrix()
 {
-  throw std::exception("The method or operation is not implemented.");
-}
+  double MuIn,MuOut; 
+  std::vector<double> percentage;
+  //double* lambda;
 
-bool LRSizer::CheckStopConditionForLDP(std::vector<double> vX, double errorBound )
+  HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
+  for (tp.GoPrevious(); !::IsNull(tp); tp.GoPrevious())
+  {
+    percentage.reserve(GetPointLambdas(tp).size());
+    MuIn=FindInputLambdaSum(tp);
+    MuOut=FindOutputLambdaSum(tp);
+
+    for (std::vector<double>::iterator lambdaIter = GetPointLambdas(tp).begin();
+      lambdaIter != GetPointLambdas(tp).end(); lambdaIter++)
+      percentage.push_back(*lambdaIter/MuIn);
+    for(int i=0;i<GetPointLambdas(tp).size();i++)
+    {
+      GetPointLambdas(tp)[i]=percentage[i]*MuOut;
+    }
+  }
+}
+double LRSizer::CalculateQ(std::vector<double>& vX)
 {
-  throw std::exception("The method or operation is not implemented.");
+  double SumInputLambdaForPoint; 
+  double SumAllInputLambda=0;
+  double QFunction;
+  HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
+  for (; tp!=design.TimingPoints.FirstInternalPoint(); tp.GoNext())
+  {
+    SumInputLambdaForPoint=FindInputLambdaSum(tp);
+    //SumAllInputLambda+=SumInputLambdaForPoint*(r_i*DownStreamCap_i);//при x_i = lower_bound_X[i]
+  }
+  
+  double SumMinX=0;
+  //for(unsigned int i=0; i < vX.size(); i++)
+    //SumMinX+=lower_bound_X[i];
+  //QFunction=SumMinX+SumAllInputLambda;
+  return QFunction;
+}
+bool LRSizer::CheckStopConditionForLDP(std::vector<double>& vX, double errorBound )
+{
+  double Sum=0;
+  for(unsigned int i=0; i < vX.size(); i++)
+    Sum+=vX[i];
+  if ((Sum-CalculateQ(vX))<errorBound) return true;
+  else false;
 }

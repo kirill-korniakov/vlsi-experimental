@@ -28,7 +28,8 @@ private:
   void SOLVE_LRS_mu(std::vector<HCell>& cells, std::vector<double>& vX);
   bool CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vector<double> nextVX, double accuracy);
   void SOLVE_LDP(std::vector<HCell>& cells);
-  bool CheckStopConditionForLDP(std::vector<double> vX, double errorBound );
+  double CalculateQ(std::vector<double>& vX);
+  bool CheckStopConditionForLDP(std::vector<double>& vX, double errorBound );
   void AdjustLambda(int step, std::vector<double> arrivalTimes );
 
   void InitLambda(double defaultLambda);
