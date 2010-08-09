@@ -11,6 +11,27 @@ int PikoSec(double delay_ns)
   return Round(1000.0 * delay_ns);
 }
 
+string GetCellPinName(HDesign& design, HTimingPointWrapper pt)
+{
+    HPinWrapper pin = design[pt.Pin()];
+    HCellWrapper cell = design[pin.Cell()];
+    string cellName = IsNull(cell) ? "PIN" : cell.Name();
+    return cellName + "." + pin.Name();
+}
+
+void ReportTEPNames(HDesign& design)
+{
+    if (!design.TimingPoints.IsInitialized()) return;
+
+    ALERT("REPORTING LIST OF TIMING END POINTS:\n");
+    
+    HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
+    for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()]; ep.GoPrevious() != endPointsEnd; )
+    {
+        WRITELINE("\tTEP: ", GetCellPinName(design, ep));
+    }
+}
+
 string FormatArcName(HDesign& design, HPin endPin, HTimingArcType arc)
 {
   if (design[endPin].IsPrimary())
@@ -224,14 +245,6 @@ void ReportNegativeSlacks(HDesign& design)
   ALERT("    WNS: %f", Utils::WNS(design));
   ALERT("  AVGNS: %f", Utils::AverageNS(design));
   //ReportVectorOfSlacks(design);
-}
-
-string GetCellPinName(HDesign& design, HTimingPointWrapper pt)
-{
-    HPinWrapper pin = design[pt.Pin()];
-    HCellWrapper cell = design[pin.Cell()];
-    string cellName = IsNull(cell) ? "PIN" : cell.Name();
-    return cellName + "." + pin.Name();
 }
 
 void ReportVectorOfSlacks(HDesign& design)

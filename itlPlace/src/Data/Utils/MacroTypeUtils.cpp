@@ -19,10 +19,19 @@ namespace Utils
     return true;
   }
 
+  bool Contain(const string& str, const char* prefix)
+  {
+      size_t found = str.find(prefix);
+      if (found != string::npos)
+          return true;
+      else
+          return false;
+  }
+
   void TryDetectMacroTypeByName(HMacroTypeWrapper& self)
   {
     string name = self.Name();
-    if (StartsWith(name, "DFF") || StartsWith(name, "SDFF"))
+    if (StartsWith(name, "DFF") || StartsWith(name, "SDFF") || Contain(name, "ffn") || Contain(name, "ftn"))
       self.SetType(MacroType_REFF);
     else if (StartsWith(name, "LAT") || StartsWith(name, "TLAT") || StartsWith(name, "DL"))
       self.SetType(MacroType_HLSL);

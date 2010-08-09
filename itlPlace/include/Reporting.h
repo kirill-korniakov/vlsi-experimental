@@ -32,6 +32,7 @@ void ReportNetPinsCoordinates(HDesign& hd, HNet net);
 void ReportNetTiming(HDesign& design, HNet net);
 
 string GetCellPinName(HDesign& design, HTimingPointWrapper pt);
+void ReportTEPNames(HDesign& design);
 void ReportVectorOfSlacks(HDesign& design);
 void ReportNegativeSlacks(HDesign&);
 void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr);
