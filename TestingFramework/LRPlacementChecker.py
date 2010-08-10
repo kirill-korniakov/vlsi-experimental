@@ -26,7 +26,7 @@ class LRPlacementChecker(Experiment_LR):
 
                 if (value == str(NOT_FOUND)):
                    return ('Failed')
-                
+
                 table[row][col] = float(value.replace(',', '.'))
 
         #print absolute values
@@ -35,7 +35,7 @@ class LRPlacementChecker(Experiment_LR):
         printStr = benchmark + ';'
         for col in range(len(metrics)):
             for row in range(len(stages)):
-                value = str(masterParser.GetFromPFST(stages[row], metrics[col]))
+                value = str(masterParser.GetFromPFST(stages[row], metrics[col])).replace(',', '.')
                 compare_result = CompareValues(value, table[row][col])
 
                 if (compare_result == 'notEqual'):

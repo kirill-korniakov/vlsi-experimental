@@ -19,14 +19,14 @@ class HPWLPlacementChecker(Experiment_HPWL):
 
         #collect metrics
         parser = LogParser(logName)
-        HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
+        HPWL = str(parser.GetFromPFST('DP', 'HPWL')).replace(',', '.')
 
         if (HPWL == str(NOT_FOUND)):
            return ('Failed')
 
         masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
         masterParser = LogParser(masterLogName)
-        masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL'))
+        masterHPWL = str(masterParser.GetFromPFST('DP', 'HPWL')).replace(',', '.')
         compare_result = CompareValues(HPWL, masterHPWL)
 
         if (compare_result == 'notEqual'):
@@ -53,4 +53,4 @@ def test():
 
     testRunner.Run()
 
-test()
+#test()
