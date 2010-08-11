@@ -8,6 +8,7 @@ void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int&
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
                                         int& min_row, int& max_row,
                                         double x, double y, AppCtx* context);
+void FindCriticalPaths(HDesign& design);
 
 HVGAlgorithm::HVGAlgorithm(HDesign& hd)
 {
@@ -59,7 +60,8 @@ void HVGAlgorithm::Initialize(bool isAgainInitialize)
 int HVGAlgorithm::BufferingCriticalPath()
 {
   if (!isInitialize)   Initialize();
-
+  if (data->design.CriticalPaths.Count() < 0)
+    FindCriticalPaths(data->design);
 
   std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
   int idx = 0;
@@ -88,15 +90,21 @@ int HVGAlgorithm::BufferingCriticalPath()
             ((net.PinsCount() == data->GetCountPinInBufferingNet()) 
             && (data->GetIsTypeLimitationOnCountPinInBufferingNetEquality()))))
           {
+            bool isBufferingNet = true;
+            if (!data->GetIsBufferingNetContainPrimaryPin())            
+              for (HNet::PinsEnumeratorW pew = net.GetPinsEnumeratorW(); pew.MoveNext();)              
+                if (pew.IsPrimary())
+                  isBufferingNet = false;
 
             if ((net.Name() != data->GetNameBufferingNet()) && (data->GetNameBufferingNet() != ""))
-              continue;
-            //{
-            //string na = net.Name();
-            //printf("start name = %s\n", na.c_str());
+              continue;  
+            if (!isBufferingNet) 
+              continue;  
+            if (!data->GetIsBuffering())
+              continue;              
+
             bufferCount += BufferingNen(net).GetPositionCount();
-            //printf("find name = %s\n", na.c_str());
-            //}
+
           }
         }
 
@@ -105,7 +113,8 @@ int HVGAlgorithm::BufferingCriticalPath()
     //ALERT("CriticalPaths id = %d", j);
   }
   ALERT("Buffers inserted: %d", bufferCount);
-
+  if (data->GetTotalAreaOfBuffersInRelationToAllCells() != 0)
+    ALERT("Percent area compose buffers = %f", data->GetPercentAreaComposeBuffers());
   return bufferCount;
 }
 
@@ -143,14 +152,22 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
   if (bufCount > 0)
   {
     TemplateTypes<NewBuffer>::list newBuffer;
-    HNet* newNet = new HNet[bufCount + 1];
-    if (isRealBuffering)
-    {
-      additionNewElement->InsertsBuffer(newBuffer, &best);
-      newBuffer.sort();
-      //ALERT("name = %s", (net, design).Name().c_str());
-      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource().GetLeft());
-    }
+    if (data->GetTotalAreaOfBuffersInRelationToAllCells() != 0)
+      for (TemplateTypes<BufferPositions>::list::iterator pos = best.GetBufferPosition()->begin(); 
+        pos != best.GetBufferPosition()->end(); ++pos)
+      {
+        data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
+      }
+
+      if (isRealBuffering)
+      {
+        HNet* newNet = new HNet[bufCount + 1];
+        additionNewElement->InsertsBuffer(newBuffer, &best);
+        newBuffer.sort();
+        //ALERT("name = %s", (net, design).Name().c_str());
+        additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource().GetLeft());
+        delete [] newNet;
+      }
   }
 
   if ((data->GetPlotSteinerPoint()) || (data->GetPlotVGTree()) || (data->GetPlotNets()))
@@ -183,7 +200,7 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
   double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
   double x2 = bufferPositions.GetPosition()->GetX() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
   double y2 = bufferPositions.GetPosition()->GetY() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
-  
+
   double xSize = 0;
   double ySize = 0;
 
@@ -281,7 +298,7 @@ int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVaria
       for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
       {
         context->sprData.binGrid.bins[rowIdx][colIdx].sumBufPotential += 
-         context->sprData.bufferPotentialOverBins[rowIdx][colIdx];
+          context->sprData.bufferPotentialOverBins[rowIdx][colIdx];
       }
     }
   }
@@ -292,14 +309,17 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
 {
   if (!isInitialize)   Initialize();
   STA(data->design);
-  ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
-  ALERT("context->sprData.binGrid.binWidth = %f",context->sprData.binGrid.binWidth);
-  ALERT("context->sprData.binGrid.binHeight = %f",context->sprData.binGrid.binHeight);
+  if (data->design.CriticalPaths.Count() < 0)
+    FindCriticalPaths(data->design);
+  //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
+  //ALERT("context->sprData.binGrid.binWidth = %f",context->sprData.binGrid.binWidth);
+  //ALERT("context->sprData.binGrid.binHeight = %f",context->sprData.binGrid.binHeight);
   if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
     data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
       data->GetSizeBuffer()) / 100.0, 1.0));
-  ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
+  //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
   ALERT("NewSizeBufferMultiplier = %f", data->GetSizeBufferMultiplier());
+  int tuyu = data->design.CriticalPaths.Count();
   std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
   int idx = 0;
   for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
@@ -323,11 +343,37 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
     for (HCriticalPath::PointsEnumeratorW point = (paths[j],data->design).GetEnumeratorW(); point.MoveNext();)
     {
       HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
-      if (net.Kind() == NetKind_Active) 
-      {        
+      if (net.Kind() == NetKind_Active)// && (net.PinsCount() <= 3 ))//&& (treeRepository.NoVGTree(net)))//
+      {
+
         if (!data->GetNetVisit()[::ToID(net)])
-          bufferCount += UpdateBinTable(context, BufferingNen(net, false));
+        {
+          if ((data->GetCountPinInBufferingNet() == 0) || (
+            ((net.PinsCount() <= data->GetCountPinInBufferingNet()) 
+            && (!data->GetIsTypeLimitationOnCountPinInBufferingNetEquality()) ) ||
+            ((net.PinsCount() == data->GetCountPinInBufferingNet()) 
+            && (data->GetIsTypeLimitationOnCountPinInBufferingNetEquality()))))
+          {
+            bool isBufferingNet = true;
+            if (!data->GetIsBufferingNetContainPrimaryPin())            
+              for (HNet::PinsEnumeratorW pew = net.GetPinsEnumeratorW(); pew.MoveNext();)              
+                if (pew.IsPrimary())
+                  isBufferingNet = false;
+
+            if ((net.Name() != data->GetNameBufferingNet()) && (data->GetNameBufferingNet() != ""))
+              continue;  
+            if (!isBufferingNet) 
+              continue;  
+            if (!data->GetIsBuffering())
+              continue;               
+
+            bufferCount += UpdateBinTable(context, BufferingNen(net, false));
+
+          }
+        }
+
       }
+
     }
     //ALERT("CriticalPaths id = %d", j);
   }
@@ -1186,9 +1232,9 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   buffer.SetWidth(vGAlgorithm->data->design.GetDouble<HMacroType::SizeX>(position.GetBufferInfo()->Type()));
 
   /*double drift = vGAlgorithm->data->design.Cells.GetDouble<HCell::Height>(
-    vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(
-    vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(
-    position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))) / 2.0;
+  vGAlgorithm->data->design.Pins.Get<HPin::Cell, HCell>(
+  vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(
+  position.GetPosition()->GetTree()->GetSource().GetSteinerPoint()))) / 2.0;
 
   HSteinerPoint sp = position.GetPosition()->GetTree()->GetSource().GetSteinerPoint();
   HPinWrapper pw = vGAlgorithm->data->design[vGAlgorithm->data->design[sp].Pin()];
@@ -1208,7 +1254,7 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   //position.GetPosition()->GetTree()->
 
   //vtbl;*/
-//  position.GetPosition()->GetTree()->pGrid.SetCell();
+  //  position.GetPosition()->GetTree()->pGrid.SetCell();
 
   char bufferName[32];
   sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
@@ -1446,7 +1492,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
   //position.GetPosition()->GetTree()->
 
   //vtbl;*/
-//  position.GetPosition()->GetTree()->pGrid.SetCell();
+  //  position.GetPosition()->GetTree()->pGrid.SetCell();
 
   char bufferName[32];
   sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
@@ -1459,7 +1505,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
   else
     x = position.GetPosition()->GetX() - buffer.Width() * 0.5;
   int column = position.GetPosition()->GetTree()->pGrid.GetColumn(x);
-  
+
   double y = 0;
   if ((vGAlgorithm->data->GetTypePartition() == 2) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
@@ -1481,7 +1527,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     x2 = newX + buffer.Width(), y2 =  newY,
     x3 = newX, y3 = newY + buffer.Height(),
     x4 = newX + buffer.Width(), y4 = newY + buffer.Height();
-    double  bufferWidth =  buffer.Width();
+  double  bufferWidth =  buffer.Width();
 
   int rowBegin = position.GetPosition()->GetTree()->pGrid.GetRow(y1);
   int rowEnd = position.GetPosition()->GetTree()->pGrid.GetRow(y3);
@@ -1500,7 +1546,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     if (cw.X() < (newX + buffer.Width() / 2.0))
     {
       if (cw.X() > newX) 
-      cw.SetX(newX - cw.Width());
+        cw.SetX(newX - cw.Width());
     }
     else
     {

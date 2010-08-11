@@ -232,6 +232,10 @@ protected:
   string nameBufferingNet;
   int typeBuferAddition;
   double sizeBufferMultiplier;
+  bool isBufferingNetContainPrimaryPin;
+  double totalAreaOfBuffersInRelationToAllCells;
+  double totalAreaCells;
+  double totalAreaBuffer;
 
 public:
   HDesign& design;
@@ -271,6 +275,12 @@ public:
   string GetNameBufferingNet();
   int GetTypeBuferAddition();
   double GetSizeBufferMultiplier();
+  bool GetIsBufferingNetContainPrimaryPin();
+  double GetTotalAreaOfBuffersInRelationToAllCells();
+  double GetTotalAreaCells();
+  double GetTotalAreaBuffer();
+  bool GetIsBuffering();
+  double GetPercentAreaComposeBuffers();
 
   void SetWirePhisics(HWirePhysicalParams& wPP);
   void SetBuffers(TemplateTypes<BufferInfo>::vector buf);
@@ -291,11 +301,17 @@ public:
   void SetNetVisit(bool* nV);
   void SetMaxBufferCount(int mBC);
   void SetTypeModificationVanGinnekenList(int tMVGL);
-  void GetCountPinInBufferingNet(int cPIBN);
-  void GetIsTypeLimitationOnCountPinInBufferingNetEquality(bool iTLCPIBNE);
-  void GetNameBufferingNet(string nBN);
-  void GetTypeBuferAddition(int tBA);
+  void SetCountPinInBufferingNet(int cPIBN);
+  void SetIsTypeLimitationOnCountPinInBufferingNetEquality(bool iTLCPIBNE);
+  void SetNameBufferingNet(string nBN);
+  void SetTypeBuferAddition(int tBA);
   void SetSizeBufferMultiplier(double sBM);
+  void SetIsBufferingNetContainPrimaryPin(bool iBNCPP);
+  void SetTotalAreaOfBuffersInRelationToAllCells(double tAOBIRTAC);
+  void SetTotalAreaCells();
+  void AddAreaBuffer(double bA);
+  void SetTotalAreaBuffer(double tAB);
+
 
 };
 #endif //__VanGinnekenData_H__

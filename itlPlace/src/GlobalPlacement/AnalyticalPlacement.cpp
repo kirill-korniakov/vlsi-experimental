@@ -522,7 +522,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
           ALERT("NEW BUFFERING STARTED");
-          ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+          ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
           HVGAlgorithm buf(hd);
           buf.Initialize();
           buf.SetBinTableBuffer(&context);

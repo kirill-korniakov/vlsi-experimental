@@ -1217,7 +1217,7 @@ VGAlgorithmData::VGAlgorithmData(HDesign& hd, HVGAlgorithm* vGA): design(hd), Wi
   printVariantsList = false;
   plotterWaitTime = 1;
   isInitialize = false;
-  isInsertInSourceAndSink =false;
+  isInsertInSourceAndSink = false;
   typeBufferingAlgorithm = 0;
   sizeBuffer = 0; 
   maxIndex = 0;
@@ -1229,6 +1229,12 @@ VGAlgorithmData::VGAlgorithmData(HDesign& hd, HVGAlgorithm* vGA): design(hd), Wi
   isTypeLimitationOnCountPinInBufferingNetEquality = false;
   nameBufferingNet = "";
   typeBuferAddition = 0;
+  sizeBufferMultiplier = 0;
+  isBufferingNetContainPrimaryPin = false;
+  totalAreaOfBuffersInRelationToAllCells = 0;
+  totalAreaCells = 0;
+  totalAreaBuffer = 0;
+
 }
 
 VGAlgorithmData::~VGAlgorithmData()
@@ -1266,18 +1272,23 @@ void VGAlgorithmData::Initialize()
   nameBufferingNet = design.cfg.ValueOf("NameBufferingNet", "");
   typeBuferAddition = design.cfg.ValueOf("TypeBuferAddition", 0);
   sizeBufferMultiplier = design.cfg.ValueOf("SizeBufferMultiplier", 1.0);
+  isBufferingNetContainPrimaryPin = design.cfg.ValueOf("IsBufferingNetContainPrimaryPin", false);
+  totalAreaOfBuffersInRelationToAllCells = design.cfg.ValueOf("TotalAreaOfBuffersInRelationToAllCells", 0.0);;
+
+  totalAreaCells = 0;
+  totalAreaBuffer = 0;
+  for (HCells::CellsEnumeratorW cw = design.Cells.GetEnumeratorW(); cw.MoveNext();)
+    totalAreaCells += cw.Width() * cw.Height();
 
   ALERT("Partition type: %d", typePartition);
+  if (typePartition == 0)
+    ALERT("Partition count: %d", partitionCount);
+
   ALERT("Buffering algorithm type type: %d", typeBufferingAlgorithm);
   ALERT("Type modification van Ginneken list: %d", typeModificationVanGinnekenList);
   ALERT("Maximum insert buffer in net: %d", maxBufferCount);
   ALERT("Type bufer addition: %d", typeBuferAddition);
   ALERT("Size buffer multiplier: %f", sizeBufferMultiplier);
-  ALERT("design.Circuit.Width() = %f",design.Circuit.Width());
-  ALERT("design.Circuit.Height() = %f",design.Circuit.Height());
-  ALERT("design[Buffers[0].Type()].SizeX() = %f",design[Buffers[0].Type()].SizeX());
-  ALERT("design[Buffers[0].Type()].SizeY() = %f",design[Buffers[0].Type()].SizeY());
-  
 }
 
 void VGAlgorithmData::LoadBuffers()
@@ -1449,6 +1460,39 @@ double VGAlgorithmData::GetSizeBufferMultiplier()
   return sizeBufferMultiplier;
 }
 
+bool VGAlgorithmData::GetIsBufferingNetContainPrimaryPin()
+{
+  return isBufferingNetContainPrimaryPin;
+}
+
+double VGAlgorithmData::GetTotalAreaOfBuffersInRelationToAllCells()
+{
+  return totalAreaOfBuffersInRelationToAllCells;
+}
+
+double VGAlgorithmData::GetTotalAreaCells()
+{
+  return totalAreaCells;
+}
+
+double VGAlgorithmData::GetTotalAreaBuffer()
+{
+  return totalAreaBuffer;
+}
+
+bool VGAlgorithmData::GetIsBuffering()
+{
+  if (totalAreaOfBuffersInRelationToAllCells != 0)
+    if (totalAreaBuffer > totalAreaOfBuffersInRelationToAllCells * totalAreaCells)
+      return false;  
+  return true;
+}
+
+double VGAlgorithmData::GetPercentAreaComposeBuffers()
+{
+  return totalAreaBuffer / totalAreaCells * 100.0;
+}
+
 void VGAlgorithmData::SetWirePhisics(HWirePhysicalParams& wPP)
 {
   WirePhisics = wPP;
@@ -1544,28 +1588,55 @@ void VGAlgorithmData::SetTypeModificationVanGinnekenList(int tMVGL)
   typeModificationVanGinnekenList = tMVGL;
 }
 
-void VGAlgorithmData::GetCountPinInBufferingNet(int cPIBN)
+void VGAlgorithmData::SetCountPinInBufferingNet(int cPIBN)
 {
   countPinInBufferingNet = cPIBN;
 }
 
-void VGAlgorithmData::GetIsTypeLimitationOnCountPinInBufferingNetEquality(bool iTLCPIBNE)
+void VGAlgorithmData::SetIsTypeLimitationOnCountPinInBufferingNetEquality(bool iTLCPIBNE)
 {
   isTypeLimitationOnCountPinInBufferingNetEquality = iTLCPIBNE;
 }
 
-void VGAlgorithmData::GetNameBufferingNet(string nBN)
+void VGAlgorithmData::SetNameBufferingNet(string nBN)
 {
   nameBufferingNet = nBN;
 }
 
-void VGAlgorithmData::GetTypeBuferAddition(int tBA)
+void VGAlgorithmData::SetTypeBuferAddition(int tBA)
 {
   typeBuferAddition = tBA;
 }
 void VGAlgorithmData::SetSizeBufferMultiplier(double sBM)
 {
   sizeBufferMultiplier = sBM;
+}
+
+void VGAlgorithmData::SetIsBufferingNetContainPrimaryPin(bool iBNCPP)
+{
+  isBufferingNetContainPrimaryPin = iBNCPP;
+}
+
+void VGAlgorithmData::SetTotalAreaOfBuffersInRelationToAllCells(double tAOBIRTAC)
+{
+  totalAreaOfBuffersInRelationToAllCells = tAOBIRTAC;
+}
+
+void VGAlgorithmData::SetTotalAreaCells()
+{
+  totalAreaCells = 0;
+  for (HCells::CellsEnumeratorW cw = design.Cells.GetEnumeratorW(); cw.MoveNext();)
+    totalAreaCells += cw.Width() * cw.Height();
+}
+
+void VGAlgorithmData::AddAreaBuffer(double bA)
+{
+  totalAreaBuffer += bA;
+}
+
+void VGAlgorithmData::SetTotalAreaBuffer(double tAB)
+{
+  totalAreaBuffer = tAB;
 }
 
 //VGAlgorithmData

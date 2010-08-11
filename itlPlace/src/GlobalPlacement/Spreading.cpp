@@ -163,15 +163,23 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
   BinGrid& binGrid = context->sprData.binGrid;
 
   //null the penalties
-
+  //context->hd->Plotter.ShowPlacement();
+ //context->hd->Plotter.PlotText("11111");
+ //context->hd->Plotter.ShowPlacement();
+double sum = 0;
+double sum2=0;
   if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+  {
+    
     for (int i = 0; i < binGrid.nBinRows; ++i)
     {
       for (int j = 0; j < binGrid.nBinCols; ++j)
       {
         binGrid.bins[i][j].sumPotential = binGrid.bins[i][j].sumBufPotential;
+        sum += binGrid.bins[i][j].sumBufPotential;
       }
     }
+  }
   else
     for (int i = 0; i < binGrid.nBinRows; ++i)
     {
@@ -228,9 +236,13 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
     // add scaled cluster potential 
     for (int k = min_row; k <= max_row; ++k)
       for (int j = min_col; j <= max_col; ++j)
+      {
         binGrid.bins[k][j].sumPotential += 
         context->ci->clusters[clusterIdx].potentialMultiplier * 
         context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
+        sum2 += context->ci->clusters[clusterIdx].potentialMultiplier * 
+          context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
+      }
   }
 
   double totalPotential = 0.0;
@@ -241,9 +253,12 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
       totalPotential += binGrid.bins[i][j].sumPotential;
     }
   }
-  //ALERT("Total Potential   = %f", totalPotential));
+  //ALERT("Total sum potential + buffer potential   = %f", totalPotential);
   //ALERT("Desired Potential = %f", 
   //  context->desiredCellsAreaAtEveryBin * context->binGrid.nBins));
+  //ALERT("Total buffer potential = %f", sum);
+  //ALERT("Total sum potential = %f", sum2);
+  //ALERT("(Total buffer potential)/(Total sum potential) = %f", sum / sum2);
 }
 
 double SpreadingPenalty(AppCtx* context, PetscScalar* x)
