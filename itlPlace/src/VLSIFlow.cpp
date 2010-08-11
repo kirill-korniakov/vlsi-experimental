@@ -288,7 +288,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 {
     //START MACROLOOP OF DESIGN
 
-    if ((hd.cfg.ValueOf("Logger.PrintStartInformations", false)) && IsPlaced(hd))
+    if ((hd.cfg.ValueOf("Logger.PrintStartInformations", false))/* && IsPlaced(hd)*/)
     {
         WRITELINE("");
         ALERT(Color_White, "INITIAL STATE");
