@@ -20,6 +20,9 @@ class TestRunner:
     parameters = ''
     experimentResult = 'Ok'
     failedList = ''
+    nOkBenchmarks      = 0
+    nChangedBenchmarks = 0
+    nFailedenchmarks   = 0
 
     def __init__(self, parameters = TestRunnerParameters()):
         self.parameters = parameters
@@ -72,10 +75,16 @@ class TestRunner:
 
             if (benchmarkResult == 'Failed'):
                 self.experimentResult = 'Failed'
-                self.failedList += ' ' + benchmark + ';'
+                self.failedList       += ' ' + benchmark + ';'
+                self.nFailedenchmarks += 1
 
-            if ((benchmarkResult == 'Changed') and (self.experimentResult != 'Failed')):
-                self.experimentResult = 'Changed'
+            else:
+                if ((benchmarkResult == 'Changed') and (self.experimentResult != 'Failed')):
+                    self.experimentResult = 'Changed'
+                    self.nChangedBenchmarks += 1
+
+                else:
+                    self.nOkBenchmarks += 1
 
         return reportTable
 
@@ -103,22 +112,34 @@ class TestRunner:
         for experiment in self.parameters.experiments:
             self.experimentResult = 'Ok'
             self.failedList = ''
+            self.nOkBenchmarks      = 0
+            self.nChangedBenchmarks = 0
+            self.nFailedenchmarks   = 0
+            
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
             #cp.CoolPrint("Sending mail with " + reportTable)
 
             #subject += ' ' + experiment.name
-            text += experiment.name + ': ' + self.experimentResult
+            #text += experiment.name + ': ' + self.experimentResult
+            text += experiment.name + ', ' + os.path.basename(experiment.cfg)
+            text += ', ' + os.path.basename(experiment.benchmarks) + ' ('
+            nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedenchmarks
+            text += str(nBenchmarks) + ' benchmark(s)):\n'
+            text += 'Ok:      ' + str(self.nOkBenchmarks) + '\n'
+            text += 'Changed: '   + str(self.nChangedBenchmarks) + '\n'
+            text += 'Failed:  ' + str(self.nFailedenchmarks)
 
             if (self.experimentResult == 'Failed'):
-               text += ' on' + self.failedList
+               text += ' (' + self.failedList + ')'
 
-            text += '\n'
+            text += '\n\n'
 
             if (self.experimentResult == 'Changed'):
                 attachmentFiles.append(reportTable)
             #emailer.SendResults(experiment, reportTable, self.experimentResult)
-            
+
+        print(text)
         if (self.parameters.doSendMail == True):
             emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
