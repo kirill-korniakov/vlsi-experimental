@@ -1,9 +1,11 @@
 #include "Timing.h"
 #include "Reporting.h"
+#include "PathFinder.h"
+
+#include <vector>
 
 void AddPI(HDesign& design, HTimingPointWrapper& tp_arrival, TemplateTypes<HNet>::queue& ready_nets) 
 {
-    //find all primary inputs
     for (HPins::PrimariesEnumeratorW primary_pad = design.Pins.GetEnumeratorW(); primary_pad.MoveNext(); )
     {
         if (primary_pad.IsPrimaryInput() && !::IsNull(primary_pad.Net()))
@@ -12,13 +14,12 @@ void AddPI(HDesign& design, HTimingPointWrapper& tp_arrival, TemplateTypes<HNet>
             tp_arrival.GoNext();
             ready_nets.push(primary_pad.Net());
         }
-    }//for (HPins::PrimariesEnumeratorW primary_pad
+    }
 }
 
 void AddInternalTSP(HDesign& design, HTimingPointWrapper& tp_arrival, TemplateTypes<HNet>::queue& ready_nets) 
 {
-    for (HCells::CellsEnumeratorW cur_cell
-        = design.Cells.GetEnumeratorW(MacroType_FirstSequential, MacroType_LastSequential);
+    for (HCells::CellsEnumeratorW cur_cell = design.Cells.GetEnumeratorW(MacroType_FirstSequential, MacroType_LastSequential);
         cur_cell.MoveNext(); )
     {//iterate over FF
         for (HCell::PinsEnumeratorW cell_pin = cur_cell.GetPinsEnumeratorW(); cell_pin.MoveNext(); )
@@ -30,16 +31,8 @@ void AddInternalTSP(HDesign& design, HTimingPointWrapper& tp_arrival, TemplateTy
                 tp_arrival.GoNext();
                 ready_nets.push(cell_pin.Net());
             }
-            //FIXME: debugging code
-            //else
-            //{
-            //    string cellName = design.GetString<HCell::Name>(cur_cell);
-            //    string pinName = design.GetString<HPin::Name>(cell_pin);
-            //    bool isTEP = design.GetBool<HTimingPoint::IsTimingEndPoint>(design.TimingPoints[cell_pin]);
-            //    ALERT("Seq, not TSP %s.%s, %d", cellName.c_str(), pinName.c_str(), isTEP);
-            //}
-        }//for (HCell::PinsEnumeratorW cell_pin
-    }//for (HCells::CellsEnumeratorW cur_cel
+        }
+    }
 }
 
 void SetReverseOrder(HDesign &design) 
@@ -48,28 +41,61 @@ void SetReverseOrder(HDesign &design)
     HTimingPointWrapper prev_point = design[design.TimingPoints.TopologicalOrderRoot()];
     for (HTimingPointWrapper cur_point = prev_point; !::IsNull(cur_point.GoNext()); prev_point = cur_point)
         cur_point.SetPrevious(prev_point);
+
     //set the first point in required order to the last one from arrival order
     design[design.TimingPoints.TopologicalOrderRoot()].SetPrevious(prev_point);
 }
 
-int* GetnActivePinsForCell(HDesign& design, int cells_size)
+int CountActivePins(int cells_size, int* nActivePinsForCell) 
+{
+    int nPins = 0;
+    for (int i = 0; i < cells_size; ++i)
+    {
+        if (nActivePinsForCell[i] > 0)
+        {
+            nPins += nActivePinsForCell[i];
+        }
+    }
+
+    return nPins;
+}
+
+int* GetnActivePinsForCell(HDesign& design, int cells_size, TemplateTypes<HCell>::queue& ready_cells)
 {
     int *nActivePinsForCell = new int[cells_size];
     memset(nActivePinsForCell, 0, cells_size * sizeof(int));
 
     //calc number of nets for each cell
-    for (HCells::CellsEnumeratorW cur_node = design.Cells.GetEnumeratorW(); cur_node.MoveNext(); )
-        if (!cur_node.IsSequential())
-            for (HCell::PinsEnumeratorW node_pin = cur_node.GetPinsEnumeratorW(); node_pin.MoveNext(); )
-                if (node_pin.Direction() == PinDirection_INPUT && !::IsNull(node_pin.Net()))
-                    nActivePinsForCell[::ToID(cur_node)]++;
+    for (HCells::CellsEnumeratorW cell = design.Cells.GetEnumeratorW(); cell.MoveNext(); )
+        if (!cell.IsSequential())
+        {
+            for (HCell::PinsEnumeratorW pin = cell.GetPinsEnumeratorW(); pin.MoveNext(); )
+            {
+                HNetWrapper net = design[pin.Net()];
+                if (pin.Direction() == PinDirection_INPUT && !::IsNull(net)/* && net.Kind() != NetKind_Skipped*/)
+                {
+                    HPinTypeWrapper pinType = design[pin.Type()];
+                    //if (pinType.Function() == PinFunction_Signal)
+                    {
+                        //ALERT("Pin function = %d", pinType.Function());
+                        //ALERT("Init pin %s", GetCellPinName(design, pin).c_str());
+                        nActivePinsForCell[::ToID(cell)]++;
+                    }
+                }
+            }
+
+            if (nActivePinsForCell[::ToID(cell)] == 0)
+            {
+                ready_cells.push(cell);
+            }
+        }
 
     return nActivePinsForCell;
 }
 
 void GetSinkCellsFromPreparedNets(HDesign& design, int*& nActivePinsForCell,
                                   HTimingPointWrapper& tp_arrival, HTimingPointWrapper& tp_required, 
-                                  TemplateTypes<HNet>::queue& nextWaveNets, TemplateTypes<HCell>::queue& fullPinCells) 
+                                  TemplateTypes<HNet>::queue& nextWaveNets, TemplateTypes<HCell>::queue& ready_cells) 
 {
     while (!nextWaveNets.empty())
     {
@@ -88,26 +114,18 @@ void GetSinkCellsFromPreparedNets(HDesign& design, int*& nActivePinsForCell,
                 tp_arrival.SetNext(design.TimingPoints[sink]);
                 tp_arrival.GoNext();
                 if (--nActivePinsForCell[::ToID(sink.Cell())] == 0)
-                    fullPinCells.push(sink.Cell());
-                //FIXME: debugging code
-                //else if (nActivePinsForCell[::ToID(sink.Cell())] == -1)
-                //{
-                //    string netName = design.GetString<HNet::Name>(net);
-                //    string cellName = design.GetString<HCell::Name>(sink.Cell());
-                //    string pinName =  design.GetString<HPin::Name>(sink);
-                //    ALERT("FUCK! net: %s\t%s.%s", netName.c_str(), cellName.c_str(), pinName.c_str());
-                //}
-                //ASSERT(nActivePinsForCell[::ToID(sink.Cell())] != -1);
+                {
+                    ready_cells.push(sink.Cell());
+                }
             }
-        }//for (HNet::SinksEnumeratorW sink
-    }//while(!ready_nets.empty())
+        }
+    }
 }
 
 void AddSinkPinsAndPrepareNewNets(HDesign& design, 
                                   HTimingPointWrapper& tp_arrival, HTimingPointWrapper& tp_required, 
                                   TemplateTypes<HNet>::queue& nextWaveNets, TemplateTypes<HCell>::queue& ready_cells) 
 {
-    //process cells
     while (!ready_cells.empty())
     {
         HCell cell = ready_cells.front();
@@ -121,14 +139,107 @@ void AddSinkPinsAndPrepareNewNets(HDesign& design,
                 tp_arrival.GoNext();
                 nextWaveNets.push(cell_pin.Net());
             }
-        }//for (HCell::PinsEnumeratorW cell_pin
-    }//while (!ready_cells.empty())
+        }
+    }
 }
 
-void ReportCycleCell(HDesign& design, int i, int p) 
+void ReportDependentCell(HDesign& design, int i, int p) 
 {
     HCell cycle_cell = ::__ConstructPtr<HCell>(i);
-    WRITELINE("%s,%d - not ready cell, pins", design.GetString<HCell::Name>(cycle_cell).c_str(), p);
+    WRITELINE("%s,%d - dependent cell", design.GetString<HCell::Name>(cycle_cell).c_str(), p);
+}
+
+void ReportInputNets(HDesign& design, HCell cycle_cell)
+{
+    WRITELINE("Input nets:");
+    for (HCell::PinsEnumeratorW pin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(cycle_cell); pin.MoveNext(); )
+    {
+        if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
+        {
+            string netName = design.GetString<HNet::Name>(pin.Net());
+            WRITELINE("  %s", netName.c_str());
+        }
+    }
+}
+
+CellVector ReduceNotReadyCells(HDesign& design, int* nActivePinsForCell, int cells_size)
+{
+    CellVector notReadyList;
+    for (int i = 0; i < cells_size; ++i)
+    {
+        if (nActivePinsForCell[i] > 0)
+        {
+            HCell cell = ::__ConstructPtr<HCell>(i);
+            notReadyList.push_back(cell);
+        }
+    }
+
+    for (CellVector::iterator iter = notReadyList.begin(); iter != notReadyList.end(); )
+    {
+        HCell curCell = *iter;
+        CellVector reachableCells = GetReachable(design, curCell);
+        RemoveDuplicates(notReadyList, reachableCells);
+        
+        string curCellName = design.GetString<HCell::Name>(curCell);
+        WRITELINE("Analyzed reachable from %s: %d remained", curCellName.c_str(), notReadyList.size());
+
+        iter = find(notReadyList.begin(), notReadyList.end(), curCell);
+        iter++;
+    }
+
+    return notReadyList;
+}
+
+void CheckForCyclesAndBreakOneIfExist(HDesign& design, int*& nActivePinsForCell, int cells_size,
+                                      HTimingPointWrapper& tp_arrival, HTimingPointWrapper& tp_required, 
+                                      TemplateTypes<HNet>::queue& nextWaveNets, TemplateTypes<HCell>::queue& ready_cells)
+{
+    if (!nextWaveNets.empty()) return; //this is not a deadlock yet
+
+    CellVector reducedCells = ReduceNotReadyCells(design, nActivePinsForCell, cells_size);
+
+    //break dependencies
+    for (int i = 0; i < reducedCells.size(); i++)
+    {
+        HCell cell = reducedCells[i];
+        string cellName = design.GetString<HCell::Name>(cell);
+        GLOGWARNING(LOGINPLACE, "Stopping cell for TopologicalOrder found: %s. All input pins will have dummy values.", cellName.c_str());
+        ReportInputNets(design, cell);
+        nActivePinsForCell[::ToID(cell)] = 0;
+        ready_cells.push(cell);
+    }
+}
+
+bool ExistAmongProcessed(HDesign& design, HTimingPoint currentArrival, HTimingPoint tp) 
+{
+    bool isExist = false;
+
+    HTimingPointWrapper start = design[design.TimingPoints.TopologicalOrderRoot()];
+    for (HTimingPointWrapper tpIter = start; !IsNull(tpIter.GoNext()); )
+    {
+        if (tpIter == tp)
+        {
+            isExist = true;
+            break;
+        }
+
+        if (tpIter == currentArrival)
+            break;
+    }
+
+    return isExist;
+}
+
+void PrintTSP(HDesign& design, HTimingPoint currentArrival)
+{
+    HTimingPointWrapper start = design[design.TimingPoints.TopologicalOrderRoot()];
+    for (HTimingPointWrapper tpIter = start; !IsNull(tpIter.GoNext()); )
+    {
+        WRITELINE("  tsp: %s", GetCellPinName(design, tpIter).c_str());
+
+        if (tpIter == currentArrival)
+            break;
+    }
 }
 
 void FindTopologicalOrder(HDesign& design)
@@ -139,60 +250,33 @@ void FindTopologicalOrder(HDesign& design)
   HTimingPointWrapper tp_arrival = design[design.TimingPoints.TopologicalOrderRoot()];
   HTimingPointWrapper tp_required = design[design.TimingPoints.TopologicalOrderRoot()];
 
+  TemplateTypes<HCell>::queue ready_cells;
+  TemplateTypes<HNet>::queue nextWaveNets;
+
   if (!::IsNull(tp_arrival.Next()) && !::IsNull(tp_required.Previous()))
   {
     LOGERROR("Method \"FindTopologicalOrder\" can be called only one time for each benchmark.\n");
     return;
   }
 
-  //FIXME: debugging print
-  ReportTEPNames(design);
-
   int cells_size = design._Design.NetList.nCellsLimit;
-  int* nActivePinsForCell = GetnActivePinsForCell(design, cells_size);
-
-  TemplateTypes<HCell>::queue ready_cells;
-  TemplateTypes<HNet>::queue nextWaveNets;
+  int* nActivePinsForCell = GetnActivePinsForCell(design, cells_size, ready_cells);
+  int nPins = CountActivePins(cells_size, nActivePinsForCell);
 
   AddPI(design, tp_arrival, nextWaveNets);
   AddInternalTSP(design, tp_arrival, nextWaveNets);
+  //PrintTSP(design, tp_arrival);
+  nPins = CountActivePins(cells_size, nActivePinsForCell);
 
   //main cycle
   while (!nextWaveNets.empty() || !ready_cells.empty())
   {
     GetSinkCellsFromPreparedNets(design, nActivePinsForCell, tp_arrival, tp_required, nextWaveNets, ready_cells);
+    nPins = CountActivePins(cells_size, nActivePinsForCell);
     AddSinkPinsAndPrepareNewNets(design, tp_arrival, tp_required, nextWaveNets, ready_cells);
-
-    //cycles detection
-    if (nextWaveNets.empty())
-    {
-      int nWaitedNets = design.Nets.Count();
-      int cycleIdx = -1;
-      for (int i = 0; i < cells_size; ++i)
-      {
-        if (nActivePinsForCell[i] > 0)
-        {//cycle detected
-          //ReportCycleCell(design, i, nActivePinsForCell[i]);
-          if (nActivePinsForCell[i] < nWaitedNets)
-          {//select node with minimal number of waited nets
-           //to break less possible number of nets
-            nWaitedNets = nActivePinsForCell[i];
-            cycleIdx = i;
-            if (nWaitedNets == 1)
-              break;
-          }
-        }
-      } //for (int i = 0
-      
-      if (cycleIdx > 0)
-      {//break detected cycle
-        HCell cycle_cell = ::__ConstructPtr<HCell>(cycleIdx);
-        GLOGWARNING(LOGINPLACE, "Cycle detected. This cycle will be broken on cell %s", design.GetString<HCell::Name>(cycle_cell).c_str());
-        nActivePinsForCell[cycleIdx] = 0;
-        ready_cells.push(cycle_cell);
-      }
-    }//if (ready_nets.empty())
-  }//while (!ready_nets.empty() && !ready_cells.empty())
+    CheckForCyclesAndBreakOneIfExist(design, nActivePinsForCell, cells_size, tp_arrival, tp_required, nextWaveNets, ready_cells);
+    nPins = CountActivePins(cells_size, nActivePinsForCell);
+  }
 
   //free temporary data
   delete[] nActivePinsForCell;
@@ -214,5 +298,7 @@ void FindTopologicalOrder(HDesign& design)
   //count number of timing start and end points - initialize start & end points iterators
   design.TimingPoints.CountStartAndEndPoints();
 
+  //ReportTEPNames(design);
+  //ReportTopologicalOrder(design);
   //ALERT("TIMING PRIOR OPERATIONS FINISHED");
 }

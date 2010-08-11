@@ -5,18 +5,25 @@
 #include "Timing.h"
 #include <math.h>
 #include "TableFormatter.h"
+#include "TimingPointsEnumerator.h"
 
 int PikoSec(double delay_ns)
 {
   return Round(1000.0 * delay_ns);
 }
 
-string GetCellPinName(HDesign& design, HTimingPointWrapper pt)
+string GetCellPinName(HDesign& design, HPin pin)
 {
-    HPinWrapper pin = design[pt.Pin()];
-    HCellWrapper cell = design[pin.Cell()];
+    HPinWrapper pinW = design[pin];
+    HCellWrapper cell = design[pinW.Cell()];
     string cellName = IsNull(cell) ? "PIN" : cell.Name();
-    return cellName + "." + pin.Name();
+    return cellName + "." + pinW.Name();
+}
+
+string GetCellPinName(HDesign& design, HTimingPoint pt)
+{
+    HPin pin = design.Get<HTimingPoint::Pin, HPin>(pt);
+    return GetCellPinName(design, pin);
 }
 
 void ReportTEPNames(HDesign& design)
@@ -28,7 +35,7 @@ void ReportTEPNames(HDesign& design)
     HTimingPoint endPointsEnd = design.TimingPoints.LastInternalPoint();
     for (HTimingPointWrapper ep = design[design.TimingPoints.TopologicalOrderRoot()]; ep.GoPrevious() != endPointsEnd; )
     {
-        WRITELINE("\tTEP: ", GetCellPinName(design, ep));
+        WRITELINE("\tTEP: %s", GetCellPinName(design, ep).c_str());
     }
 }
 
@@ -249,10 +256,10 @@ void ReportNegativeSlacks(HDesign& design)
 
 void ReportVectorOfSlacks(HDesign& design)
 {
-    size_t nCols = 2;
-    size_t idx = 0;
-    size_t colTimingPointName = idx++;
-    size_t colSlacks = idx++;
+    int nCols = 2;
+    int idx = 0;
+    int colTimingPointName = idx++;
+    int colSlacks = idx++;
 
     TableFormatter tf("TEP Slacks", nCols);
     //columns
@@ -302,4 +309,15 @@ void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr)
     sprintf(tmpFloat, "%f\t", Utils::WNS(hd));
     wnsStr += tmpFloat;
     WRITELINE(("%s", wnsStr.c_str()));
+}
+
+void ReportTopologicalOrder(HDesign& design)
+{
+    WRITELINE("");
+    ALERT("Printing Topological Order");
+
+    for(TopologicalOrder::AllPointsEnumerator pt = design; pt.MoveNext(); )
+    {
+        WRITELINE("  PTO %s", GetCellPinName(design, pt).c_str());
+    }
 }

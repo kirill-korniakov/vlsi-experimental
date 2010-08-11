@@ -1210,6 +1210,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Auxiliary\PathFinder.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\GlobalPlacement\PlacementQualityAnalyzer.cpp"
 					>
 				</File>
@@ -10471,6 +10475,10 @@
 				</File>
 				<File
 					RelativePath="..\include\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\PathFinder.h"
 					>
 				</File>
 				<File

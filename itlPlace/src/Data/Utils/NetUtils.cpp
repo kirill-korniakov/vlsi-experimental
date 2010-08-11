@@ -169,16 +169,14 @@ namespace Utils
 
   static bool IsClockNet(HNetWrapper& net, HDesign& hd)
   {
-    for (HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext(); )
+    bool isClock = true;
+    for (HNet::SinksEnumeratorW pin = net.GetSinksEnumeratorW(); pin.MoveNext(); )
     {
-      //MacroType mtype = hd.Get<HMacroType::Type, MacroType>(hd.Get<HCell::MacroType, HMacroType>(pin.Cell()));
-      //if (mtype >= MacroType_FirstSpecial && mtype <= MacroType_LastSpecial)
-      //  return true;
       PinFunction func = hd.Get<HPinType::Function, PinFunction>(pin.Type());
-      if (func == PinFunction_Clock)
-        return true;
+      if (func != PinFunction_Clock)
+        isClock = false;
     }
-    return false;
+    return isClock;
   }
 
   static bool IsPureClearPresetNet(HNetWrapper& net, HDesign& hd)
