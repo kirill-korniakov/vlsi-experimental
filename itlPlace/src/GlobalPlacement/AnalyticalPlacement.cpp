@@ -39,12 +39,10 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
 
     WRITELINE("");
     ALERT("ANALYTICAL PLACEMENT STARTED");
-    ALERT("HPWL before analytical placement: %f", Utils::CalculateHPWL(hd, true));
 
     ClusteringInformation ci(hd);
     ci.affinityFunction = Affinity;
 
-    //clustering
     Clustering(hd, ci);
 
     //set initial placement
@@ -56,11 +54,8 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
     {
         WriteCellsCoordinates2Clusters(hd, ci);
     }
-    ALERT("Initial state HPWL = %f", Utils::CalculateHPWL(hd, true));
 
     //perform placement of clustered netlist
-    //TODO: think about reorganization of loop below
-    //it is simply loop between clustering levels, why it is so complex?
     Relaxation(hd, ci, 1);
 
     ClusteringLogIterator clusteringLogIterator = ci.clusteringLog.rbegin();
@@ -116,17 +111,6 @@ int TaoInit(const char* taoCmd)
 
     PetscInitialize(&argc, &argv, (char *)0, NULL);
     TaoInitialize(&argc, &argv, (char *)0, NULL);
-
-    //int info;       // used to check for functions returning nonzero
-    //int size,rank;  // number of processes running
-    //iCHKERRQ MPI_Comm_size(PETSC_COMM_WORLD, &size);
-    //iCHKERRQ MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-
-    //if (size > 1) {
-    //  if (rank == 0)
-    //    PetscPrintf(PETSC_COMM_SELF, "This application is intended for single processor use!\n");
-    //  SETERRQ(1, "Incorrect number of processors");
-    //}
 
     return OK;
 }
@@ -261,8 +245,6 @@ void AnalyticalGlobalPlacement::GetClusterCoordinates(ClusteringInformation& ci,
     delete[] values;
     delete[] idxs;
 }
-
-
 
 void AnalyticalGlobalPlacement::GetVariablesValues(ClusteringInformation& ci, Vec x)
 {

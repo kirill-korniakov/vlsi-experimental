@@ -167,16 +167,26 @@ namespace Utils
     UnbindNet(hd, net, NetKind_Removed);
   }
 
+  //static bool IsClockNet(HNetWrapper& net, HDesign& hd)
+  //{
+  //  bool isClock = true;
+  //  for (HNet::SinksEnumeratorW pin = net.GetSinksEnumeratorW(); pin.MoveNext(); )
+  //  {
+  //    PinFunction func = hd.Get<HPinType::Function, PinFunction>(pin.Type());
+  //    if (func != PinFunction_Clock)
+  //      isClock = false;
+  //  }
+  //  return isClock;
+  //}
   static bool IsClockNet(HNetWrapper& net, HDesign& hd)
   {
-    bool isClock = true;
-    for (HNet::SinksEnumeratorW pin = net.GetSinksEnumeratorW(); pin.MoveNext(); )
-    {
-      PinFunction func = hd.Get<HPinType::Function, PinFunction>(pin.Type());
-      if (func != PinFunction_Clock)
-        isClock = false;
-    }
-    return isClock;
+      for (HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext(); )
+      {
+          PinFunction func = hd.Get<HPinType::Function, PinFunction>(pin.Type());
+          if (func == PinFunction_Clock)
+              return true;
+      }
+      return false;
   }
 
   static bool IsPureClearPresetNet(HNetWrapper& net, HDesign& hd)
