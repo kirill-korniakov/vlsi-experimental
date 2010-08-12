@@ -1,0 +1,1 @@
+30 02 * * * "cd C:\Users\beljakov.alexander.a\Desktop\VLSI\TestingFramework && Run_NightExperiment.py"

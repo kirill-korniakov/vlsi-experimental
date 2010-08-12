@@ -46,8 +46,8 @@ class HPWLPlacementChecker(Experiment_HPWL):
 def test():
     testRunner = TestRunner()
 
-    e1 = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list', "../master logs/HPWL/ispd")
-    e2 = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "../master logs/HPWL/iwls")
+    e1 = HPWLPlacementChecker('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list', "MasterLogs/HPWL/ISPD")
+    e2 = HPWLPlacementChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "MasterLogs/HPWL/IWLS")
     testRunner.parameters.experiments.append(e1)
     testRunner.parameters.experiments.append(e2)
 

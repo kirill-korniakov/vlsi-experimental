@@ -64,7 +64,7 @@ def test():
     testRunner = TestRunner()
 
     cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP_fast.list', "../master logs/LR", cmdArgs)
+    e = LRPlacementChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP_fast.list', "MasterLogs/LR", cmdArgs)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
