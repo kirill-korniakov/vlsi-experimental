@@ -12,7 +12,7 @@ def NightExperiment():
     testRunner = TestRunner()
     testRunner.parameters.experiments.append(exp_HPWL_IWLS05)
     testRunner.parameters.experiments.append(exp_HPWL_ISPD04)
-    testRunner.parameters.experiments.append(exp_LR_IWLS05GP)
+    #testRunner.parameters.experiments.append(exp_LR_IWLS05GP)
     testRunner.Run()
 
 NightExperiment()
