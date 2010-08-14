@@ -1,6 +1,6 @@
 class TestRunnerParameters:
-    doCheckout = False
-    doBuild    = False
+    doCheckout = True
+    doBuild    = True
     doSendMail = True
 
     experiments = []

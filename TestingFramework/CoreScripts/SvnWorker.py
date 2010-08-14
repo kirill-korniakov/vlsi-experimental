@@ -15,7 +15,7 @@ class SvnWorker:
     def CheckOut(self, url, to, rev = ''):
         if rev == '':
             print('Checking out HEAD revision')
-            cmdline = 'svn co ' + url + ' ' + to
+            cmdline = 'C:\Program Files (x86)\CollabNet\Subversion Client\svn.exe co ' + url + ' ' + to
             subprocess.call(cmdline)
         else :
             print('Checking out revision ' + rev)
