@@ -1,10 +1,34 @@
 #include "LRSizing.h"
 #include <math.h>
 #include "LinearRegression.h"
+#include "TimingUtils.h"
+#include <algorithm>
 
 #define accuracyForLRS_Mu 0.001
 #define DOUBLE_ACCURACY 1e-9
 #define errorBoundForLDP 0.01
+
+void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
+{
+  string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
+  string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
+
+  for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext();)
+  {
+    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
+    if (macroTypeFamily == cellFamily)
+      cellSizes.push_back(macroTypeE.SizeX());
+  }
+  std::sort(cellSizes.begin(), cellSizes.end());
+
+  //Debugging code
+  ALERT("size = %d", cellSizes.size());
+  for (int i=0;i<cellSizes.size();i++)
+  {
+    ALERT("%d : %lf", i, cellSizes[i]);
+  }
+  //End of debugging code
+}
 
 void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X)
 {
@@ -26,7 +50,7 @@ void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double
         {
           if(pinE.Name() == pinName)
           {
-            C.push_back(pinE.Capacitance());
+            C.push_back(Utils::GetSinkCapacitance(design, pinE, SignalDirection_None));
             X.push_back(macroTypeE.SizeX()); //TODO: Check, what is it!!
             break;
           }
@@ -34,6 +58,38 @@ void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double
       }
   }
   ASSERT(C.size()==X.size());
+}
+
+void LRSizer::getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X)
+{
+  ASSERT((pin,design).Direction()==PinDirection_INPUT); //Now only for input pins
+
+  HCell cell=(design,pin).Cell();
+  string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
+  string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
+  string pinName=(pin,design).Name();
+
+  //ALERT(cellFamily);
+  //ALERT(pinName);
+
+  for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext();)
+  {
+    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
+    if (macroTypeFamily == cellFamily)
+      for (HMacroType::PinsEnumeratorW pinE = macroTypeE.GetEnumeratorW(); pinE.MoveNext();)
+      {
+        if ((pinE.Direction()==PinDirection_INPUT)||(pinE.Direction()==PinDirection_OUTPUT))
+        {
+          if(pinE.Name() == pinName)
+          {
+            R.push_back(Utils::GetDriverWorstPhisics(design, pinE, SignalDirection_None).R);
+            X.push_back(macroTypeE.SizeX()); //TODO: Check, what is it!!
+            break;
+          }
+        }
+      }
+  }
+  ASSERT(R.size()==X.size());
 }
 
 int LRSizer::CountLeftArcs(HDesign& design, HNet net)
@@ -70,7 +126,14 @@ LRSizer::LRSizer(HDesign& hd): design(hd), LambdaIn(0)
   
   HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()];
   Maths::Regression::Linear* regressionC=getRegressionC(tp);
-  ALERT("Regressed: %lf", regressionC->getValue(7));
+  ALERT("RegressedC: %lf", regressionC->getValue(7));
+  
+  Maths::Regression::Linear* regressionR=getRegressionR(tp);
+  ALERT("RegressedR: %lf", regressionR->getValue(7));
+
+  HCell cell=(design,tp.Pin()).Cell();
+  std::vector<double> cellsizes;
+  getCellFamily(cell, cellsizes);
 }
 
 LRSizer::~LRSizer()
@@ -640,4 +703,22 @@ Maths::Regression::Linear* LRSizer::getRegressionC( HTimingPointWrapper tp )
   copy(X.begin(), X.end(), arrX);
 
   return new Maths::Regression::Linear(C.size(), arrX, arrC);
+}
+
+Maths::Regression::Linear* LRSizer::getRegressionR( HTimingPointWrapper tp )
+{
+  HPin pin=tp.Pin();
+
+  std::vector<double> R, X;
+
+  getPinFamilyR(pin, R, X);
+
+  int numOfAlternatives=R.size();
+  double* arrR=new double[numOfAlternatives];
+  copy(R.begin(), R.end(), arrR);
+
+  double* arrX=new double[numOfAlternatives];
+  copy(X.begin(), X.end(), arrX);
+
+  return new Maths::Regression::Linear(R.size(), arrX, arrR);
 }

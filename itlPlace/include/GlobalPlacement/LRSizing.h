@@ -67,8 +67,11 @@ private:
   bool CheckKuhn_Tucker(HTimingPoint point);
   void CheckKuhn_Tucker();
 	
-	
+  void getCellFamily(HCell cell, std::vector<double>& cellSizes);	
 	void getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X);
+  void getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X);
+
   Maths::Regression::Linear* getRegressionC( HTimingPointWrapper tp );
+  Maths::Regression::Linear* getRegressionR( HTimingPointWrapper tp );
 };
 #endif
