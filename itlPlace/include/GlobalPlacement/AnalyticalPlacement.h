@@ -18,13 +18,6 @@ namespace AnalyticalGlobalPlacement
 
   void ExportNetWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ); 
 
-  void ReportTimes();
-  void ReportIterationInfo(ClusteringInformation& ci, AppCtx& user);
-  void ReportBinGridInfo(AppCtx& context);
-  void ReportPreIterationInfo(HDesign &hd, AppCtx &context, int metaIteration, int iteration);
-  void ReportPostIterationInfo( HDesign &hd, AppCtx &context, int metaIteration, int iteration );
-  int ReportTerminationReason(TAO_SOLVER tao, int& innerTAOIterations);
-
   void SetVariablesValues(ClusteringInformation& ci, Vec& x);
   void GetVariablesValues(ClusteringInformation& ci, Vec x);
   void SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx &context, Vec& xl, Vec& xu);

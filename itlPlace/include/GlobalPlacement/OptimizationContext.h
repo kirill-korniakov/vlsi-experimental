@@ -53,7 +53,7 @@ struct AppCtx
   bool useLogSumExp;
   bool useSumOfDelays;
   bool useLR;
-  bool useQuadraticSpreading;
+  bool useSpreading;
 
   bool useBorderBounds;
 };

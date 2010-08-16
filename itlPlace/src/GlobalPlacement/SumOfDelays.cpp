@@ -1,8 +1,6 @@
 #include "SumOfDelays.h"
 #include "LogSumExp.h"
 
-extern timetype expTime;
-
 double GetNetKOpt(PetscScalar* coordinates, int nClusterCoordinates, int i, AppCtx* context)
 {
   double kopt = (CalcNetLSE(context, coordinates, i) 
@@ -84,14 +82,6 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
 
 void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
-  timetype start;
-  timetype finish;
-
-  start = GET_TIME_METHOD();
-  PrecalcExponents(context, solution);
-  finish = GET_TIME_METHOD();
-  expTime += finish - start;
-
   context->criteriaValues.sod += SumOfDelays(context, solution);;
   AddSumOfDelaysGradient(context, solution, context->criteriaValues.gSOD);
 }

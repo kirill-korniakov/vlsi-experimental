@@ -38,7 +38,7 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   useLogSumExp          = ahd.cfg.ValueOf("GlobalPlacement.useLogSumExp", false);
   useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);
   useLR                 = ahd.cfg.ValueOf("GlobalPlacement.useLR", false);
-  useQuadraticSpreading = ahd.cfg.ValueOf("GlobalPlacement.useQuadraticSpreading", false);
+  useSpreading = ahd.cfg.ValueOf("GlobalPlacement.useSpreading", false);
   useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)

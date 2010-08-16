@@ -10282,7 +10282,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\GlobalPlacement\AnalyticalPlacementReporting.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\GlobalPlacement\GlobalPlacement.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\GlobalPlacement\WeightsRoutines.h"
 					>
 				</File>
 				<Filter

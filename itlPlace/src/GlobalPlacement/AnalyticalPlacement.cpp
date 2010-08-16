@@ -1,25 +1,8 @@
-#include <windows.h>
-#include <iostream>
-#include <conio.h>
-#include <stdlib.h>
-#include "math.h"
-#include <time.h>
-#include <algorithm>
-#include <vector>
-#include <string>
-#include <list>
-
-
-#include "Auxiliary.h"
-#include "Configuration.h"
-#include "Clustering.h"
-#include "GlobalPlacement.h"
+#include "WeightsRoutines.h"
 #include "ObjectivesConstraints.h"
-#include "Spreading.h"
-#include "Parser.h"
-#include "Utils.h"
 #include "PlacementQualityAnalyzer.h"
 #include "AnalyticalPlacement.h"
+#include "AnalyticalPlacementReporting.h"
 #include "VanGinnekenAlgorithm.h"
 
 using namespace std;
@@ -459,11 +442,46 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     return OK;
 }
 
+bool IsTimeToExit(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
+                  PlacementQualityAnalyzer* QA, int iteration) 
+{
+    if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+    {
+        QA->AnalyzeQuality(iteration, &context.criteriaValues, 
+            hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+
+        if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
+        {
+            if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
+            {
+                QA->RestoreBestAchievedPlacement();
+                WriteCellsCoordinates2Clusters(hd, ci);
+                ALERT(Color_Green, "Reached maximum tolerant iteration number.");
+                return true;
+            }
+        }
+        if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
+        {
+            QA->RestoreBestAchievedPlacement();
+            WriteCellsCoordinates2Clusters(hd, ci);
+            ALERT(Color_Green, "Method converged");
+            return true;
+        }
+    }
+
+    const int nOuterIters = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nOuterIterations", 32);
+    if (iteration >= nOuterIters)
+    {
+        ALERT(Color_Green, "Iterations finished");
+        return true;
+    }
+
+    return false;
+}
+
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
-    const int nOuterIters = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nOuterIterations", 32);
-
     PlacementQualityAnalyzer* QA = 0;
     if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
     {
@@ -499,8 +517,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             UpdateCellsCoordinates(hd, ci);
         }
 
-        CalcGradientsNorms(&context);
-        UpdateWeights(hd, context, 32);
+        UpdateWeights(hd, context);
         
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
@@ -513,38 +530,12 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
           ALERT("NEW BUFFERING FINISHED");
         }
 
-        if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
-        {
-            QA->AnalyzeQuality(iteration, &context.criteriaValues, 
-                hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
-
-            if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
-            {
-                if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
-                {
-                    QA->RestoreBestAchievedPlacement();
-                    WriteCellsCoordinates2Clusters(hd, ci);
-                    ALERT(Color_Green, "Reached maximum tolerant iteration number.");
-                    break;
-                }
-            }
-            if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
-            {
-                QA->RestoreBestAchievedPlacement();
-                WriteCellsCoordinates2Clusters(hd, ci);
-                ALERT(Color_Green, "Method converged");
-                break;
-            }
-        }
-
         ReportPostIterationInfo(hd, context, metaIteration, iteration);
-        iteration++;
 
-        if (iteration > nOuterIters)
-        {
-            ALERT(Color_Green, "Iterations finished");
+        if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
-        }
+
+        iteration++;
     }
 
     if (QA != 0)

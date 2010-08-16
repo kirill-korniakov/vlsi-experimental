@@ -1,5 +1,6 @@
-#include "AnalyticalPlacement.h"
+#include "AnalyticalPlacementReporting.h"
 #include "ObjectivesConstraints.h"
+#include "WeightsRoutines.h"
 
 using namespace AnalyticalGlobalPlacement;
 
@@ -122,4 +123,15 @@ void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, A
     ALERT("RELAXATION ITERATION STARTED");
     ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
     ALERT("Number of nets: %d", ci.netList.size());
+}
+
+void AnalyticalGlobalPlacement::ReportClusterCoordinates(AppCtx* context)
+{
+    int clusterIdx = -1;
+    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+    {
+        ALERT("Cluster %d coordinates: [%.3f, %.3f]", clusterIdx,
+            context->ci->clusters[clusterIdx].xCoord, context->ci->clusters[clusterIdx].yCoord);
+    }
+    WRITELINE("");
 }

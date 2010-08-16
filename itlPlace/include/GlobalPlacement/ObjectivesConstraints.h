@@ -1,5 +1,5 @@
-#ifndef _DETAILED_PLACEMENT_H_
-#define _DETAILED_PLACEMENT_H_
+#ifndef _OBJECTIVES_CONSTRAINTS_H_
+#define _OBJECTIVES_CONSTRAINTS_H_
 
 #include "OptimizationContext.h"
 
@@ -9,13 +9,7 @@
 
 int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec G, void* ptr);
 
-void InitWeights(PetscScalar* x, AppCtx* context);
-void ReportWeights(AppCtx& context);
-void ApplyWeights(AppCtx* context);
-void UpdateWeights(HDesign& hd, AppCtx& context, int iterate);
+void TotalCostAndGradients(AppCtx* context, double* solution);
 
-void CalculateCostAndGradients(AppCtx* context, double* solution);
-void CalcGradientsNorms(AppCtx* context);
-void PrintClusterCoordinates(AppCtx* context);
 
 #endif

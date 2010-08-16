@@ -1,4 +1,5 @@
 #include "Spreading.h"
+
 #include <vector>
 
 extern timetype calcPotentialsTime;
@@ -300,7 +301,6 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
 {
   int idxInSolutionVector = 0;
   int clusterIdx = -1;
-  double muBinsPen;
 
   while (GetNextActiveClusterIdx(context->ci, clusterIdx))
   {

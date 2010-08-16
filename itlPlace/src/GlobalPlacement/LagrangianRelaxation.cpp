@@ -1,8 +1,6 @@
 #include "LagrangianRelaxation.h"
 #include "LogSumExp.h"
 
-extern timetype expTime;
-
 double GetCi(AppCtx* context, int netIdx, int sinkIdx)
 {
     return context->LRdata.r * context->LRdata.c 
@@ -107,9 +105,8 @@ int GetClusterNetPinIdx(AppCtx* context, int netIdx, int clusterIdx)
     return -1;
 }
 
-double LR(AppCtx* context, PetscScalar* solution)
+void LR(AppCtx* context, PetscScalar* solution)
 {
-    double termTWL = 0.0;
     double termTNS = 0.0;
 
     int netListSize = static_cast<int>(context->ci->netList.size());
@@ -119,18 +116,14 @@ double LR(AppCtx* context, PetscScalar* solution)
         double LSE = CalcNetLSE(context, solution, netIdx);
         double greenTerm = GetGreenTerm(context, solution, netIdx);
 
-        termTWL += LSE;
         termTNS += braces * LSE + greenTerm;
     }
-    context->criteriaValues.lse += termTWL;
-    context->criteriaValues.lr += termTNS;
 
-    return termTWL + termTNS;
+    context->criteriaValues.lr += termTNS;
 }
 
 void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solution, int idxInSolutionVector)
 {
-    double term0 = 0.0;
     double term1 = 0.0;
     double term2 = 0.0;
     double term3 = 0.0;
@@ -140,7 +133,6 @@ void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solut
     double LSE = CalcNetLSE(context, solution, netIdx);
     double gLSE = CalcNetLSEGradient(context, netIdx, idxInSolutionVector);
 
-    term0 = gLSE;
     term1 = braces * gLSE;
 
     int clusterPinIdx = GetClusterNetPinIdx(context, netIdx, clusterIdx);
@@ -171,7 +163,6 @@ void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solut
         }
     }
 
-    context->criteriaValues.gLSE[idxInSolutionVector] += term0;
     context->criteriaValues.gLR[idxInSolutionVector] += term1 + term2/* + term3*/;
 }
 
@@ -191,8 +182,6 @@ void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution)
 
 void LR_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
-    PrecalcExponents(context, solution);
-
     LR(context, solution);
     AddLRGradient(context, 2 * context->ci->mCurrentNumberOfClusters, solution);
 }

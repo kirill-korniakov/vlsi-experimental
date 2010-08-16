@@ -1,4 +1,5 @@
 #include "ObjectivesConstraints.h"
+#include "WeightsRoutines.h"
 #include "LogSumExp.h"
 #include "SumOfDelays.h"
 #include "LagrangianRelaxation.h"
@@ -6,6 +7,8 @@
 
 #include "time.h"
 #include "omp.h"
+
+extern timetype expTime;
 
 void SetGradientToZero(double* gradient, int nComponents)
 {
@@ -30,18 +33,6 @@ void NullCriteriaValues(AppCtx* context)
     SetGradientToZero(context->criteriaValues.gSOD, context->nVariables);
     SetGradientToZero(context->criteriaValues.gLR,  context->nVariables);
     SetGradientToZero(context->criteriaValues.gQS,  context->nVariables);
-}
-
-void PrintClusterCoordinates(AppCtx* context)
-{
-    int clusterIdx = -1;
-    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
-    {
-        ALERT("Cluster %d coordinates: [%.3f, %.3f]", clusterIdx,
-            context->ci->clusters[clusterIdx].xCoord, context->ci->clusters[clusterIdx].yCoord);
-    }
-
-    WRITELINE("");
 }
 
 void PrintDerivatives(int nClusterVariables, int nBufferVariables, double* gradient,
@@ -143,10 +134,8 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
     }
 }
 
-void CalculateCostAndGradients(AppCtx* context, double* solution) 
+void CostTermsAndTheirGradients(AppCtx* context, double* solution)
 {
-    NullCriteriaValues(context);  
-
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -167,12 +156,27 @@ void CalculateCostAndGradients(AppCtx* context, double* solution)
 
         #pragma omp section
         {
-            if (context->useQuadraticSpreading)
+            if (context->useSpreading)
             {
                 QS_AddObjectiveAndGradient(context, solution);
             }
         }
     }
+}
+
+void TotalCostAndGradients(AppCtx* context, double* solution) 
+{
+    NullCriteriaValues(context);
+
+    timetype start;
+    timetype finish;
+
+    start = GET_TIME_METHOD();
+    PrecalcExponents(context, solution);
+    finish = GET_TIME_METHOD();
+    expTime += finish - start;
+
+    CostTermsAndTheirGradients(context, solution);
 
     ApplyWeights(context);
 
@@ -191,7 +195,7 @@ int AnalyticalObjectiveAndGradient(TAO_APPLICATION taoapp, Vec X, double* f, Vec
     PetscScalar *solution;
     iCHKERRQ VecGetArray(X, &solution);
 
-    CalculateCostAndGradients(context, solution);
+    TotalCostAndGradients(context, solution);
 
     *f = context->criteriaValues.objective;
 
