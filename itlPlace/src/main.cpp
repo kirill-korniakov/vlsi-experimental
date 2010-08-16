@@ -71,21 +71,22 @@ int main(int argc, char** argv)
     InitFLUTE();//initialize routing
 
     //benchmark initialization
-    HDesign hd;
-    InitializeDesign(hd, argc, argv);
+    HDesign design;
+    InitializeDesign(design, argc, argv);
 
-    PinPlacement(hd);//TODO: move from global placement to separate files.
-    hd.Plotter.ShowPlacement(HPlotter::WAIT_3_SECONDS);
+    PinPlacement(design);//TODO: move from global placement to separate files.
+    design.Plotter.ShowPlacement(HPlotter::WAIT_3_SECONDS);
 
     //REPORT CIRCUIT INFO
-    ReportBenchmarkStatistics(hd);
-    ReportPlacementArea(hd);
-    ReportCellsByMacroFunction(hd);
+    ReportBenchmarkStatistics(design);
+    ReportPlacementArea(design);
+    ReportCellsByMacroFunction(design);
+    //ReportNetsInfo(design);
 
     TableFormatter flowMetrics("Placement Flow Stages Table");
-    InitFlowMetricsTable(flowMetrics, hd);
+    InitFlowMetricsTable(flowMetrics, design);
 
-    RunFlowWrapper(hd, flowMetrics);
+    RunFlowWrapper(design, flowMetrics);
 
     return 0;
   }

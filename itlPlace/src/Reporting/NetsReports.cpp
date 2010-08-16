@@ -57,7 +57,7 @@ void ReportNetsInfo(HDesign& design)
 	WRITELINE("Reporting: Number pins in nets\n");
 	for (int i = 0; i < maxPinCount + 1; i++)
 		if (nNetsWithPins[i] != 0)
-			WRITELINE("  Number of nets with\t%d\tpin =\t%d", i, nNetsWithPins[i]);
+			WRITELINE("  %d\tnets with %d\tpins", nNetsWithPins[i], i);
 
 	delete [] nNetsWithPins;
 }

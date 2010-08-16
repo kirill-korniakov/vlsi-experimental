@@ -307,11 +307,11 @@ void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNe
   Clear();
   PlotBinGrid(nBinRows, nBinCols);
   PlotPlacement();
-  PlotGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
-  PlotGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
-  PlotGradients(nClusters, (double*)x, gLR, scaling, Color_LimeGreen);
-  PlotGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
-  PlotGradients(nClusters, (double*)x, g, scaling, Color_Black);
+  PlotAntiGradients(nClusters, (double*)x, gLSE, scaling, Color_Red);
+  PlotAntiGradients(nClusters, (double*)x, gSOD, scaling, Color_Brown);
+  PlotAntiGradients(nClusters, (double*)x, gLR, scaling, Color_LimeGreen);
+  PlotAntiGradients(nClusters, (double*)x, gQS, scaling, Color_Orange);
+  PlotAntiGradients(nClusters, (double*)x, g, scaling, Color_Black);
   Refresh((HPlotter::WaitTime)waitTime);
 }
 
@@ -565,7 +565,7 @@ void HPlotter::PlotFillBinGrid(AppCtx* context)
     }
 }
 
-void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradients, 
+void HPlotter::PlotAntiGradients(int nClusters, double* coordinates, double* gradients, 
                              double scaling, Color color)
 {
   if (IsEnabled())
@@ -576,8 +576,8 @@ void HPlotter::PlotGradients(int nClusters, double* coordinates, double* gradien
     {
       start.x = DesignX2ImageX(coordinates[2*i+0]);
       start.y = DesignY2ImageY(coordinates[2*i+1]);
-      finish.x = DesignX2ImageX(coordinates[2*i+0] + scaling*gradients[2*i+0]);
-      finish.y = DesignY2ImageY(coordinates[2*i+1] + scaling*gradients[2*i+1]);
+      finish.x = DesignX2ImageX(coordinates[2*i+0] - scaling*gradients[2*i+0]);
+      finish.y = DesignY2ImageY(coordinates[2*i+1] - scaling*gradients[2*i+1]);
       cvDrawLine(IMG, start, finish, GetCvColor(color));
       cvDrawCircle(IMG, finish, 1, GetCvColor(color));
     }

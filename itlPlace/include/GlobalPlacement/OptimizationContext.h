@@ -55,7 +55,6 @@ struct AppCtx
   bool useLR;
 
   bool useQuadraticSpreading;
-  bool useLRSpreading;
 
   bool useBorderBounds;
 

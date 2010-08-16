@@ -211,7 +211,7 @@ namespace Utils
         if (hd.cfg.ValueOf("Timing.reportSkippedNets", false))
           ReportNetPins(hd, net);
         SkipNet(hd, net);
-        ALERT("\tNet \"%s\" skipped", net.Name().c_str());
+        ALERT("\tNet \"%s\" skipped, source %s", net.Name().c_str(), GetCellPinName(hd, net.Source()).c_str());
         nSkipped++;
       }
     }

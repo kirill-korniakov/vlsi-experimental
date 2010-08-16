@@ -136,23 +136,4 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   }
   context.sprData.desiredCellsAreaAtEveryBin = 
     context.sprData.totalCellArea / binGrid.nBins;
-
-  //if (useNetWeights)
-  //{
-  //  int nNets = context.ci->netList.size();//hd.Nets.Count();
-  //  HNets::ActiveNetsEnumeratorW netW = hd.Nets.GetActiveNetsEnumeratorW();
-
-  //  for (int i = 0; i < nNets && netW.MoveNext(); ++i)
-  //  {
-  //    context.ci->netList[i].weight = netW.Weight();
-  //  }
-  //}
-  if (context.useLRSpreading)
-  {
-    context.sprData.binsPenaltyValues   = new double[binGrid.nBins * 3];
-    context.sprData.muBinsPen = 
-      context.sprData.binsPenaltyValues + binGrid.nBins;
-    context.sprData.individualBinsDiscrepancy = 
-      context.sprData.binsPenaltyValues + binGrid.nBins*2;
-  }
 }

@@ -66,10 +66,10 @@ double GetBraces(AppCtx* context, PetscScalar* solution, int netIdx)
     double A = GetA(context, netIdx);
 
     double secondTerm = 0.0;
-    for (int s = 1; s < context->netListSizes[netIdx]; s++)
+    for (int sinkIdx = 1; sinkIdx < context->netListSizes[netIdx]; sinkIdx++)
     {
-        double Ci = GetCi(context, netIdx, s);
-        double Doi = GetDoi(context, solution, netIdx, s);
+        double Ci = GetCi(context, netIdx, sinkIdx);
+        double Doi = GetDoi(context, solution, netIdx, sinkIdx);
 
         secondTerm += Ci * Doi;
     }
@@ -172,7 +172,7 @@ void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solut
     }
 
     context->criteriaValues.gLSE[idxInSolutionVector] += term0;
-    context->criteriaValues.gLR[idxInSolutionVector] += term1 + term2 + term3;
+    context->criteriaValues.gLR[idxInSolutionVector] += term1 + term2/* + term3*/;
 }
 
 void AddLRGradient(AppCtx* context, int nCoordinates, PetscScalar* solution)

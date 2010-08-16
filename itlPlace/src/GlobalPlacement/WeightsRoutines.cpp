@@ -24,14 +24,6 @@ void InitWeights(double* x, AppCtx* context)
 
     context->sprData.sprWInitial = sprWInitialMultiplier * criteriaValue / penaltyValue;
     context->weights.sprW = context->sprData.sprWInitial;
-
-    if (context->useLRSpreading)
-    {
-        for (int i = 0; i < context->sprData.binGrid.nBins; ++i)
-        {
-            context->sprData.muBinsPen[i] = context->sprData.sprWInitial;
-        }
-    }
 }
 
 void ApplyWeights(AppCtx* context)
@@ -50,34 +42,9 @@ void ApplyWeights(AppCtx* context)
     }
 }
 
-void UpdateLRSpreadingMu(HDesign& hd, AppCtx& context, int iterate)
+void UpdateWeights(HDesign& hd, AppCtx& context, int iterate)
 {
     context.weights.sprW *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-
-    if (context.useLRSpreading)
-    {
-        BinGrid& binGrid = context.sprData.binGrid;
-
-        for (int i = 0; i < binGrid.nBinRows; ++i)
-        {
-            for (int j = 0; j < binGrid.nBinCols; ++j)
-            {
-                context.sprData.muBinsPen[i * binGrid.nBinCols + j] += 
-                    context.sprData.sprWInitial 
-                    * pow(context.sprData.sprWInitial, 0.2) 
-                    / pow(2.0, iterate)
-                    * (binGrid.bins[i][j].sumPotential - context.sprData.desiredCellsAreaAtEveryBin)
-                    * (binGrid.bins[i][j].sumPotential - context.sprData.desiredCellsAreaAtEveryBin);
-            }
-        }
-    }
-}
-
-void UpdateWeights( HDesign& hd, AppCtx& context, int iterate )
-{
-    context.weights.sprW *= hd.cfg.ValueOf("TAOOptions.muSpreadingMultiplier", 2.0);
-
-    UpdateLRSpreadingMu(hd, context, 32); //TODO: ISSUE 18 COMMENT 12
 
     if (context.useLR)
     {

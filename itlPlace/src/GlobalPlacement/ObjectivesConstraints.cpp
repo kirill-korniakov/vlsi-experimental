@@ -146,6 +146,7 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
 void CalculateCostAndGradients(AppCtx* context, double* solution) 
 {
     NullCriteriaValues(context);  
+
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -169,10 +170,6 @@ void CalculateCostAndGradients(AppCtx* context, double* solution)
             if (context->useQuadraticSpreading)
             {
                 QS_AddObjectiveAndGradient(context, solution);
-            }
-            if (context->useLRSpreading)
-            {
-                LRS_AddObjectiveAndGradient(context, solution);
             }
         }
     }

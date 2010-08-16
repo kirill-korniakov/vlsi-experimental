@@ -274,51 +274,21 @@ double SpreadingPenalty(AppCtx* context, PetscScalar* x)
 
   BinGrid& binGrid = context->sprData.binGrid;
 
-  if (context->useLRSpreading)
+  for (int i = 0; i < binGrid.nBinRows; ++i)
   {
-    int binIdx;
-
-    for (int i = 0; i < binGrid.nBinRows; ++i)
+    for (int j = 0; j < binGrid.nBinCols; ++j)
     {
-      for (int j = 0; j < binGrid.nBinCols; ++j)
+      residual = binGrid.bins[i][j].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
+      if (context->sprData.useUnidirectSpreading)
       {
-        binIdx = i * binGrid.nBinCols + j;
-        residual = binGrid.bins[i][j].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
-
-        if (context->sprData.useUnidirectSpreading)
-        {
-          if (residual > 0.0)
-          {
-            context->sprData.binsPenaltyValues[binIdx] = residual * residual;
-          }
-        }
-        else
-        {
-          context->sprData.binsPenaltyValues[binIdx] = residual * residual;
-        }
-
-        spreadingPenalty += context->sprData.binsPenaltyValues[binIdx];
-      }
-    } 
-  }
-  else
-  {
-    for (int i = 0; i < binGrid.nBinRows; ++i)
-    {
-      for (int j = 0; j < binGrid.nBinCols; ++j)
-      {
-        residual = binGrid.bins[i][j].sumPotential - context->sprData.desiredCellsAreaAtEveryBin;
-        if (context->sprData.useUnidirectSpreading)
-        {
-          if (residual > 0.0)
-          {
-            spreadingPenalty += residual * residual;
-          }
-        }
-        else
+        if (residual > 0.0)
         {
           spreadingPenalty += residual * residual;
         }
+      }
+      else
+      {
+        spreadingPenalty += residual * residual;
       }
     }
   }
@@ -332,66 +302,32 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
   int clusterIdx = -1;
   double muBinsPen;
 
-  if (context->useLRSpreading)
+  while (GetNextActiveClusterIdx(context->ci, clusterIdx))
   {
-    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+    idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
+
+    int min_row, min_col, max_row, max_col; // area affected by cluster potential 
+    DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
+
+    double gX = 0;
+    double gY = 0;
+
+    //#pragma omp parallel for reduction(+:gX) reduction(+:gY)
+    for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
     {
-      idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
-
-      int min_row, min_col, max_row, max_col; // area affected by cluster potential 
-      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
-
-      double gX = 0;
-      double gY = 0;
-      //#pragma omp parallel for reduction(+:gX) reduction(+:gY)
-      for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+      for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
       {
-        for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
-        {
-          double gradX;
-          double gradY;
-          CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
-            gradX, gradY);
-
-          muBinsPen = context->sprData.muBinsPen[rowIdx * context->sprData.binGrid.nBinCols + colIdx];
-          gX += muBinsPen * gradX;
-          gY += muBinsPen * gradY;
-        }
+        double gradX;
+        double gradY;
+        CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
+          /*potX,*/ gradX, /*potY,*/ gradY);
+        gX += gradX;
+        gY += gradY;
       }
-
-      grad[2*idxInSolutionVector+0] = gX;
-      grad[2*idxInSolutionVector+1] = gY;
     }
-  }
-  else
-  {
-    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
-    {
-      idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
 
-      int min_row, min_col, max_row, max_col; // area affected by cluster potential 
-      DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
-
-      double gX = 0;
-      double gY = 0;
-
-      //#pragma omp parallel for reduction(+:gX) reduction(+:gY)
-      for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
-      {
-        for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
-        {
-          double gradX;
-          double gradY;
-          CalcBellShapedFuncAndDerivative(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x, 
-            /*potX,*/ gradX, /*potY,*/ gradY);
-          gX += gradX;
-          gY += gradY;
-        }
-      }
-
-      grad[2*idxInSolutionVector+0] = gX;
-      grad[2*idxInSolutionVector+1] = gY;
-    }
+    grad[2*idxInSolutionVector+0] = gX;
+    grad[2*idxInSolutionVector+1] = gY;
   }
 }
 

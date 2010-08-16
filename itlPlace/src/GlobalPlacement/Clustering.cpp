@@ -13,14 +13,6 @@
 inline int CellToClusterIdx(ClusteringInformation& ci, HCell cell)
 {
   return ::ToID(cell) - 1;
-  /*for (unsigned int i = 0; i < ci.clusters.size(); i++)
-  {
-    if (cell == ci.clusters[i].cells[0])
-    {
-      return i;
-    }
-  }
-  return -1;*/
 }
 
 

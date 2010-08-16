@@ -11,6 +11,7 @@ using namespace std;
 
 const int ONE_FOR_MUA_AND_ONE_FOR_MUR = 2;
 const int TIMING_MODEL = 1;
+const double MAX_SLACK = 1000.0;
 
 int CountLeftArcs(HDesign& design, HNet net)
 {
@@ -233,6 +234,11 @@ double TimingPointMus::CalculateLocalFactor(double slack, double theta)
 {
     double factor = 0.0;
 
+    if (slack > MAX_SLACK)
+    {
+        return minFactor;
+    }
+
     double r = (-slack + referenceValue) / referenceValue;
     factor = pow(r, theta);
     factor = minFactor + (1.0 - minFactor) * factor;	
@@ -243,6 +249,11 @@ double TimingPointMus::CalculateLocalFactor(double slack, double theta)
 double TimingPointMus::CalculateInjectionFactor(double slack, double theta) 
 {
     double factor = 0.0;
+
+    if (slack > MAX_SLACK)
+    {
+        return minFactor;
+    }
 
     double r = (-slack + referenceValue) / referenceValue;
 
@@ -398,6 +409,7 @@ void TimingPointMus::UpdateLocalMuR(HDesign& design, double theta)
 void TimingPointMus::UpdateMus(HDesign& design)
 {
     ALERT("Mu Updating");
+    
     nIncreased = 0;
     nDecreased = 0;
 

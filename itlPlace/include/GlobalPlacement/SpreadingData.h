@@ -28,6 +28,8 @@ struct BinGrid
 
 struct SprData
 {
+  bool useUnidirectSpreading;
+
   BinGrid   binGrid;
 
   double    totalCellArea;
@@ -40,12 +42,6 @@ struct SprData
   double    invPSY;
 
   double    sprWInitial;
-  double*   muBinsPen;
-
-  double*   binsPenaltyValues;
-  double*   individualBinsDiscrepancy;
-
-  bool useUnidirectSpreading;
 
   SprData()
   {

@@ -40,7 +40,6 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);
   useLR                 = ahd.cfg.ValueOf("GlobalPlacement.useLR", false);
   useQuadraticSpreading = ahd.cfg.ValueOf("GlobalPlacement.useQuadraticSpreading", false);
-  useLRSpreading        = ahd.cfg.ValueOf("GlobalPlacement.useLRSpreading", false);
   useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)
@@ -68,13 +67,6 @@ void AppCtx::FreeMemory()
     delete [] sprData.clusterPotentialOverBins[i];
   }
   delete [] sprData.clusterPotentialOverBins;
-
-  if (useLRSpreading)
-  {
-    delete [] sprData.binsPenaltyValues;
-    delete [] sprData.muBinsPen;
-    delete [] sprData.individualBinsDiscrepancy;
-  }
 
   //TODO: check correctness of memory deletion
   delete[] LSEdata.precalcedExponents;
