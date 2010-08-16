@@ -16,7 +16,7 @@ public:
   LRSizer(HDesign& design);
 
   ~LRSizer();
-  void doLRSizing(){;}
+  void doLRSizing();
 
 private:
 
@@ -27,7 +27,7 @@ private:
   
 
   void ProjectLambdaMatrix();
-  void SOLVE_LRS_mu(std::vector<HCell>& cells, std::vector<double>& vX);
+  void SOLVE_LRS_mu(std::vector<double>& NewVX);
   bool CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vector<double> nextVX, double accuracy);
   void SOLVE_LDP(std::vector<HCell>& cells);
   double CalculateQ(std::vector<double>& vX);
@@ -37,11 +37,11 @@ private:
   void InitLambda(double defaultLambda);
   std::vector<HCell>* InitCells();
 
-  double GetObservedC(HTimingPoint tp);
+  double GetObservedC(HTimingPoint tp,std::vector<double>& vX);
   double GetWeightedResistance(HTimingPoint tp, std::vector<double>& vX, std::vector<double>& vMu);
 
   void FillVMu(std::vector<double>& vMu);
-  void initVX( std::vector<double>& vX, std::vector<HCell>& cells );
+  void initVX( std::vector<double>& vX);
   //void CalculateVC(std::vector<double>& vC, std::vector<HCell>& cells, std::vector<double> vX );
   //void CalculateVR(std::vector<double> vR, std::vector<HCell>& cells, std::vector<double> vX, std::vector<double> vMu );
   //void CalculateVX(std::vector<HCell>& cells, std::vector<double>& vX, std::vector<double> vMu, std::vector<double> vC, std::vector<double> vR );
@@ -49,10 +49,10 @@ private:
   //double CalcDownstrCapForCell(HCell& currentCell); 
   //double CalcUpstrResistForCell(HCell& currentCell,std::vector<double>& vX,std::vector<double>& vMu);
    
-  double CalcB(HCell& cell,std::vector<double>& vMu);
+  double CalcB(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
   double CalcA(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
   double CalcNewX(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
-  void UpdateVX(std::vector<HCell>& cells, std::vector<double>& newVX, std::vector<double>& vMu);
+  void UpdateVX(std::vector<double>& newVX, std::vector<double>& vMu);
 
   std::vector<double> CalculateArrivalTimes();
 
@@ -68,10 +68,15 @@ private:
   void CheckKuhn_Tucker();
 	
   void getCellFamily(HCell cell, std::vector<double>& cellSizes);	
-	void getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X);
+  void getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily);
+
+  void getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X);
   void getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X);
 
   Maths::Regression::Linear* getRegressionC( HTimingPointWrapper tp );
   Maths::Regression::Linear* getRegressionR( HTimingPointWrapper tp );
+  HMacroType roundCellToTypeFromLib( HCell cellFrom, double currentX );
+ 
+  void ApplySizing(std::vector<double>& X);
 };
 #endif

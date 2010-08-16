@@ -3,12 +3,29 @@
 #include "LinearRegression.h"
 #include "TimingUtils.h"
 #include <algorithm>
+#include <limits>
 
 #define accuracyForLRS_Mu 0.001
 #define DOUBLE_ACCURACY 1e-9
 #define errorBoundForLDP 0.01
 
-void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
+void LRSizer::ApplySizing(std::vector<double>& X)
+{
+  ASSERT(cells->size()==X.size());
+
+  std::vector<HCell>::iterator cellFrom=cells->begin();
+  std::vector<double>::iterator currentX=X.begin();
+  while(cellFrom!=cells->end() && currentX!=X.end())
+  {
+    HMacroType cellToType=roundCellToTypeFromLib(*cellFrom, *currentX);
+    (*cellFrom, design).SetType(cellToType);
+
+    cellFrom++;
+    currentX++;
+  }
+}
+
+void LRSizer::getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily)
 {
   string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
   string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
@@ -17,7 +34,18 @@ void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
   {
     string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
     if (macroTypeFamily == cellFamily)
-      cellSizes.push_back(macroTypeE.SizeX());
+      macroTypesInFamily.push_back(macroTypeE);
+  }
+}
+
+void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
+{
+  std::vector<HMacroType> macroTypesInFamily;
+  getCellFamily(cell, macroTypesInFamily);
+
+  for(std::vector<HMacroType>::iterator macroType = macroTypesInFamily.begin(); macroType != macroTypesInFamily.end(); macroType++)
+  {
+    cellSizes.push_back(design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType));
   }
   std::sort(cellSizes.begin(), cellSizes.end());
 
@@ -178,18 +206,18 @@ std::vector<HCell>* LRSizer::InitCells()
   return (cells);
 }
 
-void LRSizer::SOLVE_LRS_mu(std::vector<HCell>& cells, std::vector<double>& NewVX)
+void LRSizer::SOLVE_LRS_mu(std::vector<double>& NewVX)
 {
   std::vector<double> vMu;
   vMu.resize(size, -1);
   FillVMu(vMu);
 
   std::vector<double> vX;
-  vX.resize(cells.size());
+  //vX.resize(cells.size());
 
-  initVX(vX, cells); //for all x_i=L_i
-  //NewVX.resize(vX.size());
-  //NewVX.assign(vX.begin(), vX.end());
+  initVX(vX); //for all x_i=L_i
+  NewVX.resize(vX.size());
+  NewVX.assign(vX.begin(), vX.end());
 
 
 
@@ -206,15 +234,17 @@ void LRSizer::SOLVE_LRS_mu(std::vector<HCell>& cells, std::vector<double>& NewVX
     ///  //NewVX[] = min(
     ///}
 
-    //vX=NewVX;
+    vX=NewVX;
 
-    //UpdateVX(cells, NewVX, vMu);
+    UpdateVX(NewVX, vMu);
 
 
   } while(!CheckStopConditionForLRS_Mu(vX, NewVX, accuracyForLRS_Mu));
 }
-double LRSizer::CalcB(HCell& cell,std::vector<double>& vMu)
+
+double LRSizer::CalcB(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX )
 {
+  Maths::Regression::Linear* regressionR;
   double B=0;
   HTimingPoint tp;
   //for(HCell::PinsEnumeratorW pin = cell.GetPinsEnumeratorW(); pin.MoveNext(); )
@@ -223,40 +253,48 @@ double LRSizer::CalcB(HCell& cell,std::vector<double>& vMu)
     if (pin.Direction() == PinDirection_OUTPUT && !::IsNull(pin.Net()))
     {
       tp = design.TimingPoints[pin];
-      B+= vMu[::ToID(tp)] /* *r_pin */ *GetObservedC(tp);
+      regressionR=getRegressionR((design.TimingPoints[pin],design));
+      int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+      B=B+vMu[::ToID(tp)]*GetObservedC(tp,vX)*(regressionR->getValue(vX[index]))*vX[index];
     }
   }
   return B;
 }
-double LRSizer::CalcA(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX)
+
+double LRSizer::CalcA( HCell& cell,std::vector<double>& vMu,std::vector<double>& vX )
 {
   double A=0;
+  Maths::Regression::Linear* regressionC;
   HTimingPoint tp;
   for (HCell::PinsEnumeratorW pin = (design, cell).GetPinsEnumeratorW(); pin.MoveNext(); )
   {
     if (pin.Direction() == PinDirection_INPUT && !::IsNull(pin.Net()))
     {
       tp = design.TimingPoints[pin];
-      A+= GetWeightedResistance(tp, vX, vMu)/* *c_pin  */;
+      regressionC=getRegressionR((design.TimingPoints[pin],design));
+      int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+      A=A+(GetWeightedResistance(tp, vX, vMu)+1)*(regressionC->getValue(vX[index]))/vX[index];
     }
   }
   return A;
 }
-double LRSizer::CalcNewX(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX)
+
+double LRSizer::CalcNewX( HCell& cell,std::vector<double>& vMu,std::vector<double>& vX )
 {
-  double NewX=0;
   double root;
-  root = CalcB(cell,vMu)/CalcA(cell, vMu, vX); 
-  //NewX=min(U_i, max(L_i,root));
-  return NewX;
+  root = CalcB(cell,vMu,vX)/CalcA(cell, vMu, vX); 
+  std::vector<double> cellSizes;
+  getCellFamily(cell,cellSizes);
+  return (min(*cellSizes.end(), max(*cellSizes.begin(),root)));
 }
-void LRSizer::UpdateVX(std::vector<HCell>& cells, std::vector<double>& newVX, std::vector<double>& vMu)
+
+void LRSizer::UpdateVX( std::vector<double>& newVX, std::vector<double>& vMu )
 {
-  newVX.reserve(cells.size());
+  //newVX.reserve(cells.size());
   double newX=0;
-  for(int i=0; i<cells.size();i++)
+  for(int i=0; i<cells->size();i++)
   {
-    newX=CalcNewX(cells[i],vMu,newVX);
+    newX=CalcNewX((*cells)[i],vMu,newVX);
     newVX.push_back(newX);
   }
 }
@@ -277,26 +315,43 @@ void LRSizer::FillVMu( std::vector<double>& vMu )
   }
 }
 
-void LRSizer::initVX( std::vector<double>& vX, std::vector<HCell>& cells)
+void LRSizer::initVX( std::vector<double>& vX )
 {
   //Init all X_i by its lower bound
-  vX.assign(cells.size(), 1);
+  vX.reserve(cells->size());
+  std::vector<double> cellSizes;
+  for (std::vector<HCell>::iterator cellIter=cells->begin(); cellIter!=cells->end();cellIter++)
+  {
+    getCellFamily(*cellIter,cellSizes);
+    vX.push_back(*cellSizes.begin());
+  }
 }
 
-double LRSizer::GetObservedC(HTimingPoint tp)
+double LRSizer::GetObservedC( HTimingPoint tp,std::vector<double>& vX )
 {
   HPinWrapper pin = design[(design,tp).Pin()];
-
+  Maths::Regression::Linear* regressionC;
   if (pin.Direction() == PinDirection_INPUT)
-    return 0; //c * x_pin + f //TODO: implement formulas
+  { 
+    regressionC=getRegressionC((tp,design));
+    HCell cell = pin.Cell();
+    int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+    return (regressionC->getValue(vX[index])) /* +f */; //TODO: implement formulas
+    //return 0; //c * x_pin + f 
+  }
 
   HNet net = pin.Net();
+  
   if (pin.Direction() == PinDirection_OUTPUT && !::IsNull(net))
   {
     double sum = (design.SteinerPoints[pin],design).ObservedC();
     for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
     {
-      sum += 0 /*c*x_sink+f*/ - (sink.Type(),design).Capacitance();//TODO: implement formulas// убрать "-"?
+      regressionC=getRegressionC((design.TimingPoints[sink],design));
+      HCell cell = sink.Cell();
+      int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+      sum=sum+(regressionC->getValue(vX[index])) /* +f */-(sink.Type(),design).Capacitance();
+      //sum += 0 /*c*x_sink+f*/ - (sink.Type(),design).Capacitance();//TODO: implement formulas// убрать "-"?
     }
     return sum;
   }
@@ -304,9 +359,10 @@ double LRSizer::GetObservedC(HTimingPoint tp)
   return 0;
 }
 
-double LRSizer::GetWeightedResistance(HTimingPoint tp, std::vector<double>& vX, std::vector<double>& vMu)
+double LRSizer::GetWeightedResistance( HTimingPoint tp, std::vector<double>& vX, std::vector<double>& vMu )
 {
   HPinWrapper pin = design[(design,tp).Pin()];
+  Maths::Regression::Linear* regressionR;
 
   if (pin.Direction() == PinDirection_INPUT)
   {
@@ -315,7 +371,11 @@ double LRSizer::GetWeightedResistance(HTimingPoint tp, std::vector<double>& vX, 
 
     HPin src = (design, pin.Net()).Source();
 
-    return 0;// u_src * r_src / x_src + R_wire(from srs to pin);
+    regressionR=getRegressionR((design.TimingPoints[src],design));
+    HCell cell = (src,design).Cell();
+    int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+    return (vMu[::ToID(design.TimingPoints[src])] * (regressionR->getValue(vX[index]))) /* + R_wire(from srs to pin)*/;
+    //return 0;// u_src * r_src / x_src + R_wire(from srs to pin);
   }
 
   HNet net = pin.Net();
@@ -326,7 +386,11 @@ double LRSizer::GetWeightedResistance(HTimingPoint tp, std::vector<double>& vX, 
     for(HCell::PinsEnumeratorW inputPin = cell.GetPinsEnumeratorW(); inputPin.MoveNext(); )
       if (inputPin.Direction() == PinDirection_INPUT && !::IsNull(inputPin.Net()))
       {
-        sum += 0; //u_inputPin * r_inputPin / x_inputPin;
+        regressionR=getRegressionR((design.TimingPoints[inputPin],design));
+        HCell cell = (inputPin,design).Cell();
+        int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+        sum=sum+vMu[::ToID(design.TimingPoints[inputPin])]*(regressionR->getValue(vX[index]));
+        //sum += 0; //u_inputPin * r_inputPin / x_inputPin;
       }
   }
 
@@ -501,7 +565,7 @@ void LRSizer::SOLVE_LDP(std::vector<HCell>& cells)
 
   do{
 
-    SOLVE_LRS_mu(cells,vX);
+    SOLVE_LRS_mu(vX);
     std::vector<double> arrivalTimes=CalculateArrivalTimes();
 
     AdjustLambda(stepCounter, arrivalTimes);
@@ -721,4 +785,29 @@ Maths::Regression::Linear* LRSizer::getRegressionR( HTimingPointWrapper tp )
   copy(X.begin(), X.end(), arrX);
 
   return new Maths::Regression::Linear(R.size(), arrX, arrR);
+}
+
+HMacroType LRSizer::roundCellToTypeFromLib(HCell cellFrom, double currentX)
+{
+  std::vector<HMacroType> macroTypesInFamily;
+  getCellFamily(cellFrom, macroTypesInFamily);
+  double smallestDeltaX=std::numeric_limits<double>::max();
+  HMacroType bestMacroType;
+  for(std::vector<HMacroType>::iterator macroType = macroTypesInFamily.begin(); macroType != macroTypesInFamily.end(); macroType++)
+  {
+    double deltaX = abs(currentX - design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType));
+    if (deltaX < smallestDeltaX)
+    {
+      smallestDeltaX = design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType);
+      bestMacroType = *macroType;
+    }
+  }
+  
+  return bestMacroType;
+}
+
+void LRSizer::doLRSizing()
+{
+  //std::vector<double> newVX;
+  //SOLVE_LRS_mu(newVX);
 }
