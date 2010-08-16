@@ -374,11 +374,11 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
                                              Vec& x, Vec& xl, Vec& xu, TAO_SOLVER& tao, TAO_APPLICATION& taoapp)
 {
-    const char* taoCmd = hd.cfg.ValueOf("TAOOptions.commandLine");
+    const char* taoCmd = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.commandLine");
     TaoInit(taoCmd);
 
     /* Create TAO solver with desired solution method */
-    iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("TAOOptions.method"), &tao);
+    iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("GlobalPlacement.TAOOptions.method"), &tao);
     iCHKERRQ TaoApplicationCreate(PETSC_COMM_SELF, &taoapp);
 
     // Allocate vectors for the solution and gradient
@@ -402,12 +402,13 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
 
     iCHKERRQ TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
 
-    int nInnerIterations = hd.cfg.ValueOf("TAOOptions.nInnerIterations", 1000);
+    int nInnerIterations = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nInnerIterations", 1000);
     iCHKERRQ TaoSetMaximumIterates(tao, nInnerIterations);
-    double fatol = hd.cfg.ValueOf("TAOOptions.fatol", 1.0e-14);
-    double frtol = hd.cfg.ValueOf("TAOOptions.frtol", 1.0e-14);
-    double catol = hd.cfg.ValueOf("TAOOptions.catol", 1.0e-8);
-    double crtol = hd.cfg.ValueOf("TAOOptions.crtol", 1.0e-8);
+
+    double fatol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.fatol", 1.0e-14);
+    double frtol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.frtol", 1.0e-14);
+    double catol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.catol", 1.0e-8);
+    double crtol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.crtol", 1.0e-8);
     iCHKERRQ TaoSetTolerances(tao, fatol, frtol, catol, crtol);
 
     /* Check for TAO command line options */
@@ -461,7 +462,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
-    const int nOuterIters = hd.cfg.ValueOf("TAOOptions.nOuterIterations", 32);
+    const int nOuterIters = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nOuterIterations", 32);
 
     PlacementQualityAnalyzer* QA = 0;
     if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))

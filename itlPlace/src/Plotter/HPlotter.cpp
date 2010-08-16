@@ -301,8 +301,8 @@ void HPlotter::ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, W
 void HPlotter::VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
                               double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g)
 {
-  double scaling = m_hd.cfg.ValueOf("GlobalPlacement.gradientScaling", 1.0);
-  int waitTime = m_hd.cfg.ValueOf("GlobalPlacement.plotWait", 1);
+  double scaling = m_hd.cfg.ValueOf("GlobalPlacement.Plotting.gradientScaling", 1.0);
+  int waitTime = m_hd.cfg.ValueOf("GlobalPlacement.Plotting.plotWait", 1);
 
   Clear();
   PlotBinGrid(nBinRows, nBinCols);

@@ -53,13 +53,9 @@ struct AppCtx
   bool useLogSumExp;
   bool useSumOfDelays;
   bool useLR;
-
   bool useQuadraticSpreading;
 
   bool useBorderBounds;
-
-  //TODO: possibly we can eliminate this parameter
-  bool useNetWeights;
 };
 
 #endif

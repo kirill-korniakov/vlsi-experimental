@@ -22,7 +22,7 @@ void SODData::Initialize(HDesign& hd)
   Dbuf = bi.Dbuf();
   DbufLbufDifferenceOfSquares = Dbuf*Dbuf - Lbuf*Lbuf;
 
-  gradientBalance = hd.cfg.ValueOf("TAOOptions.gradientBalance", 1.0);
+  gradientBalance = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.gradientBalance", 1.0);
 
   InitializeNets(hd);
 }

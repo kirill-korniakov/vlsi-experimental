@@ -123,7 +123,7 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
     //ALERT("Corr gLSE&gQS %f\t", Aux::correlation(context->gLSE, context->gQS, context->nVariables));
     //ALERT("Corr gLR&gQS %f\t", Aux::correlation(context->gLR, context->gQS, context->nVariables));
 
-    static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.plotSolverState", false);
+    static bool plotSolverState = context->hd->cfg.ValueOf("GlobalPlacement.Plotting.plotSolverState", false);
     if (plotSolverState)
     {
         context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
