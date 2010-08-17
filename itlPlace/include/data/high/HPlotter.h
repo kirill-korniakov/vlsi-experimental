@@ -89,6 +89,7 @@ public:
   void Plot2PinNets();
   void PlotCircle(double x, double y, int radius, Color col);
   void PlotLine(double x1, double y1, double x2, double y2, Color col);
+  void PlotFilledRectangle(double x, double y, double width, double height, Color col);
   void PlotMostCriticalPaths(HDesign& design, int n = -1);
 
   void PlotCongestionMaps(HDPGrid& DPGrid);

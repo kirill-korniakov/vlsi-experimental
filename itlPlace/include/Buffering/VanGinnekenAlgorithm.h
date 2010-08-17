@@ -168,7 +168,7 @@ public:
   virtual void Initialize(bool isAgainInitialize = false);
 
   virtual int BufferingCriticalPath();
-  virtual VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true);
+  virtual VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true, AppCtx* context = NULL);
   virtual int SetBinTableBuffer(AppCtx* context);
 };
 

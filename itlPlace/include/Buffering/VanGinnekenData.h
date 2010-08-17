@@ -236,6 +236,8 @@ protected:
   double totalAreaOfBuffersInRelationToAllCells;
   double totalAreaCells;
   double totalAreaBuffer;
+  bool plotBuffer;
+  bool plotBinGridValue;
 
 public:
   HDesign& design;
@@ -281,6 +283,8 @@ public:
   double GetTotalAreaBuffer();
   bool GetIsBuffering();
   double GetPercentAreaComposeBuffers();
+  bool GetPlotBuffer();
+  bool GetPlotBinGridValue();
 
   void SetWirePhisics(HWirePhysicalParams& wPP);
   void SetBuffers(TemplateTypes<BufferInfo>::vector buf);
@@ -311,6 +315,8 @@ public:
   void SetTotalAreaCells();
   void AddAreaBuffer(double bA);
   void SetTotalAreaBuffer(double tAB);
+  void SetPlotBuffer(bool pB);
+  void SetPlotBinGridValue(bool pBGV);
 
 
 };

@@ -1234,6 +1234,8 @@ VGAlgorithmData::VGAlgorithmData(HDesign& hd, HVGAlgorithm* vGA): design(hd), Wi
   totalAreaOfBuffersInRelationToAllCells = 0;
   totalAreaCells = 0;
   totalAreaBuffer = 0;
+  plotBuffer = false;
+  plotBinGridValue = false;
 
 }
 
@@ -1273,7 +1275,9 @@ void VGAlgorithmData::Initialize()
   typeBuferAddition = design.cfg.ValueOf("TypeBuferAddition", 0);
   sizeBufferMultiplier = design.cfg.ValueOf("SizeBufferMultiplier", 1.0);
   isBufferingNetContainPrimaryPin = design.cfg.ValueOf("IsBufferingNetContainPrimaryPin", false);
-  totalAreaOfBuffersInRelationToAllCells = design.cfg.ValueOf("TotalAreaOfBuffersInRelationToAllCells", 0.0);;
+  totalAreaOfBuffersInRelationToAllCells = design.cfg.ValueOf("TotalAreaOfBuffersInRelationToAllCells", 0.0);
+  plotBuffer = design.cfg.ValueOf("PlotBuffer", false);
+  plotBinGridValue = design.cfg.ValueOf("PlotBinGridValue", false);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;
@@ -1493,6 +1497,15 @@ double VGAlgorithmData::GetPercentAreaComposeBuffers()
   return totalAreaBuffer / totalAreaCells * 100.0;
 }
 
+bool VGAlgorithmData::GetPlotBuffer()
+{
+  return plotBuffer;
+}
+bool VGAlgorithmData::GetPlotBinGridValue()
+{
+  return plotBinGridValue;
+}
+
 void VGAlgorithmData::SetWirePhisics(HWirePhysicalParams& wPP)
 {
   WirePhisics = wPP;
@@ -1639,4 +1652,13 @@ void VGAlgorithmData::SetTotalAreaBuffer(double tAB)
   totalAreaBuffer = tAB;
 }
 
+void VGAlgorithmData::SetPlotBuffer(bool pB)
+{
+  plotBuffer = pB;
+}
+
+void VGAlgorithmData::SetPlotBinGridValue(bool pBGV)
+{
+  plotBinGridValue = pBGV;
+}
 //VGAlgorithmData

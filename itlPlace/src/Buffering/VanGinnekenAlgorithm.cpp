@@ -63,6 +63,9 @@ int HVGAlgorithm::BufferingCriticalPath()
   if (data->design.CriticalPaths.Count() < 0)
     FindCriticalPaths(data->design);
 
+  if (data->GetPlotBuffer())
+    data->design.Plotter.ShowPlacement();
+
   std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
   int idx = 0;
 
@@ -71,7 +74,6 @@ int HVGAlgorithm::BufferingCriticalPath()
   //design.Plotter.PlotSteinerForest(Color_Black);
 
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
-
   int bufferCount = 0;
   ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
   for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
@@ -112,13 +114,17 @@ int HVGAlgorithm::BufferingCriticalPath()
     }
     //ALERT("CriticalPaths id = %d", j);
   }
+  if (data->GetPlotBuffer())
+  {
+    data->design.Plotter.Refresh(HPlotter::WaitTime(data->GetPlotterWaitTime()));
+    data->design.Plotter.ShowPlacement();
+  }
   ALERT("Buffers inserted: %d", bufferCount);
-  if (data->GetTotalAreaOfBuffersInRelationToAllCells() != 0)
-    ALERT("Percent area compose buffers = %f", data->GetPercentAreaComposeBuffers());
+  ALERT("Percent area compose buffers = %f", data->GetPercentAreaComposeBuffers());
   return bufferCount;
 }
 
-VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering)
+VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering, AppCtx* context)
 {
   if (!isInitialize)   Initialize();
 
@@ -132,7 +138,7 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
 
   data->vGTree->UpdateTree(data->design.SteinerPoints[(net, data->design).Source()]);
   //  treeRepository.CreateVGTree(net);
-  //printf("TreeSize = %d\n",vGTree->GetTreeSize());
+  //ALERT("TreeSize = %d",data->vGTree->GetTreeSize());
   if ((data->GetPlotSteinerPoint()) || (data->GetPlotNets()))
   {
     data->design.Plotter.ShowNetSteinerTree(net, Color_Black, true, 
@@ -152,22 +158,25 @@ VGVariantsListElement HVGAlgorithm::BufferingNen(HNet& net, bool isRealBuffering
   if (bufCount > 0)
   {
     TemplateTypes<NewBuffer>::list newBuffer;
-    if (data->GetTotalAreaOfBuffersInRelationToAllCells() != 0)
-      for (TemplateTypes<BufferPositions>::list::iterator pos = best.GetBufferPosition()->begin(); 
-        pos != best.GetBufferPosition()->end(); ++pos)
+    for (TemplateTypes<BufferPositions>::list::iterator pos = best.GetBufferPosition()->begin(); 
+      pos != best.GetBufferPosition()->end(); ++pos)
+    {
+      data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
+      if (data->GetPlotBuffer())
       {
-        data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
+         data->design.Plotter.PlotFilledRectangle(pos->GetPosition()->GetX(), pos->GetPosition()->GetY(), data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red);
       }
+    }
 
-      if (isRealBuffering)
-      {
-        HNet* newNet = new HNet[bufCount + 1];
-        additionNewElement->InsertsBuffer(newBuffer, &best);
-        newBuffer.sort();
-        //ALERT("name = %s", (net, design).Name().c_str());
-        additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource().GetLeft());
-        delete [] newNet;
-      }
+    if (isRealBuffering)
+    {
+      HNet* newNet = new HNet[bufCount + 1];
+      additionNewElement->InsertsBuffer(newBuffer, &best);
+      newBuffer.sort();
+      //ALERT("name = %s", (net, design).Name().c_str());
+      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource().GetLeft());
+      delete [] newNet;
+    }
   }
 
   if ((data->GetPlotSteinerPoint()) || (data->GetPlotVGTree()) || (data->GetPlotNets()))
@@ -183,8 +192,8 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
   double width = context->sprData.binGrid.binWidth;
   double height = context->sprData.binGrid.binHeight;
 
-  double binX = context->sprData.binGrid.bins[colIdx][rowIdx].xCoord - width / 2.0;
-  double binY = context->sprData.binGrid.bins[colIdx][rowIdx].yCoord - height / 2.0;
+  double binX = context->sprData.binGrid.bins[rowIdx][colIdx].xCoord - width / 2.0;
+  double binY = context->sprData.binGrid.bins[rowIdx][colIdx].yCoord - height / 2.0;
 
   double binX2 = binX + context->sprData.binGrid.binWidth;
   double binY2 = binY + context->sprData.binGrid.binHeight;
@@ -204,34 +213,45 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
   double xSize = 0;
   double ySize = 0;
 
+  bool isXVisit = false, isYVisit = false;
+
   if (x > binX) 
   {
     if (x > binX2)
+    {
       xSize = 0;
+    }
+    else
     {
       if (x2 < binX2)
       {
         xSize = bufWidth;
+        isXVisit = true;
       }
       else
       {
         xSize = binX2 - x;
+        isXVisit = true;
       }
     }
   }
   else
   {
     if (x2 < binX)
+    {
       xSize = 0;
+    }
     else
     {
       if (x2 < binX2)
       {
         xSize = x2 - binX;
+        isXVisit = true;
       }
       else
       {
         xSize = width;
+        isXVisit = true;
       }
     }
   }
@@ -240,14 +260,17 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
   {
     if (y > binY2)
       ySize = 0;
+    else
     {
       if (y2 < binY2)
       {
         ySize = bufHeight;
+        isYVisit = true;
       }
       else
       {
         ySize = binY2 - y;
+        isYVisit = true;
       }
     }
   }
@@ -260,16 +283,20 @@ double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& 
       if (y2 < binY2)
       {
         ySize = y2 - binY;
+        isYVisit = true;
       }
       else
       {
         ySize = height;
+        isYVisit = true;
       }
     }
   }
-
+  
+  //if (isXVisit && isYVisit)
+  //  ALERT("nrowIdx = %d\tcolIdx= %d", rowIdx, colIdx);
   double sizeBufferMultiplier = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->GetSizeBufferMultiplier();
-  return int (fabs(xSize * ySize * sizeBufferMultiplier));
+  return (xSize * ySize * sizeBufferMultiplier);
 }
 
 int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
@@ -278,24 +305,20 @@ int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVaria
   for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); 
     pos != vGVariant.GetBufferPosition()->end(); ++pos)
   {
-    double currBufferTotalPotential = 0;
-    int min_row, min_col, max_row, max_col; // area affected by cluster potential
-    DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, pos->GetPosition()->GetX(), pos->GetPosition()->GetY(), context);
-
-    for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+    for (int rowIdx = 0; rowIdx < context->sprData.binGrid.nBinRows; rowIdx++)
     {
-      for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
+      for (int colIdx = 0; colIdx < context->sprData.binGrid.nBinCols; colIdx++)
       {
+        context->sprData.bufferPotentialOverBins[rowIdx][colIdx] = 0;
         double bsf = CalcBufferArea(context, colIdx, rowIdx, *pos);
         context->sprData.bufferPotentialOverBins[rowIdx][colIdx] = bsf;
-        currBufferTotalPotential = bsf;
       }
     }// loop over affected bins
 
 
-    for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+    for (int rowIdx = 0; rowIdx < context->sprData.binGrid.nBinRows; rowIdx++)
     {
-      for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
+      for (int colIdx = 0; colIdx < context->sprData.binGrid.nBinCols; colIdx++)
       {
         context->sprData.binGrid.bins[rowIdx][colIdx].sumBufPotential += 
           context->sprData.bufferPotentialOverBins[rowIdx][colIdx];
@@ -316,7 +339,10 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
   //ALERT("context->sprData.binGrid.binHeight = %f",context->sprData.binGrid.binHeight);
   if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
     data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
-      data->GetSizeBuffer()) / 100.0, 1.0));
+    data->GetSizeBuffer()) / 100.0, 1.0));
+
+  if (data->GetPlotBuffer() || data->GetPlotBinGridValue())
+    data->design.Plotter.ShowPlacement();
   //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
   ALERT("NewSizeBufferMultiplier = %f", data->GetSizeBufferMultiplier());
   int tuyu = data->design.CriticalPaths.Count();
@@ -367,7 +393,7 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
             if (!data->GetIsBuffering())
               continue;               
 
-            bufferCount += UpdateBinTable(context, BufferingNen(net, false));
+            bufferCount += UpdateBinTable(context, BufferingNen(net, false, context));
 
           }
         }
@@ -377,10 +403,17 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
     }
     //ALERT("CriticalPaths id = %d", j);
   }
+  if (data->GetPlotBinGridValue())
+    data->design.Plotter.PlotFillBinGrid(context);
+  if (data->GetPlotBuffer() || data->GetPlotBinGridValue())
+  {
+    data->design.Plotter.Refresh(HPlotter::WaitTime(data->GetPlotterWaitTime()));
+    data->design.Plotter.ShowPlacement();
+  }
 
   ALERT("Buffers inserted: %d", bufferCount);
   STA(data->design);
-  data->design.Plotter.ShowFillBinGrid(context);
+  //data->design.Plotter.ShowFillBinGrid(context);
   return bufferCount;
 }
 

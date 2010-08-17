@@ -529,39 +529,29 @@ void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
 }
 void HPlotter::PlotFillBinGrid(AppCtx* context)
 {
-
-  /*
-  CvPoint start, finish;
-  start.x = DesignX2ImageX(x1);
-  start.y = DesignY2ImageY(y1);
-  finish.x = DesignX2ImageX(x2);
-  finish.y = DesignY2ImageY(y2);
-  cvRectangle(IMG, start, finish, GetCvColor(col), 1);
-  */
-
-  if (IsEnabled())
+  if (!IsEnabled())
     return;
 
   CvPoint start, finish;
-  CvScalar color;
 
-  for (int i = 0; i < context->sprData.binGrid.nBinRows; i++)
-    for (int j = 0; j < context->sprData.binGrid.nBinCols; j++)
+  start.x = DesignX2ImageX(0);
+  start.y = DesignY2ImageY(0);
+  finish.x = 0;
+  finish.y = 0;
+
+
+  for (int i = 0; i < context->sprData.binGrid.nBinCols; i++)
+    for (int j = 0; j < context->sprData.binGrid.nBinRows; j++)
     {
-      start.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord);
-      start.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord);
-      finish.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth);
-      finish.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight);
-      /*color.val[0] = context->sprData.binGrid.bins[i][j].sumPotential;
-      color.val[1] = 0;
-      color.val[2] = 0;
-      color.val[3] = 0;*/
-      color = cvColorToScalar(context->sprData.binGrid.bins[i][j].sumPotential, 1);
-      //cvRectangle(IMG, start, finish, color, 10);
       char str[255];
-      sprintf(str, "%.1f", context->sprData.binGrid.bins[i][j].sumPotential);
-      PlotTextInPoint(string(str), context->sprData.binGrid.bins[i][j].xCoord, context->sprData.binGrid.bins[i][j].yCoord, 0.5);
+      sprintf(str, "%.1f  %d  %d", context->sprData.binGrid.bins[i][j].sumBufPotential, i, j);
+      PlotTextInPoint(string(str), context->sprData.binGrid.bins[i][j].xCoord, context->sprData.binGrid.bins[i][j].yCoord, 0.3);
+      start.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.0);
+      start.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord - context->sprData.binGrid.binHeight / 2.0);
+      finish.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth / 2.0);
+      finish.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight / 2.0);
 
+      cvRectangle(IMG, start, finish, GetCvColor(Color_Red), 2);
     }
 }
 
@@ -856,7 +846,7 @@ void HPlotter::PlotTextInPoint(string text, double x, double y, double textSize 
 
       CvPoint point;
       point.x = DesignX2ImageX(x);
-      point.y = DesignY2ImageY(y) - int(30 * t * textSize);
+      point.y = DesignY2ImageY(y);
       cvPutText(IMG, str, point, &font, GetCvColor(Color_Black));
       start = i+1;
       t++;
@@ -931,6 +921,32 @@ void HPlotter::PlotLine(double x1, double y1, double x2, double y2, Color col)
     finish.x = DesignX2ImageX(x2);
     finish.y = DesignY2ImageY(y2);
     cvLine(IMG, start, finish, GetCvColor(col), 1);
+  }
+}
+
+void HPlotter::PlotFilledRectangle(double x, double y, double width, double height, Color col)
+{
+  if (!IsEnabled())
+    return;
+
+  CvPoint start, finish;
+  CvScalar cellBorderColor = cvScalar(255.0, 0.0, 0.0);
+
+  //draw border of cells
+  start.x = DesignX2ImageX(x);
+  start.y = DesignY2ImageY(y);
+  finish.x = DesignX2ImageX(x + width);
+  finish.y = DesignY2ImageY(y + height);
+
+  cvRectangle(IMG, start, finish, cellBorderColor);
+
+//  fill the cell
+  start.x++; start.y++;
+  finish.x--; finish.y--;
+  CvScalar fillColor = GetCvColor(col);
+  if (start.x <= finish.x && start.y <= finish.y)
+  {
+    cvRectangle(IMG, start, finish, fillColor, CV_FILLED);
   }
 }
 

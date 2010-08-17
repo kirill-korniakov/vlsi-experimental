@@ -111,7 +111,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
       binGrid.bins[i][j].yCoord = (i + 0.5) * binGrid.binHeight;
     }
   }
-  //set coordinates of bins from lower and upper border
+  /*//set coordinates of bins from lower and upper border
   for (int j = 0; j < binGrid.nBinCols; ++j)
   {
     binGrid.bins[0][j].yCoord = 0.0;
@@ -122,7 +122,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
   {
     binGrid.bins[i][0].xCoord = 0.0;
     binGrid.bins[i][binGrid.nBinCols-1].xCoord = binGrid.binWidth * binGrid.nBinCols;
-  }
+  }*/
 
   binGrid.nBins = binGrid.nBinCols * binGrid.nBinRows;
 
