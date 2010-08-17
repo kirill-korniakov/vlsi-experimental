@@ -410,8 +410,6 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         //hd.VGAlgorithm.Initialize();
         //hd.VGAlgorithm.BufferingCriticalPath();
         STA(hd);
-        ALERT("No wire STA:");
-        NoWireDelaySTA(hd);
         ALERT("NEW BUFFERING FINISHED");
         WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");
 
@@ -429,10 +427,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
             WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
 
-        //DoSTAIfCan(hd);
-        STA(hd);
-        ALERT("No wire STA:");
-        NoWireDelaySTA(hd);
+        DoSTAIfCan(hd);
+
     }
 
     FlowMetricsTableAddBorder(flowMetrics, hd);
