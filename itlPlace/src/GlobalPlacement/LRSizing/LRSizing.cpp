@@ -9,6 +9,11 @@
 #define DOUBLE_ACCURACY 1e-9
 #define errorBoundForLDP 0.01
 
+//TODO: function for cell family name
+//TODO: class CellFamily 
+//TODO: GetCellFamilyRC()
+//TODO: 
+
 void LRSizer::ApplySizing(std::vector<double>& X)
 {
   ASSERT(cells->size()==X.size());
@@ -19,6 +24,8 @@ void LRSizer::ApplySizing(std::vector<double>& X)
   {
     HMacroType cellToType=roundCellToTypeFromLib(*cellFrom, *currentX);
     (*cellFrom, design).SetType(cellToType);
+	(*cellFrom, design).SetHeight(design.GetDouble<HMacroType::SizeY>(cellToType));
+	(*cellFrom, design).SetWidth(design.GetDouble<HMacroType::SizeX>(cellToType));
 
     cellFrom++;
     currentX++;
@@ -79,7 +86,7 @@ void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double
           if(pinE.Name() == pinName)
           {
             C.push_back(Utils::GetSinkCapacitance(design, pinE, SignalDirection_None));
-            X.push_back(macroTypeE.SizeX()); //TODO: Check, what is it!!
+            X.push_back(macroTypeE.SizeX()); 
             break;
           }
         }
@@ -111,7 +118,7 @@ void LRSizer::getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double
           if(pinE.Name() == pinName)
           {
             R.push_back(Utils::GetDriverWorstPhisics(design, pinE, SignalDirection_None).R);
-            X.push_back(macroTypeE.SizeX()); //TODO: Check, what is it!!
+            X.push_back(macroTypeE.SizeX());
             break;
           }
         }
@@ -146,6 +153,7 @@ int LRSizer::CountLeftArcs(HDesign& design, HPin pin)
 
 LRSizer::LRSizer(HDesign& hd): design(hd), LambdaIn(0)
 {
+	//R = r*x+f
   size = design._Design.NetList.nPinsLimit;
   ::Grow(&LambdaIn, 0, size);
 
@@ -351,7 +359,9 @@ double LRSizer::GetObservedC( HTimingPoint tp,std::vector<double>& vX )
       HCell cell = sink.Cell();
       int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
       sum=sum+(regressionC->getValue(vX[index])) /* +f */-(sink.Type(),design).Capacitance();
-      //sum += 0 /*c*x_sink+f*/ - (sink.Type(),design).Capacitance();//TODO: implement formulas// убрать "-"?
+	  double cSink = Utils::GetSinkCapacitance(design, sink.Type(), SignalDirection_None);
+      //sum += 0 /*c*x_sink+f*/ - cSink;//TODO: implement formulas// убрать "-"?
+	  double rWire = design.RoutingLayers.Physics.RPerDist;
     }
     return sum;
   }
