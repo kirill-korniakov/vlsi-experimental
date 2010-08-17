@@ -50,22 +50,41 @@ void ApplyWeights(AppCtx* context)
     }
 }
 
-void UpdateWeights(HDesign& hd, AppCtx& context)
+void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA)
 {
-    if (context.useLR)
+    string objective = hd.cfg.ValueOf("params.objective");
+
+    if (objective == "LSE")
+    {
+        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
+        context.weights.sprW *= sprUpdateMultiplier;
+    }
+    else if (objective == "LR")
     {
         context.LRdata.UpdateMultipliers(hd);
 
         double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 1.0);
         double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
+
+        double initialLHPWL = QA->GetInitialMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
+        double currentLHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
+        double currentHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWL);
         
-        context.weights.lseW *= lseUpdateMultiplier;
-        context.weights.sprW *= sprUpdateMultiplier;
-    }
-    else
-    {
-        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
-        context.weights.sprW *= sprUpdateMultiplier;
+        //update LSE weight
+        double lseRatio = currentLHPWL / initialLHPWL;
+        double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
+        if (lseRatio > lseDesiredRatio)
+            context.weights.lseW *= lseUpdateMultiplier;
+        else
+            context.weights.lseW /= lseUpdateMultiplier;
+        
+        //update spreading weight
+        double sprRatio = currentLHPWL / currentHPWL;
+        double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
+        if (sprRatio > sprDesiredRatio)
+            context.weights.sprW *= sprUpdateMultiplier;
+        else
+            context.weights.sprW /= sprUpdateMultiplier;
     }
 }
 

@@ -303,7 +303,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     {
         ConfigContext ctx = hd.cfg.OpenContext("MacroLoop");
         PlacementQualityAnalyzer QA = PlacementQualityAnalyzer(hd, hd.cfg.ValueOf(".QAcriteria",
-            PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricTNSleg)));
+            PlacementQualityAnalyzer::GetMetricName(PlacementQualityAnalyzer::MetricTNSleg)));
 
         for (int i = 0; i < hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0); i++)
         {

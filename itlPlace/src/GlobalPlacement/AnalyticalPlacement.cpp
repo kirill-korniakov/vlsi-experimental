@@ -490,7 +490,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValues.objective, g, &context);
 
         QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
-            PlacementQualityAnalyzer::GetMetric(PlacementQualityAnalyzer::MetricHPWLleg)));
+            PlacementQualityAnalyzer::GetMetricName(PlacementQualityAnalyzer::MetricHPWLleg)));
         QA->AnalyzeQuality(0, &context.criteriaValues);
     }
 
@@ -517,8 +517,6 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             UpdateCellsCoordinates(hd, ci);
         }
 
-        UpdateWeights(hd, context);
-        
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
           ALERT("NEW BUFFERING STARTED");
@@ -534,6 +532,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
+
+        UpdateWeights(hd, context, QA);
 
         iteration++;
     }

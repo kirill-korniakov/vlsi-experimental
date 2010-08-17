@@ -53,13 +53,14 @@ private:
     {
         int id;
         double metrics[__MetricsNum];
+        static const int DUMMY_VALUE = -1;
 
         PlacementQuality()
         {
             id = 0;
             for (int i = 0; i < __MetricsNum; i++)
             {
-                metrics[i] = 0.0;
+                metrics[i] = DUMMY_VALUE;
             }
         }
 
@@ -86,8 +87,9 @@ private:
     static MetricInfo metricsInfo[];
 
 public:
-    static QualityMetrics GetMetric(const string& metric);
-    static const char* GetMetric(QualityMetrics metric);
+    static QualityMetrics GetMetricEnum(const string& metric);
+    static const char* GetMetricName(QualityMetrics metric);
+    
     void ReorderColumns();
 
     PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod);
@@ -95,9 +97,11 @@ public:
     ~PlacementQualityAnalyzer();
 
     void AnalyzeQuality(int id, CriteriaValues* criteriaValues = 0, double improvementTreshold = 0.0);
+    double GetInitialMetricValue(QualityMetrics metric);
+    double GetCurrentMetricValue(QualityMetrics metric);
 
-    void PrintMajorCriteria(double improvement);
-    void PrintAllCriterias(PlacementQualityAnalyzer::PlacementQuality &pq);
+    void ReportMajorCriteria(double improvement);
+    void ReportAllCriterias(PlacementQualityAnalyzer::PlacementQuality& pq);
 
     void Report();
 

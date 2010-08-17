@@ -23,7 +23,6 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
 {
     this->mus = mus;
 
-    WRITELINE("");
     bool verbose = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.verbose", false);
     if (verbose)
     {
@@ -34,7 +33,6 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
         //ReportMus(design);
         ReportMuHistogram(design);
     }
-    WRITELINE("");
 
     design.Plotter.ClearHistogram();
     string order = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.order", "CriticalPath");
@@ -132,7 +130,6 @@ void MuReporter::ReportMuHistogram(HDesign& design)
 
     tf.Print();
 
-    WRITELINE("");
     WRITELINE("");
 }
 

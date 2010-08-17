@@ -408,6 +408,7 @@ void TimingPointMus::UpdateLocalMuR(HDesign& design, double theta)
 
 void TimingPointMus::UpdateMus(HDesign& design)
 {
+    WRITELINE("");
     ALERT("Mu Updating");
     
     nIncreased = 0;
@@ -425,7 +426,7 @@ void TimingPointMus::UpdateMus(HDesign& design)
     //reporter->Report(design, this, "UpdateLocalMuR");
 
     EnforceFlowProperty(design);
-    reporter->Report(design, this, "UPDATED MUS");
+    reporter->Report(design, this/*, "UPDATED MUS"*/);
 
     ALERT("  Total: %d", nIncreased + nDecreased);
     ALERT("  Increased: %d", nIncreased);
