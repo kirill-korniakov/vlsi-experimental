@@ -85,7 +85,6 @@ bool DoRandomPlacementIfRequired(HDesign& hd, const char* cfgOptName)
 
 bool DoGlobalPlacementIfRequired(HDesign& hd, const char* cfgOptName)
 {
-    //GLOBAL PLACEMENT
     if (hd.cfg.ValueOf(cfgOptName, false))
     {
         GlobalPlacement(hd, hd.cfg.ValueOf("params.objective"));
@@ -100,16 +99,18 @@ bool DoGlobalPlacementIfRequired(HDesign& hd, const char* cfgOptName)
 
 bool DoLRTimingDrivenPlacementIfRequired(HDesign& hd, const char* cfgOptName)
 {
-    //LR-TDP
     if (hd.cfg.ValueOf(cfgOptName, false))
     {
         GlobalPlacement(hd, "LR");
 
         WRITELINE("");
-        if (hd.CanDoTiming()) ALERT("STA after LR placement:");
-        STA(hd);
-        ALERT("No wire STA:");
-        NoWireDelaySTA(hd);
+        if (hd.CanDoTiming())
+        {
+            //ALERT("No wire STA:");
+            //NoWireDelaySTA(hd);
+            ALERT("STA after LR placement:");
+            STA(hd);
+        }
         return true;
     }
     return false;
@@ -117,16 +118,18 @@ bool DoLRTimingDrivenPlacementIfRequired(HDesign& hd, const char* cfgOptName)
 
 bool DoLegalizationIfRequired(HDPGrid& grid, const char* cfgOptName)
 {
-    //LEGALIZATION
     if (grid.Design().cfg.ValueOf(cfgOptName, false))
     {
         Legalization(grid);
 
         WRITELINE("");
-        if (grid.Design().CanDoTiming()) ALERT("STA after legalization:");
-        STA(grid.Design());
-        ALERT("No wire STA:");
-        NoWireDelaySTA(grid.Design());
+        if (grid.Design().CanDoTiming()) 
+        {
+            //ALERT("No wire STA:");
+            //NoWireDelaySTA(grid.Design());
+            ALERT("STA after legalization:");
+            STA(grid.Design());            
+        }
         return true;
     }
     return false;
