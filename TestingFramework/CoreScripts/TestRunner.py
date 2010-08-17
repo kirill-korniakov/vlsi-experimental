@@ -73,7 +73,7 @@ class TestRunner:
             t_start = time.time()
             seconds_passed = 0
 
-            while(not p.poll() and seconds_passed < params.maxTimeForBenchmark):
+            while(not p.poll() and seconds_passed < self.parameters.maxTimeForBenchmark):
                 seconds_passed = time.time() - t_start
 
             retcode = p.poll()
