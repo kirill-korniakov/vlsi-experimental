@@ -82,6 +82,6 @@ void AddSumOfDelaysGradient(AppCtx* context, PetscScalar* coordinates, PetscScal
 
 void SOD_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
 {
-  context->criteriaValues.sod += SumOfDelays(context, solution);;
+  context->criteriaValues.sod = SumOfDelays(context, solution);;
   AddSumOfDelaysGradient(context, solution, context->criteriaValues.gSOD);
 }

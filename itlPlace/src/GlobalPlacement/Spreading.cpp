@@ -332,7 +332,7 @@ void AddSpreadingPenaltyGradient(AppCtx* context, PetscScalar* x, PetscScalar* g
 void QS_AddObjectiveAndGradient(AppCtx* context, PetscScalar * solution)
 {
     timetype start = GET_TIME_METHOD();
-    context->criteriaValues.spr += SpreadingPenalty(context, solution);
+    context->criteriaValues.spr = SpreadingPenalty(context, solution);
     timetype finish = GET_TIME_METHOD();
     quadraticSpreading += finish - start;
 

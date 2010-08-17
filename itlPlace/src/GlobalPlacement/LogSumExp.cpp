@@ -202,7 +202,7 @@ void LSE_AddObjectiveAndGradient(AppCtx* context, PetscScalar* solution)
   timetype finish;
 
   start = GET_TIME_METHOD();
-  context->criteriaValues.lse += LogSumExp(context, solution);
+  context->criteriaValues.lse = LogSumExp(context, solution);
   //ALERT("LSE = %f", addValue));
   finish = GET_TIME_METHOD();
   lseTime += finish - start;

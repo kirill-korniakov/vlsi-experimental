@@ -119,7 +119,7 @@ void LR(AppCtx* context, PetscScalar* solution)
         termTNS += braces * LSE + greenTerm;
     }
 
-    context->criteriaValues.lr += termTNS;
+    context->criteriaValues.lr = termTNS;
 }
 
 void GetNetDerivative(AppCtx* context, int clusterIdx, int j, PetscScalar* solution, int idxInSolutionVector)
