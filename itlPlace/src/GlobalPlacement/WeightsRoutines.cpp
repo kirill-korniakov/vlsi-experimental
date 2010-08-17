@@ -50,41 +50,46 @@ void ApplyWeights(AppCtx* context)
     }
 }
 
+double GetMultiplierAccordingDesiredRatio(double ratio, double desiredRatio, double multiplier)
+{
+    if (ratio > desiredRatio)
+        return multiplier;
+    else
+        return 1.0/multiplier;
+}
+
+double ChooseSpreadingMultiplier(HDesign& hd, double currentHPWL, double currentLHPWL)
+{
+    double sprRatio = currentLHPWL / currentHPWL;
+    double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
+    double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
+
+    return GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
+}
+
+double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL)
+{
+    double lseRatio = currentLHPWL / initialLHPWL;
+    double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
+    double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
+
+    return GetMultiplierAccordingDesiredRatio(lseRatio, lseDesiredRatio, lseUpdateMultiplier);
+}
+
 void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA)
 {
     string objective = hd.cfg.ValueOf("params.objective");
 
-    if (objective == "LSE")
-    {
-        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
-        context.weights.sprW *= sprUpdateMultiplier;
-    }
-    else if (objective == "LR")
-    {
-        context.LRdata.UpdateMultipliers(hd);
+    double initialLHPWL = QA->GetInitialMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
+    double currentLHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
+    double currentHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWL);
+    
+    context.weights.sprW *= ChooseSpreadingMultiplier(hd, currentHPWL, currentLHPWL);
 
-        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 1.0);
-        double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
-
-        double initialLHPWL = QA->GetInitialMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
-        double currentLHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
-        double currentHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWL);
-        
-        //update LSE weight
-        double lseRatio = currentLHPWL / initialLHPWL;
-        double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
-        if (lseRatio > lseDesiredRatio)
-            context.weights.lseW *= lseUpdateMultiplier;
-        else
-            context.weights.lseW /= lseUpdateMultiplier;
-        
-        //update spreading weight
-        double sprRatio = currentLHPWL / currentHPWL;
-        double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
-        if (sprRatio > sprDesiredRatio)
-            context.weights.sprW *= sprUpdateMultiplier;
-        else
-            context.weights.sprW /= sprUpdateMultiplier;
+    if (objective == "LR")
+    {
+        context.LRdata.UpdateMultipliers(hd);        
+        context.weights.lseW *= ChooseLSEMultiplier(hd, currentLHPWL, initialLHPWL);
     }
 }
 

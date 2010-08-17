@@ -33,6 +33,14 @@ void PlacementQualityAnalyzer::ReorderColumns()
     metricsInfo[MetricObSOD].column = -1;
     metricsInfo[MetricTWL].column = -1;
     metricsInfo[MetricTWLleg].column = -1;
+
+    string objective = m_design.cfg.ValueOf("params.objective");
+
+    if (objective == "LSE")
+    {
+        metricsInfo[MetricObLR].column = -1;
+        metricsInfo[MetricGLR].column = -1;
+    }
 }
 
 void PlacementQualityAnalyzer::SaveCurrentPlacementAsBestAchieved()

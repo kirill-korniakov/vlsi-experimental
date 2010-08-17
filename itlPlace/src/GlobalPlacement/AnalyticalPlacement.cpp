@@ -163,27 +163,24 @@ void AnalyticalGlobalPlacement::SetVariablesValues(ClusteringInformation & ci, V
     SetKValues(ci, x);
 }
 
-void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx &context, Vec& xl, Vec& xu)
+void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci, AppCtx& context, Vec& xl, Vec& xu)
 {
     PetscScalar* initValues = new PetscScalar[context.nVariables];
     int* idxs = InitIdxs(context.nVariables, 0);
     int idx;
     int clusterIdx;
 
-    //HPlacementRows::EnumeratorW rIter = hd.PlacementRows.GetEnumeratorW();
-    //rIter.MoveNext();
-    double siteHeight2 = 0.0;//rIter.SiteHeight() * 0.5;
-    double siteWidth2 = 0.0;//rIter.SiteWidth() * 0.5;
+    double xMargin = context.sprData.binGrid.binWidth;
+    double yMargin = context.sprData.binGrid.binHeight;
 
     //TODO: change borders according cluster sizes, we have to calculate width
     //and height of each cluster and shift slightly borders for each cluster
-
     idx = 0;
     clusterIdx = -1;
     while (GetNextActiveClusterIdx(&ci, clusterIdx))
     {
-        initValues[2*idx+0] = hd.Circuit.PlacementMinX() + siteWidth2;
-        initValues[2*idx+1] = hd.Circuit.PlacementMinY() + siteHeight2;
+        initValues[2*idx+0] = hd.Circuit.PlacementMinX() + xMargin;
+        initValues[2*idx+1] = hd.Circuit.PlacementMinY() + yMargin;
         idx++;
     }
     for (int i = 2*idx; i < context.nVariables; i++)
@@ -196,8 +193,8 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
     clusterIdx = -1;
     while (GetNextActiveClusterIdx(&ci, clusterIdx))
     {
-        initValues[2*idx+0] = hd.Circuit.PlacementMaxX() - siteWidth2;
-        initValues[2*idx+1] = hd.Circuit.PlacementMaxY() - siteHeight2;
+        initValues[2*idx+0] = hd.Circuit.PlacementMaxX() - xMargin;
+        initValues[2*idx+1] = hd.Circuit.PlacementMaxY() - yMargin;
         idx++;
     }
     for (int i = 2*idx; i < context.nVariables; i++)
