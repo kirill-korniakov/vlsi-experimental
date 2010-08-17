@@ -277,3 +277,13 @@ double PlacementQualityAnalyzer::PlacementQuality::GetMetric(QualityMetrics qm)
     else
         return metrics[qm];
 }
+
+double PlacementQualityAnalyzer::GetBackHPWL()
+{
+  return m_experiments.back().GetMetric(QualityMetrics::MetricHPWL);
+}
+
+double PlacementQualityAnalyzer::GetBackLHPWL()
+{
+  return m_experiments.back().GetMetric(QualityMetrics::MetricHPWLleg);
+}

@@ -543,15 +543,18 @@ void HPlotter::PlotFillBinGrid(AppCtx* context)
   for (int i = 0; i < context->sprData.binGrid.nBinCols; i++)
     for (int j = 0; j < context->sprData.binGrid.nBinRows; j++)
     {
-      char str[255];
-      sprintf(str, "%.1f  %d  %d", context->sprData.binGrid.bins[i][j].sumBufPotential, i, j);
-      PlotTextInPoint(string(str), context->sprData.binGrid.bins[i][j].xCoord, context->sprData.binGrid.bins[i][j].yCoord, 0.3);
+      char str1[255], str2[255];
+      sprintf(str1, "%.1f", context->sprData.binGrid.bins[i][j].sumBufPotential);
+      sprintf(str2, "%.1f", context->sprData.binGrid.bins[i][j].sumPotential);
       start.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.0);
       start.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord - context->sprData.binGrid.binHeight / 2.0);
       finish.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth / 2.0);
       finish.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight / 2.0);
 
       cvRectangle(IMG, start, finish, GetCvColor(Color_Red), 2);
+      PlotTextInPoint(string(str1), context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.1, context->sprData.binGrid.bins[i][j].yCoord - context->sprData.binGrid.binHeight / 3.0, 0.3);
+      PlotTextInPoint(string(str2), context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.1, context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight / 3.0, 0.3);
+
     }
 }
 

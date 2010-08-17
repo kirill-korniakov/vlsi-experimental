@@ -111,6 +111,9 @@ public:
     int GetConvergeIterationsNumber();
     int GetNumIterationsWithoutGain() { return m_NumIterationsWithoutGain; }
     double GetLastIterationImprovement();
+    double GetBackHPWL(); 
+    double GetBackLHPWL();
+
 
 private:
     typedef TemplateTypes<PlacementQuality>::list QualityList;

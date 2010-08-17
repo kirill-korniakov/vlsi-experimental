@@ -328,7 +328,7 @@ int HVGAlgorithm::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVaria
   return vGVariant.GetPositionCount();
 }
 
-int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
+int HVGAlgorithm::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
 {
   if (!isInitialize)   Initialize();
   STA(data->design);
@@ -338,8 +338,9 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
   //ALERT("context->sprData.binGrid.binWidth = %f",context->sprData.binGrid.binWidth);
   //ALERT("context->sprData.binGrid.binHeight = %f",context->sprData.binGrid.binHeight);
   if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
-    data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
-    data->GetSizeBuffer()) / 100.0, 1.0));
+    /*data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
+    data->GetSizeBuffer()) / 100.0, 1.0));*/
+  data->SetSizeBufferMultiplier( (LHPWL - HPWL) / LHPWL);
 
   if (data->GetPlotBuffer() || data->GetPlotBinGridValue())
     data->design.Plotter.ShowPlacement();
@@ -394,7 +395,6 @@ int HVGAlgorithm::SetBinTableBuffer(AppCtx* context)
               continue;               
 
             bufferCount += UpdateBinTable(context, BufferingNen(net, false, context));
-
           }
         }
 

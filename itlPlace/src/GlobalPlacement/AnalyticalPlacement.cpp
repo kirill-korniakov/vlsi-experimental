@@ -523,9 +523,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
           ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
           HVGAlgorithm buf(hd);
           buf.Initialize();
-          buf.SetBinTableBuffer(&context);
+          buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
           ctx.Close();
-          ALERT("NEW BUFFERING FINISHED");
+          ALERT("NEW BUFFERING FINISHED");          
         }
 
         ReportPostIterationInfo(hd, context, metaIteration, iteration);

@@ -169,7 +169,7 @@ public:
 
   virtual int BufferingCriticalPath();
   virtual VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true, AppCtx* context = NULL);
-  virtual int SetBinTableBuffer(AppCtx* context);
+  virtual int SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL);
 };
 
 #endif //__VanGinnekenAlgorithm_H__
