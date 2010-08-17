@@ -3,6 +3,7 @@ class TestRunnerParameters:
     doBuild    = True
     doSendMail = True
 
+    maxTimeForBenchmark = 3600 #one hour
     experiments = []
 
 class EmailerParameters:

@@ -68,7 +68,20 @@ class TestRunner:
                 lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
                 params.append(lefFile)
 
-            subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+            #subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+            p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+            t_start = time.time()
+            seconds_passed = 0
+
+            while(not p.poll() and seconds_passed < params.maxTimeForBenchmark):
+                seconds_passed = time.time() - t_start
+
+            retcode = p.poll()
+
+            if (retcode == None):
+                print("Failed on " + benchmark)
+                p.terminate()
+
             fPlacerOutput.close()
             #print(benchmark + ' DONE')
             benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
