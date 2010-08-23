@@ -30,9 +30,16 @@ PlacementQualityAnalyzer::MetricInfo PlacementQualityAnalyzer::metricsInfo[] =
 
 void PlacementQualityAnalyzer::ReorderColumns()
 {
-    metricsInfo[MetricObSOD].column = -1;
-    metricsInfo[MetricTWL].column = -1;
-    metricsInfo[MetricTWLleg].column = -1;
+    //metricsInfo[MetricObSOD].column = -1;
+    //metricsInfo[MetricTWL].column = -1;
+    //metricsInfo[MetricTWLleg].column = -1;
+    int numberOfColumns = m_design.cfg.ValueOf("GlobalPlacement.PQAT.numberOfColumns");
+    for (int i = 0; i < numberOfColumns; i++)
+    {
+        string metricName = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns")[i];
+        int k = GetMetricEnum(metricName);
+        metricsInfo[k].column = i + 1;
+    }
 
     string objective = m_design.cfg.ValueOf("params.objective");
 
@@ -40,6 +47,16 @@ void PlacementQualityAnalyzer::ReorderColumns()
     {
         metricsInfo[MetricObLR].column = -1;
         metricsInfo[MetricGLR].column = -1;
+    }
+
+    string techname = m_design.cfg.ValueOf("params.techname");
+
+    if (techname == "ISPD")
+    {
+        metricsInfo[MetricTNS].column = -1;
+        metricsInfo[MetricTNSleg].column = -1;
+        metricsInfo[MetricWNS].column = -1;
+        metricsInfo[MetricWNSleg].column = -1;
     }
 }
 
@@ -246,18 +263,20 @@ void PlacementQualityAnalyzer::Report()
             tf.SetCell(metricsInfo[idx].column, i->metrics[idx]);
     }
 
-    tf.NewBorderRow();
-    tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
-
-    //TODO: implement disabling
-    QualityList::iterator initial = m_experiments.begin();
-    for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
+    if (m_design.cfg.ValueOf("GlobalPlacement.PQAT.showPercents", false))
     {
-        tf.NewRow();
-        tf.SetCell(0, i->id);
+        tf.NewBorderRow();
+        tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
 
-        for (int idx = 0; idx < __MetricsNum; idx++)
-            tf.SetCell(metricsInfo[idx].column, i->metrics[idx] / initial->metrics[idx] * 100);
+        QualityList::iterator initial = m_experiments.begin();
+        for(QualityList::iterator i = m_experiments.begin(); i != m_experiments.end(); ++i)
+        {
+            tf.NewRow();
+            tf.SetCell(0, i->id);
+
+            for (int idx = 0; idx < __MetricsNum; idx++)
+                tf.SetCell(metricsInfo[idx].column, i->metrics[idx] / initial->metrics[idx] * 100);
+        }
     }
 
     WRITELINE("");
