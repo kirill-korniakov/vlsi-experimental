@@ -18,6 +18,9 @@ class Experiment_HPWL(BaseExperiment):
         parser = LogParser(logName)
         HPWL = str(parser.GetFromPFST('DP', 'HPWL'))
 
+        if (HPWL == str(NOT_FOUND)):
+            return FAILED
+
         #print metrics
         table = open(reportTable, 'a')
         table.write('\n')
@@ -26,15 +29,17 @@ class Experiment_HPWL(BaseExperiment):
         print(printStr)
         table.write(printStr)
         table.close()
+        return OK
 
 def test():
     testRunner = TestRunner()
 
-    eISPD = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
-    eIWLS = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
-    #e = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
+    #eISPD = Experiment_HPWL('ISPD04 experiment', 'hpwl_ispd04.cfg', 'ISPD04.list')
+    #eIWLS = Experiment_HPWL('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list')
+    eIWLS = BaseExperiment('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', ['HPWL'], ['DP'])
+
     testRunner.parameters.experiments.append(eIWLS)
-    testRunner.parameters.experiments.append(eISPD)
+    #testRunner.parameters.experiments.append(eISPD)
 
     testRunner.Run()
 

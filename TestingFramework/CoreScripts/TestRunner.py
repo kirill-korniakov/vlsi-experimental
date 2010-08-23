@@ -16,9 +16,12 @@ from CoreFunctions import *
 import Parameters
 from Parameters import *
 
+import BaseExperiment
+from BaseExperiment import *
+
 class TestRunner:
     parameters = ''
-    experimentResult = 'Ok'
+    experimentResult = OK
     failedList = ''
     nOkBenchmarks      = 0
     nChangedBenchmarks = 0
@@ -55,7 +58,7 @@ class TestRunner:
         reportTable = reportCreator.GetReportTableName()
 
         experiment.CreateEmptyTable(reportTable)
-        self.experimentResult = 'Ok'
+        self.experimentResult = OK
 
         for benchmark in benchmarks:
             logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
@@ -86,14 +89,14 @@ class TestRunner:
             #print(benchmark + ' DONE')
             benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
-            if (benchmarkResult == 'Failed'):
-                self.experimentResult = 'Failed'
+            if (benchmarkResult == FAILED):
+                self.experimentResult = FAILED
                 self.failedList       += ' ' + benchmark + ';'
                 self.nFailedenchmarks += 1
 
             else:
-                if ((benchmarkResult == 'Changed') and (self.experimentResult != 'Failed')):
-                    self.experimentResult = 'Changed'
+                if ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED)):
+                    self.experimentResult = CHANGED
                     self.nChangedBenchmarks += 1
 
                 else:
@@ -123,7 +126,9 @@ class TestRunner:
             self.BuildSln(GeneralParameters.slnPath)
 
         for experiment in self.parameters.experiments:
-            self.experimentResult = 'Ok'
+            startTime = GetTimeStamp()
+            print('Start time: ' + startTime)
+            self.experimentResult = OK
             self.failedList = ''
             self.nOkBenchmarks      = 0
             self.nChangedBenchmarks = 0
@@ -139,19 +144,21 @@ class TestRunner:
             text += ', ' + os.path.basename(experiment.benchmarks) + ' ('
             nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedenchmarks
             text += str(nBenchmarks) + ' benchmark(s)):\n'
+            text += 'Start time: ' + startTime + '\n'
             text += 'Ok:      ' + str(self.nOkBenchmarks) + '\n'
             text += 'Changed: '   + str(self.nChangedBenchmarks) + '\n'
             text += 'Failed:  ' + str(self.nFailedenchmarks)
 
-            if (self.experimentResult == 'Failed'):
+            if (self.experimentResult == FAILED):
                text += ' (' + self.failedList + ')'
 
             text += '\n\n'
 
-            if (self.experimentResult == 'Changed'):
+            if (self.experimentResult == CHANGED):
                 attachmentFiles.append(reportTable)
             #emailer.SendResults(experiment, reportTable, self.experimentResult)
 
+        text += 'Finished at ' + GetTimeStamp()
         print(text)
         if (self.parameters.doSendMail == True):
             emailer.PrepareAndSendMail(subject, text, attachmentFiles)

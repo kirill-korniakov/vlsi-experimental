@@ -59,6 +59,7 @@ class LRPlacementChecker(Experiment_LR):
         table = open(reportTable, 'a')
         table.write(printStr.replace('.', ','))
         table.close()
+        return result
 
 def test():
     testRunner = TestRunner()
