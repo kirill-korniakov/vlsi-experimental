@@ -42,7 +42,6 @@ public:
 
         MetricInfo(int _column, string _Name, int _precision)
         {
-            //column = _column + 1;
             column = -1;
             Name = _Name;
             precision = _precision;

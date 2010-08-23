@@ -30,33 +30,12 @@ PlacementQualityAnalyzer::MetricInfo PlacementQualityAnalyzer::metricsInfo[] =
 
 void PlacementQualityAnalyzer::ReorderColumns()
 {
-    //metricsInfo[MetricObSOD].column = -1;
-    //metricsInfo[MetricTWL].column = -1;
-    //metricsInfo[MetricTWLleg].column = -1;
     int numberOfColumns = m_design.cfg.ValueOf("GlobalPlacement.PQAT.numberOfColumns");
     for (int i = 0; i < numberOfColumns; i++)
     {
         string metricName = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns")[i];
         int k = GetMetricEnum(metricName);
         metricsInfo[k].column = i + 1;
-    }
-
-    string objective = m_design.cfg.ValueOf("params.objective");
-
-    if (objective == "LSE")
-    {
-        metricsInfo[MetricObLR].column = -1;
-        metricsInfo[MetricGLR].column = -1;
-    }
-
-    string techname = m_design.cfg.ValueOf("params.techname");
-
-    if (techname == "ISPD")
-    {
-        metricsInfo[MetricTNS].column = -1;
-        metricsInfo[MetricTNSleg].column = -1;
-        metricsInfo[MetricWNS].column = -1;
-        metricsInfo[MetricWNSleg].column = -1;
     }
 }
 
