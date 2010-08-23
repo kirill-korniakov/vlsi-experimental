@@ -18,12 +18,12 @@ protected:
   int type; // тип звена: 0 - source; 1 - sink; 2 - точка ветвлени€; 3 - кандидат на вставку буфера; 
             //4 - кандидат на вставку буфера с координатоми совподающими с source или sink;
             //5 - кандидат на вставку буфера с координатой совподающей с внутреними точками дерева штейнера
- // (TO DO: ѕ–»ƒ”ћј“№ Ќќ–ћјЋ№Ќ”ё ‘ќ–ћ”Ћ»–ќ¬ ”)
+            // TODO: ѕ–»ƒ”ћј“№ Ќќ–ћјЋ№Ќ”ё ‘ќ–ћ”Ћ»–ќ¬ ”
 
+  int index;
   HSteinerPoint sPoint;
   VanGinnekenTreeNode* left;
   VanGinnekenTreeNode* right;
-  int index;
   VanGinnekenTree* tree;
 
 public:
@@ -39,10 +39,11 @@ public:
   HSteinerPoint GetSteinerPoint();  
   double GetX();
   double GetY();
+
+  int GetIndex();
   VanGinnekenTreeNode* GetLeft();
   VanGinnekenTreeNode* GetRight();
-  int GetIndex();
-  VanGinnekenTree* GetTree();
+  VanGinnekenTree* GetTree(); 
 
   double GetRAT();//RAT in sinc
   double GetC();//capacity in sinc
@@ -58,7 +59,6 @@ public:
   void SetTree(VanGinnekenTree* t);
 
   ~VanGinnekenTreeNode();
-
 };
 
 class VanGinnekenTree
@@ -72,9 +72,7 @@ protected:
   virtual void CreateTree() = 0;
   virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL) = 0;
 
-
 public:
-  //HDesign& design;
   HVGAlgorithm* vGAlgorithm;
   HDPGrid* DPGrid;
   VanGinnekenTreeNode* vGTree;
@@ -85,18 +83,13 @@ public:
   VanGinnekenTree(HVGAlgorithm* vGA, int partitionCount, double sizeBuffer);
   VanGinnekenTree(HVGAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
-  virtual void UpdateTree(HSteinerPoint& source);
-
-  virtual void SetEdgePartitionCount(int partitionCount);
-
-  virtual VanGinnekenTreeNode GetSource();
-  virtual double GetR();
-
   virtual void ClearTree();
-
+  virtual void UpdateTree(HSteinerPoint& source);
   virtual int GetTreeSize();
 
-
+  virtual double GetR();
+  virtual VanGinnekenTreeNode GetSource();
+  virtual void SetEdgePartitionCount(int partitionCount);
 };
 
 class VGTreeUniformDistribution: public VanGinnekenTree
@@ -148,6 +141,7 @@ protected:
   VanGinnekenTreeNode* position;
   BufferInfo* bufferInfo;
   int index;
+
 public:
   BufferPositions();
   BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
@@ -162,25 +156,24 @@ public:
   void SetPosition(VanGinnekenTreeNode* pos);
   void SetBufferInfo(BufferInfo* bufInfo);
   void SetIndex(int i);
+  
   ~BufferPositions()
   {
     position = NULL;
     bufferInfo = NULL;
-
   }
 };
 
 class VGVariantsListElement
 {
-
 protected:
   double RAT;
   double c;
   TemplateTypes<BufferPositions>::list bufferPositions;
   int positionCount;
   int index;
-public:
 
+public:
   VGVariantsListElement();
 
   bool operator > (VGVariantsListElement& element);
@@ -204,20 +197,22 @@ public:
   void SetRAT(double rat);
   void SetC(double capacity);
   void SetIndex(int i);
-
-
 };
 
 class VGAlgorithmData
 {
 protected:
-  int partitionCount;
+  bool printNetInfo;
+  bool printVariantsList;
+
   bool plotVGTree;
   bool plotNets;
-  bool printNetInfo;
   bool plotSteinerPoint;
-  bool printVariantsList;
   int plotterWaitTime;
+  bool plotBuffer;
+  bool plotBinGridValue;
+
+  int partitionCount;
   bool isInitialize;
   bool isInsertInSourceAndSink;
   int typeBufferingAlgorithm;
@@ -236,8 +231,6 @@ protected:
   double totalAreaOfBuffersInRelationToAllCells;
   double totalAreaCells;
   double totalAreaBuffer;
-  bool plotBuffer;
-  bool plotBinGridValue;
 
 public:
   HDesign& design;
@@ -250,6 +243,10 @@ public:
   VGAlgorithmData(HDesign& hd,  HVGAlgorithm* vGA);
   ~VGAlgorithmData();
   void Initialize();
+
+  void ReportParameters();
+  void ReportBufferInfo(BufferInfo buf);
+
   void LoadBuffers();
 
   HDesign& GetDesign();
@@ -317,7 +314,6 @@ public:
   void SetTotalAreaBuffer(double tAB);
   void SetPlotBuffer(bool pB);
   void SetPlotBinGridValue(bool pBGV);
-
-
 };
-#endif //__VanGinnekenData_H__
+
+#endif

@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cfg", "cfg", "{8528EEF8-E5D
 		..\bin\cfg\boris_hippocrate_ALL.cfg = ..\bin\cfg\boris_hippocrate_ALL.cfg
 		..\bin\cfg\hpwl_ispd04.cfg = ..\bin\cfg\hpwl_ispd04.cfg
 		..\bin\cfg\hpwl_iwls05.cfg = ..\bin\cfg\hpwl_iwls05.cfg
+		..\bin\cfg\JointPlacementBuffering.cfg = ..\bin\cfg\JointPlacementBuffering.cfg
 		..\bin\cfg\LR.cfg = ..\bin\cfg\LR.cfg
 		..\bin\cfg\New_buffering.cfg = ..\bin\cfg\New_buffering.cfg
 	EndProjectSection

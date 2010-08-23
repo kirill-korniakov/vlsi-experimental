@@ -13,20 +13,20 @@ void HPlotter::PlotCongestionMaps(HDPGrid& DPGrid)
 
     TileGrid tileGrid(nHorTiles, nVertTiles, DPGrid);   
 
-    DrawCongestionMap(DPGrid.Design(), tileGrid, nMaxLines);
+    PlotCongestionMap(DPGrid.Design(), tileGrid, nMaxLines);
     ALERT("press any key to continue...");
     _getch();
 
-    DrawPinDensity(DPGrid.Design(), tileGrid, nMaxPins);
+    PlotPinDensity(DPGrid.Design(), tileGrid, nMaxPins);
     ALERT("press any key to continue...");
     _getch();
 
-    DrawCriticalCongestionMap(DPGrid.Design(), tileGrid, nMaxCLines);
+    PlotCriticalCongestionMap(DPGrid.Design(), tileGrid, nMaxCLines);
     ALERT("press any key to continue...");
     _getch();
 }
 
-void HPlotter::DrawCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines)
+void HPlotter::PlotCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines)
 {
     tg.CalcLinesInTiles(hd);
 
@@ -38,12 +38,12 @@ void HPlotter::DrawCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines)
             double y1 = tg.tiles[i][j].GetY();
             double x2 = x1 + tg.tileWidth;
             double y2 = y1 + tg.tileHeight;
-            hd.Plotter.DrawTileWires(x1, y1, x2, y2, tg.tiles[i][j].GetNWires(), nMaxLines);
+            hd.Plotter.PlotTileWires(x1, y1, x2, y2, tg.tiles[i][j].GetNWires(), nMaxLines);
         }
     }
 }
 
-void HPlotter::DrawPinDensity(HDesign& hd, TileGrid& tg, int nMaxPins)
+void HPlotter::PlotPinDensity(HDesign& hd, TileGrid& tg, int nMaxPins)
 {
     //calculate number of pins in each tile
     for (HNets::ActiveNetsEnumeratorW curNet = hd.Nets.GetActiveNetsEnumeratorW(); curNet.MoveNext();)
@@ -64,12 +64,12 @@ void HPlotter::DrawPinDensity(HDesign& hd, TileGrid& tg, int nMaxPins)
             double y1 = tg.tiles[i][j].GetY();
             double x2 = x1 + tg.tileWidth;
             double y2 = y1 + tg.tileHeight;
-            hd.Plotter.DrawTilePins(x1, y1, x2, y2, tg.tiles[i][j].GetNPins(), nMaxPins);
+            hd.Plotter.PlotTilePins(x1, y1, x2, y2, tg.tiles[i][j].GetNPins(), nMaxPins);
         }
     }
 }
 
-void HPlotter::DrawCriticalCongestionMap(HDesign &hd, TileGrid& tg, int nMax—Lines)
+void HPlotter::PlotCriticalCongestionMap(HDesign &hd, TileGrid& tg, int nMax—Lines)
 {
     for (HCriticalPaths::EnumeratorW path = hd.CriticalPaths.GetEnumeratorW(); path.MoveNext();)
     {
@@ -121,7 +121,7 @@ void HPlotter::DrawCriticalCongestionMap(HDesign &hd, TileGrid& tg, int nMax—Lin
             double y1 = tg.tiles[i][j].GetY();
             double x2 = x1 + tg.tileWidth;
             double y2 = y1 + tg.tileHeight;
-            hd.Plotter.DrawTileWires(x1, y1, x2, y2, tg.tiles[i][j].GetNCriticalWires(),
+            hd.Plotter.PlotTileWires(x1, y1, x2, y2, tg.tiles[i][j].GetNCriticalWires(),
                 nMax—Lines);
         }
     }

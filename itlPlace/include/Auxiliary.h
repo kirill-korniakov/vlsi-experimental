@@ -6,7 +6,7 @@
 
 namespace Aux
 {
-  static const std::string SciFormat = "%.3e";
+  static const std::string SciFormat = "%.2e";
 
   string CreateCoolFileName(string dirName, string fileName, string extension);
   string IntToString(int intValue);

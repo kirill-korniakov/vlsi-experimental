@@ -1732,6 +1732,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Buffering\GPBuffering.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Buffering\NetInfo.cpp"
 					>
 				</File>
@@ -9900,7 +9904,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Plotter\Drawer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Plotter\HPlotter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Plotter\ImageSaver.cpp"
 					>
 				</File>
 				<File
@@ -9908,7 +9920,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Plotter\Plot.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Plotter\PlotterData.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Plotter\Show.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Plotter\VideoWriter.cpp"
 					>
 				</File>
 			</Filter>

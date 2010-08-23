@@ -162,14 +162,10 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
     BinGrid& binGrid = context->sprData.binGrid;
 
     //null the penalties
-    //context->hd->Plotter.ShowPlacement();
-    //context->hd->Plotter.PlotText("11111");
-    //context->hd->Plotter.ShowPlacement();
     double sum = 0;
     double sum2=0;
     if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
     {
-
         for (int i = 0; i < binGrid.nBinRows; ++i)
         {
             for (int j = 0; j < binGrid.nBinCols; ++j)
@@ -180,6 +176,7 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
         }
     }
     else
+    {
         for (int i = 0; i < binGrid.nBinRows; ++i)
         {
             for (int j = 0; j < binGrid.nBinCols; ++j)
@@ -187,77 +184,76 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
                 binGrid.bins[i][j].sumPotential = 0.0;
             }
         }
+    }
 
+    // each cell must have total potential equal to its area
+    // this variable are needed to control this issue
+    double currClusterTotalPotential = 0.0;
 
+    // we take every cluster and consider only bins 
+    // which are affected by this cluster potential
+    int idxInSolutionVector = 0;
+    int clusterIdx = -1;
+    int min_row, min_col, max_row, max_col; // area affected by cluster potential 
 
-        // each cell must have total potential equal to its area
-        // this variable are needed to control this issue
-        double currClusterTotalPotential = 0.0;
+    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+    {
+        idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
+        currClusterTotalPotential = 0.0;
 
-        // we take every cluster and consider only bins 
-        // which are affected by this cluster potential
-        int idxInSolutionVector = 0;
-        int clusterIdx = -1;
-        int min_row, min_col, max_row, max_col; // area affected by cluster potential 
+        DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
 
-        while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+        // loop over affected bins - now we just precalculate potential
+        // later we will scale it so that currClusterTotalPotential = cluster area
+        //#pragma omp parallel for reduction(+:currClusterTotalPotential)
+        for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
         {
-            idxInSolutionVector = context->clusterIdx2solutionIdxLUT[clusterIdx];
-            currClusterTotalPotential = 0.0;
-
-            DetermineBordersOfClusterPotential(min_col, max_col, min_row, max_row, x[2*idxInSolutionVector+0], x[2*idxInSolutionVector+1], context);
-
-            // loop over affected bins - now we just precalculate potential
-            // later we will scale it so that currClusterTotalPotential = cluster area
-            //#pragma omp parallel for reduction(+:currClusterTotalPotential)
-            for (int rowIdx = min_row; rowIdx <= max_row; ++rowIdx)
+            for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
             {
-                for (int colIdx = min_col; colIdx <= max_col; ++colIdx)
-                {
-                    double bsf = CalcBellShapedFunction(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x);
+                double bsf = CalcBellShapedFunction(context, idxInSolutionVector, clusterIdx, colIdx, rowIdx, x);
 
-                    context->sprData.clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = bsf;
-                    currClusterTotalPotential += bsf;
-                }
-            }// loop over affected bins
-
-            // scale the potential
-            if (currClusterTotalPotential != 0)
-            {
-                context->ci->clusters[clusterIdx].potentialMultiplier = 
-                    context->ci->clusters[clusterIdx].area / currClusterTotalPotential;
-            } 
-            else
-            {
-                context->ci->clusters[clusterIdx].potentialMultiplier = 0;
+                context->sprData.clusterPotentialOverBins[rowIdx-min_row][colIdx-min_col] = bsf;
+                currClusterTotalPotential += bsf;
             }
+        }// loop over affected bins
 
-            // add scaled cluster potential 
-            for (int k = min_row; k <= max_row; ++k)
-                for (int j = min_col; j <= max_col; ++j)
-                {
-                    binGrid.bins[k][j].sumPotential += 
-                        context->ci->clusters[clusterIdx].potentialMultiplier * 
-                        context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
-                    sum2 += context->ci->clusters[clusterIdx].potentialMultiplier * 
-                        context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
-                }
+        // scale the potential
+        if (currClusterTotalPotential != 0)
+        {
+            context->ci->clusters[clusterIdx].potentialMultiplier = 
+                context->ci->clusters[clusterIdx].area / currClusterTotalPotential;
+        } 
+        else
+        {
+            context->ci->clusters[clusterIdx].potentialMultiplier = 0;
         }
 
-        double totalPotential = 0.0;
-        for (int i = 0; i < binGrid.nBinRows; ++i)
-        {
-            for (int j = 0; j < binGrid.nBinCols; ++j)
+        // add scaled cluster potential 
+        for (int k = min_row; k <= max_row; ++k)
+            for (int j = min_col; j <= max_col; ++j)
             {
-                totalPotential += binGrid.bins[i][j].sumPotential;
+                binGrid.bins[k][j].sumPotential += 
+                    context->ci->clusters[clusterIdx].potentialMultiplier * 
+                    context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
+                sum2 += context->ci->clusters[clusterIdx].potentialMultiplier * 
+                    context->sprData.clusterPotentialOverBins[k-min_row][j-min_col];
             }
+    }
+
+    double totalPotential = 0.0;
+    for (int i = 0; i < binGrid.nBinRows; ++i)
+    {
+        for (int j = 0; j < binGrid.nBinCols; ++j)
+        {
+            totalPotential += binGrid.bins[i][j].sumPotential;
         }
-        //ALERT("Total sum potential + buffer potential   = %f", totalPotential);
-        //ALERT("Desired Potential = %f", 
-        //  context->desiredCellsAreaAtEveryBin * context->binGrid.nBins));
-        //ALERT("Total buffer potential = %f", sum);
-        //ALERT("Total sum potential = %f", sum2);
-        //ALERT("(Total buffer potential)/(Total sum potential) = %f", sum / sum2);
+    }
+    //ALERT("Total sum potential + buffer potential   = %f", totalPotential);
+    //ALERT("Desired Potential = %f", 
+    //  context->desiredCellsAreaAtEveryBin * context->binGrid.nBins));
+    //ALERT("Total buffer potential = %f", sum);
+    //ALERT("Total sum potential = %f", sum2);
+    //ALERT("(Total buffer potential)/(Total sum potential) = %f", sum / sum2);
 }
 
 double SpreadingPenalty(AppCtx* context, PetscScalar* x)
