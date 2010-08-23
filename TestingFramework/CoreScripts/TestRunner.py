@@ -118,8 +118,20 @@ class TestRunner:
         if self.parameters.doCheckout:
             cp.CoolPrint('Delete sources and Checkout')
             svn.DeleteSources(GeneralParameters.checkoutPath)
-            #TODO: implement non HEAD revision
-            svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
+            retcode = '-1'
+            
+            for i in range(3):
+                #TODO: implement non HEAD revision
+                retcode = svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
+
+                if retcode == None:
+                    break
+                
+            if retcode != None:
+                text = 'svn error: checkout failed!'
+
+                if (self.parameters.doSendMail == True):
+                    emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
         if self.parameters.doBuild:
             cp.CoolPrint('Build')

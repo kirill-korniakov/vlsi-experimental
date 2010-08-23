@@ -16,8 +16,8 @@ class SvnWorker:
         if rev == '':
             print('Checking out HEAD revision')
             cmdline = 'C:\Program Files (x86)\CollabNet\Subversion Client\svn.exe co ' + url + ' ' + to
-            subprocess.call(cmdline)
         else :
             print('Checking out revision ' + rev)
-            cmdline = 'svn co -r ' + rev + ' ' + url + ' ' + to
-            subprocess.call(cmdline)
+            cmdline = 'C:\Program Files (x86)\CollabNet\Subversion Client\svn.exe co -r ' + rev + ' ' + url + ' ' + to
+
+        return subprocess.call(cmdline)
