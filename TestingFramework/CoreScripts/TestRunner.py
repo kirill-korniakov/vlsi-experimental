@@ -19,13 +19,19 @@ from Parameters import *
 import BaseExperiment
 from BaseExperiment import *
 
+TERMINATED = 'Terminated'
+
 class TestRunner:
     parameters = ''
     experimentResult = OK
-    failedList = ''
-    nOkBenchmarks      = 0
-    nChangedBenchmarks = 0
-    nFailedenchmarks   = 0
+    
+    failedBenchmarks = ''
+    terminatedBenchmarks = ''
+    
+    nOkBenchmarks         = 0
+    nFailedenchmarks      = 0
+    nChangedBenchmarks    = 0
+    nTerminatedBenchmarks = 0
 
     def __init__(self, parameters = TestRunnerParameters()):
         self.parameters = parameters
@@ -71,6 +77,7 @@ class TestRunner:
                 lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
                 params.append(lefFile)
 
+            benchmarkResult = ''
             #subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
             t_start = time.time()
@@ -82,20 +89,25 @@ class TestRunner:
             retcode = p.poll()
 
             if (retcode == None):
-                print("Failed on " + benchmark)
+                print("Time out on " + benchmark)
+                benchmarkResult = TERMINATED
+                self.terminatedBenchmarks  += ' ' + benchmark + ';'
+                self.nTerminatedBenchmarks += 1
                 p.terminate()
 
+            else:
+                benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+
             fPlacerOutput.close()
-            #print(benchmark + ' DONE')
-            benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+            print(benchmark + ' DONE')
 
             if (benchmarkResult == FAILED):
-                self.experimentResult = FAILED
-                self.failedList       += ' ' + benchmark + ';'
-                self.nFailedenchmarks += 1
+                self.experimentResult  = FAILED
+                self.failedBenchmarks  += ' ' + benchmark + ';'
+                self.nFailedBenchmarks += 1
 
             else:
-                if ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED)):
+                if ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
                     self.experimentResult = CHANGED
                     self.nChangedBenchmarks += 1
 
@@ -141,10 +153,14 @@ class TestRunner:
             startTime = GetTimeStamp()
             print('Start time: ' + startTime)
             self.experimentResult = OK
-            self.failedList = ''
-            self.nOkBenchmarks      = 0
-            self.nChangedBenchmarks = 0
-            self.nFailedenchmarks   = 0
+            
+            self.failedBenchmarks     = ''
+            self.terminatedBenchmarks = ''
+            
+            self.nOkBenchmarks         = 0
+            self.nChangedBenchmarks    = 0
+            self.nFailedBenchmarks     = 0
+            self.nTerminatedBenchmarks = 0
             
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
@@ -154,15 +170,17 @@ class TestRunner:
             #text += experiment.name + ': ' + self.experimentResult
             text += experiment.name + ', ' + os.path.basename(experiment.cfg)
             text += ', ' + os.path.basename(experiment.benchmarks) + ' ('
-            nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedenchmarks
+            nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedBenchmarks + self.nTerminatedBenchmarks
             text += str(nBenchmarks) + ' benchmark(s)):\n'
             text += 'Start time: ' + startTime + '\n'
-            text += 'Ok:      ' + str(self.nOkBenchmarks) + '\n'
-            text += 'Changed: '   + str(self.nChangedBenchmarks) + '\n'
-            text += 'Failed:  ' + str(self.nFailedenchmarks)
+            text += 'Ok:         '  + str(self.nOkBenchmarks) + '\n'
+            text += 'Changed:    '  + str(self.nChangedBenchmarks) + '\n'
+            text += 'Failed:     '  + str(self.nFailedBenchmarks)
 
-            if (self.experimentResult == FAILED):
-               text += ' (' + self.failedList + ')'
+            if (self.nFailedBenchmarks > 0):
+                text += ' (' + self.failedBenchmarks + ')'
+               
+            text += '\nTerminated: ' + str(self.nTerminatedBenchmarks)
 
             text += '\n\n'
 
