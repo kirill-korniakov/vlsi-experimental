@@ -91,7 +91,7 @@ def test():
     metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
     stages  = ['INIT', 'NBUF']
     cmdArgs = ''#--New_Buffering.Interval=20'
-    e = BaseExperiment('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS05.list', metrics, stages, cmdArgs)
+    e = BaseExperiment('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS05.list', 'MasterLogs/New_Buffering/IWLS', metrics, stages)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
