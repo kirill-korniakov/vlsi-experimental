@@ -1,0 +1,7 @@
+Placement Flow Stages Table
+StageName       Tag  Time(sec) Cells HPWL(nm) TWL(nm) TNS(ns) WNS(ns)
+---------------------------------------------------------------------
+InitialState    INIT     0,545   141  1132158 1132158  8,3703  0,6336
+GlobalPlacement GP       4,258   141  2346634 2554869  8,8033  0,6768
+New_Buffering   NBUF     4,286   155  2429039 2554869  8,7834  0,6706
+---------------------------------------------------------------------
