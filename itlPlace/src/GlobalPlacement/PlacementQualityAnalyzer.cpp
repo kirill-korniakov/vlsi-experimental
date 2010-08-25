@@ -30,7 +30,7 @@ PlacementQualityAnalyzer::MetricInfo PlacementQualityAnalyzer::metricsInfo[] =
 
 void PlacementQualityAnalyzer::ReorderColumns()
 {
-    int numberOfColumns = m_design.cfg.ValueOf("GlobalPlacement.PQAT.numberOfColumns");
+    int numberOfColumns = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns").getLength();
     for (int i = 0; i < numberOfColumns; i++)
     {
         string metricName = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns")[i];
