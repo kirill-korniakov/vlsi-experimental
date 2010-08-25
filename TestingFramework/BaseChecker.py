@@ -49,8 +49,8 @@ class BaseChecker(BaseExperiment):
         printStr = benchmark + ';'
 
         if (masterTable == []):
-            printStr += 'experiment has not failed but master log is empty\n'
-            return CHANGED
+            print('experiment has not failed but master log is empty\n')
+            return NEW
         
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):

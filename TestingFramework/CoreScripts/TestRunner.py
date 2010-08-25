@@ -25,10 +25,12 @@ class TestRunner:
     parameters = ''
     experimentResult = OK
     
-    failedBenchmarks = ''
+    newBenchmarks        = ''
+    failedBenchmarks     = ''
     terminatedBenchmarks = ''
     
     nOkBenchmarks         = 0
+    nNewBenchmarks        = 0
     nFailedenchmarks      = 0
     nChangedBenchmarks    = 0
     nTerminatedBenchmarks = 0
@@ -93,6 +95,7 @@ class TestRunner:
                 benchmarkResult = TERMINATED
                 self.terminatedBenchmarks  += ' ' + benchmark + ';'
                 self.nTerminatedBenchmarks += 1
+                self.experimentResult = TERMINATED
                 p.terminate()
 
             else:
@@ -106,13 +109,18 @@ class TestRunner:
                 self.failedBenchmarks  += ' ' + benchmark + ';'
                 self.nFailedBenchmarks += 1
 
-            else:
-                if ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
-                    self.experimentResult = CHANGED
-                    self.nChangedBenchmarks += 1
+            elif ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
+                self.experimentResult = CHANGED
+                self.nChangedBenchmarks += 1
 
-                else:
-                    self.nOkBenchmarks += 1
+            elif (benchmarkResult == OK):
+                self.nOkBenchmarks += 1
+
+            elif (benchmarkResult == NEW):
+                self.newBenchmarks  += ' ' + benchmark + ';'
+                self.nNewBenchmarks += 1
+
+            #else TERMINATED - do nothing 
 
         return reportTable
 
@@ -181,6 +189,14 @@ class TestRunner:
                 text += ' (' + self.failedBenchmarks + ')'
                
             text += '\nTerminated: ' + str(self.nTerminatedBenchmarks)
+
+            if (self.nTerminatedBenchmarks > 0):
+               text += ' (' + self.terminatedBenchmarks + ')'
+
+            text += '\nNEW:        ' + str(self.nNewBenchmarks)
+
+            if (self.nNewBenchmarks > 0):
+                text += '(' + self.newBenchmarks + ')'
 
             text += '\n\n'
 

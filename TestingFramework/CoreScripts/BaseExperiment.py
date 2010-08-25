@@ -4,9 +4,10 @@ from Parameters import *
 import LogParser
 from LogParser import *
 
+OK      = 'Ok'
+NEW     = 'New'
 FAILED  = 'Failed'
 CHANGED = 'Changed'
-OK      = 'Ok'
 
 class BaseExperiment:
     name = ''
