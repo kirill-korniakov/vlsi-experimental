@@ -162,10 +162,12 @@ class TestRunner:
             print('Start time: ' + startTime)
             self.experimentResult = OK
             
+            self.newBenchmarks        = ''
             self.failedBenchmarks     = ''
             self.terminatedBenchmarks = ''
             
             self.nOkBenchmarks         = 0
+            self.nNewBenchmarks        = 0
             self.nChangedBenchmarks    = 0
             self.nFailedBenchmarks     = 0
             self.nTerminatedBenchmarks = 0
@@ -178,7 +180,7 @@ class TestRunner:
             #text += experiment.name + ': ' + self.experimentResult
             text += experiment.name + ', ' + os.path.basename(experiment.cfg)
             text += ', ' + os.path.basename(experiment.benchmarks) + ' ('
-            nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedBenchmarks + self.nTerminatedBenchmarks
+            nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedBenchmarks + self.nTerminatedBenchmarks + self.nNewBenchmarks
             text += str(nBenchmarks) + ' benchmark(s)):\n'
             text += 'Start time: ' + startTime + '\n'
             text += 'Ok:         '  + str(self.nOkBenchmarks) + '\n'

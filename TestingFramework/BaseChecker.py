@@ -7,7 +7,7 @@ from Parameters import *
 class BaseChecker(BaseExperiment):
     masterLogFolder = ''
 
-    def __init__(self, name, cfg, benchmarks, masterLogFolder = '', metrics = [], stages = [], cmdLine = ''):
+    def __init__(self, name, cfg, benchmarks, masterLogFolder, metrics = [], stages = [], cmdLine = ''):
         BaseExperiment.__init__(self, name, cfg, benchmarks, metrics, stages, cmdLine)
         self.masterLogFolder = masterLogFolder
 
@@ -68,12 +68,16 @@ class BaseChecker(BaseExperiment):
         return self.CompareTables(currentTable, masterTable)
 
 def test():
-    metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
-    stages  = ['INIT', 'LEG']
+    hippMetrics = ['HPWL', 'TNS', 'WNS']
+    hippStages  = ['LEG', 'DP']
+
+    weightingMetrics = ['HPWL', 'TNS', 'WNS']
+    weightingStages  = ['GP1', 'LEG1', 'GP9', 'LEG9']
+    
     testRunner = TestRunner()
-    cmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    #e = BaseChecker('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS05_fast.list', "MasterLogs/LR", metrics, stages, cmdArgs)
-    e = BaseChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "MasterLogs/HPWL/IWLS", ['HPWL'], ['DP'])
+    #e = BaseChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "MasterLogs/HPWL/IWLS", ['HPWL'], ['DP'])
+    #e = BaseChecker('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS_GP_r1511/IWLS_GP_Hippocrate.list', "MasterLogs/HippocrateDP/Aleksandr", hippMetrics, hippStages)
+    #e = BaseChecker('Weighting (SGNW) experiment', 'Sensitivity_guided_weighting.cfg', 'IWLS05_fast.list', "MasterLogs/Weighting/SensitivityGuided", weightingMetrics, weightingStages)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()

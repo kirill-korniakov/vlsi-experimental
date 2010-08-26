@@ -38,8 +38,8 @@ def test():
     metrics = ['HPWL', 'TNS', 'WNS']
     stages  = ['LEG', 'DP']
     testRunner = TestRunner()
-    e = Experiment_HippocrateDP('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS05_fast.list', metrics, stages)
-    #e = BaseExperiment('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS05_fast.list', metrics, stages)
+    #e = Experiment_HippocrateDP('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS_GP_r1511/IWLS_GP_Hippocrate.list', metrics, stages)
+    e = BaseExperiment('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS05_fast.list', metrics, stages)
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
