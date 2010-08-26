@@ -1,5 +1,5 @@
 class TestRunnerParameters:
-    doCheckout = False
+    doCheckout = True
     doBuild    = True
     doSendMail = True
 

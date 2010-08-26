@@ -153,6 +153,8 @@ class TestRunner:
                 if (self.parameters.doSendMail == True):
                     emailer.PrepareAndSendMail(subject, text, attachmentFiles)
 
+                return -1
+
         if self.parameters.doBuild:
             cp.CoolPrint('Build')
             self.BuildSln(GeneralParameters.slnPath)
