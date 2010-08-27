@@ -109,9 +109,11 @@ class TestRunner:
                 self.failedBenchmarks  += ' ' + benchmark + ';'
                 self.nFailedBenchmarks += 1
 
-            elif ((benchmarkResult == CHANGED) and (self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
-                self.experimentResult = CHANGED
+            elif (benchmarkResult == CHANGED):
                 self.nChangedBenchmarks += 1
+
+                if ((self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
+                    self.experimentResult = CHANGED
 
             elif (benchmarkResult == OK):
                 self.nOkBenchmarks += 1
