@@ -17,7 +17,7 @@ def NightExperiment():
     exp_BUF = BaseChecker('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS05.list', "MasterLogs/New_Buffering/IWLS", buffMetrics, buffStages)
 	
     hippMetrics = ['HPWL', 'TNS', 'WNS']
-    hippStages  = ['LEG', 'HP']
+    hippStages  = ['LEG', 'DP']
     exp_HDP = BaseChecker('HippocrateDP (HDP) experiment', 'HippocrateDP.cfg', 'IWLS_GP_Hippocrate.list', "MasterLogs/HippocrateDP/Aleksandr", hippMetrics, hippStages)
 
     weightingMetrics = ['HPWL', 'TNS', 'WNS']
