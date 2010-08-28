@@ -96,7 +96,7 @@ void VanGinnekenTree::CreateSource(HSteinerPoint node, int type, int& nodeIndex,
   vGTree[nodeIndex].SetTree(tree);
 }
 
-void VanGinnekenTree::CreateSink(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VanGinnekenTree::CreatePotentialBufferPoint(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   nodeIndex++;
   vGTree[nodeIndex].SetType(type);	
@@ -104,7 +104,7 @@ void VanGinnekenTree::CreateSink(HSteinerPoint node, int type, int& nodeIndex, i
   vGTree[nodeIndex].SetTree(tree);
 }
 
-void VanGinnekenTree::CreateFirstPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VanGinnekenTree::CreateFirstPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int& rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   if (isRight)
     vGTree[rootIndex].SetRight(CreateNode(tree->vGAlgorithm->data->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex, isRight, tree));
@@ -122,7 +122,7 @@ void VanGinnekenTree::CreateFirstPointInEdge(HSteinerPoint node, int type, int& 
   rootIndex = nodeIndex;
 }
 
-void VanGinnekenTree::CreatePotentialBufferPoint(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VanGinnekenTree::CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int& rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   double rx,ry,nx,ny;
   rx = vGTree[rootIndex].GetX();
@@ -139,7 +139,7 @@ void VanGinnekenTree::CreatePotentialBufferPoint(HSteinerPoint node, int type, i
   }
 }
 
-void VanGinnekenTree::CreateLastPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VanGinnekenTree::CreateLastPointInEdgeAndSink(HSteinerPoint node, int type, int& nodeIndex, int& rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   vGTree[rootIndex].SetLeft(CreateNode(tree->vGAlgorithm->data->design.SteinerPoints.Null(), 3, nodeIndex, rootIndex, isRight, tree));
   vGTree[nodeIndex].SetX(vGAlgorithm->data->design[node].X());
@@ -178,8 +178,8 @@ void VanGinnekenTree::CreateLastPointInEdge(HSteinerPoint node, int type, int& n
 void VanGinnekenTree::CreateNewPoint(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
 {  
   CreateFirstPointInEdge(node, type, nodeIndex, rootIndex, isRight, tree);
-  CreatePotentialBufferPoint(node, type, nodeIndex, rootIndex, isRight, tree);
-  CreateLastPointInEdge(node, type, nodeIndex, rootIndex, isRight, tree);
+  CreatePotentialBufferPointInEdge(node, type, nodeIndex, rootIndex, isRight, tree);
+  CreateLastPointInEdgeAndSink(node, type, nodeIndex, rootIndex, isRight, tree);
 }
 
 VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
@@ -194,7 +194,7 @@ VanGinnekenTreeNode* VanGinnekenTree::CreateNode(HSteinerPoint node, int type, i
   }
   if (type == 3)
   {
-    CreateSink(node, type, nodeIndex, rootIndex, isRight, tree);
+    CreatePotentialBufferPoint(node, type, nodeIndex, rootIndex, isRight, tree);
   }
   return &vGTree[nodeIndex];
 }
@@ -372,7 +372,7 @@ void VGTreeDynamicDistribution::FindNewMaxPointInEdge(HSteinerPoint srcPoint, HS
     maxPos = newPartitionPointCount;
 }
 
-void VGTreeDynamicDistribution::CreatePotentialBufferPoint(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VGTreeDynamicDistribution::CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   double rx,ry,nx,ny;
   rx = vGTree[rootIndex].GetX();
@@ -473,7 +473,7 @@ void VGTreeLegalDynamicDistribution::FindNewMaxPointInEdge(HSteinerPoint srcPoin
     maxPos = newPartitionPointCount;
 }
 
-void VGTreeLegalDynamicDistribution::CreatePotentialBufferPoint(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
+void VGTreeLegalDynamicDistribution::CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& nodeIndex, int rootIndex, bool isRight, VanGinnekenTree* tree)
 {
   int lenPath = 0;
   double rx,ry,nx,ny;

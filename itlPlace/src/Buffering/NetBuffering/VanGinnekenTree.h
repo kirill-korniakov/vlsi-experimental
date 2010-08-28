@@ -18,10 +18,10 @@ protected:
   virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos) = 0;
   virtual void CreateTree();
   virtual void CreateSource(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreateSink(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreateFirstPointInEdge(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
   virtual void CreatePotentialBufferPoint(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreateLastPointInEdge(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreateFirstPointInEdge(HSteinerPoint node, int type, int& index, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& index, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreateLastPointInEdgeAndSink(HSteinerPoint node, int type, int& index, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
   virtual void CreateNewPoint(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
   virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 
@@ -61,7 +61,7 @@ class VGTreeDynamicDistribution: public VanGinnekenTree
 {
 protected:
   virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos);
-  virtual void CreatePotentialBufferPoint(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 public:
   VGTreeDynamicDistribution(NetBufferingAlgorithm* vGA);
   VGTreeDynamicDistribution(NetBufferingAlgorithm* vGA, int partitionCount);
@@ -74,7 +74,7 @@ class VGTreeLegalDynamicDistribution: public VanGinnekenTree
 {
 protected:
   virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos);
-  virtual void CreatePotentialBufferPoint(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int type, int& index, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
 public:
   VGTreeLegalDynamicDistribution(NetBufferingAlgorithm* vGA);
   VGTreeLegalDynamicDistribution(NetBufferingAlgorithm* vGA, int partitionCount);
