@@ -17,7 +17,7 @@ class BaseExperiment:
     metrics = []
     stages  = []
 
-    def __init__(self, name, cfg, benchmarks, metrics = [], stages = [], cmdLine = ''):
+    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdLine = ''):
         self.name = name
         self.cfg = GeneralParameters.binDir + 'cfg/' + cfg
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
@@ -54,19 +54,13 @@ class BaseExperiment:
                 table[row][col] = float(value.replace(',', '.'))
 
         return table
-    
-    def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        #print('ERROR: you can\'t use BaseExperiment class itself!')
-        table = self.ParseLog(logName, benchmark)
-        
-        if (table == []):
-          return FAILED
-          
+
+    def FillTable(self, values, benchmark, reportTable):
         printStr = benchmark + ';'
         
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                printStr += str(table[row][col]) + ';'
+                printStr += str(values[row][col]) + ';'
 
             printStr += ';' #an empty column between metrics on different stages
 
@@ -77,4 +71,12 @@ class BaseExperiment:
         resultFile = open(reportTable, 'a')
         resultFile.write(printStr.replace('.', ','))
         resultFile.close()
+    
+    def ParseLogAndFillTable(self, logName, benchmark, reportTable):
+        values = self.ParseLog(logName, benchmark)
+        
+        if (values == []):
+          return FAILED
+          
+        self.FillTable(values, benchmark, reportTable)
         return OK

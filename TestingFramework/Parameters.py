@@ -1,7 +1,7 @@
 class TestRunnerParameters:
-    doCheckout = True
-    doBuild    = True
-    doSendMail = True
+    doCheckout = False
+    doBuild    = False
+    doSendMail = False
 
     maxTimeForBenchmark = 3600 #one hour
     experiments = []
