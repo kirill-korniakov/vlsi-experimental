@@ -32,7 +32,7 @@ void NetInfo::SetNetInfoComputedFields(BufferInfo& buf, NetInfo& n, double r, do
   }
   else
   {
-   //   if (n.X2opt() >= 0 && n.X2opt() <= n.L())
+    //   if (n.X2opt() >= 0 && n.X2opt() <= n.L())
     //n.m_X2opt = n.X2opt();
 
     double discr2 = sqrt(discr) * 0.5;
@@ -70,9 +70,9 @@ void NetInfo::SetNetInfoComputedFields(BufferInfo& buf, NetInfo& n, double r, do
 
   n.m_OttenDelay = fnOttenDelay(0, r, c, buf.Lbuf(), n.Lnet(), n.Lext(), buf.Dbuf(), n.Dnet());
   //n.m_OttenDelay = //n.Rd() * (n.Cs() + n.L() * c) + 
-    //c * 0.5*
-    //n.L()// *  (n.Cs() + n.L() * c * 0.5)
-    //;
+  //c * 0.5*
+  //n.L()// *  (n.Cs() + n.L() * c * 0.5)
+  //;
 
   if (n.IsOttenApplicable() || n.IsModifiedOttenApplicable())
   {
@@ -138,7 +138,7 @@ NetInfo NetInfo::Create(HDesign& hd, HNet net, BufferInfo& buf)
   double arcTime;
   bool isInversed;
   HTimingArcType arc = FindArrivalArc(hd, sourceTP, SignalDirection_None, arcTime, isInversed);
-  
+
   double driverDelay = arcTime;
 
   //calc Rd

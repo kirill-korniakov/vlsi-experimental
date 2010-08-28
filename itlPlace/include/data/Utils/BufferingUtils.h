@@ -1,7 +1,7 @@
 #ifndef __BufferingUtils_H__
 #define __BufferingUtils_H__
 
-#include "VanGinnekenData.h"
+#include "VGVariantsListElement.h"
 
 namespace Utils
 {

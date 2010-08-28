@@ -81,7 +81,7 @@ namespace Buffering
     //buffer insertion point
     struct VGNode
     {
-    
+
       int EdgeID;
       double Coordinate;//0.0 <= Coordinate <= 1.0
     public:

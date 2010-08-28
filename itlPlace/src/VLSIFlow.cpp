@@ -14,7 +14,7 @@
 #include "Buffering.h"
 #include "Auxiliary.h"
 #include "PlacementQualityAnalyzer.h"
-#include "VanGinnekenAlgorithm.h"
+#include "BufferingAlgotithm.h"
 #include "HippocratePlacement.h"
 #include "LRSizing.h"
 
@@ -405,8 +405,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         ALERT("NEW BUFFERING STARTED");
         ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
         HVGAlgorithm buf(hd);
-        buf.Initialize();
-        buf.BufferingCriticalPath();
+        buf.NetListBuffering();
+        
         //hd.VGAlgorithm.Initialize();
         //hd.VGAlgorithm.BufferingCriticalPath();
         STA(hd);

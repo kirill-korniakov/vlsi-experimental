@@ -3,7 +3,7 @@
 #include "HDesign.h"
 #include "Auxiliary.h"
 #include "AdaptiveRoute.h"
-#include "VanGinnekenData.h"
+#include "VanGinnekenTreeNode.h"
 
 void HPlotter::PlotCell(HCell cell, Color col)
 {

@@ -138,7 +138,7 @@ public:
 
     int baseEdge = Edges.CreateNewEdge();
     Edges.Edges[baseEdge].Set(&Edges, source, source.HasRight() ? source : source.Left());
-    
+
     Utils::DriverPhisics dph = Utils::GetDriverTimingPhisics(design, sourcePin, SignalDirection_None);
 
     int insertedBuffersCount = RunVanGinneken(VGNode(baseEdge), dph.R);
@@ -168,7 +168,7 @@ private:
 
   RLnode* RemoveRedundentNodes(RLnode *list)
   {//list is ordered by DownstreamCapacitance asc
-   //and should be ordeder by RequiredTime asc
+    //and should be ordeder by RequiredTime asc
     RLnode dummy;
     dummy.next = list;
     dummy.RequiredTime = -INFINITY;//WARNING: must be big negative value
@@ -376,7 +376,7 @@ private:
     buffer.SetPlacementStatus(PlacementStatus_Movable);
     buffer.SetHeight(design.GetDouble<HMacroType::SizeY>(info->Type()));
     buffer.SetWidth(design.GetDouble<HMacroType::SizeX>(info->Type()));
-    
+
     char bufferName[32];
     sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
     buffer.SetName(bufferName);
@@ -507,7 +507,7 @@ private:
   {
     WireTreeEdge& e = Edges.Edges[edgeID];
     HSteinerPoint left = design.Get<HSteinerPoint::Left, HSteinerPoint>(e.Start);
-    
+
     //first point
     if (left == e.End)
       design.Set<HSteinerPoint::Left>(e.Start, design.SteinerPoints[e.InsertedBuffers.front().sink]);
@@ -532,27 +532,27 @@ private:
 public:
   void DrawTree(HNet net, Color col)
   {return;
-    std::stack<HSteinerPoint> points;
-    HPinWrapper src = ((net,design).Source(), design);
-    design.Plotter.DrawCircle(src.X(), src.Y(), 4, col);
-    points.push(design.SteinerPoints[src]);
-    while(!points.empty())
+  std::stack<HSteinerPoint> points;
+  HPinWrapper src = ((net,design).Source(), design);
+  design.Plotter.DrawCircle(src.X(), src.Y(), 4, col);
+  points.push(design.SteinerPoints[src]);
+  while(!points.empty())
+  {
+    HSteinerPointWrapper pt = (points.top(),design); points.pop();
+    if (pt.HasLeft())
     {
-      HSteinerPointWrapper pt = (points.top(),design); points.pop();
-      if (pt.HasLeft())
-      {
-        HSteinerPointWrapper lpt = (pt.Left(),design);
-        points.push(lpt);
-        design.Plotter.DrawLine(pt.X(), pt.Y(), lpt.X(), lpt.Y(), col);
-      }
-      if (pt.HasRight())
-      {
-        HSteinerPointWrapper rpt = (pt.Right(),design);
-        points.push(rpt);
-        design.Plotter.DrawLine(pt.X(), pt.Y(), rpt.X(), rpt.Y(), col);
-      }
-      design.Plotter.DrawCircle(pt.X(), pt.Y(), 2, Color_Green);
+      HSteinerPointWrapper lpt = (pt.Left(),design);
+      points.push(lpt);
+      design.Plotter.DrawLine(pt.X(), pt.Y(), lpt.X(), lpt.Y(), col);
     }
+    if (pt.HasRight())
+    {
+      HSteinerPointWrapper rpt = (pt.Right(),design);
+      points.push(rpt);
+      design.Plotter.DrawLine(pt.X(), pt.Y(), rpt.X(), rpt.Y(), col);
+    }
+    design.Plotter.DrawCircle(pt.X(), pt.Y(), 2, Color_Green);
+  }
   }
 };
 
@@ -582,7 +582,7 @@ void InsertRepeaters2(HDesign& design, double slackTreshold)
     {
       if (MaxCriticality > 0.0)
         MaxCriticality = (path,design).Criticality() * (1.0 - BufferedPercent);
-      
+
       if ((path,design).Criticality() > MaxCriticality)
         return false;
 

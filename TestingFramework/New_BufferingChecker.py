@@ -96,4 +96,4 @@ def test():
 
     testRunner.Run()
 
-test()
+#test()

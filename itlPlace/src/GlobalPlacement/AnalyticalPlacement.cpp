@@ -3,7 +3,7 @@
 #include "PlacementQualityAnalyzer.h"
 #include "AnalyticalPlacement.h"
 #include "AnalyticalPlacementReporting.h"
-#include "VanGinnekenAlgorithm.h"
+#include "GPBuffering.h"
 
 using namespace std;
 
@@ -519,7 +519,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
           WRITELINE("");
           ALERT("NEW BUFFERING STARTED");
           ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
-          HVGAlgorithm buf(hd);
+          GPBuffering buf(hd);
           buf.Initialize();
           buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
           ctx.Close();

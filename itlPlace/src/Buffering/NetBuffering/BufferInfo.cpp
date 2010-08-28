@@ -120,6 +120,6 @@ BufferInfo BufferInfo::Create(HDesign& hd, string macro, string inputPin, string
 
   result.m_Lbuf = Utils::LBuf(dph, sph, hd.RoutingLayers.Physics);
   result.m_Dbuf = Utils::DBuf(dph, sph, hd.RoutingLayers.Physics);
-  
+
   return result;
 }

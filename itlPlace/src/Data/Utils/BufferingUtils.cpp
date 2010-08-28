@@ -1,5 +1,5 @@
 #include "BufferingUtils.h"
-
+#include "BufferPositions.h"
 namespace Utils
 {
   void PrintVariants(TemplateTypes<VGVariantsListElement>::list* vGList)

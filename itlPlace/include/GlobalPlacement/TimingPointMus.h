@@ -169,7 +169,7 @@ private:
 
             DelayPropagation<sdNum>::TimeType endReqTime = dp.GetRequiredTime(tp);
             DelayPropagation<sdNum>::BoolType inversed;
-            HTimingArcTypeWrapper arc = design[FindTimingArc(design, spType, epType)];
+            HTimingArcTypeWrapper arc = design[Utils::FindTimingArc(design, spType, epType)];
             DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, endReqTime, inversed);
             dp.AccumulateWorstRequiredOnPin(start, time, inversed, tp);
         }
