@@ -1,1 +1,1 @@
-23 40 * * * "cd C:\Users\beljakov.alexander.a\Desktop\VLSI\TestingFramework && UpdateNightExperiments.py && Run_NightExperiment.py"
+20 22 * * * "cd C:\Users\beljakov.alexander.a\Desktop\trunk\TestingFramework && UpdateNightExperiments.py && Run_NightExperiment.py"
