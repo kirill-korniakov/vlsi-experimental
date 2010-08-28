@@ -22,7 +22,7 @@ def NightExperiment():
 
     weightingMetrics = ['HPWL', 'TNS', 'WNS']
     weightingStages  = ['GP1', 'LEG1', 'GP9', 'LEG9']
-    exp_WEIGHTING    = BaseChecker('Weighting (SGNW) experiment', 'Sensitivity_guided_weighting.cfg', 'IWLS05_fast.list', "MasterLogs/Weighting/SensitivityGuided", weightingMetrics, weightingStages)
+    exp_WEIGHTING    = BaseChecker('Weighting (SGNW) experiment', 'Sensitivity_guided_weighting.cfg', 'IWLS05.list', "MasterLogs/Weighting/SensitivityGuided", weightingMetrics, weightingStages)
 
     nightTestParams = TestRunnerParameters()
     nightTestParams.doCheckout = True
