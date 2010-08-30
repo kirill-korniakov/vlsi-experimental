@@ -5,9 +5,9 @@ def NightExperiment():
     exp_HPWL_ISPD04 = BaseChecker('ISPD04 HPWL experiment', 'hpwl_ispd04.cfg', 'ISPD04.list', "MasterLogs/HPWL/ISPD", ['HPWL'], ['DP'])
     exp_HPWL_IWLS05 = BaseChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05.list', "MasterLogs/HPWL/IWLS", ['HPWL'], ['DP'])
     
-    LRStages  = []
-    LRMetrics = []
-    LRCmdArgs = ''#--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
+    LRStages  = ['HPWL', 'TWL', 'TNS', 'WNS']
+    LRMetrics = ['INIT', 'LEG']
+    LRCmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
     exp_LR_IWLS05GP = BaseChecker('IWLS05GP LR experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', "MasterLogs/LR", LRStages, LRMetrics, LRCmdArgs)
 
     buffMetrics = ['HPWL', 'TWL', 'TNS', 'WNS']
