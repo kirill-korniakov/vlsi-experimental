@@ -53,6 +53,17 @@ class TestRunner:
 
         return benchmarks
 
+    def PrintXXXBenchmarks(self, status, nXXXBenchmarks, benchmarks = ''):
+        if (nXXXBenchmarks == 0):
+            return ('')
+
+        printStr = status + str(nXXXBenchmarks)
+
+        if (benchmarks != ''):
+            printStr += '(' + benchmarks + ')'
+
+        return (printStr + '\n')
+
     def RunExperiment(self, experiment):
         benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
 
@@ -92,11 +103,14 @@ class TestRunner:
 
             if (retcode == None):
                 print("Time out on " + benchmark)
-                benchmarkResult = TERMINATED
+                benchmarkResult            = TERMINATED
                 self.terminatedBenchmarks  += ' ' + benchmark + ';'
                 self.nTerminatedBenchmarks += 1
-                self.experimentResult = TERMINATED
+                self.experimentResult      = TERMINATED
                 p.terminate()
+
+                if (self.nTerminatedBenchmarks >= 3):
+                    return (reportTable)
 
             else:
                 benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
@@ -142,7 +156,7 @@ class TestRunner:
             svn.DeleteSources(GeneralParameters.checkoutPath)
             retcode = 1
             
-            for i in range(3):
+            for i in range(10):
                 #TODO: implement non HEAD revision
                 retcode = svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
 
@@ -187,24 +201,13 @@ class TestRunner:
             nBenchmarks = self.nOkBenchmarks + self.nChangedBenchmarks + self.nFailedBenchmarks + self.nTerminatedBenchmarks + self.nNewBenchmarks
             text += str(nBenchmarks) + ' benchmark(s)):\n'
             text += 'Start time: ' + startTime + '\n'
-            text += 'Ok:         '  + str(self.nOkBenchmarks) + '\n'
-            text += 'Changed:    '  + str(self.nChangedBenchmarks) + '\n'
-            text += 'Failed:     '  + str(self.nFailedBenchmarks)
-
-            if (self.nFailedBenchmarks > 0):
-                text += ' (' + self.failedBenchmarks + ')'
-               
-            text += '\nTerminated: ' + str(self.nTerminatedBenchmarks)
-
-            if (self.nTerminatedBenchmarks > 0):
-               text += ' (' + self.terminatedBenchmarks + ')'
-
-            text += '\nNEW:        ' + str(self.nNewBenchmarks)
-
-            if (self.nNewBenchmarks > 0):
-                text += '(' + self.newBenchmarks + ')'
-
-            text += '\n\n'
+            text += self.PrintXXXBenchmarks('Ok:         ', self.nOkBenchmarks)
+            text += self.PrintXXXBenchmarks('Changed:    ', self.nChangedBenchmarks)
+            text += self.PrintXXXBenchmarks('Failed:     ', self.nFailedBenchmarks, self.failedBenchmarks)
+            text += self.PrintXXXBenchmarks('Terminated: ', self.nTerminatedBenchmarks, self.terminatedBenchmarks)
+            text += self.PrintXXXBenchmarks('NEW:        ', self.nNewBenchmarks, self.newBenchmarks)
+            
+            text += '\n'
 
             if (self.experimentResult == CHANGED):
                 attachmentFiles.append(reportTable)
