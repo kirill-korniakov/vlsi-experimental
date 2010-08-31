@@ -7,7 +7,7 @@ def NightExperiment():
     
     LRStages  = ['HPWL', 'TWL', 'TNS', 'WNS']
     LRMetrics = ['INIT', 'LEG']
-    LRCmdArgs = '--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
+    LRCmdArgs = '' #'--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
     exp_LR_IWLS05GP = BaseChecker('IWLS05GP LR experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', "MasterLogs/LR", LRStages, LRMetrics, LRCmdArgs)
 
     buffMetrics = ['HPWL', 'TWL', 'TNS', 'WNS']
