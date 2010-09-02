@@ -4,6 +4,9 @@ from Parameters import *
 import LogParser
 from LogParser import *
 
+import CoreFunctions
+from CoreFunctions import *
+
 OK      = 'Ok'
 NEW     = 'New'
 FAILED  = 'Failed'
@@ -26,19 +29,18 @@ class BaseExperiment:
         self.stages  = stages
 
     def CreateEmptyTable(self, reportTable):
-        printStr = 'Benchmark;'
+        cols = ['Benchmark']
+        cols.append(EMPTYSITE)
         
         #write header of a table.
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                printStr += self.metrics[col] + '_' + self.stages[row] + ';'
+                cols.append(self.metrics[col] + '_' + self.stages[row])
+                cols.append(EMPTYSITE)
                 
-            printStr += ';' #an empty column between metrics on different stages
-                
-        printStr += '\n'
-        resultFile = open(reportTable, 'a')
-        resultFile.write(printStr.replace('.', ','))
-        resultFile.close()
+            cols.append(EMPTYSITE) #an empty column between metrics on different stages
+
+        WriteStringToFile(cols, reportTable)
 
     def ParseLog(self, logName, benchmark):
         parser = LogParser(logName)
@@ -56,22 +58,19 @@ class BaseExperiment:
         return table
 
     def FillTable(self, values, benchmark, reportTable):
-        printStr = benchmark + ';'
+        cols = [benchmark]
+        cols.append(EMPTYSITE)
         
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                printStr += str(values[row][col]) + ';'
+                cols.append(str(values[row][col]))
+                cols.append(EMPTYSITE)
 
-            printStr += ';' #an empty column between metrics on different stages
-
-        printStr += '\n'
-        print(printStr)
+            cols.append(EMPTYSITE) #an empty column between metrics on different stages
 
         #write metrics to the file
-        resultFile = open(reportTable, 'a')
-        resultFile.write(printStr.replace('.', ','))
-        resultFile.close()
-    
+        WriteStringToFile(cols, reportTable)
+
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         values = self.ParseLog(logName, benchmark)
         

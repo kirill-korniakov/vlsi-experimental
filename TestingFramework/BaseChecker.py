@@ -22,37 +22,36 @@ class BaseChecker(BaseExperiment):
         return(OK)
 
     def CreateEmptyTable(self, reportTable):
-        printStr = 'Benchmark;'
+        cols = ['Benchmark']
+        cols.append(EMPTYSITE)
         
         #write header of a table.
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                printStr += 'Current ' + self.metrics[col] + '_' + self.stages[row] + ';'
-                printStr += 'Master '  + self.metrics[col] + '_' + self.stages[row] + ';'
+                cols.append('Current ' + self.metrics[col] + '_' + self.stages[row])
+                cols.append(EMPTYSITE)
+                cols.append('Master '  + self.metrics[col] + '_' + self.stages[row])
+                cols.append(EMPTYSITE)
                 
-            printStr += ';' #an empty column between metrics on different stages
-                
-        printStr += '\n'
-        resultFile = open(reportTable, 'a')
-        resultFile.write(printStr.replace('.', ','))
-        resultFile.close()
+            cols.append(EMPTYSITE) #an empty column between metrics on different stages
+
+        WriteStringToFile(cols, reportTable)
 
     def FillTable(self, currentValues, masterValues, benchmark, reportTable):
-        printStr = benchmark + ';'
+        cols = [benchmark]
+        cols.append(EMPTYSITE)
 
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                printStr += str(currentValues[row][col]) + ';' + str(masterValues[row][col]) + ';'
+                cols.append(str(currentValues[row][col]))
+                cols.append(EMPTYSITE)
+                cols.append(str(masterValues[row][col]))
+                cols.append(EMPTYSITE)
 
-            printStr = printStr + ';' #an empty column between metrics on different stages
-
-        printStr += '\n'
-        print(printStr)
+            cols.append(EMPTYSITE) #an empty column between metrics on different stages
 
         #write metrics to the file
-        table = open(reportTable, 'a')
-        table.write(printStr.replace('.', ','))
-        table.close()
+        WriteStringToFile(cols, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         currentValues = self.ParseLog(logName, benchmark)

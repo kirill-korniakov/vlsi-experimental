@@ -4,6 +4,8 @@ import datetime
 from datetime import date
 import time
 
+EMPTYSITE = ';'
+
 class CoolPrinter:
     startTime = 0
 
@@ -79,3 +81,18 @@ def CompareValues(value1, value2, eps = 0.001):
       return 'equal'
 
     return 'notEqual'
+
+def WriteStringToFile(cols, tableFileName):
+  printStr = ''
+  
+  for col in cols:
+    if (col == EMPTYSITE):
+      printStr += ';'
+      
+    else:
+      printStr += col
+      
+  printStr += '\n'
+  resultFile = open(tableFileName, 'a')
+  resultFile.write(printStr.replace('.', ','))
+  resultFile.close()
