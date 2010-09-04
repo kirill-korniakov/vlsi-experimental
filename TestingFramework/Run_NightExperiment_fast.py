@@ -1,6 +1,9 @@
 import BaseChecker
 from BaseChecker import *
 
+lists = []
+fast_lists = []
+
 def NightExperiment():
     exp_HPWL_ISPD04 = BaseChecker('ISPD04 HPWL experiment', 'hpwl_ispd04.cfg', 'ISPD04_fast.list', "MasterLogs/HPWL/ISPD", ['HPWL'], ['DP'])
     exp_HPWL_IWLS05 = BaseChecker('IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05_fast.list', "MasterLogs/HPWL/IWLS", ['HPWL'], ['DP'])
@@ -13,7 +16,7 @@ def NightExperiment():
     buffMetrics = ['HPWL', 'TWL', 'TNS', 'WNS']
     buffStages  = ['INIT', 'NBUF']
     exp_BUF = BaseChecker('IWLS05 new_buffering experiment (GBL)', 'New_buffering.cfg', 'IWLS05.list', "MasterLogs/New_Buffering/IWLS", buffMetrics, buffStages)
-	
+
     hippMetrics = ['HPWL', 'TNS', 'WNS']
     hippStages  = ['LEG', 'DP']
     exp_HDP = BaseChecker('HippocrateDP (HDP) experiment', 'HippocrateDP.cfg', 'IWLS_GP_Hippocrate.list', "MasterLogs/HippocrateDP/Aleksandr", hippMetrics, hippStages)
@@ -35,4 +38,12 @@ def NightExperiment():
     #testRunner.parameters.experiments.append(exp_WEIGHTING)
     testRunner.Run()
 
-NightExperiment()
+def run():
+    NightExperiment() #<-lists
+
+
+def fast_run():
+    NightExperiment() #<-fast_lists
+
+run()
+#fast_run()
