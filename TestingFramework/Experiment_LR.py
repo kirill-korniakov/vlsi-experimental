@@ -5,6 +5,12 @@ import Parameters
 from Parameters import *
 
 class Experiment_LR(BaseExperiment):
+    def __init__(self):
+        _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
+        _stages  = ['INIT', 'LEG']
+        BaseExperiment.__init__(self, 'IWLS05GP LR experiment', 'LR.cfg',\
+            'IWLS_GP_r1511/IWLS_GP_fast.list', _metrics, _stages)
+
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
         #NOTE: do not format the string below, because it harms table formatting
@@ -59,7 +65,8 @@ def test():
     stages  = ['INIT', 'LEG']
 
     cmdArgs = ''#--LR.GlobalPlacement.LagrangianRelaxation.alphaTWL=1.0e-5'
-    e = Experiment_LR('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', metrics, stages, cmdArgs)
+    e = Experiment_LR('IWLS05 LR after weighting experiment', 'LR.cfg',\
+        'IWLS_GP_r1511/IWLS_GP.list', metrics, stages, cmdArgs)
     #e = BaseExperiment('IWLS05 LR after weighting experiment', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', metrics, stages, cmdArgs)
     testRunner.parameters.experiments.append(e)
 

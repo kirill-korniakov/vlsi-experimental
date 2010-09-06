@@ -28,28 +28,42 @@ class BaseExperiment:
         self.metrics = metrics
         self.stages  = stages
 
+    def CopyingConstructor(self, be):
+        self.cfg        = be.cfg
+        self.name       = be.name
+        self.stages     = be.stages
+        self.metrics    = be.metrics
+        self.cmdLine    = be.cmdLine
+        self.benchmarks = be.benchmarks
+
+    def SetConfig(self, cfg):
+        self.cfg = GeneralParameters.binDir + 'cfg/' + cfg
+
+    def SetBenchmarksList(self, benchmarks):
+        self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
+
     def CreateEmptyTable(self, reportTable):
         cols = ['Benchmark']
-        cols.append(EMPTYSITE)
-        
+        cols.append(END_OF_COLUMN)
+
         #write header of a table.
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
                 cols.append(self.metrics[col] + '_' + self.stages[row])
-                cols.append(EMPTYSITE)
-                
-            cols.append(EMPTYSITE) #an empty column between metrics on different stages
+                cols.append(END_OF_COLUMN)
+
+            cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 
         WriteStringToFile(cols, reportTable)
 
     def ParseLog(self, logName, benchmark):
         parser = LogParser(logName)
         table = [[0 for col in range(len(self.metrics))] for row in range(len(self.stages))]
-        
+
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
                 value = str(parser.GetFromPFST(self.stages[row], self.metrics[col]))
-                
+
                 if (value == str(NOT_FOUND)):
                    return []
 
@@ -57,25 +71,25 @@ class BaseExperiment:
 
         return table
 
-    def FillTable(self, values, benchmark, reportTable):
+    def AddStringToTable(self, values, benchmark, reportTable):
         cols = [benchmark]
-        cols.append(EMPTYSITE)
-        
+        cols.append(END_OF_COLUMN)
+
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
                 cols.append(str(values[row][col]))
-                cols.append(EMPTYSITE)
+                cols.append(END_OF_COLUMN)
 
-            cols.append(EMPTYSITE) #an empty column between metrics on different stages
+            cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 
         #write metrics to the file
         WriteStringToFile(cols, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         values = self.ParseLog(logName, benchmark)
-        
+
         if (values == []):
           return FAILED
-          
-        self.FillTable(values, benchmark, reportTable)
+
+        self.AddStringToTable(values, benchmark, reportTable)
         return OK

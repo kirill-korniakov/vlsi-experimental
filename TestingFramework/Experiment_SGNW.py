@@ -4,17 +4,14 @@ from CoreScripts import *
 import Parameters
 from Parameters import *
 
-class Experiment_HPWL(BaseExperiment):
+#Sensitivity Guided Net Weighting experiment
+class Experiment_SGNW(BaseExperiment):
     def __init__(self):
-        BaseExperiment.__init__(self, 'IWLS05 HPWL experiment',\
-            'hpwl_iwls05.cfg', 'IWLS05_fast.list', ['HPWL'], ['DP'])
-
-    def CreateEmptyTable(self, reportTable):
-        cols = ['Benchmark']
-        cols.append(END_OF_COLUMN)
-        cols.append('HPWL')
-
-        WriteStringToFile(cols, reportTable)
+        _metrics = ['HPWL', 'TNS', 'WNS']
+        _stages  = ['GP1', 'LEG1', 'GP9', 'LEG9']
+        BaseExperiment.__init__(self, 'Weighting (SGNW) experiment',\
+            'Sensitivity_guided_weighting.cfg', 'IWLS05_fast.list',\
+            _metrics, _stages)
 
 def test():
     testRunner = TestRunner()

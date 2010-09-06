@@ -5,19 +5,24 @@ import Parameters
 from Parameters import *
 
 class Experiment_New_Buffering(BaseExperiment):
+    def __init__(self):
+        _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
+        _stages  = ['INIT', 'NBUF']
+        BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (GBL)',\
+            'New_buffering.cfg', 'IWLS05_fast.list', _metrics, _stages)
+
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')
-        po.write('name;целов;время;буф;нач.HPWL;фин.HPWL;нач.TWL;фин.TWL;нач.TNS;фин.TNS;нач.WNS;фин.WNS;HPWL%;TWL%;TNS%;WNS%;\n')
         po.close()
-        
- 
+
+
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #get metrics
         metricTagList = ['StageName', 'Tag', 'Time(sec)', 'Cells', 'HPWL(nm)', 'TWL(nm)', 'TNS(ns)', 'WNS(ns)']
         parser = LogParser(logName)
         tagCount = parser.GetStageTag()[0]
         print('last tag = ' + str(tagCount))
-        tagList = parser.GetStageTag()[1]        
+        tagList = parser.GetStageTag()[1]
         for i in tagList:
             print('tag = ' + i)
         bbCells = parser.GetFromPFST(tagList[0], metricTagList[3])
@@ -36,17 +41,17 @@ class Experiment_New_Buffering(BaseExperiment):
         abTNS = parser.GetFromPFST(tagList[-1], metricTagList[6])
         bbWNS = parser.GetFromPFST(tagList[0], metricTagList[7])
         #bbWNS1 = parser.GetFromPFST(tagList[3], metricTagList[7])
-        abWNS = parser.GetFromPFST(tagList[-1], metricTagList[7])        
+        abWNS = parser.GetFromPFST(tagList[-1], metricTagList[7])
         pHPWL = (1 - float(abHPWL.replace(',', '.')) / float(bbHPWL.replace(',', '.'))) * 100
-        pTWL = (1 - float(abTWL.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100 
+        pTWL = (1 - float(abTWL.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100
         pTNS = (1 - float(abTNS.replace(',', '.')) / float(bbTNS.replace(',', '.'))) * 100
         pWNS = (1 - float(abWNS.replace(',', '.')) / float(bbWNS.replace(',', '.'))) * 100
-        
+
         #pHPWL1 = (1 - float(bbHPWL1.replace(',', '.')) / float(bbHPWL.replace(',', '.'))) * 100
-        #pTWL1 = (1 - float(bbTWL1.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100 
+        #pTWL1 = (1 - float(bbTWL1.replace(',', '.')) / float(bbTWL.replace(',', '.'))) * 100
         #pTNS1 = (1 - float(bbTNS1.replace(',', '.')) / float(bbTNS.replace(',', '.'))) * 100
         #pWNS1 = (1 - float(bbWNS1.replace(',', '.')) / float(bbWNS.replace(',', '.'))) * 100
-        
+
         #bTime = float(abTime1.replace(',', '.')) - float(abTime0.replace(',', '.'))
         AddBuf = float(abCells) - float(bbCells)
 
@@ -67,17 +72,17 @@ class Experiment_New_Buffering(BaseExperiment):
         printStr += str(abTNS) + ';'
         printStr += str(bbWNS) + ';'
         #printStr += str(bbWNS1) + ';'
-        printStr += str(abWNS) + ';'      
+        printStr += str(abWNS) + ';'
         printStr += str(pHPWL) + ';'
         printStr += str(pTWL) + ';'
         printStr += str(pTNS) + ';'
         printStr += str(pWNS) + ';'
-        
+
         #printStr += str(pHPWL1) + ';'
         #printStr += str(pTWL1) + ';'
         #printStr += str(pTNS1) + ';'
         #printStr += str(pWNS1) + ';'
-        
+
         printStr += '\n'
         print(printStr)
 

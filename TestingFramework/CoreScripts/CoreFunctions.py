@@ -4,7 +4,7 @@ import datetime
 from datetime import date
 import time
 
-EMPTYSITE = ';'
+END_OF_COLUMN = ';'
 
 class CoolPrinter:
     startTime = 0
@@ -84,14 +84,14 @@ def CompareValues(value1, value2, eps = 0.001):
 
 def WriteStringToFile(cols, tableFileName):
   printStr = ''
-  
+
   for col in cols:
-    if (col == EMPTYSITE):
+    if (col == END_OF_COLUMN):
       printStr += ';'
-      
+
     else:
       printStr += col
-      
+
   printStr += '\n'
   resultFile = open(tableFileName, 'a')
   resultFile.write(printStr.replace('.', ','))
