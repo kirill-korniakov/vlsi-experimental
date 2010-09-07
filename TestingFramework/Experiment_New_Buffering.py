@@ -9,7 +9,7 @@ class Experiment_New_Buffering(BaseExperiment):
         _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
         _stages  = ['INIT', 'NBUF']
         BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (GBL)',\
-            'New_buffering.cfg', 'IWLS05_fast.list', _metrics, _stages)
+            'New_buffering.cfg', 'IWLS05.list', _metrics, _stages)
 
     def CreateEmptyTable(self, reportTable):
         po = open(reportTable, 'w')

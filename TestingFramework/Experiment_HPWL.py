@@ -7,7 +7,7 @@ from Parameters import *
 class Experiment_HPWL(BaseExperiment):
     def __init__(self):
         BaseExperiment.__init__(self, 'IWLS05 HPWL experiment',\
-            'hpwl_iwls05.cfg', 'IWLS05_fast.list', ['HPWL'], ['DP'])
+            'hpwl_iwls05.cfg', 'IWLS05.list', ['HPWL'], ['DP'])
 
     def CreateEmptyTable(self, reportTable):
         cols = ['Benchmark']

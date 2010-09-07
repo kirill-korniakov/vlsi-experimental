@@ -10,7 +10,7 @@ class Experiment_SGNW(BaseExperiment):
         _metrics = ['HPWL', 'TNS', 'WNS']
         _stages  = ['GP1', 'LEG1', 'GP9', 'LEG9']
         BaseExperiment.__init__(self, 'Weighting (SGNW) experiment',\
-            'Sensitivity_guided_weighting.cfg', 'IWLS05_fast.list',\
+            'Sensitivity_guided_weighting.cfg', 'IWLS05.list',\
             _metrics, _stages)
 
 def test():
