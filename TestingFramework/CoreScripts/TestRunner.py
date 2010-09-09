@@ -110,6 +110,7 @@ class TestRunner:
                 p.terminate()
 
                 if (self.nTerminatedBenchmarks >= 3):
+                    self.terminatedBenchmarks += '\nReached maximum number of terminated benchmarks'
                     return (reportTable)
 
             else:

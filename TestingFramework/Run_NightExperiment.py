@@ -24,7 +24,7 @@ def NightExperiment():
     chk_HPWL_IWLS = Checker(exp_HPWL, "MasterLogs/HPWL/IWLS")
 
     exp_HPWL.SetConfig('hpwl_ispd04.cfg')
-    exp_HPWL.SetBenchmarksList('ISPD04_fast.list')
+    exp_HPWL.SetBenchmarksList('ISPD04.list')
     chk_HPWL_ISPD = Checker(exp_HPWL, "MasterLogs/HPWL/ISPD")
 
     chk_LR  = Checker(Experiment_LR(), "MasterLogs/LR")
@@ -33,16 +33,16 @@ def NightExperiment():
     chk_SGW = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
 
     nightTestParams = TestRunnerParameters()
-    nightTestParams.doCheckout = False
-    nightTestParams.doBuild    = False
-    nightTestParams.doSendMail = False
+    nightTestParams.doCheckout = True
+    nightTestParams.doBuild    = True
+    nightTestParams.doSendMail = True
     testRunner = TestRunner(nightTestParams)
-    #testRunner.parameters.experiments.append(chk_HPWL_IWLS)
-    #testRunner.parameters.experiments.append(chk_HPWL_ISPD)
-    #testRunner.parameters.experiments.append(chk_LR)
-    #testRunner.parameters.experiments.append(chk_BUF)
+    testRunner.parameters.experiments.append(chk_HPWL_IWLS)
+    testRunner.parameters.experiments.append(chk_HPWL_ISPD)
+    testRunner.parameters.experiments.append(chk_LR)
+    testRunner.parameters.experiments.append(chk_BUF)
     testRunner.parameters.experiments.append(chk_HDP)
-    #testRunner.parameters.experiments.append(chk_SGW)
+    testRunner.parameters.experiments.append(chk_SGW)
     testRunner.Run()
 
 NightExperiment()
