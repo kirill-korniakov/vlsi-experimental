@@ -23,12 +23,13 @@ TERMINATED = 'Terminated'
 
 class TestRunner:
     parameters = ''
+    comment    = ''
     experimentResult = OK
-    
+
     newBenchmarks        = ''
     failedBenchmarks     = ''
     terminatedBenchmarks = ''
-    
+
     nOkBenchmarks         = 0
     nNewBenchmarks        = 0
     nFailedenchmarks      = 0
@@ -110,7 +111,7 @@ class TestRunner:
                 p.terminate()
 
                 if (self.nTerminatedBenchmarks >= 3):
-                    self.terminatedBenchmarks += '\nReached maximum number of terminated benchmarks'
+                    self.comment += '\nReached maximum number of terminated benchmarks'
                     return (reportTable)
 
             else:
@@ -137,7 +138,7 @@ class TestRunner:
                 self.newBenchmarks  += ' ' + benchmark + ';'
                 self.nNewBenchmarks += 1
 
-            #else TERMINATED - do nothing 
+            #else TERMINATED - do nothing
 
         return reportTable
 
@@ -156,14 +157,14 @@ class TestRunner:
             cp.CoolPrint('Delete sources and Checkout')
             svn.DeleteSources(GeneralParameters.checkoutPath)
             retcode = 1
-            
+
             for i in range(10):
                 #TODO: implement non HEAD revision
                 retcode = svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
 
                 if retcode == 0:
                     break
-                
+
             if retcode != 0:
                 text = 'svn error: checkout failed!'
 
@@ -180,17 +181,18 @@ class TestRunner:
             startTime = GetTimeStamp()
             print('Start time: ' + startTime)
             self.experimentResult = OK
-            
+            self.comment = ''
+
             self.newBenchmarks        = ''
             self.failedBenchmarks     = ''
             self.terminatedBenchmarks = ''
-            
+
             self.nOkBenchmarks         = 0
             self.nNewBenchmarks        = 0
             self.nChangedBenchmarks    = 0
             self.nFailedBenchmarks     = 0
             self.nTerminatedBenchmarks = 0
-            
+
             cp.CoolPrint(experiment.name)
             reportTable = self.RunExperiment(experiment)
             #cp.CoolPrint("Sending mail with " + reportTable)
@@ -207,7 +209,8 @@ class TestRunner:
             text += self.PrintXXXBenchmarks('Failed:     ', self.nFailedBenchmarks, self.failedBenchmarks)
             text += self.PrintXXXBenchmarks('Terminated: ', self.nTerminatedBenchmarks, self.terminatedBenchmarks)
             text += self.PrintXXXBenchmarks('NEW:        ', self.nNewBenchmarks, self.newBenchmarks)
-            
+
+            text += self.comment
             text += '\n'
 
             if (self.experimentResult == CHANGED):
