@@ -360,7 +360,11 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
 		
 		if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
-				/*WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP")*/;
+    {
+      WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
+      STA(hd);
+      WriteFlowMetrics(flowMetrics, hd, "LRSizingafterSTA", "LRS_STA");
+    }
 
 
     DoSTAIfCan(hd);

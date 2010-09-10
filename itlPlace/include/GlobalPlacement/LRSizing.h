@@ -29,10 +29,10 @@ private:
   void ProjectLambdaMatrix();
   void SOLVE_LRS_mu(std::vector<double>& NewVX);
   bool CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vector<double> nextVX, double accuracy);
-  void SOLVE_LDP(std::vector<HCell>& cells);
-  double CalculateQ(std::vector<double>& vX);
-  bool CheckStopConditionForLDP(std::vector<double>& vX, double errorBound );
-  void AdjustLambda(int step, std::vector<double> arrivalTimes );
+  void SOLVE_LDP();
+  double CalculateQ(unsigned int size);
+  bool CheckStopConditionForLDP(std::vector<double>& vX, double errorBound);
+  void AdjustLambda(int step, std::vector<double>& arrivalTimes,std::vector<double>& vX );
 
   void InitLambda(double defaultLambda);
   std::vector<HCell>* InitCells();
@@ -52,9 +52,10 @@ private:
   double CalcB(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
   double CalcA(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
   double CalcNewX(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX);
+  double CalcDelay(HTimingPointWrapper& tp,std::vector<double>& vX);
   void UpdateVX(std::vector<double>& newVX, std::vector<double>& vMu);
 
-  std::vector<double> CalculateArrivalTimes();
+  std::vector<double> CalculateArrivalTimes(std::vector<double>& vX);
 
 
   double FindOutputLambdaSum(HTimingPoint point);
