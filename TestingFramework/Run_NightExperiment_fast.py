@@ -19,16 +19,18 @@ from Experiment_SGNW import *
 import Experiment_New_Buffering
 from Experiment_New_Buffering import *
 
-fast_lists = {"HPWL_IWLS":"IWLS05_fast.list", "HPWL_ISPD":"ISPD04_fast.list", "LR":"IWLS_GP_r1511/IWLS_GP_fast.list",\
+import FastCheckRunner
+from FastCheckRunner import *
+
+fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "HPWL_ISPD":"ISPD04_fast.list", "LR":"IWLS_GP_r1511/IWLS_GP_fast.list",\
     "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "SGW":"IWLS05_fast.list"}
-lists = {"HPWL_IWLS":"IWLS05.list", "HPWL_ISPD":"ISPD04.list", "LR":"IWLS_GP_r1511/IWLS_GP.list",\
-    "BUF":"IWLS05.list", "HDP":"IWLS_GP_Hippocrate.list", "SGW":"IWLS05.list"}
 
 def NightExperiment(lists):
     exp_HPWL = Experiment_HPWL()
-    exp_HPWL.SetBenchmarksList(lists["HPWL_IWLS"])
+    exp_HPWL.SetBenchmarksList(lists["IWLS05 HPWL experiment"])
     chk_HPWL_IWLS = Checker(exp_HPWL, "MasterLogs/HPWL/IWLS")
 
+    exp_HPWL.name = 'ISPD04 HPWL Experiment'
     exp_HPWL.SetConfig('hpwl_ispd04.cfg')
     exp_HPWL.SetBenchmarksList(lists["HPWL_ISPD"])
     chk_HPWL_ISPD = Checker(exp_HPWL, "MasterLogs/HPWL/ISPD")
@@ -38,17 +40,13 @@ def NightExperiment(lists):
     chk_HDP = Checker(Experiment_HippocrateDP(), "MasterLogs/HippocrateDP/Aleksandr")
     chk_SGW = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
 
-    nightTestParams = TestRunnerParameters()
-    nightTestParams.doCheckout = False
-    nightTestParams.doBuild    = False
-    nightTestParams.doSendMail = False
-    testRunner = TestRunner(nightTestParams)
-    testRunner.parameters.experiments.append(chk_HPWL_IWLS)
-    #testRunner.parameters.experiments.append(chk_HPWL_ISPD)
-    #testRunner.parameters.experiments.append(chk_LR)
-    #testRunner.parameters.experiments.append(chk_BUF)
-    #testRunner.parameters.experiments.append(chk_HDP)
-    #testRunner.parameters.experiments.append(chk_SGW)
+    testRunner = FastCheckRunner(fast_lists)
+    testRunner.Append(chk_HPWL_IWLS)
+    #testRunner.Append(chk_HPWL_ISPD)
+    #testRunner.Append(chk_LR)
+    #testRunner.Append(chk_BUF)
+    #testRunner.Append(chk_HDP)
+    #testRunner.Append(chk_SGW)
     testRunner.Run()
 
 def run():

@@ -65,6 +65,9 @@ class TestRunner:
 
         return (printStr + '\n')
 
+    def Append(self, newExperiment):
+         self.parameters.experiments.append(newExperiment)
+
     def RunExperiment(self, experiment):
         benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
 
@@ -111,7 +114,7 @@ class TestRunner:
                 p.terminate()
 
                 if (self.nTerminatedBenchmarks >= 3):
-                    self.comment += '\nReached maximum number of terminated benchmarks'
+                    self.comment += 'Reached maximum number of terminated benchmarks\n'
                     return (reportTable)
 
             else:
@@ -143,8 +146,8 @@ class TestRunner:
         return reportTable
 
     def Run(self):
-        cp = CoolPrinter()
-        svn = SvnWorker()
+        cp      = CoolPrinter()
+        svn     = SvnWorker()
         emailer = Emailer()
 
         subject = 'Night experiments'

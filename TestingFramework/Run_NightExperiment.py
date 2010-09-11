@@ -1,9 +1,3 @@
-import CoreScripts
-from CoreScripts import *
-
-import Checker
-from Checker import *
-
 import Experiment_HippocrateDP
 from Experiment_HippocrateDP import *
 
@@ -19,10 +13,23 @@ from Experiment_SGNW import *
 import Experiment_New_Buffering
 from Experiment_New_Buffering import *
 
-def NightExperiment():
+import CheckRunner
+from CheckRunner import *
+
+import FastCheckRunner
+from FastCheckRunner import *
+
+#fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "ISPD04 HPWL Experiment":"ISPD04_fast.list",\
+#    "Weighting (SGNW) experiment":"IWLS05_fast.list"}
+
+#fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list"}
+fast_lists = {}
+
+def NightExperiment(testRunner):
     exp_HPWL = Experiment_HPWL()
     chk_HPWL_IWLS = Checker(exp_HPWL, "MasterLogs/HPWL/IWLS")
 
+    exp_HPWL.name = 'ISPD04 HPWL Experiment'
     exp_HPWL.SetConfig('hpwl_ispd04.cfg')
     exp_HPWL.SetBenchmarksList('ISPD04.list')
     chk_HPWL_ISPD = Checker(exp_HPWL, "MasterLogs/HPWL/ISPD")
@@ -32,17 +39,19 @@ def NightExperiment():
     chk_HDP = Checker(Experiment_HippocrateDP(), "MasterLogs/HippocrateDP/Aleksandr")
     chk_SGW = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
 
-    nightTestParams = TestRunnerParameters()
-    nightTestParams.doCheckout = True
-    nightTestParams.doBuild    = True
-    nightTestParams.doSendMail = True
-    testRunner = TestRunner(nightTestParams)
-    testRunner.parameters.experiments.append(chk_HPWL_IWLS)
-    testRunner.parameters.experiments.append(chk_HPWL_ISPD)
-    testRunner.parameters.experiments.append(chk_LR)
-    testRunner.parameters.experiments.append(chk_BUF)
-    testRunner.parameters.experiments.append(chk_HDP)
-    testRunner.parameters.experiments.append(chk_SGW)
+    testRunner.Append(chk_HPWL_IWLS)
+    testRunner.Append(chk_HPWL_ISPD)
+    testRunner.Append(chk_LR)
+    testRunner.Append(chk_BUF)
+    testRunner.Append(chk_HDP)
+    testRunner.Append(chk_SGW)
     testRunner.Run()
 
-NightExperiment()
+def run():
+    if fast_lists != {}:
+        NightExperiment(FastCheckRunner(fast_lists))
+
+    else:
+        NightExperiment(CheckRunner())
+
+run()
