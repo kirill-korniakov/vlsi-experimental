@@ -22,7 +22,7 @@ from FastCheckRunner import *
 #fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "ISPD04 HPWL Experiment":"ISPD04_fast.list",\
 #    "Weighting (SGNW) experiment":"IWLS05_fast.list"}
 
-#fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list"}
+#fast_lists = {"Weighting (SGNW) experiment":"IWLS05_fast.list"}
 fast_lists = {}
 
 def NightExperiment(testRunner):

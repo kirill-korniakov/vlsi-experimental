@@ -71,6 +71,9 @@ class BaseExperiment:
 
         return table
 
+    def PrintBenchmarkTable(self, values, benchmark, reportTable):
+        return 0
+
     def AddStringToTable(self, values, benchmark, reportTable):
         cols = [benchmark]
         cols.append(END_OF_COLUMN)
@@ -92,4 +95,5 @@ class BaseExperiment:
           return FAILED
 
         self.AddStringToTable(values, benchmark, reportTable)
+        self.PrintBenchmarkTable(values, benchmark, reportTable)
         return OK
