@@ -11,29 +11,27 @@
 #include "HPinType.h"
 #include "HNet.h"
 
-struct AppCtx;
-class HWirePhysicalParams;
-
-#define	INFINITY	20000000000.0
+#define	INFINITY 20000000000.0
 #define MAXBUFFERTYPE 64
 
 using namespace Utils;
 
 class NetBufferingAlgorithm
 {
-protected:
-  bool isInitialize;
-  virtual VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
 public:
   VGAlgorithmData* data;
   AbstractCreateVGListAlgorithm* createVGListAlgorithm;
   AbstractModificationVanGinnekenList* modificationVanGinnekenList;
   AbstractAdditionNewElement* additionNewElement;
 
+  NetBufferingAlgorithm();
   NetBufferingAlgorithm(HDesign& hd);
   virtual void Initialize(bool isAgainInitialize = false);
+  virtual VGVariantsListElement BufferingNet(HNet& net, bool isRealBuffering = true);
 
-  virtual VGVariantsListElement BufferingNen(HNet& net, bool isRealBuffering = true, AppCtx* context = NULL);
+protected:
+  bool isInitialize;
+  virtual VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
 };
 
 #endif //__NetBufferingAlgorithm_H__

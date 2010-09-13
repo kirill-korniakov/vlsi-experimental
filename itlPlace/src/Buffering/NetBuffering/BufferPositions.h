@@ -6,11 +6,6 @@
 
 class BufferPositions
 {
-protected:
-  VanGinnekenTreeNode* position;
-  BufferInfo* bufferInfo;
-  int index;
-
 public:
   BufferPositions();
   BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
@@ -31,6 +26,11 @@ public:
     position = NULL;
     bufferInfo = NULL;
   }
+
+protected:
+  VanGinnekenTreeNode* position;
+  BufferInfo* bufferInfo;
+  int index;
 };
 
 #endif

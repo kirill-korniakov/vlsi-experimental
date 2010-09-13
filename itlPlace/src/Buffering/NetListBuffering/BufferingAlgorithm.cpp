@@ -1,15 +1,15 @@
-#include "BufferingAlgotithm.h"
+#include "BufferingAlgorithm.h"
 #include "NetListBufferingAlgorithm.h"
 #include "HBaseDesignItem.h"
 
 HVGAlgorithm::HVGAlgorithm(HDesign& hd): design(hd)
 {
-  typeNetListBuffering = hd.cfg.ValueOf("TypeNetListBuffering", 0);
+  typeNetlistBuffering = hd.cfg.ValueOf("TypeNetListBuffering", 0);
 }
 
-void HVGAlgorithm::NetListBuffering()
+void HVGAlgorithm::NetlistBuffering()
 {
-  if (typeNetListBuffering == 0)
+  if (typeNetlistBuffering == 0)
   {
     BufferingAllCriticalPath* bufferingAlgorithm = new BufferingAllCriticalPath(design);
     bufferingAlgorithm->Initialize();

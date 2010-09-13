@@ -3,7 +3,14 @@
 #include "Timing.h"
 #include "STA.h"
 #include "VanGinnekenTree.h"
+
 #include <math.h>
+
+NetBufferingAlgorithm::NetBufferingAlgorithm()
+{
+  isInitialize = false;
+  data = NULL;
+}
 
 NetBufferingAlgorithm::NetBufferingAlgorithm(HDesign& hd)
 {
@@ -16,38 +23,41 @@ void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
   if (isInitialize && !isAgainInitialize)
     return;  
 
+  if (data == NULL)
+      ALERT("ERROR Buffering not initialize!!!");
+
   isInitialize = true;
   data->Initialize();
 
-  if (data->typePartition == 0)
+  if (data->typePartition == VanGinnekenTree::LINEAR)
     data->vGTree = new VGTreeUniformDistribution(this, data->partitionCount);
-  if (data->typePartition == 1)
+  if (data->typePartition == VanGinnekenTree::DYNAMIC)
     data->vGTree = new VGTreeDynamicDistribution(this, data->partitionCount);
-  if (data->typePartition == 2)    
+  if (data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY)    
     data->vGTree = new VGTreeLegalDynamicDistribution(this, data->partitionCount, 
     data->sizeBuffer);    
 
-  if (data->typeBufferingAlgorithm == 0)
+  if (data->typeBufferingAlgorithm == CLASSIC_CREATE_VG_LIST)
     createVGListAlgorithm = new ClassicCreateVGListAlgorithm(this);
-  if (data->typeBufferingAlgorithm == 1)
+  if (data->typeBufferingAlgorithm == LINE_BYPASS_CREATE_VG_LIST)
     createVGListAlgorithm = new LineBypassAtCreateVGListAlgorithm(this);
-  if (data->typeBufferingAlgorithm == 2)
+  if (data->typeBufferingAlgorithm == ADAPTIVE_BYPASS_CREATE_VG_LIST)
     createVGListAlgorithm = new AdaptiveBypassAtCreateVGListAlgorithm(this);
 
-  if (data->typeModificationVanGinnekenList == 0)
+  if (data->typeModificationVanGinnekenList == STANDART_MODIFICATION_VG_LIST)
     modificationVanGinnekenList = new StandartModificationVanGinnekenList(this);
-  if (data->typeModificationVanGinnekenList == 1)
+  if (data->typeModificationVanGinnekenList == ACCOUNTING_BORDER_MODIFICATION_VG_LIST)
     modificationVanGinnekenList = new ModificationVanGinnekenListAccountingBorder(this);
-  if (data->typeModificationVanGinnekenList == 2)
+  if (data->typeModificationVanGinnekenList == EXHAUSTIVE_SEARCH)
     modificationVanGinnekenList = new ExhaustiveSearch(this);
 
-  if (data->typeBuferAddition == 0)
+  if (data->typeBufferAddition == STANDART_ADDITION)
     additionNewElement = new StandartAdditionNewElement(this);
-  if (data->typeBuferAddition == 1)
+  if (data->typeBufferAddition == LEGAL_ADDITION)
     additionNewElement = new LegalAdditionNewElement(this);
 }
 
-VGVariantsListElement NetBufferingAlgorithm::BufferingNen(HNet& net, bool isRealBuffering, AppCtx* context)
+VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isRealBuffering)
 {
   if (!isInitialize)   Initialize();
 
@@ -56,7 +66,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNen(HNet& net, bool isReal
     ALERT("\t%s\t%d\t", data->design.Nets.GetString<HNet::Name>(net).c_str(), 
       data->design.Nets.GetInt<HNet::PinsCount>(net));
   }
-  if (data->typeBuferAddition != 1)
+  if (data->typeBufferAddition != LEGAL_ADDITION)
     data->netVisit[::ToID(net)] = true;
 
   data->vGTree->UpdateTree(data->design.SteinerPoints[(net, data->design).Source()]);
@@ -85,7 +95,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNen(HNet& net, bool isReal
       data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
       if (data->plotBuffer)
       {
-        data->design.Plotter.DrawFilledRectangle2(pos->GetPosition()->GetX(), pos->GetPosition()->GetY(), data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red);
+        data->design.Plotter.DrawFilledRectangle2(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red);
       }
     }
     if (isRealBuffering)

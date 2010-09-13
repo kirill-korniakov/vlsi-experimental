@@ -191,7 +191,7 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
     VanGinnekenTreeNode* srcPoint = tree;
     VanGinnekenTreeNode* nextPoint = srcPoint;
 
-    m_hd.Plotter.DrawCircle2(srcPoint->GetX(), srcPoint->GetY(), 4, LineColor);
+    m_hd.Plotter.DrawCircle2(srcPoint->x, srcPoint->y, 4, LineColor);
 
     TemplateTypes<VanGinnekenTreeNode*>::stack points;
     points.push(srcPoint);
@@ -203,23 +203,23 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
         if (srcPoint->HasLeft())
         {
             nextPoint = srcPoint->GetLeft();
-            m_hd.Plotter.DrawLine2(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
-            m_hd.Plotter.DrawCircle2(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
-            //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
+            m_hd.Plotter.DrawLine2(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor);
+            m_hd.Plotter.DrawCircle2(srcPoint->x, srcPoint->y, 1, VGNodeColor);
+            //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
             points.push(nextPoint);
 
             if (srcPoint->HasRight())
             {
                 nextPoint = srcPoint->GetRight();
-                m_hd.Plotter.DrawLine2(srcPoint->GetX(), srcPoint->GetY(), nextPoint->GetX(), nextPoint->GetY(), LineColor);
-                m_hd.Plotter.DrawCircle2(srcPoint->GetX(), srcPoint->GetY(), 1, VGNodeColor);
-                //m_hd.Plotter.DrawRectangle(nextPoint->GetX(), nextPoint->GetY(), nextPoint->GetX() + DesignX2ImageX(5), nextPoint->GetY() + DesignY2ImageY(5),  Color(color + 1));
+                m_hd.Plotter.DrawLine2(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor);
+                m_hd.Plotter.DrawCircle2(srcPoint->x, srcPoint->y, 1, VGNodeColor);
+                //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
                 points.push(nextPoint);
             }
         }
         else
         {
-            m_hd.Plotter.DrawCircle2(srcPoint->GetX(), srcPoint->GetY(), 1, LineColor);
+            m_hd.Plotter.DrawCircle2(srcPoint->x, srcPoint->y, 1, LineColor);
         }
     }
 }

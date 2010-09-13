@@ -35,12 +35,12 @@ ClassicCreateVGListAlgorithm::CreateVGList( VanGinnekenTreeNode* node)
       {
         RightVGList = CreateVGList(node->GetRight());        
         if (vGAlgorithm->data->printVariantsList)
-          ALERT("Branch Point id: %d", node->GetIndex());
+          ALERT("Branch Point id: %d", node->index);
         return vGAlgorithm->modificationVanGinnekenList->MergeList(leftVGList, RightVGList);
       }
       if (vGAlgorithm->data->printVariantsList)
       { 
-        ALERT("BranchPoint id: %d", node->GetIndex());
+        ALERT("BranchPoint id: %d", node->index);
         PrintVariants(leftVGList);
       }
       return leftVGList;
@@ -61,8 +61,8 @@ ClassicCreateVGListAlgorithm::CreateVGList( VanGinnekenTreeNode* node)
 
       if (vGAlgorithm->data->printVariantsList)
       { 
-        ALERT("point id: %d", node->GetIndex());
-        ALERT("Length line %d and %d: %.2f",node->GetIndex(), node->GetLeft()->GetIndex(), 
+        ALERT("point id: %d", node->index);
+        ALERT("Length line %d and %d: %.2f",node->index, node->GetLeft()->index, 
           vGAlgorithm->modificationVanGinnekenList->GetLength(node, node->GetLeft()));
         PrintVariants(newList);
       }
@@ -105,7 +105,7 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
           rightList = stackList.top();
           stackList.pop();
           if (vGAlgorithm->data->printVariantsList)
-            ALERT("Branch Point id: %d", tree->vGTree[i].GetIndex());          
+            ALERT("Branch Point id: %d", tree->vGTree[i].index);          
           currentList = vGAlgorithm->modificationVanGinnekenList->MergeList(leftList, rightList);
           stackList.push(currentList);
           leftList = NULL;
@@ -116,7 +116,7 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
         {
           if (vGAlgorithm->data->printVariantsList)
           { 
-            ALERT("BranchPoint id: %d", tree->vGTree[i].GetIndex());
+            ALERT("BranchPoint id: %d", tree->vGTree[i].index);
             PrintVariants(leftList);
           }
           stackList.push(leftList);
@@ -142,9 +142,9 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
 
         if (vGAlgorithm->data->printVariantsList)
         { 
-          ALERT("point id: %d", tree->vGTree[i].GetIndex());
-          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].GetIndex(), 
-            tree->vGTree[i].GetLeft()->GetIndex(), vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
+          ALERT("point id: %d", tree->vGTree[i].index);
+          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].index, 
+            tree->vGTree[i].GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
           PrintVariants(currentList);
         }
         stackList.push(currentList);
@@ -194,7 +194,7 @@ AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
           rightList = stackList.top();
           stackList.pop();
           if (vGAlgorithm->data->printVariantsList)
-            ALERT("Branch Point id: %d", tree->vGTree[i].GetIndex());          
+            ALERT("Branch Point id: %d", tree->vGTree[i].index);          
           currentList = vGAlgorithm->modificationVanGinnekenList->MergeList(leftList, rightList);
           stackList.push(currentList);
           leftList = NULL;
@@ -205,7 +205,7 @@ AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
         {
           if (vGAlgorithm->data->printVariantsList)
           { 
-            ALERT("BranchPoint id: %d", tree->vGTree[i].GetIndex());
+            ALERT("BranchPoint id: %d", tree->vGTree[i].index);
             PrintVariants(leftList);
           }
           stackList.push(leftList);
@@ -265,9 +265,9 @@ AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
 
         if (vGAlgorithm->data->printVariantsList)
         { 
-          ALERT("point id: %d", tree->vGTree[i].GetIndex());
-          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].GetIndex(), 
-            tree->vGTree[i].GetLeft()->GetIndex(), vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
+          ALERT("point id: %d", tree->vGTree[i].index);
+          ALERT("Length line %d and %d: %.2f",tree->vGTree[i].index, 
+            tree->vGTree[i].GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTree[i], tree->vGTree[i].GetLeft()));
           PrintVariants(currentList);
         }
         stackList.push(currentList);

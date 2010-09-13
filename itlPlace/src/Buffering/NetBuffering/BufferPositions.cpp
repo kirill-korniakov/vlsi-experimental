@@ -16,14 +16,14 @@ BufferPositions::BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, 
 
 bool BufferPositions::operator > (BufferPositions& element)
 {
-  if (position->GetIndex() > element.GetPosition()->GetIndex())
+  if (position->index > element.GetPosition()->index)
     return true;
   return false;
 }
 
 bool BufferPositions::operator < (BufferPositions& element)
 {
-  if (position->GetIndex() < element.GetPosition()->GetIndex())
+  if (position->index < element.GetPosition()->index)
     return true;
   return false;
 }

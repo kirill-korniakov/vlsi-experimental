@@ -28,15 +28,15 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
 
   BinGrid& binGrid = context->sprData.binGrid;
 
-  double dx = bufferPositions.GetPosition()->GetX() - binGrid.bins[rowIdx][colIdx].xCoord;
-  double dy = bufferPositions.GetPosition()->GetY() - binGrid.bins[rowIdx][colIdx].yCoord;
+  double dx = bufferPositions.GetPosition()->x - binGrid.bins[rowIdx][colIdx].xCoord;
+  double dy = bufferPositions.GetPosition()->y - binGrid.bins[rowIdx][colIdx].yCoord;
 
-  double x = bufferPositions.GetPosition()->GetX();
-  double y = bufferPositions.GetPosition()->GetY();
+  double x = bufferPositions.GetPosition()->x;
+  double y = bufferPositions.GetPosition()->y;
   double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
   double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
-  double x2 = bufferPositions.GetPosition()->GetX() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
-  double y2 = bufferPositions.GetPosition()->GetY() + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+  double x2 = bufferPositions.GetPosition()->x + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
+  double y2 = bufferPositions.GetPosition()->y + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
 
   double xSize = 0;
   double ySize = 0;
@@ -205,12 +205,12 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
         {
           if ((data->countPinInBufferingNet == 0) || (
             ((net.PinsCount() <= data->countPinInBufferingNet) 
-            && (!data->isTypeLimitationOnCountPinInBufferingNetEquality) ) ||
+            && (!data->isExactPinCountRequired) ) ||
             ((net.PinsCount() == data->countPinInBufferingNet) 
-            && (data->isTypeLimitationOnCountPinInBufferingNetEquality))))
+            && (data->isExactPinCountRequired))))
           {
             bool isBufferingNet = true;
-            if (!data->isBufferingNetContainPrimaryPin)            
+            if (!data->isNetContainPrimaryPin)            
               for (HNet::PinsEnumeratorW pew = net.GetPinsEnumeratorW(); pew.MoveNext();)              
                 if (pew.IsPrimary())
                   isBufferingNet = false;
@@ -222,7 +222,7 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
             if (!data->IsBuffering())
               continue;               
 
-            bufferCount += UpdateBinTable(context, BufferingNen(net, false, context));
+            bufferCount += UpdateBinTable(context, BufferingNet(net, false));
           }
         }
       }

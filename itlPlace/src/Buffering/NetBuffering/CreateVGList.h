@@ -9,11 +9,12 @@ using namespace Utils;
 
 class AbstractCreateVGListAlgorithm
 {
-protected:
-  NetBufferingAlgorithm* vGAlgorithm;
 public:
   AbstractCreateVGListAlgorithm(NetBufferingAlgorithm* vGA);
   virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree) = 0;
+
+protected:
+  NetBufferingAlgorithm* vGAlgorithm;
 };
 
 class ClassicCreateVGListAlgorithm: public AbstractCreateVGListAlgorithm

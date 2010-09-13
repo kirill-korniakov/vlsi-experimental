@@ -25,7 +25,7 @@ namespace Utils
     s += ",\t{";
     for (TemplateTypes<BufferPositions>::list::iterator pos = vGE->GetBufferPosition()->begin(); pos != vGE->GetBufferPosition()->end(); ++pos)
     {
-      sprintf(sBuf, "%d", pos->GetPosition()->GetIndex());
+      sprintf(sBuf, "%d", pos->GetPosition()->index);
       s += string(sBuf);
       s += ",\t";
     }

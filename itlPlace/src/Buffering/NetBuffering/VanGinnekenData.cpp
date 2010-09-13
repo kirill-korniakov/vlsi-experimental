@@ -12,20 +12,20 @@ VGAlgorithmData::VGAlgorithmData(HDesign& hd, NetBufferingAlgorithm* vGA): desig
   plotterWaitTime = 1;
   isInitialize = false;
   isInsertInSourceAndSink = false;
-  typeBufferingAlgorithm = 0;
+  typeBufferingAlgorithm = CLASSIC_CREATE_VG_LIST;
   sizeBuffer = 0; 
   maxIndex = 0;
   vGTree = NULL;
   netVisit = NULL;
   maxBufferCount = 0;
-  typeModificationVanGinnekenList = 0;
+  typeModificationVanGinnekenList = STANDART_MODIFICATION_VG_LIST;
   countPinInBufferingNet = 0;
-  isTypeLimitationOnCountPinInBufferingNetEquality = false;
+  isExactPinCountRequired = false;
   nameBufferingNet = "";
-  typeBuferAddition = 0;
+  typeBufferAddition = STANDART_ADDITION;
   sizeBufferMultiplier = 0;
-  isBufferingNetContainPrimaryPin = false;
-  totalAreaOfBuffersInRelationToAllCells = 0;
+  isNetContainPrimaryPin = false;
+  totalAllowableBuffersArea = 0;
   totalAreaCells = 0;
   totalAreaBuffer = 0;
   plotBuffer = false;
@@ -41,13 +41,13 @@ VGAlgorithmData::~VGAlgorithmData()
 void VGAlgorithmData::ReportParameters() 
 {
   ALERT("Partition type: %d", typePartition);
-  if (typePartition == 0)
+  if (typePartition == VanGinnekenTree::LINEAR)
     ALERT("Partition count: %d", partitionCount);
 
-  ALERT("Buffering algorithm type type: %d", typeBufferingAlgorithm);
-  ALERT("Type modification van Ginneken list: %d", typeModificationVanGinnekenList);
+  ALERT("Buffering algorithm type type: %d", int (typeBufferingAlgorithm));
+  ALERT("Type modification van Ginneken list: %d", int (typeModificationVanGinnekenList));
   ALERT("Maximum insert buffer in net: %d", maxBufferCount);
-  ALERT("Type bufer addition: %d", typeBuferAddition);
+  ALERT("Type bufer addition: %d", int (typeBufferAddition));
   ALERT("Size buffer multiplier: %f", sizeBufferMultiplier);
 }
 
@@ -68,19 +68,19 @@ void VGAlgorithmData::Initialize()
 
   partitionCount = design.cfg.ValueOf("Interval", 1);  
   isInsertInSourceAndSink = design.cfg.ValueOf("IsInsertInSourceAndSink", true);
-  typeBufferingAlgorithm = design.cfg.ValueOf("TypeBufferingAlgorithm", 0);
-  typePartition = design.cfg.ValueOf("TypePartition", 0);
+  typeBufferingAlgorithm = TypeBufferingAlgorithm(design.cfg.ValueOf("TypeBufferingAlgorithm", 0));
+  typePartition = VanGinnekenTree::PartitionType(design.cfg.ValueOf("TypePartition", 0));
 
   maxBufferCount = design.cfg.ValueOf("MaxBufferCount", 0);
-  typeModificationVanGinnekenList = design.cfg.ValueOf("TypeModificationVanGinnekenList", 0);
+  typeModificationVanGinnekenList = TypeModificationVanGinnekenList (design.cfg.ValueOf("TypeModificationVanGinnekenList", 0));
 
   countPinInBufferingNet = design.cfg.ValueOf("CountPinInBufferingNet", 0);
-  isTypeLimitationOnCountPinInBufferingNetEquality = design.cfg.ValueOf("IsTypeLimitationOnCountPinInBufferingNetEquality", false);
+  isExactPinCountRequired = design.cfg.ValueOf("IsNotExactPinCountRequired", false);
   nameBufferingNet = design.cfg.ValueOf("NameBufferingNet", "");
-  typeBuferAddition = design.cfg.ValueOf("TypeBuferAddition", 0);
+  typeBufferAddition = TypeBufferAddition (design.cfg.ValueOf("TypeBufferAddition", 0));
   sizeBufferMultiplier = design.cfg.ValueOf("SizeBufferMultiplier", 1.0);
-  isBufferingNetContainPrimaryPin = design.cfg.ValueOf("IsBufferingNetContainPrimaryPin", false);
-  totalAreaOfBuffersInRelationToAllCells = design.cfg.ValueOf("TotalAreaOfBuffersInRelationToAllCells", 0.0);
+  isNetContainPrimaryPin = design.cfg.ValueOf("IsNetContainPrimaryPin", false);
+  totalAllowableBuffersArea = design.cfg.ValueOf("TotalAllowableBuffersArea", 0.0);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;
@@ -148,8 +148,8 @@ void VGAlgorithmData::LoadBuffers()
 
 bool VGAlgorithmData::IsBuffering()
 {
-  if (totalAreaOfBuffersInRelationToAllCells != 0)
-    if (totalAreaBuffer > totalAreaOfBuffersInRelationToAllCells * totalAreaCells)
+  if (totalAllowableBuffersArea != 0)
+    if (totalAreaBuffer > totalAllowableBuffersArea * totalAreaCells)
       return false;  
   return true;
 }

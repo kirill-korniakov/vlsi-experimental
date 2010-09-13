@@ -36,17 +36,18 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   char bufferName[32];
   sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
   buffer.SetName(bufferName);
-  if ((vGAlgorithm->data->typePartition == 2) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) 
+      && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
-    buffer.SetX(position.GetPosition()->GetX());
+    buffer.SetX(position.GetPosition()->x);
   else
-    buffer.SetX(position.GetPosition()->GetX() - buffer.Width() * 0.5);
+    buffer.SetX(position.GetPosition()->x - buffer.Width() * 0.5);
 
-  if ((vGAlgorithm->data->typePartition == 2) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
-    buffer.SetY(position.GetPosition()->GetY());
+    buffer.SetY(position.GetPosition()->y);
   else
-    buffer.SetY(position.GetPosition()->GetY() - buffer.Height() * 0.5);
+    buffer.SetY(position.GetPosition()->y - buffer.Height() * 0.5);
 
   buffer.SetOrientation(Orientation_N);
   vGAlgorithm->data->design.Pins.AllocatePins(buffer);
@@ -229,19 +230,19 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
   buffer.SetName(bufferName);
 
   double x = 0;
-  if ((vGAlgorithm->data->typePartition == 2) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
-    x = position.GetPosition()->GetX();
+    x = position.GetPosition()->x;
   else
-    x = position.GetPosition()->GetX() - buffer.Width() * 0.5;
+    x = position.GetPosition()->x - buffer.Width() * 0.5;
   int column = position.GetPosition()->GetTree()->pGrid.GetColumn(x);
 
   double y = 0;
-  if ((vGAlgorithm->data->typePartition == 2) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
-    y = position.GetPosition()->GetY();
+    y = position.GetPosition()->y;
   else
-    y = position.GetPosition()->GetY() - buffer.Height() * 0.5;
+    y = position.GetPosition()->y - buffer.Height() * 0.5;
   int row = position.GetPosition()->GetTree()->pGrid.GetRow(y);
 
   double newX = position.GetPosition()->GetTree()->pGrid.GetNode(row, column)->GetX();

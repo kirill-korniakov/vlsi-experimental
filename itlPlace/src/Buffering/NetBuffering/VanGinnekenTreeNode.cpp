@@ -7,41 +7,18 @@ VanGinnekenTreeNode::VanGinnekenTreeNode()
 {
   x = 0;
   y = 0;
-  type = 3;
+  type = CANDIDATE;
   index = 0;
   tree = NULL;
   left = NULL;
   right = NULL;
 }
 
-bool VanGinnekenTreeNode::isSource()
+VanGinnekenTreeNode::~VanGinnekenTreeNode()
 {
-  return (type == 0) ? true : false;
-}
-
-bool VanGinnekenTreeNode::isSink()
-{
-  return (type == 1) ? true : false;
-}
-
-bool VanGinnekenTreeNode::isBranchPoint()
-{
-  return (type == 2) ? true : false;
-}
-
-bool VanGinnekenTreeNode::isCandidate()
-{
-  return ((type == 3) || (type == 4)|| (type == 5)) ? true : false;
-}
-
-bool VanGinnekenTreeNode::isCandidateAndRealPoint()
-{
-  return (type == 4) ? true : false;
-}
-
-bool VanGinnekenTreeNode::isInternal()
-{
-  return (type == 5) ? true : false;  
+  left = NULL;
+  right = NULL;
+  tree = NULL;
 }
 
 bool VanGinnekenTreeNode::HasLeft()
@@ -63,16 +40,6 @@ HSteinerPoint VanGinnekenTreeNode::GetSteinerPoint()
   return sPoint;
 }
 
-double VanGinnekenTreeNode::GetX()
-{
-  return x;
-}
-
-double VanGinnekenTreeNode::GetY()
-{
-  return y;
-}
-
 VanGinnekenTreeNode* VanGinnekenTreeNode::GetLeft()
 {
   return left;
@@ -81,11 +48,6 @@ VanGinnekenTreeNode* VanGinnekenTreeNode::GetLeft()
 VanGinnekenTreeNode* VanGinnekenTreeNode::GetRight()
 {
   return right;
-}
-
-int VanGinnekenTreeNode::GetIndex()
-{
-  return index;
 }
 
 VanGinnekenTree* VanGinnekenTreeNode::GetTree()
@@ -123,14 +85,6 @@ void VanGinnekenTreeNode::SetSteinerPoint(HSteinerPoint sp)
 {
   sPoint = sp;
 }
-void VanGinnekenTreeNode::SetX(double value)
-{
-  x = value;
-}
-void VanGinnekenTreeNode::SetY(double value)
-{
-  y = value;
-}
 
 void VanGinnekenTreeNode::SetLeft(VanGinnekenTreeNode* node)
 {
@@ -140,24 +94,38 @@ void VanGinnekenTreeNode::SetRight(VanGinnekenTreeNode* node)
 {
   right = node;
 }
-void VanGinnekenTreeNode::SetType(int t)
-{
-  type = t;
-}
-
-void VanGinnekenTreeNode::SetIndex(int i)
-{
-  index = i;
-}
 
 void VanGinnekenTreeNode::SetTree(VanGinnekenTree* t)
 {
   tree = t;
 }
 
-VanGinnekenTreeNode::~VanGinnekenTreeNode()
+bool VanGinnekenTreeNode::isSource()
 {
-  left = NULL;
-  right = NULL;
-  tree = NULL;
+  return (type == 0) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isSink()
+{
+  return (type == 1) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isBranchPoint()
+{
+  return (type == 2) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isCandidate()
+{
+  return ((type == 3) || (type == 4)|| (type == 5)) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isCandidateAndRealPoint()
+{
+  return (type == 4) ? true : false;
+}
+
+bool VanGinnekenTreeNode::isInternal()
+{
+  return (type == 5) ? true : false;  
 }

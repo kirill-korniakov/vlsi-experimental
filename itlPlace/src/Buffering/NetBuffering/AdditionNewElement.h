@@ -9,8 +9,6 @@ using namespace Utils;
 
 class AbstractAdditionNewElement
 {
-protected:
-  NetBufferingAlgorithm* vGAlgorithm;
 public:
   AbstractAdditionNewElement(NetBufferingAlgorithm* vGA);
   virtual void InsertsBuffer(TemplateTypes<NewBuffer>::list& newBuffer, VGVariantsListElement* best) = 0;
@@ -19,6 +17,9 @@ public:
   virtual NewBuffer* FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer) = 0;
   virtual void PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer) = 0;
   virtual void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node) = 0;
+
+protected:
+  NetBufferingAlgorithm* vGAlgorithm;
 };
 
 class StandartAdditionNewElement: public AbstractAdditionNewElement

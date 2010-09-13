@@ -8,8 +8,6 @@ using namespace Utils;
 
 class AbstractModificationVanGinnekenList
 {
-protected:
-  NetBufferingAlgorithm* vGAlgorithm;
 public:
   AbstractModificationVanGinnekenList(NetBufferingAlgorithm* vGA);
   virtual TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList) = 0;
@@ -19,6 +17,9 @@ public:
   virtual void InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element) = 0;
   virtual double GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2) = 0;
   virtual TemplateTypes<VGVariantsListElement>::list* CreateNewVGList(VanGinnekenTreeNode* node) = 0;
+
+protected:
+  NetBufferingAlgorithm* vGAlgorithm;
 };
 
 class StandartModificationVanGinnekenList: public AbstractModificationVanGinnekenList
@@ -41,11 +42,10 @@ public:
   virtual TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
 };
 
-class ExhaustiveSearch: public StandartModificationVanGinnekenList
+class ExhaustiveSearch: public ModificationVanGinnekenListAccountingBorder
 {
 public:
   ExhaustiveSearch(NetBufferingAlgorithm* vGA);
-  virtual TemplateTypes<VGVariantsListElement>::list* MergeList(TemplateTypes<VGVariantsListElement>::list* leftVGList, TemplateTypes<VGVariantsListElement>::list* RightVGList);
   virtual void AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, VanGinnekenTreeNode* node);
   virtual void SortVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList);
   virtual void InsertVGVariantsListElement(TemplateTypes<VGVariantsListElement>::list* vGList, VGVariantsListElement& element);

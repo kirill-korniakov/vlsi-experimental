@@ -6,13 +6,6 @@ class BufferPositions;
 
 class VGVariantsListElement
 {
-protected:
-  double RAT;
-  double c;
-  TemplateTypes<BufferPositions>::list bufferPositions;
-  int positionCount;
-  int index;
-
 public:
   VGVariantsListElement();
 
@@ -37,6 +30,13 @@ public:
   void SetRAT(double rat);
   void SetC(double capacity);
   void SetIndex(int i);
+
+protected:
+  double RAT;
+  double c;
+  TemplateTypes<BufferPositions>::list bufferPositions;
+  int positionCount;
+  int index;
 };
 
 #endif

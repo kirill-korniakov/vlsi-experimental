@@ -3,11 +3,32 @@
 
 #include "BufferInfo.h"
 #include "Utils.h"
+#include "VanGinnekenTree.h"
 
 class VanGinnekenTree;
 class HWirePhysicalParams;
 class NetBufferingAlgorithm;
 using namespace Utils;
+
+enum TypeBufferingAlgorithm
+{
+  CLASSIC_CREATE_VG_LIST = 0,
+  LINE_BYPASS_CREATE_VG_LIST = 1,
+  ADAPTIVE_BYPASS_CREATE_VG_LIST = 2
+};
+
+enum TypeModificationVanGinnekenList
+{
+ STANDART_MODIFICATION_VG_LIST = 0,
+ ACCOUNTING_BORDER_MODIFICATION_VG_LIST = 1,
+ EXHAUSTIVE_SEARCH = 2
+};
+
+enum TypeBufferAddition
+{
+ STANDART_ADDITION = 0,
+ LEGAL_ADDITION = 1
+};
 
 class VGAlgorithmData
 {
@@ -18,36 +39,39 @@ public:
   bool plotVGTree;
   bool plotNets;
   bool plotSteinerPoint;
-  int plotterWaitTime;
   bool plotBuffer;
   bool plotBinGridValue;
+  int plotterWaitTime;
+
+  bool isInitialize;
 
   int partitionCount;
-  bool isInitialize;
-  bool isInsertInSourceAndSink;
-  int typeBufferingAlgorithm;
-  int typePartition;
-  double sizeBuffer;
+  VanGinnekenTree::PartitionType typePartition;
   int maxIndex;
-  bool* netVisit;
+  VanGinnekenTree* vGTree;
+  
+  bool isInsertInSourceAndSink;
   int maxBufferCount;
-  int typeModificationVanGinnekenList;
-  int countPinInBufferingNet;
-  bool isTypeLimitationOnCountPinInBufferingNetEquality;
+  TypeBufferingAlgorithm typeBufferingAlgorithm;  
+  TypeModificationVanGinnekenList typeModificationVanGinnekenList;
+  TypeBufferAddition typeBufferAddition;
+
+  bool* netVisit;
   string nameBufferingNet;
-  int typeBuferAddition;
-  double sizeBufferMultiplier;
-  bool isBufferingNetContainPrimaryPin;
-  double totalAreaOfBuffersInRelationToAllCells;
+  int countPinInBufferingNet;
+  bool isExactPinCountRequired;
+  bool isNetContainPrimaryPin;
+
+  double totalAllowableBuffersArea;
   double totalAreaCells;
   double totalAreaBuffer;
+  double sizeBufferMultiplier;
+  double sizeBuffer;
 
   HDesign& design;
   HWirePhysicalParams& WirePhisics;
   TemplateTypes<BufferInfo>::vector Buffers;
   NetBufferingAlgorithm* vGAlgorithm;
-
-  VanGinnekenTree* vGTree;
 
   VGAlgorithmData(HDesign& hd,  NetBufferingAlgorithm* vGA);
   ~VGAlgorithmData();

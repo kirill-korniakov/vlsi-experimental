@@ -190,7 +190,7 @@ void StandartModificationVanGinnekenList::InsertVGVariantsListElement(
 
 double StandartModificationVanGinnekenList::GetLength(VanGinnekenTreeNode* node1, VanGinnekenTreeNode* node2)
 {
-  return fabs(node1->GetX() - node2->GetX()) + fabs(node1->GetY() - node2->GetY());
+  return fabs(node1->x - node2->x) + fabs(node1->y - node2->y);
 }
 
 TemplateTypes<VGVariantsListElement>::list* 
@@ -206,7 +206,7 @@ StandartModificationVanGinnekenList::CreateNewVGList(VanGinnekenTreeNode* node)
 
   if (vGAlgorithm->data->printVariantsList)
   { 
-    ALERT("sink id: %d", node->GetIndex());
+    ALERT("sink id: %d", node->index);
     PrintVariants(newList);
   }
   return newList;
@@ -267,58 +267,8 @@ ModificationVanGinnekenListAccountingBorder::MergeList(TemplateTypes<VGVariantsL
     return result;
 }
 
-ExhaustiveSearch::ExhaustiveSearch(NetBufferingAlgorithm* vGA):StandartModificationVanGinnekenList(vGA)
+ExhaustiveSearch::ExhaustiveSearch(NetBufferingAlgorithm* vGA):ModificationVanGinnekenListAccountingBorder(vGA)
 {
-}
-TemplateTypes<VGVariantsListElement>::list* ExhaustiveSearch::MergeList(
-  TemplateTypes<VGVariantsListElement>::list* leftVGList, 
-  TemplateTypes<VGVariantsListElement>::list* RightVGList)
-{
-  TemplateTypes<VGVariantsListElement>::list* result = new TemplateTypes<VGVariantsListElement>::list();
-
-  for (TemplateTypes<VGVariantsListElement>::list::iterator left = leftVGList->begin(); 
-    left != leftVGList->end(); left++)
-    for (TemplateTypes<VGVariantsListElement>::list::iterator right = RightVGList->begin(); 
-      right != RightVGList->end(); right++)
-    {
-      if (( (left->GetPositionCount() + right->GetPositionCount()) > vGAlgorithm->data->maxBufferCount) &&
-        (vGAlgorithm->data->maxBufferCount > 0))
-        continue;
-
-      VGVariantsListElement newElement;
-
-      newElement.SetC(left->GetC() + right->GetC());
-      newElement.SetBufferPosition(*left->GetBufferPosition());
-      for (TemplateTypes<BufferPositions>::list::iterator pos = right->GetBufferPosition()->begin(); 
-        pos != right->GetBufferPosition()->end(); ++pos)
-      {
-        newElement.SetBufferPosition(*pos);
-      }
-      if (left->GetRAT() < right->GetRAT())
-      {
-        newElement.SetRAT(left->GetRAT());
-      }
-      else      
-      {
-        newElement.SetRAT(right->GetRAT());
-      }
-      InsertVGVariantsListElement(result, newElement);
-    }
-
-    if (vGAlgorithm->data->printVariantsList)
-    {
-      ALERT("left:\n");
-      PrintVariants(leftVGList);
-      ALERT("right:\n");
-      PrintVariants(RightVGList);
-      ALERT("merge:\n");
-      PrintVariants(result);
-    }
-
-    delete leftVGList;
-    delete RightVGList;
-
-    return result;
 }
 
 void ExhaustiveSearch::AddBuffer(TemplateTypes<VGVariantsListElement>::list* vGList, 
