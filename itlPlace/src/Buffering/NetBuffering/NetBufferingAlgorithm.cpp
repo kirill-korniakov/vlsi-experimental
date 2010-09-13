@@ -69,7 +69,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
   if (data->typeBufferAddition != LEGAL_ADDITION)
     data->netVisit[::ToID(net)] = true;
 
-  data->vGTree->UpdateTree(data->design.SteinerPoints[(net, data->design).Source()]);
+  data->vGTree->UpdateTree<HSteinerPoint>(data->design.SteinerPoints[(net, data->design).Source()]);
 
   if ((data->plotSteinerPoint) || (data->plotNets))
   {

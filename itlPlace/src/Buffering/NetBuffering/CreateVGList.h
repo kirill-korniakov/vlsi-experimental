@@ -30,13 +30,24 @@ class LineBypassAtCreateVGListAlgorithm: public AbstractCreateVGListAlgorithm
 public:
   LineBypassAtCreateVGListAlgorithm(NetBufferingAlgorithm* vGA);
   virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree);
+  
+protected:
+  virtual void CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList,
+  TemplateTypes<VGVariantsListElement>::list* leftList,
+  TemplateTypes<VGVariantsListElement>::list* rightList, int i);
+  virtual void CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList, int i);
 };
 
-class AdaptiveBypassAtCreateVGListAlgorithm: public AbstractCreateVGListAlgorithm
+class AdaptiveBypassAtCreateVGListAlgorithm: public LineBypassAtCreateVGListAlgorithm
 {
 public:
   AdaptiveBypassAtCreateVGListAlgorithm(NetBufferingAlgorithm* vGA);
-  virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree);
+
+protected:
+	virtual void CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList, int i);
 };
 
 #endif

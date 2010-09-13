@@ -25,6 +25,7 @@ public:
     HDPGrid* DPGrid;
     VanGinnekenTreeNode* vGTree;
     HPlacementGrid pGrid;
+	HCriticalPath criticalPath;
 
     VanGinnekenTree(NetBufferingAlgorithm* vGA);
     VanGinnekenTree(NetBufferingAlgorithm* vGA, int partitionCount);
@@ -32,8 +33,65 @@ public:
     VanGinnekenTree(NetBufferingAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
 
     virtual void ClearTree();
-    virtual void UpdateTree(HSteinerPoint& source);
     virtual int GetTreeSize();
+
+	template< class StartPoint >
+	void UpdateTree(StartPoint source)
+	{
+	  ClearTree();
+	  TemplateTypes<HSteinerPoint>::stack points;
+	  TemplateTypes<int>::stack rootIndexs;
+	  TemplateTypes<int>::stack isPoitnsVisits;
+
+	  int nodeIndex = 0;
+	  int rootIndex = 0;
+	  int isPoitnVisit = 0;
+	  HSteinerPoint srcPoint = GetSteinerPointByStartPoint(source);
+	  HSteinerPoint nextPoint = srcPoint;
+	  points.push(srcPoint);	
+	  rootIndexs.push(0);
+	  isPoitnsVisits.push(0);
+	  CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
+
+	  while (!points.empty())
+	  {
+		srcPoint = points.top();
+		rootIndex = rootIndexs.top();
+		isPoitnVisit = isPoitnsVisits.top();
+		isPoitnsVisits.pop();
+		if (isPoitnVisit == 0)
+		{
+		  if (vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
+		  {
+			  CreateNodeInLeftSubTree(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+		  }
+		  else
+		  {
+			CreateNodeInSink(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+		  }
+		}
+		else
+		  if (isPoitnVisit == 1)
+		  {
+			isPoitnVisit = 2;
+			isPoitnsVisits.push(isPoitnVisit);  
+			if (vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
+			{
+			  CreateNodeInRightSubTree(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+			}    
+		  }
+		  else
+			if (isPoitnVisit == 2)
+			{
+			  points.pop();	
+			  rootIndexs.pop();
+			}
+	  }
+
+	  treeSize = nodeIndex + 1;
+	  if (nodeIndex >= totalTreeSize)
+		ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d",totalTreeSize, nodeIndex);
+	}
 
     virtual double GetR();
     virtual VanGinnekenTreeNode GetSource();
@@ -44,6 +102,37 @@ protected:
     int totalTreeSize;  
     int treeSize;
     PartitionType TypePartition;
+
+template< class StartPoint >
+HSteinerPoint GetSteinerPointByStartPoint(StartPoint point)
+{
+	return HSteinerPoint(point);
+}
+
+	void CreateNodeInLeftSubTree(  TemplateTypes<HSteinerPoint>::stack& points,
+  TemplateTypes<int>::stack& rootIndexs,
+  TemplateTypes<int>::stack& isPoitnsVisits,
+  int& nodeIndex,
+  int& rootIndex,
+  int& isPoitnVisit,
+  HSteinerPoint& srcPoint,
+  HSteinerPoint& nextPoint);
+	void CreateNodeInSink(  TemplateTypes<HSteinerPoint>::stack& points,
+  TemplateTypes<int>::stack& rootIndexs,
+  TemplateTypes<int>::stack& isPoitnsVisits,
+  int& nodeIndex,
+  int& rootIndex,
+  int& isPoitnVisit,
+  HSteinerPoint& srcPoint,
+  HSteinerPoint& nextPoint);
+void CreateNodeInRightSubTree(  TemplateTypes<HSteinerPoint>::stack& points,
+  TemplateTypes<int>::stack& rootIndexs,
+  TemplateTypes<int>::stack& isPoitnsVisits,
+  int& nodeIndex,
+  int& rootIndex,
+  int& isPoitnVisit,
+  HSteinerPoint& srcPoint,
+  HSteinerPoint& nextPoint);
 
     template< class EnumeratorW >
     HSteinerPoint GetSourceEnumerator(EnumeratorW enumerator);

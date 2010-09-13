@@ -75,29 +75,12 @@ AbstractCreateVGListAlgorithm(vGA)
 {
 }
 
-TemplateTypes<VGVariantsListElement>::list* 
-LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
+void LineBypassAtCreateVGListAlgorithm::CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList,
+  TemplateTypes<VGVariantsListElement>::list* leftList,
+  TemplateTypes<VGVariantsListElement>::list* rightList, int i)
 {
-  TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack stackList;
-  int lastIndexTree = tree->GetTreeSize() - 1;
-
-  TemplateTypes<VGVariantsListElement>::list* newList = NULL;
-  TemplateTypes<VGVariantsListElement>::list* currentList = NULL;
-  TemplateTypes<VGVariantsListElement>::list* leftList = NULL;
-  TemplateTypes<VGVariantsListElement>::list* rightList = NULL;
-
-  for (int i = lastIndexTree; i > 0; i--)
-  {
-    if (tree->vGTree[i].isSink())
-    {
-      newList = vGAlgorithm->modificationVanGinnekenList->CreateNewVGList(&tree->vGTree[i]);
-      stackList.push(newList);
-      newList = NULL;
-    }
-    else
-      if (tree->vGTree[i].isBranchPoint())
-      {
-        leftList = stackList.top();
+	leftList = stackList.top();
         stackList.pop();
 
         if (tree->vGTree[i].HasRight())
@@ -122,9 +105,11 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
           stackList.push(leftList);
           leftList = NULL;
         }
-      }
-      else
-      {
+}
+
+void LineBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList, int i)
+{
         currentList = stackList.top();
         stackList.pop();
 
@@ -149,23 +134,10 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
         }
         stackList.push(currentList);
         currentList = NULL;
-      }
-  }
-  if (stackList.size() > 1)
-    ALERT("Error: length stackList > 1");
-
-  newList = stackList.top();
-  stackList.pop();
-  return newList;
-}
-
-AdaptiveBypassAtCreateVGListAlgorithm::AdaptiveBypassAtCreateVGListAlgorithm(NetBufferingAlgorithm* vGA): 
-AbstractCreateVGListAlgorithm(vGA)
-{
 }
 
 TemplateTypes<VGVariantsListElement>::list* 
-AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
+LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
 {
   TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack stackList;
   int lastIndexTree = tree->GetTreeSize() - 1;
@@ -184,37 +156,34 @@ AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
       newList = NULL;
     }
     else
+	{
       if (tree->vGTree[i].isBranchPoint())
-      {
-        leftList = stackList.top();
-        stackList.pop();
-
-        if (tree->vGTree[i].HasRight())
-        {
-          rightList = stackList.top();
-          stackList.pop();
-          if (vGAlgorithm->data->printVariantsList)
-            ALERT("Branch Point id: %d", tree->vGTree[i].index);          
-          currentList = vGAlgorithm->modificationVanGinnekenList->MergeList(leftList, rightList);
-          stackList.push(currentList);
-          leftList = NULL;
-          rightList = NULL;
-          currentList = NULL;
-        }
-        else
-        {
-          if (vGAlgorithm->data->printVariantsList)
-          { 
-            ALERT("BranchPoint id: %d", tree->vGTree[i].index);
-            PrintVariants(leftList);
-          }
-          stackList.push(leftList);
-          leftList = NULL;
-        }
-      }
+	  {
+        CalculateBranchPoint(tree, stackList, currentList, leftList, rightList, i);
+      }	
       else
-      {
-        currentList = stackList.top();
+	  {
+		CalculateCandidatePoint(tree, stackList, currentList, i);
+      }
+	}
+  }
+  if (stackList.size() > 1)
+    ALERT("Error: length stackList > 1");
+
+  newList = stackList.top();
+  stackList.pop();
+  return newList;
+}
+
+AdaptiveBypassAtCreateVGListAlgorithm::AdaptiveBypassAtCreateVGListAlgorithm(NetBufferingAlgorithm* vGA): 
+LineBypassAtCreateVGListAlgorithm(vGA)
+{
+}
+
+void AdaptiveBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+  TemplateTypes<VGVariantsListElement>::list* currentList, int i)
+{
+	        currentList = stackList.top();
         stackList.pop();
         if (tree->vGTree[i].isInternal() || tree->vGTree[i].isCandidateAndRealPoint())
         {
@@ -272,12 +241,4 @@ AdaptiveBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
         }
         stackList.push(currentList);
         currentList = NULL;
-      }
-  }
-  if (stackList.size() > 1)
-    ALERT("Error: length stackList > 1");
-
-  newList = stackList.top();
-  stackList.pop();
-  return newList;
 }
