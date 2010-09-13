@@ -67,4 +67,5 @@ class Checker(BaseExperiment):
             return NEW
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)
+        self.PrintBenchmarkTable(values, benchmark, reportTable)
         return self.CompareTables(currentValues, masterValues)
