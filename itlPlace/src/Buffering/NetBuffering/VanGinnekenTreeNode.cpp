@@ -35,9 +35,14 @@ bool VanGinnekenTreeNode::HasRight()
   return false;
 }
 
-HSteinerPoint VanGinnekenTreeNode::GetSteinerPoint()
+HSteinerPoint VanGinnekenTreeNode::GetSteinerPoint(bool first)
 {
   return sPoint;
+}
+
+HNet VanGinnekenTreeNode::GetNet(bool first)
+{
+  return net;
 }
 
 VanGinnekenTreeNode* VanGinnekenTreeNode::GetLeft()
@@ -57,9 +62,9 @@ VanGinnekenTree* VanGinnekenTreeNode::GetTree()
 
 double VanGinnekenTreeNode::GetRAT()	
 {		
-  if (sPoint != tree->vGAlgorithm->data->design.SteinerPoints.Null())
+  if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
   {
-    return (tree->vGAlgorithm->data->design.TimingPoints[(sPoint,tree->vGAlgorithm->data->design).Pin()],tree->vGAlgorithm->data->design).RequiredTime();
+    return (tree->vGAlgorithmData->design.TimingPoints[(sPoint,tree->vGAlgorithmData->design).Pin()],tree->vGAlgorithmData->design).RequiredTime();
   }
   else
     return 0;
@@ -67,23 +72,28 @@ double VanGinnekenTreeNode::GetRAT()
 
 double VanGinnekenTreeNode::GetC()
 {
-  if (sPoint != tree->vGAlgorithm->data->design.SteinerPoints.Null())
-    return (((sPoint,tree->vGAlgorithm->data->design).Pin(),tree->vGAlgorithm->data->design).Type(),tree->vGAlgorithm->data->design).Capacitance();
+  if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+    return (((sPoint,tree->vGAlgorithmData->design).Pin(),tree->vGAlgorithmData->design).Type(),tree->vGAlgorithmData->design).Capacitance();
   else
     return 0;
 }
 
 double VanGinnekenTreeNode::GetR()
 {
-  if (sPoint != tree->vGAlgorithm->data->design.SteinerPoints.Null())
-    return Utils::GetDriverTimingPhisics(tree->vGAlgorithm->data->design, (sPoint,tree->vGAlgorithm->data->design).Pin(), SignalDirection_None).R;
+  if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+    return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (sPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
   else
     return 0;
 }
 
-void VanGinnekenTreeNode::SetSteinerPoint(HSteinerPoint sp)  
+void VanGinnekenTreeNode::SetSteinerPoint(HSteinerPoint sp, bool first)  
 {
   sPoint = sp;
+}
+
+void VanGinnekenTreeNode::SetNet(HNet n, bool first)
+{
+  net = n;
 }
 
 void VanGinnekenTreeNode::SetLeft(VanGinnekenTreeNode* node)
@@ -102,30 +112,66 @@ void VanGinnekenTreeNode::SetTree(VanGinnekenTree* t)
 
 bool VanGinnekenTreeNode::isSource()
 {
-  return (type == 0) ? true : false;
+  return (type == SOURCE) ? true : false;
 }
 
 bool VanGinnekenTreeNode::isSink()
 {
-  return (type == 1) ? true : false;
+  return (type == SINK) ? true : false;
 }
 
 bool VanGinnekenTreeNode::isBranchPoint()
 {
-  return (type == 2) ? true : false;
+  return ((type == BRANCH) || (type == SOURCE_AND_SINK)) ? true : false;
 }
 
 bool VanGinnekenTreeNode::isCandidate()
 {
-  return ((type == 3) || (type == 4)|| (type == 5)) ? true : false;
+  return ((type == CANDIDATE) || (type == CANDIDATE_ON_PIN)|| (type == CANDIDATE_INTERNAL)) ? true : false;
 }
 
 bool VanGinnekenTreeNode::isCandidateAndRealPoint()
 {
-  return (type == 4) ? true : false;
+  return (type == CANDIDATE_ON_PIN) ? true : false;
 }
 
 bool VanGinnekenTreeNode::isInternal()
 {
-  return (type == 5) ? true : false;  
+  return (type == CANDIDATE_INTERNAL) ? true : false;  
+}
+
+VanGinnekenTreeNodePathBased::VanGinnekenTreeNodePathBased():VanGinnekenTreeNode()
+{
+}
+HSteinerPoint VanGinnekenTreeNodePathBased::GetSteinerPoint(bool first)
+{
+  if (first)
+    return sPoint;
+  else
+    return secondSPoint;
+
+}
+
+HNet VanGinnekenTreeNodePathBased::GetNet(bool first)
+{
+  if (first)
+    return net;
+  else
+    return secondNet;
+}
+
+void VanGinnekenTreeNodePathBased::SetSteinerPoint(HSteinerPoint sp, bool first)
+{
+  if (first)
+    sPoint = sp;
+  else
+    secondSPoint = sp;
+}
+
+void VanGinnekenTreeNodePathBased::SetNet(HNet n, bool first)
+{
+  if (first)
+    net = n;
+  else
+    secondNet = n;
 }

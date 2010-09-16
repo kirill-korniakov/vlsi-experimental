@@ -12,13 +12,13 @@ enum NodeType
     BRANCH = 2, // - точка ветвлени€;
     CANDIDATE = 3, // - кандидат на вставку буфера; 
     CANDIDATE_ON_PIN = 4, // - кандидат на вставку буфера с координатоми совподающими с source или sink;
-    CANDIDATE_INTERNAL = 5 // - кандидат на вставку буфера с координатой совподающей с внутреними точками дерева штейнера
+    CANDIDATE_INTERNAL = 5, // - кандидат на вставку буфера с координатой совподающей с внутреними точками дерева штейнера
+    SOURCE_AND_SINK = 6 // - точка объеден€юща€ сорс и синк двух нетов в одну точку
 };
 
 class VanGinnekenTreeNode
 {
 public:
-  HNet net;
   VanGinnekenTreeNode();  
   ~VanGinnekenTreeNode();
 
@@ -28,7 +28,8 @@ public:
 
   bool HasLeft();
   bool HasRight();
-  HSteinerPoint GetSteinerPoint();  
+  HSteinerPoint GetSteinerPoint(bool first = true);
+  HNet GetNet(bool first = true);
 
   VanGinnekenTreeNode* GetLeft();
   VanGinnekenTreeNode* GetRight();
@@ -38,7 +39,8 @@ public:
   double GetC();//capacity in sinc
   double GetR();//resistance in source
 
-  void SetSteinerPoint(HSteinerPoint sp);  
+  void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
+  void SetNet(HNet n, bool first = true);
   void SetLeft(VanGinnekenTreeNode* node);
   void SetRight(VanGinnekenTreeNode* node);
   void SetTree(VanGinnekenTree* t);
@@ -51,10 +53,25 @@ public:
   bool isInternal();
 
 protected:
+  HNet net;
   HSteinerPoint sPoint;
   VanGinnekenTreeNode* left;
   VanGinnekenTreeNode* right;
   VanGinnekenTree* tree;
+};
+
+class VanGinnekenTreeNodePathBased: public VanGinnekenTreeNode
+{
+public:
+  VanGinnekenTreeNodePathBased();
+  HSteinerPoint GetSteinerPoint(bool first = true);
+  HNet GetNet(bool first = true);
+  void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
+  void SetNet(HNet n, bool first = true);
+
+protected:
+  HNet secondNet;
+  HSteinerPoint secondSPoint;
 };
 
 #endif

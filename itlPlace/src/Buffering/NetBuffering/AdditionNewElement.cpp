@@ -36,14 +36,14 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   char bufferName[32];
   sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
   buffer.SetName(bufferName);
-  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) 
+  if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) 
       && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
     buffer.SetX(position.GetPosition()->x);
   else
     buffer.SetX(position.GetPosition()->x - buffer.Width() * 0.5);
 
-  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
     buffer.SetY(position.GetPosition()->y);
   else
@@ -230,7 +230,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
   buffer.SetName(bufferName);
 
   double x = 0;
-  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
     x = position.GetPosition()->x;
   else
@@ -238,7 +238,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
   int column = position.GetPosition()->GetTree()->pGrid.GetColumn(x);
 
   double y = 0;
-  if ((vGAlgorithm->data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
+  if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
     !position.GetPosition()->isCandidateAndRealPoint() && !position.GetPosition()->isInternal())
     y = position.GetPosition()->y;
   else

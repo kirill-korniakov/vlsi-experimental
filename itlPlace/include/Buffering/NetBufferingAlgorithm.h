@@ -26,6 +26,7 @@ public:
 
   NetBufferingAlgorithm();
   NetBufferingAlgorithm(HDesign& hd);
+  ~NetBufferingAlgorithm();
   virtual void Initialize(bool isAgainInitialize = false);
   virtual VGVariantsListElement BufferingNet(HNet& net, bool isRealBuffering = true);
 

@@ -17,6 +17,13 @@ NetBufferingAlgorithm::NetBufferingAlgorithm(HDesign& hd)
   data = new VGAlgorithmData(hd, this);
   isInitialize = false;
 }
+NetBufferingAlgorithm::~NetBufferingAlgorithm()
+{
+  delete createVGListAlgorithm;
+  delete modificationVanGinnekenList;
+  delete additionNewElement;
+  delete data;
+}
 
 void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
 {
@@ -29,14 +36,15 @@ void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
   isInitialize = true;
   data->Initialize();
 
-  if (data->typePartition == VanGinnekenTree::LINEAR)
-    data->vGTree = new VGTreeUniformDistribution(this, data->partitionCount);
-  if (data->typePartition == VanGinnekenTree::DYNAMIC)
-    data->vGTree = new VGTreeDynamicDistribution(this, data->partitionCount);
-  if (data->typePartition == VanGinnekenTree::LEGAL_POSITIONS_ONLY)    
-    data->vGTree = new VGTreeLegalDynamicDistribution(this, data->partitionCount, 
-    data->sizeBuffer);    
+  data->vGTree = new VanGinnekenTree(data);
 
+/*  if (data->typePartition == LINEAR)
+    data->vGTree = new VGTreeUniformDistribution(data);
+  if (data->typePartition == DYNAMIC)
+    data->vGTree = new VGTreeDynamicDistribution(data);
+  if (data->typePartition == LEGAL_POSITIONS_ONLY)    
+    data->vGTree = new VGTreeLegalDynamicDistribution(data, data->sizeBuffer);    
+*/
   if (data->typeBufferingAlgorithm == CLASSIC_CREATE_VG_LIST)
     createVGListAlgorithm = new ClassicCreateVGListAlgorithm(this);
   if (data->typeBufferingAlgorithm == LINE_BYPASS_CREATE_VG_LIST)
@@ -69,7 +77,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
   if (data->typeBufferAddition != LEGAL_ADDITION)
     data->netVisit[::ToID(net)] = true;
 
-  data->vGTree->UpdateTree<HSteinerPoint>(data->design.SteinerPoints[(net, data->design).Source()]);
+  data->vGTree->updateVanGinnekenTree->UpdateTree<HSteinerPoint>(data->design.SteinerPoints[(net, data->design).Source()]);
 
   if ((data->plotSteinerPoint) || (data->plotNets))
   {

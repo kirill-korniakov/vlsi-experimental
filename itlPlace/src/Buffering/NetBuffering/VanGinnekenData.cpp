@@ -1,9 +1,19 @@
 #include "VanGinnekenData.h"
 
+VGAlgorithmData::VGAlgorithmData(HDesign& hd): design(hd), WirePhisics(hd.RoutingLayers.Physics)
+{
+  DefaultValue();
+}
+
 VGAlgorithmData::VGAlgorithmData(HDesign& hd, NetBufferingAlgorithm* vGA): design(hd), WirePhisics(hd.RoutingLayers.Physics)
 {
   vGAlgorithm = vGA;
-  partitionCount = 0;
+  DefaultValue();
+}
+
+void VGAlgorithmData::DefaultValue()
+{
+  partitionPointCount = 0;
   plotVGTree = false;
   plotNets = false;
   printNetInfo = false;
@@ -30,7 +40,10 @@ VGAlgorithmData::VGAlgorithmData(HDesign& hd, NetBufferingAlgorithm* vGA): desig
   totalAreaBuffer = 0;
   plotBuffer = false;
   plotBinGridValue = false;
+  totalTreeSize = 0;
+  typeNetListBuffering = BUFFERING_ALL_CRITICAL_PATH;
 }
+
 
 VGAlgorithmData::~VGAlgorithmData()
 {
@@ -41,8 +54,8 @@ VGAlgorithmData::~VGAlgorithmData()
 void VGAlgorithmData::ReportParameters() 
 {
   ALERT("Partition type: %d", typePartition);
-  if (typePartition == VanGinnekenTree::LINEAR)
-    ALERT("Partition count: %d", partitionCount);
+  if (typePartition == LINEAR)
+    ALERT("Partition count: %d", partitionPointCount);
 
   ALERT("Buffering algorithm type type: %d", int (typeBufferingAlgorithm));
   ALERT("Type modification van Ginneken list: %d", int (typeModificationVanGinnekenList));
@@ -66,10 +79,10 @@ void VGAlgorithmData::Initialize()
   printNetInfo = design.cfg.ValueOf("Reporting.PrintNetInfo", false);
   printVariantsList = design.cfg.ValueOf("Reporting.PrintVGVariantsList", false);
 
-  partitionCount = design.cfg.ValueOf("Interval", 1);  
+  partitionPointCount = design.cfg.ValueOf("Interval", 1);  
   isInsertInSourceAndSink = design.cfg.ValueOf("IsInsertInSourceAndSink", true);
   typeBufferingAlgorithm = TypeBufferingAlgorithm(design.cfg.ValueOf("TypeBufferingAlgorithm", 0));
-  typePartition = VanGinnekenTree::PartitionType(design.cfg.ValueOf("TypePartition", 0));
+  typePartition = PartitionType(design.cfg.ValueOf("TypePartition", 0));
 
   maxBufferCount = design.cfg.ValueOf("MaxBufferCount", 0);
   typeModificationVanGinnekenList = TypeModificationVanGinnekenList (design.cfg.ValueOf("TypeModificationVanGinnekenList", 0));
@@ -81,6 +94,7 @@ void VGAlgorithmData::Initialize()
   sizeBufferMultiplier = design.cfg.ValueOf("SizeBufferMultiplier", 1.0);
   isNetContainPrimaryPin = design.cfg.ValueOf("IsNetContainPrimaryPin", false);
   totalAllowableBuffersArea = design.cfg.ValueOf("TotalAllowableBuffersArea", 0.0);
+  typeNetListBuffering = TypeNetListBuffering(design.cfg.ValueOf("TypeNetListBuffering", 0));
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;

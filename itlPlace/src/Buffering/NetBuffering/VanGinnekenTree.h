@@ -1,190 +1,158 @@
 #ifndef __VanGinnekenTree_H__
 #define __VanGinnekenTree_H__
 
-#include "VanGinnekenTreeNode.h"
+//#include "VanGinnekenTreeNode.h"
+#include "VanGinnekenTreeCreate.h"
 #include "Utils.h"
 
 class HDPGrid;
-class NetBufferingAlgorithm;
+class VGAlgorithmData;
+class UpdateVanGinnekenTree;
 using namespace Utils;
 
-
+enum PartitionType
+{
+  LINEAR               = 0, //0 - обычное линейное разбиение
+  DYNAMIC              = 1, //1 - динамическое распределение точек,
+  LEGAL_POSITIONS_ONLY = 2  //2 - легальное распределение точек (использовать только с 1 или 2 типом буферизации)
+};
 
 class VanGinnekenTree
 {
 public:
+  VGAlgorithmData* vGAlgorithmData;
+  HDPGrid* DPGrid;
+  VanGinnekenTreeNode* vGTreeNodeList;
+  HPlacementGrid pGrid;
 
-    enum PartitionType
+  UpdateVanGinnekenTree* updateVanGinnekenTree;
+  VanGinnekenTreeNodeCreate* vanGinnekenTreeNodeCreate;
+  VanGinnekenTreeCreate* vanGinnekenTreeCreate;
+  CalculateVanGinnekenSubtree* calculateVanGinnekenSubtree;
+  FindMaxPointInEdgeVanGinnekenTree* findMaxPointInEdgeVanGinnekenTree;
+
+  VanGinnekenTree(VGAlgorithmData* data);
+  ~VanGinnekenTree();
+
+  virtual void ClearTree();
+  virtual int GetTreeSize();
+  virtual double GetR();
+  virtual VanGinnekenTreeNode GetSource();
+
+};
+
+class UpdateVanGinnekenTree
+{
+public:
+  VanGinnekenTree* vGTree;
+  int treeSize;
+
+  UpdateVanGinnekenTree(VanGinnekenTree* tree);
+
+  template< class StartPoint >
+  void UpdateTree(StartPoint source)
+  {
+    vGTree->ClearTree();
+    TemplateTypes<HSteinerPoint>::stack points;
+    TemplateTypes<int>::stack rootIndexs;
+    TemplateTypes<int>::stack isPoitnsVisits;
+
+    int nodeIndex = 0;
+    int rootIndex = 0;
+    int isPoitnVisit = 0;
+    HSteinerPoint srcPoint = GetSteinerPointByStartPoint(source);
+    HNet net = vGTree->vGAlgorithmData->design.Pins.Get<HPin::Net, HNet>(vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(srcPoint));
+    HSteinerPoint nextPoint = srcPoint;
+    points.push(srcPoint);	
+    rootIndexs.push(0);
+    isPoitnsVisits.push(0);
+    //CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
+    vGTree->vanGinnekenTreeNodeCreate->CreateSource(net, srcPoint, SOURCE, nodeIndex, vGTree);
+
+    while (!points.empty())
     {
-        LINEAR               = 0, //0 - обычное линейное разбиение
-        DYNAMIC              = 1, //1 - динамическое распределение точек,
-        LEGAL_POSITIONS_ONLY = 2  //2 - легальное распределение точек (использовать только с 1 или 2 типом буферизации)
-    };
+      srcPoint = points.top();
+      rootIndex = rootIndexs.top();
+      isPoitnVisit = isPoitnsVisits.top();
+      isPoitnsVisits.pop();
+      if (isPoitnVisit == 0)
+      {
+        if (vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
+        {
+          CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+        }
+        else
+        {
+          CreateNodeInSink(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, source);
+        }
+      }
+      else
+        if (isPoitnVisit == 1)
+        {
+          isPoitnVisit = 2;
+          isPoitnsVisits.push(isPoitnVisit);  
+          if (vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
+          {
+            CreateNodeInRightSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+          }    
+        }
+        else
+          if (isPoitnVisit == 2)
+          {
+            points.pop();	
+            rootIndexs.pop();
+          }
+    }
 
-    NetBufferingAlgorithm* vGAlgorithm;
-    HDPGrid* DPGrid;
-    VanGinnekenTreeNode* vGTree;
-    HPlacementGrid pGrid;
-	HCriticalPath criticalPath;
+    treeSize = nodeIndex + 1;
+    if (nodeIndex >= vGTree->vGAlgorithmData->totalTreeSize)
+      ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d", vGTree->vGAlgorithmData->totalTreeSize, nodeIndex);
+  }
 
-    VanGinnekenTree(NetBufferingAlgorithm* vGA);
-    VanGinnekenTree(NetBufferingAlgorithm* vGA, int partitionCount);
-    VanGinnekenTree(NetBufferingAlgorithm* vGA, int partitionCount, double sizeBuffer);
-    VanGinnekenTree(NetBufferingAlgorithm* vGA, int partitionCount, HSteinerPoint& source);
+  template< class StartPoint >
+  HSteinerPoint GetSteinerPointByStartPoint(StartPoint point)
+  {
+    return HSteinerPoint(point);
+  }
 
-    virtual void ClearTree();
-    virtual int GetTreeSize();
+  HSteinerPoint GetSteinerPointByStartPoint(HSteinerPoint point)
+  {
+    return point;
+  }
 
-	template< class StartPoint >
-	void UpdateTree(StartPoint source)
-	{
-	  ClearTree();
-	  TemplateTypes<HSteinerPoint>::stack points;
-	  TemplateTypes<int>::stack rootIndexs;
-	  TemplateTypes<int>::stack isPoitnsVisits;
+  void CreateNodeInLeftSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
+    TemplateTypes<int>::stack& rootIndexs,
+    TemplateTypes<int>::stack& isPoitnsVisits,
+    int& nodeIndex,
+    int& rootIndex,
+    int& isPoitnVisit,
+    HSteinerPoint& srcPoint,
+    HSteinerPoint& nextPoint);
+  void CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
+    TemplateTypes<int>::stack& rootIndexs,
+    TemplateTypes<int>::stack& isPoitnsVisits,
+    int& nodeIndex,
+    int& rootIndex,
+    int& isPoitnVisit,
+    HSteinerPoint& srcPoint,
+    HSteinerPoint& nextPoint, HSteinerPoint& source);
+  void CreateNodeInRightSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
+    TemplateTypes<int>::stack& rootIndexs,
+    TemplateTypes<int>::stack& isPoitnsVisits,
+    int& nodeIndex,
+    int& rootIndex,
+    int& isPoitnVisit,
+    HSteinerPoint& srcPoint,
+    HSteinerPoint& nextPoint);
 
-	  int nodeIndex = 0;
-	  int rootIndex = 0;
-	  int isPoitnVisit = 0;
-	  HSteinerPoint srcPoint = GetSteinerPointByStartPoint(source);
-	  HSteinerPoint nextPoint = srcPoint;
-	  points.push(srcPoint);	
-	  rootIndexs.push(0);
-	  isPoitnsVisits.push(0);
-	  CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
-
-	  while (!points.empty())
-	  {
-		srcPoint = points.top();
-		rootIndex = rootIndexs.top();
-		isPoitnVisit = isPoitnsVisits.top();
-		isPoitnsVisits.pop();
-		if (isPoitnVisit == 0)
-		{
-		  if (vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
-		  {
-			  CreateNodeInLeftSubTree(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
-		  }
-		  else
-		  {
-			CreateNodeInSink(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
-		  }
-		}
-		else
-		  if (isPoitnVisit == 1)
-		  {
-			isPoitnVisit = 2;
-			isPoitnsVisits.push(isPoitnVisit);  
-			if (vGAlgorithm->data->design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
-			{
-			  CreateNodeInRightSubTree(points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
-			}    
-		  }
-		  else
-			if (isPoitnVisit == 2)
-			{
-			  points.pop();	
-			  rootIndexs.pop();
-			}
-	  }
-
-	  treeSize = nodeIndex + 1;
-	  if (nodeIndex >= totalTreeSize)
-		ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d",totalTreeSize, nodeIndex);
-	}
-
-    virtual double GetR();
-    virtual VanGinnekenTreeNode GetSource();
-    virtual void SetEdgePartitionCount(int partitionCount);
-
-protected:
-    int partitionPointCount;
-    int totalTreeSize;  
-    int treeSize;
-    PartitionType TypePartition;
-
-template< class StartPoint >
-HSteinerPoint GetSteinerPointByStartPoint(StartPoint point)
-{
-	return HSteinerPoint(point);
-}
-
-	void CreateNodeInLeftSubTree(  TemplateTypes<HSteinerPoint>::stack& points,
-  TemplateTypes<int>::stack& rootIndexs,
-  TemplateTypes<int>::stack& isPoitnsVisits,
-  int& nodeIndex,
-  int& rootIndex,
-  int& isPoitnVisit,
-  HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint);
-	void CreateNodeInSink(  TemplateTypes<HSteinerPoint>::stack& points,
-  TemplateTypes<int>::stack& rootIndexs,
-  TemplateTypes<int>::stack& isPoitnsVisits,
-  int& nodeIndex,
-  int& rootIndex,
-  int& isPoitnVisit,
-  HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint);
-void CreateNodeInRightSubTree(  TemplateTypes<HSteinerPoint>::stack& points,
-  TemplateTypes<int>::stack& rootIndexs,
-  TemplateTypes<int>::stack& isPoitnsVisits,
-  int& nodeIndex,
-  int& rootIndex,
-  int& isPoitnVisit,
-  HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint);
-
-    template< class EnumeratorW >
-    HSteinerPoint GetSourceEnumerator(EnumeratorW enumerator);
-    void CalculateLeftSubtree(TemplateTypes<HSteinerPoint>::stack& points, HSteinerPointWrapper& srcPoint, HSteinerPointWrapper& nextPoint, int& pointCount, int& maxTree);
-    void CalculateRightSubtree(TemplateTypes<HSteinerPoint>::stack& points, HSteinerPointWrapper& srcPoint, HSteinerPointWrapper& nextPoint, int& pointCount, int& maxTree);
-    template< class EnumeratorW >
-    void CalculatePinSubtree(EnumeratorW enumerator,TemplateTypes<HSteinerPoint>::stack& points, HSteinerPointWrapper& srcPoint, HSteinerPointWrapper& nextPoint, int& pointCount, int& maxTree);
-    template< class EnumeratorW >
-    void CalculateNodeInEnumerator(EnumeratorW enumerator, int& maxTree, int& treeSizeTemp);
-    virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos) = 0;
-    virtual void CreateTree();
-    virtual void CreateSource(HSteinerPoint node, NodeType type, int& nodeIndex, VanGinnekenTree* tree = NULL);
-    virtual void CreatePotentialBufferPoint(NodeType type, int& nodeIndex, VanGinnekenTree* tree = NULL);
-    virtual void CreateFirstPointInEdge(int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-    virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-    virtual void CreateLastPointInEdgeAndSink(HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-    virtual void CreateNewPoint(HSteinerPoint node, NodeType type, int& nodeIndex, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-    virtual VanGinnekenTreeNode* CreateNode(HSteinerPoint node, NodeType type, int& nodeIndex, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-};
-
-class VGTreeUniformDistribution: public VanGinnekenTree
-{
-public:
-    VGTreeUniformDistribution(NetBufferingAlgorithm* vGA, int partitionCount);
-    virtual ~VGTreeUniformDistribution();
-
-protected:
-    virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos);
-};
-
-class VGTreeDynamicDistribution: public VanGinnekenTree
-{
-public:
-    VGTreeDynamicDistribution(NetBufferingAlgorithm* vGA, int partitionCount);
-    virtual ~VGTreeDynamicDistribution();
-
-protected:
-    virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos);
-    virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-};
-
-class VGTreeLegalDynamicDistribution: public VanGinnekenTree
-{
-public:
-    VGTreeLegalDynamicDistribution(NetBufferingAlgorithm* vGA, int partitionCount);
-    VGTreeLegalDynamicDistribution(NetBufferingAlgorithm* vGA, int partitionCount, double sizeBuffer);
-
-    virtual ~VGTreeLegalDynamicDistribution();
-
-protected:
-    virtual void FindNewMaxPointInEdge(HSteinerPoint srcPoint, HSteinerPoint nextPoint, int& maxPos);
-    virtual void CreatePotentialBufferPointInEdge(HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  void CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
+    TemplateTypes<int>::stack& rootIndexs,
+    TemplateTypes<int>::stack& isPoitnsVisits,
+    int& nodeIndex,
+    int& rootIndex,
+    int& isPoitnVisit,
+    HSteinerPoint& srcPoint,
+    HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source);
 };
 
 #endif

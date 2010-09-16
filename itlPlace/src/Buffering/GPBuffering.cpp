@@ -33,10 +33,10 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
 
   double x = bufferPositions.GetPosition()->x;
   double y = bufferPositions.GetPosition()->y;
-  double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
-  double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
-  double x2 = bufferPositions.GetPosition()->x + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
-  double y2 = bufferPositions.GetPosition()->y + bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+  double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
+  double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+  double x2 = bufferPositions.GetPosition()->x + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
+  double y2 = bufferPositions.GetPosition()->y + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
 
   double xSize = 0;
   double ySize = 0;
@@ -123,7 +123,7 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
 
   //if (isXVisit && isYVisit)
   //  ALERT("nrowIdx = %d\tcolIdx= %d", rowIdx, colIdx);
-  double sizeBufferMultiplier = 1.0 / bufferPositions.GetPosition()->GetTree()->vGAlgorithm->data->sizeBufferMultiplier;
+  double sizeBufferMultiplier = 1.0 / bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->sizeBufferMultiplier;
   return (xSize * ySize * sizeBufferMultiplier);
 }
 

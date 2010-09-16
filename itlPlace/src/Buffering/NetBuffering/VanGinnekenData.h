@@ -30,9 +30,17 @@ enum TypeBufferAddition
  LEGAL_ADDITION = 1
 };
 
+enum TypeNetListBuffering
+{
+  BUFFERING_ALL_CRITICAL_PATH = 0,
+  PATH_BASED = 1
+};
+
 class VGAlgorithmData
 {
 public:
+  bool isInitialize;
+
   bool printNetInfo;
   bool printVariantsList;
 
@@ -43,12 +51,11 @@ public:
   bool plotBinGridValue;
   int plotterWaitTime;
 
-  bool isInitialize;
-
-  int partitionCount;
-  VanGinnekenTree::PartitionType typePartition;
+  PartitionType typePartition;
   int maxIndex;
   VanGinnekenTree* vGTree;
+  int totalTreeSize;
+  int partitionPointCount;
   
   bool isInsertInSourceAndSink;
   int maxBufferCount;
@@ -61,6 +68,7 @@ public:
   int countPinInBufferingNet;
   bool isExactPinCountRequired;
   bool isNetContainPrimaryPin;
+  TypeNetListBuffering typeNetListBuffering;
 
   double totalAllowableBuffersArea;
   double totalAreaCells;
@@ -73,8 +81,10 @@ public:
   TemplateTypes<BufferInfo>::vector Buffers;
   NetBufferingAlgorithm* vGAlgorithm;
 
+  VGAlgorithmData(HDesign& hd);
   VGAlgorithmData(HDesign& hd,  NetBufferingAlgorithm* vGA);
   ~VGAlgorithmData();
+  void DefaultValue();
   void Initialize();
 
   void ReportParameters();
