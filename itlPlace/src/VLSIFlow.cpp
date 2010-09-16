@@ -362,8 +362,11 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 		if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
     {
       WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
-      STA(hd);
-      WriteFlowMetrics(flowMetrics, hd, "LRSizingafterSTA", "LRS_STA");
+      ExportDEF(hd, "DefAfterLRSizing");
+      /*if (DoLegalizationIfRequired(DPGrid, "DesignFlow.Legalization"))
+        WriteFlowMetrics(flowMetrics, hd, "Legalization",  "LEG_LRS");*/
+      /*STA(hd);
+      WriteFlowMetrics(flowMetrics, hd, "LRSizingafterSTA", "LRS_STA");*/
     }
 
 

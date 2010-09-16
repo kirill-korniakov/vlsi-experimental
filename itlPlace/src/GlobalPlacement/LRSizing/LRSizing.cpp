@@ -22,15 +22,25 @@ void LRSizer::ApplySizing(std::vector<double>& X)
   std::vector<HCell>::iterator cellFrom=cells->begin();
   std::vector<double>::iterator currentX=X.begin();
   int i=0;//DEBUG
+  int numOfChanges=0;
   while(cellFrom!=cells->end() && currentX!=X.end())
   {
     HMacroType cellToType=roundCellToTypeFromLib(*cellFrom, *currentX);
+    
     //DEBUG
+    double roundingToSize=design.GetDouble<HMacroType::SizeX>(cellToType);
+    //ALERT("Rounding from %lf to %lf", *currentX, roundingToSize);
     HMacroType cellFromType=design[*cellFrom].Type();
     i++;
     if (cellFromType != cellToType)
-      ALERT("%d: We are changing it from %s to %s", i, (design.MacroTypes.GetString<HMacroType::Name>(cellFromType)).data(), 
-        (design.MacroTypes.GetString<HMacroType::Name>(cellToType)).data());
+    {
+      numOfChanges++;
+
+      double fromWidth=design.GetDouble<HMacroType::SizeX>(cellFromType);
+      double toWidth=design.GetDouble<HMacroType::SizeX>(cellToType);
+      ALERT("%d: We are changing it from %s (%lf) to %s (%lf)", i, (design.MacroTypes.GetString<HMacroType::Name>(cellFromType)).data(), fromWidth, 
+        (design.MacroTypes.GetString<HMacroType::Name>(cellToType)).data(), toWidth);
+    }
     //END OF DEBUG
     
 
@@ -41,6 +51,7 @@ void LRSizer::ApplySizing(std::vector<double>& X)
     cellFrom++;
     currentX++;
   }
+  ALERT("Changed types of %d elements", numOfChanges);
 }
 
 void LRSizer::getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily)
@@ -54,10 +65,13 @@ void LRSizer::getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFam
     if (macroTypeFamily == cellFamily)
       macroTypesInFamily.push_back(macroTypeE);
   }
+
+  std::sort(macroTypesInFamily.begin(),macroTypesInFamily.end(),MacroTypeSizesComparator(design));
 }
 
 void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
 {
+  cellSizes.clear();
   std::vector<HMacroType> macroTypesInFamily;
   getCellFamily(cell, macroTypesInFamily);
 
@@ -70,10 +84,13 @@ void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
   std::sort(cellSizes.begin(), cellSizes.end());
 
   //Debugging code
-  /*ALERT("size = %d", cellSizes.size());
-  for (int i=0;i<cellSizes.size();i++)
-  {
-    ALERT("%d : %lf", i, cellSizes[i]);
+  /*if (cellSizes.size()>1){
+
+    ALERT("size = %d", cellSizes.size());
+    for (int i=0;i<cellSizes.size();i++)
+    {
+      ALERT("%d : %lf", i, cellSizes[i]);
+    }
   }*/
   //End of debugging code
 }
@@ -201,16 +218,16 @@ LRSizer::LRSizer(HDesign& hd): design(hd), LambdaIn(0)
   //InitLambda(design, 1);
   cells = InitCells();
 
-  HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()];
-  Maths::Regression::Linear* regressionC=getRegressionC(tp);
-  if (regressionC) ALERT("RegressedC: %lf", regressionC->getValue(7));
+  //HTimingPointWrapper tp = design[design.TimingPoints.FirstInternalPoint()];
+  //Maths::Regression::Linear* regressionC=getRegressionC(tp);
+  //if (regressionC) ALERT("RegressedC: %lf", regressionC->getValue(7));
 
-  Maths::Regression::Linear* regressionR=getRegressionR(tp);
-  ALERT("RegressedR: %lf", regressionR->getValue(7));
+  //Maths::Regression::Linear* regressionR=getRegressionR(tp);
+  //ALERT("RegressedR: %lf", regressionR->getValue(7));
 
-  HCell cell=(design,tp.Pin()).Cell();
-  std::vector<double> cellsizes;
-  getCellFamily(cell, cellsizes);
+  //HCell cell=(design,tp.Pin()).Cell();
+  //std::vector<double> cellsizes;
+  //getCellFamily(cell, cellsizes);
 }
 
 LRSizer::~LRSizer()
@@ -267,6 +284,7 @@ void LRSizer::SOLVE_LRS_mu(std::vector<double>& NewVX)
   NewVX.resize(vX.size());
   NewVX.assign(vX.begin(), vX.end());
   
+  int stepCounter=1;
   do
   {
     ///for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()]; !::IsNull(tp.GoNext()); )
@@ -281,10 +299,11 @@ void LRSizer::SOLVE_LRS_mu(std::vector<double>& NewVX)
     ///}
     //ALERT("Size of vX before before =%d", vX.size());
 
-    //vX=NewVX;
     vX.clear();
+    vX=NewVX;
+    
     //ALERT("Size of vX after clear   =%d", vX.size());
-    vX.assign(NewVX.begin(), NewVX.end());
+    //vX.assign(NewVX.begin(), NewVX.end());
 
     //ALERT("Size of vX before        =%d", vX.size());
 
@@ -292,7 +311,12 @@ void LRSizer::SOLVE_LRS_mu(std::vector<double>& NewVX)
     //ALERT("Size of vX after         =%d", vX.size());
 
 
+    ALERT("Criterion on %d-th iteration of LRS_MU is %lf", stepCounter, CalcCriterion(NewVX));
+
+    stepCounter++;
   } while(!CheckStopConditionForLRS_Mu(vX, NewVX, accuracyForLRS_Mu));
+  
+  ALERT("Number of iterations of LRS_MU is %d", stepCounter-1);
 }
 
 double LRSizer::CalcB(HCell& cell,std::vector<double>& vMu,std::vector<double>& vX )
@@ -604,7 +628,7 @@ bool LRSizer::CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vect
       max=fabs(prevVX[i]-nextVX[i]);
   }
 
-  ALERT("max = %lf",max);
+  //ALERT("max = %lf",max);
   if (max<accuracy) return true;
   else return false;
 }
@@ -635,6 +659,9 @@ void LRSizer::SOLVE_LDP()
   do{
 
     SOLVE_LRS_mu(vX);
+
+    ALERT("Criterion on %d-th iteration is %lf", stepCounter, CalcCriterion(vX));
+
     std::vector<double> arrivalTimes=CalculateArrivalTimes(vX);
 
     AdjustLambda(stepCounter, arrivalTimes,vX);
@@ -642,6 +669,8 @@ void LRSizer::SOLVE_LDP()
 
     stepCounter++;
   } while (!CheckStopConditionForLDP(vX, errorBoundForLDP));
+
+  ALERT("Number of iterations in SOLVE LDP: %d", stepCounter-1);
 }
 
 double LRSizer::FindOutputLambdaSum(HTimingPoint point)
@@ -740,7 +769,7 @@ std::vector<double> LRSizer::CalculateArrivalTimes(std::vector<double>& vX)
       aT = regressionR->getValue(vX[index])*GetObservedC(tp,vX);
     }
     int id=::ToID(tp);
-    ALERT("id= %d", id);
+    //ALERT("id= %d", id);
     arrivalTimes[id]= aT;
   }
 
@@ -875,12 +904,12 @@ double LRSizer::CalculateQ(unsigned int size)
 {
   double SumInputLambdaForPoint; 
   double SumAllInputLambda=0;
-  double QFunction=0;//TODO Implement Q!!!
+  double QFunction=0;
   std::vector<double> XLower;
   XLower.reserve(size);
   initVX(XLower);
   HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
-  for (; tp!=design.TimingPoints.FirstInternalPoint(); tp.GoNext())
+  for (; tp!=design.TimingPoints.FirstInternalPoint(); tp.GoPrevious())
   {
     SumInputLambdaForPoint=FindInputLambdaSum(tp);
     
@@ -907,6 +936,27 @@ bool LRSizer::CheckStopConditionForLDP(std::vector<double>& vX, double errorBoun
     Sum+=vX[i];
   if ((Sum-CalculateQ(vX.size()))<errorBound) return true;
   else false;
+}
+double LRSizer::CalcCriterion(std::vector<double>& vCurrentX)
+{
+  double criterion=0, Sum=0, SumInputLambdaForPoint=0, SumAllInputLambda=0;
+  for(unsigned int i=0; i < vCurrentX.size(); i++)
+    Sum+=vCurrentX[i];
+
+  HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
+  for (; tp!=design.TimingPoints.FirstInternalPoint(); tp.GoPrevious())
+  {
+    SumInputLambdaForPoint=FindInputLambdaSum(tp);
+    HPinWrapper pin = design[(design,tp).Pin()];
+    HCell cell = pin.Cell();
+    if (::IsNull(cell)) continue;
+    Maths::Regression::Linear* regressionR = getRegressionR(tp);
+    int index = distance(cells->begin(), find(cells->begin(), cells->end(), cell));
+    SumAllInputLambda+=SumInputLambdaForPoint*(regressionR->getValue(vCurrentX[index])*GetObservedC(tp,vCurrentX));
+  }
+  criterion=Sum+SumAllInputLambda;
+
+  return criterion;
 }
 
 Maths::Regression::Linear* LRSizer::getRegressionC( HTimingPointWrapper tp )
@@ -956,10 +1006,11 @@ HMacroType LRSizer::roundCellToTypeFromLib(HCell cellFrom, double currentX)
   HMacroType bestMacroType;
   for(std::vector<HMacroType>::iterator macroType = macroTypesInFamily.begin(); macroType != macroTypesInFamily.end(); macroType++)
   {
-    double deltaX = abs(currentX - design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType));
+    double sizeOfMacroType=design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType);
+    double deltaX = fabs(currentX - sizeOfMacroType);
     if (deltaX < smallestDeltaX)
     {
-      smallestDeltaX = design.MacroTypes.GetDouble<HMacroType::SizeX>(*macroType);
+      smallestDeltaX = deltaX;
       bestMacroType = *macroType;
     }
   }
@@ -969,7 +1020,7 @@ HMacroType LRSizer::roundCellToTypeFromLib(HCell cellFrom, double currentX)
 
 void LRSizer::doLRSizing()
 {
-  FILE* fbefore = fopen("./log/fbefore.csv","w");
+  /*FILE* fbefore = fopen("./log/fbefore.csv","w");
   for (int i=0; i<cells->size(); i++)
   {
     HCell cell=(*cells)[i];
@@ -979,22 +1030,32 @@ void LRSizer::doLRSizing()
     fprintf (fbefore, "%d;%lf\n", i, width);
 
   }
-  fclose(fbefore);
+  fclose(fbefore);*/
 
   std::vector<double> newVX;
-  SOLVE_LDP();
-  SOLVE_LRS_mu(newVX);
   
-  FILE* fafter = fopen("./log/fafter.csv","w"); 
-  for (int i=0; i<newVX.size(); i++)
+  for (int i=0; i<cells->size(); i++)
   {
-    fprintf (fafter, "%d;%lf\n", i, newVX[i]);
+    std::vector<double> sizes;
+    HCell cell=(*cells)[i];
+    getCellFamily(cell, sizes);
+    //int randomIndex=int (rand()*sizes.size()/RAND_MAX);
+    //ALERT("%d : %d", sizes.size(), randomIndex);
+    //newVX.push_back(sizes[randomIndex]);
+    newVX.push_back(sizes.back());
   }
-  fclose(fafter);
+
+  //SOLVE_LDP();
+  //SOLVE_LRS_mu(newVX);
+  
+  /*FILE* fafter = fopen("./log/fafter.csv","w"); 
+  for (int i=0; i<newVX.size(); i++)
+     fprintf (fafter, "%d;%lf\n", i, newVX[i]);
+  fclose(fafter);*/
 
   ApplySizing(newVX);
 
-  FILE* fafter2 = fopen("./log/fafter2.csv","w");
+  /*FILE* fafter2 = fopen("./log/fafter2.csv","w");
   for (int i=0; i<cells->size(); i++)
   {
     HCell cell=(*cells)[i];
@@ -1004,5 +1065,5 @@ void LRSizer::doLRSizing()
     fprintf ( fafter2, "%d;%lf\n", i, width);
 
   }
-  fclose( fafter2);
+  fclose( fafter2);*/
 }

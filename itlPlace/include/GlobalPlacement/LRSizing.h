@@ -67,6 +67,7 @@ private:
   //debug functions
   bool CheckKuhn_Tucker(HTimingPoint point);
   void CheckKuhn_Tucker();
+  double CalcCriterion(std::vector<double>& vCurrentX);
 	
   void getCellFamily(HCell cell, std::vector<double>& cellSizes);	
   void getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily);
@@ -80,4 +81,14 @@ private:
  
   void ApplySizing(std::vector<double>& X);
 };
+
+class MacroTypeSizesComparator{
+public:
+  HDesign& design;
+  MacroTypeSizesComparator(HDesign& _design):design(_design){}
+  bool operator() (const HMacroType &a, const HMacroType &b){
+    return design.GetDouble<HMacroType::SizeX>(a)<design.GetDouble<HMacroType::SizeX>(b);
+  }
+};
+
 #endif
