@@ -56,7 +56,7 @@ class BaseExperiment:
 
         WriteStringToFile(cols, reportTable)
 
-    def ParseLog(self, logName, benchmark):
+    def ParseLog(self, logName):
         parser = LogParser(logName)
         table = [[0 for col in range(len(self.metrics))] for row in range(len(self.stages))]
 
@@ -89,11 +89,11 @@ class BaseExperiment:
         WriteStringToFile(cols, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        values = self.ParseLog(logName, benchmark)
+        values = self.ParseLog(logName)
 
         if (values == []):
-          return FAILED
+          return [FAILED, []]
 
         self.AddStringToTable(values, benchmark, reportTable)
         self.PrintBenchmarkTable(values, benchmark, reportTable)
-        return OK
+        return [OK, values]

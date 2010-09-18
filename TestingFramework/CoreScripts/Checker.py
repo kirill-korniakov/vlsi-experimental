@@ -54,18 +54,18 @@ class Checker(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        currentValues = self.ParseLog(logName, benchmark)
+        currentValues = self.ParseLog(logName)
 
         if (currentValues == []):
-          return FAILED
+          return [FAILED, []]
 
         masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
-        masterValues  = self.ParseLog(masterLogName, benchmark)
+        masterValues  = self.ParseLog(masterLogName)
 
         if (masterValues == []):
             print('experiment has not failed but master log is empty\n')
-            return NEW
+            return [NEW, currentValues]
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)
-        self.PrintBenchmarkTable(values, benchmark, reportTable)
-        return self.CompareTables(currentValues, masterValues)
+        #self.PrintBenchmarkTable(currentValues, benchmark, reportTable)
+        return [self.CompareTables(currentValues, masterValues), currentValues]

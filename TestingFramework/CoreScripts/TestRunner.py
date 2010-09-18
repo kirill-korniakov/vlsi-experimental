@@ -26,6 +26,8 @@ class TestRunner:
     comment    = ''
     experimentResult = OK
 
+    experimentsToCompare = {} #Group of experiments. Theit results will be compared
+
     newBenchmarks        = ''
     failedBenchmarks     = ''
     terminatedBenchmarks = ''
@@ -68,6 +70,92 @@ class TestRunner:
     def Append(self, newExperiment):
          self.parameters.experiments.append(newExperiment)
 
+    def AddExperimentToGroup(self, newExperiment):
+        self.Append(newExperiment)
+
+        if (self.experimentsToCompare != {}):
+            groupExp = list(self.experimentsToCompare.keys())[0]
+
+            if (newExperiment.benchmarks != groupExp.benchmarks):
+                print("list files are not equal")
+                exit(1)
+
+            if (newExperiment.metrics != groupExp.metrics):
+                print("metrics are not equal")
+                exit(1)
+
+            if (newExperiment.stages != groupExp.stages):
+                print("stages are not equal")
+                exit(1)
+
+        self.experimentsToCompare[newExperiment] = {}
+
+    def CompareExperimentsInGroup(self, resultFileName):
+        groupExp = list(self.experimentsToCompare.keys())[0]
+        stages   = groupExp.stages
+        metrics  = groupExp.metrics
+
+        finalStageIdx = len(metrics) - 1
+
+        #Create header of the table
+        #---First string of the header------------------
+        cols = []
+        cols.append(END_OF_COLUMN)
+        cols.append('INIT')
+
+        for col in range(len(metrics)):
+            cols.append(END_OF_COLUMN)
+
+        for experiment in self.experimentsToCompare.keys():
+            cols.append(END_OF_COLUMN)
+            cols.append(experiment.name)
+
+            for col in range(len(metrics)):
+                cols.append(END_OF_COLUMN)
+
+        WriteStringToFile(cols, resultFileName)
+
+        #---Second string of the header------------------
+        cols = ['benchmark']
+        cols.append(END_OF_COLUMN)
+
+        for col in range(len(self.experimentsToCompare.keys()) + 1):
+            for row in range(len(metrics)):
+                cols.append(metrics[row])
+                cols.append(END_OF_COLUMN)
+
+            cols.append(END_OF_COLUMN)
+
+        WriteStringToFile(cols, resultFileName)
+
+        #------Print results-------------------------------------
+        for benchmark in self.experimentsToCompare[groupExp].keys():
+            cols = [benchmark]
+            cols.append(END_OF_COLUMN)
+            #TODO: mark experiment with best result for each metric
+
+            for experiment in self.experimentsToCompare.keys():
+                resultValues = self.experimentsToCompare[experiment][benchmark]
+
+                if (len(cols) == 2):
+                    for col in range(len(metrics)):
+                        cols.append(str(resultValues[0][col]))
+                        cols.append(END_OF_COLUMN)
+
+                    cols.append(END_OF_COLUMN)
+
+                #TODO: else check intitial values
+
+                #for row in range(1, len(stages)):
+                for col in range(len(metrics)):
+                    cols.append(str(resultValues[finalStageIdx][col]))
+                    cols.append(END_OF_COLUMN)
+
+                cols.append(END_OF_COLUMN)
+
+            cols.append(END_OF_COLUMN)
+            WriteStringToFile(cols, resultFileName)
+
     def RunExperiment(self, experiment):
         benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
 
@@ -77,8 +165,8 @@ class TestRunner:
         print("\n")
 
         reportCreator = ReportCreator(experiment.cfg)
-        logFolder = reportCreator.CreateLogFolder()
-        reportTable = reportCreator.GetReportTableName()
+        logFolder     = reportCreator.CreateLogFolder()
+        reportTable   = reportCreator.GetReportTableName()
 
         experiment.CreateEmptyTable(reportTable)
         self.experimentResult = OK
@@ -86,6 +174,7 @@ class TestRunner:
         for benchmark in benchmarks:
             logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w');
+            resultValues = []
 
             defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"
             params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg), defFile, experiment.cmdLine]
@@ -118,10 +207,13 @@ class TestRunner:
                     return (reportTable)
 
             else:
-                benchmarkResult = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+                (benchmarkResult, resultValues) = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
             fPlacerOutput.close()
             print(benchmark + ' DONE')
+
+            if (experiment in self.experimentsToCompare):
+                self.experimentsToCompare[experiment][benchmark] = resultValues
 
             if (benchmarkResult == FAILED):
                 self.experimentResult  = FAILED
@@ -224,5 +316,12 @@ class TestRunner:
         print(text)
         if (self.parameters.doSendMail == True):
             emailer.PrepareAndSendMail(subject, text, attachmentFiles)
+
+        if (len(self.experimentsToCompare) > 1):
+            cp.CoolPrint('Comaparing experiments')
+            reportCreator = ReportCreator('Comaparing')
+            logFolder     = reportCreator.CreateLogFolder()
+            cmpFileName   = reportCreator.GetReportTableName()
+            self.CompareExperimentsInGroup(cmpFileName)
 
         cp.CoolPrint('Finish')

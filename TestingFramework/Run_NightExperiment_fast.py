@@ -23,7 +23,7 @@ import FastCheckRunner
 from FastCheckRunner import *
 
 fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "HPWL_ISPD":"ISPD04_fast.list", "LR":"IWLS_GP_r1511/IWLS_GP_fast.list",\
-    "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "SGW":"IWLS05_fast.list"}
+    "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "Weighting (SGNW) experiment":"IWLS05_fast.list"}
 
 def NightExperiment(lists):
     exp_HPWL = Experiment_HPWL()
@@ -39,14 +39,16 @@ def NightExperiment(lists):
     chk_BUF = Checker(Experiment_New_Buffering(), "MasterLogs/New_Buffering/IWLS")
     chk_HDP = Checker(Experiment_HippocrateDP(), "MasterLogs/HippocrateDP/Aleksandr")
     chk_SGW = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
+    chk_SGW2 = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
 
     testRunner = FastCheckRunner(fast_lists)
-    testRunner.Append(chk_HPWL_IWLS)
+    #testRunner.Append(chk_HPWL_IWLS)
     #testRunner.Append(chk_HPWL_ISPD)
     #testRunner.Append(chk_LR)
     #testRunner.Append(chk_BUF)
     #testRunner.Append(chk_HDP)
-    #testRunner.Append(chk_SGW)
+    testRunner.AddExperimentToGroup(chk_SGW)
+    testRunner.AddExperimentToGroup(chk_SGW2)
     testRunner.Run()
 
 def run():

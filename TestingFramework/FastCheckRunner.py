@@ -20,7 +20,7 @@ class FastCheckRunner(TestRunner):
     checkersParameters = {}
 
     def __init__(self, chkParams):
-        self.checkersParameters= chkParams
+        self.checkersParameters = chkParams
         TestRunner.__init__(self)
 
     def Append(self, newExperiment):

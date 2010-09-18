@@ -41,12 +41,8 @@ class Experiment_HippocrateDP(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
 def test():
-    hippMetrics = ['HPWL', 'TNS', 'WNS']
-    hippStages  = ['LEG', 'DP']
-    testRunner = TestRunner()
     e = Experiment_HippocrateDP()
-    #e = Experiment_HippocrateDP('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS_GP_Hippocrate.list', hippMetrics, hippStages)
-    #e = BaseExperiment('HippocrateDP experiment', 'HippocrateDP.cfg', 'IWLS_GP_Hippocrate.list', hippMetrics, hippStages)
+    testRunner = TestRunner()
     testRunner.parameters.experiments.append(e)
 
     testRunner.Run()
