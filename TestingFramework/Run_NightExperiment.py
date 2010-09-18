@@ -37,14 +37,21 @@ def NightExperiment(testRunner):
     chk_LR  = Checker(Experiment_LR(), "MasterLogs/LR")
     chk_BUF = Checker(Experiment_New_Buffering(), "MasterLogs/New_Buffering/IWLS")
     chk_HDP = Checker(Experiment_HippocrateDP(), "MasterLogs/HippocrateDP/Aleksandr")
-    chk_SGW = Checker(Experiment_SGNW(), "MasterLogs/Weighting/SensitivityGuided")
 
+    exp_W   = Experiment_SGNW()
+    chk_SGW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
+
+    exp_W.name = 'APlace weighting experiment'
+    exp_W.SetConfig('APlace_weighting.cfg')
+    #chk_APW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
+
+    testRunner.AddExperimentToGroup(chk_SGW)
+    testRunner.AddExperimentToGroup(exp_W)
     testRunner.Append(chk_HPWL_IWLS)
     testRunner.Append(chk_HPWL_ISPD)
     testRunner.Append(chk_LR)
     testRunner.Append(chk_BUF)
     testRunner.Append(chk_HDP)
-    testRunner.Append(chk_SGW)
     testRunner.Run()
 
 def run():
