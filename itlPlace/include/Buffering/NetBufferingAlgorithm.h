@@ -23,6 +23,7 @@ public:
   AbstractCreateVGListAlgorithm* createVGListAlgorithm;
   AbstractModificationVanGinnekenList* modificationVanGinnekenList;
   AbstractAdditionNewElement* additionNewElement;
+  CalculateVGBranchPoint* branchPoint;
 
   NetBufferingAlgorithm();
   NetBufferingAlgorithm(HDesign& hd);

@@ -86,6 +86,11 @@ double VanGinnekenTreeNode::GetR()
     return 0;
 }
 
+double VanGinnekenTreeNode::GetT()
+{
+  return 0;
+}
+
 void VanGinnekenTreeNode::SetSteinerPoint(HSteinerPoint sp, bool first)  
 {
   sPoint = sp;
@@ -140,9 +145,34 @@ bool VanGinnekenTreeNode::isInternal()
   return (type == CANDIDATE_INTERNAL) ? true : false;  
 }
 
+bool VanGinnekenTreeNode::isSteinerTreeLeaf()
+{
+  return ((type == SOURCE_AND_SINK) || (type == SINK)) ? true : false;  
+}
+
+ bool VanGinnekenTreeNode::isSteinerTreeSource()
+ {
+return ((type == SOURCE_AND_SINK) || (type == SOURCE)) ? true : false; 
+ }
+
 VanGinnekenTreeNodePathBased::VanGinnekenTreeNodePathBased():VanGinnekenTreeNode()
 {
 }
+
+double VanGinnekenTreeNodePathBased::GetR()
+{
+  if (secondSPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+    return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (secondSPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+  else
+    return 0;
+}
+
+double VanGinnekenTreeNodePathBased::GetT()
+{
+  Utils::DriverPhisics dph = Utils::GetDriverAveragePhisics(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design[secondSPoint].Pin(), signalDirection);
+  return dph.T;
+}
+
 HSteinerPoint VanGinnekenTreeNodePathBased::GetSteinerPoint(bool first)
 {
   if (first)

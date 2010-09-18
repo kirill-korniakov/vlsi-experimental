@@ -32,10 +32,7 @@ public:
   virtual TemplateTypes<VGVariantsListElement>::list* CreateVGList(VanGinnekenTree* tree);
   
 protected:
-  virtual void CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
-  TemplateTypes<VGVariantsListElement>::list* currentList,
-  TemplateTypes<VGVariantsListElement>::list* leftList,
-  TemplateTypes<VGVariantsListElement>::list* rightList, int i);
+
   virtual void CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
   TemplateTypes<VGVariantsListElement>::list* currentList, int i);
 };
@@ -48,6 +45,32 @@ public:
 protected:
 	virtual void CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
   TemplateTypes<VGVariantsListElement>::list* currentList, int i);
+};
+
+class CalculateVGBranchPoint
+{
+public:
+CalculateVGBranchPoint(NetBufferingAlgorithm* vGA);
+  virtual void CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+    TemplateTypes<VGVariantsListElement>::list* currentList,
+    TemplateTypes<VGVariantsListElement>::list* leftList,
+    TemplateTypes<VGVariantsListElement>::list* rightList, int i);
+  virtual void UpdateInBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+    TemplateTypes<VGVariantsListElement>::list* currentList,
+    TemplateTypes<VGVariantsListElement>::list* leftList, int i);
+protected:
+  NetBufferingAlgorithm* vGAlgorithm;
+};
+
+class PathBasedCalculateVGBranchPoint: public CalculateVGBranchPoint
+{
+public:
+  PathBasedCalculateVGBranchPoint(NetBufferingAlgorithm* vGA): CalculateVGBranchPoint(vGA)
+  {
+  };
+  virtual void UpdateInBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+    TemplateTypes<VGVariantsListElement>::list* currentList,
+    TemplateTypes<VGVariantsListElement>::list* leftList, int i);
 };
 
 #endif

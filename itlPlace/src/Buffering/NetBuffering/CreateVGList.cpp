@@ -15,7 +15,7 @@ AbstractCreateVGListAlgorithm(vGA)
 TemplateTypes<VGVariantsListElement>::list* 
 ClassicCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
 {
-  return CreateVGList(tree->GetSource().GetLeft());
+  return CreateVGList(tree->GetSource()->GetLeft());
 }
 
 TemplateTypes<VGVariantsListElement>::list* 
@@ -75,38 +75,6 @@ AbstractCreateVGListAlgorithm(vGA)
 {
 }
 
-void LineBypassAtCreateVGListAlgorithm::CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
-  TemplateTypes<VGVariantsListElement>::list* currentList,
-  TemplateTypes<VGVariantsListElement>::list* leftList,
-  TemplateTypes<VGVariantsListElement>::list* rightList, int i)
-{
-	leftList = stackList.top();
-        stackList.pop();
-
-        if (tree->vGTreeNodeList[i].HasRight())
-        {
-          rightList = stackList.top();
-          stackList.pop();
-          if (vGAlgorithm->data->printVariantsList)
-            ALERT("Branch Point id: %d", tree->vGTreeNodeList[i].index);          
-          currentList = vGAlgorithm->modificationVanGinnekenList->MergeList(leftList, rightList);
-          stackList.push(currentList);
-          leftList = NULL;
-          rightList = NULL;
-          currentList = NULL;
-        }
-        else
-        {
-          if (vGAlgorithm->data->printVariantsList)
-          { 
-            ALERT("BranchPoint id: %d", tree->vGTreeNodeList[i].index);
-            PrintVariants(leftList);
-          }
-          stackList.push(leftList);
-          leftList = NULL;
-        }
-}
-
 void LineBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
   TemplateTypes<VGVariantsListElement>::list* currentList, int i)
 {
@@ -114,22 +82,22 @@ void LineBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree*
         stackList.pop();
 
         vGAlgorithm->modificationVanGinnekenList->UpdateValue(currentList, 
-          vGAlgorithm->modificationVanGinnekenList->GetLength(&(tree->vGTreeNodeList[i]), 
-          (tree->vGTreeNodeList[i].GetLeft())));
+          vGAlgorithm->modificationVanGinnekenList->GetLength(tree->vGTreeNodeList[i], 
+          tree->vGTreeNodeList[i]->GetLeft()));
         vGAlgorithm->modificationVanGinnekenList->SortVGVariantsListElement(currentList);
-        if (tree->vGTreeNodeList[i].isCandidateAndRealPoint())
+        if (tree->vGTreeNodeList[i]->isCandidateAndRealPoint())
         {
           if (vGAlgorithm->data->isInsertInSourceAndSink)
-            vGAlgorithm->modificationVanGinnekenList->AddBuffer(currentList, &tree->vGTreeNodeList[i]);
+            vGAlgorithm->modificationVanGinnekenList->AddBuffer(currentList, tree->vGTreeNodeList[i]);
         }
         else
-          vGAlgorithm->modificationVanGinnekenList->AddBuffer(currentList, &tree->vGTreeNodeList[i]);
+          vGAlgorithm->modificationVanGinnekenList->AddBuffer(currentList, tree->vGTreeNodeList[i]);
 
         if (vGAlgorithm->data->printVariantsList)
         { 
-          ALERT("point id: %d", tree->vGTreeNodeList[i].index);
-          ALERT("Length line %d and %d: %.2f",tree->vGTreeNodeList[i].index, 
-            tree->vGTreeNodeList[i].GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTreeNodeList[i], tree->vGTreeNodeList[i].GetLeft()));
+          ALERT("point id: %d", tree->vGTreeNodeList[i]->index);
+          ALERT("Length line %d and %d: %.2f",tree->vGTreeNodeList[i]->index, 
+            tree->vGTreeNodeList[i]->GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(tree->vGTreeNodeList[i], tree->vGTreeNodeList[i]->GetLeft()));
           PrintVariants(currentList);
         }
         stackList.push(currentList);
@@ -149,17 +117,17 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
 
   for (int i = lastIndexTree; i > 0; i--)
   {
-    if (tree->vGTreeNodeList[i].isSink())
+    if (tree->vGTreeNodeList[i]->isSink())
     {
-      newList = vGAlgorithm->modificationVanGinnekenList->CreateNewVGList(&tree->vGTreeNodeList[i]);
+      newList = vGAlgorithm->modificationVanGinnekenList->CreateNewVGList(tree->vGTreeNodeList[i]);
       stackList.push(newList);
       newList = NULL;
     }
     else
 	{
-      if (tree->vGTreeNodeList[i].isBranchPoint())
+      if (tree->vGTreeNodeList[i]->isBranchPoint())
 	  {
-        CalculateBranchPoint(tree, stackList, currentList, leftList, rightList, i);
+        vGAlgorithm->branchPoint->CalculateBranchPoint(tree, stackList, currentList, leftList, rightList, i);
       }	
       else
 	  {
@@ -185,11 +153,11 @@ void AdaptiveBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenT
 {
 	        currentList = stackList.top();
         stackList.pop();
-        if (tree->vGTreeNodeList[i].isInternal() || tree->vGTreeNodeList[i].isCandidateAndRealPoint())
+        if (tree->vGTreeNodeList[i]->isInternal() || tree->vGTreeNodeList[i]->isCandidateAndRealPoint())
         {
           vGAlgorithm->modificationVanGinnekenList->UpdateValue(currentList, 
-            vGAlgorithm->modificationVanGinnekenList->GetLength(&(tree->vGTreeNodeList[i]), 
-            (tree->vGTreeNodeList[i].GetLeft())));
+            vGAlgorithm->modificationVanGinnekenList->GetLength(tree->vGTreeNodeList[i], 
+            tree->vGTreeNodeList[i]->GetLeft()));
           vGAlgorithm->modificationVanGinnekenList->SortVGVariantsListElement(currentList);
         }
         else
@@ -199,17 +167,17 @@ void AdaptiveBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenT
           int currentMaxIndex = vGAlgorithm->data->maxIndex;
 
           vGAlgorithm->modificationVanGinnekenList->UpdateValue(&copyList, 
-            vGAlgorithm->modificationVanGinnekenList->GetLength(&(tree->vGTreeNodeList[i]), 
-            (tree->vGTreeNodeList[i].GetLeft())));
+            vGAlgorithm->modificationVanGinnekenList->GetLength(tree->vGTreeNodeList[i], 
+            tree->vGTreeNodeList[i]->GetLeft()));
           vGAlgorithm->modificationVanGinnekenList->SortVGVariantsListElement(&copyList);
 
-          if (tree->vGTreeNodeList[i].isCandidateAndRealPoint())
+          if (tree->vGTreeNodeList[i]->isCandidateAndRealPoint())
           {
             if (vGAlgorithm->data->isInsertInSourceAndSink)
-              vGAlgorithm->modificationVanGinnekenList->AddBuffer(&copyList, &tree->vGTreeNodeList[i]);
+              vGAlgorithm->modificationVanGinnekenList->AddBuffer(&copyList, tree->vGTreeNodeList[i]);
           }
           else
-            vGAlgorithm->modificationVanGinnekenList->AddBuffer(&copyList, &tree->vGTreeNodeList[i]);
+            vGAlgorithm->modificationVanGinnekenList->AddBuffer(&copyList, tree->vGTreeNodeList[i]);
           if (currentMaxIndex != vGAlgorithm->data->maxIndex)
           {
             if (copyList.begin()->GetIndex() > currentMaxIndex)
@@ -234,11 +202,71 @@ void AdaptiveBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenT
 
         if (vGAlgorithm->data->printVariantsList)
         { 
-          ALERT("point id: %d", tree->vGTreeNodeList[i].index);
-          ALERT("Length line %d and %d: %.2f",tree->vGTreeNodeList[i].index, 
-            tree->vGTreeNodeList[i].GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(&tree->vGTreeNodeList[i], tree->vGTreeNodeList[i].GetLeft()));
+          ALERT("point id: %d", tree->vGTreeNodeList[i]->index);
+          ALERT("Length line %d and %d: %.2f",tree->vGTreeNodeList[i]->index, 
+            tree->vGTreeNodeList[i]->GetLeft()->index, vGAlgorithm->modificationVanGinnekenList->GetLength(tree->vGTreeNodeList[i], tree->vGTreeNodeList[i]->GetLeft()));
           PrintVariants(currentList);
         }
         stackList.push(currentList);
         currentList = NULL;
+}
+
+CalculateVGBranchPoint::CalculateVGBranchPoint(NetBufferingAlgorithm* vGA)
+{
+  vGAlgorithm = vGA;
+}
+
+void CalculateVGBranchPoint::CalculateBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+                                                             TemplateTypes<VGVariantsListElement>::list* currentList,
+                                                             TemplateTypes<VGVariantsListElement>::list* leftList,
+                                                             TemplateTypes<VGVariantsListElement>::list* rightList, int i)
+{
+  leftList = stackList.top();
+  stackList.pop();
+
+  if (tree->vGTreeNodeList[i]->HasRight())
+  {
+    rightList = stackList.top();
+    stackList.pop();
+    if (vGAlgorithm->data->printVariantsList)
+      ALERT("Branch Point id: %d", tree->vGTreeNodeList[i]->index);          
+    currentList = vGAlgorithm->modificationVanGinnekenList->MergeList(leftList, rightList);
+    stackList.push(currentList);
+    leftList = NULL;
+    rightList = NULL;
+    currentList = NULL;
+  }
+  else
+  {
+    UpdateInBranchPoint(tree, stackList, currentList, leftList,  i);
+    if (vGAlgorithm->data->printVariantsList)
+    { 
+      ALERT("BranchPoint id: %d", tree->vGTreeNodeList[i]->index);
+      PrintVariants(leftList);
+    }
+    stackList.push(leftList);
+    leftList = NULL;
+  }
+}
+
+void CalculateVGBranchPoint::UpdateInBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+                         TemplateTypes<VGVariantsListElement>::list* currentList,
+                         TemplateTypes<VGVariantsListElement>::list* leftList, int i)
+
+{
+}
+
+void PathBasedCalculateVGBranchPoint::UpdateInBranchPoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+                         TemplateTypes<VGVariantsListElement>::list* currentList,
+                         TemplateTypes<VGVariantsListElement>::list* leftList, int i)
+{
+  if (tree->vGTreeNodeList[i]->type == SOURCE_AND_SINK)
+  {
+    for (TemplateTypes<VGVariantsListElement>::list::iterator vGElement = leftList->begin(); vGElement != leftList->end(); ++vGElement)
+    {
+      vGElement->SetRAT(vGElement->GetRAT() - tree->vGTreeNodeList[i]->GetT() - tree->vGTreeNodeList[i]->GetR() * 
+        vGElement->GetC());
+      vGElement->SetC(tree->vGTreeNodeList[i]->GetC());
+    }
+  }
 }

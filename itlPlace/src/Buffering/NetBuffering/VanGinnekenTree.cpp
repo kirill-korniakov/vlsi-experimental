@@ -5,11 +5,16 @@
 VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data): pGrid(data->design, data->sizeBuffer)
 {
   vGAlgorithmData = data;
+
+  if (data->typeNetListBuffering == BUFFERING_ALL_CRITICAL_PATH)
+    vanGinnekenTreeCreate = new VanGinnekenTreeCreate(this);
+  if (data->typeNetListBuffering == PATH_BASED)
+     vanGinnekenTreeCreate = new VanGinnekenTreeCreatePathBased(this);
+
   if (data->typePartition == LINEAR)
   {
     updateVanGinnekenTree = new UpdateVanGinnekenTree(this);
-    vanGinnekenTreeNodeCreate = new VanGinnekenTreeNodeCreate(this);
-    vanGinnekenTreeCreate = new VanGinnekenTreeCreate(this);
+    vanGinnekenTreeNodeCreate = new VanGinnekenTreeNodeCreate(this);    
     calculateVanGinnekenSubtree = new CalculateVanGinnekenSubtree(this);
     findMaxPointInEdgeVanGinnekenTree = new FindMaxPointInEdgeVanGinnekenTree(this);
   }
@@ -18,7 +23,6 @@ VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data): pGrid(data->design, dat
   {
     updateVanGinnekenTree = new UpdateVanGinnekenTree(this);
     vanGinnekenTreeNodeCreate = new VanGinnekenTreeDynamicDistributionNodeCreate(this);
-    vanGinnekenTreeCreate = new VanGinnekenTreeCreate(this);
     calculateVanGinnekenSubtree = new CalculateVanGinnekenSubtree(this);
     findMaxPointInEdgeVanGinnekenTree = new FindMaxPointInEdgeVGTreeDynamicDistribution(this);
   }
@@ -27,7 +31,6 @@ VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data): pGrid(data->design, dat
   {
     updateVanGinnekenTree = new UpdateVanGinnekenTree(this);
     vanGinnekenTreeNodeCreate = new VanGinnekenTreeLegalDynamicDistributionNodeCreate(this);
-    vanGinnekenTreeCreate = new VanGinnekenTreeCreate(this);
     calculateVanGinnekenSubtree = new CalculateVanGinnekenSubtree(this);
     findMaxPointInEdgeVanGinnekenTree = new FindMaxPointInEdgeVanGinnekenTreeLegalDynamicDistribution(this);
   }
@@ -50,9 +53,9 @@ void VanGinnekenTree::ClearTree()
 {
   for (int i = 0; i < vGAlgorithmData->totalTreeSize; i++)
   {
-    vGTreeNodeList[i].SetLeft(NULL);
-    vGTreeNodeList[i].SetRight(NULL);
-    vGTreeNodeList[i].type = NodeType(-1);
+    vGTreeNodeList[i]->SetLeft(NULL);
+    vGTreeNodeList[i]->SetRight(NULL);
+    vGTreeNodeList[i]->type = NodeType(-1);
   }
 }
 
@@ -61,7 +64,7 @@ int VanGinnekenTree::GetTreeSize()
   return updateVanGinnekenTree->treeSize;
 }
 
-VanGinnekenTreeNode VanGinnekenTree::GetSource()
+VanGinnekenTreeNode* VanGinnekenTree::GetSource()
 {
   return vGTreeNodeList[0];
 }
@@ -69,7 +72,7 @@ VanGinnekenTreeNode VanGinnekenTree::GetSource()
 double VanGinnekenTree::GetR()
 {
   vGTreeNodeList[0];
-  return vGTreeNodeList[0].GetR();
+  return vGTreeNodeList[0]->GetR();
 }
 
 UpdateVanGinnekenTree::UpdateVanGinnekenTree(VanGinnekenTree* tree)
@@ -139,21 +142,33 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
   nextCriticalPathPointW.MoveNext();
   HSteinerPointWrapper nextSteinerPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(nextCriticalPathPointW.TimingPoint())]];
 
+  bool isCriticalPathLeaf = true;
+
   if (nextSteinerPoint == srcPoint)
   {
-    source.MoveNext();
-    source.MoveNext();
-    srcPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(source.TimingPoint())]];
-    net = vGTree->vGAlgorithmData->design.Pins.Get<HPin::Net, HNet>(vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin,HPin>(srcPoint));
+    if (source.MoveNext())
+    {
+      if (source.MoveNext())
+      {
+        isCriticalPathLeaf = false;
+          srcPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(source.TimingPoint())]];
+        net = vGTree->vGAlgorithmData->design.Pins.Get<HPin::Net, HNet>(vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin,HPin>(srcPoint));
 
-    vGTree->vanGinnekenTreeNodeCreate->RefreshSoursAndSinkPoint(net, srcPoint, SOURCE_AND_SINK, rootIndex);
+        vGTree->vanGinnekenTreeNodeCreate->RefreshSoursAndSinkPoint(net, srcPoint, SOURCE_AND_SINK, rootIndex);
+        vGTree->vGTreeNodeList[rootIndex]->signalDirection = source.SignalDirection();
 
-    CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
-
+        CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+      }
+    }
   }
-  else
+  if (isCriticalPathLeaf)
   {
     isPoitnVisit = 2;
     isPoitnsVisits.push(isPoitnVisit);
   }
+}
+
+HSteinerPoint UpdateVanGinnekenTree::GetSteinerPointByStartPoint(HCriticalPath::PointsEnumeratorW point)
+{
+  return vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(point.TimingPoint())];
 }

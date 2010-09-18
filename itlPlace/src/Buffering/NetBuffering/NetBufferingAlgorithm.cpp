@@ -63,6 +63,11 @@ void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
     additionNewElement = new StandartAdditionNewElement(this);
   if (data->typeBufferAddition == LEGAL_ADDITION)
     additionNewElement = new LegalAdditionNewElement(this);
+  
+  if (data->typeNetListBuffering == BUFFERING_ALL_CRITICAL_PATH)
+    branchPoint = new CalculateVGBranchPoint(this);
+  if (data->typeNetListBuffering == PATH_BASED)
+    branchPoint = new PathBasedCalculateVGBranchPoint(this);
 }
 
 VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isRealBuffering)
@@ -87,7 +92,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
 
   if (data->plotVGTree)
   {
-    data->design.Plotter.ShowVGTree(net, &data->vGTree->GetSource(), 
+    data->design.Plotter.ShowVGTree(net, data->vGTree->GetSource(), 
       Color_Black, true, HPlotter::WaitTime(data->plotterWaitTime));
   }
 
@@ -111,7 +116,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
       HNet* newNet = new HNet[bufCount + 1];
       additionNewElement->InsertsBuffer(newBuffer, &best);
       newBuffer.sort();
-      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource().GetLeft());
+      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource()->GetLeft());
       delete [] newNet;
     }
   }

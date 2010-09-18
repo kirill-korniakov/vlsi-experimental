@@ -25,32 +25,36 @@ public:
   double x,y; //координаты узла дерев
   NodeType type; 
   int index;
+  SignalDirection signalDirection; //известен только у точек с типом SOURCE_AND_SINK
 
-  bool HasLeft();
-  bool HasRight();
-  HSteinerPoint GetSteinerPoint(bool first = true);
-  HNet GetNet(bool first = true);
+   bool HasLeft();
+   bool HasRight();
+  virtual HSteinerPoint GetSteinerPoint(bool first = true);
+  virtual HNet GetNet(bool first = true);
 
-  VanGinnekenTreeNode* GetLeft();
-  VanGinnekenTreeNode* GetRight();
-  VanGinnekenTree* GetTree(); 
+   VanGinnekenTreeNode* GetLeft();
+   VanGinnekenTreeNode* GetRight();
+   VanGinnekenTree* GetTree(); 
 
-  double GetRAT();//RAT in sinc
-  double GetC();//capacity in sinc
-  double GetR();//resistance in source
+  virtual double GetRAT();//RAT in sinc
+  virtual double GetC();//capacity in sinc
+  virtual double GetR();//resistance in source
+  virtual double GetT();
 
-  void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
-  void SetNet(HNet n, bool first = true);
-  void SetLeft(VanGinnekenTreeNode* node);
-  void SetRight(VanGinnekenTreeNode* node);
-  void SetTree(VanGinnekenTree* t);
+  virtual void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
+  virtual void SetNet(HNet n, bool first = true);
+   void SetLeft(VanGinnekenTreeNode* node);
+   void SetRight(VanGinnekenTreeNode* node);
+  virtual void SetTree(VanGinnekenTree* t);
 
-  bool isSource();
-  bool isSink();
-  bool isBranchPoint();
-  bool isCandidate();
-  bool isCandidateAndRealPoint();
-  bool isInternal();
+  virtual bool isSource();
+  virtual bool isSink();
+  virtual bool isBranchPoint();
+  virtual bool isCandidate();
+  virtual bool isCandidateAndRealPoint();
+  virtual bool isInternal();
+  virtual bool isSteinerTreeLeaf();
+  virtual bool isSteinerTreeSource();
 
 protected:
   HNet net;
@@ -64,10 +68,12 @@ class VanGinnekenTreeNodePathBased: public VanGinnekenTreeNode
 {
 public:
   VanGinnekenTreeNodePathBased();
-  HSteinerPoint GetSteinerPoint(bool first = true);
-  HNet GetNet(bool first = true);
-  void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
-  void SetNet(HNet n, bool first = true);
+  virtual double GetR();//resistance in source
+  virtual double GetT();
+  virtual HSteinerPoint GetSteinerPoint(bool first = true);
+  virtual HNet GetNet(bool first = true);
+  virtual void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
+  virtual void SetNet(HNet n, bool first = true);
 
 protected:
   HNet secondNet;

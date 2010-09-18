@@ -22,7 +22,7 @@ class VanGinnekenTree
 public:
   VGAlgorithmData* vGAlgorithmData;
   HDPGrid* DPGrid;
-  VanGinnekenTreeNode* vGTreeNodeList;
+  VanGinnekenTreeNode** vGTreeNodeList;
   HPlacementGrid pGrid;
 
   UpdateVanGinnekenTree* updateVanGinnekenTree;
@@ -37,7 +37,7 @@ public:
   virtual void ClearTree();
   virtual int GetTreeSize();
   virtual double GetR();
-  virtual VanGinnekenTreeNode GetSource();
+  virtual VanGinnekenTreeNode* GetSource();
 
 };
 
@@ -68,7 +68,7 @@ public:
     isPoitnsVisits.push(0);
     //CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
     vGTree->vanGinnekenTreeNodeCreate->CreateSource(net, srcPoint, SOURCE, nodeIndex, vGTree);
-
+    int pininnet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
     while (!points.empty())
     {
       srcPoint = points.top();
@@ -119,6 +119,9 @@ public:
   {
     return point;
   }
+
+  HSteinerPoint GetSteinerPointByStartPoint(HCriticalPath::PointsEnumeratorW point);
+
 
   void CreateNodeInLeftSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
     TemplateTypes<int>::stack& rootIndexs,

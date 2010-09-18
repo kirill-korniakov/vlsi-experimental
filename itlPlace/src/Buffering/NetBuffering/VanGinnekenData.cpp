@@ -101,10 +101,22 @@ void VGAlgorithmData::Initialize()
   for (HCells::CellsEnumeratorW cw = design.Cells.GetEnumeratorW(); cw.MoveNext();)
     totalAreaCells += cw.Width() * cw.Height();
 
-  netVisit = new bool [design.Nets.Count() * 2];
-  for (int i = 0; i < design.Nets.Count() * 2; i++)
+  if (typeNetListBuffering == BUFFERING_ALL_CRITICAL_PATH)
   {
-    netVisit[i] = false;
+    netVisit = new bool [design.Nets.Count() * 2];
+    for (int i = 0; i < design.Nets.Count() * 2; i++)
+    {
+      netVisit[i] = false;
+    }
+  }
+  if (typeNetListBuffering == PATH_BASED)
+  {
+    netVisit = new bool [design.CriticalPaths.Count() * 2];
+
+    for (int i = 0; i < design.CriticalPaths.Count() * 2; i++)
+    {
+      netVisit[i] = false;
+    }
   }
 
   if (design.cfg.ValueOf("Reporting.reportParameters", false))

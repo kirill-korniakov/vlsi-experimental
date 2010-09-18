@@ -98,7 +98,7 @@ void StandartAdditionNewElement::AddSinksToNet(HNet& subNet, VanGinnekenTreeNode
     AddSinksToNet(subNet, node->GetRight(), subNetPinEnumW, newBuffer);
   }
 
-  if (node->isSink())
+  if (node->isSteinerTreeLeaf())
   {		
     subNetPinEnumW.MoveNext();
     vGAlgorithm->data->design.Nets.AssignPin(subNet, subNetPinEnumW, 
@@ -136,7 +136,7 @@ void StandartAdditionNewElement::PinsCountCalculation(VanGinnekenTreeNode* node,
   {
     PinsCountCalculation(node->GetRight(), nPins, newBuffer);
   }
-  if (node->isSink())
+  if (node->isSteinerTreeLeaf())
   {		
     nPins++;
     return;
@@ -147,68 +147,113 @@ void StandartAdditionNewElement::PinsCountCalculation(VanGinnekenTreeNode* node,
 void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, 
                                             HNet* newNet, VanGinnekenTreeNode* node)
 {
-  int newPinCount = 0;
-  int nNewNetPin = 0;
-  int nPins = 0;
-  char cellIdx[10];
-
-  HNet subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
-  newNet[0] = subNet;
-  vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
-  sprintf(cellIdx, "%d", 0);
-  vGAlgorithm->data->design.Nets.Set<HNet::Name>(subNet, vGAlgorithm->data->design[net].Name() + 
-    "__BufferedPart_" + string(cellIdx));
-
-  PinsCountCalculation(node, nPins, newBuffer);
-  nPins++;
-  nNewNetPin += nPins;
-  vGAlgorithm->data->design.Nets.AllocatePins(subNet, nPins);  
-  newPinCount += nPins;
-  vGAlgorithm->data->design.Nets.Set<HNet::Source, HPin>(subNet, vGAlgorithm->data->design[net].Source());
-
-
-  AddSinksToNet(subNet, node, vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
-
-  if (vGAlgorithm->data->plotNets)
-  {
-    vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, true, 
-      HPlotter::WaitTime(vGAlgorithm->data->plotterWaitTime));
-  }
-
+  HNet currentNet = net;
   int ind = 0;
-  for (TemplateTypes<NewBuffer>::list::iterator j = newBuffer.begin(); j != newBuffer.end(); ++j, ind++)
+  TemplateTypes<NewBuffer>::list::iterator j = newBuffer.begin();
+  int mustPinCount = int(newBuffer.size()) * 2;
+  int newPinCount = 0;
+  while (j != newBuffer.end())
   {
-    subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
+    HNet cNet = j->Positions.GetPosition()->GetNet();
+    int rootIndex =  j->Positions.GetPosition()->index;
+    if (cNet != currentNet)
+    {
+      while(!j->Positions.GetPosition()->GetTree()->vGTreeNodeList[rootIndex]->isSteinerTreeSource())
+      {
+        rootIndex--;
+        if (rootIndex < 0)
+        {
+          ALERT("ERROR  rootIndex < 0");
+        }
+      }
+      currentNet = cNet;
+      net = currentNet;
+      node = j->Positions.GetPosition()->GetTree()->vGTreeNodeList[rootIndex]->GetLeft();
+    }
+
+      mustPinCount += vGAlgorithm->data->design.Nets.GetInt<HNet::PinsCount>(net);
+    
+    
+    int nNewNetPin = 0;
+    int nPins = 0;
+    char cellIdx[10];
+
+    HNet subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
     newNet[ind] = subNet;
     vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
-    sprintf(cellIdx, "%d", j);
+    sprintf(cellIdx, "%d", 0);
     vGAlgorithm->data->design.Nets.Set<HNet::Name>(subNet, vGAlgorithm->data->design[net].Name() + 
       "__BufferedPart_" + string(cellIdx));
 
-    nPins = 0;
-    NewBuffer& nodeStart = *j;
-    PinsCountCalculation(nodeStart.Positions.GetPosition()->GetLeft(), nPins, newBuffer);
+    PinsCountCalculation(node, nPins, newBuffer);
     nPins++;
     nNewNetPin += nPins;
+    vGAlgorithm->data->design.Nets.AllocatePins(subNet, nPins);  
     newPinCount += nPins;
-    vGAlgorithm->data->design.Nets.AllocatePins(subNet, nPins);
-    vGAlgorithm->data->design.Nets.Set<HNet::Source, HPin>(subNet, j->source);
+    vGAlgorithm->data->design.Nets.Set<HNet::Source, HPin>(subNet, vGAlgorithm->data->design[net].Source());
 
-    NewBuffer& nodeStart2 = *j;
-    AddSinksToNet(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), 
-      vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
+
+    AddSinksToNet(subNet, node, vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
 
     if (vGAlgorithm->data->plotNets)
     {
-      vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, false, 
+      vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, true, 
         HPlotter::WaitTime(vGAlgorithm->data->plotterWaitTime));
     }
+
+
+    //for (TemplateTypes<NewBuffer>::list::iterator j = newBuffer.begin(); j != newBuffer.end(); ++j, ind++)
+    bool isStop = false;
+    ind++;
+    while (!isStop) 
+    {
+      subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
+      newNet[ind] = subNet;
+      vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
+      sprintf(cellIdx, "%d", j);
+      vGAlgorithm->data->design.Nets.Set<HNet::Name>(subNet, vGAlgorithm->data->design[net].Name() + 
+        "__BufferedPart_" + string(cellIdx));
+
+      nPins = 0;
+      NewBuffer& nodeStart = *j;
+      PinsCountCalculation(nodeStart.Positions.GetPosition()->GetLeft(), nPins, newBuffer);
+      nPins++;
+      nNewNetPin += nPins;
+      newPinCount += nPins;
+      vGAlgorithm->data->design.Nets.AllocatePins(subNet, nPins);
+      vGAlgorithm->data->design.Nets.Set<HNet::Source, HPin>(subNet, j->source);
+
+      NewBuffer& nodeStart2 = *j;
+      AddSinksToNet(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), 
+        vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
+
+      if (vGAlgorithm->data->plotNets)
+      {
+        vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, false, 
+          HPlotter::WaitTime(vGAlgorithm->data->plotterWaitTime));
+      }
+      j++;
+      if (j == newBuffer.end())
+      {
+        isStop = true;
+        HNetWrapper netw = vGAlgorithm->data->design[net];
+        int ttt = (netw.PinsCount() + int(newBuffer.size()) * 2);
+        if ((netw.PinsCount() + newBuffer.size() * 2) != newPinCount)
+          ALERT("ERRORR pin count");
+        vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
+      }
+      else
+        if (currentNet != j->Positions.GetPosition()->GetNet())
+        {
+          isStop = true; 
+
+          vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
+        }
+      ind++;
+    }
   }
-  HNetWrapper netw = vGAlgorithm->data->design[net];
-  int ttt = (netw.PinsCount() + int(newBuffer.size()) * 2);
-  if ((netw.PinsCount() + newBuffer.size() * 2) != newPinCount)
+  if (mustPinCount != newPinCount)
     ALERT("ERRORR pin count");
-  vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
 }
 
 LegalAdditionNewElement::LegalAdditionNewElement(NetBufferingAlgorithm* vGA): StandartAdditionNewElement(vGA)
