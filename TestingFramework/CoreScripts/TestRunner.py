@@ -119,9 +119,15 @@ class TestRunner:
         cols = ['benchmark']
         cols.append(END_OF_COLUMN)
 
-        for col in range(len(self.experimentsToCompare.keys()) + 1):
+        for row in range(len(metrics)):
+            cols.append(metrics[row])
+            cols.append(END_OF_COLUMN)
+
+        cols.append(END_OF_COLUMN)
+
+        for col in range(len(self.experimentsToCompare.keys())):
             for row in range(len(metrics)):
-                cols.append(metrics[row])
+                cols.append(metrics[row] + '%')
                 cols.append(END_OF_COLUMN)
 
             cols.append(END_OF_COLUMN)
@@ -130,30 +136,53 @@ class TestRunner:
 
         #------Print results-------------------------------------
         for benchmark in self.experimentsToCompare[groupExp].keys():
+            initialMetrics = []
             cols = [benchmark]
             cols.append(END_OF_COLUMN)
-            #TODO: mark experiment with best result for each metric
+            initialIdx = len(cols) #index for metrics on 'INIT' stage
+
+            #Reserve positions for each metric on 'INIT' stage
+            for col in range(len(metrics)):
+                cols.append('N/A')
+                cols.append(END_OF_COLUMN)
+
+            cols.append(END_OF_COLUMN)
+
+            #TODO: mark experiment with best result
 
             for experiment in self.experimentsToCompare.keys():
                 resultValues = self.experimentsToCompare[experiment][benchmark]
 
-                if (len(cols) == 2):
+                if (resultValues == []):
                     for col in range(len(metrics)):
-                        cols.append(str(resultValues[0][col]))
+                        cols.append('N/A')
                         cols.append(END_OF_COLUMN)
 
-                    cols.append(END_OF_COLUMN)
+                else:
+                    #if 'INITIAL' metrics haven't been printed yet
+                    if (initialMetrics == []):
+                        #take them from the table of this experiment
+                        for col in range(len(metrics)):
+                            cols[initialIdx + 2 * col] = str(resultValues[0][col])
+                            initialMetrics.append(resultValues[0][col])
 
-                #TODO: else check intitial values
+                    #else compare 'INITIAL' metrics
+                    else:
+                        for col in range(len(metrics)):
+                            cmpResult = CompareValues(initialMetrics[col], resultValues[0][col])
 
-                #for row in range(1, len(stages)):
-                for col in range(len(metrics)):
-                    cols.append(str(resultValues[finalStageIdx][col]))
-                    cols.append(END_OF_COLUMN)
+                            if (cmpResult == 'notEqual'):
+                                print('Error: not equal Init metrics')
+
+
+                    for col in range(len(metrics)):
+                        percent    = resultValues[finalStageIdx][col] / initialMetrics[col]
+                        percentStr = "%.2f" % percent
+                        cols.append(percentStr)
+                        cols.append(END_OF_COLUMN)
 
                 cols.append(END_OF_COLUMN)
 
-            cols.append(END_OF_COLUMN)
             WriteStringToFile(cols, resultFileName)
 
     def RunExperiment(self, experiment):

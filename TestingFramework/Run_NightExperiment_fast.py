@@ -23,7 +23,8 @@ import FastCheckRunner
 from FastCheckRunner import *
 
 fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "HPWL_ISPD":"ISPD04_fast.list", "LR":"IWLS_GP_r1511/IWLS_GP_fast.list",\
-    "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "Weighting (SGNW) experiment":"IWLS05_fast.list"}
+    "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "Weighting (SGNW) experiment":"IWLS05_fast.list",\
+    "APlace weighting experiment":"IWLS05_fast.list"}
 
 def NightExperiment(lists):
     exp_HPWL = Experiment_HPWL()
