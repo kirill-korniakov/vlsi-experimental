@@ -60,6 +60,11 @@ VanGinnekenTree* VanGinnekenTreeNode::GetTree()
   return tree;
 }
 
+VanGinnekenTreeNode* VanGinnekenTreeNode::GetRoot()
+{
+  return root;
+}
+
 double VanGinnekenTreeNode::GetRAT()	
 {		
   if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
@@ -99,6 +104,11 @@ void VanGinnekenTreeNode::SetSteinerPoint(HSteinerPoint sp, bool first)
 void VanGinnekenTreeNode::SetNet(HNet n, bool first)
 {
   net = n;
+}
+
+void VanGinnekenTreeNode::SetRoot(VanGinnekenTreeNode* node)
+{
+ root = node;
 }
 
 void VanGinnekenTreeNode::SetLeft(VanGinnekenTreeNode* node)

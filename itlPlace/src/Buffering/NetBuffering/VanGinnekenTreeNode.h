@@ -35,6 +35,7 @@ public:
    VanGinnekenTreeNode* GetLeft();
    VanGinnekenTreeNode* GetRight();
    VanGinnekenTree* GetTree(); 
+   VanGinnekenTreeNode* GetRoot();
 
   virtual double GetRAT();//RAT in sinc
   virtual double GetC();//capacity in sinc
@@ -46,6 +47,7 @@ public:
    void SetLeft(VanGinnekenTreeNode* node);
    void SetRight(VanGinnekenTreeNode* node);
   virtual void SetTree(VanGinnekenTree* t);
+  void SetRoot(VanGinnekenTreeNode* node);
 
   virtual bool isSource();
   virtual bool isSink();
@@ -62,6 +64,7 @@ protected:
   VanGinnekenTreeNode* left;
   VanGinnekenTreeNode* right;
   VanGinnekenTree* tree;
+  VanGinnekenTreeNode* root;
 };
 
 class VanGinnekenTreeNodePathBased: public VanGinnekenTreeNode

@@ -116,7 +116,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
       HNet* newNet = new HNet[bufCount + 1];
       additionNewElement->InsertsBuffer(newBuffer, &best);
       newBuffer.sort();
-      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource()->GetLeft());
+      additionNewElement->CreateNets(net, newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), bufCount);
       delete [] newNet;
     }
   }

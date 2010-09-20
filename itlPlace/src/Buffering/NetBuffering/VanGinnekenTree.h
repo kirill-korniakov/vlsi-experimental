@@ -56,18 +56,23 @@ public:
     TemplateTypes<HSteinerPoint>::stack points;
     TemplateTypes<int>::stack rootIndexs;
     TemplateTypes<int>::stack isPoitnsVisits;
+    TemplateTypes<HNet>::stack netInCriticalPath;
+    TemplateTypes<VanGinnekenTreeNode*>::stack vanGinnekenTreeNodeRoot;
 
     int nodeIndex = 0;
     int rootIndex = 0;
     int isPoitnVisit = 0;
     HSteinerPoint srcPoint = GetSteinerPointByStartPoint(source);
     HNet net = vGTree->vGAlgorithmData->design.Pins.Get<HPin::Net, HNet>(vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(srcPoint));
+    netInCriticalPath.push(net);
     HSteinerPoint nextPoint = srcPoint;
     points.push(srcPoint);	
     rootIndexs.push(0);
     isPoitnsVisits.push(0);
     //CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
-    vGTree->vanGinnekenTreeNodeCreate->CreateSource(net, srcPoint, SOURCE, nodeIndex, vGTree);
+    int pinInNet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
+    VanGinnekenTreeNode* root = vGTree->vanGinnekenTreeNodeCreate->CreateSource(net, srcPoint, SOURCE, nodeIndex, vGTree);
+    vanGinnekenTreeNodeRoot.push(root);
     int pininnet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
     while (!points.empty())
     {
@@ -79,11 +84,11 @@ public:
       {
         if (vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::HasLeft, bool>(srcPoint))
         {
-          CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+          CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, vanGinnekenTreeNodeRoot);
         }
         else
         {
-          CreateNodeInSink(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, source);
+          CreateNodeInSink(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, source, netInCriticalPath, vanGinnekenTreeNodeRoot);
         }
       }
       else
@@ -93,7 +98,7 @@ public:
           isPoitnsVisits.push(isPoitnVisit);  
           if (vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::HasRight, bool>(srcPoint))
           {
-            CreateNodeInRightSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+            CreateNodeInRightSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, vanGinnekenTreeNodeRoot);
           }    
         }
         else
@@ -101,6 +106,13 @@ public:
           {
             points.pop();	
             rootIndexs.pop();
+            if (rootIndex == vanGinnekenTreeNodeRoot.top()->index)
+            {
+              vanGinnekenTreeNodeRoot.pop();
+              netInCriticalPath.pop();
+              if (netInCriticalPath.size() > 0)
+                net = netInCriticalPath.top();
+            }
           }
     }
 
@@ -130,7 +142,7 @@ public:
     int& rootIndex,
     int& isPoitnVisit,
     HSteinerPoint& srcPoint,
-    HSteinerPoint& nextPoint);
+    HSteinerPoint& nextPoint, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
   void CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
     TemplateTypes<int>::stack& rootIndexs,
     TemplateTypes<int>::stack& isPoitnsVisits,
@@ -138,7 +150,9 @@ public:
     int& rootIndex,
     int& isPoitnVisit,
     HSteinerPoint& srcPoint,
-    HSteinerPoint& nextPoint, HSteinerPoint& source);
+    HSteinerPoint& nextPoint, HSteinerPoint& source,
+    TemplateTypes<HNet>::stack& netInCriticalPath,
+    TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
   void CreateNodeInRightSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
     TemplateTypes<int>::stack& rootIndexs,
     TemplateTypes<int>::stack& isPoitnsVisits,
@@ -146,7 +160,7 @@ public:
     int& rootIndex,
     int& isPoitnVisit,
     HSteinerPoint& srcPoint,
-    HSteinerPoint& nextPoint);
+    HSteinerPoint& nextPoint, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
 
   void CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
     TemplateTypes<int>::stack& rootIndexs,
@@ -155,7 +169,9 @@ public:
     int& rootIndex,
     int& isPoitnVisit,
     HSteinerPoint& srcPoint,
-    HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source);
+    HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source,
+    TemplateTypes<HNet>::stack& netInCriticalPath,
+  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
 };
 
 #endif

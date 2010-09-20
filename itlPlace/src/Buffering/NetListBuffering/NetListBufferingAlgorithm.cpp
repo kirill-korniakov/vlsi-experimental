@@ -118,13 +118,58 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
     }
     if (isRealBuffering)
     {
-      HNet* newNet = new HNet[bufCount + 1];
+      HNet curNet = best.GetBufferPosition()->begin()->GetPosition()->GetNet();
+      int newNetCount = 0;
+      for (TemplateTypes<BufferPositions>::list::iterator buf = best.GetBufferPosition()->begin(); 
+        buf != best.GetBufferPosition()->end(); ++buf)
+      {
+        if (buf->GetPosition()->GetNet() == curNet)
+        {
+          newNetCount++;
+        }
+        else
+        {
+          newNetCount += 2;
+          curNet = buf->GetPosition()->GetNet();
+        }
+      }
+      newNetCount++;
+      HNet* newNet = new HNet[newNetCount + 1];
       additionNewElement->InsertsBuffer(newBuffer, &best);
       newBuffer.sort();
+
+      TemplateTypes<NewBuffer>::list newBuffer2;
+      HNetWrapper nw = data->design[newBuffer.begin()->Positions.GetPosition()->GetNet()];
+      newBuffer2.push_back(*newBuffer.begin());
+      for (TemplateTypes<NewBuffer>::list::iterator i = newBuffer.begin(); i != newBuffer.end(); i++)
+      {
+        HNetWrapper nw1 = data->design[i->Positions.GetPosition()->GetNet()];
+        for (TemplateTypes<NewBuffer>::list::iterator j = i; j != newBuffer.end(); j++)
+        {
+          HNetWrapper nw2 = data->design[j->Positions.GetPosition()->GetNet()];
+          if (nw1 == nw2)
+          {
+            bool f = false;
+            for (TemplateTypes<NewBuffer>::list::iterator t = newBuffer2.begin(); t != newBuffer2.end(); t++)
+            {
+              if (t->Positions.GetPosition()->index == j->Positions.GetPosition()->index)
+              {
+                f = true;
+                break;
+              }
+            }
+            if (!f)
+            {
+              newBuffer2.push_back(*j);
+            }
+          }
+        }
+      }
+
       additionNewElement->CreateNets(data->design.Pins.Get<HPin::Net, HNet>(
         data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(
         data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(
-        data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath)))), newBuffer, newNet, data->vGTree->GetSource()->GetLeft());
+        data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath)))), newBuffer2, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
       delete [] newNet;
     }
   }
@@ -158,7 +203,11 @@ int PathBasedBuffering::BufferingNetlist()
   ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
   for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
   {
-    bufferCount += BufferingCriticalPath(paths[j]).GetPositionCount();
+    //if (data->design.CriticalPaths.GetInt<HCriticalPath::PointsCount>(paths[j]) == 8)
+      bufferCount += BufferingCriticalPath(paths[j]).GetPositionCount();
+      ALERT("Buffer insited = %d", bufferCount);
+      FindCriticalPaths(data->design);
+      STA(data->design);
   }
   if (data->plotBuffer)
   {

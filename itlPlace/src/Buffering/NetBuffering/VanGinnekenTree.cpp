@@ -88,11 +88,11 @@ void UpdateVanGinnekenTree::CreateNodeInLeftSubTree(HNet& net, TemplateTypes<HSt
   int& rootIndex,
   int& isPoitnVisit,
   HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint)
+  HSteinerPoint& nextPoint, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
 {
         isPoitnVisit = 1;
         nextPoint = vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Left, HSteinerPoint>(srcPoint);
-        vGTree->vanGinnekenTreeNodeCreate->CreateNewPoint(net, nextPoint, BRANCH, nodeIndex, rootIndex, false, vGTree);
+        vGTree->vanGinnekenTreeNodeCreate->CreateNewPoint(net, nextPoint, BRANCH, nodeIndex, rootIndex, vanGinnekenTreeNodeRoot, false, vGTree);
         rootIndexs.push(nodeIndex);
         points.push(nextPoint);
         isPoitnsVisits.push(isPoitnVisit);
@@ -106,7 +106,9 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
   int& rootIndex,
   int& isPoitnVisit,
   HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint, HSteinerPoint& source)
+  HSteinerPoint& nextPoint, HSteinerPoint& source,
+  TemplateTypes<HNet>::stack& netInCriticalPath,
+  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
 {
 	    isPoitnVisit = 2;
         isPoitnsVisits.push(isPoitnVisit);
@@ -119,10 +121,10 @@ void UpdateVanGinnekenTree::CreateNodeInRightSubTree(HNet& net, TemplateTypes<HS
   int& rootIndex,
   int& isPoitnVisit,
   HSteinerPoint& srcPoint,
-  HSteinerPoint& nextPoint)
+  HSteinerPoint& nextPoint, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
 {
           nextPoint = vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Right, HSteinerPoint>(srcPoint);
-          vGTree->vanGinnekenTreeNodeCreate->CreateNewPoint(net, nextPoint, BRANCH, nodeIndex, rootIndex, true, vGTree);
+          vGTree->vanGinnekenTreeNodeCreate->CreateNewPoint(net, nextPoint, BRANCH, nodeIndex, rootIndex, vanGinnekenTreeNodeRoot, true, vGTree);
           rootIndexs.push(nodeIndex);
           points.push(nextPoint);
           isPoitnsVisits.push(0);
@@ -135,7 +137,9 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
                       int& rootIndex,
                       int& isPoitnVisit,
                       HSteinerPoint& srcPoint,
-                      HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source)
+                      HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source,
+                      TemplateTypes<HNet>::stack& netInCriticalPath,
+                      TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
 {
 
   HCriticalPath::PointsEnumeratorW nextCriticalPathPointW = source;
@@ -151,13 +155,21 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
       if (source.MoveNext())
       {
         isCriticalPathLeaf = false;
-          srcPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(source.TimingPoint())]];
+        srcPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(source.TimingPoint())]];
+        int pinInNet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
         net = vGTree->vGAlgorithmData->design.Pins.Get<HPin::Net, HNet>(vGTree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin,HPin>(srcPoint));
-
+        int pinInNet2 = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
+        HSteinerPointWrapper o = vGTree->vGAlgorithmData->design[srcPoint];
+        HNetWrapper oo = vGTree->vGAlgorithmData->design[net];
+        string netName0 = oo.Name();
+        HPinWrapper pw = vGTree->vGAlgorithmData->design[oo.Source()];
+        HSteinerPointWrapper spw = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[pw]];
+        netInCriticalPath.push(net);
+        vanGinnekenTreeNodeRoot.push(vGTree->vGTreeNodeList[rootIndex]);
         vGTree->vanGinnekenTreeNodeCreate->RefreshSoursAndSinkPoint(net, srcPoint, SOURCE_AND_SINK, rootIndex);
         vGTree->vGTreeNodeList[rootIndex]->signalDirection = source.SignalDirection();
 
-        CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint);
+        CreateNodeInLeftSubTree(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, vanGinnekenTreeNodeRoot);
       }
     }
   }

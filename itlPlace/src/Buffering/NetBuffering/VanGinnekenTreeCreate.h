@@ -13,12 +13,12 @@ public:
   VanGinnekenTreeNodeCreate(VanGinnekenTree* tree);
 
   virtual VanGinnekenTreeNode* CreateSource(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, VanGinnekenTree* tree = NULL);
-  virtual VanGinnekenTreeNode* CreatePotentialBufferPoint(HNet net, NodeType type, int& nodeIndex, VanGinnekenTree* tree = NULL);
-  virtual void CreateFirstPointInEdge(HNet net, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreateSinkOrBranchPoint(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, bool isRight, VanGinnekenTree* tree);
-  virtual void CreateLastPointInEdge(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
-  virtual void CreateNewPoint(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual VanGinnekenTreeNode* CreatePotentialBufferPoint(HNet net, NodeType type, int& nodeIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, VanGinnekenTree* tree = NULL);
+  virtual void CreateFirstPointInEdge(HNet net, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreateSinkOrBranchPoint(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreateLastPointInEdge(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreateNewPoint(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
   virtual void RefreshSoursAndSinkPoint(HNet net, HSteinerPoint node, NodeType type, int& rootIndex);
 };
 
@@ -28,7 +28,7 @@ public:
   VanGinnekenTreeDynamicDistributionNodeCreate(VanGinnekenTree* tree):VanGinnekenTreeNodeCreate(tree)
   {
   };
-  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
 };
 
 class VanGinnekenTreeLegalDynamicDistributionNodeCreate: public VanGinnekenTreeNodeCreate
@@ -37,7 +37,7 @@ public:
   VanGinnekenTreeLegalDynamicDistributionNodeCreate(VanGinnekenTree* tree):VanGinnekenTreeNodeCreate(tree)
   {
   };
-  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, bool isRight = false, VanGinnekenTree* tree = NULL);
+  virtual void CreatePotentialBufferPointInEdge(HNet net, HSteinerPoint node, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight = false, VanGinnekenTree* tree = NULL);
 };
 
 class VanGinnekenTreeCreate
