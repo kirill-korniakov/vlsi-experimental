@@ -31,6 +31,9 @@ public:
   virtual void AddSinksToNet(HNet& subNet, VanGinnekenTreeNode* node, HNetWrapper::PinsEnumeratorW& subNetPinEnumW, TemplateTypes<NewBuffer>::list& newBuffer);
   virtual NewBuffer* FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer);
   virtual void PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer);
+  virtual void AddPointToSteinerTree(NewBuffer& buffer, TemplateTypes<NewBuffer>::list& newBuffer);
+  HSteinerPoint FindStartPoindInEdge(NewBuffer& buffer, bool& isRight, TemplateTypes<NewBuffer>::list& newBuffer);
+  HSteinerPoint FindEndPoindInEdge(NewBuffer& buffer, TemplateTypes<NewBuffer>::list& newBuffer);
   virtual void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node, int newNetCount);
 };
 

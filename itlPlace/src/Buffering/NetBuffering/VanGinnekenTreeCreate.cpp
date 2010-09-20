@@ -247,10 +247,10 @@ void VanGinnekenTreeCreatePathBased::CreateTree()
   int treeSizeTemp = 0;
   for (HCriticalPaths::EnumeratorW enumerator = vGTree->vGAlgorithmData->design.CriticalPaths.GetEnumeratorW(); enumerator.MoveNext();)
   {
-    ALERT("riticalPath = %d; all point:", ::ToID(enumerator));
+    /*ALERT("riticalPath = %d; all point:", ::ToID(enumerator));
     for (HCriticalPath::PointsEnumeratorW en = enumerator.GetEnumeratorW(); en.MoveNext();)
       ALERT("\tPoint = %d", ::ToID(en));
-    
+    */
     CalculateNodeInEnumerator<HCriticalPaths::EnumeratorW>(enumerator, maxTree, treeSizeTemp);
   }
   vGTree->vGAlgorithmData->totalTreeSize = maxTree;

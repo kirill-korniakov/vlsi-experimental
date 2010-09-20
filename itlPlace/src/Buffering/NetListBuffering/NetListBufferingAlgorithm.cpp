@@ -205,9 +205,9 @@ int PathBasedBuffering::BufferingNetlist()
   {
     //if (data->design.CriticalPaths.GetInt<HCriticalPath::PointsCount>(paths[j]) == 8)
       bufferCount += BufferingCriticalPath(paths[j]).GetPositionCount();
-      ALERT("Buffer insited = %d", bufferCount);
-      FindCriticalPaths(data->design);
-      STA(data->design);
+      //ALERT("Buffer insited = %d", bufferCount);
+      //FindCriticalPaths(data->design);
+      STA(data->design, false);
   }
   if (data->plotBuffer)
   {
