@@ -82,6 +82,9 @@ def CompareValues(value1, value2, eps = 0.001):
 
     return 'notEqual'
 
+def MarkResultAsBest(col):
+    return '--> ' + col
+
 def WriteStringToFile(cols, tableFileName):
   printStr = ''
 

@@ -84,10 +84,6 @@ class TestRunner:
                 print("metrics are not equal")
                 exit(1)
 
-            if (newExperiment.stages != groupExp.stages):
-                print("stages are not equal")
-                exit(1)
-
         self.experimentsToCompare[newExperiment] = {}
 
     def CompareExperimentsInGroup(self, resultFileName):
@@ -137,6 +133,9 @@ class TestRunner:
         #------Print results-------------------------------------
         for benchmark in self.experimentsToCompare[groupExp].keys():
             initialMetrics = []
+            bestMetrics    = [1000000 for i in range(len(metrics))]
+            bestMetricsIdx = [0 for i in range(len(metrics))]
+
             cols = [benchmark]
             cols.append(END_OF_COLUMN)
             initialIdx = len(cols) #index for metrics on 'INIT' stage
@@ -174,14 +173,21 @@ class TestRunner:
                             if (cmpResult == 'notEqual'):
                                 print('Error: not equal Init metrics')
 
-
                     for col in range(len(metrics)):
-                        percent    = resultValues[finalStageIdx][col] / initialMetrics[col]
+                        percent = 100 * resultValues[finalStageIdx][col] / initialMetrics[col]
                         percentStr = "%.2f" % percent
+
+                        if (percent < bestMetrics[col]):
+                            bestMetrics[col]    = percent   #remember best result
+                            bestMetricsIdx[col] = len(cols) #and index
+
                         cols.append(percentStr)
                         cols.append(END_OF_COLUMN)
 
                 cols.append(END_OF_COLUMN)
+
+            for idx in bestMetricsIdx:
+                cols[idx] = MarkResultAsBest(cols[idx])
 
             WriteStringToFile(cols, resultFileName)
 

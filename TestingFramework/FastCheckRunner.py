@@ -10,8 +10,8 @@ from Experiment_HPWL import *
 import Experiment_LR
 from Experiment_LR import *
 
-import Experiment_SGNW
-from Experiment_SGNW import *
+import Experiment_Weighting
+from Experiment_Weighting import *
 
 import Experiment_New_Buffering
 from Experiment_New_Buffering import *
