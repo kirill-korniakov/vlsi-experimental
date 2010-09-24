@@ -26,8 +26,8 @@ from FastCheckRunner import *
 #    "Weighting (SGNW) experiment":"IWLS05_fast.list"}
 
 #fast_lists = {"Weighting (SGNW) experiment":"IWLS05_fast.list"}
-fast_lists = {"HippocrateDP experiment":"IWLS_GP_Hippocrate.list"}
-#fast_lists = {}
+#fast_lists = {"HippocrateDP experiment":"IWLS_GP_Hippocrate.list"}
+fast_lists = {}
 
 def NightExperiment(testRunner):
     exp_HPWL = Experiment_HPWL()
@@ -47,14 +47,14 @@ def NightExperiment(testRunner):
 
     exp_W.name = 'APlace weighting experiment'
     exp_W.SetConfig('APlace_weighting.cfg')
-    #chk_APW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
+    chk_APW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
 
-    #testRunner.AddExperimentToGroup(chk_SGW)
-    #testRunner.AddExperimentToGroup(exp_W)
-    #testRunner.Append(chk_HPWL_IWLS)
-    #testRunner.Append(chk_HPWL_ISPD)
-    #testRunner.Append(chk_LR)
-    #testRunner.Append(chk_BUF)
+    testRunner.AddExperimentToGroup(chk_SGW)
+    testRunner.AddExperimentToGroup(chk_APW)
+    testRunner.Append(chk_HPWL_IWLS)
+    testRunner.Append(chk_HPWL_ISPD)
+    testRunner.Append(chk_LR)
+    testRunner.Append(chk_BUF)
     testRunner.Append(chk_HDP)
     testRunner.Run()
 
@@ -64,9 +64,9 @@ def run():
 
     else:
         nightTestParams = TestRunnerParameters()
-        nightTestParams.doCheckout = False
-        nightTestParams.doBuild    = False
-        nightTestParams.doSendMail = False
+        nightTestParams.doCheckout = True
+        nightTestParams.doBuild    = True
+        nightTestParams.doSendMail = True
         testRunner = TestRunner(nightTestParams)
         NightExperiment(testRunner)
 
