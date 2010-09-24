@@ -23,7 +23,7 @@ import FastCheckRunner
 from FastCheckRunner import *
 
 fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "HPWL_ISPD":"ISPD04_fast.list", "LR":"IWLS_GP_r1511/IWLS_GP_fast.list",\
-    "BUF":"IWLS05_fast.list", "HDP":"IWLS_GP_Hippocrate.list", "Weighting (SGNW) experiment":"IWLS05_fast.list",\
+    "BUF":"IWLS05_fast.list", "HippocrateDP experiment":"IWLS_GP_Hippocrate.list", "Weighting (SGNW) experiment":"IWLS05_fast.list",\
     "APlace weighting experiment":"IWLS05_fast.list"}
 
 def NightExperiment(lists):
@@ -40,7 +40,7 @@ def NightExperiment(lists):
     chk_BUF = Checker(Experiment_New_Buffering(), "MasterLogs/New_Buffering/IWLS")
     chk_HDP = Checker(Experiment_HippocrateDP(), "MasterLogs/HippocrateDP/Aleksandr")
 
-    exp_W   = Experiment_SGNW()
+    exp_W   = Experiment_Weighting()
     chk_SGW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
 
     exp_W.name = 'APlace weighting experiment'
@@ -52,7 +52,7 @@ def NightExperiment(lists):
     #testRunner.Append(chk_HPWL_ISPD)
     #testRunner.Append(chk_LR)
     #testRunner.Append(chk_BUF)
-    #testRunner.Append(chk_HDP)
+    testRunner.Append(chk_HDP)
     testRunner.AddExperimentToGroup(chk_SGW)
     testRunner.AddExperimentToGroup(chk_APW)
     testRunner.Run()

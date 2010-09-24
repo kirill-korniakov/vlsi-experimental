@@ -5,7 +5,7 @@ import Parameters
 from Parameters import *
 
 #Sensitivity Guided Net Weighting experiment
-class Experiment_SGNW(BaseExperiment):
+class Experiment_Weighting(BaseExperiment):
     def __init__(self):
         _metrics = ['HPWL', 'TNS', 'WNS']
         _stages  = ['INIT', 'LEG1', 'LEG2', 'LEG3', 'LEG4', 'LEG5', 'LEG6', 'LEG7', 'LEG8', 'LEG9', 'LEG']

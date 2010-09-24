@@ -1,20 +1,5 @@
-import Checker
-from Checker import *
-
-import Experiment_HippocrateDP
-from Experiment_HippocrateDP import *
-
-import Experiment_HPWL
-from Experiment_HPWL import *
-
-import Experiment_LR
-from Experiment_LR import *
-
-import Experiment_Weighting
-from Experiment_Weighting import *
-
-import Experiment_New_Buffering
-from Experiment_New_Buffering import *
+import TestRunner
+from TestRunner import *
 
 class FastCheckRunner(TestRunner):
     checkersParameters = {}
