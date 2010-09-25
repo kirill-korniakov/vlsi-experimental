@@ -90,10 +90,7 @@ class TestRunner:
 
     def CompareExperimentsInGroup(self, resultFileName):
         groupExp = list(self.experimentsToCompare.keys())[0]
-        stages   = groupExp.stages
         metrics  = groupExp.metrics
-
-        finalStageIdx = len(metrics) - 1
 
         #Create header of the table
         #---First string of the header------------------
@@ -152,7 +149,8 @@ class TestRunner:
             #TODO: mark experiment with best result
 
             for experiment in self.experimentsToCompare.keys():
-                resultValues = self.experimentsToCompare[experiment][benchmark]
+                resultValues  = self.experimentsToCompare[experiment][benchmark]
+                finalStageIdx = len(experiment.stages) - 1
 
                 if (resultValues == []):
                     for col in range(len(metrics)):
