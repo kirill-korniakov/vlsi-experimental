@@ -22,13 +22,6 @@ from Experiment_New_Buffering import *
 import FastCheckRunner
 from FastCheckRunner import *
 
-#fast_lists = {"IWLS05 HPWL experiment":"IWLS05_fast.list", "ISPD04 HPWL Experiment":"ISPD04_fast.list",\
-#    "Weighting (SGNW) experiment":"IWLS05_fast.list"}
-
-#fast_lists = {"Weighting (SGNW) experiment":"IWLS05_fast.list"}
-#fast_lists = {"HippocrateDP experiment":"IWLS_GP_Hippocrate.list"}
-fast_lists = {}
-
 def NightExperiment(testRunner):
     exp_HPWL = Experiment_HPWL()
     chk_HPWL_IWLS = Checker(exp_HPWL, "MasterLogs/HPWL/IWLS")
@@ -58,16 +51,14 @@ def NightExperiment(testRunner):
     testRunner.Append(chk_HDP)
     testRunner.Run()
 
-def run():
-    if fast_lists != {}:
-        NightExperiment(FastCheckRunner(fast_lists))
+def RunNightExperiments():
+    nightTestParams            = TestRunnerParameters()
+    nightTestParams.doBuild    = True
+    nightTestParams.doCheckout = True
+    nightTestParams.doSendMail = True
 
-    else:
-        nightTestParams = TestRunnerParameters()
-        nightTestParams.doCheckout = True
-        nightTestParams.doBuild    = True
-        nightTestParams.doSendMail = True
-        testRunner = TestRunner(nightTestParams)
-        NightExperiment(testRunner)
+    testRunner = TestRunner(nightTestParams)
+    NightExperiment(testRunner)
 
-run()
+if (__name__ == "__main__"):
+    RunNightExperiments()

@@ -69,9 +69,11 @@ class TestRunner:
 
     def Append(self, newExperiment):
          self.parameters.experiments.append(newExperiment)
+         return 0
 
     def AddExperimentToGroup(self, newExperiment):
-        self.Append(newExperiment)
+        if (self.Append(newExperiment) != 0):
+            return
 
         if (self.experimentsToCompare != {}):
             groupExp = list(self.experimentsToCompare.keys())[0]

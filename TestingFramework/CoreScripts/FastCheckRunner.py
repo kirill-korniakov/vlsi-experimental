@@ -13,4 +13,6 @@ class FastCheckRunner(TestRunner):
 
         if (expName in self.checkersParameters):
             newExperiment.SetBenchmarksList(self.checkersParameters[expName])
-            TestRunner.Append(self, newExperiment)
+            return TestRunner.Append(self, newExperiment)
+
+        return 1
