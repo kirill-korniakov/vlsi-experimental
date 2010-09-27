@@ -1,6 +1,8 @@
 #include "Reporting.h"
 #include "Utils.h"
 #include "AdaptiveRoute.h"
+#include "Auxiliary.h"
+#include "TableFormatter.h"
 
 void ReportNetPins(HDesign& design, HNet net)
 {
@@ -306,4 +308,88 @@ void SteinerWoodReport(HDesign& design, bool IsStepReport)
 	ALERT("crossing in tree = %d", sum.crossing);
 	ALERT("Tree heve only right  = %d", sum.onlyRight);
 	ALERT("no tree in net = %d", sum.noTree);
+}
+
+string GetSTPointName(HSteinerPoint pt, HDesign& hd)
+{
+  if ((hd,pt).IsInternal())
+    return Aux::Format("pt%d",-::ToID(pt));
+  else
+    return Utils::MakePinFullName(hd, (hd,pt).Pin());
+}
+
+void PrintSteinerTree(HDesign& design, HNet net)
+{
+  int numCols = 0;
+  int colName = numCols++;
+  int colLeft = numCols++;
+  int colRight = numCols++;
+  int colX = numCols++;
+  int colY = numCols++;
+  int colExtractedR = numCols++;
+  int colExtractedC = numCols++;
+  int colObservedC = numCols++;
+  int colPathDelay = numCols++;
+
+  //create header
+  TableFormatter tf(Aux::Format("Steiner tree for net %s",(net,design).Name().c_str()), numCols);
+  //columns
+  tf.SetColumnAlign(colName, TableFormatter::Align_Left);
+  tf.SetColumnAlign(colLeft, TableFormatter::Align_Left);
+  tf.SetColumnAlign(colRight, TableFormatter::Align_Left);
+  
+  //header row
+  tf.NewHeaderRow();
+  tf.SetCell(colName, "Point Name");
+  tf.SetCell(colLeft, "Left child");
+  tf.SetCell(colRight, "Right child");
+  tf.SetCell(colX, "X (nm)");
+  tf.SetColumnPrecision(colX, 2);
+  tf.SetCell(colY, "Y (nm)");
+  tf.SetColumnPrecision(colY, 2);
+  tf.SetCell(colExtractedR, "Extracted R (kohms)");
+  tf.SetCell(colExtractedC, "Extracted C (pF)");
+  tf.SetCell(colObservedC, "Observed C (pF)");
+  tf.SetCell(colPathDelay, "Path Delay (ns)");
+  tf.NewBorderRow();
+
+  std::stack<HSteinerPoint> trackBack;
+  HSteinerPointWrapper wpt = design[design.SteinerPoints[(design,net).Source()]];
+
+  while(true)
+  {
+    tf.NewRow();
+    tf.SetCell(colName, GetSTPointName(wpt, design));
+    if (wpt.HasLeft())
+      tf.SetCell(colLeft, GetSTPointName(wpt.Left(), design));
+    if (wpt.HasRight())
+    {
+      tf.SetCell(colRight, GetSTPointName(wpt.Right(), design));
+      trackBack.push(wpt.Right());
+    }
+    tf.SetCell(colX, wpt.X());
+    tf.SetCell(colY, wpt.Y());
+    tf.SetCell(colExtractedR, wpt.ExtractedR());
+    tf.SetCell(colExtractedC, wpt.ExtractedC());
+    tf.SetCell(colObservedC, wpt.ObservedC());
+    tf.SetCell(colPathDelay, wpt.PathDelay());
+
+    if (wpt.HasLeft())
+      wpt.GoLeft();
+    else if (trackBack.empty())
+      break;
+    else
+    {
+      wpt = trackBack.top();
+      trackBack.pop();
+    }
+  }
+
+  tf.Print();
+}
+
+void ReportRouting(HDesign& design)
+{
+  for (HNets::ActiveNetsEnumeratorW net = design.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); )
+    PrintSteinerTree(design, net);
 }

@@ -105,22 +105,37 @@ void FLUTERoute(HDesign& aDesign, HNet& aNet)
 
   //HACK: sort pins to get flute internal order
   //do not modify
-  //sort indexes: y - first, x - second
-  for (int q = 0; q < numOfPins - 1; q++)
   {
-    int minIdx = q;
-    for (int j = q + 1; j < numOfPins; j++)
+    for (int q = 0; q < numOfPins - 1; q++)
     {
-      if (  ::gPinY[::gPinIndexes[minIdx]] >  ::gPinY[::gPinIndexes[j]]
-      || (::gPinY[::gPinIndexes[minIdx]] == ::gPinY[::gPinIndexes[j]]
-      &&  ::gPinX[::gPinIndexes[minIdx]] >  ::gPinX[::gPinIndexes[j]]))
+      double minval = ::gPinX[::gPinIndexes[q]];
+      int minidx = q;
+      for (int j = q + 1; j < numOfPins; j++)
       {
-        minIdx = j;
+        if (minval > ::gPinX[::gPinIndexes[j]])
+        {
+          minval = ::gPinX[::gPinIndexes[j]];
+          minidx = j;
+        }
       }
-    } //for (int j = q + 1; j < numOfPins; j++)
-    ::Swap(::gPinIndexes.AsArray() + q, ::gPinIndexes.AsArray() + minIdx);
-  }// for (int q = 0; q < numOfPins - 1; q++)
+      ::Swap(::gPinIndexes.AsArray() + q, ::gPinIndexes.AsArray() + minidx);
+    }
 
+    for (int w = 0; w < numOfPins - 1; w++)
+    {
+      double minval = ::gPinY[::gPinIndexes[w]];
+      int minidx = w;
+      for (int j = w + 1; j < numOfPins; j++)
+      {
+        if (minval > ::gPinY[::gPinIndexes[j]])
+        {
+          minval = ::gPinY[::gPinIndexes[j]];
+          minidx = j;
+        }
+      }
+      ::Swap(::gPinIndexes.AsArray() + w, ::gPinIndexes.AsArray() + minidx);
+    }
+  }//end of FLUTE Hack.
 
   FLUTE::Tree flTree = FLUTE::flute(numOfPins, ::gPinX.AsArray(), ::gPinY.AsArray(), ::gAccuracy);
 

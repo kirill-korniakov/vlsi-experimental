@@ -54,6 +54,18 @@ string FormatArcName(HDesign& design, HPin endPin, HTimingArcType arc)
     return typeName + "%"+ design.GetString<HPin::Name>(startPin) + "->" + design.GetString<HPin::Name>(endPin);
 }
 
+string FormatArcName(HDesign& design, HPinType endPin, HTimingArcType arc)
+{
+  HPinType startPin = design.TimingArcTypes.GetStartPinType(arc, endPin);
+  TimingType tt = design[arc].TimingType();
+
+  if (tt == TimingType_SetupFalling || tt == TimingType_SetupRising)
+    return string("(setup) ") + design[endPin].Name();
+  else if (tt == TimingType_HoldFalling || tt == TimingType_HoldRising)
+    return string("(hold) ") + design[endPin].Name();
+  else
+    return design[startPin].Name() + "->" + design[endPin].Name();
+}
 
 void PrintPath(HDesign& design, HCriticalPath path, int pathNumber)
 {
@@ -320,4 +332,134 @@ void ReportTopologicalOrder(HDesign& design)
     {
         WRITELINE("  PTO %s", GetCellPinName(design, pt).c_str());
     }
+}
+
+void ReportMacrotypesShort(HDesign& design)
+{
+  int numCols = 0;
+  int colName = numCols++;
+  int colIn = numCols++;
+  int colOut = numCols++;
+  int colX = numCols++;
+  int colY = numCols++;
+  int colXs = numCols++;
+  int colYs = numCols++;
+
+  std::vector<HMacroTypeWrapper> macros;
+  macros.reserve(design.MacroTypes.Count());
+
+  for(HMacroTypes::EnumeratorW macro = design.MacroTypes.GetEnumeratorW(); macro.MoveNext();)
+    macros.push_back(macro);
+
+  struct MacroComparer
+  {
+    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
+    {
+      return left.Name() < right.Name();
+    }
+  };
+
+  std::sort(macros.begin(), macros.end(), MacroComparer());
+
+  HSiteWrapper site = design.Sites.NullW();
+  HPlacementRows::EnumeratorW rIter = design.PlacementRows.GetEnumeratorW();
+  if (rIter.MoveNext())
+    site = rIter.Site();
+  
+  double sx = site.Width();
+  double sy = site.Height();
+  if (sx == 0.0) sx = 1.0;
+  if (sy == 0.0) sy = 1.0;
+
+  //create header
+  TableFormatter tf("Macro Types Summary", numCols);
+  //columns
+  tf.SetColumnAlign(colName, TableFormatter::Align_Left);
+  //header row
+  tf.NewHeaderRow();
+  tf.SetCell(colName, "Macro Name");
+  tf.SetCell(colIn, "Inputs Count");
+  tf.SetCell(colOut, "Outputs Count");
+  tf.SetCell(colX, "Width (nm)");
+  tf.SetColumnPrecision(colX, 0);
+  tf.SetCell(colY, "Height (nm)");
+  tf.SetColumnPrecision(colY, 0);
+  tf.SetCell(colXs, "Width (sites)");
+  tf.SetColumnPrecision(colXs, 2);
+  tf.SetCell(colYs, "Height (sites)");
+  tf.SetColumnPrecision(colYs, 2);
+  tf.NewBorderRow();
+
+  for(std::vector<HMacroTypeWrapper>::iterator m = macros.begin(); m != macros.end(); ++m)
+  {
+    tf.NewRow();
+    tf.SetCell(colName, m->Name());
+    tf.SetCell(colX, m->SizeX());
+    tf.SetCell(colY, m->SizeY());
+    tf.SetCell(colXs, m->SizeX()/sx);
+    tf.SetCell(colYs, m->SizeY()/sy);
+
+    int numInputs = 0;
+    int numOutputs = 0;
+    
+    for(HMacroType::PinsEnumeratorW pin = m->GetEnumeratorW(); pin.MoveNext(); )
+    {
+      if (pin.Direction() == PinDirection_OUTPUT) numOutputs++;
+      if (pin.Direction() == PinDirection_INPUT) numInputs++;
+    }
+    tf.SetCell(colIn, numInputs);
+    tf.SetCell(colOut, numOutputs);
+  }
+
+  tf.Print();
+}
+
+void ReportLibraryPhisics(HDesign& design, SignalDirection sd)
+{
+  ALERT("Library phisics report:");
+  int numCols = 0;
+  int colName = numCols++;
+  int colC = numCols++;
+  int colR = numCols++;
+  int colT = numCols++;
+  int colArcType = numCols++;
+
+  //create header
+  TableFormatter tf("Library Phisics Summary", numCols);
+  //columns
+  tf.SetColumnAlign(colName, TableFormatter::Align_Left);
+  tf.SetColumnAlign(colArcType, TableFormatter::Align_Left);
+  //header row
+  tf.NewHeaderRow();
+  tf.SetCell(colName, "Arc/Pin name");
+  tf.SetCell(colR, "R (kohm)");
+  tf.SetCell(colC, "C (pf)");
+  tf.SetCell(colT, "T (ns)");
+  tf.SetCell(colArcType, "Arc type");
+  tf.NewBorderRow();
+
+  std::vector<HMacroTypeWrapper> macros;
+  macros.reserve(design.MacroTypes.Count());
+
+  for(HMacroTypes::EnumeratorW macro = design.MacroTypes.GetEnumeratorW(); macro.MoveNext();)
+    macros.push_back(macro);
+
+  struct MacroComparer
+  {
+    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
+    {
+      return left.Name() < right.Name();
+    }
+  };
+
+  std::sort(macros.begin(), macros.end(), MacroComparer());
+  
+  //fill table
+ 
+  tf.NewBorderRow();
+
+  WRITELINE("Wire resistance (kohm/nm): r = %g", design.RoutingLayers.Physics.RPerDist);
+  WRITELINE("Wire capacitance (pF/nm):  c = %g", design.RoutingLayers.Physics.LinearC);
+
+  tf.Print();
 }

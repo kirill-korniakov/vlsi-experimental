@@ -17,6 +17,7 @@ namespace Utils
 
   SinkPhisics GetSinkCapacitance(HDesign& design, HPinType sink, SignalDirection ph);
   SinkPhisics GetSinkCapacitance(HDesign& design, HPin sink, SignalDirection ph);
+  DriverPhisics GetArcPhisics(HDesign& design, HTimingArcType timingArc, SignalDirection ph);
   DriverPhisics GetDriverWorstPhisics(HDesign& design, HPinType driver, SignalDirection ph);
   DriverPhisics GetDriverAveragePhisics(HDesign& design, HPinType driver, SignalDirection ph);
   DriverPhisics GetDriverTimingPhisics(HDesign& design, HPin driver, SignalDirection ph);

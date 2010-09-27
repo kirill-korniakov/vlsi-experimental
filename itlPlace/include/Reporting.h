@@ -30,6 +30,8 @@ void ReportCountNetsWithTypes(HDesign& design);
 void ReportNetPins(HDesign& hd, HNet net);
 void ReportNetPinsCoordinates(HDesign& hd, HNet net);
 void ReportNetTiming(HDesign& design, HNet net);
+void ReportRouting(HDesign& design);
+void PrintSteinerTree(HDesign& design, HNet net);
 
 string GetCellPinName(HDesign& design, HPin pin);
 string GetCellPinName(HDesign& design, HTimingPoint pt);
@@ -41,5 +43,7 @@ void ReportNegativeSlacks(HDesign&);
 void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr);
 
 void PrintTimingReport(HDesign& hd, int nPaths = -1);
+void ReportMacrotypesShort(HDesign& design);
+void ReportLibraryPhisics(HDesign& design, SignalDirection sd);
 
 #endif //__REPORTING_H__

@@ -37,6 +37,45 @@ SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPin sink, SignalDirectio
   return GetSinkCapacitance(design, design.Get<HPin::Type, HPinType>(sink), ph);
 }
 
+DriverPhisics Utils::GetArcPhisics(HDesign& design, HTimingArcType timingArc, SignalDirection ph)
+{
+  DriverPhisics result;
+  result.C = result.T = result.R = 0.0;
+
+  if (::IsNull(timingArc)) return result;
+  HTimingArcTypeWrapper arc = design[timingArc];
+  if (arc.TimingType() == TimingType_Combinational
+    || arc.TimingType() == TimingType_RisingEdge
+    || arc.TimingType() == TimingType_FallingEdge
+    || arc.TimingType() == TimingType_HoldFalling
+    || arc.TimingType() == TimingType_HoldRising
+    || arc.TimingType() == TimingType_SetupFalling
+    || arc.TimingType() == TimingType_SetupRising
+    )
+  {
+    switch (ph)
+    {
+    case SignalDirection_Rise:
+    case SignalDirection_None:
+      result.R = arc.ResistanceRise();
+      result.T = arc.TIntrinsicRise();
+    case SignalDirection_Fall:
+      result.R = arc.ResistanceFall();
+      result.T = arc.TIntrinsicFall();
+      break;
+    case SignalDirection_Average:
+      result.R = max(arc.ResistanceFall(), arc.ResistanceRise());
+      result.T = max(arc.TIntrinsicFall(), arc.TIntrinsicRise());
+      break;
+    default:
+      GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
+      break;
+    };
+  }
+
+  return result;
+}
+
 DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, SignalDirection ph)
 {
   DriverPhisics result;
@@ -50,30 +89,9 @@ DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, Sig
 
   for (HPinType::ArcsEnumeratorW arc = design[driver].GetArcsEnumeratorW(); arc.MoveNext(); )
   {
-    if (arc.TimingType() == TimingType_Combinational
-      || arc.TimingType() == TimingType_RisingEdge
-      || arc.TimingType() == TimingType_FallingEdge)
-    {
-      switch (ph)
-      {
-      case SignalDirection_Rise:
-      case SignalDirection_None:
-        result.R = max(result.R, arc.ResistanceRise());
-        result.T = max(result.R, arc.TIntrinsicRise());
-        break;
-      case SignalDirection_Fall:
-        result.R = max(result.R, arc.ResistanceFall());
-        result.T = max(result.R, arc.TIntrinsicFall());
-        break;
-      case SignalDirection_Average:
-        result.R = max(result.R, max(arc.ResistanceFall(), arc.ResistanceRise()));
-        result.T = max(result.T, max(arc.TIntrinsicFall(), arc.TIntrinsicRise()));
-        break;
-      default:
-        GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
-        break;
-      };
-    }
+    DriverPhisics arcph = GetArcPhisics(design, arc, ph);
+    result.R = max(result.R, arcph.R);
+    result.T = max(result.T, arcph.T);
   }
 
   return result;
@@ -91,31 +109,12 @@ DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPinType driver, S
   int arcsCount = 0;
   for (HPinType::ArcsEnumeratorW arc = design[driver].GetArcsEnumeratorW(); arc.MoveNext(); )
   {
-    if (arc.TimingType() == TimingType_Combinational 
-      || arc.TimingType() == TimingType_RisingEdge
-      || arc.TimingType() == TimingType_FallingEdge)
-    {
-      switch (ph)
-      {
-      case SignalDirection_Rise:
-      case SignalDirection_None:
-        result.R += arc.ResistanceRise();
-        result.T += arc.TIntrinsicRise();
-        break;
-      case SignalDirection_Fall:
-        result.R += arc.ResistanceFall();
-        result.T += arc.TIntrinsicFall();
-        break;
-      case SignalDirection_Average:
-        result.R += 0.5 * (arc.ResistanceFall() + arc.ResistanceRise());
-        result.T += 0.5 * (arc.TIntrinsicFall() + arc.TIntrinsicRise());
-        break;
-      default:
-        GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
-        break;
-      };
+    DriverPhisics arcph = GetArcPhisics(design, arc, ph);
+    result.R += arcph.R;
+    result.T += arcph.T;
+
+    if (arcph.R != 0.0 || arcph.T != 0.0)
       ++arcsCount;
-    }
   }
 
   if (arcsCount > 1)
@@ -164,10 +163,10 @@ DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, Signal
       double arcTime;
       HTimingArcType arc1 = FindArrivalArc(design, design.TimingPoints[driver], SignalDirection_Fall, arcTime, inverted);
       HTimingArcType arc2 = FindArrivalArc(design, design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
-      result.R = 0.5 * (design.GetDouble<HTimingArcType::ResistanceRise>(arc2)
-        + design.GetDouble<HTimingArcType::ResistanceFall>(arc1));
-      result.T = 0.5 * (design.GetDouble<HTimingArcType::TIntrinsicRise>(arc2)
-        + design.GetDouble<HTimingArcType::TIntrinsicFall>(arc1));
+      result.R = max(design.GetDouble<HTimingArcType::ResistanceRise>(arc2)
+        , design.GetDouble<HTimingArcType::ResistanceFall>(arc1));
+      result.T = max(design.GetDouble<HTimingArcType::TIntrinsicRise>(arc2)
+        , design.GetDouble<HTimingArcType::TIntrinsicFall>(arc1));
     }
     break;
   default:
