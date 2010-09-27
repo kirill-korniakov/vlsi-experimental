@@ -65,7 +65,7 @@ public:
 
   bool* netVisit;
   string nameBufferingNet;
-  int countPinInBufferingNet;
+  int countPinInBufferingInterconnection;
   bool isExactPinCountRequired;
   bool isNetContainPrimaryPin;
   TypeNetListBuffering typeNetListBuffering;

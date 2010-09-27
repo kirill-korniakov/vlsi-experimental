@@ -12,7 +12,8 @@ public:
   int BufferingCriticalPaths();
 
 protected:
-  bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet net);
+  bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet interconnection);
+  bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HCriticalPath interconnection);
 };
 
 class PathBasedBuffering: public BufferingAllCriticalPath

@@ -29,7 +29,7 @@ void VGAlgorithmData::DefaultValue()
   netVisit = NULL;
   maxBufferCount = 0;
   typeModificationVanGinnekenList = STANDART_MODIFICATION_VG_LIST;
-  countPinInBufferingNet = 0;
+  countPinInBufferingInterconnection = 0;
   isExactPinCountRequired = false;
   nameBufferingNet = "";
   typeBufferAddition = STANDART_ADDITION;
@@ -87,7 +87,7 @@ void VGAlgorithmData::Initialize()
   maxBufferCount = design.cfg.ValueOf("MaxBufferCount", 0);
   typeModificationVanGinnekenList = TypeModificationVanGinnekenList (design.cfg.ValueOf("TypeModificationVanGinnekenList", 0));
 
-  countPinInBufferingNet = design.cfg.ValueOf("CountPinInBufferingNet", 0);
+  countPinInBufferingInterconnection = design.cfg.ValueOf("CountPinInBufferingInterconnection", 0);
   isExactPinCountRequired = design.cfg.ValueOf("IsNotExactPinCountRequired", false);
   nameBufferingNet = design.cfg.ValueOf("NameBufferingNet", "");
   typeBufferAddition = TypeBufferAddition (design.cfg.ValueOf("TypeBufferAddition", 0));

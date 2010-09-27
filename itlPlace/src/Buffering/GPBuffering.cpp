@@ -203,10 +203,10 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
       {
         if (!data->netVisit[::ToID(net)])
         {
-          if ((data->countPinInBufferingNet == 0) || (
-            ((net.PinsCount() <= data->countPinInBufferingNet) 
+          if ((data->countPinInBufferingInterconnection == 0) || (
+            ((net.PinsCount() <= data->countPinInBufferingInterconnection) 
             && (!data->isExactPinCountRequired) ) ||
-            ((net.PinsCount() == data->countPinInBufferingNet) 
+            ((net.PinsCount() == data->countPinInBufferingInterconnection) 
             && (data->isExactPinCountRequired))))
           {
             bool isBufferingNet = true;
