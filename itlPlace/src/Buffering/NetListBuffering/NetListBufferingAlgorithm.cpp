@@ -98,11 +98,11 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
   data->vGTree->updateVanGinnekenTree->UpdateTree<HCriticalPath::PointsEnumeratorW>(pointsEnumeratorW);
 
 
-  /* if ((data->plotSteinerPoint) || (data->plotNets))
+  if ((data->plotSteinerPoint) || (data->plotNets))
   {
-  data->design.Plotter.ShowNetSteinerTree(net, Color_Black, true, 
-  HPlotter::WaitTime(data->plotterWaitTime));
-  }*/
+    data->design.Plotter.ShowCriticalPathSteinerTree(criticalPath, Color_Black, true, 
+    HPlotter::WaitTime(data->plotterWaitTime));
+  }
 
   /*if (data->plotVGTree)
   {
@@ -183,10 +183,10 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
     }
   }
 
-  /*if ((data->plotSteinerPoint) || (data->plotVGTree) || (data->plotNets))
+  if ((data->plotSteinerPoint) || (data->plotVGTree) || (data->plotNets))
   {
   data->design.Plotter.ShowPlacement();
-  }*/
+  }
 
   return best;
 }

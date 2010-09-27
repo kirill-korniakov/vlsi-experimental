@@ -150,6 +150,18 @@ void HPlotter::ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement, W
     Refresh(waitTime);
 }
 
+void HPlotter::ShowCriticalPathSteinerTree(HCriticalPath path, Color color, bool isShowPlacement, WaitTime waitTime, double textSize)
+{
+    if (!IsEnabled()) 
+        return;
+
+    if (isShowPlacement)
+        ShowPlacement();
+
+    PlotCriticalPathSteinerTree(path, color);  
+    Refresh(waitTime);
+}
+
 void HPlotter::ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement, WaitTime waitTime, Color VGNodeColor, double textSize)
 {  
     if (!IsEnabled()) 

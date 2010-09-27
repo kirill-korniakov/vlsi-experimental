@@ -184,6 +184,78 @@ void HPlotter::PlotNetSteinerTree(HNet net, Color color)
     }
 }
 
+void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
+{
+    HCriticalPathWrapper pointW = m_hd[path];
+    HCriticalPath::PointsEnumeratorW pointsEnumeratorW = pointW.GetEnumeratorW();
+    
+    HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(m_hd.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(pointsEnumeratorW))]];
+    HSteinerPointWrapper nextPoint = srcPoint;
+
+    m_hd.Plotter.DrawCircle2(srcPoint.X(), srcPoint.Y(), 4, color);
+
+    TemplateTypes<HSteinerPoint>::stack points;
+    points.push(srcPoint);
+    while (!points.empty())
+    {
+        srcPoint = points.top();
+        points.pop();
+
+        if (srcPoint.HasLeft())
+        {
+            nextPoint = srcPoint.Left();
+            m_hd.Plotter.DrawLine2(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+            points.push(nextPoint);
+
+            if (srcPoint.HasRight())
+            {
+                nextPoint = srcPoint.Right();
+                m_hd.Plotter.DrawLine2(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+                points.push(nextPoint);
+            }
+        }
+        else
+        {
+          HCriticalPath::PointsEnumeratorW nextCriticalPathPointW = pointsEnumeratorW;
+          nextCriticalPathPointW.MoveNext();
+          HSteinerPointWrapper nextSteinerPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(nextCriticalPathPointW.TimingPoint())]];
+
+          bool isCriticalPathLeaf = true;
+
+          if (nextSteinerPoint == srcPoint)
+          {
+            if (pointsEnumeratorW.MoveNext())
+            {
+              if (pointsEnumeratorW.MoveNext())
+              {
+                isCriticalPathLeaf = false;
+                srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(pointsEnumeratorW.TimingPoint())]];
+                m_hd.Plotter.DrawCircle2(srcPoint.X(), srcPoint.Y(), 4, color);
+                if (srcPoint.HasLeft())
+                {
+                    nextPoint = srcPoint.Left();
+                    m_hd.Plotter.DrawLine2(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+                    points.push(nextPoint);
+
+                    if (srcPoint.HasRight())
+                    {
+                        nextPoint = srcPoint.Right();
+                        m_hd.Plotter.DrawLine2(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
+                        points.push(nextPoint);
+                    }
+                }
+              }
+            }
+          }
+          if (isCriticalPathLeaf)
+          {
+            m_hd.Plotter.DrawCircle2(srcPoint.X(), srcPoint.Y(), 1, color);
+          }
+              
+        }
+    }
+}
+
 void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor)
 {
     if (!IsEnabled()) return;

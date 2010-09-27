@@ -67,6 +67,7 @@ public:
   void ShowLegalizationState(WaitTime waitTime, bool drawSites);
   void ShowSteinerForest(Color color, WaitTime waitTime = NO_WAIT);
   void ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
+  void ShowCriticalPathSteinerTree(HCriticalPath net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
   void ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color VGNodeColor = Color_Red, double textSize = -1);
   void ShowNet(HNet net, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color color = Color_Peru, double textSize = -1);
   
@@ -80,6 +81,7 @@ public:
   void PlotSites();
   void PlotCriticalPath(HCriticalPath);
   void PlotNetSteinerTree(HNet net, Color color);
+  void PlotCriticalPathSteinerTree(HCriticalPath path, Color color);
   void PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor = Color_Red);
   void PlotNet(HNet net, Color color = Color_Peru);
   void PlotFullWires();
