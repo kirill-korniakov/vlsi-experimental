@@ -5,6 +5,12 @@
 #include <vector>
 #include "LinearRegression.h"
 
+struct StPEdge
+{
+  double startX,startY;
+  double endX,endY;
+};
+
 class LRSizer{
 private:
   HDesign& design;
@@ -68,6 +74,12 @@ private:
   bool CheckKuhn_Tucker(HTimingPoint point);
   void CheckKuhn_Tucker();
   double CalcCriterion(std::vector<double>& vCurrentX);
+  void GetPinsCharacteristics();
+  void GetMacroTypeCharacteristics();
+  void GetNetStPEdges(HNet net,std::vector<StPEdge>& StPEdges);
+  void GetStPEdges();
+  void PlotNetSteinerTree(HNet net, Color color);
+  double GetLength(StPEdge edge);
 	
   void getCellFamily(HCell cell, std::vector<double>& cellSizes);	
   void getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily);
@@ -80,6 +92,7 @@ private:
   HMacroType roundCellToTypeFromLib( HCell cellFrom, double currentX );
  
   void ApplySizing(std::vector<double>& X);
+  double getMacroTypeSize(HMacroType macroType);
 };
 
 class MacroTypeSizesComparator{

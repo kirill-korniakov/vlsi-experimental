@@ -1,0 +1,51 @@
+VERSION 5.6 ;
+
+DESIGN b5c ;
+
+UNITS DISTANCE MICRONS 2000 ;
+
+DIEAREA ( 0 0 ) ( 196 196 ) ;
+
+COMPONENTS 5 ;
+   - c1inv INV_X01 
+      + PLACED ( 54 168 ) N ;
+   - c2or OR2_X1 
+      + PLACED ( 52 84 ) N ;
+   - c3inv INV_X01 
+      + PLACED ( 54 28 ) N ;
+   - c4nand NAND2_X1 
+      + PLACED ( 123 112 ) N ;
+   - c5and AND2_X1 
+      + PLACED ( 122 56 ) N ;
+END COMPONENTS
+
+PINS 5 ;
+   - in1 + NET in1
+      + DIRECTION INPUT
+      + COVER ( 0 147 ) N ;
+   - in2 + NET in2
+      + DIRECTION INPUT
+      + COVER ( 0 91 ) N ;
+   - in3 + NET in3
+      + DIRECTION INPUT
+      + COVER ( 0 35 ) N ;
+   - out1 + NET out1
+      + DIRECTION OUTPUT
+      + COVER ( 196 119 ) N ;
+   - out2 + NET out2
+      + DIRECTION OUTPUT
+      + COVER ( 196 63 ) N ;
+END PINS
+
+NETS 8 ;
+   - in1 ( PIN in1 )  ( c1inv A )  ( c2or A ) ;
+   - in2 ( PIN in2 )  ( c2or B ) ;
+   - in3 ( PIN in3 )  ( c3inv A )  ;
+   - out1 ( c4nand Y )  ( PIN out1 ) ;
+   - out2 ( c5and Y )  ( PIN out2 ) ;
+   - n_c1y_c4a ( c1inv Y )  ( c4nand A )  ;
+   - n_c2y_c4b_c5a ( c2or Y )  ( c4nand B ) ( c5and A )  ;
+   - n_c3y_c5b ( c3inv Y )  ( c5and B )  ;
+END NETS
+
+END DESIGN

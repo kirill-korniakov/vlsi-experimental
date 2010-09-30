@@ -1,0 +1,835 @@
+library (b5c) {
+
+  /* Documentation Attributes */
+  date                    		: "Fri 10 Oct 2008, 18:23:51";
+  revision                		: "revision 1.0";
+  comment                 		: "ITLab test library";
+
+  /* General Attributes */
+  technology              		  (cmos);
+  delay_model             		: table_lookup;
+  in_place_swap_mode      		: match_footprint;
+  library_features        		  (report_delay_calculation,report_power_calculation);
+
+  /* Units Attributes */
+  time_unit               		: "1ns";
+  leakage_power_unit      		: "1pW";
+  voltage_unit            		: "1V";
+  current_unit            		: "1uA";
+  pulling_resistance_unit 		: "1kohm";
+  capacitive_load_unit    		  (1,pf);
+
+  /* Operation Conditions */
+  nom_process             		: 1.00;
+  nom_temperature         		: 25.00;
+  nom_voltage             		: 1.10;
+
+  define(process_corner, operating_conditions, string);
+  operating_conditions (typical) {
+    process_corner	: "TypTyp";
+    process       	: 1.00;
+    voltage       	: 1.10;
+    temperature   	: 25.00;
+    tree_type     	: balanced_tree;
+  }
+  default_operating_conditions : typical;
+
+  /* Threshold Definitions */
+  slew_lower_threshold_pct_fall 	: 30.00 ;
+  slew_lower_threshold_pct_rise 	: 30.00 ;
+  slew_upper_threshold_pct_fall 	: 70.00 ;
+  slew_upper_threshold_pct_rise 	: 70.00 ;
+  slew_derate_from_library      	: 1.00 ;
+  input_threshold_pct_fall      	: 50.00 ;
+  input_threshold_pct_rise      	: 50.00 ;
+  output_threshold_pct_fall     	: 50.00 ;
+  output_threshold_pct_rise     	: 50.00 ;
+  default_leakage_power_density 	: 0.00 ;
+  default_cell_leakage_power    	: 0.00 ;
+
+  /* Default Pin Attributes */
+  default_inout_pin_cap       		: 1.0;
+  default_input_pin_cap       		: 1.0;
+  default_output_pin_cap      		: 0.0;
+  default_fanout_load         		: 1.0;
+
+  lu_table_template (Timing_X0) {
+	variable_1 : input_net_transition;
+	variable_2 : total_output_net_capacitance;
+	index_1 ("0,1000")
+	index_2 ("1000,2000")
+  }
+
+/******************************************************************************************
+ Module          	: AND2_X1
+ Cell Description	: Combinational cell (AND2_X1) with drive strength X1
+*******************************************************************************************/
+
+cell (AND2_X1) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.505;
+		fall_capacitance	: 0.495;
+		rise_capacitance	: 0.515;
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.525;
+		fall_capacitance	: 0.510;
+		rise_capacitance	: 0.540;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("7250,14450", "8250,15450");
+			}
+			cell_rise(Timing_X0) {
+				values ("7250,14450", "8250,15450");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("7065,14065", "8065,15065");
+			}
+			cell_rise(Timing_X0) {
+				values ("7065,14065", "8065,15065");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: AND2_X2
+ Cell Description	: Combinational cell (AND2_X2) with drive strength X2
+*******************************************************************************************/
+
+cell (AND2_X2) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.510;
+		fall_capacitance	: 0.500;
+		rise_capacitance	: 0.520;
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.550;
+		fall_capacitance	: 0.000530;
+		rise_capacitance	: 0.000570;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("3650,7250", "4650,8250");
+			}
+			cell_rise(Timing_X0) {
+				values ("3650,7250", "4650,8250");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("3565,7065", "4565,8065");
+			}
+			cell_rise(Timing_X0) {
+				values ("3565,7065", "4565,8065");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: AND2_X4
+ Cell Description	: Combinational cell (AND2_X4) with drive strength X4
+*******************************************************************************************/
+
+cell (AND2_X4) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.520;
+		fall_capacitance	: 0.510;
+		rise_capacitance	: 0.530;
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.600;
+		fall_capacitance	: 0.580;
+		rise_capacitance	: 0.520;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("1850,3650", "2850,4650");
+			}
+			cell_rise(Timing_X0) {
+				values ("1850,3650", "2850,4650");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("1815,3565", "2815,4565");
+			}
+			cell_rise(Timing_X0) {
+				values ("1815,3565", "2815,4565");
+			}
+		}
+	}
+}
+
+/******************************************************************************************
+ Module          	: INV_X01
+ Cell Description	: Combinational cell (INV_X01) with drive strength X1
+*******************************************************************************************/
+
+cell (INV_X01) {
+
+	area               	: 0.000014;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.350;
+		fall_capacitance	: 0.320;
+		rise_capacitance	: 0.380;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("11200,22400", "12200,23400");
+			}
+			cell_rise(Timing_X0) {
+				values ("11200,22400", "12200,23400");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: INV_X16
+ Cell Description	: Combinational cell (INV_X16) with drive strength X16
+*******************************************************************************************/
+
+cell (INV_X16) {
+
+	area               	: 0.000035;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 5.600;
+		fall_capacitance	: 5.300;
+		rise_capacitance	: 5.900;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("700,1400", "1700,2400");
+			}
+			cell_rise(Timing_X0) {
+				values ("700,1400", "1700,2400");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: INV_X02
+ Cell Description	: Combinational cell (INV_X02) with drive strength X2
+*******************************************************************************************/
+
+cell (INV_X02) {
+
+	area               	: 0.000014;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.700;
+		fall_capacitance	: 0.650;
+		rise_capacitance	: 0.750;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("5600,11200", "6600,12200");
+			}
+			cell_rise(Timing_X0) {
+				values ("5600,11200", "6600,12200");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: INV_X32
+ Cell Description	: Combinational cell (INV_X32) with drive strength X32
+*******************************************************************************************/
+
+cell (INV_X32) {
+
+	area               	: 0.000056;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 11.200;
+		fall_capacitance	: 11.100;
+		rise_capacitance	: 11.300;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("350,700", "1350,1700");
+			}
+			cell_rise(Timing_X0) {
+				values ("350,700", "1350,1700");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: INV_X04
+ Cell Description	: Combinational cell (INV_X04) with drive strength X4
+*******************************************************************************************/
+
+cell (INV_X04) {
+
+	area               	: 0.000014;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 1.400;
+		fall_capacitance	: 1.380;
+		rise_capacitance	: 1.420;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("2800,5600", "3800,6600");
+			}
+			cell_rise(Timing_X0) {
+				values ("2800,5600", "3800,6600");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: INV_X08
+ Cell Description	: Combinational cell (INV_X08) with drive strength X8
+*******************************************************************************************/
+
+cell (INV_X08) {
+
+	area               	: 0.000021;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 2.800;
+		fall_capacitance	: 2.700;
+		rise_capacitance	: 2.900;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!A";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("1400,2800", "2400,3800");
+			}
+			cell_rise(Timing_X0) {
+				values ("1400,2800", "2400,3800");
+			}
+		}
+	}
+}
+
+/******************************************************************************************
+ Module          	: NAND2_X1
+ Cell Description	: Combinational cell (NAND2_X1) with drive strength X1
+*******************************************************************************************/
+
+cell (NAND2_X1) {
+
+	area               	: 0.000021;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.425;
+		fall_capacitance	: 0.400;
+		rise_capacitance	: 0.450;
+
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.550;
+		fall_capacitance	: 0.500;
+		rise_capacitance	: 0.600;
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("11008,22008", "12008,23008");
+			}
+			cell_rise(Timing_X0) {
+				values ("11008,22008", "12008,23008");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("10001.3,20001.3", "11001.3,21001.3");
+			}
+			cell_rise(Timing_X0) {
+				values ("10001.3,20001.3", "11001.3,21001.3");
+			}
+		}
+	}
+}
+
+
+/******************************************************************************************
+ Module          	: NAND2_X2
+ Cell Description	: Combinational cell (NAND2_X2) with drive strength X2
+*******************************************************************************************/
+
+cell (NAND2_X2) {
+
+	area               	: 0.000021;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.850;
+		fall_capacitance	: 0.800;
+		rise_capacitance	: 0.900;
+
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 1.100;
+		fall_capacitance	: 1.000;
+		rise_capacitance	: 1.200;
+
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("5508,11008", "6508,12008");
+			}
+			cell_rise(Timing_X0) {
+				values ("5508,11008", "6508,12008");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("5001.3,10001.3", "6001.3,11001.3");
+			}
+			cell_rise(Timing_X0) {
+				values ("5001.3,10001.3", "6001.3,11001.3");
+			}
+		}
+	}
+
+}
+
+
+/******************************************************************************************
+ Module          	: NAND2_X4
+ Cell Description	: Combinational cell (NAND2_X4) with drive strength X4
+*******************************************************************************************/
+
+cell (NAND2_X4) {
+
+	area               	: 0.000035;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 1.700;
+		fall_capacitance	: 1.680;
+		rise_capacitance	: 1.720;
+
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 2.200;
+		fall_capacitance	: 2.120;
+		rise_capacitance	: 2.280;
+
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "!(A & B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("2758,5508", "3758,6508");
+			}
+			cell_rise(Timing_X0) {
+				values ("2758,5508", "3758,6508");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : negative_unate;
+
+			cell_fall(Timing_X0) {
+				values ("2501.3,5001.3", "3501.3,6001.3");
+			}
+			cell_rise(Timing_X0) {
+				values ("2501.3,5001.3", "3501.3,6001.3");
+			}
+		}
+
+	}
+
+}
+
+/******************************************************************************************
+ Module          	: OR2_X1
+ Cell Description	: Combinational cell (OR2_X1) with drive strength X1
+*******************************************************************************************/
+
+cell (OR2_X1) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.550;
+		fall_capacitance	: 0.500;
+		rise_capacitance	: 0.600;
+
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.530;
+		fall_capacitance	: 0.510;
+		rise_capacitance	: 0.550;
+
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "(A | B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("8060,16060", "9060,17060");
+			}
+			cell_rise(Timing_X0) {
+				values ("8060,16060", "9060,17060");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("7680,15280", "8680,16280");
+			}
+			cell_rise(Timing_X0) {
+				values ("7680,15280", "8680,16280");
+			}
+		}
+
+	}
+
+}
+
+
+/******************************************************************************************
+ Module          	: OR2_X2
+ Cell Description	: Combinational cell (OR2_X2) with drive strength X2
+*******************************************************************************************/
+
+cell (OR2_X2) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+
+		direction		: input;
+		capacitance		: 0.600;
+		fall_capacitance	: 0.560;
+		rise_capacitance	: 0.640;
+
+	}
+
+	pin (B) {
+
+		direction		: input;
+		capacitance		: 0.531;
+		fall_capacitance	: 0.509;
+		rise_capacitance	: 0.553;
+
+	}
+
+	pin (Y) {
+
+		direction		: output;
+		function		: "(A | B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("4060,8060", "5060,9060");
+			}
+			cell_rise(Timing_X0) {
+				values ("4060,8060", "5060,9060");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("3880,7680", "4880,8680");
+			}
+			cell_rise(Timing_X0) {
+				values ("3880,7680", "4880,8680");
+			}
+		}
+
+	}
+
+}
+
+
+/******************************************************************************************
+ Module          	: OR2_X4
+ Cell Description	: Combinational cell (OR2_X4) with drive strength X4
+*******************************************************************************************/
+
+cell (OR2_X4) {
+
+	area               	: 0.000028;
+
+	pin (A) {
+		direction		: input;
+		capacitance		: 0.700;
+		fall_capacitance	: 0.650;
+		rise_capacitance	: 0.750;
+	}
+
+	pin (B) {
+		direction		: input;
+		capacitance		: 0.533;
+		fall_capacitance	: 0.510;
+		rise_capacitance	: 0.556;
+	}
+
+	pin (Y) {
+		direction		: output;
+		function		: "(A | B)";
+
+		timing () {
+
+			related_pin	   : "A";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("2060,4060", "3060,5060");
+			}
+			cell_rise(Timing_X0) {
+				values ("2060,4060", "3060,5060");
+			}
+		}
+
+		timing () {
+
+			related_pin	   : "B";
+			timing_sense	   : positive_unate;
+
+			cell_fall(Timing_X0) {
+				values ("1980,3880", "2980,4880");
+			}
+			cell_rise(Timing_X0) {
+				values ("1980,3880", "2980,4880");
+			}
+		}
+	}
+
+}
+
+}
+/*
+* End of file
+*/
