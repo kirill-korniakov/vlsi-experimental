@@ -45,8 +45,10 @@ class GeneralParameters:
 	benchmarkCheckoutPath = "../Benchmarks/"
 
 class LogParserParameters:
-    tableHeader = 'Placement Flow Stages Table'
-    borderPattern = '-----'
+    PFSTTableHeader   = 'Placement Flow Stages Table'
+    PQATTableHeader   = 'Placement Quality Analysis Table'
+    PFSTBorderPattern = '-----'
+    PQATBorderPattern = ''
 
 class Tools:
 	MSBuild  = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"

@@ -13,14 +13,14 @@ class Experiment_Buffering(BaseExperiment):
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         #get metrics
         parser = LogParser(logName)
-        bbHPWL = parser.GetFromPFST('INIT', 4)
-        abHPWL = parser.GetFromPFST('LEGB', 4)
-        bbTWL = parser.GetFromPFST('INIT', 5)
-        abTWL = parser.GetFromPFST('LEGB', 5)
-        bbTNS = parser.GetFromPFST('INIT', 6)
-        abTNS = parser.GetFromPFST('LEGB', 6)
-        bbWNS = parser.GetFromPFST('INIT', 7)
-        abWNS = parser.GetFromPFST('LEGB', 7)
+        bbHPWL = parser.GetFromTable('INIT', 4)
+        abHPWL = parser.GetFromTable('LEGB', 4)
+        bbTWL = parser.GetFromTable('INIT', 5)
+        abTWL = parser.GetFromTable('LEGB', 5)
+        bbTNS = parser.GetFromTable('INIT', 6)
+        abTNS = parser.GetFromTable('LEGB', 6)
+        bbWNS = parser.GetFromTable('INIT', 7)
+        abWNS = parser.GetFromTable('LEGB', 7)
 
         #print metrics
         printStr = benchmark + ';'

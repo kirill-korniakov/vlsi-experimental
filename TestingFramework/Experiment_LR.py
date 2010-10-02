@@ -25,16 +25,16 @@ class Experiment_LR(BaseExperiment):
         cols = [benchmark, END_OF_COLUMN]
 
         #print absolute values
-        for col in range(len(metrics)):
-            for row in range(len(stages)):
+        for col in range(len(self.metrics)):
+            for row in range(len(self.stages)):
                 cols.append(str(values[row][col]))
                 cols.append(END_OF_COLUMN)
 
         cols.append(END_OF_COLUMN)
 
         #print percents
-        for col in range(len(metrics)):
-            for row in range(1, len(stages)):
+        for col in range(len(self.metrics)):
+            for row in range(1, len(self.stages)):
                 if values[0][col] != 0.0:
                     percent = 100.0 * (values[row][col]/values[0][col] - 1.0)
 
@@ -48,8 +48,10 @@ class Experiment_LR(BaseExperiment):
 
 def test():
     e = Experiment_LR()
+    e.SetBenchmarksList('IWLS_GP_r1511/IWLS_GP_fast.list')
     testRunner = TestRunner()
     testRunner.parameters.experiments.append(e)
     testRunner.Run()
 
-#test()
+if (__name__ == "__main__"):
+    test()

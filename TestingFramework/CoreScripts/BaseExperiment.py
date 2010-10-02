@@ -62,7 +62,7 @@ class BaseExperiment:
 
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
-                value = str(parser.GetFromPFST(self.stages[row], self.metrics[col]))
+                value = str(parser.GetFromTable(self.stages[row], self.metrics[col]))
 
                 if (value == str(NOT_FOUND)):
                    return []
@@ -70,6 +70,12 @@ class BaseExperiment:
                 table[row][col] = float(value.replace(',', '.'))
 
         return table
+
+    def ParsePQAT(self, logName):
+        parser = LogParser(logName)
+        metricsForChart = ['HPWL', 'TNS']
+        value = str(parser.GetFromTable('10', 'HPWL', PQAT))
+        print(value)
 
     def PrintBenchmarkTable(self, values, benchmark, reportTable):
         return 0
@@ -96,4 +102,5 @@ class BaseExperiment:
 
         self.AddStringToTable(values, benchmark, reportTable)
         self.PrintBenchmarkTable(values, benchmark, reportTable)
+        self.ParsePQAT(logName)
         return [OK, values]

@@ -8,7 +8,7 @@ from Parameters import *
 class Experiment_Weighting(BaseExperiment):
     def __init__(self):
         _metrics = ['HPWL', 'TNS', 'WNS']
-        _stages  = ['INIT', 'LEG1', 'LEG2', 'LEG3', 'LEG4', 'LEG5', 'LEG6', 'LEG7', 'LEG8', 'LEG9', 'LEG']
+        _stages  = ['INIT', 'LEG']
         BaseExperiment.__init__(self, 'Weighting (SGNW) experiment',\
             'Sensitivity_guided_weighting.cfg', 'IWLS05.list',\
             _metrics, _stages)
@@ -34,7 +34,7 @@ def test():
 
     metrics = ['HPWL', 'TNS', 'WNS']
     #stages  = ['INIT', 'LEG1', 'LEG2', 'LEG3', 'LEG4', 'LEG5', 'LEG6', 'LEG7', 'LEG8', 'LEG9', 'LEG']
-    stages  = ['INIT', 'LEG1', 'LEG2', 'LEG']
+    stages  = ['INIT', 'LEG']
 
     cValues = [600, 500, 750]
     expName = 'Weighting (SGNW) experiment_C_'
