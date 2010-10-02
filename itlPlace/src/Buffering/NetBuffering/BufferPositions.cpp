@@ -16,16 +16,34 @@ BufferPositions::BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, 
 
 bool BufferPositions::operator > (BufferPositions& element)
 {
-  if (position->index > element.GetPosition()->index)
+  if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
     return true;
+  else 
+    if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
+      return false;
+    else
+    {
+      if (position->index > element.GetPosition()->index)
+        return true;
+      return false;
+    }
   return false;
 }
 
 bool BufferPositions::operator < (BufferPositions& element)
 {
-  if (position->index < element.GetPosition()->index)
+  if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
     return true;
-  return false;
+  else 
+    if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
+      return false;
+    else
+    {
+      if (position->index < element.GetPosition()->index)
+        return true;
+      return false;
+    }
+    return false;
 }
 
 VanGinnekenTreeNode* BufferPositions::GetPosition()

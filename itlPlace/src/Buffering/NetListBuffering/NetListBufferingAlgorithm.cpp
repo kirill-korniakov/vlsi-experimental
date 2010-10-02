@@ -5,6 +5,7 @@
 #include "STA.h"
 #include "VanGinnekenTree.h"
 #include <math.h>
+#include "Reporting.h"
 
 bool BufferingAllCriticalPath::IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet interconnection)
 {
@@ -95,6 +96,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
     data->netVisit[::ToID(criticalPath)] = true;
   HCriticalPath::PointsEnumeratorW pointsEnumeratorW = (criticalPath,data->design).GetEnumeratorW();
   pointsEnumeratorW.MoveNext();
+  //ALERT("critical Path point count = %d", data->design.CriticalPaths.GetInt<HCriticalPath::PointsCount>(criticalPath));
   data->vGTree->updateVanGinnekenTree->UpdateTree<HCriticalPath::PointsEnumeratorW>(pointsEnumeratorW);
 
 
@@ -146,8 +148,16 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
       HNet* newNet = new HNet[newNetCount + 1];
       additionNewElement->InsertsBuffer(newBuffer, &best);
       newBuffer.sort();
+      /*for (TemplateTypes<NewBuffer>::list::iterator i = newBuffer.begin(); i != newBuffer.end(); i++)
+      {
+        HSteinerPointWrapper spw1 = data->design[data->design.SteinerPoints[i->sink]];
+        HSteinerPointWrapper spw2 = data->design[data->design.SteinerPoints[i->source]];
+        HNetWrapper nw1 = data->design[i->Positions.GetPosition()->GetNet()];     
 
-      TemplateTypes<NewBuffer>::list newBuffer2;
+        ALERT("node=%d\sink=%d sinkSP=%d source%d sourceSP%d net=%d name=%s ", i->Positions.GetPosition()->index,::ToID(i->sink),::ToID(spw1),::ToID(i->source), ::ToID(spw2), ::ToID(nw1),  nw1.Name().c_str());
+      }*/
+
+      /*TemplateTypes<NewBuffer>::list newBuffer2;
       HNetWrapper nw = data->design[newBuffer.begin()->Positions.GetPosition()->GetNet()];
       newBuffer2.push_back(*newBuffer.begin());
       for (TemplateTypes<NewBuffer>::list::iterator i = newBuffer.begin(); i != newBuffer.end(); i++)
@@ -173,12 +183,12 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
             }
           }
         }
-      }
-
+      }*/
+      additionNewElement->currentCriticalPath = criticalPath;
       additionNewElement->CreateNets(data->design.Pins.Get<HPin::Net, HNet>(
         data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(
         data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(
-        data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath)))), newBuffer2, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
+        data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath)))), newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
       delete [] newNet;
     }
   }
@@ -200,34 +210,88 @@ int PathBasedBuffering::BufferingNetlist()
 
   if (data->plotBuffer)
     data->design.Plotter.ShowPlacement();
+  
+  int totalBufferCount = 0;
+  ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
+  //for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
+  bool isBufferingFinish = false;
+  int totalIndex = 0;
+  int ind = 0;
+  int bufferCount = 0;
+  double curTNS = 0;
+  double curWNS = 0;
+  double minTNS = INFINITY;
+  double minWNS = INFINITY;
 
   std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
   int idx = 0;
-
   for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
     paths[idx++] = i;
-
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
-  int bufferCount = 0;
-  ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
-  for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
+
+  while ((!isBufferingFinish) && (totalIndex < data->design.CriticalPaths.Count() * 2) && (ind < data->design.CriticalPaths.Count()))
   {
-    if (IsAppropriateNumberOfPins(data, paths[j]))
+    bufferCount = 0;
+    if (IsAppropriateNumberOfPins(data, paths[ind]))
     {
+
       bool isBufferingNet = true;
       if (!data->isNetContainPrimaryPin) 
-        if (data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(paths[j])))) ||
-          data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::EndPoint, HCriticalPathPoint>(paths[j])))))
+        if (data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(paths[ind])))) ||
+          data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::EndPoint, HCriticalPathPoint>(paths[ind])))))
           isBufferingNet = false;
 
-      if (!isBufferingNet) 
-        continue; 
-      if (!data->IsBuffering())
-        continue; 
+      /*for (HCriticalPath::PointsEnumeratorW point = (paths[ind],data->design).GetEnumeratorW(); point.MoveNext();)
+      {
+        HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
+        if (net.Name().find(data->textIdentifierBufferedNet) != -1)
+          isBufferingNet = false;
+      }*/
 
-      bufferCount += BufferingCriticalPath(paths[j]).GetPositionCount();
-      STA(data->design, false);
+      if (!isBufferingNet) 
+      {
+        ind++;
+        continue; 
+      }
+      if (!data->IsBuffering())
+      {
+        ind++;
+        continue; 
+      }
+
+      if (data->printCriticalPathsInfo)
+        PrintPath(data->design, paths[ind], ::ToID(paths[ind]));       
+      bufferCount = BufferingCriticalPath(paths[ind]).GetPositionCount();
+      
+      totalBufferCount += bufferCount;
+
+      if (bufferCount == 0)
+      {
+        ind++;
+      }
+      else
+      {
+        STA(data->design, data->printTimingAfterBufferingCriticalPaths);
+        FindCriticalPaths(data->design);
+        curTNS = Utils::TNS(data->design);
+        curWNS = Utils::WNS(data->design);
+        if (curTNS < minTNS)
+          minTNS = curTNS;
+        //else
+        //break;
+        if (curWNS < minWNS)
+          minWNS = curWNS;
+        //else
+        //break;
+        paths.resize(data->design.CriticalPaths.Count());
+        int idx = 0;
+        for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
+          paths[idx++] = i;
+        std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
+        ind = 0;
+      }
     }
+    totalIndex++;
   }
 
   if (data->plotBuffer)
@@ -235,7 +299,9 @@ int PathBasedBuffering::BufferingNetlist()
     data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
     data->design.Plotter.ShowPlacement();
   }
-  ALERT("Buffers inserted: %d", bufferCount);
+  ALERT("Buffers inserted: %d", totalBufferCount);
+  ALERT("Minimal TNS: %f", minTNS);
+  ALERT("Minimal WNS: %f", minWNS);
   ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
-  return bufferCount;
+  return totalBufferCount;
 }

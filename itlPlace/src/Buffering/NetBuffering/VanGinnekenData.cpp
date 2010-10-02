@@ -42,6 +42,10 @@ void VGAlgorithmData::DefaultValue()
   plotBinGridValue = false;
   totalTreeSize = 0;
   typeNetListBuffering = BUFFERING_ALL_CRITICAL_PATH;
+  printCriticalPathsInfo = false;
+  printTimingAfterBufferingCriticalPaths = false;
+  textIdentifierBufferedNet = "__BufferedPart_";
+  textIdentifierBuffer = "buf_";
 }
 
 
@@ -95,6 +99,8 @@ void VGAlgorithmData::Initialize()
   isNetContainPrimaryPin = design.cfg.ValueOf("IsNetContainPrimaryPin", false);
   totalAllowableBuffersArea = design.cfg.ValueOf("TotalAllowableBuffersArea", 0.0);
   typeNetListBuffering = TypeNetListBuffering(design.cfg.ValueOf("TypeNetListBuffering", 0));
+  printCriticalPathsInfo = design.cfg.ValueOf("Reporting.PrintCriticalPathsInfo", false);
+  printTimingAfterBufferingCriticalPaths = design.cfg.ValueOf("Reporting.PrintTimingAfterBufferingCriticalPaths", false);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;

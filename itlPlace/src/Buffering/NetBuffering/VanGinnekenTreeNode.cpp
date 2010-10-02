@@ -179,7 +179,7 @@ double VanGinnekenTreeNodePathBased::GetR()
 
 double VanGinnekenTreeNodePathBased::GetT()
 {
-  Utils::DriverPhisics dph = Utils::GetDriverAveragePhisics(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design[secondSPoint].Pin(), signalDirection);
+  Utils::DriverPhisics dph = Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design[secondSPoint].Pin(), signalDirection);
   return dph.T;
 }
 

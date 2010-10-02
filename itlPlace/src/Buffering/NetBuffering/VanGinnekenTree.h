@@ -58,7 +58,7 @@ public:
     TemplateTypes<int>::stack isPoitnsVisits;
     TemplateTypes<HNet>::stack netInCriticalPath;
     TemplateTypes<VanGinnekenTreeNode*>::stack vanGinnekenTreeNodeRoot;
-
+    int pc = 1;
     int nodeIndex = 0;
     int rootIndex = 0;
     int isPoitnVisit = 0;
@@ -88,7 +88,7 @@ public:
         }
         else
         {
-          CreateNodeInSink(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, source, netInCriticalPath, vanGinnekenTreeNodeRoot);
+          CreateNodeInSink(net, points, rootIndexs, isPoitnsVisits, nodeIndex, rootIndex, isPoitnVisit, srcPoint, nextPoint, source, netInCriticalPath, vanGinnekenTreeNodeRoot, pc);
         }
       }
       else
@@ -117,6 +117,7 @@ public:
     }
 
     treeSize = nodeIndex + 1;
+    //ALERT("pc = %d", pc);
     if (nodeIndex >= vGTree->vGAlgorithmData->totalTreeSize)
       ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d", vGTree->vGAlgorithmData->totalTreeSize, nodeIndex);
   }
@@ -152,7 +153,7 @@ public:
     HSteinerPoint& srcPoint,
     HSteinerPoint& nextPoint, HSteinerPoint& source,
     TemplateTypes<HNet>::stack& netInCriticalPath,
-    TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
+    TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc);
   void CreateNodeInRightSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
     TemplateTypes<int>::stack& rootIndexs,
     TemplateTypes<int>::stack& isPoitnsVisits,
@@ -171,7 +172,7 @@ public:
     HSteinerPoint& srcPoint,
     HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source,
     TemplateTypes<HNet>::stack& netInCriticalPath,
-  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot);
+  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc);
 };
 
 #endif

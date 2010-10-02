@@ -108,7 +108,7 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
   HSteinerPoint& srcPoint,
   HSteinerPoint& nextPoint, HSteinerPoint& source,
   TemplateTypes<HNet>::stack& netInCriticalPath,
-  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
+  TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc)
 {
 	    isPoitnVisit = 2;
         isPoitnsVisits.push(isPoitnVisit);
@@ -139,7 +139,7 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
                       HSteinerPoint& srcPoint,
                       HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source,
                       TemplateTypes<HNet>::stack& netInCriticalPath,
-                      TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot)
+                      TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc)
 {
 
   HCriticalPath::PointsEnumeratorW nextCriticalPathPointW = source;
@@ -154,6 +154,7 @@ void UpdateVanGinnekenTree::CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPo
     {
       if (source.MoveNext())
       {
+        pc+=2;
         isCriticalPathLeaf = false;
         srcPoint = vGTree->vGAlgorithmData->design[vGTree->vGAlgorithmData->design.SteinerPoints[vGTree->vGAlgorithmData->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(source.TimingPoint())]];
         int pinInNet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);

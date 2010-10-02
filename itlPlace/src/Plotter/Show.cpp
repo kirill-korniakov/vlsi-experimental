@@ -158,6 +158,9 @@ void HPlotter::ShowCriticalPathSteinerTree(HCriticalPath path, Color color, bool
     if (isShowPlacement)
         ShowPlacement();
 
+    char bufferName[256];
+    sprintf(bufferName, "Critical Path id = %d\tpoint count = %d", ::ToID(path), m_hd.CriticalPaths.GetInt<HCriticalPath::PointsCount>(path));
+    DrawText(string(bufferName), textSize);
     PlotCriticalPathSteinerTree(path, color);  
     Refresh(waitTime);
 }

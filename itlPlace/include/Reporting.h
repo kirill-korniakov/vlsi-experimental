@@ -45,5 +45,6 @@ void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr);
 void PrintTimingReport(HDesign& hd, int nPaths = -1);
 void ReportMacrotypesShort(HDesign& design);
 void ReportLibraryPhisics(HDesign& design, SignalDirection sd);
+void PrintPath(HDesign& design, HCriticalPath path, int pathNumber);
 
 #endif //__REPORTING_H__

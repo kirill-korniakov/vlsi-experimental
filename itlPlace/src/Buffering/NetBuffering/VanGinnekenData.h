@@ -43,6 +43,8 @@ public:
 
   bool printNetInfo;
   bool printVariantsList;
+  bool printCriticalPathsInfo;
+  bool printTimingAfterBufferingCriticalPaths;
 
   bool plotVGTree;
   bool plotNets;
@@ -62,6 +64,8 @@ public:
   TypeBufferingAlgorithm typeBufferingAlgorithm;  
   TypeModificationVanGinnekenList typeModificationVanGinnekenList;
   TypeBufferAddition typeBufferAddition;
+  string textIdentifierBufferedNet;
+  string textIdentifierBuffer;
 
   bool* netVisit;
   string nameBufferingNet;

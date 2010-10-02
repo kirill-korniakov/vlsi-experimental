@@ -188,12 +188,14 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
 {
     HCriticalPathWrapper pointW = m_hd[path];
     HCriticalPath::PointsEnumeratorW pointsEnumeratorW = pointW.GetEnumeratorW();
+    pointsEnumeratorW.MoveNext();
     
     HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(m_hd.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(pointsEnumeratorW))]];
     HSteinerPointWrapper nextPoint = srcPoint;
 
     m_hd.Plotter.DrawCircle2(srcPoint.X(), srcPoint.Y(), 4, color);
-
+    int pointCount = pointW.PointsCount();
+    int pc = 1;
     TemplateTypes<HSteinerPoint>::stack points;
     points.push(srcPoint);
     while (!points.empty())
@@ -228,11 +230,14 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
             {
               if (pointsEnumeratorW.MoveNext())
               {
+                pc+=2;
                 isCriticalPathLeaf = false;
                 srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(pointsEnumeratorW.TimingPoint())]];
                 m_hd.Plotter.DrawCircle2(srcPoint.X(), srcPoint.Y(), 4, color);
+                bool f = false;
                 if (srcPoint.HasLeft())
                 {
+                  f = true;
                     nextPoint = srcPoint.Left();
                     m_hd.Plotter.DrawLine2(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color);
                     points.push(nextPoint);
@@ -244,6 +249,8 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
                         points.push(nextPoint);
                     }
                 }
+                if (!f)
+                  ALERT("Error source not left!!!");
               }
             }
           }
@@ -254,6 +261,8 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
               
         }
     }
+    if (pc != (pointCount - 1))
+      ALERT("error point count in !!!!!!!!pc = %d\tpoint count = %d", pc, pointCount);
 }
 
 void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNodeColor)

@@ -6,6 +6,7 @@
 AbstractAdditionNewElement::AbstractAdditionNewElement(NetBufferingAlgorithm* vGA)
 {
   vGAlgorithm = vGA;
+  currentCriticalPath = vGA->data->design.CriticalPaths.Null();
 }
 
 StandartAdditionNewElement::StandartAdditionNewElement(NetBufferingAlgorithm* vGA): AbstractAdditionNewElement(vGA)
@@ -34,7 +35,7 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
   buffer.SetWidth(vGAlgorithm->data->design.GetDouble<HMacroType::SizeX>(position.GetBufferInfo()->Type()));
 
   char bufferName[32];
-  sprintf(bufferName, "buf_%d", ::ToID(buffer));//TODO: create unique name
+  sprintf(bufferName, "%s%d", vGAlgorithm->data->textIdentifierBuffer.c_str(), ::ToID(buffer));//TODO: create unique name
   buffer.SetName(bufferName);
   if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) 
     && position.GetPosition()->isCandidate() && 
@@ -84,6 +85,11 @@ void StandartAdditionNewElement::AddSinksToNet(HNet& subNet, VanGinnekenTreeNode
         source);
       Utils::InsertNextPoint(vGAlgorithm->data->design, vGAlgorithm->data->design.TimingPoints[bufferOutput], 
         vGAlgorithm->data->design.TimingPoints[bufferInput]);
+      
+      /*if (vGAlgorithm->data->typeNetListBuffering == PATH_BASED)
+      {
+        vGAlgorithm->data->design.CriticalPathPoints.SetPoints()
+      }*/
 
       return;
   }
@@ -194,6 +200,7 @@ HSteinerPoint StandartAdditionNewElement::FindStartPoindInEdge(NewBuffer& buffer
     if (nb != NULL)
       return vGAlgorithm->data->design.SteinerPoints[nb->source];
   }
+  return vGAlgorithm->data->design.SteinerPoints.Null();
 }
 
 HSteinerPoint StandartAdditionNewElement::FindEndPoindInEdge(NewBuffer& buffer, TemplateTypes<NewBuffer>::list& newBuffer)
@@ -209,6 +216,7 @@ HSteinerPoint StandartAdditionNewElement::FindEndPoindInEdge(NewBuffer& buffer, 
       return vGAlgorithm->data->design.SteinerPoints[nb->sink];
     i++;
   }
+  return vGAlgorithm->data->design.SteinerPoints.Null();
 }
 
 void StandartAdditionNewElement::AddPointToSteinerTree(NewBuffer& buffer, TemplateTypes<NewBuffer>::list& newBuffer)
@@ -239,6 +247,7 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
   int newPinCount = 0;
   while (j != newBuffer.end())
   {
+    int newNetNumb = 0;
     HNet cNet = j->Positions.GetPosition()->GetNet();
     int rootIndex =  j->Positions.GetPosition()->GetRoot()->index;
     if (cNet != currentNet)
@@ -268,9 +277,12 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
     HNet subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
     newNet[ind] = subNet;
     vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
-    sprintf(cellIdx, "%d", 0);
+    sprintf(cellIdx, "%d", newNetNumb);
     vGAlgorithm->data->design.Nets.Set<HNet::Name>(subNet, vGAlgorithm->data->design[net].Name() + 
-      "__BufferedPart_" + string(cellIdx));
+      vGAlgorithm->data->textIdentifierBufferedNet + string(cellIdx));
+    
+    string ssss = vGAlgorithm->data->design[net].Name() + 
+      vGAlgorithm->data->textIdentifierBufferedNet + string(cellIdx);
 
     PinsCountCalculation(node, nPins, newBuffer);
     nPins++;
@@ -294,13 +306,16 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
     ind++;
     while (!isStop) 
     {
+      newNetNumb++;
       bufferInInCurrentNet++;
       subNet = vGAlgorithm->data->design.Nets.AllocateNet(false);
       newNet[ind] = subNet;
       vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(subNet, NetKind_Active);
-      sprintf(cellIdx, "%d", j);
+      sprintf(cellIdx, "%d", newNetNumb);
       vGAlgorithm->data->design.Nets.Set<HNet::Name>(subNet, vGAlgorithm->data->design[net].Name() + 
-        "__BufferedPart_" + string(cellIdx));
+        vGAlgorithm->data->textIdentifierBufferedNet + string(cellIdx));
+      string sss = vGAlgorithm->data->design[net].Name() + 
+        vGAlgorithm->data->textIdentifierBufferedNet + string(cellIdx);
 
       nPins = 0;
       NewBuffer& nodeStart = *j;
