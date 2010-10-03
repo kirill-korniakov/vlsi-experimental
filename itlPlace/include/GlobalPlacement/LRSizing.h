@@ -47,7 +47,7 @@ private:
   double GetWeightedResistance(HTimingPoint tp, std::vector<double>& vX, std::vector<double>& vMu);
 
   void FillVMu(std::vector<double>& vMu);
-  void initVX( std::vector<double>& vX);
+  void initVXbyLowerBound( std::vector<double>& vX);
   //void CalculateVC(std::vector<double>& vC, std::vector<HCell>& cells, std::vector<double> vX );
   //void CalculateVR(std::vector<double> vR, std::vector<HCell>& cells, std::vector<double> vX, std::vector<double> vMu );
   //void CalculateVX(std::vector<HCell>& cells, std::vector<double>& vX, std::vector<double> vMu, std::vector<double> vC, std::vector<double> vR );
@@ -71,6 +71,10 @@ private:
   static int CountLeftArcs(HDesign& design, HPin pin);
 
   //debug functions
+  std::vector<double> TestCalculateArrivalTimes(std::vector<double>& vX);
+  void LRSizer::initVX( std::vector<double>& vX );
+  double TestCalculateInputTPDelay(std::vector<double>& vX,HTimingPoint& tp,std::vector<double>& arrivalTimes);
+  double TestCalculateOutputTPDelay(std::vector<double>& vX,HTimingPoint& tp,std::vector<double>& arrivalTimes);
   bool CheckKuhn_Tucker(HTimingPoint point);
   void CheckKuhn_Tucker();
   double CalcCriterion(std::vector<double>& vCurrentX);
