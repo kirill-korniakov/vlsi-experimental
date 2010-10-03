@@ -532,7 +532,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
 
-        UpdateWeights(hd, context, QA);
+        UpdateWeights(hd, context, QA, ci);
 
         iteration++;
     }

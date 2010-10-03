@@ -1,5 +1,7 @@
 #include "ObjectivesConstraints.h"
 #include "WeightsRoutines.h"
+#include "Clustering.h"
+#include "Timing.h"
 
 void InitWeights(double* x, AppCtx* context)
 {
@@ -76,7 +78,7 @@ double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL
     return GetMultiplierAccordingDesiredRatio(lseRatio, lseDesiredRatio, lseUpdateMultiplier);
 }
 
-void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA)
+void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, ClusteringInformation& ci)
 {
     string objective = hd.cfg.ValueOf("params.objective");
 
@@ -91,6 +93,9 @@ void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA)
         context.LRdata.UpdateMultipliers(hd);        
         context.weights.lseW *= ChooseLSEMultiplier(hd, currentLHPWL, initialLHPWL);
     }
+
+    ComputeAndExportWeightsIfRequired(hd); //do weighting
+    WriteWeightsToClusteredNets(hd, ci);
 }
 
 void ReportWeights(AppCtx& context) 

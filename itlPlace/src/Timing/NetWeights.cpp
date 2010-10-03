@@ -180,6 +180,16 @@ void GetNewCommandLine(string& newCMD, const string& nwtsFileName, int argc, cha
   printf("new command line is %s\n", newCMD.c_str());
 }
 
+void ComputeAndExportWeightsIfRequired(HDesign& hd)
+{
+  if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
+  {
+    string nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
+    ComputeNetWeights(hd);
+    ExportNetWeights(hd, nwtsFileName.c_str());
+  }
+}
+
 void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 {
   int nLoops = hd.cfg.ValueOf("DesignFlow.nMacroIterations", 10);
@@ -193,11 +203,12 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 
   ALERT("Current iteration of net weighting is %d", nCyclesCounter);
 
-  nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
+  //nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
   defFileName  = hd.Circuit.Name() + "_" + Aux::IntToString(nCyclesCounter) + ".def";
   ComputeNetWeights(hd);
-  ExportNetWeights(hd, nwtsFileName.c_str());
-  ExportDEF(hd, defFileName);
+  //ExportNetWeights(hd, nwtsFileName.c_str());
+  //ExportDEF(hd, defFileName);
+  ComputeAndExportWeightsIfRequired(hd);
   ReportTNSWNSSequence(hd, tnsStr, wnsStr);
 
   if (nCyclesCounter == nLoops)

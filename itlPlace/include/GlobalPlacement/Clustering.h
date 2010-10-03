@@ -95,5 +95,6 @@ void CalculateScores(HDesign& hd, ClusteringInformation& ci,
                      std::vector<MergeCandidate>& clustersData, int*& netListSizes);
 
 int CalculateNumberOfActiveClusters(ClusteringInformation& ci);
+void WriteWeightsToClusteredNets(HDesign& hd, ClusteringInformation& ci);
 
 #endif

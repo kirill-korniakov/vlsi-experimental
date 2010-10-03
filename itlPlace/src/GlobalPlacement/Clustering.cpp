@@ -83,6 +83,16 @@ void AssignClusters(HDesign& design, ClusteringInformation& ci, HNetWrapper& net
     MoveValueToTheFirstPosition(idxs, sourceIdx); 
 }
 
+void WriteWeightsToClusteredNets(HDesign& hd, ClusteringInformation& ci)
+{
+  int netIdx = 0;
+
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); ++netIdx)
+  {
+    ci.netList[netIdx].weight = net.Weight();
+  }
+}
+
 void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
 {
     ci.netList.resize(hd.Nets.Count(NetKind_Active));
@@ -92,9 +102,9 @@ void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
     for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); ++netIdx)
     {
         AssignClusters(hd, ci, net, netIdx);
-        ci.netList[netIdx].weight = net.Weight();
     }
 
+    WriteWeightsToClusteredNets(hd, ci);
     ci.netLevels.push_back(ci.netList);
 }
 

@@ -11,6 +11,7 @@ void FindCriticalPaths(HDesign& design);
 void ComputeNetWeights(HDesign& hd);
 void ExportNetWeights(HDesign& hd, const char* fileName);
 void ImportNetWeights(HDesign& hd, const char* fileName);
+void ComputeAndExportWeightsIfRequired(HDesign& hd);
 void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter);
 
 void GetArrivalRisingArc(HDesign& hd,
