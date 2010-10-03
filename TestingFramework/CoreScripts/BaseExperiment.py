@@ -30,12 +30,13 @@ class BaseExperiment:
         self.stages  = stages
 
     def CopyingConstructor(self, be):
-        self.cfg        = be.cfg
-        self.name       = be.name
-        self.stages     = be.stages
-        self.metrics    = be.metrics
-        self.cmdLine    = be.cmdLine
-        self.benchmarks = be.benchmarks
+        self.cfg         = be.cfg
+        self.name        = be.name
+        self.stages      = be.stages
+        self.metrics     = be.metrics
+        self.cmdLine     = be.cmdLine
+        self.benchmarks  = be.benchmarks
+        self.doParsePQAT = be.doParsePQAT
 
     def SetConfig(self, cfg):
         self.cfg = GeneralParameters.binDir + 'cfg/' + cfg
