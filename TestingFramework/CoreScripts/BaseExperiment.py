@@ -75,7 +75,7 @@ class BaseExperiment:
     def ParsePQATAndPrintTable(self, logName):
         metricsForChart   = ['HPWL', 'TNS', 'WNS']
         benchmarkFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
-        cols = []
+        cols = ['stage', END_OF_COLUMN]
 
         for col in metricsForChart:
             cols += [col, END_OF_COLUMN]
