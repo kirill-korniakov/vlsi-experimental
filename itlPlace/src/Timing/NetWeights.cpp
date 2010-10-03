@@ -180,14 +180,11 @@ void GetNewCommandLine(string& newCMD, const string& nwtsFileName, int argc, cha
   printf("new command line is %s\n", newCMD.c_str());
 }
 
-void ComputeAndExportWeightsIfRequired(HDesign& hd)
+void ComputeAndExportWeights(HDesign& hd)
 {
-  if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
-  {
-    string nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
-    ComputeNetWeights(hd);
-    ExportNetWeights(hd, nwtsFileName.c_str());
-  }
+  string nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
+  ComputeNetWeights(hd);
+  ExportNetWeights(hd, nwtsFileName.c_str());
 }
 
 void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
@@ -208,7 +205,7 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
   ComputeNetWeights(hd);
   //ExportNetWeights(hd, nwtsFileName.c_str());
   //ExportDEF(hd, defFileName);
-  ComputeAndExportWeightsIfRequired(hd);
+  ComputeAndExportWeights(hd);
   ReportTNSWNSSequence(hd, tnsStr, wnsStr);
 
   if (nCyclesCounter == nLoops)
