@@ -11,6 +11,8 @@ class Experiment_LR(BaseExperiment):
         BaseExperiment.__init__(self, 'IWLS05GP LR experiment', 'LR.cfg',\
             'IWLS_GP_r1511/IWLS_GP.list', _metrics, _stages)
 
+        self.doParsePQAT = True
+
     def CreateEmptyTable(self, reportTable):
         cols = ['Benchmark', END_OF_COLUMN, 'initHPWL', END_OF_COLUMN, 'lrHPWL', END_OF_COLUMN, 'dpHPWL', END_OF_COLUMN,\
         'initTWL', END_OF_COLUMN, 'lrTWL', END_OF_COLUMN, 'dpTWL', END_OF_COLUMN,\
@@ -27,8 +29,7 @@ class Experiment_LR(BaseExperiment):
         #print absolute values
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
-                cols.append(str(values[row][col]))
-                cols.append(END_OF_COLUMN)
+                cols += [str(values[row][col]), END_OF_COLUMN]
 
         cols.append(END_OF_COLUMN)
 

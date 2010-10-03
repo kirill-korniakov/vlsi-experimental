@@ -13,18 +13,7 @@ class Experiment_Weighting(BaseExperiment):
             'Sensitivity_guided_weighting.cfg', 'IWLS05.list',\
             _metrics, _stages)
 
-    def PrintBenchmarkTable(self, values, benchmark, reportTable):
-        benchmarkFileName = os.path.dirname(reportTable) + '/' + os.path.basename(benchmark) + '.csv'
-
-        for stage in values:
-            cols = []
-            #cols.append(END_OF_COLUMN)
-
-            for metric in stage:
-                cols.append(str(metric))
-                cols.append(END_OF_COLUMN)
-
-            WriteStringToFile(cols, benchmarkFileName)
+        self.doParsePQAT = True
 
 def test():
     testRunner = TestRunner()

@@ -18,16 +18,15 @@ class LogParser:
         log.close()
 
         #move to the table
-        lineIdx = 0
-        tableHeader = ''
+        lineIdx       = 0
+        tableHeader   = ''
+        borderPattern = self.parameters.PFSTBorderPattern
 
         if (tableType == PFST):
-            tableHeader   = self.parameters.PFSTTableHeader
-            borderPattern = self.parameters.PFSTBorderPattern
+            tableHeader = self.parameters.PFSTTableHeader
 
         else:
-            tableHeader   = self.parameters.PQATTableHeader
-            borderPattern = self.parameters.PQATBorderPattern
+            tableHeader = self.parameters.PQATTableHeader
 
         for line in lines:
             if line.find(tableHeader) != -1:
@@ -53,7 +52,7 @@ class LogParser:
 
         #parse stages
         lineIdx = lineIdx + 3
-        while lines[lineIdx].find(borderPattern) == -1:
+        while ((lines[lineIdx].find(borderPattern) == -1) and (lines[lineIdx] != '\n')):
             if lines[lineIdx].find(stageTag + ' ') != -1:
                 ll = lines[lineIdx].split()
                 return ll[colIdx]
@@ -61,6 +60,8 @@ class LogParser:
             if lineIdx == len(lines):
                 print('Stage ' + stageTag + ' not found')
                 return NOT_FOUND
+
+        return NOT_FOUND
 
     def GetStageTag(self):
         log = open(self.logName, 'r')

@@ -19,6 +19,7 @@ class BaseExperiment:
     cmdLine = ''
     metrics = []
     stages  = []
+    doParsePQAT = False
 
     def __init__(self, name, cfg, benchmarks, metrics, stages, cmdLine = ''):
         self.name = name
@@ -43,8 +44,7 @@ class BaseExperiment:
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
 
     def CreateEmptyTable(self, reportTable):
-        cols = ['Benchmark']
-        cols.append(END_OF_COLUMN)
+        cols = ['Benchmark', END_OF_COLUMN]
 
         #write header of a table.
         for row in range(len(self.stages)):
@@ -71,23 +71,39 @@ class BaseExperiment:
 
         return table
 
-    def ParsePQAT(self, logName):
-        parser = LogParser(logName)
-        metricsForChart = ['HPWL', 'TNS']
-        value = str(parser.GetFromTable('10', 'HPWL', PQAT))
-        print(value)
+    def ParsePQATAndPrintTable(self, logName):
+        metricsForChart   = ['HPWL', 'TNS', 'WNS']
+        benchmarkFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
+        cols = []
 
-    def PrintBenchmarkTable(self, values, benchmark, reportTable):
-        return 0
+        for col in metricsForChart:
+            cols += [col, END_OF_COLUMN]
+
+        WriteStringToFile(cols, benchmarkFileName)
+
+        parser    = LogParser(logName)
+        currStage = 0
+
+        while (True):
+            cols = [str(currStage), END_OF_COLUMN]
+
+            for col in range(len(metricsForChart)):
+                value = str(parser.GetFromTable(str(currStage), metricsForChart[col], PQAT))
+
+                if (value == str(NOT_FOUND)):
+                    return
+
+                cols += [value, END_OF_COLUMN]
+
+            currStage += 1
+            WriteStringToFile(cols, benchmarkFileName)
 
     def AddStringToTable(self, values, benchmark, reportTable):
-        cols = [benchmark]
-        cols.append(END_OF_COLUMN)
+        cols = [benchmark, END_OF_COLUMN]
 
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                cols.append(str(values[row][col]))
-                cols.append(END_OF_COLUMN)
+                cols += [str(values[row][col]), END_OF_COLUMN]
 
             cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 
@@ -101,6 +117,8 @@ class BaseExperiment:
           return [FAILED, []]
 
         self.AddStringToTable(values, benchmark, reportTable)
-        self.PrintBenchmarkTable(values, benchmark, reportTable)
-        self.ParsePQAT(logName)
+
+        if (self.doParsePQAT == True):
+            self.ParsePQATAndPrintTable(logName)
+
         return [OK, values]

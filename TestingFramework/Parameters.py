@@ -48,7 +48,6 @@ class LogParserParameters:
     PFSTTableHeader   = 'Placement Flow Stages Table'
     PQATTableHeader   = 'Placement Quality Analysis Table'
     PFSTBorderPattern = '-----'
-    PQATBorderPattern = ''
 
 class Tools:
 	MSBuild  = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"

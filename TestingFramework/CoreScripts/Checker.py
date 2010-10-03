@@ -67,5 +67,8 @@ class Checker(BaseExperiment):
             return [NEW, currentValues]
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)
-        #self.PrintBenchmarkTable(currentValues, benchmark, reportTable)
+
+        if (self.doParsePQAT == True):
+            self.ParsePQATAndPrintTable(logName)
+
         return [self.CompareTables(currentValues, masterValues), currentValues]
