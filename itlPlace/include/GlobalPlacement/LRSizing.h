@@ -97,6 +97,7 @@ private:
  
   void ApplySizing(std::vector<double>& X);
   double getMacroTypeSize(HMacroType macroType);
+  string getMacroTypeFamilyName(HMacroType macroType);
 };
 
 class MacroTypeSizesComparator{

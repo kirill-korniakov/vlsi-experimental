@@ -193,7 +193,6 @@ void LRSizer::GetPinsCharacteristics()
   HPin pin;
   string pinName,cellName,direction="null";
   HCell cell;
-//  double c, r,t;
   Utils::DriverPhisics DPhisics;
   for (HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()].GoNext(); !::IsNull(tp); tp.GoNext())
   {
@@ -270,12 +269,12 @@ void LRSizer::ApplySizing(std::vector<double>& X)
 
 void LRSizer::getCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily)
 {
-  string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
-  string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
+  
+  string cellFamily = getMacroTypeFamilyName((cell,design).Type());
 
   for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext();)
   {
-    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
+    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );
     if (macroTypeFamily == cellFamily)
       macroTypesInFamily.push_back(macroTypeE);
   }
@@ -312,18 +311,15 @@ void LRSizer::getCellFamily(HCell cell, std::vector<double>& cellSizes)
 void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X)
 {
   HCell cell=(design,pin).Cell();
-  string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
-  string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
+  
+  string cellFamily = getMacroTypeFamilyName((cell,design).Type());
   string pinName=(pin,design).Name();
-
-  //ALERT(cellFamily);
-  //ALERT(pinName);
 
   std::vector<double> cellSizes;
 
   for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext();)
   {
-    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
+    string macroTypeFamily = getMacroTypeFamilyName(macroTypeE);
     if (macroTypeFamily == cellFamily)
     {
       double size=getMacroTypeSize(macroTypeE);//design.MacroTypes.GetDouble<HMacroType::SizeX>(macroTypeE);
@@ -347,13 +343,12 @@ void LRSizer::getPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double
     }
   }
   ASSERT(C.size()==X.size());
-  //int i=1;
-  //ALERT(cellFamily.data());
-  //if (cellFamily.data() == "DFFSRX")
-  //{
-  //    i++;
-  //ALERT("DFFSRX");
-  //}
+}
+
+std::string LRSizer::getMacroTypeFamilyName(HMacroType macroType)
+{
+  string macroTypeName = design.MacroTypes.GetString<HMacroType::Name>(macroType);
+  return macroTypeName.substr( 0, macroTypeName.length()-2 );
 }
 
 void LRSizer::getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X)
@@ -363,18 +358,14 @@ void LRSizer::getPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double
   */
 
   HCell cell=(design,pin).Cell();
-  string cellName = design.MacroTypes.GetString<HMacroType::Name>((cell,design).Type());
-  string cellFamily = cellName.substr( 0, cellName.length()-2 );//TODO: Correct looking for cell family
+  string cellFamily = getMacroTypeFamilyName((cell,design).Type());
   string pinName=(pin,design).Name();
 
   std::vector<double> cellSizes;
 
-  //ALERT(cellFamily);
-  //ALERT(pinName);
-
   for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext();)
   {
-    string macroTypeFamily = macroTypeE.Name().substr( 0, macroTypeE.Name().length()-2 );//TODO: Correct looking for cell family
+    string macroTypeFamily = getMacroTypeFamilyName(macroTypeE);
     if (macroTypeFamily == cellFamily)
     {
       double size=getMacroTypeSize(macroTypeE);//design.MacroTypes.GetDouble<HMacroType::SizeX>(macroTypeE);
@@ -562,7 +553,6 @@ double LRSizer::CalcB(HCell& cell,std::vector<double>& vMu,std::vector<double>& 
   Maths::Regression::Linear* regressionR;
   double B=0;
   HTimingPoint tp;
-  //for(HCell::PinsEnumeratorW pin = cell.GetPinsEnumeratorW(); pin.MoveNext(); )
   for (HCell::PinsEnumeratorW pin = (design, cell).GetPinsEnumeratorW(); pin.MoveNext(); )
   {
     if (pin.Direction() == PinDirection_OUTPUT && !::IsNull(pin.Net()))
@@ -872,7 +862,6 @@ bool LRSizer::CheckStopConditionForLRS_Mu( std::vector<double> prevVX, std::vect
       max=fabs(prevVX[i]-nextVX[i]);
   }
 
-  //ALERT("max = %lf",max);
   if (max<accuracy) return true;
   else return false;
 }
@@ -1445,7 +1434,6 @@ void LRSizer::ProjectLambdaMatrix()
 {
   double MuIn,MuOut; 
   std::vector<double> percentage;
-  //double* lambda;
 
   HTimingPointWrapper tp = design[design.TimingPoints.TopologicalOrderRoot()];
   for (tp.GoPrevious(); !::IsNull(tp); tp.GoPrevious())
@@ -1538,7 +1526,7 @@ Maths::Regression::Linear* LRSizer::getRegressionC( HTimingPointWrapper tp )
   double* arrX=new double[numOfAlternatives];
   copy(X.begin(), X.end(), arrX);
 
-  //if (C.size() <= 1) ALERT("c.size<=1");
+  ASSERT(C.size() > 1);
 
   return new Maths::Regression::Linear((int)C.size(), arrX, arrC);
 }
@@ -1597,12 +1585,14 @@ double LRSizer::getMacroTypeSize(HMacroType macroType)
 void LRSizer::doLRSizing()
 {
 
-#if MODE_TEST   
+#ifdef MODE_TEST   
+  ALERT("MODE TEST defined");
   std::vector<double> vX;
   initVXbyLowerBound(vX);
   std::vector<double> arrivalTimes=TestCalculateArrivalTimes(vX);
-#elif
-
+  return;
+#endif
+  ALERT("MODE TEST not defined");
   /*FILE* fbefore = fopen("./log/fbefore.csv","w");
   for (int i=0; i<cells->size(); i++)
   {
@@ -1641,13 +1631,12 @@ void LRSizer::doLRSizing()
   /*FILE* fafter2 = fopen("./log/fafter2.csv","w");
   for (int i=0; i<cells->size(); i++)
   {
-  HCell cell=(*cells)[i];
-  HCellWrapper cellW=(design, cell);
+    HCell cell=(*cells)[i];
+    HCellWrapper cellW=(design, cell);
 
-  double width = design.Cells.GetDouble<HCell::Width>(cellW);
-  fprintf ( fafter2, "%d;%lf\n", i, width);
+    double width = design.Cells.GetDouble<HCell::Width>(cellW);
+    fprintf ( fafter2, "%d;%lf\n", i, width);
 
   }
   fclose( fafter2);*/
-#endif
 }
