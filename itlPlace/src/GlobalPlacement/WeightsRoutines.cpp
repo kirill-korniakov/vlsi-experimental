@@ -94,7 +94,7 @@ void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, C
         context.weights.lseW *= ChooseLSEMultiplier(hd, currentLHPWL, initialLHPWL);
     }
 
-    if (hd.cfg.ValueOf("NetWeighting.useNetWeights", false))
+    if (hd.cfg.ValueOf("LSE.Clustering.useNetWeights", false))
     {
       ComputeAndExportWeights(hd); //do weighting
       WriteWeightsToClusteredNets(hd, ci);
