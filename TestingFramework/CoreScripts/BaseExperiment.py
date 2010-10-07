@@ -73,31 +73,9 @@ class BaseExperiment:
         return table
 
     def ParsePQATAndPrintTable(self, logName):
-        metricsForChart   = ['HPWL', 'TNS', 'WNS']
-        benchmarkFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
-        cols = ['stage', END_OF_COLUMN]
-
-        for col in metricsForChart:
-            cols += [col, END_OF_COLUMN]
-
-        WriteStringToFile(cols, benchmarkFileName)
-
-        parser    = LogParser(logName)
-        currStage = 0
-
-        while (True):
-            cols = [str(currStage), END_OF_COLUMN]
-
-            for col in range(len(metricsForChart)):
-                value = str(parser.GetFromTable(str(currStage), metricsForChart[col], PQAT))
-
-                if (value == str(NOT_FOUND)):
-                    return
-
-                cols += [value, END_OF_COLUMN]
-
-            currStage += 1
-            WriteStringToFile(cols, benchmarkFileName)
+        metricsForChart = ['HPWL', 'TNS', 'WNS']
+        parser = LogParser(logName)
+        parser.ParsePQATAndPrintTable(metricsForChart)
 
     def AddStringToTable(self, values, benchmark, reportTable):
         cols = [benchmark, END_OF_COLUMN]

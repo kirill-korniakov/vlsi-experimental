@@ -1,3 +1,6 @@
+import CoreFunctions
+from CoreFunctions import *
+
 import Parameters
 from Parameters import *
 
@@ -53,7 +56,7 @@ class LogParser:
         #parse stages
         lineIdx = lineIdx + 3
         while ((lines[lineIdx].find(borderPattern) == -1) and (lines[lineIdx] != '\n')):
-            if lines[lineIdx].find(stageTag + ' ') != -1:
+            if lines[lineIdx].find(' ' + stageTag + ' ') != -1:
                 ll = lines[lineIdx].split()
                 return ll[colIdx]
             lineIdx = lineIdx + 1
@@ -62,6 +65,39 @@ class LogParser:
                 return NOT_FOUND
 
         return NOT_FOUND
+
+    def ParsePQATAndPrintTable(self, metrics):
+        benchmarkFileName = os.path.dirname(self.logName) + '/' + os.path.basename(self.logName) + '.csv'
+        cols = ['stage', END_OF_COLUMN]
+
+        for col in metrics:
+            cols += [col, END_OF_COLUMN]
+
+        WriteStringToFile(cols, benchmarkFileName)
+        currStage = 0
+        table = {}
+
+        while (True):
+            cols = [str(currStage), END_OF_COLUMN]
+            table[currStage] = []
+
+            for col in range(len(metrics)):
+                value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
+                value = float(value.replace(',', '.'))
+
+                if (value == NOT_FOUND):
+                    return
+
+                table[currStage].append(value)
+
+                if (currStage > 0):
+                    if (table[0][col] > 0):
+                        value = value * 100 / table[0][col]
+
+                cols += [str(value), END_OF_COLUMN]
+
+            currStage += 1
+            WriteStringToFile(cols, benchmarkFileName)
 
     def GetStageTag(self):
         log = open(self.logName, 'r')
