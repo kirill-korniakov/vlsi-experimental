@@ -66,6 +66,31 @@ class LogParser:
 
         return NOT_FOUND
 
+    def ParsePQAT(self, metrics):
+        currStage = 0
+        table = {}
+
+        while (True):
+            table[currStage] = []
+
+            for col in range(len(metrics)):
+                value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
+                value = float(value.replace(',', '.'))
+
+                if (value == NOT_FOUND):
+                    del table[currStage] #delete empty field
+                    return table
+
+                if (currStage > 0):
+                    if (table[0][col] > 0):
+                        value = value * 100 / table[0][col]
+
+                table[currStage].append(value)
+
+            currStage += 1
+
+        return table
+
     def ParsePQATAndPrintTable(self, metrics):
         benchmarkFileName = os.path.dirname(self.logName) + '/' + os.path.basename(self.logName) + '.csv'
         cols = ['stage', END_OF_COLUMN]
@@ -74,30 +99,17 @@ class LogParser:
             cols += [col, END_OF_COLUMN]
 
         WriteStringToFile(cols, benchmarkFileName)
-        currStage = 0
-        table = {}
+        table = self.ParsePQAT(metrics)
 
-        while (True):
+        for currStage in table.keys():
             cols = [str(currStage), END_OF_COLUMN]
-            table[currStage] = []
 
             for col in range(len(metrics)):
-                value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
-                value = float(value.replace(',', '.'))
+                cols += [str(table[currStage][col]), END_OF_COLUMN]
 
-                if (value == NOT_FOUND):
-                    return
-
-                table[currStage].append(value)
-
-                if (currStage > 0):
-                    if (table[0][col] > 0):
-                        value = value * 100 / table[0][col]
-
-                cols += [str(value), END_OF_COLUMN]
-
-            currStage += 1
             WriteStringToFile(cols, benchmarkFileName)
+
+        return table
 
     def GetStageTag(self):
         log = open(self.logName, 'r')
