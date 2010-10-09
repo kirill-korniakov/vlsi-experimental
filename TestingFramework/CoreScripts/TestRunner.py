@@ -45,7 +45,15 @@ class TestRunner:
     def BuildSln(self, slnPath, mode = "Rebuild"):
         print('Building solution...')
         args = [Tools.MSBuild, slnPath, '/t:' + mode, '/p:Configuration=Release']
-        subprocess.Popen(subprocess.list2cmdline(args)).communicate()
+        #subprocess.Popen(subprocess.list2cmdline(args), stdout = buildLogFile).communicate()
+        res = subprocess.call(args)
+
+        if (res != 0):
+            print('Build failed!')
+            buildLog = GeneralParameters.buildLog
+            emailer  = Emailer()
+            emailer.PrepareAndSendMail('Night experiments', 'build failed', [buildLog])
+            exit(1)
 
     def ExtractBenchmarkList(self, benchmarksListPath):
         benchmarks = (open(benchmarksListPath).read()).split('\n')
@@ -208,7 +216,7 @@ class TestRunner:
 
         for benchmark in benchmarks:
             logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
-            fPlacerOutput = open(logFileName, 'w');
+            fPlacerOutput = open(logFileName, 'w')
             resultValues = []
 
             defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"

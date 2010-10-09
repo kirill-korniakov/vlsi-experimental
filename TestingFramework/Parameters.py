@@ -39,10 +39,11 @@ class ReportParameters:
     logFolder = 'Reports/'
 
 class GeneralParameters:
-	checkoutPath = "../itlPlace/"
-	binDir  = checkoutPath + "bin/"
-	slnPath = checkoutPath + "make/itlPlace.sln"
 	benchmarkCheckoutPath = "../Benchmarks/"
+	checkoutPath          = "../itlPlace/"
+	buildLog              = checkoutPath + "obj/release/BuildLog.htm"
+	slnPath               = checkoutPath + "make/itlPlace.sln"
+	binDir                = checkoutPath + "bin/"
 
 class LogParserParameters:
     PFSTTableHeader   = 'Placement Flow Stages Table'

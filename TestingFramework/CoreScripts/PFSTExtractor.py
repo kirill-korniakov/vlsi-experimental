@@ -39,7 +39,7 @@ def ExtractPFSTToFile(logName, masterLogFolder):
 
         except IOError:
             print('Error while opening ' + masterLogName)
-            exit()
+            exit(1)
 
 def Run():
     lastLogFolder   = '../Reports/LR.cfg_2010-10-09_12-08-37'
