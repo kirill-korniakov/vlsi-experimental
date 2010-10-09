@@ -1,10 +1,7 @@
 import os
 
-NOT_FOUND = -1.0
-
-def ExtractPFSTToFile(logName):
+def ExtractPFSTToFile(logName, masterLogFolder):
         tableHeader = 'Placement Flow Stages Table'
-        
         log = open(logName, 'r')
         lines = log.readlines()
         log.close()
@@ -24,7 +21,7 @@ def ExtractPFSTToFile(logName):
 
                     if lineIdx == len(lines):
                         print('PFST was not found in ' + logName + '\n')
-                        return NOT_FOUND
+                        return False
             else:
                 printStr += line
 
@@ -33,16 +30,34 @@ def ExtractPFSTToFile(logName):
                                 isTableReached = True
                         else:
                                 break
-                
-        log = open(logName, 'w')
-        log.write(printStr)
-        log.close()
 
-def Run(logFolder = ''):
-        if (logFolder == ''):
-            logFolder = os.getcwd()
-        
-        for log in os.listdir(logFolder):
-                if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
-                        ExtractPFSTToFile(log)
+        try:
+            masterLogName = masterLogFolder + '/' + os.path.basename(logName)
+            log = open(masterLogName, 'w')
+            log.write(printStr)
+            log.close()
+
+        except IOError:
+            print('Error while opening ' + masterLogName)
+            exit()
+
+def Run():
+    lastLogFolder   = '../Reports/LR.cfg_2010-10-09_12-08-37'
+    masterLogFolder = '../Reports/LR_master'
+
+    if (lastLogFolder == ''):
+        lastLogFolder = os.getcwd()
+
+    if (os.path.exists(lastLogFolder) == False):
+        print('folder ' + lastLogFolder + ' does not exist')
+        return
+
+    if (os.path.exists(masterLogFolder) == False):
+        print('folder ' + masterLogFolder + ' does not exist')
+        return
+
+    for log in os.listdir(lastLogFolder):
+        if (os.path.isfile(os.path.join(lastLogFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
+            ExtractPFSTToFile(lastLogFolder + '/' + log, masterLogFolder)
+
 Run()
