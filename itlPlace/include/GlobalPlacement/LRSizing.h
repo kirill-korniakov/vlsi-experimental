@@ -86,7 +86,7 @@ private:
 
   Maths::Regression::Linear* GetRegressionC(HTimingPointWrapper tp);
   Maths::Regression::Linear* GetRegressionR(HTimingPointWrapper tp);
-
+  Maths::Regression::Linear* GetRegressionR(HPin inputPin, HPin outputPin);
   HMacroType RoundCellToTypeFromLib(HCell cellFrom, double currentX);
 
   void ApplySizing(std::vector<double>& X);

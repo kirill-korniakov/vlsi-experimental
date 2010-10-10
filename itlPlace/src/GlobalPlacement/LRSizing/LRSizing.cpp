@@ -1154,6 +1154,40 @@ Maths::Regression::Linear* LRSizer::GetRegressionR(HTimingPointWrapper tp)
   return new Maths::Regression::Linear((int)R.size(), arrX, arrR);
 }
 
+Maths::Regression::Linear* LRSizer::GetRegressionR(HPin inputPin, HPin outputPin)
+{
+  std::vector<double> R, invX;
+  for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext(); )
+  {
+    std::string cellName = macroTypeE.Name();
+    if (cellName == (design, (outputPin, design).Cell()).Name())
+    {
+      double cellSize=GetMacroTypeSize(macroTypeE);
+      for(HMacroType::PinsEnumeratorW pinE = macroTypeE.GetEnumeratorW(); pinE.MoveNext();)
+      {
+        if(pinE.Direction() == PinDirection_OUTPUT && pinE.Name() == design.GetString<HPin::Name>(outputPin))
+        {
+          for(HPinType::ArcsEnumeratorW arcE = pinE.GetArcsEnumeratorW(); arcE.MoveNext();)
+          {
+            HPinType pinWhichConnectsToPinE = arcE.GetStartPinType(pinE);
+            if (design[pinWhichConnectsToPinE].Name() == (inputPin, design).Name())
+            {
+              invX.push_back(1.0 / cellSize);
+              R.push_back(arcE.ResistanceRise());
+            }
+          }
+        }
+      }
+    }
+  }
+  unsigned int numOfAlternatives = (int)R.size();
+  double* arrInvX = new double[numOfAlternatives];
+  copy(invX.begin(), invX.end(), arrInvX);
+  double* arrR = new double[numOfAlternatives];
+  copy(R.begin(), R.end(), arrR);
+  return new Maths::Regression::Linear((int)R.size(), arrInvX, arrR);
+}
+
 HMacroType LRSizer::RoundCellToTypeFromLib(HCell cellFrom, double currentX)
 {
   std::vector<HMacroType> macroTypesInFamily;
