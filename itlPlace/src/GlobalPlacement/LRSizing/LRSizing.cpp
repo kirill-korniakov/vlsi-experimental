@@ -10,7 +10,7 @@
 #define DOUBLE_ACCURACY 1e-4
 #define errorBoundForLDP 0.01
 
-//#define MODE_TEST 1
+#define MODE_TEST 1
 
 //TODO: function for cell family name
 //TODO: class CellFamily 
@@ -687,7 +687,6 @@ double LRSizer::FindOutputLambdaSum(HTimingPoint point)
   {
     HNet net = (design,pin).Net();
     ASSERT(design[net].Source() == pin);
-
     for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
     {
       std::vector<double>& lambdas = GetPointLambdas(design.TimingPoints[sink]);
@@ -696,7 +695,6 @@ double LRSizer::FindOutputLambdaSum(HTimingPoint point)
     }
     return sumOfLambda;
   }
-
   if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT)
   {
     //cell input pin, iterate cell arcs
@@ -740,260 +738,117 @@ bool LRSizer::CheckKuhn_Tucker( HTimingPoint point)
   return (fabs(FindOutputLambdaSum(point) - FindInputLambdaSum(point)) < DOUBLE_ACCURACY);
 }
 
-double LRSizer::TestCalculateInputTPDelay(std::vector<double>& vX, HTimingPoint& tp, 
-                                          std::vector<double>& arrivalTimes)
+double LRSizer::GetInputTimigPointAT(std::vector<double>& vX, HTimingPoint& tp, 
+                                       std::vector<double>& arrivalTimes)
 {
-  //No ideas of how to find wire delay(x_sink)
-  //  double aT;
-  double r = design.RoutingLayers.Physics.RPerDist;
-  double c = design.RoutingLayers.Physics.LinearC;
-  double temp = 0;
-
-  if(::ToID(tp) == 21)
+  HPinWrapper src = design[(design[design.Get<HPin::Net, HNet>(design.Get<HTimingPoint::Pin, HPin>(tp))]).Source()];
+  HSteinerPointWrapper point = design[design.SteinerPoints[design[design.Get<HTimingPoint::Pin, HPin>(tp)]]];
+  HSteinerPointWrapper srcPoint = design[design.SteinerPoints[src]];
+  HSteinerPointWrapper nextPoint = srcPoint;  
+  HSteinerPointWrapper nextRoot = point;
+  HSteinerPointWrapper previousRoot = point;
+  HSteinerPointWrapper srcP = srcPoint;
+  TemplateTypes<HSteinerPoint>::stack points;
+  double obsWireC, srcWireR,sinkCap;
+  double aT = 0;
+  while (GetParentStPoint(nextRoot, srcPoint) != nextRoot)
   {
-    temp=28 * r * (28 * c / 2 + 14 * c + 28 * c) + 14 * r *(14*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
+    obsWireC = 0;
+    srcWireR = 0;
+    sinkCap = 0;
+    nextRoot = GetParentStPoint(nextRoot, srcPoint);
+    if (nextRoot.Left() == previousRoot)
+      nextPoint = nextRoot.Left();
+    else
+      nextPoint = nextRoot.Right();
+    obsWireC += design.GetDouble<HSteinerPoint::ExtractedC>(nextPoint) / 2;
+    HPin nextPointPin = design.Get<HSteinerPoint::Pin, HPin>(nextPoint);
+    if (!::IsNull(nextPointPin) && design.Get<HPin::Direction, PinDirection>(nextPointPin) == PinDirection_INPUT &&
+      !::IsNull(design[nextPointPin].Cell()))
     {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
+      Maths::Regression::Linear* regressionC = GetRegressionC((design.TimingPoints[nextPointPin],design));
+      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), design[nextPointPin].Cell()));
+      obsWireC += (regressionC->getValue(vX[index]));
     }
-    temp+=28*r*(sinksCap[0]+sinksCap[1])+14*r*sinksCap[0];
-  }
-  if(::ToID(tp)==17)
-  {
-    temp=28*r*(28*c/2+14*c+28*c)+28*r*(28*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
+    srcWireR = design.GetDouble<HSteinerPoint::ExtractedR>(nextPoint);
+    points.push(nextPoint);
+    srcP = nextRoot;
+    previousRoot = nextRoot;
+    
+    while (!points.empty()) points.pop(); //Clear stack
+    points.push(nextPoint);   
+    
+    while (!points.empty())
     {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
+      srcP = points.top();
+      points.pop();
+      
+      if (srcP.HasLeft())
+      {
+        nextPoint = srcP.Left();
+        obsWireC += design.GetDouble<HSteinerPoint::ExtractedC>(nextPoint);
+        HPin leftPointPin = design.Get<HSteinerPoint::Pin, HPin>(nextPoint);
+        
+        if (!::IsNull(leftPointPin) && design.Get<HPin::Direction, PinDirection>(leftPointPin) == PinDirection_INPUT &&
+          !::IsNull(design[leftPointPin].Cell()))
+        {
+          Maths::Regression::Linear* regressionC = GetRegressionC((design.TimingPoints[leftPointPin],design));
+          int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), design[leftPointPin].Cell()));
+          obsWireC += (regressionC->getValue(vX[index]));
+        }
+        points.push(nextPoint);
+        
+        if (srcP.HasRight())
+        {
+          nextPoint = srcP.Right();
+          obsWireC += design.GetDouble<HSteinerPoint::ExtractedC>(nextPoint);
+          HPin rightPointPin = design.Get<HSteinerPoint::Pin, HPin>(nextPoint);
+          if (!::IsNull(rightPointPin) && design.Get<HPin::Direction, PinDirection>(rightPointPin) == PinDirection_INPUT &&
+            !::IsNull(design[rightPointPin].Cell()))
+          {
+            Maths::Regression::Linear* regressionC = GetRegressionC((design.TimingPoints[rightPointPin],design));
+            int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), design[rightPointPin].Cell()));
+            obsWireC += (regressionC->getValue(vX[index]));
+          }
+          points.push(nextPoint);
+        }
+      }
     }
-    temp+=28*r*(sinksCap[0]+sinksCap[1])+28*r*sinksCap[1];
+    aT += srcWireR * obsWireC;
   }
-  if(::ToID(tp)==19)
-  {
-    temp=28*r*(28*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap = (regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=28*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==25)
-  {
-    temp=28*r*(28*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=28*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==12)
-  {
-    temp=63*r*(63*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=63*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==12)
-  {
-    temp=63*r*(63*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=63*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==14)
-  {
-    temp=35*r*(35*c/2+28*c)+14*r*(14*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=35*r*(sinksCap[0]+sinksCap[1])+14*r*sinksCap[0];
-  }
-  if(::ToID(tp)==7)
-  {
-    temp=35*r*(35*c/2+28*c)+14*r*(14*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=35*r*(sinksCap[0]+sinksCap[1])+14*r*sinksCap[1];
-  }
-  if(::ToID(tp)==9)
-  {
-    temp=49*r*(49*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=49*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==9)
-  {
-    temp=49*r*(49*c/2);
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    double sinkCap=0;
-    std::vector<double> sinksCap;
-    HPin source = design.Get<HNet::Source, HPin>(net);
-    temp+=arrivalTimes[::ToID(design.TimingPoints[source])];
-
-    for(HNet::SinksEnumeratorW sink = (design,net).GetSinksEnumeratorW(); sink.MoveNext(); )
-    {
-      if (sink.IsPrimaryOutput()) sinkCap+=0;
-
-      Maths::Regression::Linear* regressionC=GetRegressionC((design.TimingPoints[sink],design));
-      HCell cell = sink.Cell();
-      int index = (int)distance(cells->begin(), find(cells->begin(), cells->end(), cell));
-      sinkCap=(regressionC->getValue(vX[index]));
-      sinksCap.push_back(sinkCap);
-    }
-    temp+=49*r*(sinksCap[0]);
-  }
-  if(::ToID(tp)==4)
-  {
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    HPin source = design.Get<HNet::Source, HPin>(net);
-
-    temp=35*r*(35*c/2)+arrivalTimes[::ToID(design.TimingPoints[source])];
-  }
-  if(::ToID(tp)==5)
-  {
-
-    HPin pin=design.Get<HTimingPoint::Pin, HPin>(tp);
-    HNet net = design.Get<HPin::Net, HNet>(pin);
-    HPin source = design.Get<HNet::Source, HPin>(net);
-
-    temp=35*r*(35*c/2)+arrivalTimes[::ToID(design.TimingPoints[source])];
-  } 
-
-  return temp;
+  aT += arrivalTimes[::ToID(design.TimingPoints[src])];
+  return aT;
 }
 
-double LRSizer::TestCalculateOutputTPDelay(std::vector<double>& vX, HTimingPoint& tp, 
+HSteinerPointWrapper LRSizer::GetParentStPoint(HSteinerPointWrapper& point,HSteinerPointWrapper& srcPoint)
+{
+  TemplateTypes<HSteinerPoint>::stack points;
+  HSteinerPointWrapper nextPoint = srcPoint;
+  HSteinerPointWrapper parentPoint = srcPoint;
+  points.push(srcPoint);
+  while (!points.empty())
+  {
+    parentPoint = points.top();
+    points.pop();
+    if (parentPoint.HasLeft())
+    {
+      nextPoint = parentPoint.Left();
+      if (nextPoint == point)
+        return parentPoint;
+      points.push(nextPoint);
+      if (parentPoint.HasRight())
+      {
+        nextPoint = parentPoint.Right();
+        if (nextPoint == point)
+          return parentPoint;
+        points.push(nextPoint);
+      }
+    }
+  }
+  return point;
+}
+
+double LRSizer::GetOutputTimingPointAT(std::vector<double>& vX, HTimingPoint& tp, 
                                            std::vector<double>& arrivalTimes)
 {
   Maths::Regression::Linear* regressionR = GetRegressionR((design, tp));
@@ -1020,7 +875,7 @@ double LRSizer::TestCalculateOutputTPDelay(std::vector<double>& vX, HTimingPoint
   return (maxDelay + R * GetObservedC(tp, vX));
 }
 
-std::vector<double> LRSizer::TestCalculateArrivalTimes(std::vector<double>& vX)
+std::vector<double> LRSizer::GetArrivalTimes(std::vector<double>& vX)
 {
   std::vector<double> arrivalTimes;
   arrivalTimes.reserve(size);
@@ -1043,13 +898,14 @@ std::vector<double> LRSizer::TestCalculateArrivalTimes(std::vector<double>& vX)
     {
       if ((design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_INPUT) || pin.IsPrimaryOutput())
       {
-        aT=TestCalculateInputTPDelay(vX, tp, arrivalTimes);      
+         aT=GetInputTimigPointAT(vX,tp,arrivalTimes);
       }
       else
       {
         if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT)
         {
-          aT=TestCalculateOutputTPDelay(vX, tp, arrivalTimes);
+          int tpID=::ToID(tp);
+          aT=GetOutputTimingPointAT(vX, tp, arrivalTimes);
         }
       }
     }
@@ -1284,7 +1140,7 @@ Maths::Regression::Linear* LRSizer::GetRegressionC( HTimingPointWrapper tp )
   return new Maths::Regression::Linear((int)C.size(), arrX, arrC);
 }
 
-Maths::Regression::Linear* LRSizer::GetRegressionR( HTimingPointWrapper tp )
+Maths::Regression::Linear* LRSizer::GetRegressionR(HTimingPointWrapper tp)
 {
   HPin pin = tp.Pin();
   std::vector<double> R, X;
@@ -1335,7 +1191,7 @@ void LRSizer::DoLRSizing()
   ALERT("MODE TEST defined");
   std::vector<double> vX;
   InitVxByLowerBound(vX);
-  std::vector<double> arrivalTimes = TestCalculateArrivalTimes(vX);
+  std::vector<double> arrivalTimes = GetArrivalTimes(vX);
   return;
 #endif
 

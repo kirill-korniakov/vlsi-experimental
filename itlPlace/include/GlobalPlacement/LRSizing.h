@@ -60,11 +60,13 @@ private:
   static int CountLeftArcs(HDesign& design, HPin pin);
 
   //debug functions
-  std::vector<double> TestCalculateArrivalTimes(std::vector<double>& vX);
+  HSteinerPointWrapper GetParentStPoint(HSteinerPointWrapper& point,HSteinerPointWrapper& srcPoint);
+  double GetInputTimigPointAT(std::vector<double>& vX,HTimingPoint& tp,std::vector<double>& arrivalTimes);
+  std::vector<double> GetArrivalTimes(std::vector<double>& vX);
   void LRSizer::initVX(std::vector<double>& vX);
   double TestCalculateInputTPDelay(std::vector<double>& vX, HTimingPoint& tp, 
     std::vector<double>& arrivalTimes);
-  double TestCalculateOutputTPDelay(std::vector<double>& vX, HTimingPoint& tp, 
+  double GetOutputTimingPointAT(std::vector<double>& vX, HTimingPoint& tp, 
     std::vector<double>& arrivalTimes);
   bool CheckKuhn_Tucker(HTimingPoint point);
   void CheckKuhn_Tucker();
@@ -84,6 +86,7 @@ private:
 
   Maths::Regression::Linear* GetRegressionC(HTimingPointWrapper tp);
   Maths::Regression::Linear* GetRegressionR(HTimingPointWrapper tp);
+
   HMacroType RoundCellToTypeFromLib(HCell cellFrom, double currentX);
 
   void ApplySizing(std::vector<double>& X);
