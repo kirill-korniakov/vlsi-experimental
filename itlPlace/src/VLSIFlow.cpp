@@ -249,8 +249,7 @@ bool DoLRSizingIfRequired(HDPGrid& grid, const char* cfgOptName)
 				//LambdaMatrix lm (grid,grid.Design());
 				LRSizer sizer(grid.Design());
 				
-				sizer.doLRSizing();
-				//DoLRSizing(grid, grid.Design());
+				sizer.DoLRSizing();
 				WRITELINE("LRSizing finished");
 				return true;
 		}
@@ -358,17 +357,11 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DP");
     if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
-		
 		if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
     {
       WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
       ExportDEF(hd, "DefAfterLRSizing");
-      /*if (DoLegalizationIfRequired(DPGrid, "DesignFlow.Legalization"))
-        WriteFlowMetrics(flowMetrics, hd, "Legalization",  "LEG_LRS");*/
-      /*STA(hd);
-      WriteFlowMetrics(flowMetrics, hd, "LRSizingafterSTA", "LRS_STA");*/
     }
-
 
     DoSTAIfCan(hd);
 
