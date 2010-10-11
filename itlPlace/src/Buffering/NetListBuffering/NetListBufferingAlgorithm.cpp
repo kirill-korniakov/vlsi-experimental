@@ -89,7 +89,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
 
   if (data->printNetInfo)
   {    
-    ALERT("\t%d\t%d\t", ::ToID(criticalPath), data->design.CriticalPaths.GetInt<HCriticalPath::PointsCount>(criticalPath));
+    ALERT("Critical path id:%d\t%d\t", ::ToID(criticalPath), data->design.CriticalPaths.GetInt<HCriticalPath::PointsCount>(criticalPath));
   }
 
   if (data->typeBufferAddition != LEGAL_ADDITION)
@@ -201,6 +201,40 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
   return best;
 }
 
+int findRepeat(string str, string find)
+{
+  if (str.find(find) != -1)
+    int ttt = 9876876;
+  int strLength = str.length();
+  int i = 0;
+  int findLength = find.length();
+  bool f = false;
+  int result = 0;
+  while (i < strLength)
+  {
+    f = true;
+    for (int j = 0; j < findLength; j++, i++)
+    {
+      if (str[i] != find[j])
+      {
+        f = false;
+        break;
+      }
+    }
+    if (f) 
+      result++;
+    else 
+      i++;
+  }
+  return result;
+}
+
+bool PathBasedBuffering::IsLimitationCountCriticalPathExecute(int totalIndex)
+{
+  if (data->limitationCountCriticalPath == 0) return true;
+  return (totalIndex < data->design.CriticalPaths.Count() * data->limitationCountCriticalPath);
+}
+
 int PathBasedBuffering::BufferingNetlist()
 {
 
@@ -229,7 +263,7 @@ int PathBasedBuffering::BufferingNetlist()
     paths[idx++] = i;
   std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
 
-  while ((!isBufferingFinish) && (totalIndex < data->design.CriticalPaths.Count() * 2) && (ind < data->design.CriticalPaths.Count()))
+  while ((!isBufferingFinish) && IsLimitationCountCriticalPathExecute(totalIndex) && (ind < data->design.CriticalPaths.Count()))
   {
     bufferCount = 0;
     if (IsAppropriateNumberOfPins(data, paths[ind]))
@@ -241,12 +275,20 @@ int PathBasedBuffering::BufferingNetlist()
           data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::EndPoint, HCriticalPathPoint>(paths[ind])))))
           isBufferingNet = false;
 
-      /*for (HCriticalPath::PointsEnumeratorW point = (paths[ind],data->design).GetEnumeratorW(); point.MoveNext();)
+      if (data->IslimitationsCountRepeatNet())
       {
-        HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
-        if (net.Name().find(data->textIdentifierBufferedNet) != -1)
-          isBufferingNet = false;
-      }*/
+        int countRepeatNet = 0;
+        int curRepeatNet = 0;
+        for (HCriticalPath::PointsEnumeratorW point = (paths[ind],data->design).GetEnumeratorW(); point.MoveNext();)
+        {
+          HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
+          curRepeatNet = findRepeat(net.Name(), data->textIdentifierBufferedNet);
+          if (curRepeatNet > countRepeatNet) 
+            countRepeatNet = curRepeatNet;
+          if (countRepeatNet >= data->maxCountRepeatNet)
+            isBufferingNet = false;
+        }
+      }
 
       if (!isBufferingNet) 
       {
@@ -260,9 +302,12 @@ int PathBasedBuffering::BufferingNetlist()
       }
 
       if (data->printCriticalPathsInfo)
-        PrintPath(data->design, paths[ind], ::ToID(paths[ind]));       
-      bufferCount = BufferingCriticalPath(paths[ind]).GetPositionCount();
+      {
+        ALERT("Critical Paths number = %d", ind);
+        PrintPath(data->design, paths[ind], ::ToID(paths[ind])); 
+      }
       
+      bufferCount = BufferingCriticalPath(paths[ind]).GetPositionCount();
       totalBufferCount += bufferCount;
 
       if (bufferCount == 0)
@@ -271,19 +316,18 @@ int PathBasedBuffering::BufferingNetlist()
       }
       else
       {
-        STA(data->design, data->printTimingAfterBufferingCriticalPaths);
+        STA(data->design, data->printTimingAfterBufferingCriticalPaths, data->reRoutingSteinerTree);
         FindCriticalPaths(data->design);
         curTNS = Utils::TNS(data->design);
         curWNS = Utils::WNS(data->design);
+        
         if (curTNS < minTNS)
           minTNS = curTNS;
-        //else
-        //break;
         if (curWNS < minWNS)
           minWNS = curWNS;
-        //else
-        //break;
+
         paths.resize(data->design.CriticalPaths.Count());
+        
         int idx = 0;
         for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
           paths[idx++] = i;

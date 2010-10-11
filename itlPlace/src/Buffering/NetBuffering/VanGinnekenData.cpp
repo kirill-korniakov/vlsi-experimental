@@ -46,6 +46,9 @@ void VGAlgorithmData::DefaultValue()
   printTimingAfterBufferingCriticalPaths = false;
   textIdentifierBufferedNet = "__BufferedPart_";
   textIdentifierBuffer = "buf_";
+  reRoutingSteinerTree = false;
+  maxCountRepeatNet = 0;
+  limitationCountCriticalPath = 0;
 }
 
 
@@ -101,6 +104,9 @@ void VGAlgorithmData::Initialize()
   typeNetListBuffering = TypeNetListBuffering(design.cfg.ValueOf("TypeNetListBuffering", 0));
   printCriticalPathsInfo = design.cfg.ValueOf("Reporting.PrintCriticalPathsInfo", false);
   printTimingAfterBufferingCriticalPaths = design.cfg.ValueOf("Reporting.PrintTimingAfterBufferingCriticalPaths", false);
+  reRoutingSteinerTree = design.cfg.ValueOf("ReRoutingSteinerTree", false);
+  maxCountRepeatNet = reRoutingSteinerTree = design.cfg.ValueOf("MaxCountRepeatNet", 0);
+  limitationCountCriticalPath = reRoutingSteinerTree = design.cfg.ValueOf("limitationCountCriticalPath", 0);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;
@@ -184,6 +190,13 @@ bool VGAlgorithmData::IsBuffering()
     if (totalAreaBuffer > totalAllowableBuffersArea * totalAreaCells)
       return false;  
   return true;
+}
+
+bool VGAlgorithmData::IslimitationsCountRepeatNet()
+{
+  if (maxCountRepeatNet != 0)
+    return true;
+  return false;
 }
 
 double VGAlgorithmData::PercentAreaComposeBuffers()

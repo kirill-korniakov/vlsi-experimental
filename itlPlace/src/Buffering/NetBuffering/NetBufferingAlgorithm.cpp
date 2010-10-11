@@ -144,19 +144,24 @@ VGVariantsListElement NetBufferingAlgorithm::Algorithm(VanGinnekenTree* vGTree)
     Utils::PrintVariants(vGList);
     ALERT("R = %.2f",vGTree->GetR());
   }
+  double t0 = 0;
   for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
   {
     t = i->GetRAT() - i->GetC() * vGTree->GetR();
-
     if (t > tMax)
     {
       tMax = t;
       best = (*i);
     }
+
+    if (i->GetPositionCount() == 0)
+      t0 = t;
+
   }
+  
   if (data->printNetInfo)
   {
-    ALERT("best pos = %d\ttmax = %.20f\n", best.GetPositionCount(), tMax);
+    ALERT("best pos = %d\ttmax = %.15f\tt0 = %.15f\trat = %.15f\tdifferenceT = %.15f\tdifferenceRAT = %.15f\n", best.GetPositionCount(), tMax, t0, vGTree->GetSource()->GetRAT(), tMax - t0, tMax - vGTree->GetSource()->GetRAT());
   }
   delete vGList;
   if (data->printVariantsList)

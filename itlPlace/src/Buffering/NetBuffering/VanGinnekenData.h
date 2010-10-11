@@ -66,6 +66,7 @@ public:
   TypeBufferAddition typeBufferAddition;
   string textIdentifierBufferedNet;
   string textIdentifierBuffer;
+  
 
   bool* netVisit;
   string nameBufferingNet;
@@ -73,6 +74,10 @@ public:
   bool isExactPinCountRequired;
   bool isNetContainPrimaryPin;
   TypeNetListBuffering typeNetListBuffering;
+  bool reRoutingSteinerTree;
+  int maxCountRepeatNet;
+  int limitationCountCriticalPath;
+
 
   double totalAllowableBuffersArea;
   double totalAreaCells;
@@ -96,6 +101,7 @@ public:
 
   void LoadBuffers();
   bool IsBuffering();
+  bool IslimitationsCountRepeatNet();
   double PercentAreaComposeBuffers();
 
   void CalculationTotalAreaCells();

@@ -157,55 +157,40 @@ HSteinerPoint StandartAdditionNewElement::FindStartPoindInEdge(NewBuffer& buffer
   while ((i > buffer.Positions.GetPosition()->GetRoot()->index) && (!isFindStartPoint))
   {
     i--;
-    if (!buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->isCandidate() && !buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->isSink())
+    if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->isCandidate())
     {
-      isFindStartPoint = true;
-      if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->HasLeft())
-        if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->GetLeft()->index == 
-          buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i + 1]->index) 
-        {
-          isRight = false;
-          return buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->GetSteinerPoint(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->type != SOURCE_AND_SINK);
-        }
-        else
-        {
-          if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->HasRight())
-            if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->GetRight()->index ==
-              buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i + 1]->index)
-            { 
-              isRight = true;
-              return buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->GetSteinerPoint(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->type != SOURCE_AND_SINK);;
-            }
-            else
-            {          
-              int j = i;
-              i++;
-              while ((j > buffer.Positions.GetPosition()->GetRoot()->index) &&
-                (!(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetRight()->index ==
-                buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->index) &&
-                !(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetLeft()->index == 
-                buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->index))
-                )
-                j++;
-              if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetRight()->index ==
-                buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i]->index)
-                isRight = false;
-              else
-                isRight = true;
-              return buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetSteinerPoint(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->type != SOURCE_AND_SINK);;
-            }
-        }
+      NewBuffer* nb = FindBufferNumberByIndex(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i], newBuffer);
+      if (nb != NULL)
+        return vGAlgorithm->data->design.SteinerPoints[nb->source];
     }
-    NewBuffer* nb = FindBufferNumberByIndex(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[i], newBuffer);
-    if (nb != NULL)
-      return vGAlgorithm->data->design.SteinerPoints[nb->source];
+    else 
+      isFindStartPoint = true;
+  }
+  int lastCandidateInEdge = i + 1;
+  int j = i;
+  while (j >= buffer.Positions.GetPosition()->GetRoot()->index) 
+  {
+    if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->HasLeft())
+      if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetLeft()->index == lastCandidateInEdge) 
+      {
+        isRight = false;
+        return buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetSteinerPoint(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->type != SOURCE_AND_SINK);
+      }
+    if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->HasRight())
+      if (buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetRight()->index == lastCandidateInEdge)
+      {
+        isRight = true;
+        return buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->GetSteinerPoint(buffer.Positions.GetPosition()->GetTree()->vGTreeNodeList[j]->type != SOURCE_AND_SINK);;
+      }
+      j--;
   }
   return vGAlgorithm->data->design.SteinerPoints.Null();
 }
 
+
 HSteinerPoint StandartAdditionNewElement::FindEndPoindInEdge(NewBuffer& buffer, TemplateTypes<NewBuffer>::list& newBuffer)
 {
-  int i = buffer.Positions.GetPosition()->index;
+  int i = buffer.Positions.GetPosition()->index + 1;
   bool isFindEndPoint = false;
   while (!isFindEndPoint) 
   {
