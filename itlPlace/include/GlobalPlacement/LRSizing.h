@@ -51,8 +51,6 @@ private:
   double CalcDelay(HTimingPointWrapper& tp, std::vector<double>& vX);
   void UpdateVX(std::vector<double>& newVX, std::vector<double>& vMu);
 
-  std::vector<double> CalculateArrivalTimes(std::vector<double>& vX);
-
   double FindOutputLambdaSum(HTimingPoint point);
   double FindInputLambdaSum(HTimingPoint point);
 
@@ -61,7 +59,7 @@ private:
 
   //debug functions
   HSteinerPointWrapper GetParentStPoint(HSteinerPointWrapper& point,HSteinerPointWrapper& srcPoint);
-  double GetInputTimigPointAT(std::vector<double>& vX,HTimingPoint& tp,std::vector<double>& arrivalTimes);
+  double GetInputTimingPointAT(std::vector<double>& vX,HTimingPoint& tp,std::vector<double>& arrivalTimes);
   std::vector<double> GetArrivalTimes(std::vector<double>& vX);
   void LRSizer::initVX(std::vector<double>& vX);
   double TestCalculateInputTPDelay(std::vector<double>& vX, HTimingPoint& tp, 
@@ -73,21 +71,15 @@ private:
   double CalcCriterion(std::vector<double>& vCurrentX);
   void PrintPinsCharacteristics();
   void PrintMacroTypeCharacteristics();
-  void GetNetStPEdges(HNet net,std::vector<StPEdge>& StPEdges);
-  void GetStPEdges();
-  void PlotNetSteinerTree(HNet net, Color color);
-  double GetLength(StPEdge edge);
-
+  
   void GetCellFamily(HCell cell, std::vector<double>& cellSizes);	
   void GetCellFamily(HCell cell, std::vector<HMacroType>& macroTypesInFamily);
 
   void GetPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X);
-  void GetPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X);
   void GetArcFamilyR(HPin startPin, HPin endPin, std::vector<double>& R, std::vector<double>& invX);
 
 
   Maths::Regression::Linear* GetRegressionC(HTimingPointWrapper tp);
-  Maths::Regression::Linear* GetRegressionR(HTimingPointWrapper tp);
   Maths::Regression::Linear* GetRegressionR(HPin inputPin, HPin outputPin);
   HMacroType RoundCellToTypeFromLib(HCell cellFrom, double currentX);
 
