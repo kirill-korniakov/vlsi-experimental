@@ -83,6 +83,8 @@ private:
 
   void GetPinFamilyC(HPin pin, std::vector<double>& C, std::vector<double>& X);
   void GetPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X);
+  void GetArcFamilyR(HPin startPin, HPin endPin, std::vector<double>& R, std::vector<double>& invX);
+
 
   Maths::Regression::Linear* GetRegressionC(HTimingPointWrapper tp);
   Maths::Regression::Linear* GetRegressionR(HTimingPointWrapper tp);
@@ -92,6 +94,7 @@ private:
   void ApplySizing(std::vector<double>& X);
   double GetMacroTypeSize(HMacroType macroType);
   string GetMacroTypeFamilyName(HMacroType macroType);
+ 
 };
 
 class MacroTypeSizesComparator{

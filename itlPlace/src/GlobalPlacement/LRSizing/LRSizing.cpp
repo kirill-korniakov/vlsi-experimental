@@ -316,10 +316,41 @@ std::string LRSizer::GetMacroTypeFamilyName(HMacroType macroType)
   return macroTypeName.substr(0, macroTypeName.length()-2);
 }
 
+void LRSizer::GetArcFamilyR(HPin startPin, HPin endPin, std::vector<double>& R, std::vector<double>& invX)
+{
+  ASSERT((startPin, design).Direction() == PinDirection_INPUT);
+  ASSERT((endPin, design).Direction() == PinDirection_OUTPUT);
+  ASSERT((endPin, design).Cell() == (startPin, design).Cell()); //Pins are on one cell
+
+  for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext(); )
+  {
+    std::string cellName = macroTypeE.Name();
+    if (cellName == (design, (endPin, design).Cell()).Name())
+    {
+      for(HMacroType::PinsEnumeratorW pinE = macroTypeE.GetEnumeratorW(); pinE.MoveNext();)
+      {
+        if(pinE.Direction() == PinDirection_OUTPUT && pinE.Name() == design.GetString<HPin::Name>(endPin))
+        {
+          for(HPinType::ArcsEnumeratorW arcE = pinE.GetArcsEnumeratorW(); arcE.MoveNext();)
+          {
+            HPinType pinWhichConnectsToPinE = arcE.GetStartPinType(pinE);
+            if (design[pinWhichConnectsToPinE].Name() == (endPin, design).Name())
+            {
+              invX.push_back(1.0 / GetMacroTypeSize(macroTypeE));
+              R.push_back(arcE.ResistanceRise());
+            }
+          }
+        }
+      }
+    }
+  }
+  ASSERT(R.size() == invX.size());
+}
+
 void LRSizer::GetPinFamilyR(HPin pin, std::vector<double>& R, std::vector<double>& X)
 {
-  /* UNCOMMENT!!!!!
-  ASSERT((pin,design).Direction() == PinDirection_INPUT); //Now only for input pins
+  /*
+    TODO: THIS METHOD IS TO BE DELETED due to existence of GetArcFamilyR
   */
   HCell cell = (design,pin).Cell();
   string cellFamily = GetMacroTypeFamilyName((cell,design).Type());
@@ -1102,7 +1133,7 @@ bool LRSizer::CheckStopConditionForLDP(std::vector<double>& vX, double errorBoun
     Sum += vX[i];
   if ((Sum - CalculateQ((int)vX.size())) < errorBound) 
     return true;
-  else false;
+  else return false;
 } 
 
 double LRSizer::CalcCriterion(std::vector<double>& vCurrentX)
@@ -1142,6 +1173,9 @@ Maths::Regression::Linear* LRSizer::GetRegressionC( HTimingPointWrapper tp )
 
 Maths::Regression::Linear* LRSizer::GetRegressionR(HTimingPointWrapper tp)
 {
+  /*
+    TODO: THIS METHOD IS TO BE DELETED due to existence of GetRegressionR(HPin inputPin, HPin outputPin)
+  */
   HPin pin = tp.Pin();
   std::vector<double> R, X;
   GetPinFamilyR(pin, R, X);
@@ -1157,34 +1191,13 @@ Maths::Regression::Linear* LRSizer::GetRegressionR(HTimingPointWrapper tp)
 Maths::Regression::Linear* LRSizer::GetRegressionR(HPin inputPin, HPin outputPin)
 {
   std::vector<double> R, invX;
-  for (HMacroTypes::EnumeratorW macroTypeE = design.MacroTypes.GetEnumeratorW(); macroTypeE.MoveNext(); )
-  {
-    std::string cellName = macroTypeE.Name();
-    if (cellName == (design, (outputPin, design).Cell()).Name())
-    {
-      double cellSize=GetMacroTypeSize(macroTypeE);
-      for(HMacroType::PinsEnumeratorW pinE = macroTypeE.GetEnumeratorW(); pinE.MoveNext();)
-      {
-        if(pinE.Direction() == PinDirection_OUTPUT && pinE.Name() == design.GetString<HPin::Name>(outputPin))
-        {
-          for(HPinType::ArcsEnumeratorW arcE = pinE.GetArcsEnumeratorW(); arcE.MoveNext();)
-          {
-            HPinType pinWhichConnectsToPinE = arcE.GetStartPinType(pinE);
-            if (design[pinWhichConnectsToPinE].Name() == (inputPin, design).Name())
-            {
-              invX.push_back(1.0 / cellSize);
-              R.push_back(arcE.ResistanceRise());
-            }
-          }
-        }
-      }
-    }
-  }
-  unsigned int numOfAlternatives = (int)R.size();
-  double* arrInvX = new double[numOfAlternatives];
-  copy(invX.begin(), invX.end(), arrInvX);
+  GetArcFamilyR(inputPin, outputPin, R, invX);
+  int numOfAlternatives = (int)R.size();
   double* arrR = new double[numOfAlternatives];
   copy(R.begin(), R.end(), arrR);
+  double* arrInvX = new double[numOfAlternatives];
+  copy(invX.begin(), invX.end(), arrInvX);
+  ASSERT(R.size() > 1);
   return new Maths::Regression::Linear((int)R.size(), arrInvX, arrR);
 }
 
