@@ -2,7 +2,7 @@
 #include "NetBufferingAlgorithm.h"
 #include "HDPGrid.h"
 
-VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data): pGrid(data->design, data->sizeBuffer)
+VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data)
 {
   vGAlgorithmData = data;
 
@@ -29,6 +29,7 @@ VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data): pGrid(data->design, dat
 
   if (data->typePartition == LEGAL_POSITIONS_ONLY) 
   {
+    pGrid = new HPlacementGrid(data->design, data->sizeBuffer);
     updateVanGinnekenTree = new UpdateVanGinnekenTree(this);
     vanGinnekenTreeNodeCreate = new VanGinnekenTreeLegalDynamicDistributionNodeCreate(this);
     calculateVanGinnekenSubtree = new CalculateVanGinnekenSubtree(this);

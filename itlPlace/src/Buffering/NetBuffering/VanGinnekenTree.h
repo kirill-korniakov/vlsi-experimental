@@ -23,7 +23,7 @@ public:
   VGAlgorithmData* vGAlgorithmData;
   HDPGrid* DPGrid;
   VanGinnekenTreeNode** vGTreeNodeList;
-  HPlacementGrid pGrid;
+  HPlacementGrid* pGrid;
 
   UpdateVanGinnekenTree* updateVanGinnekenTree;
   VanGinnekenTreeNodeCreate* vanGinnekenTreeNodeCreate;

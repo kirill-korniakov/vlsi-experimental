@@ -52,7 +52,7 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
 
   buffer.SetOrientation(Orientation_N);
   vGAlgorithm->data->design.Pins.AllocatePins(buffer);
-  position.GetPosition()->GetTree()->pGrid.SetCell(buffer);
+  //position.GetPosition()->GetTree()->pGrid->SetCell(buffer);
   NewBuffer buf;
   buf.Positions = position;
   buf.cell = buffer;
@@ -374,7 +374,7 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     x = position.GetPosition()->x;
   else
     x = position.GetPosition()->x - buffer.Width() * 0.5;
-  int column = position.GetPosition()->GetTree()->pGrid.GetColumn(x);
+  int column = position.GetPosition()->GetTree()->pGrid->GetColumn(x);
 
   double y = 0;
   if ((vGAlgorithm->data->typePartition == LEGAL_POSITIONS_ONLY) && position.GetPosition()->isCandidate() && 
@@ -382,10 +382,10 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     y = position.GetPosition()->y;
   else
     y = position.GetPosition()->y - buffer.Height() * 0.5;
-  int row = position.GetPosition()->GetTree()->pGrid.GetRow(y);
+  int row = position.GetPosition()->GetTree()->pGrid->GetRow(y);
 
-  double newX = position.GetPosition()->GetTree()->pGrid.GetNode(row, column)->GetX();
-  double newY = position.GetPosition()->GetTree()->pGrid.GetNode(row, column)->GetY();
+  double newX = position.GetPosition()->GetTree()->pGrid->GetNode(row, column)->GetX();
+  double newY = position.GetPosition()->GetTree()->pGrid->GetNode(row, column)->GetY();
   buffer.SetX(newX);
   buffer.SetY(newY);
 
@@ -399,18 +399,18 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     x4 = newX + buffer.Width(), y4 = newY + buffer.Height();
   double  bufferWidth =  buffer.Width();
 
-  int rowBegin = position.GetPosition()->GetTree()->pGrid.GetRow(y1);
-  int rowEnd = position.GetPosition()->GetTree()->pGrid.GetRow(y3);
-  int columnBegin = position.GetPosition()->GetTree()->pGrid.GetColumn(x1);
-  int columnEnd = position.GetPosition()->GetTree()->pGrid.GetColumn(x4);
+  int rowBegin = position.GetPosition()->GetTree()->pGrid->GetRow(y1);
+  int rowEnd = position.GetPosition()->GetTree()->pGrid->GetRow(y3);
+  int columnBegin = position.GetPosition()->GetTree()->pGrid->GetColumn(x1);
+  int columnEnd = position.GetPosition()->GetTree()->pGrid->GetColumn(x4);
   HCell* intersept = new HCell [abs(rowEnd - rowBegin) * abs(columnEnd - columnBegin)];
-  position.GetPosition()->GetTree()->pGrid.CellInZone(newX, newY, buffer.Width(), buffer.Height(), interseptCount, intersept);
+  position.GetPosition()->GetTree()->pGrid->CellInZone(newX, newY, buffer.Width(), buffer.Height(), interseptCount, intersept);
   double leftShift = 0;
   double leftRight = 0;
   for (int i = 0; i < interseptCount; i++)
   {
     HCellWrapper cw = vGAlgorithm->data->design[intersept[i]];
-    position.GetPosition()->GetTree()->pGrid.ExtractCell(cw);
+    position.GetPosition()->GetTree()->pGrid->ExtractCell(cw);
     double cwx = cw.X(), cwy = cw.Y();
     double cwWidth = cw.Width();
     if (cw.X() < (newX + buffer.Width() / 2.0))
@@ -422,12 +422,12 @@ void LegalAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& newBu
     {
       cw.SetX(newX + buffer.Width());
     }
-    position.GetPosition()->GetTree()->pGrid.SetCell(cw);
+    position.GetPosition()->GetTree()->pGrid->SetCell(cw);
   }
   if (interseptCount > 0)
     delete [] intersept;
 
-  position.GetPosition()->GetTree()->pGrid.SetCell(buffer);
+  position.GetPosition()->GetTree()->pGrid->SetCell(buffer);
   NewBuffer buf;
   buf.Positions = position;
   buf.cell = buffer;

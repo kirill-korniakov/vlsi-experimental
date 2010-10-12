@@ -172,7 +172,7 @@ void VanGinnekenTreeLegalDynamicDistributionNodeCreate::CreatePotentialBufferPoi
   ry = vGTree->vGTreeNodeList[rootIndex]->y;
   nx = vGTree->vGAlgorithmData->design[node].X();
   ny = vGTree->vGAlgorithmData->design[node].Y();
-  PlacementGridNode **path = vGTree->pGrid.GetPath(lenPath, rx, ry, nx, ny);    
+  PlacementGridNode **path = vGTree->pGrid->GetPath(lenPath, rx, ry, nx, ny);    
   for (int i = 0; i < lenPath; i++)
   {
     vGTree->vGTreeNodeList[rootIndex]->SetLeft(CreatePotentialBufferPoint(net, CANDIDATE, nodeIndex, vanGinnekenTreeNodeRoot, tree));
@@ -368,10 +368,10 @@ void FindMaxPointInEdgeVanGinnekenTreeLegalDynamicDistribution::FindNewMaxPointI
   nx = vGTree->vGAlgorithmData->design[nextPoint].X();
   ny = vGTree->vGAlgorithmData->design[nextPoint].Y();
 
-  int rsy = vGTree->pGrid.GetRow(ry);
-  int rfy = vGTree->pGrid.GetRow(ny);
-  int rsx = vGTree->pGrid.GetColumn(rx);
-  int rfx = vGTree->pGrid.GetColumn(nx);
+  int rsy = vGTree->pGrid->GetRow(ry);
+  int rfy = vGTree->pGrid->GetRow(ny);
+  int rsx = vGTree->pGrid->GetColumn(rx);
+  int rfx = vGTree->pGrid->GetColumn(nx);
 
   int RowCount = abs(rsy - rfy) + 1;
   int ColumnCount = abs(rsx - rfx) + 1;

@@ -106,7 +106,7 @@ void VGAlgorithmData::Initialize()
   printTimingAfterBufferingCriticalPaths = design.cfg.ValueOf("Reporting.PrintTimingAfterBufferingCriticalPaths", false);
   reRoutingSteinerTree = design.cfg.ValueOf("ReRoutingSteinerTree", false);
   maxCountRepeatNet = reRoutingSteinerTree = design.cfg.ValueOf("MaxCountRepeatNet", 0);
-  limitationCountCriticalPath = reRoutingSteinerTree = design.cfg.ValueOf("limitationCountCriticalPath", 0);
+  limitationCountCriticalPath = reRoutingSteinerTree = design.cfg.ValueOf("LimitationCountCriticalPath", 0);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;
