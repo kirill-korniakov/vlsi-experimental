@@ -23,7 +23,7 @@ TERMINATED = 'Terminated'
 
 class TestRunner:
     parameters = ''
-    comment    = ''
+    errors    = ''
     experimentResult = OK
 
     experimentsToCompare = {} #Group of experiments. Theit results will be compared
@@ -246,7 +246,7 @@ class TestRunner:
                 p.terminate()
 
                 if (self.nTerminatedBenchmarks >= 3):
-                    self.comment += 'Reached maximum number of terminated benchmarks\n'
+                    self.errors += 'Reached maximum number of terminated benchmarks\n'
                     return (reportTable)
 
             else:
@@ -319,7 +319,7 @@ class TestRunner:
             startTime = GetTimeStamp()
             print('Start time: ' + startTime)
             self.experimentResult = OK
-            self.comment = ''
+            self.errors = ''
 
             self.newBenchmarks        = ''
             self.failedBenchmarks     = ''
@@ -348,7 +348,7 @@ class TestRunner:
             text += self.PrintXXXBenchmarks('Terminated: ', self.nTerminatedBenchmarks, self.terminatedBenchmarks)
             text += self.PrintXXXBenchmarks('NEW:        ', self.nNewBenchmarks, self.newBenchmarks)
 
-            text += self.comment
+            text += self.errors
             text += '\n'
 
             if (self.experimentResult == CHANGED):

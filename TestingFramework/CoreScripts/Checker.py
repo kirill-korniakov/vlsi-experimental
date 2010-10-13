@@ -63,7 +63,7 @@ class Checker(BaseExperiment):
         masterValues  = self.ParseLog(masterLogName)
 
         if (masterValues == []):
-            print('experiment has not failed but master log is empty\n')
+            print('experiment has not failed but master log is empty or does not exist\n')
             return [NEW, currentValues]
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)

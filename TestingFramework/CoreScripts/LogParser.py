@@ -16,9 +16,14 @@ class LogParser:
         self.parameters = parameters
 
     def GetFromTable(self, stageTag, metricTag, tableType = PFST):
-        log = open(self.logName, 'r')
-        lines = log.readlines()
-        log.close()
+        try:
+            log = open(self.logName, 'r')
+            lines = log.readlines()
+            log.close()
+
+        except IOError:
+            print('Error: can not open file ' + self.logName)
+            return NOT_FOUND
 
         #move to the table
         lineIdx       = 0
