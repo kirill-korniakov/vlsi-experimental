@@ -1,6 +1,0 @@
-Placement Flow Stages Table
-StageName    Tag  Time(sec) Cells  HPWL(nm)   TWL(nm)    TNS(ns) WNS(ns)
-------------------------------------------------------------------------
-InitialState INIT     4,767 46771 640490719 640490719 23755,8700 38,3403
-
-[    65.575] Thats All!
