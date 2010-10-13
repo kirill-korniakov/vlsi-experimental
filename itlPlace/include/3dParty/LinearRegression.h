@@ -82,8 +82,8 @@ namespace Maths
         // calculate regression line parameters
 
         // make sure slope is not infinite
-        if(fabs(xx)==0)
-          ALERT("fabs(xx)==0!!");
+//        if(fabs(xx)==0)
+          //printf("fabs(xx)==0!!");
         assert(fabs(xx) != 0);
 
         m_b = xy / xx;
