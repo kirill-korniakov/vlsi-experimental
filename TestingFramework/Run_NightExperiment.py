@@ -42,12 +42,12 @@ def NightExperiment(testRunner):
     exp_W.SetConfig('APlace_weighting.cfg')
     chk_APW = Checker(exp_W, "MasterLogs/Weighting/SensitivityGuided")
 
+    testRunner.Append(chk_BUF)
     testRunner.AddExperimentToGroup(chk_SGW)
     testRunner.AddExperimentToGroup(chk_APW)
     testRunner.Append(chk_HPWL_IWLS)
     testRunner.Append(chk_HPWL_ISPD)
     testRunner.Append(chk_LR)
-    testRunner.Append(chk_BUF)
     testRunner.Append(chk_HDP)
     testRunner.Run()
 
