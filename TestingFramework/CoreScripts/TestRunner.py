@@ -42,18 +42,26 @@ class TestRunner:
         self.parameters = parameters
         self.parameters.experiments = []
 
+    def SendErrorMessageAndExit(self, subject, text, attachmentFiles = []):
+        emailer = Emailer()
+        emailer.PrepareAndSendMailIfRequired(subject, text, attachmentFiles)
+        exit(1)
+
     def BuildSln(self, slnPath, mode = "Rebuild"):
         print('Building solution...')
+        res  = 0
         args = [Tools.MSBuild, slnPath, '/t:' + mode, '/p:Configuration=Release']
-        #subprocess.Popen(subprocess.list2cmdline(args), stdout = buildLogFile).communicate()
-        res = subprocess.call(args)
+
+        try:
+            res = subprocess.call(args)
+
+        except WindowsError:
+            self.SendErrorMessageAndExit('Night experiments', 'Error: can not call' + Tools.MSBuild)
 
         if (res != 0):
             print('Build failed!')
             buildLog = GeneralParameters.buildLog
-            emailer  = Emailer()
-            emailer.PrepareAndSendMail('Night experiments', 'build failed', [buildLog])
-            exit(1)
+            self.SendErrorMessageAndExit('Night experiments', 'build failed', [buildLog])
 
     def ExtractBenchmarkList(self, benchmarksListPath):
         benchmarks = (open(benchmarksListPath).read()).split('\n')
@@ -227,8 +235,14 @@ class TestRunner:
                 params.append(lefFile)
 
             benchmarkResult = ''
-            #subprocess.call(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
-            p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+
+            try:
+                p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+
+            except WindowsError:
+                print('Error: can not call ' + GeneralParameters.binDir + 'itlPlaceRelease.exe')
+                self.SendErrorMessageAndExit('Night experiments', 'can not start itlPlaceRelease.exe')
+
             t_start = time.time()
             seconds_passed = 0
 
@@ -298,18 +312,18 @@ class TestRunner:
 
             for i in range(10):
                 #TODO: implement non HEAD revision
-                retcode = svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
+                try:
+                    retcode = svn.CheckOut(RepoParameters.srcRepoPath, GeneralParameters.checkoutPath)
+
+                except WindowsError:
+                    self.SendErrorMessageAndExit('Night experiments', 'Error: can not call svn.exe')
 
                 if retcode == 0:
                     break
 
             if retcode != 0:
                 text = 'svn error: checkout failed!'
-
-                if (self.parameters.doSendMail == True):
-                    emailer.PrepareAndSendMail(subject, text, attachmentFiles)
-
-                return -1
+                self.SendErrorMessageAndExit(subject, text, attachmentFiles)
 
         if self.parameters.doBuild:
             cp.CoolPrint('Build')
@@ -357,8 +371,7 @@ class TestRunner:
 
         text += 'Finished at ' + GetTimeStamp()
         print(text)
-        if (self.parameters.doSendMail == True):
-            emailer.PrepareAndSendMail(subject, text, attachmentFiles)
+        emailer.PrepareAndSendMailIfRequired(subject, text, attachmentFiles)
 
         if (len(self.experimentsToCompare) > 1):
             cp.CoolPrint('Comaparing experiments')
