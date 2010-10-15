@@ -208,18 +208,25 @@ class TestRunner:
             WriteStringToFile(cols, resultFileName)
 
     def RunExperiment(self, experiment):
-        benchmarks = self.ExtractBenchmarkList(experiment.benchmarks)
+        #self.ExtractBenchmarkList(experiment.benchmarks)
 
         print('Config: %s' % experiment.cfg)
         print('List:   %s' % experiment.benchmarks)
-        print("Benchmarks:\n" + ", ".join(benchmarks))
-        print("\n")
 
         reportCreator = ReportCreator(experiment.cfg)
         logFolder     = reportCreator.CreateLogFolder()
         reportTable   = reportCreator.GetReportTableName()
-
         experiment.CreateEmptyTable(reportTable)
+
+        (areExperimentParametersOk, errors, benchmarks) = experiment.CheckParametersAndPrepareBenchmarks()
+
+        if (errors != ''):
+            self.errors += 'Error: ' + errors + '\n'
+
+        if (not areExperimentParametersOk):
+            self.experimentResult = FAILED
+            return (reportTable)
+
         self.experimentResult = OK
 
         for benchmark in benchmarks:

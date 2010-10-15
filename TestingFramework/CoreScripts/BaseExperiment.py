@@ -44,6 +44,69 @@ class BaseExperiment:
     def SetBenchmarksList(self, benchmarks):
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
 
+    #returns list: [status, errors]
+    #status: True if parameters are ok, False otherwise
+    #errors: description of errors if happen, '' if not
+    def CheckParameters(self):
+        #check if config file can be found
+        if (not os.path.exists(self.cfg)):
+            return ([False, 'file "' + self.cfg + '" not found'])
+
+        #check if benchmarks list file can be found
+        if (not os.path.exists(self.benchmarks)):
+            return ([False, 'file "' + self.benchmarks + '" not found'])
+
+        return ([True, ''])
+
+    #returns list: [status, notFoundBenchmarks, benchmarks]
+    #status: True if at least one benchmark was found, False otherwise
+    #notFoundBenchmarksStr: string with benchmarks which were not found
+    #benchmarks: list of benchmarks which were found
+    def PrepareBenchmarks(self):
+        notFoundBenchmarksStr = ''
+        notFoundBenchmarks    = []
+        benchmarks            = (open(self.benchmarks).read()).split('\n')
+
+        # Perform filtering of empty lines and commented by # benchmarks
+        benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
+        benchmarks = [x for x in benchmarks if len(x.strip())]
+
+        print("Benchmarks:\n" + ", ".join(benchmarks))
+        print("\n")
+
+        #check if all benchmarks can be found
+        for i in range(len(benchmarks)):
+            benchmark = os.path.dirname(os.path.abspath(self.benchmarks)) + "/" + benchmarks[i] + ".def"
+
+            if (not os.path.exists(benchmark)):
+                notFoundBenchmarks.append(benchmarks[i])
+
+        #print and delete from list benchmarks which were not found
+        if (notFoundBenchmarks != []):
+            for benchmark in notFoundBenchmarks:
+                benchmarks.remove(benchmark)
+                notFoundBenchmarksStr += ' "' + benchmark + '";'
+
+            notFoundBenchmarksStr += ' were not found!'
+            print('Error: benchmarks ' + notFoundBenchmarksStr)
+
+        nFoundBenchmarks = len(benchmarks)
+        status           = (nFoundBenchmarks > 0)
+        return (status, notFoundBenchmarksStr, benchmarks)
+
+    #returns list: [status, errors, benchmarks]
+    #status: True if parameters are ok, False otherwise
+    #errors: description of errors if happen, '' if not
+    #benchmarks: list of benchmarks which were found
+    def CheckParametersAndPrepareBenchmarks(self):
+        chekResult = self.CheckParameters()
+
+        if (not chekResult[0]):
+            chekResult.append([])
+            return (chekResult)
+
+        return self.PrepareBenchmarks()
+
     def CreateEmptyTable(self, reportTable):
         cols = ['Benchmark', END_OF_COLUMN]
 
