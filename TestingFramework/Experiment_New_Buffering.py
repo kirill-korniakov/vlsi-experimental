@@ -11,11 +11,6 @@ class Experiment_New_Buffering(BaseExperiment):
         BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)',\
             'New_buffering.cfg', 'IWLS_GP_r1511_New_Buffering.list', _metrics, _stages)
 
-    def CreateEmptyTable(self, reportTable):
-        po = open(reportTable, 'w')
-        po.close()
-
-
 def test():
     testRunner = TestRunner()
     e = Experiment_New_Buffering()

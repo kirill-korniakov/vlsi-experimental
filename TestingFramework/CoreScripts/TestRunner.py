@@ -63,15 +63,6 @@ class TestRunner:
             buildLog = GeneralParameters.buildLog
             self.SendErrorMessageAndExit('Night experiments', 'build failed', [buildLog])
 
-    def ExtractBenchmarkList(self, benchmarksListPath):
-        benchmarks = (open(benchmarksListPath).read()).split('\n')
-
-        # Perform filtering of empty lines and commented by # benchmarks
-        benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
-        benchmarks = [x for x in benchmarks if len(x.strip())]
-
-        return benchmarks
-
     def PrintXXXBenchmarks(self, status, nXXXBenchmarks, benchmarks = ''):
         if (nXXXBenchmarks == 0):
             return ('')
@@ -208,8 +199,6 @@ class TestRunner:
             WriteStringToFile(cols, resultFileName)
 
     def RunExperiment(self, experiment):
-        #self.ExtractBenchmarkList(experiment.benchmarks)
-
         print('Config: %s' % experiment.cfg)
         print('List:   %s' % experiment.benchmarks)
 
