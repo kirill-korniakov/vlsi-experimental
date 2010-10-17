@@ -136,6 +136,8 @@ VGVariantsListElement NetBufferingAlgorithm::Algorithm(VanGinnekenTree* vGTree)
   VGVariantsListElement best;
   double tMax = -INFINITY;
 
+  double del = data->design.GetDouble<HSteinerPoint::PathDelay>(vGTree->vGTreeNodeList[vGTree->updateVanGinnekenTree->treeSize-1] ->GetSteinerPoint());
+
   TemplateTypes<VGVariantsListElement>::list* vGList = createVGListAlgorithm->CreateVGList(vGTree);
 
   if (data->printVariantsList)
@@ -145,6 +147,7 @@ VGVariantsListElement NetBufferingAlgorithm::Algorithm(VanGinnekenTree* vGTree)
     ALERT("R = %.2f",vGTree->GetR());
   }
   double t0 = 0;
+  
   for (TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin(); i != vGList->end(); ++i)
   {
     t = i->GetRAT() - i->GetC() * vGTree->GetR();
@@ -156,12 +159,11 @@ VGVariantsListElement NetBufferingAlgorithm::Algorithm(VanGinnekenTree* vGTree)
 
     if (i->GetPositionCount() == 0)
       t0 = t;
-
   }
   
   if (data->printNetInfo)
   {
-    ALERT("best pos = %d\ttmax = %.15f\tt0 = %.15f\trat = %.15f\tdifferenceT = %.15f\tdifferenceRAT = %.15f\n", best.GetPositionCount(), tMax, t0, vGTree->GetSource()->GetRAT(), tMax - t0, tMax - vGTree->GetSource()->GetRAT());
+    ALERT("best pos = %d\ttmax = %.15f\tt0 = %.15f\trat = %.15f\tdifferenceT = %.15f\tdifferenceRAT = %.15f\n", best.GetPositionCount(), tMax, t0, vGTree->GetSource()->GetSinkRAT(), tMax - t0, tMax - vGTree->GetSource()->GetSinkRAT());
   }
   delete vGList;
   if (data->printVariantsList)

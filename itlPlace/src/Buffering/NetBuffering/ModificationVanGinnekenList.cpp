@@ -116,27 +116,75 @@ void StandartModificationVanGinnekenList::SortVGVariantsListElement(TemplateType
 {
   TemplateTypes<VGVariantsListElement>::list::iterator i = vGList->begin();
   TemplateTypes<VGVariantsListElement>::list::iterator j = i;
+  bool isDeleteVariantsListElement = false;
 
   while (i != vGList->end())
   {
-    j++;
+    if ((!isDeleteVariantsListElement) || (i == j))
+      j++;
+
+    isDeleteVariantsListElement = false;
     if (j == vGList->end())
       break;
 
-    if ((i->GetRAT() >= j->GetRAT()) && (i->GetC() <= j->GetC()))
+    if ((i->GetRAT() > j->GetRAT()) && (i->GetC() < j->GetC()))
     {
       TemplateTypes<VGVariantsListElement>::list::iterator j1 = j;
       j++;
       vGList->erase(j1);
+      isDeleteVariantsListElement = true;
+      continue;
     }
     else
+    {
       if ((i->GetRAT() < j->GetRAT()) && (i->GetC() > j->GetC()))
       {
         TemplateTypes<VGVariantsListElement>::list::iterator i1 = i;
-        ++i;
+        i++;
         vGList->erase(i1);
+        isDeleteVariantsListElement = true;
+        continue;
       }
-      i = j;   
+      else
+      {
+        if ((i->GetRAT() > j->GetRAT()) && (fabs(i->GetC() - j->GetC()) < ZERO))
+        {
+          TemplateTypes<VGVariantsListElement>::list::iterator j1 = j;
+          j++;
+          vGList->erase(j1);
+          isDeleteVariantsListElement = true;
+          continue;
+        }
+        else
+          if ((i->GetRAT() < j->GetRAT()) && (fabs(i->GetC() - j->GetC()) < ZERO))
+          {
+            TemplateTypes<VGVariantsListElement>::list::iterator i1 = i;
+            i++;
+            vGList->erase(i1);
+            isDeleteVariantsListElement = true;
+            continue;
+          }
+
+          if ((fabs(i->GetRAT() - j->GetRAT()) < ZERO) && (i->GetC() < j->GetC()))
+          {
+            TemplateTypes<VGVariantsListElement>::list::iterator j1 = j;
+            j++;
+            vGList->erase(j1);
+            isDeleteVariantsListElement = true;
+            continue;
+          }
+          else
+            if ((fabs(i->GetRAT() - j->GetRAT()) < ZERO) && (i->GetC() > j->GetC()))
+            {
+              TemplateTypes<VGVariantsListElement>::list::iterator i1 = i;
+              i++;
+              vGList->erase(i1);
+              isDeleteVariantsListElement = true;
+              continue;
+            }
+      }
+    }
+    i = j;   
   }
 }
 
@@ -199,7 +247,8 @@ StandartModificationVanGinnekenList::CreateNewVGList(VanGinnekenTreeNode* node)
   TemplateTypes<VGVariantsListElement>::list* newList = new TemplateTypes<VGVariantsListElement>::list();
   VGVariantsListElement element;
   element.SetC(node->GetC());
-  element.SetRAT(node->GetRAT());  
+  element.SetRAT(node->GetSinkRAT());  
+
   vGAlgorithm->data->maxIndex = vGAlgorithm->data->maxIndex + 1;
   element.SetIndex(vGAlgorithm->data->maxIndex);
   newList->push_back(element);

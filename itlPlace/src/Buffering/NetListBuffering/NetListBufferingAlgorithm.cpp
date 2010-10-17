@@ -247,7 +247,6 @@ int PathBasedBuffering::BufferingNetlist()
   
   int totalBufferCount = 0;
   ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
-  //for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
   bool isBufferingFinish = false;
   int totalIndex = 0;
   int ind = 0;
@@ -300,12 +299,35 @@ int PathBasedBuffering::BufferingNetlist()
         ind++;
         continue; 
       }
+      if (data->nameBufferingNet != "")
+      {
+        HPinWrapper firstPin = data->design[data->design[data->design[data->design[paths[ind]].StartPoint()].TimingPoint()].Pin()];
+        HPinWrapper lastPin = data->design[data->design[data->design[data->design[paths[ind]].EndPoint()].TimingPoint()].Pin()];
+
+        HCellWrapper firstCell = data->design[firstPin.Cell()];
+        HCellWrapper lastCell = data->design[lastPin.Cell()];
+
+        string pathName = 
+          string("From    ") + 
+          (firstPin.IsPrimary() ?  string("PIN") : firstCell.Name()) +
+          firstPin.Name().c_str() +
+          string("    To    ") +
+          (lastPin.IsPrimary() ?  string("PIN") : lastCell.Name()) +
+          lastPin.Name();
+
+        if (pathName != data->nameBufferingNet)
+        {
+          ind++;
+          continue; 
+        }
+      }
 
       if (data->printCriticalPathsInfo)
       {
         ALERT("Critical Paths number = %d", ind);
         PrintPath(data->design, paths[ind], ::ToID(paths[ind])); 
       }
+
       
       bufferCount = BufferingCriticalPath(paths[ind]).GetPositionCount();
       totalBufferCount += bufferCount;

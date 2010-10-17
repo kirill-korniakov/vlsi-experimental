@@ -37,9 +37,10 @@ public:
    VanGinnekenTree* GetTree(); 
    VanGinnekenTreeNode* GetRoot();
 
-  virtual double GetRAT();//RAT in sinc
+  virtual double GetSinkRAT();//RAT in sinc
+  virtual double GetSourceRAT();//RAT in source
   virtual double GetC();//capacity in sinc
-  virtual double GetR();//resistance in source
+  virtual double GetR(bool isRequiredArc = false);//resistance in source
   virtual double GetT();
 
   virtual void SetSteinerPoint(HSteinerPoint sp, bool first = true);  
@@ -71,7 +72,8 @@ class VanGinnekenTreeNodePathBased: public VanGinnekenTreeNode
 {
 public:
   VanGinnekenTreeNodePathBased();
-  virtual double GetR();//resistance in source
+  virtual double GetSourceRAT();//RAT in source
+  virtual double GetR(bool isRequiredArc = false);//resistance in source
   virtual double GetT();
   virtual HSteinerPoint GetSteinerPoint(bool first = true);
   virtual HNet GetNet(bool first = true);

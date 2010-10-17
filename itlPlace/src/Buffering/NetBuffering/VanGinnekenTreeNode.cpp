@@ -2,6 +2,7 @@
 #include "HBaseDesignItem.h"
 #include "VanGinnekenTree.h"
 #include "NetBufferingAlgorithm.h"
+#include "Timing.h"
 
 VanGinnekenTreeNode::VanGinnekenTreeNode()
 {
@@ -65,8 +66,18 @@ VanGinnekenTreeNode* VanGinnekenTreeNode::GetRoot()
   return root;
 }
 
-double VanGinnekenTreeNode::GetRAT()	
+double VanGinnekenTreeNode::GetSinkRAT()	
 {		
+  if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+  {
+    return (tree->vGAlgorithmData->design.TimingPoints[(sPoint,tree->vGAlgorithmData->design).Pin()],tree->vGAlgorithmData->design).RequiredTime();
+  }
+  else
+    return 0;
+}
+
+double VanGinnekenTreeNode::GetSourceRAT()
+{
   if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
   {
     return (tree->vGAlgorithmData->design.TimingPoints[(sPoint,tree->vGAlgorithmData->design).Pin()],tree->vGAlgorithmData->design).RequiredTime();
@@ -83,10 +94,24 @@ double VanGinnekenTreeNode::GetC()
     return 0;
 }
 
-double VanGinnekenTreeNode::GetR()
+double VanGinnekenTreeNode::GetR(bool isRequiredArc)
 {
   if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
-    return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (sPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+  {
+    
+    if (isRequiredArc)
+    {
+      HPin driver = tree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(sPoint);
+      bool inverted;
+      double arcTime;
+      HTimingArcType arc = FindRequiredArc(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
+      double r = tree->vGAlgorithmData->design.GetDouble<HTimingArcType::ResistanceRise>(arc);
+      return r;
+    }
+    else
+      return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (sPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+
+  }
   else
     return 0;
 }
@@ -169,18 +194,59 @@ VanGinnekenTreeNodePathBased::VanGinnekenTreeNodePathBased():VanGinnekenTreeNode
 {
 }
 
-double VanGinnekenTreeNodePathBased::GetR()
+double VanGinnekenTreeNodePathBased::GetSourceRAT()
 {
   if (secondSPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
-    return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (secondSPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+  {
+    return (tree->vGAlgorithmData->design.TimingPoints[(secondSPoint,tree->vGAlgorithmData->design).Pin()],tree->vGAlgorithmData->design).RequiredTime();
+  }
   else
+    if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+      return (tree->vGAlgorithmData->design.TimingPoints[(sPoint,tree->vGAlgorithmData->design).Pin()],tree->vGAlgorithmData->design).RequiredTime();
     return 0;
+}
+
+double VanGinnekenTreeNodePathBased::GetR(bool isRequiredArc)
+{
+  if (secondSPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+  {
+    if (isRequiredArc)
+    {
+      HPin driver = tree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(secondSPoint);
+      bool inverted;
+      double arcTime;
+      HTimingArcType arc = FindRequiredArc(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
+      return tree->vGAlgorithmData->design.GetDouble<HTimingArcType::ResistanceRise>(arc);
+    }
+    else
+      return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (secondSPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+  } 
+  else
+    if (sPoint != tree->vGAlgorithmData->design.SteinerPoints.Null())
+    {
+      if (isRequiredArc)
+      {
+        HPin driver = tree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(sPoint);
+        bool inverted;
+        double arcTime;
+        HTimingArcType arc = FindRequiredArc(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
+        return tree->vGAlgorithmData->design.GetDouble<HTimingArcType::ResistanceRise>(arc);
+      }
+      else
+        return Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, (sPoint,tree->vGAlgorithmData->design).Pin(), SignalDirection_None).R;
+
+    }
+    else
+      ALERT("ERROR in GetR");
 }
 
 double VanGinnekenTreeNodePathBased::GetT()
 {
-  Utils::DriverPhisics dph = Utils::GetDriverTimingPhisics(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design[secondSPoint].Pin(), signalDirection);
-  return dph.T;
+  HPin driver = tree->vGAlgorithmData->design.SteinerPoints.Get<HSteinerPoint::Pin, HPin>(sPoint);
+  bool inverted;
+  double arcTime;
+  HTimingArcType arc = FindRequiredArc(tree->vGAlgorithmData->design, tree->vGAlgorithmData->design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
+  return tree->vGAlgorithmData->design.GetDouble<HTimingArcType::TIntrinsicRise>(arc);
 }
 
 HSteinerPoint VanGinnekenTreeNodePathBased::GetSteinerPoint(bool first)

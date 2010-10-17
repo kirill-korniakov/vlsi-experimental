@@ -12,6 +12,7 @@
 #include "HNet.h"
 
 #define	INFINITY 20000000000.0
+#define ZERO 0.00000000001
 #define MAXBUFFERTYPE 64
 
 using namespace Utils;
