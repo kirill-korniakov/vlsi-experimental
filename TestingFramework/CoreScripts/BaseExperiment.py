@@ -122,23 +122,14 @@ class BaseExperiment:
 
     def ParseLog(self, logName):
         parser = LogParser(logName)
-        table = [[0 for col in range(len(self.metrics))] for row in range(len(self.stages))]
-
-        for col in range(len(self.metrics)):
-            for row in range(len(self.stages)):
-                value = str(parser.GetFromTable(self.stages[row], self.metrics[col]))
-
-                if (value == str(NOT_FOUND)):
-                   return []
-
-                table[row][col] = float(value.replace(',', '.'))
-
-        return table
+        return (parser.ParsePFST(self.metrics, self.stages))
 
     def ParsePQATAndPrintTable(self, logName):
-        metricsForChart = ['HPWL', 'TNS', 'WNS']
-        parser = LogParser(logName)
-        parser.ParsePQATAndPrintTable(metricsForChart)
+        metrics      = ['HPWL', 'TNS', 'WNS']
+        parser       = LogParser(logName)
+        table        = parser.ParsePQAT(metrics)
+        PQATFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
+        PrintPQATToFile(table, metrics, PQATFileName)
 
     def AddStringToTable(self, values, benchmark, reportTable):
         cols = [benchmark, END_OF_COLUMN]

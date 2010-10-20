@@ -96,23 +96,17 @@ class LogParser:
 
         return table
 
-    def ParsePQATAndPrintTable(self, metrics):
-        benchmarkFileName = os.path.dirname(self.logName) + '/' + os.path.basename(self.logName) + '.csv'
-        cols = ['stage', END_OF_COLUMN]
+    def ParsePFST(self, metrics, stages):
+        table = [[0 for col in range(len(metrics))] for row in range(len(stages))]
 
-        for col in metrics:
-            cols += [col, END_OF_COLUMN]
+        for col in range(len(metrics)):
+            for row in range(len(stages)):
+                value = str(self.GetFromTable(stages[row], metrics[col]))
 
-        WriteStringToFile(cols, benchmarkFileName)
-        table = self.ParsePQAT(metrics)
+                if (value == str(NOT_FOUND)):
+                   return []
 
-        for currStage in table.keys():
-            cols = [str(currStage), END_OF_COLUMN]
-
-            for col in range(len(metrics)):
-                cols += [str(table[currStage][col]), END_OF_COLUMN]
-
-            WriteStringToFile(cols, benchmarkFileName)
+                table[row][col] = float(value.replace(',', '.'))
 
         return table
 
@@ -163,4 +157,3 @@ class LogParser:
         if lineIdx == len(lines):
             print(tableHeader + ' not found in log file')
             return NOT_FOUND
-
