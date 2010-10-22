@@ -110,7 +110,7 @@ void HPlotter::PlotCriticalCongestionMap(HDesign &hd, TileGrid& tg, int nMax—Lin
     if (tg.lines.size() != 0)
     {
         int nMaxAllLines  = hd.cfg.ValueOf("CongestionMap.nMaxLines", 10);
-        nMax—Lines = nMaxAllLines * tg.criticalLines.size() / tg.lines.size();
+        nMax—Lines = int(nMaxAllLines * tg.criticalLines.size() / tg.lines.size());
     }
 
     for (int i = 0; i < tg.nHorTiles; i++)

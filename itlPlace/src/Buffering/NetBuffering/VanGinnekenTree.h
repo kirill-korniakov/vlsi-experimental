@@ -69,7 +69,6 @@ public:
     points.push(srcPoint);	
     rootIndexs.push(0);
     isPoitnsVisits.push(0);
-    //CreateNode(srcPoint, SOURCE, nodeIndex, rootIndex, false, this);
     int pinInNet = vGTree->vGAlgorithmData->design.Nets.GetInt<HNet::PinsCount>(net);
     VanGinnekenTreeNode* root = vGTree->vanGinnekenTreeNodeCreate->CreateSource(net, srcPoint, SOURCE, nodeIndex, vGTree);
     vanGinnekenTreeNodeRoot.push(root);
@@ -117,9 +116,8 @@ public:
     }
 
     treeSize = nodeIndex + 1;
-    //ALERT("pc = %d", pc);
     if (nodeIndex >= vGTree->vGAlgorithmData->totalTreeSize)
-      ALERT("ERROR3!!!!! + totalTreeSize = %d\tnodeIndex = %d", vGTree->vGAlgorithmData->totalTreeSize, nodeIndex);
+      ALERT("ERROR  totalTreeSize = %d\t< nodeIndex = %d", vGTree->vGAlgorithmData->totalTreeSize, nodeIndex);
   }
 
   template< class StartPoint >

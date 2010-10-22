@@ -238,6 +238,7 @@ double VanGinnekenTreeNodePathBased::GetR(bool isRequiredArc)
     }
     else
       ALERT("ERROR in GetR");
+  return 0;
 }
 
 double VanGinnekenTreeNodePathBased::GetT()

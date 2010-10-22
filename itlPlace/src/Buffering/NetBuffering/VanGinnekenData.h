@@ -77,6 +77,7 @@ public:
   bool reRoutingSteinerTree;
   int maxCountRepeatNet;
   int limitationCountCriticalPath;
+  int numberBufferedAtOnceCriticalPaths;
 
 
   double totalAllowableBuffersArea;

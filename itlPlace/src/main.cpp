@@ -54,9 +54,7 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
   //initialize routing
   design.SteinerPoints.Initialize();
   design.Wires.Initialize();
-
   InitializeTiming(design);
-
   design.Plotter.Initialize();
 }
 

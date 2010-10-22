@@ -82,7 +82,13 @@ AbstractCreateVGListAlgorithm(vGA)
 {
 }
 
-void LineBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+
+CalculateVGCandidatePoint::CalculateVGCandidatePoint(NetBufferingAlgorithm* vGA)
+{
+  vGAlgorithm = vGA;
+}
+
+void CalculateVGCandidatePoint::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
                                                                 TemplateTypes<VGVariantsListElement>::list* currentList, int i)
 {
   currentList = stackList.top();
@@ -134,28 +140,27 @@ LineBypassAtCreateVGListAlgorithm::CreateVGList(VanGinnekenTree* tree)
     {
       if (tree->vGTreeNodeList[i]->isBranchPoint())
       {
-        vGAlgorithm->branchPoint->CalculateBranchPoint(tree, stackList, currentList, leftList, rightList, i);
+        vGAlgorithm->calculateBranchPoint->CalculateBranchPoint(tree, stackList, currentList, leftList, rightList, i);
       }	
       else
       {
-        CalculateCandidatePoint(tree, stackList, currentList, i);
+        vGAlgorithm->calculateCandidatePoint->CalculateCandidatePoint(tree, stackList, currentList, i);
       }
     }
   }
-  if (stackList.size() > 1)
-    ALERT("Error: length stackList > 1");
+  ASSERT(stackList.size() == 1);
 
   newList = stackList.top();
   stackList.pop();
   return newList;
 }
 
-AdaptiveBypassAtCreateVGListAlgorithm::AdaptiveBypassAtCreateVGListAlgorithm(NetBufferingAlgorithm* vGA): 
-LineBypassAtCreateVGListAlgorithm(vGA)
+AdaptiveBypassAtCalculateVGCandidatePoint::AdaptiveBypassAtCalculateVGCandidatePoint(NetBufferingAlgorithm* vGA): 
+CalculateVGCandidatePoint(vGA)
 {
 }
 
-void AdaptiveBypassAtCreateVGListAlgorithm::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
+void AdaptiveBypassAtCalculateVGCandidatePoint::CalculateCandidatePoint(VanGinnekenTree* tree, TemplateTypes<TemplateTypes<VGVariantsListElement>::list*>::stack& stackList,
                                                                     TemplateTypes<VGVariantsListElement>::list* currentList, int i)
 {
   currentList = stackList.top();

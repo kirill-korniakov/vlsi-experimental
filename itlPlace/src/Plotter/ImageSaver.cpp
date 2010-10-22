@@ -77,7 +77,7 @@ void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
                     FILE* fimg = fopen(fileName.c_str(), "rb");
                     if (fimg != 0)
                     {
-                        fsize = fread(buffer, 1, fsize, fimg);
+                        fsize = int(fread(buffer, 1, fsize, fimg));
                         fclose(fimg);
                     }
                     Logger::Global.WriteToHTMLStream(false, "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", Base64::Encode(buffer, fsize).c_str());

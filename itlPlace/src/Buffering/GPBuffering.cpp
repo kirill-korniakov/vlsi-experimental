@@ -121,8 +121,6 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
     }
   }
 
-  //if (isXVisit && isYVisit)
-  //  ALERT("nrowIdx = %d\tcolIdx= %d", rowIdx, colIdx);
   double sizeBufferMultiplier = 1.0 / bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->sizeBufferMultiplier;
   return (xSize * ySize * sizeBufferMultiplier);
 }

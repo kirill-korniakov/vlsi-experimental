@@ -88,8 +88,7 @@ void VanGinnekenTreeNodeCreate::CreateSinkOrBranchPoint(HNet net, HSteinerPoint 
     vGTree->vGTreeNodeList[nodeIndex]->type = type;	
   }
 
-  if (nodeIndex >= vGTree->vGAlgorithmData->totalTreeSize)
-    ALERT("ERROR2!!!!!");
+  ASSERT(nodeIndex < vGTree->vGAlgorithmData->totalTreeSize);
 }
 
 void VanGinnekenTreeNodeCreate::CreateLastPointInEdge(HNet net, HSteinerPoint node, NodeType type, int& nodeIndex, int& rootIndex, TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, bool isRight, VanGinnekenTree* tree)
@@ -247,10 +246,6 @@ void VanGinnekenTreeCreatePathBased::CreateTree()
   int treeSizeTemp = 0;
   for (HCriticalPaths::EnumeratorW enumerator = vGTree->vGAlgorithmData->design.CriticalPaths.GetEnumeratorW(); enumerator.MoveNext();)
   {
-    /*ALERT("riticalPath = %d; all point:", ::ToID(enumerator));
-    for (HCriticalPath::PointsEnumeratorW en = enumerator.GetEnumeratorW(); en.MoveNext();)
-      ALERT("\tPoint = %d", ::ToID(en));
-    */
     CalculateNodeInEnumerator<HCriticalPaths::EnumeratorW>(enumerator, maxTree, treeSizeTemp);
   }
   vGTree->vGAlgorithmData->totalTreeSize = maxTree;

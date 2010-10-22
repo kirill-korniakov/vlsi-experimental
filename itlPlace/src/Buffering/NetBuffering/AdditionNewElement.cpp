@@ -237,14 +237,6 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
     int rootIndex =  j->Positions.GetPosition()->GetRoot()->index;
     if (cNet != currentNet)
     {
-      /*while(!j->Positions.GetPosition()->GetTree()->vGTreeNodeList[rootIndex]->isSteinerTreeSource())
-      {
-      rootIndex--;
-      if (rootIndex < 0)
-      {
-      ALERT("ERROR  rootIndex < 0");
-      }
-      }*/
       currentNet = cNet;
       net = currentNet;
       node = j->Positions.GetPosition()->GetTree()->vGTreeNodeList[rootIndex]->GetLeft();
@@ -326,28 +318,19 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
       {
         isStop = true;
         vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
-        if (nNewNetPin != (pinCountInCurrentNet + bufferInInCurrentNet * 2))
-        {
-          string netName0 = vGAlgorithm->data->design.Nets.GetString<HNet::Name>(net);
-          ALERT("ERRORR pin count");          
-        }
+        ASSERT(nNewNetPin == (pinCountInCurrentNet + bufferInInCurrentNet * 2));
       }
       else
         if (currentNet != j->Positions.GetPosition()->GetNet())
         {
           isStop = true; 
           vGAlgorithm->data->design.Nets.Set<HNet::Kind, NetKind>(net, NetKind_Buffered);
-          if (nNewNetPin != (pinCountInCurrentNet + bufferInInCurrentNet * 2))
-          {
-            string netName0 = vGAlgorithm->data->design.Nets.GetString<HNet::Name>(net);
-            ALERT("ERRORR pin count");            
-          }
+          ASSERT(nNewNetPin == (pinCountInCurrentNet + bufferInInCurrentNet * 2));
         }
         ind++;
     }
   }
-  if (mustPinCount != newPinCount)
-    ALERT("ERRORR pin count");
+  ASSERT(mustPinCount == newPinCount);
 }
 
 LegalAdditionNewElement::LegalAdditionNewElement(NetBufferingAlgorithm* vGA): StandartAdditionNewElement(vGA)

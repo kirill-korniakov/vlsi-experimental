@@ -49,6 +49,7 @@ void VGAlgorithmData::DefaultValue()
   reRoutingSteinerTree = false;
   maxCountRepeatNet = 0;
   limitationCountCriticalPath = 0;
+  numberBufferedAtOnceCriticalPaths = 0;
 }
 
 
@@ -69,6 +70,7 @@ void VGAlgorithmData::ReportParameters()
   ALERT("Maximum insert buffer in net: %d", maxBufferCount);
   ALERT("Type bufer addition: %d", int (typeBufferAddition));
   ALERT("Size buffer multiplier: %f", sizeBufferMultiplier);
+  ALERT("Type net-list buffering: %d", int(typeNetListBuffering));
 }
 
 void VGAlgorithmData::Initialize()
@@ -105,8 +107,9 @@ void VGAlgorithmData::Initialize()
   printCriticalPathsInfo = design.cfg.ValueOf("Reporting.PrintCriticalPathsInfo", false);
   printTimingAfterBufferingCriticalPaths = design.cfg.ValueOf("Reporting.PrintTimingAfterBufferingCriticalPaths", false);
   reRoutingSteinerTree = design.cfg.ValueOf("ReRoutingSteinerTree", false);
-  maxCountRepeatNet = reRoutingSteinerTree = design.cfg.ValueOf("MaxCountRepeatNet", 0);
-  limitationCountCriticalPath = reRoutingSteinerTree = design.cfg.ValueOf("LimitationCountCriticalPath", 0);
+  maxCountRepeatNet = design.cfg.ValueOf("MaxCountRepeatNet", 0);
+  limitationCountCriticalPath = design.cfg.ValueOf("LimitationCountCriticalPath", 0);
+  numberBufferedAtOnceCriticalPaths = design.cfg.ValueOf("NumberBufferedAtOnceCriticalPaths", 0);
 
   totalAreaCells = 0;
   totalAreaBuffer = 0;

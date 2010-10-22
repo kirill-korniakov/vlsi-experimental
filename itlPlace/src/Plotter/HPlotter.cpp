@@ -178,7 +178,7 @@ Color HPlotter::_GetCellColor(HCell plotCell)
         {
           macro = macroTypeEW.Name();
           bool isbuf = false;
-          for (int i = 0; (i < n) && !isbuf; i++)
+          for (unsigned int i = 0; (i < n) && !isbuf; i++)
             if (macro == bufferList[i])
               isbuf = true;
           if (!isbuf)

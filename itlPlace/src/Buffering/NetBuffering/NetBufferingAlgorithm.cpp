@@ -30,27 +30,24 @@ void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
   if (isInitialize && !isAgainInitialize)
     return;  
 
-  if (data == NULL)
-      ALERT("ERROR Buffering not initialize!!!");
-
+  ASSERT(data != NULL);
   isInitialize = true;
   data->Initialize();
 
   data->vGTree = new VanGinnekenTree(data);
 
-/*  if (data->typePartition == LINEAR)
-    data->vGTree = new VGTreeUniformDistribution(data);
-  if (data->typePartition == DYNAMIC)
-    data->vGTree = new VGTreeDynamicDistribution(data);
-  if (data->typePartition == LEGAL_POSITIONS_ONLY)    
-    data->vGTree = new VGTreeLegalDynamicDistribution(data, data->sizeBuffer);    
-*/
   if (data->typeBufferingAlgorithm == CLASSIC_CREATE_VG_LIST)
     createVGListAlgorithm = new ClassicCreateVGListAlgorithm(this);
   if (data->typeBufferingAlgorithm == LINE_BYPASS_CREATE_VG_LIST)
+  {
     createVGListAlgorithm = new LineBypassAtCreateVGListAlgorithm(this);
+    calculateCandidatePoint = new CalculateVGCandidatePoint(this);
+  }
   if (data->typeBufferingAlgorithm == ADAPTIVE_BYPASS_CREATE_VG_LIST)
-    createVGListAlgorithm = new AdaptiveBypassAtCreateVGListAlgorithm(this);
+  {
+    createVGListAlgorithm = new LineBypassAtCreateVGListAlgorithm(this);
+    calculateCandidatePoint = new AdaptiveBypassAtCalculateVGCandidatePoint(this);
+  }
 
   if (data->typeModificationVanGinnekenList == STANDART_MODIFICATION_VG_LIST)
     modificationVanGinnekenList = new StandartModificationVanGinnekenList(this);
@@ -65,9 +62,9 @@ void NetBufferingAlgorithm::Initialize(bool isAgainInitialize)
     additionNewElement = new LegalAdditionNewElement(this);
   
   if (data->typeNetListBuffering == BUFFERING_ALL_CRITICAL_PATH)
-    branchPoint = new CalculateVGBranchPoint(this);
+    calculateBranchPoint = new CalculateVGBranchPoint(this);
   if (data->typeNetListBuffering == PATH_BASED)
-    branchPoint = new PathBasedCalculateVGBranchPoint(this);
+    calculateBranchPoint = new PathBasedCalculateVGBranchPoint(this);
 }
 
 VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isRealBuffering)
