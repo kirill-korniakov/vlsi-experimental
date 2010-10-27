@@ -107,11 +107,13 @@ def PrintPQATToFile(PQATTable, metrics, tableFileName):
         cols += [col, END_OF_COLUMN]
 
     WriteStringToFile(cols, tableFileName)
+    currStageIdx = 0
 
     for currStage in PQATTable:
-        cols = [str(currStage), END_OF_COLUMN]
+        cols = [str(currStageIdx), END_OF_COLUMN]
+        currStageIdx += 1
 
         for col in range(len(metrics)):
-            cols += [str(PQATTable[currStage][col]), END_OF_COLUMN]
+            cols += [str(currStage[col]), END_OF_COLUMN]
 
         WriteStringToFile(cols, tableFileName)

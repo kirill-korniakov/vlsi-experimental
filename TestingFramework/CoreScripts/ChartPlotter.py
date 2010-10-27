@@ -11,9 +11,9 @@ def PlotChartForBenchmark(benchmark, table):
     yValues = []
     del table[0] #don't use values of 0 iteration
 
-    for currStage in table.keys():
-        xValues.append(table[currStage][1])
-        yValues.append(table[currStage][0])
+    for currStage in table:
+        xValues.append(currStage[1])
+        yValues.append(currStage[0])
 
     fig = plt.figure()
     plt.plot(xValues, yValues)

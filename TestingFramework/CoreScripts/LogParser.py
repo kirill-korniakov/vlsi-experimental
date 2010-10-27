@@ -73,10 +73,10 @@ class LogParser:
 
     def ParsePQAT(self, metrics):
         currStage = 0
-        table = {}
+        table = []
 
         while (True):
-            table[currStage] = []
+            table.append([])
 
             for col in range(len(metrics)):
                 value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
