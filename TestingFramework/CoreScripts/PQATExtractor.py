@@ -2,7 +2,7 @@ import LogParser
 from LogParser import *
 
 import CoreFunctions
-from CoreFunctions import PrintPQATToFile
+from CoreFunctions import PrintTableToFile
 
 import ChartPlotter
 from ChartPlotter import *
@@ -22,8 +22,8 @@ def ParsePQAT(logFolder, doPlotCharts):
             print('Error: table is empty')
             return
 
-        PQATFile = logFolder + '/' + os.path.basename(log) + '.csv'
-        PrintPQATToFile(table, metrics, PQATFile)
+        PQATFileName = logFolder + '/' + os.path.basename(log) + '.csv'
+        PrintTableToFile(PQATFileName, table, metrics)
 
         if (doPlotCharts):
             PlotChartForBenchmark(logFolder + '/' + log, table)

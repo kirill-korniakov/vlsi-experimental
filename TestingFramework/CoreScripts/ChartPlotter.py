@@ -1,4 +1,7 @@
 def PlotChartForBenchmark(benchmark, table):
+    if (not table):
+        print('table for ' + benchmark  + ' is empty')
+        return
     try:
         import matplotlib.pyplot as plt
         from matplotlib.pyplot import figure, savefig

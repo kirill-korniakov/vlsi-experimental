@@ -100,7 +100,7 @@ def WriteStringToFile(cols, tableFileName):
   resultFile.write(printStr.replace('.', ','))
   resultFile.close()
 
-def PrintPQATToFile(PQATTable, metrics, tableFileName):
+def PrintTableToFile(tableFileName, table, metrics, stages = []):
     cols = ['stage', END_OF_COLUMN]
 
     for col in metrics:
@@ -109,11 +109,16 @@ def PrintPQATToFile(PQATTable, metrics, tableFileName):
     WriteStringToFile(cols, tableFileName)
     currStageIdx = 0
 
-    for currStage in PQATTable:
-        cols = [str(currStageIdx), END_OF_COLUMN]
-        currStageIdx += 1
+    for currStage in table:
+        currStageName = str(currStageIdx)
 
-        for col in range(len(metrics)):
-            cols += [str(currStage[col]), END_OF_COLUMN]
+        if (stages):
+            currStageName = stages[currStageIdx]
+
+        cols = [currStageName, END_OF_COLUMN]
+
+        for value in currStage:
+            cols += [str(value), END_OF_COLUMN]
 
         WriteStringToFile(cols, tableFileName)
+        currStageIdx += 1

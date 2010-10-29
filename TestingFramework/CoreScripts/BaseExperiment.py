@@ -129,7 +129,7 @@ class BaseExperiment:
         parser       = LogParser(logName)
         table        = parser.ParsePQAT(metrics)
         PQATFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
-        PrintPQATToFile(table, metrics, PQATFileName)
+        PrintTableToFile(PQATFileName, table, metrics)
 
     def AddStringToTable(self, values, benchmark, reportTable):
         cols = [benchmark, END_OF_COLUMN]
