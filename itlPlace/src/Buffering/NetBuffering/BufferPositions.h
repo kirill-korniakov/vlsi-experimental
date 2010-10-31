@@ -7,30 +7,30 @@
 class BufferPositions
 {
 public:
-  BufferPositions();
-  BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
+    BufferPositions();
+    BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i);
 
-  bool operator > (BufferPositions& element);
-  bool operator < (BufferPositions& element);
+    bool operator > (BufferPositions& element);
+    bool operator < (BufferPositions& element);
 
-  VanGinnekenTreeNode* GetPosition();
-  BufferInfo* GetBufferInfo();
-  int GetIndex();
+    VanGinnekenTreeNode* GetPosition();
+    BufferInfo* GetBufferInfo();
+    int GetIndex();
 
-  void SetPosition(VanGinnekenTreeNode* pos);
-  void SetBufferInfo(BufferInfo* bufInfo);
-  void SetIndex(int i);
+    void SetPosition(VanGinnekenTreeNode* pos);
+    void SetBufferInfo(BufferInfo* bufInfo);
+    void SetIndex(int i);
 
-  ~BufferPositions()
-  {
-    position = NULL;
-    bufferInfo = NULL;
-  }
+    ~BufferPositions()
+    {
+        position = NULL;
+        bufferInfo = NULL;
+    }
 
 protected:
-  VanGinnekenTreeNode* position;
-  BufferInfo* bufferInfo;
-  int index;
+    VanGinnekenTreeNode* position;
+    BufferInfo* bufferInfo;
+    int index;
 };
 
 #endif

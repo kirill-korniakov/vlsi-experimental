@@ -6,12 +6,13 @@
 class HVGAlgorithm
 {
 public:
-  HVGAlgorithm(HDesign& hd);
-  void NetlistBuffering();
+    HVGAlgorithm(HDesign& hd);
+    void NetlistBuffering();
+    void RemoveNewBuffering();
 
 private:
-  int typeNetlistBuffering;
-  HDesign& design;
+    int typeNetlistBuffering;
+    HDesign& design;
 };
 
 #endif

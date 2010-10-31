@@ -20,8 +20,8 @@
 
 void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design)
 {
-	fmt.NewBorderRow();
-	fmt.SetCell(0, "-", fmt.NumOfColumns(), TableFormatter::Align_Fill);
+    fmt.NewBorderRow();
+    fmt.SetCell(0, "-", fmt.NumOfColumns(), TableFormatter::Align_Fill);
 }
 
 void InitFlowMetricsTable(TableFormatter& fmt, HDesign& design)
@@ -164,19 +164,19 @@ void DoSTAIfCan(HDesign& hd)
 
 bool IsPlaced(HDesign& hd, double eps = 0.001)
 {
-  HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW();
-  cell.MoveNext(); //get first cell
-  double startCellX = cell.X();
-  double startCellY = cell.Y();
+    HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW();
+    cell.MoveNext(); //get first cell
+    double startCellX = cell.X();
+    double startCellY = cell.Y();
 
-  while (cell.MoveNext())
-  {
-    //if coords of current cell are not equal to coord of start cell
-    if ((fabs(cell.X() - startCellX) >= eps) || (fabs(cell.X() - startCellX) >= eps))
-      return true; //not all elements are placed to the same place
-  }
+    while (cell.MoveNext())
+    {
+        //if coords of current cell are not equal to coord of start cell
+        if ((fabs(cell.X() - startCellX) >= eps) || (fabs(cell.X() - startCellX) >= eps))
+            return true; //not all elements are placed to the same place
+    }
 
-  return false; //all elements are placed to the same place
+    return false; //all elements are placed to the same place
 }
 
 bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
@@ -239,23 +239,78 @@ bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
 
 bool DoLRSizingIfRequired(HDPGrid& grid, const char* cfgOptName)
 {
-		if (grid.Design().cfg.ValueOf(cfgOptName, false))
-		{
-				//DetailedPlacement(grid);
+    if (grid.Design().cfg.ValueOf(cfgOptName, false))
+    {
+        //DetailedPlacement(grid);
 
-				WRITELINE("LRSizing started");
-				//if (grid.Design().CanDoTiming()) ALERT("STA after detailed placement:");
-				//STA(grid.Design());
-				//LambdaMatrix lm (grid,grid.Design());
-				LRSizer sizer(grid.Design());
-				
-				sizer.DoLRSizing();
-				WRITELINE("LRSizing finished");
-				return true;
-		}
-		return false;
+        WRITELINE("LRSizing started");
+        //if (grid.Design().CanDoTiming()) ALERT("STA after detailed placement:");
+        //STA(grid.Design());
+        //LambdaMatrix lm (grid,grid.Design());
+        LRSizer sizer(grid.Design());
+
+        sizer.DoLRSizing();
+        WRITELINE("LRSizing finished");
+        return true;
+    }
+    return false;
 }
 
+bool DoBufferingIfRequired(HDesign& hd, const char* cfgOptName)
+{
+    //BUFFERING
+    if (hd.cfg.ValueOf(cfgOptName, false))
+    {
+        ConfigContext ctx = hd.cfg.OpenContext("Buffering");
+        //ExportDEF(hd, "bb_" + hd.Circuit.Name() + ".def");
+
+        if (hd.cfg.ValueOf("Buffering.DoIterative", false))
+            InsertRepeaters2(hd, hd.cfg.ValueOf("Buffering.Iterations", 40), hd.cfg.ValueOf("Buffering.Percent", 0.70));
+        else
+            InsertRepeaters2(hd, hd.cfg.ValueOf("Buffering.Percent", 0.70));
+        STA(hd);
+        return true;
+    }
+
+    return false;
+}
+
+bool DoNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
+{
+    if (hd.cfg.ValueOf(cfgOptName, false))
+    {
+        //New_BUFFERING
+
+        ALERT("NEW BUFFERING STARTED");
+        ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+        HVGAlgorithm buf(hd);
+        buf.NetlistBuffering();
+
+        STA(hd);
+        ALERT("NEW BUFFERING FINISHED");
+        return true;
+    }
+
+    return false;
+}
+
+bool DoRemoveNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
+{
+    if (hd.cfg.ValueOf(cfgOptName, false))
+    {
+        //RemoveNewBuffering
+        ALERT("REMOVE NEW BUFFERING STARTED");
+        ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+        HVGAlgorithm buf(hd);
+        buf.RemoveNewBuffering();
+
+        STA(hd);
+        ALERT("REMOVE NEW BUFFERING FINISHED");
+        return true;
+    }
+
+    return false;
+}
 
 void PlotCongestionMapIfRequired(HDPGrid& grid)
 {
@@ -323,6 +378,26 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
             if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.LoopDetailedPlacement"))
                 WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DP%d", i + 1));
 
+            if (DoBufferingIfRequired(hd, "DesignFlow.LoopBuffering"))
+                WriteFlowMetrics(flowMetrics, hd, "Buffering", Aux::Format("BUF&d", i + 1));
+            if (DoRemoveNewBufferingIfRequired(hd, "DesignFlow.LoopRemoveNewBuffering"))
+                WriteFlowMetrics(flowMetrics, hd, "RemoveNewBuffering", Aux::Format("RNB&d", i + 1));
+            if (DoNewBufferingIfRequired(hd, "DesignFlow.LoopNew_Buffering"))
+                WriteFlowMetrics(flowMetrics, hd, "New_Buffering", Aux::Format("NBUF&d", i + 1));
+
+            if (DoRandomPlacementIfRequired(hd, "DesignFlow.LoopBufRandomPlacement"))
+                WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", Aux::Format("RNDB&d", i + 1));
+            if (DoGlobalPlacementIfRequired(hd, "DesignFlow.LoopBufGlobalPlacement"))
+                WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", Aux::Format("GPB&d", i + 1));
+            if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.LoopBufLR"))
+                WriteFlowMetrics(flowMetrics, hd, "LRPlacement", Aux::Format("LRB&d", i + 1));
+
+            if (DoLegalizationIfRequired(DPGrid, "DesignFlow.LoopBufLegalization"))
+                WriteFlowMetrics(flowMetrics, hd, "Legalization", Aux::Format("LEGB&d", i + 1));
+
+            if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.LoopBufDetailedPlacement"))
+                WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DPB&d", i + 1));
+
             DoSTAIfCan(hd);
 
             if (hd.CanDoTiming() && Utils::TNS(hd) == 0 && Utils::WNS(hd) == 0)
@@ -337,8 +412,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
                 UpdateNetWeightsIfRequired(hd, i);
         }
 
-        QA.RestoreBestAchievedPlacement();
-        QA.Report();
+        //QA.RestoreBestAchievedPlacement();
+        //QA.Report();
     }
 
     //PLACEMENT
@@ -357,10 +432,10 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DP");
     if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
-		if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
+    if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
     {
-      WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
-      ExportDEF(hd, "DefAfterLRSizing");
+        WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
+        ExportDEF(hd, "DefAfterLRSizing");
     }
 
     DoSTAIfCan(hd);
@@ -368,68 +443,28 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     PlotCongestionMapIfRequired(DPGrid);
     RunFGRRoutingIfRequired(DPGrid);
 
-    //BUFFERING
-    if (hd.cfg.ValueOf("DesignFlow.Buffering", false))
-    {
-        ConfigContext ctx = hd.cfg.OpenContext("Buffering");
-        //ExportDEF(hd, "bb_" + hd.Circuit.Name() + ".def");
 
-        if (hd.cfg.ValueOf("Buffering.DoIterative", false))
-            InsertRepeaters2(hd, hd.cfg.ValueOf("Buffering.Iterations", 40), hd.cfg.ValueOf("Buffering.Percent", 0.70));
-        else
-            InsertRepeaters2(hd, hd.cfg.ValueOf("Buffering.Percent", 0.70));
-        STA(hd);
-
+    if (DoBufferingIfRequired(hd, "DesignFlow.Buffering"))
         WriteFlowMetrics(flowMetrics, hd, "Buffering", "BUF");
-
-        if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");
-        if (DoGlobalPlacementIfRequired(hd, "DesignFlow.BufGlobalPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", "GPB");
-        if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.BufLR"))
-            WriteFlowMetrics(flowMetrics, hd, "LRPlacement", "LRB");
-
-        HDPGrid DPGrid(hd);
-        if (DoLegalizationIfRequired(DPGrid, "DesignFlow.BufLegalization"))
-            WriteFlowMetrics(flowMetrics, hd, "Legalization", "LEGB");
-
-        if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
-
-        DoSTAIfCan(hd);
-    }
-
-    //New_BUFFERING
-    if (hd.cfg.ValueOf("DesignFlow.New_Buffering", false))
-    {
-        ALERT("NEW BUFFERING STARTED");
-        ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
-        HVGAlgorithm buf(hd);
-        buf.NetlistBuffering();
-        
-        //hd.VGAlgorithm.Initialize();
-        //hd.VGAlgorithm.BufferingCriticalPath();
-        STA(hd);
-        ALERT("NEW BUFFERING FINISHED");
+    if (DoRemoveNewBufferingIfRequired(hd, "DesignFlow.RemoveNewBuffering"))
+        WriteFlowMetrics(flowMetrics, hd, "RemoveNewBuffering", "RNB");
+    if (DoNewBufferingIfRequired(hd, "DesignFlow.New_Buffering"))
         WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");
 
-        if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");
-        if (DoGlobalPlacementIfRequired(hd, "DesignFlow.BufGlobalPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", "GPB");
-        if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.BufLR"))
-            WriteFlowMetrics(flowMetrics, hd, "LRPlacement", "LRB");
+    if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");
+    if (DoGlobalPlacementIfRequired(hd, "DesignFlow.BufGlobalPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", "GPB");
+    if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.BufLR"))
+        WriteFlowMetrics(flowMetrics, hd, "LRPlacement", "LRB");
 
-        HDPGrid DPGrid(hd);
-        if (DoLegalizationIfRequired(DPGrid, "DesignFlow.BufLegalization"))
-            WriteFlowMetrics(flowMetrics, hd, "Legalization", "LEGB");
+    if (DoLegalizationIfRequired(DPGrid, "DesignFlow.BufLegalization"))
+        WriteFlowMetrics(flowMetrics, hd, "Legalization", "LEGB");
 
-        if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
-            WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
+    if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.BufDetailedPlacement"))
+        WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DPB");
 
-        DoSTAIfCan(hd);
-
-    }
+    DoSTAIfCan(hd);
 
     FlowMetricsTableAddBorder(flowMetrics, hd);
 

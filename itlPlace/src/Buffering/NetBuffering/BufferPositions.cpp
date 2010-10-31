@@ -2,76 +2,76 @@
 
 BufferPositions::BufferPositions()
 {
-  index = 0;
-  position = NULL;
-  bufferInfo = NULL;
+    index = 0;
+    position = NULL;
+    bufferInfo = NULL;
 }
 
 BufferPositions::BufferPositions(VanGinnekenTreeNode* pos, BufferInfo* bufInfo, int i)
 {
-  index = i;
-  position = pos;
-  bufferInfo = bufInfo;
+    index = i;
+    position = pos;
+    bufferInfo = bufInfo;
 }
 
 bool BufferPositions::operator > (BufferPositions& element)
 {
-  if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
-    return true;
-  else 
-    if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
-      return false;
-    else
-    {
-      if (position->index > element.GetPosition()->index)
+    if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
         return true;
-      return false;
-    }
-  return false;
+    else 
+        if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
+            return false;
+        else
+        {
+            if (position->index > element.GetPosition()->index)
+                return true;
+            return false;
+        }
+        return false;
 }
 
 bool BufferPositions::operator < (BufferPositions& element)
 {
-  if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
-    return true;
-  else 
-    if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
-      return false;
-    else
-    {
-      if (position->index < element.GetPosition()->index)
+    if (::ToID(position->GetNet()) <  ::ToID(element.GetPosition()->GetNet()))
         return true;
-      return false;
-    }
-    return false;
+    else 
+        if (::ToID(position->GetNet()) >  ::ToID(element.GetPosition()->GetNet()))
+            return false;
+        else
+        {
+            if (position->index < element.GetPosition()->index)
+                return true;
+            return false;
+        }
+        return false;
 }
 
 VanGinnekenTreeNode* BufferPositions::GetPosition()
 {
-  return position;
+    return position;
 }
 
 BufferInfo* BufferPositions::GetBufferInfo()
 {
-  return bufferInfo;
+    return bufferInfo;
 }
 
 int BufferPositions::GetIndex()
 {
-  return index;
+    return index;
 }
 
 void BufferPositions::SetPosition(VanGinnekenTreeNode* pos)
 {
-  position = pos;
+    position = pos;
 }
 
 void BufferPositions::SetBufferInfo(BufferInfo* bufInfo)
 {
-  bufferInfo = bufInfo;
+    bufferInfo = bufInfo;
 }
 
 void BufferPositions::SetIndex(int i)
 {
-  index = i;
+    index = i;
 }

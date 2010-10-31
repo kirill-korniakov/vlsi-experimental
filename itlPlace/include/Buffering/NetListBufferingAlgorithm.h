@@ -28,4 +28,13 @@ private:
     bool IsLimitationCountCriticalPathExecute(int totalIndex);
 };
 
+class RemoveBuffer
+{
+public:
+    VGAlgorithmData* data;
+    RemoveBuffer(HDesign& hd);
+    ~RemoveBuffer();
+    void RemoveNewBuffering();
+};
+
 #endif
