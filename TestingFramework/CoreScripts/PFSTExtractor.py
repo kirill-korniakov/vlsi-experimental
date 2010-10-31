@@ -7,7 +7,7 @@ def ExtractPFSTToFile(logName, masterLogFolder):
         log.close()
         isHeaderFound  = False
         isTableReached = False
-        lineIdx = 0
+        lineIdx  = 0
         printStr = ''
 
         for line in lines:

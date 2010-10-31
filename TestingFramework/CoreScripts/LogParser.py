@@ -86,10 +86,6 @@ class LogParser:
                     del table[currStage] #delete empty field
                     return table
 
-                if (currStage > 0):
-                    if (table[0][col] > 0):
-                        value = value * 100 / table[0][col]
-
                 table[currStage].append(value)
 
             currStage += 1

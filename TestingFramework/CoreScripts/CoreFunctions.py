@@ -100,6 +100,18 @@ def WriteStringToFile(cols, tableFileName):
   resultFile.write(printStr.replace('.', ','))
   resultFile.close()
 
+def MakeTableInPercents(table):
+    currStageIdx = 0
+
+    for stage in table:
+        for col in range(len(stage)):
+            if ((currStageIdx > 0) and (table[0][col] > 0)):
+                table[currStageIdx][col] = stage[col] * 100 / table[0][col]
+
+        currStageIdx += 1
+
+    return table
+
 def PrintTableToFile(tableFileName, table, metrics, stages = []):
     cols = ['stage', END_OF_COLUMN]
 

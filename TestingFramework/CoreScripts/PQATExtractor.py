@@ -2,7 +2,7 @@ import LogParser
 from LogParser import *
 
 import CoreFunctions
-from CoreFunctions import PrintTableToFile
+from CoreFunctions import PrintTableToFile, MakeTableInPercents
 
 import ChartPlotter
 from ChartPlotter import *
@@ -22,6 +22,7 @@ def ParsePQAT(logFolder, doPlotCharts):
             print('Error: table is empty')
             return
 
+        table        = MakeTableInPercents(table)
         PQATFileName = logFolder + '/' + os.path.basename(log) + '.csv'
         PrintTableToFile(PQATFileName, table, metrics)
 

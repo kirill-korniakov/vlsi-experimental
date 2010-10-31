@@ -9,12 +9,13 @@ from CoreFunctions import PrintTableToFile
 def PrintAndPlotPFST(logName, metrics, stages):
     parser = LogParser(logName)
     table  = parser.ParsePFST(metrics, stages)
+    table  = MakeTableInPercents(table)
     PrintTableToFile(logName + '.csv', table, metrics, stages)
     PlotChartForBenchmark(logName, table)
 
 def Run():
+    #lastLogFolder = '../Reports/SGNW'
     lastLogFolder   = '../Reports/APlace_weighting'
-    #masterLogFolder = '../Reports/LR_master'
     metrics = ['HPWL', 'TNS']
     stages  = ['INIT', 'LEG1', 'LEG2', 'LEG3', 'LEG4', 'LEG5', 'LEG6', 'LEG7', 'LEG8', 'LEG9']
 

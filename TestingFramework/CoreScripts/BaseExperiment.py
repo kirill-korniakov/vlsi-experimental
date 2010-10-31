@@ -128,6 +128,7 @@ class BaseExperiment:
         metrics      = ['HPWL', 'TNS', 'WNS']
         parser       = LogParser(logName)
         table        = parser.ParsePQAT(metrics)
+        table        = MakeTableInPercents(table)
         PQATFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
         PrintTableToFile(PQATFileName, table, metrics)
 
