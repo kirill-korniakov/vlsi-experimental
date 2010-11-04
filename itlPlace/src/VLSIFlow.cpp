@@ -381,22 +381,22 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
             if (DoBufferingIfRequired(hd, "DesignFlow.LoopBuffering"))
                 WriteFlowMetrics(flowMetrics, hd, "Buffering", Aux::Format("BUF&d", i + 1));
             if (DoRemoveNewBufferingIfRequired(hd, "DesignFlow.LoopRemoveNewBuffering"))
-                WriteFlowMetrics(flowMetrics, hd, "RemoveNewBuffering", Aux::Format("RNB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "RemoveNewBuffering", Aux::Format("RNB%d", i + 1));
             if (DoNewBufferingIfRequired(hd, "DesignFlow.LoopNew_Buffering"))
-                WriteFlowMetrics(flowMetrics, hd, "New_Buffering", Aux::Format("NBUF&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "New_Buffering", Aux::Format("NBUF%d", i + 1));
 
             if (DoRandomPlacementIfRequired(hd, "DesignFlow.LoopBufRandomPlacement"))
-                WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", Aux::Format("RNDB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", Aux::Format("RNDB%d", i + 1));
             if (DoGlobalPlacementIfRequired(hd, "DesignFlow.LoopBufGlobalPlacement"))
-                WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", Aux::Format("GPB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "GlobalPlacement", Aux::Format("GPB%d", i + 1));
             if (DoLRTimingDrivenPlacementIfRequired(hd, "DesignFlow.LoopBufLR"))
-                WriteFlowMetrics(flowMetrics, hd, "LRPlacement", Aux::Format("LRB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "LRPlacement", Aux::Format("LRB%d", i + 1));
 
             if (DoLegalizationIfRequired(DPGrid, "DesignFlow.LoopBufLegalization"))
-                WriteFlowMetrics(flowMetrics, hd, "Legalization", Aux::Format("LEGB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "Legalization", Aux::Format("LEGB%d", i + 1));
 
             if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.LoopBufDetailedPlacement"))
-                WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DPB&d", i + 1));
+                WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", Aux::Format("DPB%d", i + 1));
 
             DoSTAIfCan(hd);
 
@@ -412,8 +412,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
                 UpdateNetWeightsIfRequired(hd, i);
         }
 
-        //QA.RestoreBestAchievedPlacement();
-        //QA.Report();
+        QA.RestoreBestAchievedPlacement();
+        QA.Report();
     }
 
     //PLACEMENT

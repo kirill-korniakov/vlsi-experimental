@@ -358,24 +358,16 @@ RemoveBuffer::~RemoveBuffer()
 
 void RemoveBuffer::RemoveNewBuffering()
 {
+    ALERT("Cells before remove = %d", data->design.Cells.CellsCount());
     for (HNets::NetsEnumeratorW nw =  data->design.Nets.GetFullEnumeratorW(); nw.MoveNext(); )
     {
-        /*if (nw.Name().find(data->textIdentifierBufferedNet) != -1)
-        {
-            nw.SetKind(NetKind_Removed);
-            
-        }*/
-        if (nw.Kind() == NetKind_Buffered)
-        {
-             Utils::RestoreBufferedNet(data->design, nw);
-
-        }
-
-       
-
+        Utils::RestoreBufferedNet(data->design, nw);
     }
 
-
+    int bufferCount = data->design.Cells.CellsCount() - data->design.Cells.MovableCellsCount();
+    ALERT("Buffer count = %d", bufferCount);
+    data->design._Design.NetList.nCellsEnd -= bufferCount;
+    ALERT("Cells after remove = %d", data->design.Cells.CellsCount());
 
     data->design.Plotter.ShowPlacement();
     STA(data->design);
