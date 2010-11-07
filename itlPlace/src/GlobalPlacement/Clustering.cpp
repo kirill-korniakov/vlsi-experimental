@@ -83,6 +83,38 @@ void AssignClusters(HDesign& design, ClusteringInformation& ci, HNetWrapper& net
     MoveValueToTheFirstPosition(idxs, sourceIdx); 
 }
 
+void AssignWeightForClusteredNet(HDesign& hd, ClusteringInformation& ci, int netIdx)
+{
+  double maxWeight = 0.0;
+  //find original nets connected to all clusters in this clustered net
+  for (int i = 0; i < static_cast<int>(ci.netList[netIdx].clusterIdxs.size()); i++)
+  {
+    int currClusterIdx = ci.netList[netIdx].clusterIdxs[i];
+
+    if (!IsMovableCell(currClusterIdx) || ci.clusters[currClusterIdx].isFake)
+      continue;
+
+    //for all cells in this cluster ci.clusters[clusterIdx].isFake
+    for (int j = 0; j < static_cast<int>(ci.clusters[currClusterIdx].cells.size()); j++)
+    {
+      HCell currCell = ci.clusters[currClusterIdx].cells[j];
+
+      for (HCell::PinsEnumerator pe = hd.Get<HCell::Pins, HCell::PinsEnumerator>(currCell);
+           pe.MoveNext(); )
+      {
+        HNet currNet = hd.Get<HPin::Net, HNet>(pe);
+        double netWeight = hd.GetDouble<HNet::Weight>(currNet);
+
+        if (netWeight > maxWeight)
+          maxWeight = netWeight;
+      }
+    }
+  }
+
+  ASSERT(maxWeight > 0);
+  ci.netList[netIdx].weight = maxWeight;
+}
+
 void WriteWeightsToClusteredNets(HDesign& hd, ClusteringInformation& ci)
 {
   int netIdx = 0;
@@ -90,6 +122,7 @@ void WriteWeightsToClusteredNets(HDesign& hd, ClusteringInformation& ci)
   for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); ++netIdx)
   {
     ci.netList[netIdx].weight = net.Weight();
+    //AssignWeightForClusteredNet(hd, ci, netIdx);
   }
 }
 

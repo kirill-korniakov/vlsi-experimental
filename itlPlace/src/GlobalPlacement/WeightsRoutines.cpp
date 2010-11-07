@@ -97,7 +97,13 @@ void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, C
     if (hd.cfg.ValueOf("LSE.Clustering.useNetWeights", false))
     {
       ComputeAndExportWeights(hd); //do weighting
-      WriteWeightsToClusteredNets(hd, ci);
+      //WriteWeightsToClusteredNets(hd, ci);
+      //int netIdx = 0;
+
+      for (int i = 0; i < static_cast<int>(ci.netList.size()); i++)
+      {
+        AssignWeightForClusteredNet(hd, ci, i);
+      }
     }
 }
 
