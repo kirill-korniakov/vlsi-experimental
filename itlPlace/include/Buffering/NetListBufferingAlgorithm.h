@@ -6,24 +6,24 @@
 class BufferingAllCriticalPath : public NetBufferingAlgorithm
 {
 public:
-  BufferingAllCriticalPath(HDesign& hd): NetBufferingAlgorithm(hd)
-  {
-  };
-  int BufferingCriticalPaths();
+    BufferingAllCriticalPath(HDesign& hd): NetBufferingAlgorithm(hd)
+    {
+    };
+    int BufferingCriticalPaths();
 
 protected:
-  bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet interconnection);
-  bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HCriticalPath interconnection);
+    bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet interconnection);
+    bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HCriticalPath interconnection);
 };
 
 class PathBasedBuffering: public BufferingAllCriticalPath
 {
 public:
-  PathBasedBuffering(HDesign& hd):BufferingAllCriticalPath(hd)
-  {
-  }
-  VGVariantsListElement BufferingCriticalPath(HCriticalPath criticalPath, bool isRealBuffering = true);
-  int BufferingNetlist();
+    PathBasedBuffering(HDesign& hd):BufferingAllCriticalPath(hd)
+    {
+    }
+    VGVariantsListElement BufferingCriticalPath(HCriticalPath criticalPath, bool isRealBuffering = true);
+    int BufferingNetlist();
 private:
     bool IsLimitationCountCriticalPathExecute(int totalIndex);
 };

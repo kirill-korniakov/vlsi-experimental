@@ -5,7 +5,7 @@
 VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data)
 {
     vGAlgorithmData = data;
-
+    pGrid = NULL;
     if (data->typeNetListBuffering == BUFFERING_ALL_CRITICAL_PATH)
         vanGinnekenTreeCreate = new VanGinnekenTreeCreate(this);
     if (data->typeNetListBuffering == PATH_BASED)
@@ -41,13 +41,30 @@ VanGinnekenTree::VanGinnekenTree(VGAlgorithmData* data)
 
 VanGinnekenTree::~VanGinnekenTree()
 {
+    //delete updateVanGinnekenTree;
+    //delete vanGinnekenTreeNodeCreate;
+    //delete vanGinnekenTreeCreate;
+    //delete calculateVanGinnekenSubtree;
+    //delete findMaxPointInEdgeVanGinnekenTree;
+    //delete [] vGTreeNodeList;
+
+
+    delete DPGrid;
+    
+   
+    for (int i = 0; i < vGAlgorithmData->totalTreeSize; i++)
+        delete vGTreeNodeList[i];
+    delete [] vGTreeNodeList;
+    
+    if (pGrid != NULL)
+    delete pGrid;
+
     delete updateVanGinnekenTree;
     delete vanGinnekenTreeNodeCreate;
     delete vanGinnekenTreeCreate;
     delete calculateVanGinnekenSubtree;
     delete findMaxPointInEdgeVanGinnekenTree;
-    delete DPGrid;
-    delete [] vGTreeNodeList;
+    vGAlgorithmData = NULL;
 }
 
 void VanGinnekenTree::ClearTree()

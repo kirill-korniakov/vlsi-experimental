@@ -262,7 +262,7 @@ namespace Utils
     {
       Utils::DeletePointInList(design, design.TimingPoints[bufferInput]);
       Utils::DeletePointInList(design, design.TimingPoints[source]);
-      design.Set<HCell::PlacementStatus>(design.Get<HPin::Cell, HCell>(source), PlacementStatus_Fictive);
+      //design.Set<HCell::PlacementStatus>(design.Get<HPin::Cell, HCell>(source), PlacementStatus_Fictive);
     }
 
     for (HNet::SinksEnumeratorW sink = design.Get<HNet::Sinks, HNet::SinksEnumeratorW>(netToRemove); sink.MoveNext(); )

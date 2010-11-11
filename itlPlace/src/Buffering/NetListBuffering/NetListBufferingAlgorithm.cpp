@@ -349,6 +349,7 @@ int PathBasedBuffering::BufferingNetlist()
 RemoveBuffer::RemoveBuffer(HDesign& hd)
 {
     data = new VGAlgorithmData(hd);
+    data->Initialize();
 }
 
 RemoveBuffer::~RemoveBuffer()
@@ -358,16 +359,26 @@ RemoveBuffer::~RemoveBuffer()
 
 void RemoveBuffer::RemoveNewBuffering()
 {
-    ALERT("Cells before remove = %d", data->design.Cells.CellsCount());
+
+    ALERT("Cells before remove = %d", data->design.Cells.PlaceableCellsCount());
+    int bufferCount = 0;
+    for (HCells::PlaceableCellsEnumeratorW pCell = data->design.Cells.GetPlaceableCellsEnumeratorW(); pCell.MoveNext(); )
+    {
+        for(unsigned int j = 0; j < data->Buffers.size(); j++)
+        {
+            if (data->design.Cells.Get<HCell::MacroType, HMacroType>(pCell) == data->Buffers[j].Type())
+                bufferCount++;
+        }
+    }
     for (HNets::NetsEnumeratorW nw =  data->design.Nets.GetFullEnumeratorW(); nw.MoveNext(); )
     {
         Utils::RestoreBufferedNet(data->design, nw);
     }
 
-    int bufferCount = data->design.Cells.CellsCount() - data->design.Cells.MovableCellsCount();
     ALERT("Buffer count = %d", bufferCount);
     data->design._Design.NetList.nCellsEnd -= bufferCount;
-    ALERT("Cells after remove = %d", data->design.Cells.CellsCount());
+    //data->design._Design.NetList.cellTypeBounds[MacroType_Last + 1].nFictive = 0;
+    ALERT("Cells after remove = %d", data->design.Cells.PlaceableCellsCount());
 
     data->design.Plotter.ShowPlacement();
     STA(data->design);

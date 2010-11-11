@@ -14,12 +14,14 @@ void HVGAlgorithm::NetlistBuffering()
         BufferingAllCriticalPath* bufferingAlgorithm = new BufferingAllCriticalPath(design);
         bufferingAlgorithm->Initialize();
         bufferingAlgorithm->BufferingCriticalPaths();
+        delete bufferingAlgorithm;
     }
     else
     {
         PathBasedBuffering* bufferingAlgorithm = new PathBasedBuffering(design);
         bufferingAlgorithm->Initialize();
         bufferingAlgorithm->BufferingNetlist();
+        delete bufferingAlgorithm;
     }
 }
 

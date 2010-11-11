@@ -58,7 +58,7 @@ VGAlgorithmData::~VGAlgorithmData()
     if (netVisit != NULL)
         delete [] netVisit;
     if (vGTree != NULL)
-        delete [] vGTree;
+        delete vGTree;
 
 }
 
