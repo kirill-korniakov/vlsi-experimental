@@ -31,12 +31,13 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
     int lClusterRatio;
     int lDesiredFinalNumberOfClusters;
     double lClustersAreaTolerance;
+    int lCurrentNumberOfClusters;
 
     if (0 == fscanf(resultFile, "a %d %d %I64X %d\n",
                     &lClusterRatio, 
                     &lDesiredFinalNumberOfClusters, 
                     &lClustersAreaTolerance,
-                    &mCurrentNumberOfClusters)
+                    &lCurrentNumberOfClusters)
       || lClusterRatio != mClusterRatio
       || lDesiredFinalNumberOfClusters != mDesiredFinalNumberOfClusters
       || lClustersAreaTolerance != mClustersAreaTolerance)
@@ -45,6 +46,7 @@ bool ClusteringInformation::LoadFromFile(const char* fileName, const char* bench
       return false;
     }
 
+    mCurrentNumberOfClusters = lCurrentNumberOfClusters;
     LoadClustersFromFile(resultFile, hd);
     LoadClusteringLogFromFile(resultFile);
     LoadNetLevelsFromFile(resultFile);
