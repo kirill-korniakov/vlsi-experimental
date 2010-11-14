@@ -112,6 +112,16 @@ def MakeTableInPercents(table):
 
     return table
 
+def ExtractXYFromTable(table):
+    xValues = []
+    yValues = []
+
+    for currStage in table:
+        xValues.append(currStage[1])
+        yValues.append(currStage[0])
+
+    return (xValues, yValues)
+
 def PrintTableToFile(tableFileName, table, metrics, stages = []):
     cols = ['stage', END_OF_COLUMN]
 

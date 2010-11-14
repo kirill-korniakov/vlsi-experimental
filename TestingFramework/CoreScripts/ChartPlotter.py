@@ -1,7 +1,4 @@
-def PlotChartForBenchmark(benchmark, table):
-    if (not table):
-        print('table for ' + benchmark  + ' is empty')
-        return
+def PlotChartForBenchmark(benchmark, xValues, yValues):
     try:
         import matplotlib.pyplot as plt
         from matplotlib.pyplot import figure, savefig
@@ -9,14 +6,6 @@ def PlotChartForBenchmark(benchmark, table):
     except ImportError:
         print('Unable to plot charts: matplotlib needed')
         return
-
-    xValues = []
-    yValues = []
-    del table[0] #don't use values of 0 iteration
-
-    for currStage in table:
-        xValues.append(currStage[1])
-        yValues.append(currStage[0])
 
     fig = plt.figure()
     plt.plot(xValues, yValues)

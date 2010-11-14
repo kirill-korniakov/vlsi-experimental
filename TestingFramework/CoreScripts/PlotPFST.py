@@ -11,7 +11,10 @@ def PrintAndPlotPFST(logName, metrics, stages):
     table  = parser.ParsePFST(metrics, stages)
     table  = MakeTableInPercents(table)
     PrintTableToFile(logName + '.csv', table, metrics, stages)
-    PlotChartForBenchmark(logName, table)
+
+    del table[0] #don't use values of 0 iteration
+    [xValues, yValues] = ExtractXYFromTable(table)
+    PlotChartForBenchmark(logName, xValues, yValues)
 
 def Run():
     #lastLogFolder = '../Reports/SGNW'
