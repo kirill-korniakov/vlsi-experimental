@@ -25,13 +25,15 @@ def ParseAndPlotPQAT(logFolder, doPlotCharts):
         table        = MakeTableInPercents(table)
         PQATFileName = logFolder + '/' + os.path.basename(log) + '.csv'
         PrintTableToFile(PQATFileName, table, metrics)
-
-        #Plot
-        del table[0] #don't use values of 0 iteration
         [xValues, yValues] = ExtractXYFromTable(table)
 
+        #Start point (percents)
+        xValues[0] = 100
+        yValues[0] = 100
+
+        #Plot
         if (doPlotCharts):
-            PlotChartForBenchmark(logFolder + '/' + log, xValues, yValues)
+            PlotChartForBenchmark(logFolder + '/' + log, xValues, 'TNS', yValues, 'HPWL')
 
 def Run():
     #logFolder    = '../Reports/LR_make_charts'

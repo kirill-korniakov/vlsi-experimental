@@ -9,16 +9,21 @@ from CoreFunctions import PrintTableToFile
 def PrintAndPlotPFST(logName, metrics, stages):
     parser = LogParser(logName)
     table  = parser.ParsePFST(metrics, stages)
+
+    if (table == []):
+        print('Error: table is empty')
+        return
+
     table  = MakeTableInPercents(table)
     PrintTableToFile(logName + '.csv', table, metrics, stages)
 
     del table[0] #don't use values of 0 iteration
     [xValues, yValues] = ExtractXYFromTable(table)
-    PlotChartForBenchmark(logName, xValues, yValues)
+    PlotChartForBenchmark(logName, xValues, 'TNS', yValues, 'HPWL')
 
 def Run():
-    #lastLogFolder = '../Reports/SGNW'
-    lastLogFolder   = '../Reports/APlace_weighting'
+    lastLogFolder = '../Reports/SGNW'
+    #lastLogFolder   = '../Reports/APlace_weighting'
     metrics = ['HPWL', 'TNS']
     stages  = ['INIT', 'LEG1', 'LEG2', 'LEG3', 'LEG4', 'LEG5', 'LEG6', 'LEG7', 'LEG8', 'LEG9']
 
