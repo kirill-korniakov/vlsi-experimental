@@ -165,32 +165,6 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
     return best;
 }
 
-int findRepeat(string str, string find)
-{
-    unsigned int strLength = int (str.length());
-    unsigned int i = 0;
-    unsigned int findLength = int (find.length());
-    bool f = false;
-    int result = 0;
-    while (i < strLength)
-    {
-        f = true;
-        for (unsigned int j = 0; j < findLength; j++, i++)
-        {
-            if (str[i] != find[j])
-            {
-                f = false;
-                break;
-            }
-        }
-        if (f) 
-            result++;
-        else 
-            i++;
-    }
-    return result;
-}
-
 bool PathBasedBuffering::IsLimitationCountCriticalPathExecute(int totalIndex)
 {
     if (data->limitationCountCriticalPath == 0) return true;
@@ -243,7 +217,7 @@ int PathBasedBuffering::BufferingNetlist()
                 for (HCriticalPath::PointsEnumeratorW point = (paths[ind],data->design).GetEnumeratorW(); point.MoveNext();)
                 {
                     HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
-                    curRepeatNet = findRepeat(net.Name(), data->textIdentifierBufferedNet);
+                    curRepeatNet = Utils::FindRepeat(net.Name(), data->textIdentifierBufferedNet);
                     if (curRepeatNet > countRepeatNet) 
                         countRepeatNet = curRepeatNet;
                     if (countRepeatNet >= data->maxCountRepeatNet)
@@ -359,7 +333,6 @@ RemoveBuffer::~RemoveBuffer()
 
 void RemoveBuffer::RemoveNewBuffering()
 {
-
     ALERT("Cells before remove = %d", data->design.Cells.PlaceableCellsCount());
     int bufferCount = 0;
     for (HCells::PlaceableCellsEnumeratorW pCell = data->design.Cells.GetPlaceableCellsEnumeratorW(); pCell.MoveNext(); )

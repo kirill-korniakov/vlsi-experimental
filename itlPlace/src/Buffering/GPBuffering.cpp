@@ -4,13 +4,14 @@
 #include "Utils.h"
 #include "Timing.h"
 #include "VanGinnekenTree.h"
+#include "Reporting.h"
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
                                         int& min_row, int& max_row,
                                         double x, double y, AppCtx* context);
 
-GPBuffering::GPBuffering(HDesign& hd): NetBufferingAlgorithm(hd)
+GPBuffering::GPBuffering(HDesign& hd): PathBasedBuffering(hd)
 {
 
 }
@@ -152,6 +153,143 @@ int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
         }
     }
     return vGVariant.GetPositionCount();
+}
+
+int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL)
+{
+    if (!isInitialize) Initialize();
+
+    if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
+        //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
+        //data->GetSizeBuffer()) / 100.0, 1.0));
+        data->sizeBufferMultiplier = ((LHPWL - HPWL) / LHPWL);
+
+    //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
+    //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
+    ALERT("NewSizeBufferMultiplier = %f", data->sizeBufferMultiplier);
+
+    STA(data->design);
+    if (data->design.CriticalPaths.Count() < 0)
+        FindCriticalPaths(data->design);
+
+    if (data->plotBuffer || data->plotBinGridValue)
+        data->design.Plotter.ShowPlacement();
+
+    int totalBufferCount = 0;
+    ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
+    bool isBufferingFinish = false;
+    int totalIndex = 0;
+    int ind = 0;
+    int bufferCount = 0;
+    double curTNS = 0;
+    double curWNS = 0;
+    double minTNS = INFINITY;
+    double minWNS = INFINITY;  
+
+    std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
+    int idx = 0;
+    for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
+        paths[idx++] = i;
+    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
+
+
+    for (int i = 0; i < context->sprData.binGrid.nBinRows; ++i)
+    {
+        for (int j = 0; j < context->sprData.binGrid.nBinCols; ++j)
+        {
+            context->sprData.binGrid.bins[i][j].sumBufPotential = 0.0;
+            context->sprData.bufferPotentialOverBins[i][j] = 0.0;
+        }
+    }
+
+    ALERT("#CriticalPaths = %d", data->design.CriticalPaths.Count());int countCP = 0;
+    while ((!isBufferingFinish) && IsLimitationCountCriticalPathExecute(totalIndex) && (ind < data->design.CriticalPaths.Count()))
+    {
+        bufferCount = 0;
+        if (IsAppropriateNumberOfPins(data, paths[ind]))
+        {
+
+            bool isBufferingNet = true;
+            if (!data->isNetContainPrimaryPin) 
+                if (data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(paths[ind])))) ||
+                    data->design.Pins.GetBool<HPin::IsPrimary>(data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(data->design.CriticalPaths.Get<HCriticalPath::EndPoint, HCriticalPathPoint>(paths[ind])))))
+                    isBufferingNet = false;
+
+            if (data->IslimitationsCountRepeatNet())
+            {
+                int countRepeatNet = 0;
+                int curRepeatNet = 0;
+                for (HCriticalPath::PointsEnumeratorW point = (paths[ind],data->design).GetEnumeratorW(); point.MoveNext();)
+                {
+                    HNetWrapper net = data->design[((point.TimingPoint(),data->design).Pin(),data->design).OriginalNet()];
+                    curRepeatNet = Utils::FindRepeat(net.Name(), data->textIdentifierBufferedNet);
+                    if (curRepeatNet > countRepeatNet) 
+                        countRepeatNet = curRepeatNet;
+                    if (countRepeatNet >= data->maxCountRepeatNet)
+                        isBufferingNet = false;
+                }
+            }
+
+            if (!isBufferingNet) 
+            {
+                ind++;
+                continue; 
+            }
+            if (!data->IsBuffering())
+            {
+                ind++;
+                continue; 
+            }
+            if (data->nameBufferingNet != "")
+            {
+                HPinWrapper firstPin = data->design[data->design[data->design[data->design[paths[ind]].StartPoint()].TimingPoint()].Pin()];
+                HPinWrapper lastPin = data->design[data->design[data->design[data->design[paths[ind]].EndPoint()].TimingPoint()].Pin()];
+
+                HCellWrapper firstCell = data->design[firstPin.Cell()];
+                HCellWrapper lastCell = data->design[lastPin.Cell()];
+
+                string pathName = 
+                    string("From    ") + 
+                    (firstPin.IsPrimary() ?  string("PIN") : firstCell.Name()) +
+                    firstPin.Name().c_str() +
+                    string("    To    ") +
+                    (lastPin.IsPrimary() ?  string("PIN") : lastCell.Name()) +
+                    lastPin.Name();
+
+                if (pathName != data->nameBufferingNet)
+                {
+                    ind++;
+                    continue; 
+                }
+            }
+
+            if (data->printCriticalPathsInfo)
+            {
+                ALERT("Critical Paths number = %d", ind);
+                PrintPath(data->design, paths[ind], ::ToID(paths[ind])); 
+            }
+
+            bufferCount = UpdateBinTable(context, BufferingCriticalPath(paths[ind], false));
+            totalBufferCount += bufferCount;
+            ind++;
+        }
+        totalIndex++;
+    }
+
+    if (data->plotBinGridValue)
+        data->design.Plotter.PlotFillBinGrid(context);
+
+    if (data->plotBuffer || data->plotBinGridValue)
+    {
+        data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
+        data->design.Plotter.ShowPlacement();
+    }
+
+    ALERT("Buffers inserted: %d", totalBufferCount);
+    ALERT("Minimal TNS: %f", minTNS);
+    ALERT("Minimal WNS: %f", minWNS);
+    ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
+    return totalBufferCount;
 }
 
 int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)

@@ -416,7 +416,7 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
     //INITIALIZE OPTIMIZATION PROBLEM PARAMETERS
     context.Initialize(hd, ci);
     iCHKERRQ InitializeTAO(hd, ci, context, x, xl, xu, tao, taoapp);
-    
+
     ReportIterationInfo(ci, context);
     ReportBinGridInfo(context);   
     ExportNetWeights(netListIter, ci, i);
@@ -501,7 +501,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         //VecGetArray(x, &solution);
         //InitWeights(solution, &context);
         //VecRestoreArray(x, &solution);
-        
+
         // Tao solve the application
         iCHKERRQ TaoSolveApplication(taoapp, tao);
         int innerTAOIterations = 0;
@@ -516,15 +516,19 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
-          WRITELINE("");
-          ALERT("NEW BUFFERING STARTED");
-          ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
-          GPBuffering buf(hd);
-          buf.Initialize();
-          buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
-          ctx.Close();
-          ALERT("NEW BUFFERING FINISHED");
-          WRITELINE("");
+            WRITELINE("");
+            ALERT("NEW BUFFERING STARTED");
+            ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
+            GPBuffering buf(hd);
+            buf.Initialize();
+            if (hd.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
+                buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+            else
+                buf.SetBinTablePathBasedBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+
+            ctx.Close();
+            ALERT("NEW BUFFERING FINISHED");
+            WRITELINE("");
         }
 
         ReportPostIterationInfo(hd, context, metaIteration, iteration);

@@ -33,4 +33,30 @@ namespace Utils
     ALERT("variant: %d\t\t%s",i, s.c_str());
     delete [] sBuf;
   }
+
+  int FindRepeat(string str, string find)
+  {
+      unsigned int strLength = int (str.length());
+      unsigned int i = 0;
+      unsigned int findLength = int (find.length());
+      bool f = false;
+      int result = 0;
+      while (i < strLength)
+      {
+          f = true;
+          for (unsigned int j = 0; j < findLength; j++, i++)
+          {
+              if (str[i] != find[j])
+              {
+                  f = false;
+                  break;
+              }
+          }
+          if (f) 
+              result++;
+          else 
+              i++;
+      }
+      return result;
+  }
 }
