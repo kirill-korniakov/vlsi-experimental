@@ -1,6 +1,9 @@
 import CoreFunctions
 from CoreFunctions import *
 
+import sys
+sys.path.append('../')
+
 import Parameters
 from Parameters import *
 
