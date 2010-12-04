@@ -15,7 +15,7 @@ def ParseAndPlotPQAT(logFolder, doPlotCharts):
 
     for log in os.listdir(logFolder):
       if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
-        parser = LogParser(logFolder + '/' + log)
+        parser = LogParser(logFolder + '/' + log, PQAT)
         table  = parser.ParsePQAT(metrics)
 
         if (table == []):

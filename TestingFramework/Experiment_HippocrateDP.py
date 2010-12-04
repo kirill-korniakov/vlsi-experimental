@@ -41,7 +41,9 @@ class Experiment_HippocrateDP(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
 def test():
-    #e = Experiment_HippocrateDP()
+    e = Experiment_HippocrateDP()
+    e.stages = ['LEG', 'DP']
+    #e.stages = []
     #testRunner = TestRunner()
     #testRunner.Append(e)
     #testRunner.Run()

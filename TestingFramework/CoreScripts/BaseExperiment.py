@@ -126,7 +126,7 @@ class BaseExperiment:
 
     def ParsePQATAndPrintTable(self, logName):
         metrics      = ['HPWL', 'TNS', 'WNS']
-        parser       = LogParser(logName)
+        parser       = LogParser(logName, PQAT)
         table        = parser.ParsePQAT(metrics)
         table        = MakeTableInPercents(table)
         PQATFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
@@ -145,6 +145,10 @@ class BaseExperiment:
         WriteStringToFile(cols, reportTable)
 
     def MakeResultTable(self, logFolder, reportTable):
+        if (os.path.exists(logFolder) == False):
+            print('folder ' + logFolder + 'does not exist')
+            return
+
         reportTable = logFolder + '/' + reportTable
         self.CreateEmptyTable(reportTable)
 

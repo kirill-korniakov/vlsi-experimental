@@ -12,11 +12,18 @@ PFST = 'PFST'
 PQAT = 'PQAT'
 
 class LogParser:
-    logName = ''
+    logName     = ''
+    tableHeader = ''
 
-    def __init__(self, logName, parameters = LogParserParameters()):
-        self.logName = logName
+    def __init__(self, logName, tableType = PFST, parameters = LogParserParameters()):
+        self.logName    = logName
         self.parameters = parameters
+
+        if (tableType == PFST):
+            self.tableHeader = self.parameters.PFSTTableHeader
+
+        else:
+            self.tableHeader = self.parameters.PQATTableHeader
 
     def GetFromTable(self, stageTag, metricTag, tableType = PFST):
         try:
@@ -30,23 +37,16 @@ class LogParser:
 
         #move to the table
         lineIdx       = 0
-        tableHeader   = ''
         borderPattern = self.parameters.PFSTBorderPattern
 
-        if (tableType == PFST):
-            tableHeader = self.parameters.PFSTTableHeader
-
-        else:
-            tableHeader = self.parameters.PQATTableHeader
-
         for line in lines:
-            if line.find(tableHeader) != -1:
+            if line.find(self.tableHeader) != -1:
                 break
             else:
                 lineIdx = lineIdx + 1
 
         if lineIdx == len(lines):
-            print(tableHeader + ' not found in log file')
+            print(self.tableHeader + ' not found in log file')
             return NOT_FOUND
 
         #find colIdx
@@ -96,6 +96,9 @@ class LogParser:
         return table
 
     def ParsePFST(self, metrics, stages):
+        if (stages == []):
+            stages.extend(self.GetStageTag())
+
         table = [[0 for col in range(len(metrics))] for row in range(len(stages))]
 
         for col in range(len(metrics)):
@@ -119,7 +122,7 @@ class LogParser:
             linesCount = linesCount + 1
 
         for line in lines:
-            if line.find(tableHeader) != -1:
+            if line.find(self.tableHeader) != -1:
 
                 metrics = lines[lineIdx+1].split()
                 colIdx = 0
@@ -138,21 +141,22 @@ class LogParser:
 
                 columCount = 0;
                 i = lineIdx
-                while ((lines[i].find(self.parameters.borderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                while ((lines[i].find(self.parameters.PFSTBorderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     columCount = columCount + 1
                     i = i + 1
 
                 tagList = ['' for i in range(columCount)]
-                while ((lines[lineIdx].find(self.parameters.borderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                while ((lines[lineIdx].find(self.parameters.PFSTBorderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     ll = lines[lineIdx].split()
                     tagList[tagId] = ll[colIdx]
                     tagId = tagId + 1
                     lineIdx = lineIdx + 1
 
-                res = [tagId, tagList]
-                return res
+                #res = [tagId, tagList]
+                #return res
+                return tagList
             else:
                 lineIdx = lineIdx + 1
         if lineIdx == len(lines):
-            print(tableHeader + ' not found in log file')
+            print(self.tableHeader + ' not found in log file')
             return NOT_FOUND
