@@ -48,4 +48,5 @@ def test():
 
     testRunner.Run()
 
-#test()
+if (__name__ == "__main__"):
+    test()

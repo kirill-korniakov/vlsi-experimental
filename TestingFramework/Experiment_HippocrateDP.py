@@ -41,10 +41,12 @@ class Experiment_HippocrateDP(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
 def test():
-    e = Experiment_HippocrateDP()
-    testRunner = TestRunner()
-    testRunner.parameters.experiments.append(e)
+    #e = Experiment_HippocrateDP()
+    #testRunner = TestRunner()
+    #testRunner.Append(e)
+    #testRunner.Run()
 
-    testRunner.Run()
+    e.MakeResultTable('.\Reports\HippocrateDP.cfg_2010-12-04_12-59-24', 'HippocrateDPTable.csv')
 
-#test()
+if (__name__ == "__main__"):
+    test()

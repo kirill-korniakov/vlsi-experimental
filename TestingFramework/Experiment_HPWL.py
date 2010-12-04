@@ -22,4 +22,5 @@ def test():
     testRunner.parameters.experiments.append(eIWLS)
     testRunner.Run()
 
-#test()
+if (__name__ == "__main__"):
+    test()

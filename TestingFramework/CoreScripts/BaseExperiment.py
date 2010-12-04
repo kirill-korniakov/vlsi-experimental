@@ -144,6 +144,15 @@ class BaseExperiment:
         #write metrics to the file
         WriteStringToFile(cols, reportTable)
 
+    def MakeResultTable(self, logFolder, reportTable):
+        reportTable = logFolder + '/' + reportTable
+        self.CreateEmptyTable(reportTable)
+
+        for log in os.listdir(logFolder):
+            if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
+                benchmark = os.path.splitext(log)[0]
+                self.ParseLogAndFillTable(logFolder + '/' + log, benchmark, reportTable)
+
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         values = self.ParseLog(logName)
 
