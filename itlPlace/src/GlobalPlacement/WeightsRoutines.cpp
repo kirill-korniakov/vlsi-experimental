@@ -59,14 +59,52 @@ double GetMultiplierAccordingDesiredRatio(double ratio, double desiredRatio, dou
     else
         return 1.0/multiplier;
 }
+double GetMultiplierAccordingDesiredRatio(HDesign& hd, double deltaRatio, int updateFunction)
+{
+	double multiplier = 1.0;
+	
+	double N = hd.cfg.ValueOf("GlobalPlacement.Weights.N", 1.0);
+	double R = hd.cfg.ValueOf("GlobalPlacement.Weights.R", 1.1);
+	double A = hd.cfg.ValueOf("GlobalPlacement.Weights.A", 1.0);
+	double B = hd.cfg.ValueOf("GlobalPlacement.Weights.B", 1.0);
+	double C = hd.cfg.ValueOf("GlobalPlacement.Weights.C", 1.0);
+	
+	if (updateFunction == 0)
+	{
+		double p = N;
+		int s = deltaRatio > 0 ? 1 : (deltaRatio < 0) ? -1 : 0;
+		double f = fabs(deltaRatio);
+		multiplier = 1 + C*s*pow(f, p);
+	}
+	else if (updateFunction == 1)
+		multiplier = 1 + A*atan(B*deltaRatio);
+
+	else if (updateFunction == 2)
+		multiplier = pow(R, deltaRatio);
+
+	else if (updateFunction == 3)
+		multiplier = pow(1 + deltaRatio, N);
+
+	return multiplier;
+}
 
 double ChooseSpreadingMultiplier(HDesign& hd, double currentHPWL, double currentLHPWL)
 {
     double sprRatio = currentLHPWL / currentHPWL;
     double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
-    double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
-
-    return GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
+	
+	bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);
+	int sprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateFunction", 0);
+	if (useSprUpdateFunction)
+	{
+		double deltaRatio = sprRatio - sprDesiredRatio;
+	    return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, sprUpdateFunction);
+	}
+	else
+	{
+	    double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
+        return GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
+    }
 }
 
 double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL)
@@ -74,6 +112,14 @@ double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL
     double lseRatio = currentLHPWL / initialLHPWL;
     double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
     double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
+	
+	bool useLseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useLseUpdateFunction", false);
+	int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 0);
+	if (useLseUpdateFunction)
+	{
+		double deltaRatio = lseRatio - lseDesiredRatio;
+		return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, lseUpdateFunction);
+	}
 
     return GetMultiplierAccordingDesiredRatio(lseRatio, lseDesiredRatio, lseUpdateMultiplier);
 }
