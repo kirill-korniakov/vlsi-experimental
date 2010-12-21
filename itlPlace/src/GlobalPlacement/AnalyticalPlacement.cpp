@@ -514,29 +514,30 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
             UpdateCellsCoordinates(hd, ci);
         }
 
-        if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
-        {
-            WRITELINE("");
-            ALERT("NEW BUFFERING STARTED");
-            ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
-            GPBuffering buf(hd);
-            buf.Initialize();
-            if (hd.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
-                buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
-            else
-                buf.SetBinTablePathBasedBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
-
-            ctx.Close();
-            ALERT("NEW BUFFERING FINISHED");
-            WRITELINE("");
-        }
-
         ReportPostIterationInfo(hd, context, metaIteration, iteration);
 
         if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
 
         UpdateWeights(hd, context, QA, ci);
+
+        if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+            if (metaIteration >= hd.cfg.ValueOf("GlobalPlacement.New_Buffering.NumberMetaIterationStartBuffering", 0))
+            {
+                WRITELINE("");
+                ALERT("NEW BUFFERING STARTED");
+                ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
+                GPBuffering buf(hd);
+                buf.Initialize();
+                if (hd.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
+                    buf.SetBinTableBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+                else
+                    buf.SetBinTablePathBasedBuffer(&context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+
+                ctx.Close();
+                ALERT("NEW BUFFERING FINISHED");
+                WRITELINE("");
+            }
 
         iteration++;
     }

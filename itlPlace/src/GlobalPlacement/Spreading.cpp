@@ -248,12 +248,14 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
             totalPotential += binGrid.bins[i][j].sumPotential;
         }
     }
-    //ALERT("Total sum potential + buffer potential   = %f", totalPotential);
-    //ALERT("Desired Potential = %f", 
-    //  context->desiredCellsAreaAtEveryBin * context->binGrid.nBins));
-    //ALERT("Total buffer potential = %f", sum);
-    //ALERT("Total sum potential = %f", sum2);
-    //ALERT("(Total buffer potential)/(Total sum potential) = %f", sum / sum2);
+    if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+        if (context->hd->cfg.ValueOf("GlobalPlacement.New_Buffering.Reporting.PrintSumPutencial", false))
+        {
+            ALERT("Total sum potential + buffer potential   = %f", totalPotential);
+            ALERT("Total buffer potential = %f", sum);
+            ALERT("Total sum potential = %f", sum2);
+            ALERT("(Total buffer potential)/(Total sum potential) = %f", sum / sum2);
+        }
 }
 
 double SpreadingPenalty(AppCtx* context, PetscScalar* x)

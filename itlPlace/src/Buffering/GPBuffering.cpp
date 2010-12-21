@@ -122,7 +122,7 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
         }
     }
 
-    double sizeBufferMultiplier = 1.0 / bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->sizeBufferMultiplier;
+    double sizeBufferMultiplier = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->sizeBufferMultiplier;
     return (xSize * ySize * sizeBufferMultiplier);
 }
 
@@ -162,7 +162,7 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
     if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
         //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
         //data->GetSizeBuffer()) / 100.0, 1.0));
-        data->sizeBufferMultiplier = ((LHPWL - HPWL) / LHPWL);
+        data->sizeBufferMultiplier = 1.0 - ((LHPWL - HPWL) / LHPWL);
 
     //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
     //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
@@ -299,7 +299,7 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
     if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
         //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
         //data->GetSizeBuffer()) / 100.0, 1.0));
-        data->sizeBufferMultiplier = ((LHPWL - HPWL) / LHPWL);
+        data->sizeBufferMultiplier =  1.0 - ((LHPWL - HPWL) / LHPWL);
 
     if (data->plotBuffer || data->plotBinGridValue)
         data->design.Plotter.ShowPlacement();
