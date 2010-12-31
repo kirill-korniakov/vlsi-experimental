@@ -224,7 +224,26 @@ class TestRunner:
             resultValues = []
 
             defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"
-            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg), defFile, experiment.cmdLine]
+
+            benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
+            pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
+            pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
+
+            #if (os.path.exists(benchmarkDirectory) != True):
+            #    os.mkdir(benchmarkDirectory)
+
+            #if (os.path.exists(pixDirectory) != True):
+            #    os.makedirs(pixDirectory)
+
+            milestonePixDirectory = pixDirectory + "//milestones"
+
+            if (os.path.exists(milestonePixDirectory) != True):
+                os.makedirs(milestonePixDirectory)
+
+            milestonePixDirParam  = "--plotter.milestonePixDirectory=" + milestonePixDirectory
+
+            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(experiment.cfg),\
+                      defFile, experiment.cmdLine, pixDirParam, milestonePixDirParam]
             #HACK: ugly hack for ISPD04 benchmarks
             if experiment.cfg.find("ispd04") != -1:
                 lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
