@@ -202,7 +202,7 @@ class TestRunner:
         print('Config: %s' % experiment.cfg)
         print('List:   %s' % experiment.benchmarks)
 
-        reportCreator = ReportCreator(experiment.cfg)
+        reportCreator = ReportCreator(experiment.name, experiment.cfg)
         logFolder     = reportCreator.CreateLogFolder()
         reportTable   = reportCreator.GetReportTableName()
         experiment.CreateEmptyTable(reportTable)

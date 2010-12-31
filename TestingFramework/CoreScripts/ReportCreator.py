@@ -12,9 +12,10 @@ class ReportCreator:
     logFolder = ''
     cfgName = ''
 
-    def __init__(self, cfgName):
+    def __init__(self, experimentName, cfgName):
         self.cfgName = cfgName
-        self.logFolder = ReportParameters.logFolder + os.path.basename(cfgName) + '_' + GetTimeStamp()
+        self.logFolder = ReportParameters.logFolder + experimentName.replace(" ", "_")\
+                         + "_" + os.path.basename(cfgName) + '_' + GetTimeStamp()
 
     def GetReportTableName(self):
         (path, cfgFileName) = os.path.split(self.cfgName)
