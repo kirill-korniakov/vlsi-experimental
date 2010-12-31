@@ -1,4 +1,3 @@
-import subprocess
 import sys
 import os
 
@@ -10,23 +9,24 @@ from Parameters import *
 
 class ReportCreator:
     logFolder = ''
-    cfgName = ''
+    cfgName   = ''
 
     def __init__(self, experimentName, cfgName):
-        self.cfgName = cfgName
-        self.logFolder = ReportParameters.logFolder + experimentName.replace(" ", "_")\
-                         + "_" + os.path.basename(cfgName) + '_' + GetTimeStamp()
+        self.cfgName   = cfgName
+        self.logFolder = "%s%s_%s_%s" % (ReportParameters.logFolder, experimentName.replace(" ", "_"),\
+                         os.path.basename(cfgName), GetTimeStamp())
 
     def GetReportTableName(self):
         (path, cfgFileName) = os.path.split(self.cfgName)
-        return self.logFolder + '/' + "ReportTable_{0}.csv".format(cfgFileName)
+        return ("%s//ReportTable_%s.csv" % (self.logFolder, cfgFileName))
 
     def CreateLogFolder(self):
         if os.path.exists(self.logFolder):
-            newFolderName = self.logFolder + "_backup_from_" + GetTimeStamp()
+            newFolderName = "%s_backup_from_%s" % (self.logFolder, GetTimeStamp())
             os.rename(self.logFolder, newFolderName)
+
         if os.path.exists(ReportParameters.logFolder) != True:
             os.mkdir(ReportParameters.logFolder)
-        os.mkdir(self.logFolder)
 
+        os.mkdir(self.logFolder)
         return self.logFolder
