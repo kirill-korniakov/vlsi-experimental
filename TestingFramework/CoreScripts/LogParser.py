@@ -113,50 +113,54 @@ class LogParser:
         return table
 
     def GetStageTag(self):
-        log = open(self.logName, 'r')
+        log   = open(self.logName, 'r')
         lines = log.readlines()
         log.close()
-        lineIdx = 0
+        lineIdx    = 0
         linesCount = 0
+
         for line in lines:
             linesCount = linesCount + 1
 
         for line in lines:
             if line.find(self.tableHeader) != -1:
+                colIdx    = 0
+                metrics   = lines[lineIdx + 1].split()
+                metricTag = 'Tag'
 
-                metrics = lines[lineIdx+1].split()
-                colIdx = 0
-                metricTag = 'Tag';
                 for metric in metrics:
                     if metrics[colIdx].find(metricTag) == 0:
                         break
+
                     else:
                         colIdx = colIdx + 1
+
                 if colIdx == len(metrics):
                     print('Tag ' + metricTag + ' not found')
                     return NOT_FOUND
 
-                lineIdx = lineIdx + 3
-                tagId = 0
-
+                lineIdx    = lineIdx + 3
                 columCount = 0;
-                i = lineIdx
-                while ((lines[i].find(self.parameters.PFSTBorderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                i          = lineIdx
+
+                while ((lines[i].find(self.parameters.PFSTBorderPattern) == -1)\
+                        and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     columCount = columCount + 1
                     i = i + 1
 
-                tagList = ['' for i in range(columCount)]
-                while ((lines[lineIdx].find(self.parameters.PFSTBorderPattern) == -1) and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                tagList = []
+
+                while ((lines[lineIdx].find(self.parameters.PFSTBorderPattern) == -1)\
+                        and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     ll = lines[lineIdx].split()
-                    tagList[tagId] = ll[colIdx]
-                    tagId = tagId + 1
+                    tagList.append(ll[colIdx])
                     lineIdx = lineIdx + 1
 
-                #res = [tagId, tagList]
-                #return res
                 return tagList
+
             else:
                 lineIdx = lineIdx + 1
+
         if lineIdx == len(lines):
             print(self.tableHeader + ' not found in log file')
             return NOT_FOUND
