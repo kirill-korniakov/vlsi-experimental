@@ -12,6 +12,10 @@ NEW     = 'New'
 FAILED  = 'Failed'
 CHANGED = 'Changed'
 
+class ExperimentResults:
+    result = ''
+    pfstTable = []
+
 class BaseExperiment:
     name = ''
     cfg  = ''
@@ -23,7 +27,7 @@ class BaseExperiment:
 
     def __init__(self, name, cfg, benchmarks, metrics, stages, cmdLine = ''):
         self.name = name
-        self.cfg = GeneralParameters.binDir + 'cfg/' + cfg
+        self.cfg = GeneralParameters.binDir + 'cfg//' + cfg
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
         self.cmdLine = cmdLine
         self.metrics = metrics
@@ -39,7 +43,7 @@ class BaseExperiment:
         self.doParsePQAT = be.doParsePQAT
 
     def SetConfig(self, cfg):
-        self.cfg = GeneralParameters.binDir + 'cfg/' + cfg
+        self.cfg = GeneralParameters.binDir + 'cfg//' + cfg
 
     def SetBenchmarksList(self, benchmarks):
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
@@ -76,7 +80,7 @@ class BaseExperiment:
 
         #check if all benchmarks can be found
         for i in range(len(benchmarks)):
-            benchmark = os.path.dirname(os.path.abspath(self.benchmarks)) + "/" + benchmarks[i] + ".def"
+            benchmark = os.path.dirname(os.path.abspath(self.benchmarks)) + "//" + benchmarks[i] + ".def"
 
             if (not os.path.exists(benchmark)):
                 notFoundBenchmarks.append(benchmarks[i])

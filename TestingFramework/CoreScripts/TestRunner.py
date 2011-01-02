@@ -223,7 +223,7 @@ class TestRunner:
             fPlacerOutput = open(logFileName, 'w')
             resultValues = []
 
-            defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".def"
+            defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "//" + benchmark + ".def"
 
             benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
             pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
