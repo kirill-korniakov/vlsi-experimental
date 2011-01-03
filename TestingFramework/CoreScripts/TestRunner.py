@@ -26,7 +26,7 @@ class TestRunner:
     errors    = ''
     experimentResult = OK
 
-    experimentsToCompare = {} #Group of experiments. Theit results will be compared
+    experimentsToCompare = {} #Group of experiments. Their results will be compared
 
     newBenchmarks        = ''
     failedBenchmarks     = ''
@@ -219,7 +219,7 @@ class TestRunner:
         self.experimentResult = OK
 
         for benchmark in benchmarks:
-            logFileName = logFolder + "/" + os.path.basename(benchmark) + ".log"
+            logFileName = logFolder + "//" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w')
             resultValues = []
 
@@ -246,7 +246,7 @@ class TestRunner:
                       defFile, experiment.cmdLine, pixDirParam, milestonePixDirParam]
             #HACK: ugly hack for ISPD04 benchmarks
             if experiment.cfg.find("ispd04") != -1:
-                lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "/" + benchmark + ".lef"
+                lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "//" + benchmark + ".lef"
                 params.append(lefFile)
 
             benchmarkResult = ''

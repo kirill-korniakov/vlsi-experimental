@@ -11,5 +11,7 @@ class ResultsStorage:
         if (experimentResults.has_key(experiment)):
             print("Error: the result for experiment %s is already stored" % (experiment.name))
 
+        experimentResults[experiment] = result
+
     def GetResults(self):
         pass

@@ -13,8 +13,17 @@ FAILED  = 'Failed'
 CHANGED = 'Changed'
 
 class ExperimentResults:
-    result = ''
-    pfstTable = []
+    pfstTables = {} #benchmark: pfst
+    errors = []
+    nOkBenchmarks = 0
+
+    newBenchmarks        = []
+    failedBenchmarks     = []
+    changedBenchmarks    = []
+    terminatedBenchmarks = []
+
+    def AddError(self, error):
+        errors.append(error)
 
 class BaseExperiment:
     name = ''
@@ -133,7 +142,7 @@ class BaseExperiment:
         parser       = LogParser(logName, PQAT)
         table        = parser.ParsePQAT(metrics)
         table        = MakeTableInPercents(table)
-        PQATFileName = os.path.dirname(logName) + '/' + os.path.basename(logName) + '.csv'
+        PQATFileName = os.path.dirname(logName) + '//' + os.path.basename(logName) + '.csv'
         PrintTableToFile(PQATFileName, table, metrics)
 
     def AddStringToTable(self, values, benchmark, reportTable):
@@ -153,13 +162,13 @@ class BaseExperiment:
             print('folder ' + logFolder + 'does not exist')
             return
 
-        reportTable = logFolder + '/' + reportTable
+        reportTable = logFolder + '//' + reportTable
         self.CreateEmptyTable(reportTable)
 
         for log in os.listdir(logFolder):
             if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
                 benchmark = os.path.splitext(log)[0]
-                self.ParseLogAndFillTable(logFolder + '/' + log, benchmark, reportTable)
+                self.ParseLogAndFillTable(logFolder + '//' + log, benchmark, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         values = self.ParseLog(logName)
