@@ -30,19 +30,21 @@ class ExperimentLauncher:
         self.experiment     = experiment
         self.resultsStorage = resultsStorage
 
+    def AddErrorToResults(self, error):
+        print(error)
+        experimentResults.AddError(error)
+
     def CheckParameters(self):
         #check if config file can be found
         if (not os.path.exists(experiment.cfg)):
             error = "Error: file '%s' not found" % (experiment.cfg)
-            print(error)
-            experimentResults.AddError(error)
+            AddErrorToResults(error)
             return False
 
         #check if benchmarks list file can be found
         if (not os.path.exists(experiment.benchmarks)):
             error = "Error: file '%s' not found" % (experiment.benchmarks)
-            print(error)
-            experimentResults.AddError(error)
+            AddErrorToResults.AddError(error)
             return False
 
         return True
@@ -75,8 +77,7 @@ class ExperimentLauncher:
                 notFoundBenchmarksStr += ' "' + benchmark + '";'
 
             error = "Error: benchmarks %s were not found!" % (notFoundBenchmarksStr)
-            print(error)
-            experimentResults.AddError(error)
+            AddErrorToResults.AddError(error)
 
         nFoundBenchmarks = len(benchmarks)
         status           = (nFoundBenchmarks > 0)
@@ -100,23 +101,25 @@ class ExperimentLauncher:
         benchmarks = self.CheckParametersAndPrepareBenchmarks()
 
         if (benchmarks == []):
-            self.experimentResult = FAILED
+            experimentResults.result = FAILED
             return (reportTable)
 
-        self.experimentResult = OK
+        ##self.experimentResult = OK
+        nTerminatedBenchmarks = 0
 
         for benchmark in benchmarks:
-            logFileName = logFolder + "//" + os.path.basename(benchmark) + ".log"
+            logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w')
-            resultValues = []
+            resultValues  = []
 
-            defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "//" + benchmark + ".def"
+            defFile = "--params.def=" + os.path.dirname(os.path.abspath(experiment.benchmarks))\
+                      + "//" + benchmark + ".def"
 
             benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
             pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
             pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
 
-            #if (os.path.exists(benchmarkDirectory) != True):
+            #if (os.path.exists(benchmarkDirectory) != True):##
             #    os.mkdir(benchmarkDirectory)
 
             #if (os.path.exists(pixDirectory) != True):
@@ -133,7 +136,9 @@ class ExperimentLauncher:
                       defFile, experiment.cmdLine, pixDirParam, milestonePixDirParam]
             #HACK: ugly hack for ISPD04 benchmarks
             if experiment.cfg.find("ispd04") != -1:
-                lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks)) + "//" + benchmark + ".lef"
+                lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(experiment.benchmarks))\
+                          + "//" + benchmark + ".lef"
+
                 params.append(lefFile)
 
             benchmarkResult = ''
@@ -156,44 +161,30 @@ class ExperimentLauncher:
 
             if (retcode == None):
                 print("Time out on " + benchmark)
-                benchmarkResult            = TERMINATED
-                self.terminatedBenchmarks  += ' ' + benchmark + ';'
-                self.nTerminatedBenchmarks += 1
-                self.experimentResult      = TERMINATED
+                ##benchmarkResult            = TERMINATED
+                ##self.terminatedBenchmarks  += ' ' + benchmark + ';'
+                nTerminatedBenchmarks += 1
+                ##self.experimentResult      = TERMINATED
+                experimentResults.result = TERMINATED
+                experimentResults.AddBencmarkResult(benchmark, TERMINATED)
                 p.terminate()
 
-                if (self.nTerminatedBenchmarks >= 3):
-                    self.errors += 'Reached maximum number of terminated benchmarks\n'
+                if (nTerminatedBenchmarks >= 3):
+                    ##self.errors += 'Reached maximum number of terminated benchmarks\n'
+                    AddErrorToResults('Reached maximum number of terminated benchmarks')
                     return (reportTable)
 
             else:
-                (benchmarkResult, resultValues) = experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+                (experimentResults.result, resultValues) = \
+                        experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+
+                experimentResults.AddPFSTForBenchmark(resultValues)
 
             fPlacerOutput.close()
             print(benchmark + ' DONE')
 
-            if (experiment in self.experimentsToCompare):
-                self.experimentsToCompare[experiment][benchmark] = resultValues
-
-            if (benchmarkResult == FAILED):
-                self.experimentResult  = FAILED
-                self.failedBenchmarks  += ' ' + benchmark + ';'
-                self.nFailedBenchmarks += 1
-
-            elif (benchmarkResult == CHANGED):
-                self.nChangedBenchmarks += 1
-
-                if ((self.experimentResult != FAILED) and (self.experimentResult != TERMINATED)):
-                    self.experimentResult = CHANGED
-
-            elif (benchmarkResult == OK):
-                self.nOkBenchmarks += 1
-
-            elif (benchmarkResult == NEW):
-                self.newBenchmarks  += ' ' + benchmark + ';'
-                self.nNewBenchmarks += 1
-
-            #else TERMINATED - do nothing
+            #if (experiment in self.experimentsToCompare):
+            #    self.experimentsToCompare[experiment][benchmark] = resultValues
 
         return reportTable
 

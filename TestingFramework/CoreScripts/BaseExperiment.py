@@ -13,17 +13,28 @@ FAILED  = 'Failed'
 CHANGED = 'Changed'
 
 class ExperimentResults:
-    pfstTables = {} #benchmark: pfst
+    result = ''
     errors = []
-    nOkBenchmarks = 0
+    pfstTables = {} #benchmark: pfst
+    #nOkBenchmarks = 0
 
-    newBenchmarks        = []
-    failedBenchmarks     = []
-    changedBenchmarks    = []
-    terminatedBenchmarks = []
+    #newBenchmarks        = []
+    #failedBenchmarks     = []
+    #changedBenchmarks    = []
+    #terminatedBenchmarks = []
+    benchmarkResults = {}
 
     def AddError(self, error):
         errors.append(error)
+
+    def AddBenchmarkResult(self, benchmark, result):
+        if (not result in benchmarkResults.keys()):
+            benchmarkResults[result] = []
+
+        benchmarkResults[result].append(benchmark)
+
+    def AddPFSTForBenchmark(self, benchmark, table):
+        pfstTables[benchmark] = table
 
 class BaseExperiment:
     name = ''
