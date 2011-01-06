@@ -13,28 +13,40 @@ FAILED  = 'Failed'
 CHANGED = 'Changed'
 
 class ExperimentResults:
-    result = ''
-    errors = []
-    pfstTables = {} #benchmark: pfst
-    #nOkBenchmarks = 0
-
-    #newBenchmarks        = []
-    #failedBenchmarks     = []
-    #changedBenchmarks    = []
-    #terminatedBenchmarks = []
-    benchmarkResults = {}
+    errors           = []
+    pfstTables       = {} #benchmark: pfst
+    benchmarkResults = {} #result: [benchmarks]
 
     def AddError(self, error):
-        errors.append(error)
+        self.errors.append(error)
 
     def AddBenchmarkResult(self, benchmark, result):
-        if (not result in benchmarkResults.keys()):
-            benchmarkResults[result] = []
+        if (not result in self.benchmarkResults.keys()):
+            self.benchmarkResults[result] = []
 
-        benchmarkResults[result].append(benchmark)
+        self.benchmarkResults[result].append(benchmark)
 
     def AddPFSTForBenchmark(self, benchmark, table):
-        pfstTables[benchmark] = table
+        self.pfstTables[benchmark] = table
+
+    def AsString(self):
+        resultStr = ""
+
+        for result in list(self.benchmarkResults.keys()):
+            resultStr += ("%s: %s benchmarks (" % (result, len(self.benchmarkResults[result])))
+
+            for benchmark in (self.benchmarkResults[result]):
+                resultStr += ("%s; " % (benchmark))
+
+            resultStr += ")\n"
+
+        for error in self.errors:
+            resultStr += ("%s\n" % (error))
+
+        return resultStr
+
+    def Print(self):
+        print(self.AsString())
 
 class BaseExperiment:
     name = ''
