@@ -82,6 +82,10 @@ def CompareValues(value1, value2, eps = 0.001):
 
     return 'notEqual'
 
+def ReportErrorAndExit(error, emailer):
+    print(error)
+    emailer.SendMessageAndExit(error)
+
 def MarkResultAsBest(col):
     return '--> ' + col
 

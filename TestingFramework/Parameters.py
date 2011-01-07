@@ -3,10 +3,10 @@ class TestRunnerParameters:
     doBuild    = False
     doSendMail = False
 
-    maxTimeForBenchmark = 3600 #one hour
     experiments = []
 
 class EmailerParameters:
+    subject    = "Night experiments"
     recipients = ['itlab.vlsi@itlab.unn.ru']
     #recipients = ['zhivoderov.a@gmail.com']
     #recipients = ['kirill.kornyakov@gmail.com']
@@ -39,11 +39,12 @@ class ReportParameters:
     logFolder = 'Reports/'
 
 class GeneralParameters:
-	benchmarkCheckoutPath = "../Benchmarks/"
-	checkoutPath          = "../itlPlace/"
-	buildLog              = checkoutPath + "obj/release/BuildLog.htm"
-	slnPath               = checkoutPath + "make/itlPlace.sln"
-	binDir                = checkoutPath + "bin/"
+    maxTimeForBenchmark   = 3600 #one hour
+    benchmarkCheckoutPath = "../Benchmarks/"
+    checkoutPath          = "../itlPlace/"
+    buildLog              = checkoutPath + "obj/release/BuildLog.htm"
+    slnPath               = checkoutPath + "make/itlPlace.sln"
+    binDir                = checkoutPath + "bin/"
 
 class LogParserParameters:
     PFSTTableHeader   = 'Placement Flow Stages Table'

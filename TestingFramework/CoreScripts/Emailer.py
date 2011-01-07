@@ -40,9 +40,14 @@ class Emailer:
             self.parameters.smtppass,   # password
             0)                          # TTLS
 
-    def PrepareAndSendMailIfRequired(self, subject, text, attachmentFiles):
+    def PrepareAndSendMailIfRequired(self, text, attachmentFiles):
         if (TestRunnerParameters.doSendMail == True):
+            subject = self.parameters.subject
             self.PrepareAndSendMail(subject, text, attachmentFiles)
+
+    def SendMessageAndExit(self, text, attachmentFiles = []):
+        self.PrepareAndSendMailIfRequired(text, attachmentFiles)
+        exit(1)
 
     def send_mail(self,
         sender,               # from e-mail address

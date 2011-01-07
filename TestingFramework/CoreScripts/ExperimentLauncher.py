@@ -1,6 +1,3 @@
-#import BaseExperiment
-#from BaseExperiment import *
-
 import subprocess
 import sys
 import os
@@ -9,34 +6,37 @@ import datetime
 from datetime import date
 import time
 
-#from Emailer import *
-#from SvnWorker import *
-#from ReportCreator import *
+import BaseExperiment
+from BaseExperiment import *
 
-#import CoreFunctions
-#from CoreFunctions import *
-
-import CoreScripts
-from CoreScripts import *
-
+import ResultsStorage
 from ResultsStorage import *
+
+import Emailer
+from Emailer import *
+
+import ReportCreator
+from ReportCreator import *
+
+import CoreFunctions
+from CoreFunctions import *
 
 import Parameters
 from Parameters import *
 
-import Experiment_HippocrateDP
-from Experiment_HippocrateDP import *
-
-#TERMINATED = 'Terminated'
+TERMINATED = 'Terminated'
 
 class ExperimentLauncher:
+    emailer           = None
     experiment        = None
     resultsStorage    = None
-    experimentResults = ExperimentResults()
+    experimentResults = None
 
-    def __init__(self, experiment, resultsStorage):
-        self.experiment     = experiment
-        self.resultsStorage = resultsStorage
+    def __init__(self, experiment, resultsStorage, emailer):
+        self.emailer           = emailer
+        self.experiment        = experiment
+        self.resultsStorage    = resultsStorage
+        self.experimentResults = ExperimentResults()
 
     def AddErrorToResults(self, error):
         print(error)
@@ -99,16 +99,18 @@ class ExperimentLauncher:
         reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg)
         logFolder     = reportCreator.CreateLogFolder()
         reportTable   = reportCreator.GetReportTableName()
+
         self.experiment.CreateEmptyTable(reportTable)
 
         benchmarks = self.CheckParametersAndPrepareBenchmarks()
 
         if (benchmarks == []):
-            return (reportTable)
+            return
 
         nTerminatedBenchmarks = 0
 
         for benchmark in benchmarks:
+            self.experimentResults.AddPFSTForBenchmark(benchmark, [])
             logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w')
             resultValues  = []
@@ -142,14 +144,13 @@ class ExperimentLauncher:
                 p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
 
             except WindowsError:
-                print("Error: can not call %sitlPlaceRelease.exe" % (GeneralParameters.binDir))
-                ##!!!self.SendErrorMessageAndExit('Night experiments', 'can not start itlPlaceRelease.exe')
-                exit(1)
+                error = "Error: can not call %sitlPlaceRelease.exe" % (GeneralParameters.binDir)
+                ReportErrorAndExit(error, self.emailer)
 
             t_start = time.time()
             seconds_passed = 0
 
-            while(not p.poll() and seconds_passed < 1.01): ##!!!
+            while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
                 seconds_passed = time.time() - t_start
 
             retcode = p.poll()
@@ -163,7 +164,7 @@ class ExperimentLauncher:
                 if (nTerminatedBenchmarks >= 3):
                     self.AddErrorToResults("Reached maximum number of terminated benchmarks")
                     self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
-                    return (reportTable)
+                    return
 
             else:
                 (result, resultValues) = \
@@ -172,6 +173,9 @@ class ExperimentLauncher:
                 self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
                 self.experimentResults.AddBenchmarkResult(benchmark, result)
 
+                if (result == CHANGED):
+                    self.experimentResults.resultFile = reportTable
+
             fPlacerOutput.close()
             print(benchmark + " DONE")
 
@@ -179,19 +183,11 @@ class ExperimentLauncher:
             self.experimentResults.Print()
             #
 
-            ##!if (experiment in self.experimentsToCompare):
-            ##!    self.experimentsToCompare[experiment][benchmark] = resultValues
-
         self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
-        self.resultsStorage.GetResults()
-        return reportTable
+        return
 
 def test():
-    e              = Experiment_HippocrateDP()
-    storage        = ResultsStorage()
-    launcher       = ExperimentLauncher(e, storage)
-
-    launcher.RunExperiment()
+    pass
 
 if __name__ == '__main__':
     test()
