@@ -55,9 +55,12 @@ def RunNightExperiments():
     nightTestParams            = TestRunnerParameters()
     nightTestParams.doBuild    = True
     nightTestParams.doCheckout = True
-    nightTestParams.doSendMail = True
 
-    testRunner = TestRunner(nightTestParams)
+    emailerParams            = EmailerParameters()
+    emailerParams.doSendMail = True
+    emailer                  = Emailer(emailerParams)
+
+    testRunner = TestRunner(nightTestParams, emailer)
     NightExperiment(testRunner)
 
 if (__name__ == "__main__"):

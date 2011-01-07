@@ -15,18 +15,6 @@ class Emailer:
     def __init__(self, parameters = EmailerParameters()):
         self.parameters = parameters
 
-    def SendResults(self, experiment, reportTable, result):
-        attachmentFiles = list()
-
-        if (result == 'Changed'):
-            attachmentFiles.append(experiment.cfg)
-            attachmentFiles.append(experiment.benchmarks)
-            attachmentFiles.append(reportTable)
-
-        subject = experiment.name
-        text = subject + ': ' + result
-        self.PrepareAndSendMail(subject, text, attachmentFiles)
-
     def PrepareAndSendMail(self, subject, text, attachmentFiles):
         self.send_mail(
             self.parameters.sender,     # from
@@ -41,8 +29,9 @@ class Emailer:
             0)                          # TTLS
 
     def PrepareAndSendMailIfRequired(self, text, attachmentFiles):
-        if (TestRunnerParameters.doSendMail == True):
+        if (self.parameters.doSendMail == True):
             subject = self.parameters.subject
+            print("Sending email with results:\n%s" % (text))
             self.PrepareAndSendMail(subject, text, attachmentFiles)
 
     def SendMessageAndExit(self, text, attachmentFiles = []):

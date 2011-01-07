@@ -36,9 +36,9 @@ class TestRunner:
         self.parameters.experiments = []
 
     def BuildSln(self, slnPath, mode = "Rebuild"):
-        print('Building solution...')
+        print("Building solution...")
         res  = 0
-        args = [Tools.MSBuild, slnPath, '/t:' + mode, '/p:Configuration=Release']
+        args = [Tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
 
         try:
             res = subprocess.call(args)

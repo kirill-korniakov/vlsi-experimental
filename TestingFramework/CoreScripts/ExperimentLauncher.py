@@ -105,6 +105,7 @@ class ExperimentLauncher:
         benchmarks = self.CheckParametersAndPrepareBenchmarks()
 
         if (benchmarks == []):
+            self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
             return
 
         nTerminatedBenchmarks = 0
