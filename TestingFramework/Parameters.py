@@ -2,8 +2,6 @@ class TestRunnerParameters:
     doCheckout = False
     doBuild    = False
 
-    experiments = []
-
 class EmailerParameters:
     doSendMail = False
     subject    = "Night experiments"

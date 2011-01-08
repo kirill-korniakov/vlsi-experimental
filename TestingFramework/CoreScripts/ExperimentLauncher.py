@@ -131,7 +131,6 @@ class ExperimentLauncher:
             milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
 
             params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(self.experiment.cfg),\
-                      #defFile, self.experiment.cmdLine, pixDirParam, milestonePixDirParam]
                       defFile, pixDirParam, milestonePixDirParam]
             params.extend(self.experiment.cmdArgs)
             #HACK: ugly hack for ISPD04 benchmarks

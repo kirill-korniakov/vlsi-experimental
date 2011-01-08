@@ -28,18 +28,19 @@ import SolutionBuilder
 from SolutionBuilder import *
 
 class TestRunner:
-    emailer    = None
-    parameters = None
-    storage    = ResultsStorage()
-    comparator = ExperimentsComparator(storage)
+    emailer     = None
+    parameters  = None
+    experiments = []
+    storage     = ResultsStorage()
+    comparator  = ExperimentsComparator(storage)
 
     def __init__(self, parameters = TestRunnerParameters(), emailer = Emailer()):
-        self.emailer                = emailer
-        self.parameters             = parameters
-        self.parameters.experiments = []
+        self.emailer     = emailer
+        self.parameters  = parameters
+        self.experiments = []
 
     def Append(self, newExperiment):
-         self.parameters.experiments.append(newExperiment)
+         self.experiments.append(newExperiment)
          return 0
 
     def AddExperimentToGroup(self, newExperiment):
@@ -60,7 +61,7 @@ class TestRunner:
             solutionBuilder = SolutionBuilder(self.emailer)
             solutionBuilder.BuildSln()
 
-        for experiment in self.parameters.experiments:
+        for experiment in self.experiments:
             startTime = GetTimeStamp()
             print("Start time: %s" % (startTime))
             cp.CoolPrint(experiment.name)
