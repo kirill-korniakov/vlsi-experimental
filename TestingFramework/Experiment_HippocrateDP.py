@@ -23,12 +23,13 @@ class Experiment_HippocrateDP(BaseExperiment):
 def test():
     e = Experiment_HippocrateDP()
     #e.stages = ['LEG', 'DP']
-    e.stages = []
-    #testRunner = TestRunner()
-    #testRunner.Append(e)
-    #testRunner.Run()
+    #e.stages = []
+    e.cmdArgs = ["--plotter.enabled=true", "--plotter.createVideo=true"]
+    testRunner = TestRunner()
+    testRunner.Append(e)
+    testRunner.Run()
 
-    e.MakeResultTable('.\Reports\HippocrateDP_experiment_HippocrateDP.cfg_2011-01-01_14-12-44', 'HippocrateDPTable.csv')
+    #e.MakeResultTable(".\Reports\HippocrateDP_experiment_HippocrateDP.cfg_2011-01-01_14-12-44', 'HippocrateDPTable.csv")
 
 if (__name__ == "__main__"):
     test()

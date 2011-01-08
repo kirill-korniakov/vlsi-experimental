@@ -62,16 +62,16 @@ class BaseExperiment:
     name = ''
     cfg  = ''
     benchmarks = ''
-    cmdLine = ''
+    cmdArgs = [] #list of command line arguments
     metrics = []
     stages  = []
     doParsePQAT = False
 
-    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdLine = ''):
+    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs = []):
         self.name = name
         self.cfg = GeneralParameters.binDir + 'cfg//' + cfg
         self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
-        self.cmdLine = cmdLine
+        self.cmdArgs = cmdArgs
         self.metrics = metrics
         self.stages  = stages
 
@@ -80,7 +80,7 @@ class BaseExperiment:
         self.name        = be.name
         self.stages      = be.stages
         self.metrics     = be.metrics
-        self.cmdLine     = be.cmdLine
+        self.cmdArgs     = be.cmdArgs
         self.benchmarks  = be.benchmarks
         self.doParsePQAT = be.doParsePQAT
 
