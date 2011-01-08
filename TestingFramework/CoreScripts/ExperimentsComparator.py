@@ -1,5 +1,5 @@
-#import CoreFunctions
-#from CoreFunctions import *
+import CoreFunctions
+from CoreFunctions import *
 
 import ReportCreator
 from ReportCreator import *
