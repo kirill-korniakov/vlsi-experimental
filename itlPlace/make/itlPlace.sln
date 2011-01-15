@@ -13,6 +13,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cfg", "cfg", "{8528EEF8-E5D2-4C4B-9A56-65FC8B70C6BA}"
 	ProjectSection(SolutionItems) = preProject
 		..\bin\cfg\boris_hippocrate_ALL.cfg = ..\bin\cfg\boris_hippocrate_ALL.cfg
+		..\bin\cfg\HippocrateDP.cfg = ..\bin\cfg\HippocrateDP.cfg
 		..\bin\cfg\hpwl_ispd04.cfg = ..\bin\cfg\hpwl_ispd04.cfg
 		..\bin\cfg\JointPlacementBuffering.cfg = ..\bin\cfg\JointPlacementBuffering.cfg
 		..\bin\cfg\LR.cfg = ..\bin\cfg\LR.cfg

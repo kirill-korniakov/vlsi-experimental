@@ -71,7 +71,8 @@ namespace libconfig
     ~ConfigExt()
     {
       if (m_Replicate && m_Replicant != 0)
-        m_Replicant->writeFile(("Replicated_" + Name()).c_str());
+        m_Replicant->writeFile(MakeReplicantName().c_str());
+
       if (m_Replicant != 0)
       {
         delete m_Replicant;
@@ -80,6 +81,7 @@ namespace libconfig
     }
 
     string Name() const { return m_FileName; }
+    string MakeReplicantName();
     void LoadConfiguration(const char* file);
     void SetArguments(int argc, char** argv);
     void SetCfgValue(const std::string& path, const std::string& value, bool pathIsRooted = false);

@@ -269,6 +269,27 @@ searchStart:
     return result;
   }
 
+  string ConfigExt::MakeReplicantName()
+  {
+    int idx = m_FileName.find_last_of('\\');
+
+    if (idx <= 0) //name doesn't contain '\\'
+    {
+      idx = m_FileName.find_last_of('/');
+
+      if (idx <= 0) //name doesn't contain '/'
+      {
+        ALERT("Replicated cfg name:Replicated_%s", m_FileName.c_str());
+        return ("Replicated_" + m_FileName);
+      }
+    }
+
+    string replicantName = m_FileName.substr(0, idx + 1);
+    replicantName += "Replicated_" + m_FileName.substr(idx + 1);
+    ALERT("Replicated cfg name: %s", replicantName.c_str());
+    return replicantName;
+  }
+
   void ConfigExt::LoadConfiguration(const char* file)
   {
     try
