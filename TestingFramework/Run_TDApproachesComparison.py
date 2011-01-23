@@ -11,8 +11,8 @@ def LRvsBuffering():
     exp_Buffering = Experiment_Buffering('IWLS05 buffering experiment (GBL)', 'kirill_buffering.cfg', benchmarkList)
 
     testRunner = TestRunner()
-    testRunner.parameters.experiments.append(exp_LR)
-    testRunner.parameters.experiments.append(exp_Buffering)
+    testRunner.Append(exp_LR)
+    testRunner.Append(exp_Buffering)
     testRunner.Run()
 
 LRvsBuffering()

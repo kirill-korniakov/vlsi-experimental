@@ -51,7 +51,7 @@ def test():
     e = Experiment_LR()
     e.SetBenchmarksList('IWLS_GP_r1511/IWLS_GP_fast.list')
     testRunner = TestRunner()
-    testRunner.parameters.experiments.append(e)
+    testRunner.Append(e)
     testRunner.Run()
 
 if (__name__ == "__main__"):

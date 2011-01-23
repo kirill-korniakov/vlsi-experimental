@@ -7,7 +7,7 @@ def New_Buffering():
     exp_New_Buffering = Experiment_New_Buffering('IWLS05 New_Buffering experiment ', 'New_Buffering.cfg', benchmarkList)
 
     testRunner = TestRunner()
-    testRunner.parameters.experiments.append(exp_New_Buffering)
+    testRunner.Append(exp_New_Buffering)
     testRunner.Run()
 
 New_Buffering()

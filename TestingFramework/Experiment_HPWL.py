@@ -19,7 +19,7 @@ class Experiment_HPWL(BaseExperiment):
 def test():
     eIWLS = Experiment_HPWL()
     testRunner = TestRunner()
-    testRunner.parameters.experiments.append(eIWLS)
+    testRunner.Append(eIWLS)
     testRunner.Run()
 
 if (__name__ == "__main__"):
