@@ -5,13 +5,13 @@ import os
 import Parameters
 from Parameters import *
 
-import CoreFunctions
-from CoreFunctions import *
+from CoreFunctions import Logger
 
 from Emailer import *
 from SvnWorker import *
 
 class SvnWorker:
+    logger  = None
     emailer = None
 
     def __init__(self, emailer):
@@ -19,11 +19,11 @@ class SvnWorker:
 
     def DeleteSources(self):
         dir = GeneralParameters.checkoutPath
-        print("Deleting previous version of itlPlace...")
+        self.logger.Log("Deleting previous version of itlPlace...")
 
         if os.path.exists(dir):
             RemoveDir(dir)
-        print("Done")
+        self.logger.Log("Done")
 
     def doCheckOut(self, command):
         retcode = 1
@@ -34,24 +34,24 @@ class SvnWorker:
 
             except WindowsError:
                 error = "Error: can not call svn.exe"
-                ReportErrorAndExit(error, self.emailer)
+                ReportErrorAndExit(error, self.logger, self.emailer)
 
             if retcode == 0:
                 break
 
         if retcode != 0:
             error = "svn error: checkout failed!"
-            ReportErrorAndExit(error, self.emailer)
+            ReportErrorAndExit(error, self.logger, self.emailer)
 
         return
 
     def FormCommand(self, rev = ""):
         if (rev != ""):
-            print("Checking out revision %s" % (rev))
+            self.logger.Log("Checking out revision %s" % (rev))
             rev = " -r %s" % (rev)
 
         else:
-            print("Checking out HEAD revision")
+            self.logger.Log("Checking out HEAD revision")
 
         url     = RepoParameters.srcRepoPath
         to      = GeneralParameters.checkoutPath
@@ -66,8 +66,8 @@ class SvnWorker:
         return command
 
     def CheckOut(self):
-        cp = CoolPrinter()
-        cp.CoolPrint("Delete sources and Checkout")
+        self.logger = Logger()
+        self.logger.CoolLog("Delete sources and Checkout")
         self.DeleteSources()
         command = self.FormCommand()
         self.doCheckOut(command)

@@ -1,5 +1,4 @@
-import CoreFunctions
-from CoreFunctions import *
+from CoreFunctions import Logger
 
 import ReportCreator
 from ReportCreator import *
@@ -8,6 +7,7 @@ import BaseExperiment
 from BaseExperiment import *
 
 class ExperimentsComparator:
+    logger               = None
     storage              = None
     experimentsToCompare = {} #Group of experiments. Their results will be compared
                               #experiment: {benchmark: pfst}
@@ -21,11 +21,11 @@ class ExperimentsComparator:
             groupExp = list(self.experimentsToCompare.keys())[0]
 
             if (newExperiment.benchmarks != groupExp.benchmarks):
-                print("Error: list files are not equal!")
+                self.logger.Log("Error: list files are not equal!")
                 exit(1)
 
             if (newExperiment.metrics != groupExp.metrics):
-                print("Error: metrics are not equal!")
+                self.logger.Log("Error: metrics are not equal!")
                 exit(1)
 
         self.experimentsToCompare[newExperiment] = {}
@@ -36,7 +36,7 @@ class ExperimentsComparator:
                 self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment].pfstTables
 
             else:
-                print("Error: result for %s not found" % (experiment.name))
+                self.logger.Log("Error: result for %s not found" % (experiment.name))
 
     def CreateEmptyTable(self, resultFileName, metrics):
         #Create header of the table
@@ -112,7 +112,7 @@ class ExperimentsComparator:
                             cmpResult = CompareValues(initialMetrics[col], resultValues[0][col])
 
                             if (cmpResult == 'notEqual'):
-                                print('Error: not equal Init metrics')
+                                self.logger.Log('Error: not equal Init metrics')
 
                     for col in range(len(metrics)):
                         percent = 100 * resultValues[finalStageIdx][col] / initialMetrics[col]
@@ -134,10 +134,11 @@ class ExperimentsComparator:
 
     def CompareExperiments(self):
         if (len(self.experimentsToCompare) > 1):
-            cp = CoolPrinter()
-            cp.CoolPrint("Comaparing experiments")
+            self.logger = Logger()
+            self.logger.CoolLog("Comparing experiments")
             reportCreator = ReportCreator("Comaparing", "Comparing")
             logFolder     = reportCreator.CreateLogFolder()
             cmpFileName   = reportCreator.GetReportTableName()
             self.GetExperimentsResults()
             self.MakeResultTable(cmpFileName)
+            self.logger.Log("Comparing finished")

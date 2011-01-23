@@ -24,22 +24,24 @@ from CoreFunctions import *
 import Parameters
 from Parameters import *
 
-TERMINATED = 'Terminated'
+TERMINATED = "Terminated"
 
 class ExperimentLauncher:
+    logger            = None
     emailer           = None
     experiment        = None
     resultsStorage    = None
     experimentResults = None
 
     def __init__(self, experiment, resultsStorage, emailer):
+        self.logger            = Logger()
         self.emailer           = emailer
         self.experiment        = experiment
         self.resultsStorage    = resultsStorage
         self.experimentResults = ExperimentResults()
 
     def AddErrorToResults(self, error):
-        print(error)
+        self.logger.Log(error)
         self.experimentResults.AddError(error)
 
     def CheckParameters(self):
@@ -65,7 +67,7 @@ class ExperimentLauncher:
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
         benchmarks = [x for x in benchmarks if len(x.strip())]
-        print("Benchmarks:\n%s\n" % (", ".join(benchmarks)))
+        self.logger.Log("Benchmarks:\n%s\n" % (", ".join(benchmarks)))
 
         #check if all benchmarks can be found
         for i in range(len(benchmarks)):
@@ -93,8 +95,8 @@ class ExperimentLauncher:
         return self.PrepareBenchmarks()
 
     def RunExperiment(self):
-        print("Config: %s" % self.experiment.cfg)
-        print("List:   %s" % self.experiment.benchmarks)
+        self.logger.Log("Config: %s" % self.experiment.cfg)
+        self.logger.Log("List:   %s" % self.experiment.benchmarks)
 
         reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg)
         logFolder     = reportCreator.CreateLogFolder()
@@ -133,6 +135,11 @@ class ExperimentLauncher:
             params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(self.experiment.cfg),\
                       defFile, pixDirParam, milestonePixDirParam]
             params.extend(self.experiment.cmdArgs)
+
+            #Temporary... Strange problems with replicated configs... Bug 100
+            params.append("--Config.Replicate=false")
+            #
+
             #HACK: ugly hack for ISPD04 benchmarks
             if self.experiment.cfg.find("ispd04") != -1:
                 lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
@@ -140,14 +147,14 @@ class ExperimentLauncher:
 
                 params.append(lefFile)
 
-            benchmarkResult = ''
+            benchmarkResult = ""
 
             try:
                 p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
 
             except WindowsError:
                 error = "Error: can not call %sitlPlaceRelease.exe" % (GeneralParameters.binDir)
-                ReportErrorAndExit(error, self.emailer)
+                ReportErrorAndExit(error, self.logger, self.emailer)
 
             t_start = time.time()
             seconds_passed = 0
@@ -158,7 +165,7 @@ class ExperimentLauncher:
             retcode = p.poll()
 
             if (retcode == None):
-                print("Time out on %s" % (benchmark))
+                self.logger.Log("Time out on %s" % (benchmark))
                 nTerminatedBenchmarks += 1
                 self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
                 p.terminate()
@@ -179,7 +186,7 @@ class ExperimentLauncher:
                     self.experimentResults.resultFile = reportTable
 
             fPlacerOutput.close()
-            print(benchmark + " DONE")
+            self.logger.Log(benchmark + " DONE")
 
             #testing only
             self.experimentResults.Print()

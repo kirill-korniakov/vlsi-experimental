@@ -9,8 +9,7 @@ import time
 from Emailer import *
 from SvnWorker import *
 
-import CoreFunctions
-from CoreFunctions import *
+from CoreFunctions import Logger
 
 import Parameters
 from Parameters import *
@@ -19,11 +18,11 @@ class SolutionBuilder:
     emailer = None
 
     def __init__(self, emailer):
-        self.emailer                = emailer
+        self.emailer = emailer
 
     def BuildSln(self, slnPath = GeneralParameters.slnPath, mode = "Rebuild"):
-        cp = CoolPrinter()
-        cp.CoolPrint("Building solution...")
+        logger = Logger()
+        logger.CoolLog("Building solution...")
         res  = 0
         args = [Tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
 
@@ -32,7 +31,7 @@ class SolutionBuilder:
 
         except WindowsError:
             error = ("Error: can not call %s" % (Tools.MSBuild))
-            ReportErrorAndExit(error, self.emailer)
+            ReportErrorAndExit(error, logger, self.emailer)
 
         if (res != 0):
             error = "Build failed!"

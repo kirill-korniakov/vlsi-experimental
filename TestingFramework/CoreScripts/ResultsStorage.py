@@ -1,18 +1,20 @@
 import BaseExperiment
 from BaseExperiment import *
+from CoreFunctions import Logger
 
 import Emailer
 from Emailer import *
 
 class ResultsStorage:
+    logger            = None
     experimentResults = {} #experiment: result
 
     def __init__(self):
-        pass
+        self.logger = Logger()
 
     def AddExperimentResult(self, experiment, result):
         if (self.experimentResults.has_key(experiment)):
-            print("Error: the result for experiment %s is already stored" % (experiment.name))
+            self.logger.Log("Error: the result for experiment %s is already stored" % (experiment.name))
 
         self.experimentResults[experiment] = result
 
@@ -25,8 +27,8 @@ class ResultsStorage:
 
         return result
 
-    def PrintResults(self):
-        print("Results:\n%s" % (self.AsString()))
+    def LogResults(self):
+        self.logger.Log("\nResults:\n%s" % (self.AsString()))
 
     def SendResults(self, emailer):
         attachmentFiles = []

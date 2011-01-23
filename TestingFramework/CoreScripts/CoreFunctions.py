@@ -6,11 +6,12 @@ import time
 
 END_OF_COLUMN = ';'
 
-class CoolPrinter:
-    startTime = 0
+class CoolPrinter_:
+    startTime = time.time()
 
     def __init__(self):
-        self.startTime = time.time()
+        #self.startTime = time.time()
+        pass
 
     def PrintWorkTime(self):
         runTime = time.time() - self.startTime
@@ -23,6 +24,28 @@ class CoolPrinter:
         print('######################################################')
         self.PrintWorkTime()
         print('\n')
+
+class Logger:
+    startTime   = time.time()
+    logFileName = ".//TF.log"
+
+    def LogWorkTime(self):
+        runTime = time.time() - self.startTime
+        self.Log("RUNTIME %2.2i:%2.2i" % (int(runTime / 60), int(runTime % 60)))
+
+    def CoolLog(self, message):
+        self.Log('\n')
+        self.Log("######################################################")
+        self.Log("####### %s" % (message))
+        self.Log("######################################################")
+        self.LogWorkTime()
+        self.Log('\n')
+
+    def Log(self, message):
+        print(message)
+        log = open(self.logFileName, 'a')
+        log.write(message + '\n')
+        log.close()
 
 def GetTimeStamp():
     return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -82,8 +105,8 @@ def CompareValues(value1, value2, eps = 0.001):
 
     return 'notEqual'
 
-def ReportErrorAndExit(error, emailer):
-    print(error)
+def ReportErrorAndExit(error, logger, emailer):
+    logger.Log(error)
     emailer.SendMessageAndExit(error)
 
 def MarkResultAsBest(col):

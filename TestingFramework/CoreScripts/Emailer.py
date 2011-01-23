@@ -11,8 +11,13 @@ import os
 import Parameters
 from Parameters import *
 
+from CoreFunctions import Logger
+
 class Emailer:
+    logger = None
+
     def __init__(self, parameters = EmailerParameters()):
+        self.logger     = Logger()
         self.parameters = parameters
 
     def PrepareAndSendMail(self, subject, text, attachmentFiles):
@@ -31,7 +36,7 @@ class Emailer:
     def PrepareAndSendMailIfRequired(self, text, attachmentFiles):
         if (self.parameters.doSendMail == True):
             subject = self.parameters.subject
-            print("Sending email with results:\n%s" % (text))
+            self.logger.Log("Sending email with results:\n%s" % (text))
             self.PrepareAndSendMail(subject, text, attachmentFiles)
 
     def SendMessageAndExit(self, text, attachmentFiles = []):

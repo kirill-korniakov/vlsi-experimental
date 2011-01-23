@@ -50,8 +50,8 @@ class TestRunner:
         self.comparator.AddExperimentToGroup(newExperiment)
 
     def Run(self):
-        cp  = CoolPrinter()
-        cp.CoolPrint("Start")
+        logger = Logger()
+        logger.CoolLog("Start")
 
         if self.parameters.doCheckout:
             svn = SvnWorker(self.emailer)
@@ -63,14 +63,14 @@ class TestRunner:
 
         for experiment in self.experiments:
             startTime = GetTimeStamp()
-            print("Start time: %s" % (startTime))
-            cp.CoolPrint(experiment.name)
+            logger.Log("Start time: %s" % (startTime))
+            logger.CoolLog(experiment.name)
 
             launcher = ExperimentLauncher(experiment, self.storage, self.emailer)
             launcher.RunExperiment()
 
-        self.storage.PrintResults()
+        self.storage.LogResults()
         self.storage.SendResults(self.emailer)
 
         self.comparator.CompareExperiments()
-        cp.CoolPrint("Finish")
+        logger.CoolLog("Finish")
