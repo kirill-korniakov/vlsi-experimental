@@ -6,25 +6,6 @@ import time
 
 END_OF_COLUMN = ';'
 
-class CoolPrinter_:
-    startTime = time.time()
-
-    def __init__(self):
-        #self.startTime = time.time()
-        pass
-
-    def PrintWorkTime(self):
-        runTime = time.time() - self.startTime
-        print("RUNTIME %2.2i:%2.2i" % (int(runTime/60), int(runTime%60)))
-
-    def CoolPrint(self, message):
-        print('\n')
-        print('######################################################')
-        print('####### ' + message)
-        print('######################################################')
-        self.PrintWorkTime()
-        print('\n')
-
 class Logger:
     startTime   = time.time()
     logFileName = ".//TF.log"
