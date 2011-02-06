@@ -28,6 +28,9 @@ class Logger:
         log.write(message + '\n')
         log.close()
 
+    def LogStartMessage(self):
+        self.CoolLog("Started on %s" % (GetTimeStamp()))
+
 def GetTimeStamp():
     return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 

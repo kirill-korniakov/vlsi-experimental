@@ -51,7 +51,7 @@ class TestRunner:
 
     def Run(self):
         logger = Logger()
-        logger.CoolLog("Start")
+        logger.LogStartMessage()
 
         if self.parameters.doCheckout:
             svn = SvnWorker(self.emailer)
