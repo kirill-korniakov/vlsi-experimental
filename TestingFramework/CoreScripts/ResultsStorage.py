@@ -13,7 +13,7 @@ class ResultsStorage:
         self.logger = Logger()
 
     def AddExperimentResult(self, experiment, result):
-        if (self.experimentResults.has_key(experiment)):
+        if (experiment in self.experimentResults.keys()):
             self.logger.Log("Error: the result for experiment %s is already stored" % (experiment.name))
 
         self.experimentResults[experiment] = result

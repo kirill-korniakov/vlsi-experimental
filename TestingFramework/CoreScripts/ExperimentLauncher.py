@@ -131,14 +131,11 @@ class ExperimentLauncher:
                 os.makedirs(milestonePixDirectory)
 
             milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
+            exeName = GeneralParameters.binDir + "itlPlaceRelease.exe"
 
-            params = [GeneralParameters.binDir + "itlPlaceRelease.exe", os.path.abspath(self.experiment.cfg),\
+            params = [exeName, os.path.abspath(self.experiment.cfg),\
                       defFile, pixDirParam, milestonePixDirParam]
             params.extend(self.experiment.cmdArgs)
-
-            #Temporary... Strange problems with replicated configs... Bug 100
-            params.append("--Config.Replicate=false")
-            #
 
             #HACK: ugly hack for ISPD04 benchmarks
             if self.experiment.cfg.find("ispd04") != -1:
@@ -153,14 +150,28 @@ class ExperimentLauncher:
                 p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
 
             except WindowsError:
-                error = "Error: can not call %sitlPlaceRelease.exe" % (GeneralParameters.binDir)
+                error = "Error: can not call %s" % (exeName)
                 ReportErrorAndExit(error, self.logger, self.emailer)
 
             t_start = time.time()
             seconds_passed = 0
 
-            while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
+            ##while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
+            renamed = False
+
+            while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
                 seconds_passed = time.time() - t_start
+
+                try:
+                    ##open_res = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
+                    ##print(open_res == False)
+                    ##open_res.close()
+                    renamed = os.rename(exeName, exeName + "_")
+                    renamed = os.rename(exeName + "_", exeName)
+
+                #except IOError:
+                except OSError:
+                    renamed = False
 
             retcode = p.poll()
 
