@@ -158,6 +158,7 @@ class ExperimentLauncher:
 
             ##while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
             renamed = False
+            time.sleep(1)
 
             while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
                 seconds_passed = time.time() - t_start
