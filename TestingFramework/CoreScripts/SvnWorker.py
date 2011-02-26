@@ -5,7 +5,7 @@ import os
 import Parameters
 from Parameters import *
 
-from CoreFunctions import Logger
+from CoreFunctions import *
 
 from Emailer import *
 from SvnWorker import *
