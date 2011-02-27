@@ -158,23 +158,25 @@ class ExperimentLauncher:
 
             ##while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
             renamed = False
-            time.sleep(5)
+            time.sleep(1)
 
             while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
                 seconds_passed = time.time() - t_start
 
                 try:
-                    ##open_res = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
-                    ##print(open_res == False)
-                    ##open_res.close()
-                    renamed = os.rename(exeName, exeName + "_")
-                    renamed = os.rename(exeName + "_", exeName)
+                    renamed = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
+                    ##print(renamed == False)
+                    renamed.close()
+                    #renamed = os.rename(exeName, exeName + "_")
+                    #renamed = os.rename(exeName + "_", exeName)
 
-                #except IOError:
-                except OSError:
+                except IOError:
+                #except OSError:
                     renamed = False
 
             retcode = p.poll()
+            self.logger.Log("seconds passed: %s" % (seconds_passed))
+            self.logger.Log("retcode: %s" % (retcode))
 
             if (retcode == None):
                 self.logger.Log("Time out on %s" % (benchmark))
