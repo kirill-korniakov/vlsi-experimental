@@ -335,22 +335,82 @@ void RemoveBuffer::RemoveNewBuffering()
 {
     ALERT("Cells before remove = %d", data->design.Cells.PlaceableCellsCount());
     int bufferCount = 0;
+    int startNewPinIndex = data->design._Design.NetList.nPinsEnd;
     for (HCells::PlaceableCellsEnumeratorW pCell = data->design.Cells.GetPlaceableCellsEnumeratorW(); pCell.MoveNext(); )
     {
         for(unsigned int j = 0; j < data->Buffers.size(); j++)
         {
             if (data->design.Cells.Get<HCell::MacroType, HMacroType>(pCell) == data->Buffers[j].Type())
+            {
                 bufferCount++;
+                for (HCell::PinsEnumeratorW pw = pCell.GetPinsEnumeratorW(); pw.MoveNext();)
+                    if (::ToID(pw) < startNewPinIndex)
+                        startNewPinIndex = ::ToID(pw);
+            }
         }
     }
+
     for (HNets::NetsEnumeratorW nw =  data->design.Nets.GetFullEnumeratorW(); nw.MoveNext(); )
     {
         Utils::RestoreBufferedNet(data->design, nw);
     }
 
     ALERT("Buffer count = %d", bufferCount);
+    int newCellEnd = data->design._Design.NetList.nCellsEnd - bufferCount;
+    for (int i = newCellEnd; i < data->design._Design.NetList.nCellsEnd; i++)
+    {
+        data->design._Design.NetList.cellHeight[i] = 0;
+        data->design._Design.NetList.cellName[i].clear();
+        data->design._Design.NetList.cellOrient[i] = Orientation_Default;
+        data->design._Design.NetList.cellPinEndIdx[i] = 0;
+        data->design._Design.NetList.cellPinStartIdx[i] = 0;
+        data->design._Design.NetList.cellPlStatus[i] = PlacementStatus_Default;
+        data->design._Design.NetList.cellType[i] = 0;
+        data->design._Design.NetList.cellWidth[i] = 0;
+        data->design._Design.NetList.cellX[i] = 0;
+        data->design._Design.NetList.cellY[i] = 0;
+    }
     data->design._Design.NetList.nCellsEnd -= bufferCount;
-    //data->design._Design.NetList.cellTypeBounds[MacroType_Last + 1].nFictive = 0;
+    data->design._Design.NetList.cellTypeBounds[MacroType_Last + 1].nFictive = 0;
+
+    for (int k = startNewPinIndex; k < data->design._Design.NetList.nPinsEnd; k++)
+    {
+        data->design._Design.NetList.pinCellIdx[k] = 0;
+        data->design._Design.NetList.pinDirection[k] = PinDirection_Default;
+        //data->design._Design.NetList.pinName[k].clear();
+        data->design._Design.NetList.pinNetIdx[k] = 0;
+        data->design._Design.NetList.pinOffsetX[k] = 0;
+        data->design._Design.NetList.pinOffsetY[k] = 0;
+        data->design._Design.NetList.pinOriginalNetIdx[k] = 0;
+        data->design._Design.NetList.pinType[k] = 0;
+    }
+
+    data->design._Design.NetList.nPinsEnd = startNewPinIndex;
+
+    int newNetCount = data->design._Design.NetList.nNetsByKind[NetKind_Removed];
+    int newNetEnd = data->design._Design.NetList.nNetsEnd - newNetCount;
+    if (newNetCount != 0)
+    {
+        for (int h = data->design._Design.NetList.netPinStart[newNetEnd]; h < data->design._Design.NetList.nNetPinEnd; h++)
+            data->design._Design.NetList.netPins[h] = 0;
+
+        data->design._Design.NetList.nNetPinEnd = data->design._Design.NetList.netPinStart[newNetEnd];
+    }
+
+    for (int l = newNetEnd; l < data->design._Design.NetList.nNetsEnd; l++)
+    {
+        data->design._Design.NetList.netHPWL[l] = 0;
+        data->design._Design.NetList.netKind[l] = NetKind_Default;
+        data->design._Design.NetList.netLnet[l] = 0;
+        data->design._Design.NetList.netName[l].clear();
+        data->design._Design.NetList.netPinEnd[l] = 0;
+        data->design._Design.NetList.netPinStart[l] = 0;
+        data->design._Design.NetList.netWeight[l] = 0;
+    }
+
+    data->design._Design.NetList.nNetsEnd = newNetEnd;
+    data->design._Design.NetList.nNetsByKind[NetKind_Removed] = 0;
+
     ALERT("Cells after remove = %d", data->design.Cells.PlaceableCellsCount());
 
     data->design.Plotter.ShowPlacement();
