@@ -5,11 +5,11 @@ class TestRunnerParameters:
 class EmailerParameters:
     doSendMail = False
     subject    = "Night experiments"
-    #recipients = ['itlab.vlsi@itlab.unn.ru']
+    recipients = ['itlab.vlsi@itlab.unn.ru']
     #recipients = ['zhivoderov.a@gmail.com']
     #recipients = ['kirill.kornyakov@gmail.com']
     #recipients = ['kirill.kornyakov@gmail.com', 'belyakov.alexander.a@gmail.com']
-    recipients = ['belyakov.alexander.a@gmail.com']
+    #recipients = ['belyakov.alexander.a@gmail.com']
     #recipients = ''
 
     #sender     = 'VLSIMailerDaemon@gmail.com'

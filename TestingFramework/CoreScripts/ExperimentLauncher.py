@@ -182,7 +182,12 @@ class ExperimentLauncher:
                 self.logger.Log("Time out on %s" % (benchmark))
                 nTerminatedBenchmarks += 1
                 self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
-                p.terminate()
+
+                try:
+                    p.terminate()
+
+                except Exception:
+                    pass
 
                 if (nTerminatedBenchmarks >= 3):
                     self.AddErrorToResults("Reached maximum number of terminated benchmarks")

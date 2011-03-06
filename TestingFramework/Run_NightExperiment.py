@@ -49,7 +49,15 @@ def NightExperiment(testRunner):
     testRunner.Append(chk_HPWL_ISPD)
     testRunner.Append(chk_LR)
     testRunner.Append(chk_HDP)
-    testRunner.Run()
+
+    try:
+        testRunner.Run()
+
+    except Exception:
+        import traceback
+        logger = Logger()
+        logger.Log("exception: %s" % (traceback.format_exc()))
+
 
 def RunNightExperiments():
     nightTestParams            = TestRunnerParameters()
