@@ -271,17 +271,14 @@ searchStart:
 
   string ConfigExt::MakeReplicantName()
   {
-    int idx = m_FileName.find_last_of('\\');
+    int idx1 = m_FileName.find_last_of('\\');
+    int idx2 = m_FileName.find_last_of('/');
+    int idx  = max(idx1, idx2);
 
-    if (idx <= 0) //name doesn't contain '\\'
+    if (idx < 0)
     {
-      idx = m_FileName.find_last_of('/');
-
-      if (idx <= 0) //name doesn't contain '/'
-      {
-        ALERT("Replicated cfg name:Replicated_%s", m_FileName.c_str());
-        return ("Replicated_" + m_FileName);
-      }
+      ALERT("Replicated cfg name:Replicated_%s", m_FileName.c_str());
+      return ("Replicated_" + m_FileName);
     }
 
     string replicantName = m_FileName.substr(0, idx + 1);
