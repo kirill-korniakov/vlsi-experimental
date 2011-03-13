@@ -8,8 +8,7 @@ class Experiment_LR(BaseExperiment):
     def __init__(self):
         _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
         _stages  = ['INIT', 'LEG']
-        BaseExperiment.__init__(self, 'IWLS05GP LR experiment', 'LR.cfg',\
-            'IWLS_GP_r1511/IWLS_GP.list', _metrics, _stages)
+        BaseExperiment.__init__(self, 'LR experiment (IWLS05GP)', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', _metrics, _stages)
 
         self.doParsePQAT = True
 
@@ -38,7 +37,6 @@ class Experiment_LR(BaseExperiment):
             for row in range(1, len(self.stages)):
                 if values[0][col] != 0.0:
                     percent = 100.0 * (values[row][col]/values[0][col] - 1.0)
-
                 else:
                     percent = -1.0
 
@@ -47,12 +45,13 @@ class Experiment_LR(BaseExperiment):
 
         WriteStringToFile(cols, reportTable)
 
-def test():
+def TestRun():
     e = Experiment_LR()
-    e.SetBenchmarksList('IWLS_GP_r1511/IWLS_GP_fast.list')
+    #e.SetBenchmarksList('IWLS_GP_r1511/IWLS_GP_fast.list')
+
     testRunner = TestRunner()
     testRunner.Append(e)
     testRunner.Run()
 
 if (__name__ == "__main__"):
-    test()
+    TestRun()

@@ -6,8 +6,7 @@ from Parameters import *
 
 class Experiment_HPWL(BaseExperiment):
     def __init__(self):
-        BaseExperiment.__init__(self, 'IWLS05 HPWL experiment',\
-            'hpwl_iwls05.cfg', 'IWLS05.list', ['HPWL'], ['DP'])
+        BaseExperiment.__init__(self, 'IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05.list', ['HPWL'], ['DP'])
 
     def CreateEmptyTable(self, reportTable):
         cols = ['Benchmark']
@@ -17,9 +16,10 @@ class Experiment_HPWL(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
 def test():
-    eIWLS = Experiment_HPWL()
+    experiment = Experiment_HPWL()
+
     testRunner = TestRunner()
-    testRunner.Append(eIWLS)
+    testRunner.Append(experiment)
     testRunner.Run()
 
 if (__name__ == "__main__"):

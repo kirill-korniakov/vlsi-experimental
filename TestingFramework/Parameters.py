@@ -6,9 +6,6 @@ class EmailerParameters:
     doSendMail = False
     subject    = "Night experiments"
     recipients = ['itlab.vlsi@itlab.unn.ru']
-    #recipients = ['zhivoderov.a@gmail.com']
-    #recipients = ['kirill.kornyakov@gmail.com']
-    #recipients = ['kirill.kornyakov@gmail.com', 'belyakov.alexander.a@gmail.com']
     #recipients = ['belyakov.alexander.a@gmail.com']
     #recipients = ''
 
@@ -50,5 +47,5 @@ class LogParserParameters:
     PFSTBorderPattern = '-----'
 
 class Tools:
-	MSBuild  = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"
+	MSBuild = "c:/WINDOWS/Microsoft.NET/Framework/v2.0.50727/MSBuild.exe"
 	UnRar = "7z.exe"

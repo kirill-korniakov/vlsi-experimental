@@ -95,8 +95,8 @@ class ExperimentLauncher:
         return self.PrepareBenchmarks()
 
     def RunExperiment(self):
-        self.logger.Log("Config: %s" % self.experiment.cfg)
-        self.logger.Log("List:   %s" % self.experiment.benchmarks)
+        self.logger.Log("Config:     %s" % self.experiment.cfg)
+        self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
         reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg)
         logFolder     = reportCreator.CreateLogFolder()
@@ -175,8 +175,8 @@ class ExperimentLauncher:
                     renamed = False
 
             retcode = p.poll()
-            self.logger.Log("seconds passed: %s" % (seconds_passed))
-            self.logger.Log("retcode: %s" % (retcode))
+            self.logger.Log("seconds passed: %.2f" % (seconds_passed))
+            self.logger.Log("process retcode: %s" % (retcode))
 
             if (retcode == None):
                 self.logger.Log("Time out on %s" % (benchmark))
