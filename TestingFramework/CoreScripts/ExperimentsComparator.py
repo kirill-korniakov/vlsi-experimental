@@ -136,7 +136,7 @@ class ExperimentsComparator:
         if (len(self.experimentsToCompare) > 1):
             self.logger = Logger()
             self.logger.CoolLog("Comparing experiments")
-            reportCreator = ReportCreator("Comaparing", "Comparing")
+            reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp())
             logFolder     = reportCreator.CreateLogFolder()
             cmpFileName   = reportCreator.GetReportTableName()
             self.GetExperimentsResults()

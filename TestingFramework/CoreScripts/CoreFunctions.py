@@ -32,7 +32,7 @@ class Logger:
         self.CoolLog("Started on %s" % (GetTimeStamp()))
 
 def GetTimeStamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 def Absolutize(x):
     divisor = x[0]
@@ -102,7 +102,6 @@ def WriteStringToFile(cols, tableFileName):
   for col in cols:
     if (col == END_OF_COLUMN):
       printStr += ';'
-
     else:
       printStr += col
 

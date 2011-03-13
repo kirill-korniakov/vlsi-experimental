@@ -62,9 +62,7 @@ class TestRunner:
             solutionBuilder.BuildSln()
 
         for experiment in self.experiments:
-            startTime = GetTimeStamp()
-            logger.Log("Start time: %s" % (startTime))
-            logger.CoolLog(experiment.name)
+            logger.CoolLog(experiment.name + ' : ' + GetTimeStamp())
 
             launcher = ExperimentLauncher(experiment, self.storage, self.emailer)
             launcher.RunExperiment()

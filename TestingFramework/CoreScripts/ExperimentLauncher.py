@@ -156,7 +156,6 @@ class ExperimentLauncher:
             t_start = time.time()
             seconds_passed = 0
 
-            ##while(not p.poll() and seconds_passed < GeneralParameters.maxTimeForBenchmark):
             renamed = False
             time.sleep(1)
 
@@ -165,7 +164,6 @@ class ExperimentLauncher:
 
                 try:
                     renamed = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
-                    ##print(renamed == False)
                     renamed.close()
                     #renamed = os.rename(exeName, exeName + "_")
                     #renamed = os.rename(exeName + "_", exeName)
@@ -175,8 +173,8 @@ class ExperimentLauncher:
                     renamed = False
 
             retcode = p.poll()
-            self.logger.Log("seconds passed: %.2f" % (seconds_passed))
-            self.logger.Log("process retcode: %s" % (retcode))
+            self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
+            self.logger.Log("Process retcode: %s" % (retcode))
 
             if (retcode == None):
                 self.logger.Log("Time out on %s" % (benchmark))
@@ -209,7 +207,6 @@ class ExperimentLauncher:
 
             #testing only
             self.experimentResults.Print()
-            #
 
         self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
         return
