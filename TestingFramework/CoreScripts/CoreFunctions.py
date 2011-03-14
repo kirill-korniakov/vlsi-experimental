@@ -52,7 +52,7 @@ def PrintAbsValues(po, sequence):
 
 def Average(values):
     """Computes the arithmetic mean of a list of numbers.
-    >>> print(average([20, 30, 70]))
+    >>> print(Average([20, 30, 70]))
     40.0
     """
     return sum(values) / len(values)
@@ -65,7 +65,6 @@ def RemoveDir(dirName):
                 RemoveDir(file)
             else:
                 RemovePermissions(file)
-#                print('remove file')
                 os.remove(file)
         try:
             os.rmdir(dirName)
@@ -73,11 +72,10 @@ def RemoveDir(dirName):
             pass
 
 def RemovePermissions(filePath) :
-        if (not os.access(filePath, os.W_OK)):
-            os.chmod(filePath, 666)
+    if (not os.access(filePath, os.W_OK)):
+        os.chmod(filePath, 666)
 
 def CompareValues(value1, value2, eps = 0.001):
-
     if (value1 == value2):
       return 'same'
 
@@ -94,7 +92,7 @@ def ReportErrorAndExit(error, logger, emailer):
     emailer.SendMessageAndExit(error)
 
 def MarkResultAsBest(col):
-    return '--> ' + col
+    return '* ' + col
 
 def WriteStringToFile(cols, tableFileName):
   printStr = ''

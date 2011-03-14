@@ -9,7 +9,7 @@ class Experiment_Joint(BaseExperiment):
 		metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
 		stages  = ['INIT', 'GP', 'BUF', 'LEGB']
 
-		BaseExperiment.__init__(self, 'Joint Algorithm', 'JointPlacementBuffering.cfg', 'IWLS05.list', metrics, stages)
+		BaseExperiment.__init__(self, 'Joint Algorithm', 'JointPlacementBuffering.cfg', 'IWLS_GP_r1511_joint.list', metrics, stages)
 
 def TestRun():
 	experimentWithoutBuffering = Experiment_Joint()

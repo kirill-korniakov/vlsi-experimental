@@ -7,13 +7,13 @@ import BaseExperiment
 from BaseExperiment import *
 
 class ExperimentsComparator:
-    logger               = None
-    storage              = None
+    logger = None
+    storage = None
     experimentsToCompare = {} #Group of experiments. Their results will be compared
                               #experiment: {benchmark: pfst}
 
     def __init__(self, storage):
-        self.storage              = storage
+        self.storage = storage
         self.experimentsToCompare = {}
 
     def AddExperimentToGroup(self, newExperiment):
@@ -34,9 +34,8 @@ class ExperimentsComparator:
         for experiment in list(self.experimentsToCompare.keys()):
             if (experiment in self.storage.experimentResults):
                 self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment].pfstTables
-
             else:
-                self.logger.Log("Error: result for %s not found" % (experiment.name))
+                self.logger.Log("Error: results for %s not found" % (experiment.name))
 
     def CreateEmptyTable(self, resultFileName, metrics):
         #Create header of the table
@@ -72,23 +71,26 @@ class ExperimentsComparator:
 
     def MakeResultTable(self, resultFileName):
         groupExp = list(self.experimentsToCompare.keys())[0]
-        metrics  = groupExp.metrics
-        self.CreateEmptyTable(resultFileName, metrics)
+        self.CreateEmptyTable(resultFileName, groupExp.metrics)
 
-        #------Print results-------------------------------------
-        for benchmark in list(self.experimentsToCompare[groupExp].keys()):
+        benchmarks = list(self.experimentsToCompare[groupExp].keys())
+        for benchmark in benchmarks:
+            newTableString = self.CreateTableString(benchmark, groupExp.metrics)
+            WriteStringToFile(newTableString, resultFileName)
+
+    def CreateTableString(self, benchmark, metrics):
             initialMetrics = []
-            bestMetrics    = [1000000 for i in range(len(metrics))]
-            bestMetricsIdx = [0 for i in range(len(metrics))]
+            bestValues    = [1000000 for i in range(len(metrics))]
+            bestValuesIdx = [0 for i in range(len(metrics))]
 
-            cols       = [benchmark, END_OF_COLUMN]
-            initialIdx = len(cols) #index for metrics on 'INIT' stage
+            tableStringContent = [benchmark, END_OF_COLUMN]
+            initialIdx = len(tableStringContent) #index for metrics values on 'INIT' stage
 
             #Reserve positions for each metric on 'INIT' stage
             for col in range(len(metrics)):
-                cols.extend(["N/A", END_OF_COLUMN])
+                tableStringContent.extend(["N/A", END_OF_COLUMN])
 
-            cols.append(END_OF_COLUMN)
+            tableStringContent.append(END_OF_COLUMN)
 
             for experiment in list(self.experimentsToCompare.keys()):
                 resultValues  = self.experimentsToCompare[experiment][benchmark]
@@ -96,41 +98,38 @@ class ExperimentsComparator:
 
                 if (resultValues == []):
                     for col in range(len(metrics)):
-                        cols.extend(["N/A", END_OF_COLUMN])
-
+                        tableStringContent.extend(["N/A", END_OF_COLUMN])
                 else:
-                    #if 'INITIAL' metrics haven't been printed yet
                     if (initialMetrics == []):
+                        #if 'INITIAL' metrics haven't been printed yet
                         #take them from the table of this experiment
                         for col in range(len(metrics)):
-                            cols[initialIdx + 2 * col] = str(resultValues[0][col])
+                            tableStringContent[initialIdx + 2 * col] = str(resultValues[0][col])
                             initialMetrics.append(resultValues[0][col])
-
-                    #else compare 'INITIAL' metrics
                     else:
+                        #else compare 'INITIAL' metrics
                         for col in range(len(metrics)):
                             cmpResult = CompareValues(initialMetrics[col], resultValues[0][col])
-
-                            if (cmpResult == 'notEqual'):
+                            if (cmpResult == 'notEqual' and metrics[col] != 'Time'):
                                 self.logger.Log('Error: not equal Init metrics')
 
                     for col in range(len(metrics)):
                         percent = 100 * resultValues[finalStageIdx][col] / initialMetrics[col]
                         percentStr = "%.2f" % percent
 
-                        if (percent < bestMetrics[col]):
-                            bestMetrics[col]    = percent   #remember best result
-                            bestMetricsIdx[col] = len(cols) #and index
+                        if (percent < bestValues[col]):
+                            bestValues[col] = percent #remember the best result
+                            bestValuesIdx[col] = len(tableStringContent) #and its index
 
-                        cols.extend([percentStr, END_OF_COLUMN])
+                        tableStringContent.extend([percentStr, END_OF_COLUMN])
 
-                cols.append(END_OF_COLUMN)
+                tableStringContent.append(END_OF_COLUMN)
 
-            for idx in bestMetricsIdx:
+            for idx in bestValuesIdx:
                 if (idx > 0):
-                    cols[idx] = MarkResultAsBest(cols[idx])
+                    tableStringContent[idx] = MarkResultAsBest(tableStringContent[idx])
 
-            WriteStringToFile(cols, resultFileName)
+            return tableStringContent
 
     def CompareExperiments(self):
         if (len(self.experimentsToCompare) > 1):

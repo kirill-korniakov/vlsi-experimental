@@ -25,6 +25,7 @@ import Parameters
 from Parameters import *
 
 TERMINATED = "Terminated"
+nTerminatedBenchmarks = 0 #TODO: check if everything is OK
 
 class ExperimentLauncher:
     logger            = None
@@ -67,7 +68,7 @@ class ExperimentLauncher:
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
         benchmarks = [x for x in benchmarks if len(x.strip())]
-        self.logger.Log("Benchmarks:\n%s\n" % (", ".join(benchmarks)))
+        self.logger.Log("\n%s\n" % (", ".join(benchmarks)))
 
         #check if all benchmarks can be found
         for i in range(len(benchmarks)):
@@ -95,12 +96,12 @@ class ExperimentLauncher:
         return self.PrepareBenchmarks()
 
     def RunExperiment(self):
-        self.logger.Log("Config:     %s" % self.experiment.cfg)
+        self.logger.Log("Config: %s" % self.experiment.cfg)
         self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
         reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg)
-        logFolder     = reportCreator.CreateLogFolder()
-        reportTable   = reportCreator.GetReportTableName()
+        logFolder = reportCreator.CreateLogFolder()
+        reportTable = reportCreator.GetReportTableName()
 
         self.experiment.CreateEmptyTable(reportTable)
 
@@ -111,8 +112,12 @@ class ExperimentLauncher:
             return
 
         nTerminatedBenchmarks = 0
-
         for benchmark in benchmarks:
+            self.RunPlacer(benchmark, logFolder, reportTable)
+
+        self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
+
+    def RunPlacer(self, benchmark, logFolder, reportTable):
             self.experimentResults.AddPFSTForBenchmark(benchmark, [])
             logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
             fPlacerOutput = open(logFileName, 'w')
@@ -173,6 +178,7 @@ class ExperimentLauncher:
                     renamed = False
 
             retcode = p.poll()
+            self.logger.Log(benchmark + " finished")
             self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
             self.logger.Log("Process retcode: %s" % (retcode))
 
@@ -183,7 +189,6 @@ class ExperimentLauncher:
 
                 try:
                     p.terminate()
-
                 except Exception:
                     pass
 
@@ -191,7 +196,6 @@ class ExperimentLauncher:
                     self.AddErrorToResults("Reached maximum number of terminated benchmarks")
                     self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
                     return
-
             else:
                 (result, resultValues) = \
                         self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
@@ -203,13 +207,8 @@ class ExperimentLauncher:
                     self.experimentResults.resultFile = reportTable
 
             fPlacerOutput.close()
-            self.logger.Log(benchmark + " DONE")
 
-            #testing only
-            self.experimentResults.Print()
-
-        self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
-        return
+            self.experimentResults.Print() #testing only
 
 def test():
     pass
