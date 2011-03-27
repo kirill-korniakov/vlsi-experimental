@@ -6,6 +6,10 @@ import time
 
 END_OF_COLUMN = ';'
 
+SAME = 'same'
+EQUAL = 'equal'
+NOT_EQUAL = 'NotEqual'
+
 class Logger:
     startTime   = time.time()
     logFileName = ".//TF.log"
@@ -77,15 +81,15 @@ def RemovePermissions(filePath) :
 
 def CompareValues(value1, value2, eps = 0.001):
     if (value1 == value2):
-      return 'same'
+      return SAME
 
     value1 = float(value1)
     value2 = float(value2)
 
     if (abs(value1 - value2) < eps):
-      return 'equal'
+      return EQUAL
 
-    return 'notEqual'
+    return NOT_EQUAL
 
 def ReportErrorAndExit(error, logger, emailer):
     logger.Log(error)

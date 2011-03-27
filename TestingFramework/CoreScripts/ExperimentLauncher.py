@@ -28,6 +28,8 @@ TERMINATED = "Terminated"
 nTerminatedBenchmarks = 0 #TODO: check if everything is OK
 
 class ExperimentLauncher:
+    global nTerminatedBenchmarks
+
     logger            = None
     emailer           = None
     experiment        = None
@@ -68,7 +70,7 @@ class ExperimentLauncher:
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
         benchmarks = [x for x in benchmarks if len(x.strip())]
-        self.logger.Log("\n%s\n" % (", ".join(benchmarks)))
+        self.logger.Log("\n  * %s\n" % ("\n  * ".join(benchmarks)))
 
         #check if all benchmarks can be found
         for i in range(len(benchmarks)):
@@ -106,7 +108,6 @@ class ExperimentLauncher:
         self.experiment.CreateEmptyTable(reportTable)
 
         benchmarks = self.CheckParametersAndPrepareBenchmarks()
-
         if (benchmarks == []):
             self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
             return

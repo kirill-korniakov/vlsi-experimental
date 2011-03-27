@@ -12,13 +12,15 @@ class Experiment_Joint(BaseExperiment):
 		BaseExperiment.__init__(self, 'Joint Algorithm', 'JointPlacementBuffering.cfg', 'IWLS_GP_r1511_joint.list', metrics, stages)
 
 def TestRun():
+	plotterFlag = "--plotter.enabled=false"
+
 	experimentWithoutBuffering = Experiment_Joint()
-	experimentWithoutBuffering.name = "JointWithoutBuffering"
-	experimentWithoutBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=false"]
+	experimentWithoutBuffering.name = "Joint Without Buffering"
+	experimentWithoutBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=false", plotterFlag]
 
 	experimentWithBuffering = Experiment_Joint()
-	experimentWithBuffering.name = "JointWithBuffering"
-	experimentWithBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=true"]
+	experimentWithBuffering.name = "Joint With Buffering"
+	experimentWithBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=true", plotterFlag]
 
 	testRunner = TestRunner()
 	testRunner.AddExperimentToGroup(experimentWithoutBuffering)
