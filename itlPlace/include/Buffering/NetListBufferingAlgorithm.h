@@ -32,6 +32,7 @@ class RemoveBuffer
 {
 public:
     VGAlgorithmData* data;
+    RemoveBuffer(VGAlgorithmData* oldData);
     RemoveBuffer(HDesign& hd);
     ~RemoveBuffer();
     void RemoveNewBuffering();

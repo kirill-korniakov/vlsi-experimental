@@ -12,6 +12,7 @@ public:
     virtual int SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL);
 
 private:
+    RemoveBuffer* removeBuffer;
     double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions);
     virtual int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
 

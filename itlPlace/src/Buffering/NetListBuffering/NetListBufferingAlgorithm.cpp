@@ -320,6 +320,11 @@ int PathBasedBuffering::BufferingNetlist()
     return totalBufferCount;
 }
 
+RemoveBuffer::RemoveBuffer(VGAlgorithmData* oldData)
+{
+    data = oldData;
+}
+
 RemoveBuffer::RemoveBuffer(HDesign& hd)
 {
     data = new VGAlgorithmData(hd);
@@ -352,7 +357,10 @@ void RemoveBuffer::RemoveNewBuffering()
 
     for (HNets::NetsEnumeratorW nw =  data->design.Nets.GetFullEnumeratorW(); nw.MoveNext(); )
     {
-        Utils::RestoreBufferedNet(data->design, nw);
+        if (Utils::FindRepeat(nw.Name(), data->textIdentifierBufferedNet) == 0)
+            Utils::RestoreBufferedNet(data->design, nw);
+        else
+            int yyy = 0;
     }
 
     ALERT("Buffer count = %d", bufferCount);

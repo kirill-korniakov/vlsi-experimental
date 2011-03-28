@@ -15,6 +15,7 @@ void DetermineBordersOfClusterPotential(int& min_col, int& max_col,
 
 GPBuffering::GPBuffering(HDesign& hd): PathBasedBuffering(hd)
 {
+    removeBuffer = new RemoveBuffer(this->data);
 }
 
 double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
@@ -191,7 +192,7 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
     for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
         paths[idx++] = i;
     std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
-
+    int countCP = 0;
 
     for (int i = 0; i < context->sprData.binGrid.nBinRows; ++i)
     {
@@ -202,7 +203,6 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
         }
     }
 
-    ALERT("#CriticalPaths = %d", data->design.CriticalPaths.Count());int countCP = 0;
     while ((!isBufferingFinish) && IsLimitationCountCriticalPathExecute(totalIndex) && (ind < data->design.CriticalPaths.Count()))
     {
         bufferCount = 0;
@@ -269,9 +269,44 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
                 PrintPath(data->design, paths[ind], ::ToID(paths[ind])); 
             }
 
-            bufferCount = UpdateBinTable(context, BufferingCriticalPath(paths[ind], false));
+            bufferCount = UpdateBinTable(context, BufferingCriticalPath(paths[ind]));
             totalBufferCount += bufferCount;
-            ind++;
+
+            if (bufferCount == 0)
+            {
+                ind++;
+            }
+            else
+            {
+                STA(data->design, data->printTimingAfterBufferingCriticalPaths, data->reRoutingSteinerTree);
+
+                curTNS = Utils::TNS(data->design);
+                curWNS = Utils::WNS(data->design);
+
+                if (curTNS < minTNS)
+                    minTNS = curTNS;
+                if (curWNS < minWNS)
+                    minWNS = curWNS;
+
+                if (countCP > data->numberBufferedAtOnceCriticalPaths)
+                {
+                    FindCriticalPaths(data->design);
+                    countCP = 0;
+                    ind = 0;
+                    paths.resize(data->design.CriticalPaths.Count());
+
+                    int idx = 0;
+                    for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
+                        paths[idx++] = i;
+                    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
+                }
+                else
+                {
+                    ind++;   
+                    countCP++;
+                }
+
+            }
         }
         totalIndex++;
     }
@@ -380,4 +415,6 @@ void GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
         data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
         data->design.Plotter.ShowPlacement();
     } 
+
+    removeBuffer->RemoveNewBuffering();
 }
