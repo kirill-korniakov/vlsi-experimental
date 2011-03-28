@@ -47,7 +47,6 @@ class ExperimentResults:
 
             for benchmark in (self.benchmarkResults[result]):
                 resultStr += ("%s; " % (benchmark))
-
             resultStr += ")\n"
 
         for error in self.errors:

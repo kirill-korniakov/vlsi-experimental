@@ -6,6 +6,8 @@
 #include "VanGinnekenTree.h"
 #include "Reporting.h"
 
+#include <string>
+
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
                                         int& min_row, int& max_row,
@@ -13,7 +15,6 @@ void DetermineBordersOfClusterPotential(int& min_col, int& max_col,
 
 GPBuffering::GPBuffering(HDesign& hd): PathBasedBuffering(hd)
 {
-
 }
 
 double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
@@ -141,7 +142,6 @@ int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
                 context->sprData.bufferPotentialOverBins[rowIdx][colIdx] = bsf;
             }
         }// loop over affected bins
-
 
         for (int rowIdx = 0; rowIdx < context->sprData.binGrid.nBinRows; rowIdx++)
         {
@@ -292,44 +292,11 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
     return totalBufferCount;
 }
 
-int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
+void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
 {
-    if (!isInitialize) Initialize();
-
-    if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
-        //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
-        //data->GetSizeBuffer()) / 100.0, 1.0));
-        data->sizeBufferMultiplier =  1.0 - ((LHPWL - HPWL) / LHPWL);
-
-    if (data->plotBuffer || data->plotBinGridValue)
-        data->design.Plotter.ShowPlacement();
-
-    //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
-    //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
-    ALERT("NewSizeBufferMultiplier = %f", data->sizeBufferMultiplier);
-
-    STA(data->design);
-    if (data->design.CriticalPaths.Count() < 0)
-        FindCriticalPaths(data->design);
-
-    std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
-    int idx = 0;
-    for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
-        paths[idx++] = i;
-    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
-
-
-    for (int i = 0; i < context->sprData.binGrid.nBinRows; ++i)
-    {
-        for (int j = 0; j < context->sprData.binGrid.nBinCols; ++j)
-        {
-            context->sprData.binGrid.bins[i][j].sumBufPotential = 0.0;
-            context->sprData.bufferPotentialOverBins[i][j] = 0.0;
-        }
-    }
-
     int bufferCount = 0;
     ALERT("#CriticalPaths = %d", data->design.CriticalPaths.Count());
+
     for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
     {
         for (HCriticalPath::PointsEnumeratorW point = (paths[j],data->design).GetEnumeratorW(); point.MoveNext();)
@@ -364,6 +331,46 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
             }
         }
     }
+    ALERT("Buffers inserted: %d", bufferCount);
+}
+
+void GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
+{
+    if (!isInitialize) 
+        Initialize();
+
+    if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
+        //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
+        //data->GetSizeBuffer()) / 100.0, 1.0));
+        data->sizeBufferMultiplier =  1.0 - ((LHPWL - HPWL) / LHPWL);
+
+    if (data->plotBuffer || data->plotBinGridValue)
+        data->design.Plotter.ShowPlacement();
+
+    //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
+    //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
+    ALERT("NewSizeBufferMultiplier = %f", data->sizeBufferMultiplier);
+
+    STA(data->design);
+    if (data->design.CriticalPaths.Count() < 0)
+        FindCriticalPaths(data->design);
+
+    std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
+    int idx = 0;
+    for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
+        paths[idx++] = i;
+    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
+
+    for (int i = 0; i < context->sprData.binGrid.nBinRows; ++i)
+    {
+        for (int j = 0; j < context->sprData.binGrid.nBinCols; ++j)
+        {
+            context->sprData.binGrid.bins[i][j].sumBufPotential = 0.0;
+            context->sprData.bufferPotentialOverBins[i][j] = 0.0;
+        }
+    }
+
+    FillBinTable(context, paths);
 
     if (data->plotBinGridValue)
         data->design.Plotter.PlotFillBinGrid(context);
@@ -372,9 +379,5 @@ int GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
     {
         data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
         data->design.Plotter.ShowPlacement();
-    }
-
-    ALERT("Buffers inserted: %d", bufferCount);
-
-    return bufferCount;
+    } 
 }

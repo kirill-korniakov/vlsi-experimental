@@ -8,12 +8,14 @@ class GPBuffering: public PathBasedBuffering
 {
 public:
     GPBuffering(HDesign& hd);
-    virtual int SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL);
+    virtual void SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL);
     virtual int SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL);
-    
 
 private:
     double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions);
     virtual int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
+
+    void FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths);
 };
+
 #endif

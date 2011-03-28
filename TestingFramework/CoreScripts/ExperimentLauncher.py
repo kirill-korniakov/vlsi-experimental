@@ -115,6 +115,7 @@ class ExperimentLauncher:
         nTerminatedBenchmarks = 0
         for benchmark in benchmarks:
             self.RunPlacer(benchmark, logFolder, reportTable)
+            self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
 
         self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
 
@@ -175,13 +176,12 @@ class ExperimentLauncher:
                     #renamed = os.rename(exeName + "_", exeName)
 
                 except IOError:
-                #except OSError:
                     renamed = False
 
             retcode = p.poll()
-            self.logger.Log(benchmark + " finished")
             self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
-            self.logger.Log("Process retcode: %s" % (retcode))
+            if retcode != 0:
+                self.logger.Log("Process retcode: %s" % (retcode))
 
             if (retcode == None):
                 self.logger.Log("Time out on %s" % (benchmark))
@@ -208,8 +208,7 @@ class ExperimentLauncher:
                     self.experimentResults.resultFile = reportTable
 
             fPlacerOutput.close()
-
-            self.experimentResults.Print() #testing only
+            #self.experimentResults.Print() #testing only
 
 def test():
     pass
