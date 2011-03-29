@@ -21,7 +21,7 @@ void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
     ConfigContext ctx = data->design.cfg.OpenContext("GlobalPlacement.New_Buffering");
 
     Initialize();
-    if (data->design.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
+    if (data->design.cfg.ValueOf("TypeNetListBuffering", 0) == BUFFERING_ALL_CRITICAL_PATH)
         SetBinTableBuffer(&context, HPWL, LHPWL);
     else
         SetBinTablePathBasedBuffer(&context, HPWL, LHPWL);
