@@ -339,8 +339,10 @@ RemoveBuffer::~RemoveBuffer()
 void RemoveBuffer::RemoveNewBuffering()
 {
     ALERT("Cells before remove = %d", data->design.Cells.PlaceableCellsCount());
+    data->design.Plotter.ShowPlacement();
     int bufferCount = 0;
     int startNewPinIndex = data->design._Design.NetList.nPinsEnd;
+
     for (HCells::PlaceableCellsEnumeratorW pCell = data->design.Cells.GetPlaceableCellsEnumeratorW(); pCell.MoveNext(); )
     {
         for(unsigned int j = 0; j < data->Buffers.size(); j++)
@@ -355,12 +357,13 @@ void RemoveBuffer::RemoveNewBuffering()
         }
     }
 
+    int textIdentifierBufferedNetCount = 0;
     for (HNets::NetsEnumeratorW nw =  data->design.Nets.GetFullEnumeratorW(); nw.MoveNext(); )
     {
         if (Utils::FindRepeat(nw.Name(), data->textIdentifierBufferedNet) == 0)
             Utils::RestoreBufferedNet(data->design, nw);
         else
-            int yyy = 0;
+            textIdentifierBufferedNetCount++;
     }
 
     ALERT("Buffer count = %d", bufferCount);
@@ -395,7 +398,8 @@ void RemoveBuffer::RemoveNewBuffering()
 
     data->design._Design.NetList.nPinsEnd = startNewPinIndex;
 
-    int newNetCount = data->design._Design.NetList.nNetsByKind[NetKind_Removed];
+    int newNetCount = data->design._Design.NetList.nNetsByKind[NetKind_Removed] + data->design._Design.NetList.nNetsByKind[NetKind_Buffered];
+    ASSERT(newNetCount == textIdentifierBufferedNetCount);
     int newNetEnd = data->design._Design.NetList.nNetsEnd - newNetCount;
     if (newNetCount != 0)
     {
@@ -418,10 +422,12 @@ void RemoveBuffer::RemoveNewBuffering()
 
     data->design._Design.NetList.nNetsEnd = newNetEnd;
     data->design._Design.NetList.nNetsByKind[NetKind_Removed] = 0;
+    data->design._Design.NetList.nNetsByKind[NetKind_Buffered] = 0;
 
     ALERT("Cells after remove = %d", data->design.Cells.PlaceableCellsCount());
 
     data->design.Plotter.ShowPlacement();
     STA(data->design);
     FindCriticalPaths(data->design);
+    data->design.Plotter.ShowPlacement();
 }

@@ -337,6 +337,9 @@ void GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, doubl
     ALERT("Minimal TNS: %f", minTNS);
     ALERT("Minimal WNS: %f", minWNS);
     ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
+    ALERT("REMOVE NEW BUFFERING STARTED");
+    removeBuffer->RemoveNewBuffering();
+    ALERT("REMOVE NEW BUFFERING FINISHED");
 }
 
 void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
@@ -426,7 +429,5 @@ void GPBuffering::SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL)
     {
         data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
         data->design.Plotter.ShowPlacement();
-    } 
-
-    removeBuffer->RemoveNewBuffering();
+    }     
 }
