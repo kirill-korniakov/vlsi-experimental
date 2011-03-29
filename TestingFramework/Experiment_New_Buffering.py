@@ -6,12 +6,10 @@ from Parameters import *
 
 class Experiment_New_Buffering(BaseExperiment):
 	def __init__(self):
-		#_metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
-		#_stages  = ['INIT', 'GP1', 'NBUF1', 'LEGB1', 'GP2', 'NBUF2', 'LEGB2', 'GP3', 'NBUF3', 'LEGB3', 'GP4', 'NBUF4', 'LEGB4', 'GP5', 'NBUF5', 'LEGB5', 'GP6', 'NBUF6', 'LEGB6', 'GP7', 'NBUF7', 'LEGB7', 'GP8', 'NBUF8', 'LEGB8', 'GP9', 'NBUF9', 'LEGB9', 'GP10', 'NBUF10', 'LEGB10']
 		_metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
 		_stages  = ['INIT', 'GP',  'NBUF', 'LEGB']
 		
-		BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)', 'New_buffering.cfg', 'IWLS05.list', _metrics, _stages)
+		BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)', 'NewBuffering.cfg', 'IWLS05.list', _metrics, _stages)
 
 def TestRun():
 	#e.MakeResultTable('buf', '111')

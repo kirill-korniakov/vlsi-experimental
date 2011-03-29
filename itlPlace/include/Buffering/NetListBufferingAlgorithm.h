@@ -24,6 +24,7 @@ public:
     }
     VGVariantsListElement BufferingCriticalPath(HCriticalPath criticalPath, bool isRealBuffering = true);
     int BufferingNetlist();
+
 protected:
     bool IsLimitationCountCriticalPathExecute(int totalIndex);
 };

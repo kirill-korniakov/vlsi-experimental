@@ -1,5 +1,4 @@
-#ifndef __NetBufferingAlgorithm_H__
-#define __NetBufferingAlgorithm_H__
+#pragma once
 
 #include "VanGinnekenData.h"
 #include "BufferPositions.h"
@@ -37,5 +36,3 @@ protected:
   bool isInitialize;
   virtual VGVariantsListElement Algorithm(VanGinnekenTree* vGTree);
 };
-
-#endif //__NetBufferingAlgorithm_H__

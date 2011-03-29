@@ -57,7 +57,9 @@ class ExperimentsComparator:
         referenceExperiment = list(self.experimentsToCompare.keys())[referenceExperimentIdx]
         self.PrintLabelAndBlanks(cols, referenceExperiment.name, nMetrics)
 
-        for experiment in list(self.experimentsToCompare.keys()):
+        for experiment in self.experimentsToCompare.keys():
+            if (self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx):
+                continue
             self.PrintLabelAndBlanks(cols, experiment.name, nMetrics)
 
         WriteStringToFile(cols, resultFileName)
@@ -73,7 +75,9 @@ class ExperimentsComparator:
             cols.extend([metrics[row], END_OF_COLUMN])
         cols.append(END_OF_COLUMN)
 
-        for col in range(len(self.experimentsToCompare.keys())):
+        for experiment in self.experimentsToCompare.keys():
+            if self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx:
+                continue
             for row in nMetrics:
                 cols.extend([metrics[row] + '%', END_OF_COLUMN])
             cols.append(END_OF_COLUMN)
@@ -117,9 +121,11 @@ class ExperimentsComparator:
             newTableLine.append(END_OF_COLUMN)
 
             # normal experiments
-            for experiment in list(self.experimentsToCompare.keys()):
-                resultValues = self.experimentsToCompare[experiment][benchmark]
-
+            for experiment in self.experimentsToCompare.keys():
+                if self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx:
+                    continue
+                    
+                resultValues = self.experimentsToCompare[experiment][benchmark]                
                 if (resultValues == []):
                     for metricIdx in nMetrics:
                         newTableLine.extend(["N/A", END_OF_COLUMN])

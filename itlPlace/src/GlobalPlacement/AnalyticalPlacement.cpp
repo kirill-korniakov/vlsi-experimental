@@ -476,24 +476,6 @@ bool IsTimeToExit(HDesign& hd, ClusteringInformation& ci, AppCtx& context,
     return false;
 }
 
-void DoBuffering(HDesign& hd, AppCtx& context, double HPWL, double LHPWL)
-{
-    WRITELINE("");
-    ALERT("NEW BUFFERING STARTED");
-    ConfigContext ctx = hd.cfg.OpenContext("GlobalPlacement.New_Buffering");
-
-    GPBuffering buf(hd);
-    buf.Initialize();
-    if (hd.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
-        buf.SetBinTableBuffer(&context, HPWL, LHPWL);
-    else
-        buf.SetBinTablePathBasedBuffer(&context, HPWL, LHPWL);
-
-    ctx.Close();
-    ALERT("NEW BUFFERING FINISHED");
-    WRITELINE("");
-}
-
 int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
@@ -543,7 +525,8 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         {
             if (metaIteration >= hd.cfg.ValueOf("GlobalPlacement.New_Buffering.NumberMetaIterationStartBuffering", 0))
             {
-                DoBuffering(hd, context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+                GPBuffering bufferer(hd);
+                bufferer.DoBuffering(context, QA->GetBackHPWL(), QA->GetBackLHPWL());
             }
         }
 

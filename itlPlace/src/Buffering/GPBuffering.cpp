@@ -1,12 +1,8 @@
 #include "GPBuffering.h"
 #include "OptimizationContext.h"
 #include "STA.h"
-#include "Utils.h"
 #include "Timing.h"
-#include "VanGinnekenTree.h"
 #include "Reporting.h"
-
-#include <string>
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
@@ -16,6 +12,23 @@ void DetermineBordersOfClusterPotential(int& min_col, int& max_col,
 GPBuffering::GPBuffering(HDesign& hd): PathBasedBuffering(hd)
 {
     removeBuffer = new RemoveBuffer(this->data);
+}
+
+void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
+{
+    WRITELINE("");
+    ALERT("NEW BUFFERING STARTED");
+    ConfigContext ctx = data->design.cfg.OpenContext("GlobalPlacement.New_Buffering");
+
+    Initialize();
+    if (data->design.cfg.ValueOf("TypeNetListBuffering", 0) == 0)
+        SetBinTableBuffer(&context, HPWL, LHPWL);
+    else
+        SetBinTablePathBasedBuffer(&context, HPWL, LHPWL);
+
+    ctx.Close();
+    ALERT("NEW BUFFERING FINISHED");
+    WRITELINE("");
 }
 
 double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions)
@@ -36,10 +49,11 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
 
     double x = bufferPositions.GetPosition()->x;
     double y = bufferPositions.GetPosition()->y;
-    double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
-    double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
-    double x2 = bufferPositions.GetPosition()->x + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeX();
-    double y2 = bufferPositions.GetPosition()->y + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[bufferPositions.GetBufferInfo()->Type()].SizeY();
+    HMacroType type = bufferPositions.GetBufferInfo()->Type();
+    double bufWidth = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[type].SizeX();
+    double bufHeight = bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[type].SizeY();
+    double x2 = bufferPositions.GetPosition()->x + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[type].SizeX();
+    double y2 = bufferPositions.GetPosition()->y + bufferPositions.GetPosition()->GetTree()->vGAlgorithmData->design[type].SizeY();
 
     double xSize = 0;
     double ySize = 0;
@@ -130,7 +144,6 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, Buff
 
 int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
 {
-
     for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); 
         pos != vGVariant.GetBufferPosition()->end(); ++pos)
     {
@@ -156,7 +169,7 @@ int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
     return vGVariant.GetPositionCount();
 }
 
-int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL)
+void GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL)
 {
     if (!isInitialize) Initialize();
 
@@ -324,7 +337,6 @@ int GPBuffering::SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double
     ALERT("Minimal TNS: %f", minTNS);
     ALERT("Minimal WNS: %f", minWNS);
     ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
-    return totalBufferCount;
 }
 
 void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
