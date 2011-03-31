@@ -163,7 +163,7 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
 
     //null the penalties
     double sum = 0;
-    double sum2=0;
+    double sum2 = 0;
     if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
     {
         for (int i = 0; i < binGrid.nBinRows; ++i)
@@ -248,8 +248,9 @@ void CalculatePotentials(AppCtx* context, PetscScalar* x)
             totalPotential += binGrid.bins[i][j].sumPotential;
         }
     }
+
     if (context->hd->cfg.ValueOf("GlobalPlacement.UseBuffering", false))
-        if (context->hd->cfg.ValueOf("GlobalPlacement.New_Buffering.Reporting.PrintSumPutencial", false))
+        if (context->hd->cfg.ValueOf("GlobalPlacement.New_Buffering.Reporting.PrintSumPotencial", false))
         {
             ALERT("Total sum potential + buffer potential   = %f", totalPotential);
             ALERT("Total buffer potential = %f", sum);

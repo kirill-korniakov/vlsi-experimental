@@ -1,5 +1,4 @@
-#ifndef __HIGH_PLOTTER_H__
-#define __HIGH_PLOTTER_H__
+#pragma once
 
 #include "HBaseDesignItem.h"
 #include "HCell.h"
@@ -16,12 +15,6 @@ class TileGrid;
 
 class HPlotter
 {
-protected:
-  void* m_data;
-  HDesign& m_hd;
-  bool m_isDestroyed;
-  bool m_isHistogramDestroyed;
-
 public:
   HPlotter(HDesign& design);
   ~HPlotter();
@@ -35,21 +28,20 @@ public:
     WAIT_10_SECONDS = 10000
   };
 
-  //FIXME: think about 2 windows
-  // org methods
   void Initialize();
-  void InitializeHistogramWindow();
-  void Destroy();
-  void DestroyHistogramWindow();
-  void ClearHistogram();
-  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
   bool IsEnabled();
+  void Destroy();
 
   void Clear();
   void Refresh(WaitTime waitTime = NO_WAIT);
   void Refresh(const string& cfgPath);
   void SetAutoRefreshMinFrequency(int freq);
   void ResetAutoRefreshFrequency();
+
+  void InitializeHistogramWindow();
+  void DestroyHistogramWindow();
+  void ClearHistogram();
+  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
 
   void SaveImage(string fileName = "", string dirName = ""); 
   void SaveMilestoneImage(string fileSuffix, bool addToHtmlLog = true);
@@ -63,7 +55,7 @@ public:
   void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
   void ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime = NO_WAIT);
   void VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
-    double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g);
+                      double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g);
   void ShowLegalizationState(WaitTime waitTime, bool drawSites);
   void ShowSteinerForest(Color color, WaitTime waitTime = NO_WAIT);
   void ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
@@ -112,6 +104,12 @@ public:
   void DrawRectangle(double x1, double y1, double x2, double y2, Color col);
   void DrawBar(double x1, double y1, double x2, double y2, Color col);
 
+protected:
+  void* m_data;
+  HDesign& m_hd;
+  bool m_isDestroyed;
+  bool m_isHistogramDestroyed;
+
 private:
   bool _IsEnabled();
   void _AutoRefresh();
@@ -119,5 +117,3 @@ private:
 
   Color _GetCellColor(HCell cell);
 };
-
-#endif //__HIGH_PLOTTER_H__

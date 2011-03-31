@@ -25,11 +25,9 @@ import Parameters
 from Parameters import *
 
 TERMINATED = "Terminated"
-nTerminatedBenchmarks = 0 #TODO: check if everything is OK
+nTerminatedBenchmarks = 10 #TODO: check if everything is OK
 
-class ExperimentLauncher:
-    global nTerminatedBenchmarks
-
+class ExperimentLauncher:   
     logger            = None
     emailer           = None
     experiment        = None
@@ -98,6 +96,8 @@ class ExperimentLauncher:
         return self.PrepareBenchmarks()
 
     def RunExperiment(self):
+        global nTerminatedBenchmarks
+        
         self.logger.Log("Config: %s" % self.experiment.cfg)
         self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
@@ -112,7 +112,7 @@ class ExperimentLauncher:
             self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
             return
 
-        nTerminatedBenchmarks = 0
+        nTerminatedBenchmarks = 33
         for benchmark in benchmarks:
             self.RunPlacer(benchmark, logFolder, reportTable)
             self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
@@ -120,95 +120,97 @@ class ExperimentLauncher:
         self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
 
     def RunPlacer(self, benchmark, logFolder, reportTable):
-            self.experimentResults.AddPFSTForBenchmark(benchmark, [])
-            logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
-            fPlacerOutput = open(logFileName, 'w')
-            resultValues  = []
+        global nTerminatedBenchmarks
+        
+        self.experimentResults.AddPFSTForBenchmark(benchmark, [])
+        logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
+        fPlacerOutput = open(logFileName, 'w')
+        resultValues  = []
 
-            defFile = "--params.def=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
-                      + "//" + benchmark + ".def"
+        defFile = "--params.def=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
+                  + "//" + benchmark + ".def"
 
-            benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
-            pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
-            pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
+        benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
+        pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
+        pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
 
-            milestonePixDirectory = pixDirectory + "//milestones"
+        milestonePixDirectory = pixDirectory + "//milestones"
 
-            if (os.path.exists(milestonePixDirectory) != True):
-                os.makedirs(milestonePixDirectory)
+        if (os.path.exists(milestonePixDirectory) != True):
+            os.makedirs(milestonePixDirectory)
 
-            milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
-            exeName = GeneralParameters.binDir + "itlPlaceRelease.exe"
+        milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
+        exeName = GeneralParameters.binDir + "itlPlaceRelease.exe"
 
-            params = [exeName, os.path.abspath(self.experiment.cfg),\
-                      defFile, pixDirParam, milestonePixDirParam]
-            params.extend(self.experiment.cmdArgs)
+        params = [exeName, os.path.abspath(self.experiment.cfg),\
+                  defFile, pixDirParam, milestonePixDirParam]
+        params.extend(self.experiment.cmdArgs)
 
-            #HACK: ugly hack for ISPD04 benchmarks
-            if self.experiment.cfg.find("ispd04") != -1:
-                lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
-                          + "//" + benchmark + ".lef"
+        #HACK: ugly hack for ISPD04 benchmarks
+        if self.experiment.cfg.find("ispd04") != -1:
+            lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
+                      + "//" + benchmark + ".lef"
 
-                params.append(lefFile)
+            params.append(lefFile)
 
-            benchmarkResult = ""
+        benchmarkResult = ""
+
+        try:
+            p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+
+        except WindowsError:
+            error = "Error: can not call %s" % (exeName)
+            ReportErrorAndExit(error, self.logger, self.emailer)
+
+        t_start = time.time()
+        seconds_passed = 0
+
+        renamed = False
+        time.sleep(1)
+
+        while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
+            seconds_passed = time.time() - t_start
 
             try:
-                p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+                renamed = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
+                renamed.close()
+                #renamed = os.rename(exeName, exeName + "_")
+                #renamed = os.rename(exeName + "_", exeName)
 
-            except WindowsError:
-                error = "Error: can not call %s" % (exeName)
-                ReportErrorAndExit(error, self.logger, self.emailer)
+            except IOError:
+                renamed = False
 
-            t_start = time.time()
-            seconds_passed = 0
+        retcode = p.poll()
+        self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
+        if retcode != 0:
+            self.logger.Log("Process retcode: %s" % (retcode))
 
-            renamed = False
-            time.sleep(1)
+        if (retcode == None):
+            self.logger.Log("Time out on %s" % (benchmark))
+            nTerminatedBenchmarks += 1
+            self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
 
-            while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
-                seconds_passed = time.time() - t_start
+            try:
+                p.terminate()
+            except Exception:
+                pass
 
-                try:
-                    renamed = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
-                    renamed.close()
-                    #renamed = os.rename(exeName, exeName + "_")
-                    #renamed = os.rename(exeName + "_", exeName)
+            if (nTerminatedBenchmarks >= 3):
+                self.AddErrorToResults("Reached maximum number of terminated benchmarks")
+                self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
+                return
+        else:
+            (result, resultValues) = \
+                    self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
-                except IOError:
-                    renamed = False
+            self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
+            self.experimentResults.AddBenchmarkResult(benchmark, result)
 
-            retcode = p.poll()
-            self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
-            if retcode != 0:
-                self.logger.Log("Process retcode: %s" % (retcode))
+            if (result == CHANGED):
+                self.experimentResults.resultFile = reportTable
 
-            if (retcode == None):
-                self.logger.Log("Time out on %s" % (benchmark))
-                nTerminatedBenchmarks += 1
-                self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
-
-                try:
-                    p.terminate()
-                except Exception:
-                    pass
-
-                if (nTerminatedBenchmarks >= 3):
-                    self.AddErrorToResults("Reached maximum number of terminated benchmarks")
-                    self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
-                    return
-            else:
-                (result, resultValues) = \
-                        self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
-
-                self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
-                self.experimentResults.AddBenchmarkResult(benchmark, result)
-
-                if (result == CHANGED):
-                    self.experimentResults.resultFile = reportTable
-
-            fPlacerOutput.close()
-            #self.experimentResults.Print() #testing only
+        fPlacerOutput.close()
+        #self.experimentResults.Print() #testing only
 
 def test():
     pass

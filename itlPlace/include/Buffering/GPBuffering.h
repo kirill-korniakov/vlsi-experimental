@@ -9,12 +9,16 @@ public:
     void DoBuffering(AppCtx& context, double HPWL, double LHPWL);
 
 private:
-    virtual void SetBinTableBuffer(AppCtx* context, double HPWL, double LHPWL);
-    virtual void SetBinTablePathBasedBuffer(AppCtx* context, double HPWL, double LHPWL);
-    virtual int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);
-    
-    double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions);
+    void Plot(AppCtx* context);
+
+    void Init2(AppCtx* context, double HPWL, double LHPWL);
+
     void FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths);
+    void FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPath>& paths);
+
+    int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);    
+    double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions);
 
     RemoveBuffer* removeBuffer;
+    std::vector<HCriticalPath> paths;
 };
