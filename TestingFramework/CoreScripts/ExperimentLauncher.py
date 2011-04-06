@@ -25,7 +25,7 @@ import Parameters
 from Parameters import *
 
 TERMINATED = "Terminated"
-nTerminatedBenchmarks = 10 #TODO: check if everything is OK
+nTerminatedBenchmarks = 0 #TODO: check if everything is OK
 
 class ExperimentLauncher:   
     logger            = None

@@ -4,7 +4,7 @@ class TestRunnerParameters:
 
 class EmailerParameters:
     doSendMail = False
-    subject    = "Night experiments"
+    subject    = "[TF] Night Experiments"
     recipients = ['itlab.vlsi@itlab.unn.ru']
     #recipients = ['belyakov.alexander.a@gmail.com']
     #recipients = ''
