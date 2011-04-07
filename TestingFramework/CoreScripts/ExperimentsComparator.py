@@ -85,10 +85,10 @@ class ExperimentsComparator:
         WriteStringToFile(cols, resultFileName)
 
     def MakeResultTable(self, resultFileName):
-        groupExp = list(self.experimentsToCompare.keys())[0]
+        groupExp = self.experimentsToCompare.keys()[0]
         self.PrintTableHeader(resultFileName, groupExp.metrics)
 
-        benchmarks = list(self.experimentsToCompare[groupExp].keys())
+        benchmarks = self.experimentsToCompare[groupExp].keys()
         for benchmark in benchmarks:
             newTableString = self.CreateNewTableLine(benchmark, groupExp.metrics)
             WriteStringToFile(newTableString, resultFileName)
