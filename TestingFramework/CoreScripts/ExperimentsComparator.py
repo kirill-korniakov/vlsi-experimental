@@ -151,9 +151,9 @@ class ExperimentsComparator:
 
                 newTableLine.append(END_OF_COLUMN)
 
-            for idx in bestValuesIdx:
-                if (idx > 0):
-                    newTableLine[idx] = MarkResultAsBest(newTableLine[idx])
+            #for idx in bestValuesIdx:
+            #    if (idx > 0):
+            #        newTableLine[idx] = MarkResultAsBest(newTableLine[idx])
 
             return newTableLine
 
