@@ -42,26 +42,19 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
     HDesign& design = bufferPosition.GetPosition()->GetTree()->vGAlgorithmData->design;
     BinGrid& binGrid = context->sprData.binGrid;
 
-    double width = binGrid.binWidth;
-    double height = binGrid.binHeight;
-
-    double binX = binGrid.bins[binRow][binCol].xCoord - width / 2.0;
-    double binY = binGrid.bins[binRow][binCol].yCoord - height / 2.0;
-
+    double binX = binGrid.bins[binRow][binCol].xCoord - binGrid.binWidth / 2.0;
+    double binY = binGrid.bins[binRow][binCol].yCoord - binGrid.binHeight / 2.0;
     double binX2 = binX + binGrid.binWidth;
     double binY2 = binY + binGrid.binHeight;
-
-    double dx = bufferPosition.GetPosition()->x - binGrid.bins[binRow][binCol].xCoord;
-    double dy = bufferPosition.GetPosition()->y - binGrid.bins[binRow][binCol].yCoord;
-
-    double x = bufferPosition.GetPosition()->x;
-    double y = bufferPosition.GetPosition()->y;
 
     HMacroType type = bufferPosition.GetBufferInfo()->Type();    
     double bufWidth = design[type].SizeX();
     double bufHeight = design[type].SizeY();
-    double x2 = bufferPosition.GetPosition()->x + design[type].SizeX();
-    double y2 = bufferPosition.GetPosition()->y + design[type].SizeY();
+
+    double x = bufferPosition.GetPosition()->x;
+    double y = bufferPosition.GetPosition()->y;
+    double x2 = x + bufWidth;
+    double y2 = y + bufHeight;
 
     double xSize = 0;
     double ySize = 0;
@@ -103,7 +96,7 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
             }
             else
             {
-                xSize = width;
+                xSize = binGrid.binWidth;
                 isXVisit = true;
             }
         }
@@ -140,7 +133,7 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
             }
             else
             {
-                ySize = height;
+                ySize = binGrid.binHeight;
                 isYVisit = true;
             }
         }
@@ -150,20 +143,23 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
     return (xSize * ySize * sizeBufferMultiplier);
 }
 
-int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant)
+void GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& buffers)
 {
-    for (TemplateTypes<BufferPositions>::list::iterator pos = vGVariant.GetBufferPosition()->begin(); 
-        pos != vGVariant.GetBufferPosition()->end(); ++pos)
+    TemplateTypes<BufferPositions>::list::iterator bufferPosition;
+    for (bufferPosition = buffers.GetBufferPosition()->begin(); bufferPosition != buffers.GetBufferPosition()->end(); ++bufferPosition)
     {
+        double x = bufferPosition->GetPosition()->x;
+        double y = bufferPosition->GetPosition()->y;
+
         for (int binRow = 0; binRow < context->sprData.binGrid.nBinRows; binRow++)
         {
             for (int binCol = 0; binCol < context->sprData.binGrid.nBinCols; binCol++)
             {
                 context->sprData.bufferPotentialOverBins[binRow][binCol] = 0;
-                double bsf = CalcBufferArea(context, binCol, binRow, *pos);
+                double bsf = CalcBufferArea(context, binCol, binRow, *bufferPosition);
                 context->sprData.bufferPotentialOverBins[binRow][binCol] = bsf;
             }
-        }// loop over affected bins
+        }
 
         for (int binRow = 0; binRow < context->sprData.binGrid.nBinRows; binRow++)
         {
@@ -174,15 +170,16 @@ int GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVarian
             }
         }
     }
-    return vGVariant.GetPositionCount();
 }
 
 void GPBuffering::Init2(AppCtx* context, double HPWL, double LHPWL)
 {
     if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
+    {
         //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
         //data->GetSizeBuffer()) / 100.0, 1.0));
         data->sizeBufferMultiplier = 1.0 - ((LHPWL - HPWL) / LHPWL);
+    }
 
     //ALERT("Buffering type: %d", data->design.cfg.ValueOf("TypePartition", 0));
     //ALERT("data->GetSizeBuffer() = %f",data->GetSizeBuffer());
@@ -290,7 +287,9 @@ void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPa
                 PrintPath(data->design, paths[ind], ::ToID(paths[ind])); 
             }
 
-            bufferCount = UpdateBinTable(context, BufferingCriticalPath(paths[ind]));
+            VGVariantsListElement buffers = BufferingCriticalPath(paths[ind]);
+            bufferCount = buffers.GetPositionCount();
+            UpdateBinTable(context, buffers);
             totalBufferCount += bufferCount;
 
             if (bufferCount == 0)
@@ -342,10 +341,16 @@ void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPa
     ALERT("REMOVE NEW BUFFERING FINISHED");
 }
 
+bool GPBuffering::FIXME_GiveMeProperName(HNetWrapper net)
+{
+    return  (data->countPinInBufferingInterconnection == 0) || 
+            ((net.PinsCount() <= data->countPinInBufferingInterconnection) && (!data->isExactPinCountRequired)) ||
+            ((net.PinsCount() == data->countPinInBufferingInterconnection) && (data->isExactPinCountRequired) );
+}
+
 void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
 {
     int bufferCount = 0;
-    ALERT("#CriticalPaths = %d", data->design.CriticalPaths.Count());
 
     for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
     {
@@ -356,12 +361,7 @@ void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& path
             {
                 if (!data->netVisit[::ToID(net)])
                 {
-                    //FIXME: create a function with a meaningful name and boolean return value
-                    if ((data->countPinInBufferingInterconnection == 0) || (
-                        ((net.PinsCount() <= data->countPinInBufferingInterconnection) 
-                        && (!data->isExactPinCountRequired) ) ||
-                        ((net.PinsCount() == data->countPinInBufferingInterconnection) 
-                        && (data->isExactPinCountRequired))))
+                    if (FIXME_GiveMeProperName(net))
                     {
                         bool isBufferingNet = true;
                         if (!data->isNetContainPrimaryPin)            
@@ -376,12 +376,15 @@ void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& path
                         if (!data->IsBuffering())
                             continue;               
 
-                        bufferCount += UpdateBinTable(context, BufferingNet(net, false));
+                        VGVariantsListElement buffers = BufferingNet(net, false);
+                        bufferCount += buffers.GetPositionCount();
+                        UpdateBinTable(context, buffers);                        
                     }
                 }
             }
         }
     }
+
     ALERT("Buffers inserted: %d", bufferCount);
 }
 

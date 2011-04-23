@@ -55,47 +55,54 @@ void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
     if (!IsEnabled())
         return;
 
-    if (m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
-    {
-        string fileName = Aux::CreateCoolFileName(m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), m_hd.Circuit.Name() + "_" + fileSuffix, "png");
-        //cvSaveImage(fileName.c_str(), m_Data->img);
-        SavePlotterImage(m_hd.cfg, fileName, m_Data->img,
-            m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
-            m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
+    if (!m_hd.cfg.ValueOf("plotter.saveMilestoneImages", false))
+        return;
 
-        if (Logger::Global.HasHTMLStream() && addToHtmlLog)
+    static int milestoneIdx = 0;
+    string fileName = Aux::CreateCoolFileName(
+        m_hd.cfg.ValueOf("plotter.milestonePixDirectory", "."), 
+        m_hd.Circuit.Name() + "_" + Aux::IntToString(milestoneIdx++, 3) + "_" + fileSuffix, 
+        "png");
+
+    SavePlotterImage(m_hd.cfg, fileName, m_Data->img,
+        m_hd.cfg.ValueOf("plotter.CompressMilestoneImages", true),
+        m_hd.cfg.ValueOf("plotter.MilestonePaletteSize", 16));
+
+    if (Logger::Global.HasHTMLStream() && addToHtmlLog)
+    {
+        bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
+        Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");
+        Logger::Global.WriteToHTMLStream(true, "%s", fileName.c_str());
+        if (embeed && Aux::FileExists(fileName))
         {
-            bool embeed = m_hd.cfg.ValueOf("plotter.embeedMilestones", false);
-            Logger::Global.WriteToHTMLStream(false, "%s", "<div class=\"milestone\"><img alt=\"");
-            Logger::Global.WriteToHTMLStream(true, "%s", fileName.c_str());
-            if (embeed && Aux::FileExists(fileName))
+            int fsize = Aux::GetFileSize(fileName);
+            unsigned char* buffer = new unsigned char[fsize];
+            try
             {
-                int fsize = Aux::GetFileSize(fileName);
-                unsigned char* buffer = new unsigned char[fsize];
-                try
+                FILE* fimg = fopen(fileName.c_str(), "rb");
+                if (fimg != 0)
                 {
-                    FILE* fimg = fopen(fileName.c_str(), "rb");
-                    if (fimg != 0)
-                    {
-                        fsize = int(fread(buffer, 1, fsize, fimg));
-                        fclose(fimg);
-                    }
-                    Logger::Global.WriteToHTMLStream(false, "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", Base64::Encode(buffer, fsize).c_str());
+                    fsize = int(fread(buffer, 1, fsize, fimg));
+                    fclose(fimg);
                 }
-                catch(...)
-                {
-                    delete[] buffer;
-                    throw;
-                }
+                Logger::Global.WriteToHTMLStream(
+                    false, 
+                    "\" src=\"data:image/jpeg;base64,%s\" /></div>\n", 
+                    Base64::Encode(buffer, fsize).c_str());
+            }
+            catch(...)
+            {
                 delete[] buffer;
+                throw;
             }
-            else
-            {
-                for (size_t i = 0; i < fileName.length(); ++i)
-                    if (fileName[i] == '\\')
-                        fileName[i] = '/';
-                Logger::Global.WriteToHTMLStream(false, "\" src=\"../%s\" /></div>\n", fileName.c_str());
-            }
+            delete[] buffer;
+        }
+        else
+        {
+            for (size_t i = 0; i < fileName.length(); ++i)
+                if (fileName[i] == '\\')
+                    fileName[i] = '/';
+            Logger::Global.WriteToHTMLStream(false, "\" src=\"../%s\" /></div>\n", fileName.c_str());
         }
     }
 }

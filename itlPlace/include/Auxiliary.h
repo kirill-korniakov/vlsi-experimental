@@ -9,7 +9,7 @@ namespace Aux
   static const std::string SciFormat = "%.2e";
 
   string CreateCoolFileName(string dirName, string fileName, string extension);
-  string IntToString(int intValue);
+  string IntToString(int intValue, int length = 0);
   string ChangeExtention(const string& filename, const char* newExt);
   bool FileExists(const string& strFilename);
   unsigned GetFileSize(const string& strFilename);

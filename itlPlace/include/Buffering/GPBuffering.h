@@ -16,8 +16,9 @@ private:
     void FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths);
     void FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPath>& paths);
 
-    int UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);    
+    void UpdateBinTable(AppCtx* context, VGVariantsListElement& vGVariant);    
     double CalcBufferArea(AppCtx* context, int colIdx, int rowIdx, BufferPositions& bufferPositions);
+    bool FIXME_GiveMeProperName(HNetWrapper net);
 
     RemoveBuffer* removeBuffer;
     std::vector<HCriticalPath> paths;
