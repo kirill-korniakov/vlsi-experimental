@@ -146,16 +146,13 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
 void GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& buffers)
 {
     TemplateTypes<BufferPositions>::list::iterator bufferPosition;
-    for (bufferPosition = buffers.GetBufferPosition()->begin(); bufferPosition != buffers.GetBufferPosition()->end(); ++bufferPosition)
+    for (bufferPosition = buffers.GetBufferPosition()->begin(); 
+        bufferPosition != buffers.GetBufferPosition()->end(); ++bufferPosition)
     {
-        double x = bufferPosition->GetPosition()->x;
-        double y = bufferPosition->GetPosition()->y;
-
         for (int binRow = 0; binRow < context->sprData.binGrid.nBinRows; binRow++)
         {
             for (int binCol = 0; binCol < context->sprData.binGrid.nBinCols; binCol++)
             {
-                context->sprData.bufferPotentialOverBins[binRow][binCol] = 0;
                 double bsf = CalcBufferArea(context, binCol, binRow, *bufferPosition);
                 context->sprData.bufferPotentialOverBins[binRow][binCol] = bsf;
             }
@@ -351,6 +348,8 @@ bool GPBuffering::FIXME_GiveMeProperName(HNetWrapper net)
 void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
 {
     int bufferCount = 0;
+
+
 
     for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
     {

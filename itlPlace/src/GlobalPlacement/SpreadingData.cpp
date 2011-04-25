@@ -89,11 +89,15 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
 
     //allocate memory
     clusterPotentialOverBins = new double*[maxAffectedRows];
-    bufferPotentialOverBins = new double* [maxAffectedRows];
     for (int i = 0; i < maxAffectedRows; i++)
     {
         clusterPotentialOverBins[i] = new double[maxAffectedCols];
-        bufferPotentialOverBins[i]  = new double[maxAffectedCols];
+    }
+
+    bufferPotentialOverBins = new double* [binGrid.nBinRows];
+    for (int i = 0; i < binGrid.nBinRows; i++)
+    {
+        bufferPotentialOverBins[i]  = new double[binGrid.nBinCols];
     }
     
     binGrid.bins = new Bin*[binGrid.nBinRows];

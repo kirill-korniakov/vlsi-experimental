@@ -3,6 +3,8 @@
 #include "Clustering.h"
 #include "Timing.h"
 
+#include "GPBuffering.h"
+
 void InitWeights(double* x, AppCtx* context)
 {
     context->weights.lseW = 1.0;
@@ -10,6 +12,9 @@ void InitWeights(double* x, AppCtx* context)
     context->weights.lrW  = 1.0;
     context->weights.sprW = 1.0;
 
+    //FIXME: just try
+    GPBuffering bufferer(*(context->hd));
+    bufferer.DoBuffering(*context, 0, 0);
     TotalCostAndGradients(context, x);
 
     double lseInitialRatio = context->hd->cfg.ValueOf("GlobalPlacement.Weights.lseInitialRatio", 1.0);
@@ -93,8 +98,7 @@ double ChooseSpreadingMultiplier(HDesign& hd, double currentHPWL, double current
     double sprRatio = currentLHPWL / currentHPWL;
     double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
 	
-	bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);
-	
+	bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);	
 	if (useSprUpdateFunction)
 	{
 		int sprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateFunction", 2);
