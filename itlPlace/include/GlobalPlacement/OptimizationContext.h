@@ -1,5 +1,4 @@
-#ifndef __OPTIMIZATION_CONTEXT__
-#define __OPTIMIZATION_CONTEXT__
+#pragma once
 
 #include "HBaseDesignItem.h"
 
@@ -31,31 +30,29 @@ struct Weights
 // application-provided call-back routines that evaluate the function and gradient
 struct AppCtx
 {
-  void Initialize(HDesign& ahd, ClusteringInformation& aci);
-  void FreeMemory();
+    void Initialize(HDesign& ahd, ClusteringInformation& aci);
+    void FreeMemory();
 
-  HDesign*                hd;
-  ClusteringInformation*  ci;
+    HDesign* hd;
+    ClusteringInformation* ci;
 
-  int   nVariables;
-  int*  netListSizes;  
-  int*  clusterIdx2solutionIdxLUT;
-  int*  solutionIdx2clusterIdxLUT;
-  
-  LSEData   LSEdata;
-  SODData   SODdata;
-  LRData    LRdata;
-  SprData   sprData;
+    LSEData   LSEdata;
+    SODData   SODdata;
+    LRData    LRdata;
+    SprData   sprData;
 
-  CriteriaValues criteriaValues;
-  Weights weights;
+    CriteriaValues criteriaValues;
+    Weights weights;
 
-  bool useLogSumExp;
-  bool useSumOfDelays;
-  bool useLR;
-  bool useSpreading;
+    bool useLogSumExp;
+    bool useSumOfDelays;
+    bool useLR;
+    bool useSpreading;
 
-  bool useBorderBounds;
+    bool useBorderBounds;
+
+    int   nVariables;
+    int*  netListSizes;  
+    int*  clusterIdx2solutionIdxLUT;
+    int*  solutionIdx2clusterIdxLUT;
 };
-
-#endif

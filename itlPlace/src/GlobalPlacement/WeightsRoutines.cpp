@@ -32,7 +32,7 @@ void InitWeights(double* x, AppCtx* context)
         context->weights.sprW = context->sprData.sprWInitial = bigValue * sprInitialRatio / context->criteriaValues.spr;
     else
         context->weights.sprW = context->sprData.sprWInitial = 0.0;
-    
+
     if (context->useLR)
         context->weights.lrW = bigValue * lrInitialRatio / context->criteriaValues.lr;
     else
@@ -66,50 +66,54 @@ double GetMultiplierAccordingDesiredRatio(double ratio, double desiredRatio, dou
 }
 double GetMultiplierAccordingDesiredRatio(HDesign& hd, double deltaRatio, int updateFunction)
 {
-	double multiplier = 1.0;
-	
-	double N = hd.cfg.ValueOf("GlobalPlacement.Weights.N", 1.0);
-	double R = hd.cfg.ValueOf("GlobalPlacement.Weights.R", 1.1);
-	double A = hd.cfg.ValueOf("GlobalPlacement.Weights.A", 1.0);
-	double B = hd.cfg.ValueOf("GlobalPlacement.Weights.B", 1.0);
-	double C = hd.cfg.ValueOf("GlobalPlacement.Weights.C", 1.0);
-	
-	if (updateFunction == 0)
-	{
-		double p = N;
-		int s = deltaRatio > 0 ? 1 : (deltaRatio < 0) ? -1 : 0;
-		double f = fabs(deltaRatio);
-		multiplier = 1 + C*s*pow(f, p);
-	}
-	else if (updateFunction == 1)
-		multiplier = 1 + A*atan(B*deltaRatio);
+    double multiplier = 1.0;
 
-	else if (updateFunction == 2)
-		multiplier = pow(R, deltaRatio);
+    double N = hd.cfg.ValueOf("GlobalPlacement.Weights.N", 1.0);
+    double R = hd.cfg.ValueOf("GlobalPlacement.Weights.R", 1.1);
+    double A = hd.cfg.ValueOf("GlobalPlacement.Weights.A", 1.0);
+    double B = hd.cfg.ValueOf("GlobalPlacement.Weights.B", 1.0);
+    double C = hd.cfg.ValueOf("GlobalPlacement.Weights.C", 1.0);
 
-	else if (updateFunction == 3)
-		multiplier = pow(1 + deltaRatio, N);
+    if (updateFunction == 0)
+    {
+        double p = N;
+        int s = deltaRatio > 0 ? 1 : (deltaRatio < 0) ? -1 : 0;
+        double f = fabs(deltaRatio);
+        multiplier = 1 + C*s*pow(f, p);
+    }
+    else if (updateFunction == 1)
+        multiplier = 1 + A*atan(B*deltaRatio);
 
-	return multiplier;
+    else if (updateFunction == 2)
+        multiplier = pow(R, deltaRatio);
+
+    else if (updateFunction == 3)
+        multiplier = pow(1 + deltaRatio, N);
+
+    return multiplier;
 }
 
-double ChooseSpreadingMultiplier(HDesign& hd, double currentHPWL, double currentLHPWL)
+double ChooseSpreadingMultiplier(HDesign& hd, int iteration, double currentHPWL, double currentLHPWL)
 {
     double sprRatio = currentLHPWL / currentHPWL;
     double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
-	
-	bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);	
-	if (useSprUpdateFunction)
-	{
-		int sprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateFunction", 2);
-		double deltaRatio = sprRatio - sprDesiredRatio;
-	    return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, sprUpdateFunction);
-	}
-	else
-	{
-	    double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
-        return GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
+    double mult = 0.0;
+
+    bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);	
+    if (useSprUpdateFunction) //&& iteration > 10
+    {
+        int sprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateFunction", 2);
+        double deltaRatio = sprRatio - sprDesiredRatio;
+        mult = GetMultiplierAccordingDesiredRatio(hd, deltaRatio, sprUpdateFunction);
     }
+    else
+    {
+        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
+        mult = GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
+    }
+    //ALERT("  spreading multiplier = %.2f", mult);
+
+    return mult;
 }
 
 double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL)
@@ -117,28 +121,28 @@ double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL
     double lseRatio = currentLHPWL / initialLHPWL;
     double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
     double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
-	
-	bool useLseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useLseUpdateFunction", false);
-	
-	if (useLseUpdateFunction)
-	{
-		int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 0);
-		double deltaRatio = lseRatio - lseDesiredRatio;
-		return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, lseUpdateFunction);
-	}
+
+    bool useLseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useLseUpdateFunction", false);
+
+    if (useLseUpdateFunction)
+    {
+        int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 0);
+        double deltaRatio = lseRatio - lseDesiredRatio;
+        return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, lseUpdateFunction);
+    }
 
     return GetMultiplierAccordingDesiredRatio(lseRatio, lseDesiredRatio, lseUpdateMultiplier);
 }
 
-void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, ClusteringInformation& ci)
+void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, int iteration)
 {
     string objective = hd.cfg.ValueOf("params.objective");
 
-    double initialLHPWL = QA->GetInitialMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
-    double currentLHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWLleg);
-    double currentHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::QualityMetrics::MetricHPWL);
-    
-    context.weights.sprW *= ChooseSpreadingMultiplier(hd, currentHPWL, currentLHPWL);
+    double initialLHPWL = QA->GetInitialMetricValue(PlacementQualityAnalyzer::MetricHPWLleg);
+    double currentLHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::MetricHPWLleg);
+    double currentHPWL = QA->GetCurrentMetricValue(PlacementQualityAnalyzer::MetricHPWL);
+
+    context.weights.sprW *= ChooseSpreadingMultiplier(hd, iteration, currentHPWL, currentLHPWL);
 
     if (objective == "LR")
     {
@@ -148,14 +152,14 @@ void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, C
 
     if (hd.cfg.ValueOf("LSE.Clustering.useNetWeights", false))
     {
-      ComputeAndExportWeights(hd); //do weighting
-      //WriteWeightsToClusteredNets(hd, ci);
-      //int netIdx = 0;
+        ComputeAndExportWeights(hd); //do weighting
+        //WriteWeightsToClusteredNets(hd, ci);
+        //int netIdx = 0;
 
-      for (int i = 0; i < static_cast<int>(ci.netList.size()); i++)
-      {
-        AssignWeightForClusteredNet(hd, ci, i);
-      }
+        for (int i = 0; i < static_cast<int>(context.ci->netList.size()); i++)
+        {
+            AssignWeightForClusteredNet(hd, *context.ci, i);
+        }
     }
 }
 

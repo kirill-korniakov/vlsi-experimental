@@ -519,7 +519,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
         if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
 
-        UpdateWeights(hd, context, QA, ci);
+        UpdateWeights(hd, context, QA, iteration);
 
         if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
         {
