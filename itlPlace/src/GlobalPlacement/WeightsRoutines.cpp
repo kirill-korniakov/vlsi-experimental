@@ -70,25 +70,39 @@ double GetMultiplierAccordingDesiredRatio(HDesign& hd, double deltaRatio, int up
 
     double N = hd.cfg.ValueOf("GlobalPlacement.Weights.N", 1.0);
     double R = hd.cfg.ValueOf("GlobalPlacement.Weights.R", 1.1);
-    double A = hd.cfg.ValueOf("GlobalPlacement.Weights.A", 1.0);
-    double B = hd.cfg.ValueOf("GlobalPlacement.Weights.B", 1.0);
-    double C = hd.cfg.ValueOf("GlobalPlacement.Weights.C", 1.0);
-
-    if (updateFunction == 0)
-    {
-        double p = N;
+    double M = hd.cfg.ValueOf("GlobalPlacement.Weights.M", 1.0);
+    double P = hd.cfg.ValueOf("GlobalPlacement.Weights.P", 1.1);
+    
+    //Spreading Update Functions
+    if (updateFunction == 1) {
         int s = deltaRatio > 0 ? 1 : (deltaRatio < 0) ? -1 : 0;
         double f = fabs(deltaRatio);
-        multiplier = 1 + C*s*pow(f, p);
+        multiplier = 1 + s*pow(f, N);
     }
-    else if (updateFunction == 1)
-        multiplier = 1 + A*atan(B*deltaRatio);
-
-    else if (updateFunction == 2)
+    else if (updateFunction == 2) {
+        multiplier = pow(1 + atan(deltaRatio), N);
+    }
+    else if (updateFunction == 3) {
         multiplier = pow(R, deltaRatio);
-
-    else if (updateFunction == 3)
+    }
+    else if (updateFunction == 4) {
         multiplier = pow(1 + deltaRatio, N);
+    }
+    //LSE Update Functions
+    else if (updateFunction == 5) {
+        int s = deltaRatio > 0 ? 1 : (deltaRatio < 0) ? -1 : 0;
+        double f = fabs(deltaRatio);
+        multiplier = 1 + s*pow(f, M);
+    }
+    else if (updateFunction == 6) {
+        multiplier = pow(1 + atan(deltaRatio), M);
+    }
+    else if (updateFunction == 7) {
+        multiplier = pow(P, deltaRatio);
+    }
+    else if (updateFunction == 8) {
+        multiplier = pow(1 + deltaRatio, M);
+    }
 
     return multiplier;
 }
@@ -126,7 +140,7 @@ double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL
 
     if (useLseUpdateFunction)
     {
-        int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 0);
+        int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 7);
         double deltaRatio = lseRatio - lseDesiredRatio;
         return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, lseUpdateFunction);
     }
