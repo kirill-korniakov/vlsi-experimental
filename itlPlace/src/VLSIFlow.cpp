@@ -279,13 +279,10 @@ bool DoNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
 {
     if (hd.cfg.ValueOf(cfgOptName, false))
     {
-        //New_BUFFERING
-
         ALERT("NEW BUFFERING STARTED");
         ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
         HVGAlgorithm buf(hd);
         buf.NetlistBuffering();
-
         STA(hd);
         ALERT("NEW BUFFERING FINISHED");
         return true;

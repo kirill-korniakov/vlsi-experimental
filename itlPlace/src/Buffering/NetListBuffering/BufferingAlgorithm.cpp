@@ -11,6 +11,7 @@ void HVGAlgorithm::NetlistBuffering()
 {
     if (typeNetlistBuffering == 0)
     {
+        ALERT("Simple netlist buffering");
         BufferingAllCriticalPath* bufferingAlgorithm = new BufferingAllCriticalPath(design);
         bufferingAlgorithm->Initialize();
         bufferingAlgorithm->BufferingCriticalPaths();
@@ -18,6 +19,7 @@ void HVGAlgorithm::NetlistBuffering()
     }
     else
     {
+        ALERT("Path-based buffering");
         PathBasedBuffering* bufferingAlgorithm = new PathBasedBuffering(design);
         bufferingAlgorithm->Initialize();
         bufferingAlgorithm->BufferingNetlist();

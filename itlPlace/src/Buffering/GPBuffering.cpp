@@ -17,7 +17,7 @@ GPBuffering::GPBuffering(HDesign& hd): PathBasedBuffering(hd)
 void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
 {
     WRITELINE("");
-    ALERT("NEW BUFFERING STARTED");
+    ALERT("GPBuffering STARTED");
     ConfigContext ctx = data->design.cfg.OpenContext("GlobalPlacement.New_Buffering");
 
     if (!isInitialize) 
@@ -33,7 +33,7 @@ void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
     Plot(&context);
 
     ctx.Close();
-    ALERT("NEW BUFFERING FINISHED");
+    ALERT("GPBuffering FINISHED");
     WRITELINE("");
 }
 

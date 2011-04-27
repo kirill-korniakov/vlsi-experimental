@@ -125,7 +125,7 @@ double ChooseSpreadingMultiplier(HDesign& hd, int iteration, double currentHPWL,
         double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
         mult = GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
     }
-    //ALERT("  spreading multiplier = %.2f", mult);
+    ALERT("  spreading multiplier = %.2f", mult);
 
     return mult;
 }
@@ -172,7 +172,7 @@ void UpdateWeights(HDesign& hd, AppCtx& context, PlacementQualityAnalyzer* QA, i
 
         for (int i = 0; i < static_cast<int>(context.ci->netList.size()); i++)
         {
-            AssignWeightForClusteredNet(hd, *context.ci, i);
+            AssignWeightForClusteredNet(hd, *(context.ci), i);
         }
     }
 }
