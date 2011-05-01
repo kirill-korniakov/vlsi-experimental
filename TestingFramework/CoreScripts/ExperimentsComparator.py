@@ -58,7 +58,7 @@ class ExperimentsComparator:
         self.PrintLabelAndBlanks(cols, referenceExperiment.name, nMetrics)
 
         for experiment in self.experimentsToCompare.keys():
-            if (self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx):
+            if (list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx):
                 continue
             self.PrintLabelAndBlanks(cols, experiment.name, nMetrics)
 
@@ -76,16 +76,21 @@ class ExperimentsComparator:
         cols.append(END_OF_COLUMN)
 
         for experiment in self.experimentsToCompare.keys():
-            if self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx:
+            if list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx:
                 continue
             for row in nMetrics:
-                cols.extend([metrics[row] + '%', END_OF_COLUMN])
+                if (metrics[row] != 'Time'):
+                    cols.extend([metrics[row] + '%', END_OF_COLUMN])
+
+                else:
+                    cols.extend([metrics[row], END_OF_COLUMN])
+
             cols.append(END_OF_COLUMN)
 
         WriteStringToFile(cols, resultFileName)
 
     def MakeResultTable(self, resultFileName):
-        groupExp = self.experimentsToCompare.keys()[0]
+        groupExp = list(self.experimentsToCompare.keys())[0]
         self.PrintTableHeader(resultFileName, groupExp.metrics)
 
         benchmarks = self.experimentsToCompare[groupExp].keys()
@@ -102,7 +107,7 @@ class ExperimentsComparator:
 
             # INIT metrics
             initialMetrics = []
-            resultValues = self.experimentsToCompare.values()[0][benchmark]
+            resultValues = list(self.experimentsToCompare.values())[0][benchmark]
             for metricIdx in nMetrics:
                 value = resultValues[0][metricIdx]
                 newTableLine.extend([str(value), END_OF_COLUMN])
@@ -122,10 +127,10 @@ class ExperimentsComparator:
 
             # normal experiments
             for experiment in self.experimentsToCompare.keys():
-                if self.experimentsToCompare.keys().index(experiment) == referenceExperimentIdx:
+                if list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx:
                     continue
-                    
-                resultValues = self.experimentsToCompare[experiment][benchmark]                
+
+                resultValues = self.experimentsToCompare[experiment][benchmark]
                 if (resultValues == []):
                     for metricIdx in nMetrics:
                         newTableLine.extend(["N/A", END_OF_COLUMN])
@@ -140,14 +145,17 @@ class ExperimentsComparator:
 
                 finalStageIdx = len(experiment.stages) - 1
                 for metricIdx in nMetrics:
-                    percent = 100 * resultValues[finalStageIdx][metricIdx] / referenceMetrics[metricIdx]
-                    percentStr = "%.2f" % percent
+                    valueStr = resultValues[finalStageIdx][metricIdx]
+
+                    if (metrics[metricIdx] != 'Time'):
+                        percent = 100 * resultValues[finalStageIdx][metricIdx] / referenceMetrics[metricIdx]
+                        valueStr = "%.2f" % percent
 
                     if (percent < bestValues[metricIdx]):
                         bestValues[metricIdx] = percent #remember the best result
                         bestValuesIdx[metricIdx] = len(newTableLine) #and its index
 
-                    newTableLine.extend([percentStr, END_OF_COLUMN])
+                    newTableLine.extend([valueStr, END_OF_COLUMN])
 
                 newTableLine.append(END_OF_COLUMN)
 

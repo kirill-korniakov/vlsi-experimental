@@ -27,7 +27,7 @@ from Parameters import *
 TERMINATED = "Terminated"
 nTerminatedBenchmarks = 0 #TODO: check if everything is OK
 
-class ExperimentLauncher:   
+class ExperimentLauncher:
     logger            = None
     emailer           = None
     experiment        = None
@@ -97,7 +97,7 @@ class ExperimentLauncher:
 
     def RunExperiment(self):
         global nTerminatedBenchmarks
-        
+
         self.logger.Log("Config: %s" % self.experiment.cfg)
         self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
@@ -121,7 +121,7 @@ class ExperimentLauncher:
 
     def RunPlacer(self, benchmark, logFolder, reportTable):
         global nTerminatedBenchmarks
-        
+
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
         logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
         fPlacerOutput = open(logFileName, 'w')
@@ -134,7 +134,7 @@ class ExperimentLauncher:
         pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
         pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
 
-        milestonePixDirectory = pixDirectory + "//milestones"
+        milestonePixDirectory = os.path.abspath(pixDirectory + "//milestones")
 
         if (os.path.exists(milestonePixDirectory) != True):
             os.makedirs(milestonePixDirectory)

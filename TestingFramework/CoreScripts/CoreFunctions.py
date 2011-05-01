@@ -105,7 +105,7 @@ def WriteStringToFile(cols, tableFileName):
     if (col == END_OF_COLUMN):
       printStr += ';'
     else:
-      printStr += col
+      printStr += str(col)
 
   printStr += '\n'
   resultFile = open(tableFileName, 'a')
