@@ -22,7 +22,12 @@ void HVGAlgorithm::NetlistBuffering()
         ALERT("Path-based buffering");
         PathBasedBuffering* bufferingAlgorithm = new PathBasedBuffering(design);
         bufferingAlgorithm->Initialize();
-        bufferingAlgorithm->BufferingNetlist();
+        
+        if (design.cfg.ValueOf("TypePathBased", 0) == 0)
+            bufferingAlgorithm->BufferingNetlist();
+        else
+            bufferingAlgorithm->BufferingNetlist2();
+
         delete bufferingAlgorithm;
     }
 }

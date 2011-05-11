@@ -10542,6 +10542,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\Buffering\CriticalPathBuffering.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\Buffering\GPBuffering.h"
 					>
 				</File>

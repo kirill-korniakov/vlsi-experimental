@@ -17,7 +17,6 @@ public:
     virtual NewBuffer* FindBufferNumberByIndex(VanGinnekenTreeNode* node, TemplateTypes<NewBuffer>::list& newBuffer) = 0;
     virtual void PinsCountCalculation(VanGinnekenTreeNode* node, int& nPins, TemplateTypes<NewBuffer>::list& newBuffer) = 0;
     virtual void CreateNets(HNet& net, TemplateTypes<NewBuffer>::list& newBuffer, HNet* newNet, VanGinnekenTreeNode* node, int newNetCount) = 0;
-    HCriticalPath currentCriticalPath;
 
 protected:
     NetBufferingAlgorithm* vGAlgorithm;

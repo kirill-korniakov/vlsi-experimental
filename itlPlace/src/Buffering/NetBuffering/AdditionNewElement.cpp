@@ -5,8 +5,7 @@
 
 AbstractAdditionNewElement::AbstractAdditionNewElement(NetBufferingAlgorithm* vGA)
 {
-    vGAlgorithm = vGA;
-    currentCriticalPath = vGA->data->design.CriticalPaths.Null();
+    vGAlgorithm = vGA;    
 }
 
 StandartAdditionNewElement::StandartAdditionNewElement(NetBufferingAlgorithm* vGA): AbstractAdditionNewElement(vGA)

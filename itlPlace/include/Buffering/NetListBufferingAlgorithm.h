@@ -2,6 +2,7 @@
 #define __NetListBuffering_H__
 
 #include "NetBufferingAlgorithm.h"
+#include "CriticalPathBuffering.h"
 
 class BufferingAllCriticalPath : public NetBufferingAlgorithm
 {
@@ -14,6 +15,7 @@ public:
 protected:
     bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HNet interconnection);
     bool IsAppropriateNumberOfPins(VGAlgorithmData* data, HCriticalPath interconnection);
+    bool IsAppropriateNumberOfPins(VGAlgorithmData* data, CriticalPathBuffering& interconnection);
 };
 
 class PathBasedBuffering: public BufferingAllCriticalPath
@@ -23,7 +25,9 @@ public:
     {
     }
     VGVariantsListElement BufferingCriticalPath(HCriticalPath criticalPath, bool isRealBuffering = true);
+    VGVariantsListElement BufferingCriticalPath(CriticalPathBuffering& criticalPath, bool isRealBuffering = true);
     int BufferingNetlist();
+    int BufferingNetlist2();
 
 protected:
     bool IsLimitationCountCriticalPathExecute(int totalIndex);

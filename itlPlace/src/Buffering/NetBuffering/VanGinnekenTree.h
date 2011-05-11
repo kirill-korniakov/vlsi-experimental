@@ -3,6 +3,7 @@
 
 //#include "VanGinnekenTreeNode.h"
 #include "VanGinnekenTreeCreate.h"
+#include "CriticalPathBuffering.h"
 #include "Utils.h"
 
 class HDPGrid;
@@ -132,6 +133,7 @@ public:
     }
 
     HSteinerPoint GetSteinerPointByStartPoint(HCriticalPath::PointsEnumeratorW point);
+    HSteinerPoint GetSteinerPointByStartPoint(CriticalPathBuffering& point);
 
 
     void CreateNodeInLeftSubTree(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
@@ -169,6 +171,17 @@ public:
         int& isPoitnVisit,
         HSteinerPoint& srcPoint,
         HSteinerPoint& nextPoint, HCriticalPath::PointsEnumeratorW& source,
+        TemplateTypes<HNet>::stack& netInCriticalPath,
+        TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc);
+
+        void CreateNodeInSink(HNet& net, TemplateTypes<HSteinerPoint>::stack& points,
+        TemplateTypes<int>::stack& rootIndexs,
+        TemplateTypes<int>::stack& isPoitnsVisits,
+        int& nodeIndex,
+        int& rootIndex,
+        int& isPoitnVisit,
+        HSteinerPoint& srcPoint,
+        HSteinerPoint& nextPoint, CriticalPathBuffering& source,
         TemplateTypes<HNet>::stack& netInCriticalPath,
         TemplateTypes<VanGinnekenTreeNode*>::stack& vanGinnekenTreeNodeRoot, int& pc);
 };
