@@ -63,7 +63,10 @@ public:
 
     HTimingPoint TimingPoint()
     {
-        return design->CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>( points[indexPoint]);
+        if (indexPoint < pointCount)
+            return design->CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>( points[indexPoint]);
+        else
+            return design->TimingPoints.Null();
     }
 
     HTimingPoint TimingPointStart()
@@ -73,7 +76,10 @@ public:
 
     SignalDirection SignalDirection() 
     {
-        return (*design)[points[indexPoint]].SignalDirection();
+        if (indexPoint < pointCount)
+            return (*design)[points[indexPoint]].SignalDirection();
+        else
+            return SignalDirection::SignalDirection_Default;
     }
 
     double Criticality()

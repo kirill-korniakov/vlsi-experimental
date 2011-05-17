@@ -340,7 +340,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(CriticalPathBuff
     }
 
     if (data->typeBufferAddition != LEGAL_ADDITION)
-        data->netVisit[::ToID(criticalPath)] = true;
+        data->netVisit[criticalPath.indexPaht] = true;
 //    HCriticalPath::PointsEnumeratorW pointsEnumeratorW = (criticalPath,data->design).GetEnumeratorW();
     criticalPath.MoveNext();
     data->vGTree->updateVanGinnekenTree->UpdateTree<CriticalPathBuffering>(criticalPath);
@@ -529,8 +529,8 @@ int PathBasedBuffering::BufferingNetlist2()
                 if (curWNS < minWNS)
                     minWNS = curWNS;
 
-                if (countCP > data->numberBufferedAtOnceCriticalPaths)
-                {
+                //if (countCP > data->numberBufferedAtOnceCriticalPaths)
+                //{
                    /* FindCriticalPaths(data->design);
                     countCP = 0;
                     ind = 0;
@@ -539,13 +539,13 @@ int PathBasedBuffering::BufferingNetlist2()
                     int idx = 0;
                     for(HCriticalPaths::Enumerator i = data->design.CriticalPaths.GetEnumerator(); i.MoveNext();)
                         paths[idx++] = i;
-                    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));
-                */}
-                else
-                {
+                    std::sort(paths.begin(), paths.end(), Utils::CriticalPathComparator(data->design));*/
+                //}
+                //else
+                //{
                     ind++;   
                     countCP++;
-                }
+                //}
 
             }
         }
