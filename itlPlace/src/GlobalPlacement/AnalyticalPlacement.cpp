@@ -537,7 +537,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
     if (QA != 0)
     {
-        QA->Report();
+        QA->Report("Placement Quality Analysis Table");
         delete QA;
     }
 

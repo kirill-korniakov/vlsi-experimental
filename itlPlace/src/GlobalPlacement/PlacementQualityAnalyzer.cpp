@@ -221,9 +221,9 @@ void PlacementQualityAnalyzer::ReportAllCriterias(PlacementQualityAnalyzer::Plac
     }
 }
 
-void PlacementQualityAnalyzer::Report()
+void PlacementQualityAnalyzer::Report(const string& caption)
 {
-    TableFormatter tf("Placement Quality Analysis Table");
+    TableFormatter tf(caption);
     ReorderColumns();
 
     tf.NewHeaderRow();

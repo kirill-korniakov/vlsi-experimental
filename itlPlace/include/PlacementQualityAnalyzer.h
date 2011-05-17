@@ -102,7 +102,7 @@ public:
     void ReportAllCriterias(PlacementQualityAnalyzer::PlacementQuality& pq);
 
     void ReorderColumns();
-    void Report();
+    void Report(const string& caption);
 
     void SaveCurrentPlacementAsBestAchieved();
     void RestoreBestAchievedPlacement();

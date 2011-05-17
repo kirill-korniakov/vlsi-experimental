@@ -24,7 +24,7 @@ void Legalization(HDPGrid& grid)
 
     if (doReport)
     {
-        QA->Report();
+        QA->Report("Legalization Degradation");
         ALERT("LEGALIZATION FINISHED");
     }
 }

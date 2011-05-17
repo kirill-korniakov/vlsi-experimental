@@ -340,8 +340,6 @@ void UpdateNetWeightsIfRequired(HDesign& hd, int iteration)
 
 void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 {
-    //START MACROLOOP OF DESIGN
-
     if ((hd.cfg.ValueOf("Logger.PrintStartInformations", false))/* && IsPlaced(hd)*/)
     {
         WRITELINE("");
@@ -350,6 +348,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "InitialState", "INIT");
     }
 
+    //START MACROLOOP OF DESIGN
     if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 0)
     {
         ConfigContext ctx = hd.cfg.OpenContext("MacroLoop");
@@ -410,10 +409,10 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         }
 
         QA.RestoreBestAchievedPlacement();
-        QA.Report();
+        QA.Report("Placement Quality Analysis Table");
     }
 
-    //PLACEMENT
+    //GLOBAL PLACEMENT
     if (DoRandomPlacementIfRequired(hd, "DesignFlow.RandomPlacement"))
         WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RND");
     if (DoGlobalPlacementIfRequired(hd, "DesignFlow.GlobalPlacement"))
@@ -425,10 +424,12 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
     if (DoLegalizationIfRequired(DPGrid, "DesignFlow.Legalization"))
         WriteFlowMetrics(flowMetrics, hd, "Legalization",  "LEG");
+
     if (DoDetailedPlacementIfRequired(DPGrid, "DesignFlow.DetailedPlacement"))
         WriteFlowMetrics(flowMetrics, hd, "DetailedPlacement", "DP");
     if (DoHippocratePlacementIfRequired(hd, "DesignFlow.HippocratePlacement"))
         WriteFlowMetrics(flowMetrics, hd, "HippocratePlacement", "HP");
+
     if (DoLRSizingIfRequired(DPGrid, "DesignFlow.LRSizing"))
     {
         WriteFlowMetrics(flowMetrics, hd, "LRSizing", "LRS");
@@ -439,7 +440,6 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
     PlotCongestionMapIfRequired(DPGrid);
     RunFGRRoutingIfRequired(DPGrid);
-
 
     if (DoBufferingIfRequired(hd, "DesignFlow.Buffering"))
         WriteFlowMetrics(flowMetrics, hd, "Buffering", "BUF");
