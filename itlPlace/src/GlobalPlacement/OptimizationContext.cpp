@@ -35,11 +35,11 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   netListSizes = new int[ci->netList.size()];
   CalculateNetListSizes(ci->netList, netListSizes);
   
-  useLogSumExp          = ahd.cfg.ValueOf("GlobalPlacement.useLogSumExp", false);
-  useSumOfDelays        = ahd.cfg.ValueOf("GlobalPlacement.useSumOfDelays", false);
-  useLR                 = ahd.cfg.ValueOf("GlobalPlacement.useLR", false);
-  useSpreading = ahd.cfg.ValueOf("GlobalPlacement.useSpreading", false);
-  useBorderBounds       = ahd.cfg.ValueOf("GlobalPlacement.useBorderBounds", true);
+  useLogSumExp          = ahd.cfg.ValueOf(".useLogSumExp", false);
+  useSumOfDelays        = ahd.cfg.ValueOf(".useSumOfDelays", false);
+  useLR                 = ahd.cfg.ValueOf(".useLR", false);
+  useSpreading = ahd.cfg.ValueOf(".useSpreading", false);
+  useBorderBounds       = ahd.cfg.ValueOf(".useBorderBounds", true);
 
   if (useLogSumExp || useSumOfDelays || useLR)
     LSEdata.Initialize(ahd, aci, sprData.binGrid.binWidth);
@@ -48,7 +48,7 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   if (useLR)
     LRdata.Initialize(ahd);
 
-  sprData.useUnidirectSpreading = ahd.cfg.ValueOf("GlobalPlacement.useUnidirectSpreading", false);
+  sprData.useUnidirectSpreading = ahd.cfg.ValueOf(".useUnidirectSpreading", false);
 }
 
 void AppCtx::FreeMemory()

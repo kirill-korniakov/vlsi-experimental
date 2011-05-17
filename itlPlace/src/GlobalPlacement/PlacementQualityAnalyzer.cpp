@@ -30,10 +30,15 @@ PlacementQualityAnalyzer::MetricInfo PlacementQualityAnalyzer::metricsInfo[] =
 
 void PlacementQualityAnalyzer::ReorderColumns()
 {
-    int numberOfColumns = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns").getLength();
+    for (int i = 0; i < __MetricsNum; i++)
+    {
+        metricsInfo[i].column = -1;
+    }
+
+    int numberOfColumns = m_design.cfg.ValueOf(".PQAT.Columns").getLength();
     for (int i = 0; i < numberOfColumns; i++)
     {
-        string metricName = m_design.cfg.ValueOf("GlobalPlacement.PQAT.Columns")[i];
+        string metricName = m_design.cfg.ValueOf(".PQAT.Columns")[i];
         int k = GetMetricEnum(metricName);
         metricsInfo[k].column = i + 1;
     }
@@ -242,7 +247,7 @@ void PlacementQualityAnalyzer::Report()
             tf.SetCell(metricsInfo[idx].column, i->metrics[idx]);
     }
 
-    if (m_design.cfg.ValueOf("GlobalPlacement.PQAT.showPercents", false))
+    if (m_design.cfg.ValueOf(".PQAT.showPercents", false))
     {
         tf.NewBorderRow();
         tf.SetCell(0, "-", tf.NumOfColumns(), TableFormatter::Align_Fill);
@@ -286,10 +291,10 @@ double PlacementQualityAnalyzer::PlacementQuality::GetMetric(QualityMetrics qm)
 
 double PlacementQualityAnalyzer::GetBackHPWL()
 {
-  return m_experiments.back().GetMetric(QualityMetrics::MetricHPWL);
+  return m_experiments.back().GetMetric(MetricHPWL);
 }
 
 double PlacementQualityAnalyzer::GetBackLHPWL()
 {
-  return m_experiments.back().GetMetric(QualityMetrics::MetricHPWLleg);
+  return m_experiments.back().GetMetric(MetricHPWLleg);
 }

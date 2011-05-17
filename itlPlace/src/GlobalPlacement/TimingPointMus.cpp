@@ -52,10 +52,10 @@ TimingPointMus::TimingPointMus(HDesign& design): MuS(0), MuIn(0), reporter(new M
     ::Grow(&MuS, 0, size);
     ::Grow(&MuIn, 0, size);
 
-    double defaultMu = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.muLR", 0.99);
+    double defaultMu = design.cfg.ValueOf(".LagrangianRelaxation.muLR", 0.99);
 
-    minFactor = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.minFactor", 0.01);
-    referenceValue = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.referenceValue", 100);
+    minFactor = design.cfg.ValueOf(".LagrangianRelaxation.minFactor", 0.01);
+    referenceValue = design.cfg.ValueOf(".LagrangianRelaxation.referenceValue", 100);
     nIncreased = 0;
     nDecreased = 0;
 
@@ -416,7 +416,7 @@ void TimingPointMus::UpdateMus(HDesign& design)
 
     STA(design, false);
     
-    double theta = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.theta", 2.0);
+    double theta = design.cfg.ValueOf(".LagrangianRelaxation.theta", 2.0);
 
     UpdateMuS(design, theta);
     //reporter->Report(design, this, "UpdateMuS");    

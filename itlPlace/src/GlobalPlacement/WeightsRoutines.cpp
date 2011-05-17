@@ -17,9 +17,9 @@ void InitWeights(double* x, AppCtx* context)
     bufferer.DoBuffering(*context, 0, 0);
     TotalCostAndGradients(context, x);
 
-    double lseInitialRatio = context->hd->cfg.ValueOf("GlobalPlacement.Weights.lseInitialRatio", 1.0);
-    double sprInitialRatio = context->hd->cfg.ValueOf("GlobalPlacement.Weights.sprInitialRatio", 1.0);
-    double lrInitialRatio = context->hd->cfg.ValueOf("GlobalPlacement.Weights.lrInitialRatio", 1.0);
+    double lseInitialRatio = context->hd->cfg.ValueOf(".Weights.lseInitialRatio", 1.0);
+    double sprInitialRatio = context->hd->cfg.ValueOf(".Weights.sprInitialRatio", 1.0);
+    double lrInitialRatio = context->hd->cfg.ValueOf(".Weights.lrInitialRatio", 1.0);
 
     double bigValue = 1.0e+6;
 
@@ -68,10 +68,10 @@ double GetMultiplierAccordingDesiredRatio(HDesign& hd, double deltaRatio, int up
 {
     double multiplier = 1.0;
 
-    double N = hd.cfg.ValueOf("GlobalPlacement.Weights.N", 1.0);
-    double R = hd.cfg.ValueOf("GlobalPlacement.Weights.R", 1.1);
-    double M = hd.cfg.ValueOf("GlobalPlacement.Weights.M", 1.0);
-    double P = hd.cfg.ValueOf("GlobalPlacement.Weights.P", 1.1);
+    double N = hd.cfg.ValueOf(".Weights.N", 1.0);
+    double R = hd.cfg.ValueOf(".Weights.R", 1.1);
+    double M = hd.cfg.ValueOf(".Weights.M", 1.0);
+    double P = hd.cfg.ValueOf(".Weights.P", 1.1);
     
     //Spreading Update Functions
     if (updateFunction == 1) {
@@ -110,19 +110,19 @@ double GetMultiplierAccordingDesiredRatio(HDesign& hd, double deltaRatio, int up
 double ChooseSpreadingMultiplier(HDesign& hd, int iteration, double currentHPWL, double currentLHPWL)
 {
     double sprRatio = currentLHPWL / currentHPWL;
-    double sprDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.sprDesiredRatio", 1.1);
+    double sprDesiredRatio = hd.cfg.ValueOf(".Weights.sprDesiredRatio", 1.1);
     double mult = 0.0;
 
-    bool useSprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useSprUpdateFunction", false);	
+    bool useSprUpdateFunction = hd.cfg.ValueOf(".Weights.useSprUpdateFunction", false);	
     if (useSprUpdateFunction) //&& iteration > 10
     {
-        int sprUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateFunction", 2);
+        int sprUpdateFunction = hd.cfg.ValueOf(".Weights.sprUpdateFunction", 2);
         double deltaRatio = sprRatio - sprDesiredRatio;
         mult = GetMultiplierAccordingDesiredRatio(hd, deltaRatio, sprUpdateFunction);
     }
     else
     {
-        double sprUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.sprUpdateMultiplier", 2.0);
+        double sprUpdateMultiplier = hd.cfg.ValueOf(".Weights.sprUpdateMultiplier", 2.0);
         mult = GetMultiplierAccordingDesiredRatio(sprRatio, sprDesiredRatio, sprUpdateMultiplier);
     }
     ALERT("  spreading multiplier = %.2f", mult);
@@ -133,14 +133,14 @@ double ChooseSpreadingMultiplier(HDesign& hd, int iteration, double currentHPWL,
 double ChooseLSEMultiplier(HDesign& hd, double currentLHPWL, double initialLHPWL)
 {
     double lseRatio = currentLHPWL / initialLHPWL;
-    double lseDesiredRatio = hd.cfg.ValueOf("GlobalPlacement.Weights.lseDesiredRatio", 1.0);
-    double lseUpdateMultiplier = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateMultiplier", 1.0);
+    double lseDesiredRatio = hd.cfg.ValueOf(".Weights.lseDesiredRatio", 1.0);
+    double lseUpdateMultiplier = hd.cfg.ValueOf(".Weights.lseUpdateMultiplier", 1.0);
 
-    bool useLseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.useLseUpdateFunction", false);
+    bool useLseUpdateFunction = hd.cfg.ValueOf(".Weights.useLseUpdateFunction", false);
 
     if (useLseUpdateFunction)
     {
-        int lseUpdateFunction = hd.cfg.ValueOf("GlobalPlacement.Weights.lseUpdateFunction", 7);
+        int lseUpdateFunction = hd.cfg.ValueOf(".Weights.lseUpdateFunction", 7);
         double deltaRatio = lseRatio - lseDesiredRatio;
         return GetMultiplierAccordingDesiredRatio(hd, deltaRatio, lseUpdateFunction);
     }

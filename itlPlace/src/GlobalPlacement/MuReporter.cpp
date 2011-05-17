@@ -11,10 +11,10 @@
 
 MuReporter::MuReporter(HDesign& design)
 {
-    if (design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.plotMus", false))
+    if (design.cfg.ValueOf(".LagrangianRelaxation.Reporter.plotMus", false))
         design.Plotter.InitializeHistogramWindow();
     scaling = 0.01;  //TODO: choose proper scale
-    waitTime = design.cfg.ValueOf("GlobalPlacement.Plotting.plotWait", 1);
+    waitTime = design.cfg.ValueOf(".Plotting.plotWait", 1);
 
     plotX = 0;
 }
@@ -23,7 +23,7 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
 {
     this->mus = mus;
 
-    bool verbose = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.verbose", false);
+    bool verbose = design.cfg.ValueOf(".LagrangianRelaxation.Reporter.verbose", false);
     if (verbose)
     {
         if (msg != "")
@@ -35,7 +35,7 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
     }
 
     design.Plotter.ClearHistogram();
-    string order = design.cfg.ValueOf("GlobalPlacement.LagrangianRelaxation.Reporter.order", "CriticalPath");
+    string order = design.cfg.ValueOf(".LagrangianRelaxation.Reporter.order", "CriticalPath");
     if (order == "CriticalPath")
         PlotMusInCriticalPathOrder(design);
     else if (order == "Topological")

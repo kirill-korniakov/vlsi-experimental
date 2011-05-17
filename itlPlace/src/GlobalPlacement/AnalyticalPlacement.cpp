@@ -28,8 +28,10 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
 
     Clustering(hd, ci);
 
+    ConfigContext ctx1 = hd.cfg.OpenContext("GlobalPlacement");
+
     //set initial placement
-    if (hd.cfg.ValueOf("GlobalPlacement.placeToTheCenter", false))
+    if (hd.cfg.ValueOf(".placeToTheCenter", false))
     {
         PlaceToTheCenterIntially(hd, ci);
     }
@@ -106,7 +108,7 @@ void AnalyticalGlobalPlacement::PlaceToTheCenterIntially(HDesign& hd, Clustering
     double maxX = hd.Circuit.PlacementMaxX();
     double minY = hd.Circuit.PlacementMinY();
     double maxY = hd.Circuit.PlacementMaxY();
-    double shufflePercent = hd.cfg.ValueOf("GlobalPlacement.shufflePercent", 0.0);
+    double shufflePercent = hd.cfg.ValueOf(".shufflePercent", 0.0);
 
     int clusterIdx = -1;
     while (GetNextActiveClusterIdx(&ci, clusterIdx))
@@ -199,7 +201,7 @@ void AnalyticalGlobalPlacement::SetBounds(HDesign& hd, ClusteringInformation& ci
     }
     for (int i = 2*idx; i < context.nVariables; i++)
     {//set upper borders for ki variables
-        initValues[i] = hd.cfg.ValueOf("GlobalPlacement.bufferCountUpperBound", 100.0); //TODO: set correct upper bound
+        initValues[i] = hd.cfg.ValueOf(".bufferCountUpperBound", 100.0); //TODO: set correct upper bound
     }
     VecSetValues(xu, context.nVariables, idxs, initValues, INSERT_VALUES);
 
@@ -354,11 +356,11 @@ int AnalyticalGlobalPlacement::Interpolation(HDesign& hd, ClusteringInformation&
 int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation &ci, AppCtx &context, 
                                              Vec& x, Vec& xl, Vec& xu, TAO_SOLVER& tao, TAO_APPLICATION& taoapp)
 {
-    const char* taoCmd = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.commandLine");
+    const char* taoCmd = hd.cfg.ValueOf(".TAOOptions.commandLine");
     TaoInit(taoCmd);
 
     /* Create TAO solver with desired solution method */
-    iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf("GlobalPlacement.TAOOptions.method"), &tao);
+    iCHKERRQ TaoCreate(PETSC_COMM_SELF, hd.cfg.ValueOf(".TAOOptions.method"), &tao);
     iCHKERRQ TaoApplicationCreate(PETSC_COMM_SELF, &taoapp);
 
     // Allocate vectors for the solution and gradient
@@ -382,13 +384,13 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
 
     iCHKERRQ TaoAppSetObjectiveAndGradientRoutine(taoapp, AnalyticalObjectiveAndGradient, (void*)&context);
 
-    int nInnerIterations = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nInnerIterations", 1000);
+    int nInnerIterations = hd.cfg.ValueOf(".TAOOptions.nInnerIterations", 1000);
     iCHKERRQ TaoSetMaximumIterates(tao, nInnerIterations);
 
-    double fatol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.fatol", 1.0e-14);
-    double frtol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.frtol", 1.0e-14);
-    double catol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.catol", 1.0e-8);
-    double crtol = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.crtol", 1.0e-8);
+    double fatol = hd.cfg.ValueOf(".TAOOptions.fatol", 1.0e-14);
+    double frtol = hd.cfg.ValueOf(".TAOOptions.frtol", 1.0e-14);
+    double catol = hd.cfg.ValueOf(".TAOOptions.catol", 1.0e-8);
+    double crtol = hd.cfg.ValueOf(".TAOOptions.crtol", 1.0e-8);
     iCHKERRQ TaoSetTolerances(tao, fatol, frtol, catol, crtol);
 
     /* Check for TAO command line options */
@@ -442,14 +444,14 @@ int AnalyticalGlobalPlacement::Relaxation(HDesign& hd, ClusteringInformation& ci
 bool IsTimeToExit(HDesign& hd, ClusteringInformation& ci, AppCtx& context, 
                   PlacementQualityAnalyzer* QA, int iteration) 
 {
-    if (hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+    if (hd.cfg.ValueOf(".useQAClass", false))
     {
         QA->AnalyzeQuality(iteration, &context.criteriaValues, 
-            hd.cfg.ValueOf("GlobalPlacement.improvementTreshold", 0.0));
+            hd.cfg.ValueOf(".improvementTreshold", 0.0));
 
-        if (hd.cfg.ValueOf("GlobalPlacement.earlyExit", false))
+        if (hd.cfg.ValueOf(".earlyExit", false))
         {
-            if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf("GlobalPlacement.nTolerantIterations", 2))
+            if (QA->GetNumIterationsWithoutGain() >= hd.cfg.ValueOf(".nTolerantIterations", 2))
             {
                 QA->RestoreBestAchievedPlacement();
                 WriteCellsCoordinates2Clusters(hd, ci);
@@ -457,7 +459,7 @@ bool IsTimeToExit(HDesign& hd, ClusteringInformation& ci, AppCtx& context,
                 return true;
             }
         }
-        if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf("GlobalPlacement.nConvergedIterations", 2))
+        if (QA->GetConvergeIterationsNumber() >= hd.cfg.ValueOf(".nConvergedIterations", 2))
         {
             QA->RestoreBestAchievedPlacement();
             WriteCellsCoordinates2Clusters(hd, ci);
@@ -466,7 +468,7 @@ bool IsTimeToExit(HDesign& hd, ClusteringInformation& ci, AppCtx& context,
         }
     }
 
-    const int nOuterIters = hd.cfg.ValueOf("GlobalPlacement.TAOOptions.nOuterIterations", 32);
+    const int nOuterIters = hd.cfg.ValueOf(".TAOOptions.nOuterIterations", 32);
     if (iteration >= nOuterIters)
     {
         ALERT(Color_Green, "Iterations finished");
@@ -480,13 +482,13 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
                                      TAO_APPLICATION taoapp, TAO_SOLVER tao, Vec x, int metaIteration)
 {
     PlacementQualityAnalyzer* QA = 0;
-    if(hd.cfg.ValueOf("GlobalPlacement.useQAClass", false))
+    if(hd.cfg.ValueOf(".useQAClass", false))
     {
         Vec g;
         iCHKERRQ VecCreateSeq(PETSC_COMM_SELF, context.nVariables, &g);
         AnalyticalObjectiveAndGradient(taoapp, x, &context.criteriaValues.objective, g, &context);
 
-        QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf("GlobalPlacement.QAcriteria",
+        QA = new PlacementQualityAnalyzer(hd, hd.cfg.ValueOf(".QAcriteria",
             PlacementQualityAnalyzer::GetMetricName(PlacementQualityAnalyzer::MetricHPWLleg)));
         QA->AnalyzeQuality(0, &context.criteriaValues);
     }
@@ -521,9 +523,9 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         UpdateWeights(hd, context, QA, iteration);
 
-        if (hd.cfg.ValueOf("GlobalPlacement.UseBuffering", false))
+        if (hd.cfg.ValueOf(".UseBuffering", false))
         {
-            if (metaIteration >= hd.cfg.ValueOf("GlobalPlacement.New_Buffering.NumberMetaIterationStartBuffering", 0))
+            if (metaIteration >= hd.cfg.ValueOf(".New_Buffering.NumberMetaIterationStartBuffering", 0))
             {
                 GPBuffering bufferer(hd);
                 bufferer.DoBuffering(context, QA->GetBackHPWL(), QA->GetBackLHPWL());

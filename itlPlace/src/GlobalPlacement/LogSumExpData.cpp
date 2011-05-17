@@ -3,7 +3,7 @@
 void LSEData::Initialize(HDesign& hd, ClusteringInformation& ci, double binWidth)
 {
   //TODO: probably we can choose this parameter better
-  alpha = binWidth * hd.cfg.ValueOf("GlobalPlacement.alphaMultiplier", 0.5);
+  alpha = binWidth * hd.cfg.ValueOf(".alphaMultiplier", 0.5);
 
   int netListSize = ci.netList.size();
   SUM1 = new double[4*netListSize];
@@ -11,7 +11,7 @@ void LSEData::Initialize(HDesign& hd, ClusteringInformation& ci, double binWidth
   SUM3 = SUM2 + netListSize;
   SUM4 = SUM3 + netListSize;
 
-  batchSize = hd.cfg.ValueOf("GlobalPlacement.batchSizeForvdExp", 1000);
+  batchSize = hd.cfg.ValueOf(".batchSizeForvdExp", 1000);
 
   unsigned int coordsCount = ci.mCurrentNumberOfClusters 
     + ci.terminalCells.size() + ci.primaryPins.size();

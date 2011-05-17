@@ -67,7 +67,6 @@ public:
     string textIdentifierBufferedNet;
     string textIdentifierBuffer;
 
-
     bool* netVisit;
     string nameBufferingNet;
     int countPinInBufferingInterconnection;
@@ -78,7 +77,6 @@ public:
     int maxCountRepeatNet;
     int limitationCountCriticalPath;
     int numberBufferedAtOnceCriticalPaths;
-
 
     double totalAllowableBuffersArea;
     double totalAreaCells;

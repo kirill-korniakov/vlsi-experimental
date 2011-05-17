@@ -48,7 +48,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
         binGrid, desiredNumberOfClustersAtEveryBin);
 
     //TODO: correct this potential radius calculation
-    double potentialRatio = hd.cfg.ValueOf("GlobalPlacement.potentialRatio", 2.1); //WARNING: must be greater than 0.5
+    double potentialRatio = hd.cfg.ValueOf(".potentialRatio", 2.1); //WARNING: must be greater than 0.5
     potentialRadiusX = potentialRatio*binGrid.binWidth;
     potentialRadiusY = potentialRatio*binGrid.binHeight;
     invPSX = 1 / potentialRadiusX / potentialRadiusX;

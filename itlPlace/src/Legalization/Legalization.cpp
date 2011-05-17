@@ -1,27 +1,30 @@
 #include "Legalization.h"
 #include "Utils.h"
+#include "PlacementQualityAnalyzer.h"
+#include "Auxiliary.h"
 
 void Legalization(HDPGrid& grid)
 {
-  ConfigContext ctx = grid.Design().cfg.OpenContext("Legalization");
-  bool doReport = grid.Design().cfg.ValueOf(".doReport", false);
-  if (doReport)
-  {
-    WRITELINE("");
-    ALERT("LEGALIZATION STARTED (Abacus)");
-  }
+    ConfigContext ctx = grid.Design().cfg.OpenContext("Legalization");
 
-  double wlBeforeL = Utils::CalculateHPWL(grid.Design(), false);
-  if (doReport)
-    ALERT("HPWL before legalization: %f", wlBeforeL);
+    bool doReport = grid.Design().cfg.ValueOf(".doReport", false);
+    if (doReport)
+    {
+        WRITELINE("");
+        ALERT("LEGALIZATION STARTED (Abacus)");
+    }
 
-  AbacusLegalization(grid);
-  double wlAfterL = Utils::CalculateHPWL(grid.Design(), false);
-  if (doReport)
-  {
-    ALERT("HPWL after legalization: %f", wlAfterL);
-    ALERT("Improvement after legalization: %f%%", 100.0 * (1.0 - wlAfterL/wlBeforeL));
+    PlacementQualityAnalyzer* QA = 
+        new PlacementQualityAnalyzer(grid.Design(), grid.Design().cfg.ValueOf("GlobalPlacement.QAcriteria"));
+    QA->AnalyzeQuality(0);
 
-    ALERT("LEGALIZATION FINISHED");
-  }
+    AbacusLegalization(grid);
+
+    QA->AnalyzeQuality(1);
+
+    if (doReport)
+    {
+        QA->Report();
+        ALERT("LEGALIZATION FINISHED");
+    }
 }

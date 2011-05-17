@@ -18,7 +18,7 @@ void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
 {
     WRITELINE("");
     ALERT("GPBuffering STARTED");
-    ConfigContext ctx = data->design.cfg.OpenContext("GlobalPlacement.New_Buffering");
+    ConfigContext ctx = data->design.cfg.OpenContext("New_Buffering");
 
     if (!isInitialize) 
         Initialize();
@@ -171,7 +171,7 @@ void GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& buffers
 
 void GPBuffering::Init2(AppCtx* context, double HPWL, double LHPWL)
 {
-    if (data->design.cfg.ValueOf("AdaptiveSizeBufferMultiplier", false))
+    if (data->design.cfg.ValueOf(".AdaptiveSizeBufferMultiplier", false))
     {
         //data->SetSizeBufferMultiplier( min((context->sprData.binGrid.binHeight * context->sprData.binGrid.binWidth / 
         //data->GetSizeBuffer()) / 100.0, 1.0));

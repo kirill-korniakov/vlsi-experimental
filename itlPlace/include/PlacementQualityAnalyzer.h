@@ -89,8 +89,6 @@ private:
 public:
     static QualityMetrics GetMetricEnum(const string& metric);
     static const char* GetMetricName(QualityMetrics metric);
-    
-    void ReorderColumns();
 
     PlacementQualityAnalyzer(HDesign& design, QualityMetrics qmethod);
     PlacementQualityAnalyzer(HDesign& design, const string& qmethod);
@@ -103,6 +101,7 @@ public:
     void ReportMajorCriteria(double improvement);
     void ReportAllCriterias(PlacementQualityAnalyzer::PlacementQuality& pq);
 
+    void ReorderColumns();
     void Report();
 
     void SaveCurrentPlacementAsBestAchieved();
