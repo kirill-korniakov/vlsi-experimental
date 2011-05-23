@@ -26,7 +26,9 @@ void HVGAlgorithm::NetlistBuffering()
         if (design.cfg.ValueOf("TypePathBased", 0) == 0)
             bufferingAlgorithm->BufferingNetlist();
         else
+        {
             bufferingAlgorithm->BufferingNetlist2();
+        }
 
         delete bufferingAlgorithm;
     }
