@@ -6,23 +6,12 @@ import datetime
 from datetime import date
 import time
 
-import BaseExperiment
 from BaseExperiment import *
-
-import ResultsStorage
-from ResultsStorage import *
-
-import Emailer
-from Emailer import *
-
-import ReportCreator
-from ReportCreator import *
-
-import CoreFunctions
-from CoreFunctions import *
-
-import Parameters
-from Parameters import *
+from Emailer import Emailer
+from ResultsStorage import ResultsStorage
+from ReportCreator import ReportCreator
+from CoreFunctions import Logger
+from ParametersParsing import GeneralParameters
 
 TERMINATED = "Terminated"
 nTerminatedBenchmarks = 0 #TODO: check if everything is OK
@@ -63,7 +52,7 @@ class ExperimentLauncher:
     def PrepareBenchmarks(self):
         notFoundBenchmarksStr = ''
         notFoundBenchmarks    = []
-        benchmarks            = (open(self.experiment.benchmarks).read()).split('\n')
+        benchmarks            = (open(self.experiment.benchmarks).read()).split("\n")
 
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
@@ -95,15 +84,15 @@ class ExperimentLauncher:
 
         return self.PrepareBenchmarks()
 
-    def RunExperiment(self):
+    def RunExperiment(self, generalParameters, reportParameters):
         global nTerminatedBenchmarks
 
         self.logger.Log("Config: %s" % self.experiment.cfg)
         self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
-        reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg)
-        logFolder = reportCreator.CreateLogFolder()
-        reportTable = reportCreator.GetReportTableName()
+        reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg, reportParameters)
+        logFolder     = reportCreator.CreateLogFolder()
+        reportTable   = reportCreator.GetReportTableName()
 
         self.experiment.CreateEmptyTable(reportTable)
 
@@ -114,12 +103,12 @@ class ExperimentLauncher:
 
         nTerminatedBenchmarks = 33
         for benchmark in benchmarks:
-            self.RunPlacer(benchmark, logFolder, reportTable)
+            self.RunPlacer(benchmark, logFolder, reportTable, generalParameters)
             self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
 
         self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
 
-    def RunPlacer(self, benchmark, logFolder, reportTable):
+    def RunPlacer(self, benchmark, logFolder, reportTable, generalParameters):
         global nTerminatedBenchmarks
 
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
@@ -140,7 +129,7 @@ class ExperimentLauncher:
             os.makedirs(milestonePixDirectory)
 
         milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
-        exeName = GeneralParameters.binDir + "itlPlaceRelease.exe"
+        exeName = generalParameters.binDir + "itlPlaceRelease.exe"
 
         params = [exeName, os.path.abspath(self.experiment.cfg),\
                   defFile, pixDirParam, milestonePixDirParam]
@@ -156,7 +145,7 @@ class ExperimentLauncher:
         benchmarkResult = ""
 
         try:
-            p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = GeneralParameters.binDir)
+            p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = generalParameters.binDir)
 
         except WindowsError:
             error = "Error: can not call %s" % (exeName)
@@ -168,11 +157,11 @@ class ExperimentLauncher:
         renamed = False
         time.sleep(1)
 
-        while(renamed == False and seconds_passed < GeneralParameters.maxTimeForBenchmark):
+        while(renamed == False and seconds_passed < generalParameters.maxTimeForBenchmark):
             seconds_passed = time.time() - t_start
 
             try:
-                renamed = open(GeneralParameters.binDir + "itlPlaceRelease.exe", 'a')
+                renamed = open(generalParameters.binDir + "itlPlaceRelease.exe", 'a')
                 renamed.close()
                 #renamed = os.rename(exeName, exeName + "_")
                 #renamed = os.rename(exeName + "_", exeName)
@@ -215,5 +204,5 @@ class ExperimentLauncher:
 def test():
     pass
 
-if __name__ == '__main__':
+if (__name__ == "__main__"):
     test()

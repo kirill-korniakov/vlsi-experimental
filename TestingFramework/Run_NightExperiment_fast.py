@@ -1,11 +1,5 @@
-import CoreScripts
-from CoreScripts import *
-
-import FastCheckRunner
-from FastCheckRunner import *
-
-import Run_NightExperiment
-from Run_NightExperiment import *
+from CoreScripts.FastCheckRunner import FastCheckRunner
+from Run_NightExperiment import NightExperiment
 
 def RunFastExperiments():
     fast_lists = {\
@@ -19,6 +13,7 @@ def RunFastExperiments():
 #        "APlace weighting experiment":"IWLS05_fast.list",\
         }
 
-    Run_NightExperiment.NightExperiment(FastCheckRunner(fast_lists))
+    NightExperiment(FastCheckRunner(fast_lists))
 
-RunFastExperiments()
+if (__name__ == "__main__"):
+  RunFastExperiments()

@@ -1,23 +1,22 @@
-import CoreFunctions
-from CoreFunctions import *
-
-import sys
-sys.path.append('../')
-
-import Parameters
-from Parameters import *
+from CoreFunctions import CreateConfigParser
+from ParametersParsing import LogParserParameters
 
 NOT_FOUND = -1.0
-PFST = 'PFST'
-PQAT = 'PQAT'
+PFST = "PFST"
+PQAT = "PQAT"
 
 class LogParser:
-    logName     = ''
-    tableHeader = ''
+    logName     = ""
+    tableHeader = ""
+    parameters  = None
 
-    def __init__(self, logName, tableType = PFST, parameters = LogParserParameters()):
-        self.logName    = logName
-        self.parameters = parameters
+    def __init__(self, logName, tableType = PFST, cfgParser = None):
+        self.logName = logName
+
+        if (cfgParser == None):
+          cfgParser  = CreateConfigParser()
+
+        self.parameters = LogParserParameters(cfgParser)
 
         if (tableType == PFST):
             self.tableHeader = self.parameters.PFSTTableHeader

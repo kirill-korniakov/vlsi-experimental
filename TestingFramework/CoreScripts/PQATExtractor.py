@@ -1,51 +1,50 @@
-import LogParser
-from LogParser import *
-
-import CoreFunctions
+import os
+from LogParser import LogParser, PQAT
+from ChartPlotter import PlotChartForBenchmark
 from CoreFunctions import PrintTableToFile, MakeTableInPercents, ExtractXYFromTable
 
-import ChartPlotter
-from ChartPlotter import *
-
 def ParseAndPlotPQAT(logFolder, doPlotCharts):
-    metrics = ['HPWL', 'TNS', 'WNS']
+  metrics = ["HPWL", "TNS", "WNS"]
 
-    if (logFolder == ''):
-      logFolder = os.getcwd()
+  if (logFolder == ""):
+    logFolder = os.getcwd()
 
-    for log in os.listdir(logFolder):
-      if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
-        parser = LogParser(logFolder + '/' + log, PQAT)
-        table  = parser.ParsePQAT(metrics)
+  for log in os.listdir(logFolder):
+    if (os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1])):
+      logName = os.path.join(logFolder, log)
+      parser = LogParser(logName, PQAT)
+      table  = parser.ParsePQAT(metrics)
 
-        if (table == []):
-            print('Error: table is empty')
-            return
-
-        table        = MakeTableInPercents(table)
-        PQATFileName = logFolder + '/' + os.path.basename(log) + '.csv'
-        PrintTableToFile(PQATFileName, table, metrics)
-        [xValues, yValues] = ExtractXYFromTable(table)
-
-        #Start point (percents)
-        xValues[0] = 100
-        yValues[0] = 100
-
-        #Plot
-        if (doPlotCharts):
-            PlotChartForBenchmark(logFolder + '/' + log, xValues, 'TNS', yValues, 'HPWL')
-
-def Run():
-    #logFolder    = '../Reports/LR_make_charts'
-    #logFolder    = '../Reports/Relaxation_SGNW'
-    #logFolder    = '../Reports/Relaxation_APlace'
-    logFolder    = '../Reports/hpwl_iwls05'
-    doPlotCharts = True
-
-    if (os.path.exists(logFolder) == False):
-        print('folder ' + logFolder + 'does not exist')
+      if (table == []):
+        print("Error: table is empty")
         return
 
-    ParseAndPlotPQAT(logFolder, doPlotCharts)
+      table        = MakeTableInPercents(table)
+      PQATFileName = os.path.join(logFolder, os.path.basename(log) + ".csv")
+      PrintTableToFile(PQATFileName, table, metrics)
+      [xValues, yValues] = ExtractXYFromTable(table)
 
-Run()
+      #Start point (percents)
+      xValues[0] = 100
+      yValues[0] = 100
+
+      #Plot
+      if (doPlotCharts):
+        PlotChartForBenchmark(logName, xValues, "TNS", yValues, "HPWL")
+
+def Run():
+  #logFolder    = r"../Reports/LR_make_charts"
+  #logFolder    = r"../Reports/Relaxation_SGNW"
+  #logFolder    = r"../Reports/Relaxation_APlace"
+
+  logFolder    = r"../Reports/HPWL"
+  doPlotCharts = True
+
+  if (os.path.exists(logFolder) == False):
+      print("folder %s does not exist" % (logFolder))
+      return
+
+  ParseAndPlotPQAT(logFolder, doPlotCharts)
+
+if (__name__ == "__main__"):
+  Run()

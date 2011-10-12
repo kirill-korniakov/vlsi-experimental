@@ -6,35 +6,62 @@ import datetime
 from datetime import date
 import time
 
-from Emailer import *
-from SvnWorker import *
-
+from Emailer import Emailer
 from CoreFunctions import Logger
 
-import Parameters
-from Parameters import *
-
 class SolutionBuilder:
-    emailer = None
+  emailer = None
 
-    def __init__(self, emailer):
-        self.emailer = emailer
+  def __init__(self, emailer):
+    self.emailer = emailer
 
-    def BuildSln(self, slnPath = GeneralParameters.slnPath, mode = "Rebuild"):
-        logger = Logger()
-        logger.CoolLog("Building solution...")
-        res  = 0
-        args = [Tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
+  def BuildSln(self, generalParameters, tools, mode = "Rebuild"):
+    logger = Logger()
+    logger.CoolLog("Building solution...")
 
-        try:
-            res = subprocess.call(args)
+    slnPath = generalParameters.slnPath
+    res     = 0
+    args    = [tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
 
-        except WindowsError:
-            error = ("Error: can not call %s" % (Tools.MSBuild))
-            ReportErrorAndExit(error, logger, self.emailer)
+    try:
+      res = subprocess.call(args)
 
-        if (res != 0):
-            error = "Build failed!"
-            print(error)
-            buildLog = GeneralParameters.buildLog
-            self.emailer.SendMessageAndExit(error, [buildLog])
+    except WindowsError:
+      error = ("Error: can not call %s" % (Tools.MSBuild))
+      ReportErrorAndExit(error, logger, self.emailer)
+
+    except Exception:
+      import traceback
+      error = "Error: %s" % (traceback.format_exc())
+      ReportErrorAndExit(error, logger, self.emailer)
+
+    if (res != 0):
+      error = "Build failed!"
+      print(error)
+      buildLog = generalParameters.buildLog
+
+      if (os.path.exists(buildLog)):
+        self.emailer.SendMessageAndExit(error, [buildLog])
+
+      else:
+        self.emailer.SendMessageAndExit(error)
+
+def test():
+  from ConfigParser import ConfigParser
+  from ParametersParsing import EmailerParameters, GeneralParameters, Tools
+
+  configFile = "Parameters.conf"
+  parentDir  = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+  configFile = os.path.join(parentDir, configFile)
+  cfgParser  = ConfigParser()
+  cfgParser.read(configFile)
+
+  tools             = Tools(cfgParser)
+  emailerParameters = EmailerParameters(cfgParser)
+  generalParameters = GeneralParameters(cfgParser)
+  solutionBuilder   = SolutionBuilder(Emailer(emailerParameters))
+
+  solutionBuilder.BuildSln(generalParameters, tools)
+
+if (__name__ == "__main__"):
+  test()

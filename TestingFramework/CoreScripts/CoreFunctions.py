@@ -1,35 +1,36 @@
 import os
-
+import time
 import datetime
 from datetime import date
-import time
+from ConfigParser import ConfigParser
 
-END_OF_COLUMN = ';'
+CONFIG_FILE   = "Parameters.conf"
+END_OF_COLUMN = ";"
 
-SAME = 'same'
-EQUAL = 'equal'
-NOT_EQUAL = 'NotEqual'
+SAME      = "same"
+EQUAL     = "equal"
+NOT_EQUAL = "NotEqual"
 
 class Logger:
     startTime   = time.time()
-    logFileName = ".//TF.log"
+    logFileName = r"./TF.log"
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime
         self.Log("RUNTIME %2.2i:%2.2i" % (int(runTime / 60), int(runTime % 60)))
 
     def CoolLog(self, message):
-        self.Log('\n')
+        self.Log("\n")
         self.Log("######################################################")
         self.Log("####### %s" % (message))
         self.Log("######################################################")
         self.LogWorkTime()
-        self.Log('\n')
+        self.Log("\n")
 
     def Log(self, message):
         print(message)
         log = open(self.logFileName, 'a')
-        log.write(message + '\n')
+        log.write(message + "\n")
         log.close()
 
     def LogStartMessage(self):
@@ -156,3 +157,12 @@ def PrintTableToFile(tableFileName, table, metrics, stages = []):
 
         WriteStringToFile(cols, tableFileName)
         currStageIdx += 1
+
+def CreateConfigParser():
+  cfgParser  = ConfigParser()
+  parentDir  = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+  configFile = os.path.join(parentDir, CONFIG_FILE)
+  cfgParser.read(configFile)
+  return cfgParser
+
+

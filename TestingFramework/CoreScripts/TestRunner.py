@@ -1,74 +1,83 @@
-import subprocess
-import sys
 import os
-
+import sys
+import time
 import datetime
 from datetime import date
-import time
+import subprocess
+from ConfigParser import ConfigParser
 
-from Emailer import *
-from SvnWorker import *
+from Emailer import Emailer
+from SvnWorker import SvnWorker
+from SolutionBuilder import SolutionBuilder
+from ResultsStorage import ResultsStorage
+from ExperimentLauncher import ExperimentLauncher
+from ExperimentsComparator import ExperimentsComparator
+from CoreFunctions import Logger, GetTimeStamp, CreateConfigParser
 
-import CoreFunctions
-from CoreFunctions import *
-
-import Parameters
-from Parameters import *
-
-import BaseExperiment
-from BaseExperiment import *
-
-import ExperimentLauncher
-from ExperimentLauncher import *
-
-import ExperimentsComparator
-from ExperimentsComparator import *
-
-import SolutionBuilder
-from SolutionBuilder import *
+from ParametersParsing import TestRunnerParameters, EmailerParameters, RepoParameters,\
+     ReportParameters, GeneralParameters, LogParserParameters, Tools
 
 class TestRunner:
-    emailer     = None
-    parameters  = None
-    experiments = []
-    storage     = ResultsStorage()
-    comparator  = ExperimentsComparator(storage)
+  emailer     = None
+  cfgParser   = CreateConfigParser()
+  parameters  = None
+  experiments = []
+  storage     = ResultsStorage()
+  comparator  = ExperimentsComparator(storage)
 
-    def __init__(self, parameters = TestRunnerParameters(), emailer = Emailer()):
-        self.emailer     = emailer
-        self.parameters  = parameters
-        self.experiments = []
+  def __init__(self, parameters = None, emailer = None):
+    if (parameters == None):
+      parameters = TestRunnerParameters(self.cfgParser)
 
-    def Append(self, newExperiment):
-         self.experiments.append(newExperiment)
-         return 0
+    if (emailer == None):
+      emailerParameters = EmailerParameters(self.cfgParser)
+      emailer = Emailer(emailerParameters)
 
-    def AddExperimentToGroup(self, newExperiment):
-        if (self.Append(newExperiment) != 0):
-            return
+    self.emailer     = emailer
+    self.parameters  = parameters
+    self.experiments = []
 
-        self.comparator.AddExperimentToGroup(newExperiment)
+  def Append(self, newExperiment):
+    self.experiments.append(newExperiment)
+    return 0
 
-    def Run(self):
-        logger = Logger()
-        logger.LogStartMessage()
+  def AddExperimentToGroup(self, newExperiment):
+    if (self.Append(newExperiment) != 0):
+      return
 
-        if self.parameters.doCheckout:
-            svn = SvnWorker(self.emailer)
-            svn.CheckOut()
+    self.comparator.AddExperimentToGroup(newExperiment)
 
-        if self.parameters.doBuild:
-            solutionBuilder = SolutionBuilder(self.emailer)
-            solutionBuilder.BuildSln()
+  def Run(self):
+    logger = Logger()
+    logger.LogStartMessage()
+    generalParameters = GeneralParameters(self.cfgParser)
 
-        for experiment in self.experiments:
-            logger.CoolLog(experiment.name + ' : ' + GetTimeStamp())
+    if self.parameters.doCheckout:
+      repoParameters = RepoParameters(self.cfgParser)
+      svn            = SvnWorker(self.emailer, generalParameters, repoParameters)
+      svn.CheckOut()
 
-            launcher = ExperimentLauncher(experiment, self.storage, self.emailer)
-            launcher.RunExperiment()
+    if self.parameters.doBuild:
+      tools = Tools(self.cfgParser)
+      solutionBuilder = SolutionBuilder(self.emailer)
+      solutionBuilder.BuildSln(generalParameters, tools)
 
-        self.storage.LogResults()
-        self.storage.SendResults(self.emailer)
+    for experiment in self.experiments:
+      logger.CoolLog("%s: starting %s" % (GetTimeStamp(), experiment.name))
+      reportParameters = ReportParameters(self.cfgParser)
 
-        self.comparator.CompareExperiments()
-        logger.CoolLog("Finish")
+      launcher = ExperimentLauncher(experiment, self.storage, self.emailer)
+      launcher.RunExperiment(generalParameters, reportParameters)
+
+    self.storage.LogResults()
+    self.storage.SendResults(self.emailer)
+
+    self.comparator.CompareExperiments()
+    logger.CoolLog("Finish")
+
+def test():
+  testRunner = TestRunner()
+  testRunner.Run()
+
+if (__name__ == "__main__"):
+    test()

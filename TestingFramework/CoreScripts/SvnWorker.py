@@ -2,23 +2,22 @@ import subprocess
 import sys
 import os
 
-import Parameters
-from Parameters import *
-
-from CoreFunctions import *
-
-from Emailer import *
-from SvnWorker import *
+from Emailer import Emailer
+from CoreFunctions import Logger, ReportErrorAndExit, RemoveDir
 
 class SvnWorker:
-    logger  = None
-    emailer = None
+    logger            = None
+    emailer           = None
+    repoParameters    = None
+    generalParameters = None
 
-    def __init__(self, emailer):
-        self.emailer = emailer
+    def __init__(self, emailer, generalParameters, repoParameters):
+        self.emailer           = emailer
+        self.repoParameters    = repoParameters
+        self.generalParameters = generalParameters
 
     def DeleteSources(self):
-        dir = GeneralParameters.checkoutPath
+        dir = self.generalParameters.checkoutPath
         self.logger.Log("Deleting previous version of itlPlace...")
 
         if os.path.exists(dir):
@@ -53,8 +52,8 @@ class SvnWorker:
         else:
             self.logger.Log("Checking out HEAD revision")
 
-        url     = RepoParameters.srcRepoPath
-        to      = GeneralParameters.checkoutPath
+        url = self.repoParameters.srcRepoPath
+        to  = self.generalParameters.checkoutPath
 
         #for testing...
         #url = 'http://svn.software.unn.ru/VLSI/CODE/trunk/TestingFramework'
@@ -72,6 +71,19 @@ class SvnWorker:
         command = self.FormCommand()
         self.doCheckOut(command)
 
-if __name__ == '__main__':
-    svnWorker = SvnWorker(Emailer())
-    svnWorker.CheckOut()
+if (__name__ == "__main__"):
+  from ConfigParser import ConfigParser
+  from ParametersParsing import EmailerParameters, GeneralParameters, RepoParameters
+
+  configFile = "Parameters.conf"
+  parentDir  = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+  configFile = os.path.join(parentDir, configFile)
+  cfgParser  = ConfigParser()
+  cfgParser.read(configFile)
+
+  emailerParameters = EmailerParameters(cfgParser)
+  repoParameters    = RepoParameters(cfgParser)
+  generalParameters = GeneralParameters(cfgParser)
+
+  svnWorker = SvnWorker(Emailer(emailerParameters), generalParameters, repoParameters)
+  svnWorker.CheckOut()

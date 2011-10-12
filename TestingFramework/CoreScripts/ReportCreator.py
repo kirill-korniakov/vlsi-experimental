@@ -1,33 +1,34 @@
 import sys
 import os
 
-import CoreFunctions
-from CoreFunctions import *
-
-import Parameters
-from Parameters import *
+from CoreFunctions import GetTimeStamp, CreateConfigParser
+from ParametersParsing import ReportParameters
 
 class ReportCreator:
-    logFolder = ''
-    cfgName   = ''
+  logFolder        = ""
+  cfgName          = ""
+  reportParameters = None
 
-    def __init__(self, experimentName, cfgName):
-        self.cfgName   = cfgName
-        self.logFolder = "%s%s_%s_%s" % (ReportParameters.logFolder, experimentName,\
-                         os.path.basename(cfgName), GetTimeStamp())
-        self.logFolder = self.logFolder.replace(" ", "_")
+  def __init__(self, experimentName, cfgName, reportParameters):
+    self.cfgName          = cfgName
+    self.reportParameters = reportParameters
 
-    def GetReportTableName(self):
-        (path, cfgFileName) = os.path.split(self.cfgName)
-        return ("%s//ReportTable_%s.csv" % (self.logFolder, cfgFileName))
+    self.logFolder = r"%s%s_%s_%s" % (self.reportParameters.logFolder, experimentName,\
+                     os.path.basename(cfgName), GetTimeStamp())
 
-    def CreateLogFolder(self):
-        if os.path.exists(self.logFolder):
-            newFolderName = "%s_backup_from_%s" % (self.logFolder, GetTimeStamp())
-            os.rename(self.logFolder, newFolderName)
+    self.logFolder = self.logFolder.replace(" ", "_")
 
-        if os.path.exists(ReportParameters.logFolder) != True:
-            os.mkdir(ReportParameters.logFolder)
+  def GetReportTableName(self):
+    (path, cfgFileName) = os.path.split(self.cfgName)
+    return (r"%s/ReportTable_%s.csv" % (self.logFolder, cfgFileName))
 
-        os.mkdir(self.logFolder)
-        return self.logFolder
+  def CreateLogFolder(self):
+    if os.path.exists(self.logFolder):
+      newFolderName = "%s_backup_from_%s" % (self.logFolder, GetTimeStamp())
+      os.rename(self.logFolder, newFolderName)
+
+    if os.path.exists(self.reportParameters.logFolder) != True:
+      os.mkdir(self.reportParameters.logFolder)
+
+    os.mkdir(self.logFolder)
+    return self.logFolder

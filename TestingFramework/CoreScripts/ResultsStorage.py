@@ -1,9 +1,4 @@
-import BaseExperiment
-from BaseExperiment import *
 from CoreFunctions import Logger
-
-import Emailer
-from Emailer import *
 
 class ResultsStorage:
     logger = None
@@ -13,7 +8,7 @@ class ResultsStorage:
         self.logger = Logger()
 
     def AddExperimentResult(self, experiment, result):
-        if (experiment in self.experimentResults.keys()):
+        if (experiment in list(self.experimentResults.keys())):
             self.logger.Log("Error: the result for experiment %s is already stored" % experiment.name)
 
         self.experimentResults[experiment] = result

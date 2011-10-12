@@ -1,10 +1,5 @@
-import Parameters
-from Parameters import *
-
-import LogParser
-from LogParser import *
-
-import CoreFunctions
+from ParametersParsing import GeneralParameters
+from LogParser import LogParser, PFST, PQAT
 from CoreFunctions import *
 
 OK      = "Ok"
@@ -58,95 +53,114 @@ class ExperimentResults:
         print(self.AsString())
 
 class BaseExperiment:
-    name = ''
-    cfg  = ''
-    benchmarks = ''
-    cmdArgs = [] #list of command line arguments
-    metrics = []
-    stages  = []
-    doParsePQAT = False
+  name        = ""
+  cfg         = ""
+  benchmarks  = ""
+  cmdArgs     = [] #list of command line arguments
+  metrics     = []
+  stages      = []
+  doParsePQAT = False
 
-    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs = []):
-        self.name = name
-        self.cfg = GeneralParameters.binDir + 'cfg//' + cfg
-        self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
-        self.cmdArgs = cmdArgs
-        self.metrics = metrics
-        self.stages  = stages
+  cfgParser         = CreateConfigParser()
+  generalParameters = GeneralParameters(cfgParser)
 
-    def CopyingConstructor(self, be):
-        self.cfg         = be.cfg
-        self.name        = be.name
-        self.stages      = be.stages
-        self.metrics     = be.metrics
-        self.cmdArgs     = be.cmdArgs
-        self.benchmarks  = be.benchmarks
-        self.doParsePQAT = be.doParsePQAT
+  def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs = []):
+    self.name = name
+    self.cfg = self.generalParameters.binDir + "cfg//" + cfg
+    self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
+    self.cmdArgs = cmdArgs
+    self.metrics = metrics
+    self.stages  = stages
 
-    def SetConfig(self, cfg):
-        self.cfg = GeneralParameters.binDir + 'cfg//' + cfg
+  def CopyingConstructor(self, be):
+    self.cfg         = be.cfg
+    self.name        = be.name
+    self.stages      = be.stages
+    self.metrics     = be.metrics
+    self.cmdArgs     = be.cmdArgs
+    self.benchmarks  = be.benchmarks
+    self.doParsePQAT = be.doParsePQAT
 
-    def SetBenchmarksList(self, benchmarks):
-        self.benchmarks = GeneralParameters.benchmarkCheckoutPath + benchmarks
+  def SetConfig(self, cfg):
+    self.cfg = self.generalParameters.binDir + "cfg//" + cfg
 
-    def CreateEmptyTable(self, reportTable):
-        cols = ['Benchmark', END_OF_COLUMN]
+  def SetBenchmarksList(self, benchmarks):
+    self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
 
-        #write header of a table.
-        for row in range(len(self.stages)):
-            for col in range(len(self.metrics)):
-                cols.append(self.metrics[col] + '_' + self.stages[row])
-                cols.append(END_OF_COLUMN)
+  def CreateEmptyTable(self, reportTable):
+    cols = ['Benchmark', END_OF_COLUMN]
 
-            cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
+    #write header of a table.
+    for row in range(len(self.stages)):
+      for col in range(len(self.metrics)):
+        cols.append(self.metrics[col] + '_' + self.stages[row])
+        cols.append(END_OF_COLUMN)
 
-        WriteStringToFile(cols, reportTable)
+      cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 
-    def ParseLog(self, logName):
-        parser = LogParser(logName)
-        return (parser.ParsePFST(self.metrics, self.stages))
+    WriteStringToFile(cols, reportTable)
 
-    def ParsePQATAndPrintTable(self, logName):
-        metrics      = ['HPWL', 'TNS', 'WNS']
-        parser       = LogParser(logName, PQAT)
-        table        = parser.ParsePQAT(metrics)
-        table        = MakeTableInPercents(table)
-        PQATFileName = os.path.dirname(logName) + '//' + os.path.basename(logName) + '.csv'
-        PrintTableToFile(PQATFileName, table, metrics)
+  def ParseLog(self, logName):
+    parser = LogParser(logName, PFST, self.cfgParser)
+    return (parser.ParsePFST(self.metrics, self.stages))
 
-    def AddStringToTable(self, values, benchmark, reportTable):
-        cols = [benchmark, END_OF_COLUMN]
+  def ParsePQATAndPrintTable(self, logName):
+    metrics      = ['HPWL', 'TNS', 'WNS']
+    parser       = LogParser(logName, PQAT, self.cfgParser)
+    table        = parser.ParsePQAT(metrics)
+    table        = MakeTableInPercents(table)
+    PQATFileName = os.path.dirname(logName) + '//' + os.path.basename(logName) + '.csv'
+    PrintTableToFile(PQATFileName, table, metrics)
 
-        for row in range(len(self.stages)):
-            for col in range(len(self.metrics)):
-                cols += [str(values[row][col]), END_OF_COLUMN]
-            cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
+  def AddStringToTable(self, values, benchmark, reportTable):
+    cols = [benchmark, END_OF_COLUMN]
 
-        #write metrics to the file
-        WriteStringToFile(cols, reportTable)
+    for row in range(len(self.stages)):
+      for col in range(len(self.metrics)):
+        cols += [str(values[row][col]), END_OF_COLUMN]
 
-    def MakeResultTable(self, logFolder, reportTable):
-        if (os.path.exists(logFolder) == False):
-            print('folder ' + logFolder + 'does not exist')
-            return
+      cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 
-        reportTable = logFolder + '//' + reportTable
-        self.CreateEmptyTable(reportTable)
+    #write metrics to the file
+    WriteStringToFile(cols, reportTable)
 
-        for log in os.listdir(logFolder):
-            if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
-                benchmark = os.path.splitext(log)[0]
-                self.ParseLogAndFillTable(logFolder + '//' + log, benchmark, reportTable)
+  def MakeResultTable(self, logFolder, reportTable):
+    if (os.path.exists(logFolder) == False):
+      print('folder ' + logFolder + 'does not exist')
+      return
 
-    def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        values = self.ParseLog(logName)
+    reportTable = logFolder + '//' + reportTable
+    self.CreateEmptyTable(reportTable)
 
-        if (values == []):
-          return [FAILED, []]
+    for log in os.listdir(logFolder):
+      if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
+        benchmark = os.path.splitext(log)[0]
+        self.ParseLogAndFillTable(logFolder + '//' + log, benchmark, reportTable)
 
-        self.AddStringToTable(values, benchmark, reportTable)
+  def ParseLogAndFillTable(self, logName, benchmark, reportTable):
+    values = self.ParseLog(logName)
 
-        if (self.doParsePQAT == True):
-            self.ParsePQATAndPrintTable(logName)
+    if (values == []):
+      return [FAILED, []]
 
-        return [OK, values]
+    self.AddStringToTable(values, benchmark, reportTable)
+
+    if (self.doParsePQAT == True):
+      self.ParsePQATAndPrintTable(logName)
+
+    return [OK, values]
+
+def test():
+  from TestRunner import TestRunner
+
+  stages     = ["LEG", "DP"]
+  metrics    = ["HPWL", "TNS", "WNS"]
+  experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list",\
+                              metrics, stages)
+
+  testRunner = TestRunner()
+  testRunner.Append(experiment)
+  testRunner.Run()
+
+if (__name__ == "__main__"):
+  test()

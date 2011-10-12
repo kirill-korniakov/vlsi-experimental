@@ -1,9 +1,6 @@
 import CoreScripts
 from CoreScripts import *
 
-import Parameters
-from Parameters import *
-
 #Sensitivity Guided Net Weighting experiment
 class Experiment_Weighting(BaseExperiment):
     def __init__(self):

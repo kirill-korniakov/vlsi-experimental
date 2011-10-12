@@ -8,10 +8,8 @@ from email import encoders
 from base64 import b64encode
 import os
 
-import Parameters
-from Parameters import *
-
 from CoreFunctions import Logger
+from ParametersParsing import EmailerParameters
 
 class Emailer:
     logger = None

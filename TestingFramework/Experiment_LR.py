@@ -1,9 +1,6 @@
 import CoreScripts
 from CoreScripts import *
 
-import Parameters
-from Parameters import *
-
 class Experiment_LR(BaseExperiment):
     def __init__(self):
         _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']

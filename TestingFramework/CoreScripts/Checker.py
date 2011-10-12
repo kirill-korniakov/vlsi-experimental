@@ -1,9 +1,6 @@
 import CoreScripts
 from CoreScripts import *
 
-import Parameters
-from Parameters import *
-
 class Checker(BaseExperiment):
     masterLogFolder = ''
 
