@@ -1,5 +1,4 @@
-import TestRunner
-from TestRunner import *
+from TestRunner import TestRunner
 
 class FastCheckRunner(TestRunner):
     checkersParameters = {}

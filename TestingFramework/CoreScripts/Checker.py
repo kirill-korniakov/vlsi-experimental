@@ -1,8 +1,11 @@
+import os
 import CoreScripts
-from CoreScripts import *
+from CoreScripts.BaseExperiment import OK, CHANGED, NEW, FAILED, BaseExperiment
+from CoreScripts.CoreFunctions import SAME, EQUAL, NOT_EQUAL, END_OF_COLUMN, CompareValues,\
+                                      WriteStringToFile, Logger
 
 class Checker(BaseExperiment):
-    masterLogFolder = ''
+    masterLogFolder = ""
 
     def __init__(self, baseExperimnet, masterLogFolder):
         BaseExperiment.CopyingConstructor(self, baseExperimnet)
@@ -13,19 +16,19 @@ class Checker(BaseExperiment):
             for row in range(len(self.stages)):
                 compare_result = CompareValues(table1[row][col], table2[row][col])
 
-                if (compare_result == 'notEqual'):
+                if (compare_result == NOT_EQUAL):
                   return(CHANGED)
 
         return(OK)
 
     def CreateEmptyTable(self, reportTable):
-        cols = ['Benchmark']
+        cols = ["Benchmark"]
         cols.append(END_OF_COLUMN)
 
         #write header of a table.
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                cols.append('Current ' + self.metrics[col] + '_' + self.stages[row])
+                cols.append("Current " + self.metrics[col] + '_' + self.stages[row])
                 cols.append(END_OF_COLUMN)
                 cols.append('Master '  + self.metrics[col] + '_' + self.stages[row])
                 cols.append(END_OF_COLUMN)
@@ -56,11 +59,12 @@ class Checker(BaseExperiment):
         if (currentValues == []):
           return [FAILED, []]
 
-        masterLogName = self.masterLogFolder + "/" + os.path.basename(logName)
+        masterLogName = os.path.join(self.masterLogFolder, os.path.basename(logName))
         masterValues  = self.ParseLog(masterLogName)
 
         if (masterValues == []):
-            print('experiment has not failed but master log is empty or does not exist\n')
+            logger = Logger()
+            logger.Log("Experiment has not failed but master log is empty or does not exist\n")
             return [NEW, currentValues]
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)

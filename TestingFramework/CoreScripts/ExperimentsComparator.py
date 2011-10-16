@@ -1,10 +1,5 @@
 from CoreFunctions import Logger
-
-import ReportCreator
-from ReportCreator import *
-
-import BaseExperiment
-from BaseExperiment import *
+from ReportCreator import ReportCreator
 
 referenceExperimentIdx = 0
 

@@ -1,14 +1,15 @@
-import CoreScripts
-from CoreScripts import *
+from CoreScripts.TestRunner import TestRunner
+from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_HPWL(BaseExperiment):
     def __init__(self):
-        BaseExperiment.__init__(self, 'IWLS05 HPWL experiment', 'hpwl_iwls05.cfg', 'IWLS05.list', ['HPWL'], ['DP'])
+        BaseExperiment.__init__(self, "IWLS05 HPWL experiment", "hpwl_iwls05.cfg", "IWLS05.list", ["HPWL"], ["DP"])
 
     def CreateEmptyTable(self, reportTable):
-        cols = ['Benchmark']
+        cols = ["Benchmark"]
         cols.append(END_OF_COLUMN)
-        cols.append('HPWL')
+        cols.append("HPWL")
 
         WriteStringToFile(cols, reportTable)
 

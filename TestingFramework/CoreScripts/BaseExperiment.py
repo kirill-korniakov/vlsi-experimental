@@ -1,6 +1,8 @@
+import os
 from ParametersParsing import GeneralParameters
 from LogParser import LogParser, PFST, PQAT
-from CoreFunctions import *
+from CoreFunctions import END_OF_COLUMN, Logger, CreateConfigParser, WriteStringToFile,\
+                          MakeTableInPercents, PrintTableToFile, Logger
 
 OK      = "Ok"
 NEW     = "New"
@@ -66,7 +68,7 @@ class BaseExperiment:
 
   def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs = []):
     self.name = name
-    self.cfg = self.generalParameters.binDir + "cfg//" + cfg
+    self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
     self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
     self.cmdArgs = cmdArgs
     self.metrics = metrics
@@ -82,18 +84,18 @@ class BaseExperiment:
     self.doParsePQAT = be.doParsePQAT
 
   def SetConfig(self, cfg):
-    self.cfg = self.generalParameters.binDir + "cfg//" + cfg
+    self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
 
   def SetBenchmarksList(self, benchmarks):
-    self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
+    self.benchmarks = os.path.join(self.generalParameters.benchmarkCheckoutPath, benchmarks)
 
   def CreateEmptyTable(self, reportTable):
-    cols = ['Benchmark', END_OF_COLUMN]
+    cols = ["Benchmark", END_OF_COLUMN]
 
     #write header of a table.
     for row in range(len(self.stages)):
       for col in range(len(self.metrics)):
-        cols.append(self.metrics[col] + '_' + self.stages[row])
+        cols.append("%s_%s" % (self.metrics[col], self.stages[row]))
         cols.append(END_OF_COLUMN)
 
       cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
@@ -105,11 +107,12 @@ class BaseExperiment:
     return (parser.ParsePFST(self.metrics, self.stages))
 
   def ParsePQATAndPrintTable(self, logName):
-    metrics      = ['HPWL', 'TNS', 'WNS']
+    metrics      = ["HPWL", "TNS", "WNS"]
     parser       = LogParser(logName, PQAT, self.cfgParser)
     table        = parser.ParsePQAT(metrics)
     table        = MakeTableInPercents(table)
-    PQATFileName = os.path.dirname(logName) + '//' + os.path.basename(logName) + '.csv'
+    pqatName     = r"%s.csv" % (os.path.basename(logName))
+    PQATFileName = os.path.join(os.path.dirname(logName), pqatName)
     PrintTableToFile(PQATFileName, table, metrics)
 
   def AddStringToTable(self, values, benchmark, reportTable):
@@ -126,16 +129,17 @@ class BaseExperiment:
 
   def MakeResultTable(self, logFolder, reportTable):
     if (os.path.exists(logFolder) == False):
-      print('folder ' + logFolder + 'does not exist')
+      logger = Logger()
+      logger.Log("Error: folder %s does not exist" % (logFolder))
       return
 
-    reportTable = logFolder + '//' + reportTable
+    reportTable = os.path.join(logFolder, reportTable)
     self.CreateEmptyTable(reportTable)
 
     for log in os.listdir(logFolder):
-      if (os.path.isfile(os.path.join(logFolder, log)) and ('.log' == os.path.splitext(log)[-1])):
+      if (os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1])):
         benchmark = os.path.splitext(log)[0]
-        self.ParseLogAndFillTable(logFolder + '//' + log, benchmark, reportTable)
+        self.ParseLogAndFillTable(os.path.join(logFolder, log), benchmark, reportTable)
 
   def ParseLogAndFillTable(self, logName, benchmark, reportTable):
     values = self.ParseLog(logName)
@@ -149,6 +153,14 @@ class BaseExperiment:
       self.ParsePQATAndPrintTable(logName)
 
     return [OK, values]
+
+def TestResultTableMaking():
+  stages     = ["LEG", "DP"]
+  metrics    = ["HPWL", "TNS", "WNS"]
+  experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list",\
+                              metrics, stages)
+
+  experiment.MakeResultTable(r"..\Reports\HippocrateDP", "TestTable2.csv")
 
 def test():
   from TestRunner import TestRunner
