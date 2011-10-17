@@ -1,11 +1,12 @@
-import CoreScripts
-from CoreScripts import *
+from CoreScripts.TestRunner import TestRunner
+from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_LR(BaseExperiment):
     def __init__(self):
         _metrics = ['HPWL', 'TWL', 'TNS', 'WNS']
         _stages  = ['INIT', 'LEG']
-        BaseExperiment.__init__(self, 'LR experiment (IWLS05GP)', 'LR.cfg', 'IWLS_GP_r1511/IWLS_GP.list', _metrics, _stages)
+        BaseExperiment.__init__(self, 'LR experiment (IWLS05GP)', 'LR.cfg', r'IWLS_GP_r1511\IWLS_GP.list', _metrics, _stages)
 
         self.doParsePQAT = True
 

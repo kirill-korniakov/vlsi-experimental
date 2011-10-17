@@ -28,9 +28,9 @@ class Checker(BaseExperiment):
         #write header of a table.
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
-                cols.append("Current " + self.metrics[col] + '_' + self.stages[row])
+                cols.append("Current %s_%s" % (self.metrics[col], self.stages[row]))
                 cols.append(END_OF_COLUMN)
-                cols.append('Master '  + self.metrics[col] + '_' + self.stages[row])
+                cols.append("Master %s_%s" % (self.metrics[col], self.stages[row]))
                 cols.append(END_OF_COLUMN)
 
             cols.append(END_OF_COLUMN) #an empty column between metrics on different stages

@@ -120,7 +120,7 @@ class BaseExperiment:
 
     for row in range(len(self.stages)):
       for col in range(len(self.metrics)):
-        cols += [str(values[row][col]), END_OF_COLUMN]
+        cols.extend([str(values[row][col]), END_OF_COLUMN])
 
       cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
 

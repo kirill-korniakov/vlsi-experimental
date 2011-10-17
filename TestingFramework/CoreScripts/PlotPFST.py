@@ -13,7 +13,7 @@ def PrintAndPlotPFST(logName, metrics, stages):
       return
 
   table  = MakeTableInPercents(table)
-  PrintTableToFile(logName + ".csv", table, metrics, stages)
+  PrintTableToFile(r"%s.csv" % (logName), table, metrics, stages)
 
   del table[0] #don"t use values of 0 iteration
   [xValues, yValues] = ExtractXYFromTable(table)
@@ -38,6 +38,8 @@ def Run():
   for log in os.listdir(lastLogFolder):
     if (os.path.isfile(os.path.join(lastLogFolder, log)) and (".log" == os.path.splitext(log)[-1])):
       PrintAndPlotPFST(os.path.join(lastLogFolder, log), metrics, stages)
+
+  print("Success")
 
 if (__name__ == "__main__"):
   Run()

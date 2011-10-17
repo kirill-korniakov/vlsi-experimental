@@ -1,15 +1,13 @@
-import CoreScripts
-from CoreScripts import *
-
-import Parameters
-from Parameters import *
+from CoreScripts.TestRunner import TestRunner
+from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_Joint(BaseExperiment):
     def __init__(self):
-        metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
-        stages  = ['INIT', 'GP', 'NBUF', 'LEGB']
+        metrics = ["Time", "Cells", "HPWL", "TWL", "TNS", "WNS"]
+        stages  = ["INIT", "GP", "NBUF", "LEGB"]
 
-        BaseExperiment.__init__(self, 'Joint Algorithm', 'JointPlacementBuffering.cfg', 'IWLS_GP_r1511_joint.list', metrics, stages)
+        BaseExperiment.__init__(self, "Joint Algorithm", "JointPlacementBuffering.cfg", "IWLS_GP_r1511_joint.list", metrics, stages)
 
 def TestRun():
     plotterFlag = "--plotter.enabled=false"
@@ -19,15 +17,15 @@ def TestRun():
     simpleBuffering = Experiment_Joint()
     simpleBuffering.name = "Simple Buffering"
     simpleBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=false", bufferingTypeSimple, plotterFlag]
-    
+
     pathBuffering = Experiment_Joint()
     pathBuffering.name = "Path Buffering"
     pathBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=false", bufferingTypePath, plotterFlag]
-    
+
     jointSimpleBuffering = Experiment_Joint()
     jointSimpleBuffering.name = "Joint Simple Buffering"
     jointSimpleBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=true", bufferingTypeSimple, plotterFlag]
-    
+
     jointPathBuffering = Experiment_Joint()
     jointPathBuffering.name = "Joint Path Buffering"
     jointPathBuffering.cmdArgs = ["--LSE.GlobalPlacement.UseBuffering=true", bufferingTypePath, plotterFlag]
