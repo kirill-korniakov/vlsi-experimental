@@ -60,7 +60,7 @@ class ExperimentsComparator:
         WriteStringToFile(cols, resultFileName)
 
         # Second line of the table header
-        cols = ['benchmark', END_OF_COLUMN]
+        cols = ["benchmark", END_OF_COLUMN]
 
         for row in nMetrics:
             cols.extend([metrics[row], END_OF_COLUMN])
@@ -74,8 +74,8 @@ class ExperimentsComparator:
             if list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx:
                 continue
             for row in nMetrics:
-                if (metrics[row] != 'Time'):
-                    cols.extend([metrics[row] + '%', END_OF_COLUMN])
+                if (metrics[row] != "Time"):
+                    cols.extend(["%s%" % (metrics[row]), END_OF_COLUMN])
 
                 else:
                     cols.extend([metrics[row], END_OF_COLUMN])
@@ -132,17 +132,17 @@ class ExperimentsComparator:
                     newTableLine.append(END_OF_COLUMN)
                     continue
 
-                #compare 'INITIAL' metrics
+                #compare "INITIAL" metrics
                 for metricIdx in nMetrics:
                     cmpResult = CompareValues(initialMetrics[metricIdx], resultValues[0][metricIdx])
-                    if (cmpResult == NOT_EQUAL and metrics[metricIdx] != 'Time'):
-                        self.logger.Log('Error: not equal INIT metrics')
+                    if (cmpResult == NOT_EQUAL and metrics[metricIdx] != "Time"):
+                        self.logger.Log("Error: not equal INIT metrics")
 
                 finalStageIdx = len(experiment.stages) - 1
                 for metricIdx in nMetrics:
                     valueStr = resultValues[finalStageIdx][metricIdx]
 
-                    if (metrics[metricIdx] != 'Time'):
+                    if (metrics[metricIdx] != "Time"):
                         percent = 100 * resultValues[finalStageIdx][metricIdx] / referenceMetrics[metricIdx]
                         valueStr = "%.2f" % percent
 

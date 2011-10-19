@@ -97,10 +97,10 @@ def ReportErrorAndExit(error, logger, emailer):
     emailer.SendMessageAndExit(error)
 
 def MarkResultAsBest(col):
-    return '* ' + col
+    return "* " + col
 
 def WriteStringToFile(cols, tableFileName):
-  printStr = ''
+  printStr = ""
 
   for col in cols:
     if (col == END_OF_COLUMN):
@@ -108,55 +108,55 @@ def WriteStringToFile(cols, tableFileName):
     else:
       printStr += str(col)
 
-  printStr += '\n'
+  printStr += "\n"
   resultFile = open(tableFileName, 'a')
   resultFile.write(printStr.replace('.', ','))
   resultFile.close()
 
 def MakeTableInPercents(table):
-    currStageIdx = 0
+  currStageIdx = 0
 
-    for stage in table:
-        for col in range(len(stage)):
-            if ((currStageIdx > 0) and (table[0][col] > 0)):
-                table[currStageIdx][col] = stage[col] * 100 / table[0][col]
+  for stage in table:
+    for col in range(len(stage)):
+      if ((currStageIdx > 0) and (table[0][col] > 0)):
+        table[currStageIdx][col] = stage[col] * 100 / table[0][col]
 
-        currStageIdx += 1
+    currStageIdx += 1
 
-    return table
+  return table
 
 def ExtractXYFromTable(table):
-    xValues = []
-    yValues = []
+  xValues = []
+  yValues = []
 
-    for currStage in table:
-        xValues.append(currStage[1])
-        yValues.append(currStage[0])
+  for currStage in table:
+    xValues.append(currStage[1])
+    yValues.append(currStage[0])
 
-    return (xValues, yValues)
+  return (xValues, yValues)
 
 def PrintTableToFile(tableFileName, table, metrics, stages = []):
-    cols = ['stage', END_OF_COLUMN]
+  cols = ["stage", END_OF_COLUMN]
 
-    for col in metrics:
-        cols += [col, END_OF_COLUMN]
+  for col in metrics:
+    cols.extend([col, END_OF_COLUMN])
+
+  WriteStringToFile(cols, tableFileName)
+  currStageIdx = 0
+
+  for currStage in table:
+    currStageName = str(currStageIdx)
+
+    if (stages):
+      currStageName = stages[currStageIdx]
+
+    cols = [currStageName, END_OF_COLUMN]
+
+    for value in currStage:
+      cols.extend([str(value), END_OF_COLUMN])
 
     WriteStringToFile(cols, tableFileName)
-    currStageIdx = 0
-
-    for currStage in table:
-        currStageName = str(currStageIdx)
-
-        if (stages):
-            currStageName = stages[currStageIdx]
-
-        cols = [currStageName, END_OF_COLUMN]
-
-        for value in currStage:
-            cols += [str(value), END_OF_COLUMN]
-
-        WriteStringToFile(cols, tableFileName)
-        currStageIdx += 1
+    currStageIdx += 1
 
 def CreateConfigParser():
   cfgParser  = ConfigParser()

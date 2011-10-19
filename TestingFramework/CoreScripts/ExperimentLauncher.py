@@ -50,7 +50,7 @@ class ExperimentLauncher:
         return True
 
     def PrepareBenchmarks(self):
-        notFoundBenchmarksStr = ''
+        notFoundBenchmarksStr = ""
         notFoundBenchmarks    = []
         benchmarks            = (open(self.experiment.benchmarks).read()).split("\n")
 
@@ -61,7 +61,9 @@ class ExperimentLauncher:
 
         #check if all benchmarks can be found
         for i in range(len(benchmarks)):
-            benchmark = os.path.dirname(os.path.abspath(self.experiment.benchmarks)) + "//" + benchmarks[i] + ".def"
+            benchmark       = r"%s.def" % (benchmarks[i])
+            benchmarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
+            benchmark       = os.path.join(benchmarkFolder, benchmark)
 
             if (not os.path.exists(benchmark)):
                 notFoundBenchmarks.append(benchmarks[i])
@@ -71,6 +73,7 @@ class ExperimentLauncher:
             for benchmark in notFoundBenchmarks:
                 benchmarks.remove(benchmark)
                 notFoundBenchmarksStr += ' "' + benchmark + '";'
+                notFoundBenchmarksStr += ' "%s";' % (benchmark)
 
             error = "Error: benchmarks %s were not found!" % (notFoundBenchmarksStr)
             self.AddErrorToResults(error)
@@ -112,35 +115,37 @@ class ExperimentLauncher:
         global nTerminatedBenchmarks
 
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
-        logFileName   = logFolder + "//" + os.path.basename(benchmark) + ".log"
+        logFileName   = r"%s.log" % (os.path.basename(benchmark))
+        logFileName   = os.path.join(logFolder, logFileName)
         fPlacerOutput = open(logFileName, 'w')
         resultValues  = []
 
-        defFile = "--params.def=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
-                  + "//" + benchmark + ".def"
+        defFile         = r"%s.def" % (benchmark)
+        benchMarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
+        defFile         = os.path.join(benchMarkFolder, defFile)
+        defFileParam    = "--params.def=%s" % (defFile)
 
-        benchmarkDirectory = os.path.abspath(logFolder + "//" + os.path.basename(benchmark))
-        pixDirectory       = os.path.abspath(logFolder + "//" + os.path.basename(benchmark) + "//pix")
-        pixDirParam        = "--plotter.pixDirectory=" + pixDirectory
+        pixFolder   = os.path.abspath(os.path.join(logFolder, os.path.basename(benchmark), "pix"))
+        pixDirParam = "--plotter.pixDirectory=%s" % (pixFolder)
 
-        milestonePixDirectory = os.path.abspath(pixDirectory + "//milestones")
+        milestonePixFolder = os.path.abspath(os.path.join(pixFolder, "milestones"))
 
-        if (os.path.exists(milestonePixDirectory) != True):
-            os.makedirs(milestonePixDirectory)
+        if (os.path.exists(milestonePixFolder) != True):
+            os.makedirs(milestonePixFolder)
 
-        milestonePixDirParam = "--plotter.milestonePixDirectory=" + milestonePixDirectory
-        exeName = generalParameters.binDir + "itlPlaceRelease.exe"
+        milestonePixDirParam = "--plotter.milestonePixDirectory=%s" % (milestonePixFolder)
 
-        params = [exeName, os.path.abspath(self.experiment.cfg),\
-                  defFile, pixDirParam, milestonePixDirParam]
+        exeName = os.path.join(generalParameters.binDir, "itlPlaceRelease.exe")
+        params  = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam,\
+                   milestonePixDirParam]
         params.extend(self.experiment.cmdArgs)
 
         #HACK: ugly hack for ISPD04 benchmarks
         if self.experiment.cfg.find("ispd04") != -1:
-            lefFile = "--params.lef=" + os.path.dirname(os.path.abspath(self.experiment.benchmarks))\
-                      + "//" + benchmark + ".lef"
-
-            params.append(lefFile)
+            lefFile      = r"%s.lef" % (benchmark)
+            lefFile      = os.path.join(benchMarkFolder, lefFile)
+            lefFileParam = "--params.lef=%s" % (lefFile)
+            params.append(lefFileParam)
 
         benchmarkResult = ""
 
@@ -161,7 +166,7 @@ class ExperimentLauncher:
             seconds_passed = time.time() - t_start
 
             try:
-                renamed = open(generalParameters.binDir + "itlPlaceRelease.exe", 'a')
+                renamed = open(exeName, 'a')
                 renamed.close()
                 #renamed = os.rename(exeName, exeName + "_")
                 #renamed = os.rename(exeName + "_", exeName)

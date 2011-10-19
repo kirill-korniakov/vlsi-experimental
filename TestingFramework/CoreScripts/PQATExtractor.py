@@ -20,7 +20,8 @@ def ParseAndPlotPQAT(logFolder, doPlotCharts):
         return
 
       table        = MakeTableInPercents(table)
-      PQATFileName = os.path.join(logFolder, os.path.basename(log) + ".csv")
+      PQATFileName = r"%s.csv" % (os.path.basename(log))
+      PQATFileName = os.path.join(logFolder, PQATFileName)
       PrintTableToFile(PQATFileName, table, metrics)
       [xValues, yValues] = ExtractXYFromTable(table)
 

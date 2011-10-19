@@ -31,7 +31,7 @@ class LogParser:
             log.close()
 
         except IOError:
-            print('Error: can not open file ' + self.logName)
+            print("Error: can not open file %s" % (self.logName))
             return NOT_FOUND
 
         #move to the table
@@ -45,7 +45,7 @@ class LogParser:
                 lineIdx = lineIdx + 1
 
         if lineIdx == len(lines):
-            print(self.tableHeader + ' not found in log file')
+            print("%s not found in log file" % (self.tableHeader))
             return NOT_FOUND
 
         #find colIdx
@@ -57,18 +57,18 @@ class LogParser:
             else:
                 colIdx = colIdx + 1
         if colIdx == len(metrics):
-            print('Tag ' + metricTag + ' not found')
+            print("Tag %s not found" % (metricTag))
             return NOT_FOUND
 
         #parse stages
         lineIdx = lineIdx + 3
-        while ((lines[lineIdx].find(borderPattern) == -1) and (lines[lineIdx] != '\n')):
-            if lines[lineIdx].find(' ' + stageTag + ' ') != -1:
+        while ((lines[lineIdx].find(borderPattern) == -1) and (lines[lineIdx] != "\n")):
+            if lines[lineIdx].find(" %s " % (stageTag)) != -1:
                 ll = lines[lineIdx].split()
                 return ll[colIdx]
             lineIdx = lineIdx + 1
             if lineIdx == len(lines):
-                print('Stage ' + stageTag + ' not found')
+                print("Stage %s not found" % (stageTag))
                 return NOT_FOUND
 
         return NOT_FOUND
@@ -82,7 +82,7 @@ class LogParser:
 
             for col in range(len(metrics)):
                 value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
-                value = float(value.replace(',', '.'))
+                value = float(value.replace(",", "."))
 
                 if (value == NOT_FOUND):
                     del table[currStage] #delete empty field
@@ -107,7 +107,7 @@ class LogParser:
                 if (value == str(NOT_FOUND)):
                    return []
 
-                table[row][col] = float(value.replace(',', '.'))
+                table[row][col] = float(value.replace(",", "."))
 
         return table
 
@@ -125,7 +125,7 @@ class LogParser:
             if line.find(self.tableHeader) != -1:
                 colIdx    = 0
                 metrics   = lines[lineIdx + 1].split()
-                metricTag = 'Tag'
+                metricTag = "Tag"
 
                 for metric in metrics:
                     if metrics[colIdx].find(metricTag) == 0:
@@ -135,7 +135,7 @@ class LogParser:
                         colIdx = colIdx + 1
 
                 if colIdx == len(metrics):
-                    print('Tag ' + metricTag + ' not found')
+                    print("Tag %s not found" % (metricTag))
                     return NOT_FOUND
 
                 lineIdx    = lineIdx + 3
@@ -161,5 +161,5 @@ class LogParser:
                 lineIdx = lineIdx + 1
 
         if lineIdx == len(lines):
-            print(self.tableHeader + ' not found in log file')
+            print("%s not found in log file" % (self.tableHeader))
             return NOT_FOUND

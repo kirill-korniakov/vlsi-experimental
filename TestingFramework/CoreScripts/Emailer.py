@@ -57,22 +57,22 @@ class Emailer:
         assert type(files) == list
 
         msg = MIMEMultipart()
-        msg['From'] = sender
-        msg['To'] = COMMASPACE.join(to)
-        msg['Date'] = formatdate(localtime = True)
-        msg['Subject'] = subject
+        msg["From"]    = sender
+        msg["To"]      = COMMASPACE.join(to)
+        msg["Date"]    = formatdate(localtime = True)
+        msg["Subject"] = subject
 
         msg.attach(MIMEText(text))
         #msg.attach(MIMEText(text, "html", "UTF-8"))
 
         for file in files:
-            part = MIMEBase('application', "octet-stream")
+            part = MIMEBase("application", "octet-stream")
             #part.set_payload(open(file, "rb").read())
             #encoders.encode_base64(part)
             file_content = open(file,"rb").read()
-            part.set_payload(b64encode(file_content).decode('ascii'))
-            part['Content-Transfer-Encoding'] = 'base64'
-            part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(file))
+            part.set_payload(b64encode(file_content).decode("ascii"))
+            part["Content-Transfer-Encoding"] = "base64"
+            part.add_header("Content-Disposition", 'attachment; filename="%s"' % os.path.basename(file))
             msg.attach(part)
 
         # connect to server and send the mail
