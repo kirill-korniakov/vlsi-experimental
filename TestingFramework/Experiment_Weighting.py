@@ -30,10 +30,12 @@ def test():
   for cValue in cValues:
       #cmdArgs = "--NetWeighting.SensitivityGuidedNetWeighting.C=1000"
 
-      e = BaseExperiment(expName + str(cValue), "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list", metrics, stages, [cmdArgs + str(cValue)])
+      e = BaseExperiment(expName + str(cValue), "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list",\
+                         metrics, stages, [cmdArgs + str(cValue)])
       testRunner.AddExperimentToGroup(e)
 
-  eLeg = BaseExperiment("Leg1", "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list", metrics, ["INIT", "LEG1"], [])#["--DesignFlow.LoopGlobalPlacement=false")]
+  eLeg = BaseExperiment("Leg1", "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list", metrics,\
+                        ["INIT", "LEG1"], [])#["--DesignFlow.LoopGlobalPlacement=false")]
   testRunner.AddExperimentToGroup(eLeg)
   testRunner.Run()
 

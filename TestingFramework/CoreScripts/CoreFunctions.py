@@ -30,7 +30,7 @@ class Logger:
     def Log(self, message):
         print(message)
         log = open(self.logFileName, 'a')
-        log.write(message + "\n")
+        log.write(("%s\n") % (message))
         log.close()
 
     def LogStartMessage(self):
@@ -51,9 +51,9 @@ def Absolutize(x):
 
 def PrintAbsValues(po, sequence):
     if len(sequence):
-        po.write((str(Absolutize(sequence)).replace(", ", ";")[1:-1] +
-                ';' + str(min(sequence)) + ';' + str(Average(sequence))).replace(".", ","))
-        po.write(2*';')
+        po.write(("%s;%s;%s" % (str(Absolutize(sequence)).replace(", ", ";")[1:-1], str(min(sequence)),\
+                                str(Average(sequence)))).replace(".", ","))
+        po.write(2 * ";")
 
 def Average(values):
     """Computes the arithmetic mean of a list of numbers.
@@ -104,13 +104,13 @@ def WriteStringToFile(cols, tableFileName):
 
   for col in cols:
     if (col == END_OF_COLUMN):
-      printStr += ';'
+      printStr += ";"
     else:
       printStr += str(col)
 
   printStr += "\n"
   resultFile = open(tableFileName, 'a')
-  resultFile.write(printStr.replace('.', ','))
+  resultFile.write(printStr.replace(".", ","))
   resultFile.close()
 
 def MakeTableInPercents(table):

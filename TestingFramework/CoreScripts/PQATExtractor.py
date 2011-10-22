@@ -37,8 +37,9 @@ def Run():
   #logFolder    = r"../Reports/LR_make_charts"
   #logFolder    = r"../Reports/Relaxation_SGNW"
   #logFolder    = r"../Reports/Relaxation_APlace"
+  #logFolder    = r"../Reports/HPWL"
 
-  logFolder    = r"../Reports/HPWL"
+  logFolder    = r"../Reports/LR"
   doPlotCharts = True
 
   if (os.path.exists(logFolder) == False):
@@ -46,6 +47,7 @@ def Run():
       return
 
   ParseAndPlotPQAT(logFolder, doPlotCharts)
+  print("Finished")
 
 if (__name__ == "__main__"):
   Run()
