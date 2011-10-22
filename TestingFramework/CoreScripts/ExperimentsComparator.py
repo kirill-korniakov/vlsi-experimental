@@ -1,4 +1,4 @@
-from CoreFunctions import Logger
+from CoreFunctions import Logger, GetTimeStamp
 from ReportCreator import ReportCreator
 
 referenceExperimentIdx = 0
