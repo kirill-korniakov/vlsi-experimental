@@ -51,6 +51,7 @@ class TestRunner:
     logger = Logger()
     logger.LogStartMessage()
     generalParameters = GeneralParameters(self.cfgParser)
+    reportParameters  = ReportParameters(self.cfgParser)
 
     if self.parameters.doCheckout:
       repoParameters = RepoParameters(self.cfgParser)
@@ -64,15 +65,13 @@ class TestRunner:
 
     for experiment in self.experiments:
       logger.CoolLog("%s: starting %s" % (GetTimeStamp(), experiment.name))
-      reportParameters = ReportParameters(self.cfgParser)
-
       launcher = ExperimentLauncher(experiment, self.storage, self.emailer)
       launcher.RunExperiment(generalParameters, reportParameters)
 
     self.storage.LogResults()
     self.storage.SendResults(self.emailer)
 
-    self.comparator.CompareExperiments()
+    self.comparator.CompareExperiments(reportParameters)
     logger.CoolLog("Finish")
 
 def test():

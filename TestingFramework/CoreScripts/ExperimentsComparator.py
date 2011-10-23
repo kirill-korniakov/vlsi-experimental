@@ -1,4 +1,6 @@
-from CoreFunctions import Logger, GetTimeStamp
+from CoreFunctions import Logger, GetTimeStamp, END_OF_COLUMN, WriteStringToFile, CompareValues,\
+                          NOT_EQUAL, MarkResultAsBest
+
 from ReportCreator import ReportCreator
 
 referenceExperimentIdx = 0
@@ -75,7 +77,7 @@ class ExperimentsComparator:
                 continue
             for row in nMetrics:
                 if (metrics[row] != "Time"):
-                    cols.extend(["%s%" % (metrics[row]), END_OF_COLUMN])
+                    cols.extend([metrics[row] + "%", END_OF_COLUMN])
 
                 else:
                     cols.extend([metrics[row], END_OF_COLUMN])
@@ -103,6 +105,7 @@ class ExperimentsComparator:
             # INIT metrics
             initialMetrics = []
             resultValues = list(self.experimentsToCompare.values())[0][benchmark]
+
             for metricIdx in nMetrics:
                 value = resultValues[0][metricIdx]
                 newTableLine.extend([str(value), END_OF_COLUMN])
@@ -160,13 +163,20 @@ class ExperimentsComparator:
 
             return newTableLine
 
-    def CompareExperiments(self):
+    def CompareExperiments(self, reportParameters):
         if (len(self.experimentsToCompare) > 1):
             self.logger = Logger()
             self.logger.CoolLog("Comparing experiments")
-            reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp())
+
+            #try:
+            reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp(), reportParameters)
             logFolder     = reportCreator.CreateLogFolder()
             cmpFileName   = reportCreator.GetReportTableName()
             self.GetExperimentsResults()
             self.MakeResultTable(cmpFileName)
+
+            """except:
+                import traceback
+                self.logger.Log("exception: %s" % (traceback.format_exc()))"""
+
             self.logger.Log("Comparing finished")

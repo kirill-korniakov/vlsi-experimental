@@ -23,7 +23,7 @@ def test():
   #stages  = ["INIT", "LEG1", "LEG2", "LEG3", "LEG4", "LEG5", "LEG6", "LEG7", "LEG8", "LEG9", "LEG"]
   stages  = ["INIT", "LEG"]
 
-  cValues = [600, 500, 750]
+  cValues = [600, 750]
   expName = "Weighting (SGNW) experiment_C_"
   cmdArgs = "--NetWeighting.SensitivityGuidedNetWeighting.C="
 
