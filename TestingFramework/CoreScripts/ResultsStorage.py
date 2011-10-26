@@ -1,4 +1,5 @@
 from CoreFunctions import Logger
+from BaseExperiment import ExperimentResults
 
 class ResultsStorage:
     logger = None
