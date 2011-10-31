@@ -24,13 +24,14 @@ def test():
   stages  = ["INIT", "LEG"]
 
   cValues = [600, 750]
+  cValues = [600]
   expName = "Weighting (SGNW) experiment_C_"
   cmdArgs = "--NetWeighting.SensitivityGuidedNetWeighting.C="
 
   for cValue in cValues:
       #cmdArgs = "--NetWeighting.SensitivityGuidedNetWeighting.C=1000"
 
-      e = BaseExperiment(expName + str(cValue), "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list",\
+      e = BaseExperiment("%s%s" % (expName, str(cValue)), "Sensitivity_guided_weighting.cfg", "IWLS05_fast.list",\
                          metrics, stages, [cmdArgs + str(cValue)])
       testRunner.AddExperimentToGroup(e)
 

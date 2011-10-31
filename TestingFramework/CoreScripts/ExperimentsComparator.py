@@ -3,180 +3,219 @@ from CoreFunctions import Logger, GetTimeStamp, END_OF_COLUMN, WriteStringToFile
 
 from ReportCreator import ReportCreator
 
-referenceExperimentIdx = 0
-
 class ExperimentsComparator:
-    global referenceExperimentIdx
+  referenceExperimentIdx = 0
 
-    logger = None
-    storage = None
-    experimentsToCompare = {} #Group of experiments. Their results will be compared
-                              #experiment: {benchmark: pfst}
+  logger = None
+  storage = None
+  experimentsToCompare = {} #Group of experiments. Their results will be compared
+                            #experiment: {benchmark: pfst}
 
-    def __init__(self, storage):
-        self.storage = storage
-        self.experimentsToCompare = {}
+  def __init__(self, storage):
+    self.storage = storage
+    self.experimentsToCompare = {}
 
-    def AddExperimentToGroup(self, newExperiment):
-        if (self.experimentsToCompare != {}):
-            groupExp = list(self.experimentsToCompare.keys())[0]
+  def AddExperimentToGroup(self, newExperiment):
+    if (self.experimentsToCompare != {}):
+      groupExp = list(self.experimentsToCompare.keys())[0]
 
-            if (newExperiment.benchmarks != groupExp.benchmarks):
-                self.logger.Log("Error: list files are not equal!")
-                exit(1)
+      if (newExperiment.benchmarks != groupExp.benchmarks):
+        self.logger.Log("Error: list files are not equal!")
+        exit(1)
 
-            if (newExperiment.metrics != groupExp.metrics):
-                self.logger.Log("Error: metrics are not equal!")
-                exit(1)
+      if (newExperiment.metrics != groupExp.metrics):
+        self.logger.Log("Error: metrics are not equal!")
+        exit(1)
 
-        self.experimentsToCompare[newExperiment] = {}
+    self.experimentsToCompare[newExperiment] = {}
 
-    def GetExperimentsResults(self):
-        for experiment in list(self.experimentsToCompare.keys()):
-            if (experiment in self.storage.experimentResults):
-                self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment].pfstTables
-            else:
-                self.logger.Log("Error: results for %s not found" % (experiment.name))
+  def GetExperimentsResults(self):
+    for experiment in list(self.experimentsToCompare.keys()):
+      if (experiment in self.storage.experimentResults):
+        self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment].pfstTables
 
-    def PrintLabelAndBlanks(self, cols, label, nMetrics):
-        cols.extend([END_OF_COLUMN, label])
-        for col in nMetrics:
-            cols.append(END_OF_COLUMN)
+      else:
+        self.logger.Log("Error: results for %s not found" % (experiment.name))
 
-    def PrintTableHeader(self, resultFileName, metrics):
-        nMetrics = range(len(metrics))
+  def PrintLabelAndBlanks(self, cols, label, nMetrics):
+    cols.extend([END_OF_COLUMN, label])
 
-        # First line of the table header
-        cols = []
+    for col in nMetrics:
+      cols.append(END_OF_COLUMN)
 
-        self.PrintLabelAndBlanks(cols, "INIT", nMetrics)
+  def PrintTableHeader(self, resultFileName, metrics):
+    nMetrics = range(len(metrics))
 
-        referenceExperiment = list(self.experimentsToCompare.keys())[referenceExperimentIdx]
-        self.PrintLabelAndBlanks(cols, referenceExperiment.name, nMetrics)
+    # First line of the table header
+    cols = []
 
-        for experiment in self.experimentsToCompare.keys():
-            if (list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx):
-                continue
-            self.PrintLabelAndBlanks(cols, experiment.name, nMetrics)
+    self.PrintLabelAndBlanks(cols, "INIT", nMetrics)
 
-        WriteStringToFile(cols, resultFileName)
+    referenceExperiment = list(self.experimentsToCompare.keys())[self.referenceExperimentIdx]
+    self.PrintLabelAndBlanks(cols, referenceExperiment.name, nMetrics)
 
-        # Second line of the table header
-        cols = ["benchmark", END_OF_COLUMN]
+    for experiment in self.experimentsToCompare.keys():
+      if (list(self.experimentsToCompare.keys()).index(experiment) == self.referenceExperimentIdx):
+        continue
 
-        for row in nMetrics:
-            cols.extend([metrics[row], END_OF_COLUMN])
-        cols.append(END_OF_COLUMN)
+      self.PrintLabelAndBlanks(cols, experiment.name, nMetrics)
 
-        for row in nMetrics:
-            cols.extend([metrics[row], END_OF_COLUMN])
-        cols.append(END_OF_COLUMN)
+    WriteStringToFile(cols, resultFileName)
 
-        for experiment in self.experimentsToCompare.keys():
-            if list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx:
-                continue
-            for row in nMetrics:
-                if (metrics[row] != "Time"):
-                    cols.extend([metrics[row] + "%", END_OF_COLUMN])
+    # Second line of the table header
+    cols = ["benchmark", END_OF_COLUMN]
 
-                else:
-                    cols.extend([metrics[row], END_OF_COLUMN])
+    for row in nMetrics:
+      cols.extend([metrics[row], END_OF_COLUMN])
 
-            cols.append(END_OF_COLUMN)
+    cols.append(END_OF_COLUMN)
 
-        WriteStringToFile(cols, resultFileName)
+    for row in nMetrics:
+      cols.extend([metrics[row], END_OF_COLUMN])
 
-    def MakeResultTable(self, resultFileName):
-        groupExp = list(self.experimentsToCompare.keys())[0]
-        self.PrintTableHeader(resultFileName, groupExp.metrics)
+    cols.append(END_OF_COLUMN)
 
-        benchmarks = self.experimentsToCompare[groupExp].keys()
-        for benchmark in benchmarks:
-            newTableString = self.CreateNewTableLine(benchmark, groupExp.metrics)
-            WriteStringToFile(newTableString, resultFileName)
+    for experiment in self.experimentsToCompare.keys():
+      if list(self.experimentsToCompare.keys()).index(experiment) == self.referenceExperimentIdx:
+        continue
 
-    def CreateNewTableLine(self, benchmark, metrics):
-            nMetrics = range(len(metrics))
-            bestValues = [1000000 for i in nMetrics]
-            bestValuesIdx = [0 for i in nMetrics]
+      for row in nMetrics:
+        if (metrics[row] != "Time"):
+          cols.extend([metrics[row] + "%", END_OF_COLUMN])
 
-            newTableLine = [benchmark, END_OF_COLUMN]
+        else:
+          cols.extend([metrics[row], END_OF_COLUMN])
 
-            # INIT metrics
-            initialMetrics = []
-            resultValues = list(self.experimentsToCompare.values())[0][benchmark]
+      cols.append(END_OF_COLUMN)
 
-            for metricIdx in nMetrics:
-                value = resultValues[0][metricIdx]
-                newTableLine.extend([str(value), END_OF_COLUMN])
-                initialMetrics.append(value)
-            newTableLine.append(END_OF_COLUMN)
+    WriteStringToFile(cols, resultFileName)
 
-            # reference metrics
-            referenceMetrics = []
-            experiment = list(self.experimentsToCompare.keys())[referenceExperimentIdx]
-            resultValues = self.experimentsToCompare[experiment][benchmark]
-            for metricIdx in nMetrics:
-                finalStageIdx = len(experiment.stages) - 1
-                value = resultValues[finalStageIdx][metricIdx]
-                newTableLine.extend([str(value), END_OF_COLUMN])
-                referenceMetrics.append(value)
-            newTableLine.append(END_OF_COLUMN)
+  def MakeResultTable(self, resultFileName):
+    groupExp = list(self.experimentsToCompare.keys())[0]
+    self.PrintTableHeader(resultFileName, groupExp.metrics)
+    benchmarks = self.experimentsToCompare[groupExp].keys()
 
-            # normal experiments
-            for experiment in self.experimentsToCompare.keys():
-                if list(self.experimentsToCompare.keys()).index(experiment) == referenceExperimentIdx:
-                    continue
+    for benchmark in benchmarks:
+      newTableLine = self.CreateNewTableLine(benchmark, groupExp.metrics)
+      WriteStringToFile(newTableLine, resultFileName)
 
-                resultValues = self.experimentsToCompare[experiment][benchmark]
-                if (resultValues == []):
-                    for metricIdx in nMetrics:
-                        newTableLine.extend(["N/A", END_OF_COLUMN])
-                    newTableLine.append(END_OF_COLUMN)
-                    continue
+  def CreateNewTableLine(self, benchmark, metrics):
+    nMetrics        = range(len(metrics))
+    bestValues      = [1000000 for i in nMetrics]
+    bestValuesIdx   = [0 for i in nMetrics]
+    experimentsLine = []
 
-                #compare "INITIAL" metrics
-                for metricIdx in nMetrics:
-                    cmpResult = CompareValues(initialMetrics[metricIdx], resultValues[0][metricIdx])
-                    if (cmpResult == NOT_EQUAL and metrics[metricIdx] != "Time"):
-                        self.logger.Log("Error: not equal INIT metrics")
+    # INIT metrics
+    initialMetrics     = []
+    initialMetricsLine = []
 
-                finalStageIdx = len(experiment.stages) - 1
-                for metricIdx in nMetrics:
-                    valueStr = resultValues[finalStageIdx][metricIdx]
+    # reference metrics
+    referenceMetrics = []
+    experiment       = list(self.experimentsToCompare.keys())[self.referenceExperimentIdx]
+    resultValues     = self.experimentsToCompare[experiment][benchmark]
 
-                    if (metrics[metricIdx] != "Time"):
-                        percent = 100 * resultValues[finalStageIdx][metricIdx] / referenceMetrics[metricIdx]
-                        valueStr = "%.2f" % percent
+    if (resultValues != []): #If target experiment succeed on current benchmark
+      for metricIdx in nMetrics:
+        #Fill reference metrics
+        finalStageIdx = len(experiment.stages) - 1
+        value         = resultValues[finalStageIdx][metricIdx]
+        experimentsLine.extend([str(value), END_OF_COLUMN])
+        referenceMetrics.append(value)
 
-                    if (percent < bestValues[metricIdx]):
-                        bestValues[metricIdx] = percent #remember the best result
-                        bestValuesIdx[metricIdx] = len(newTableLine) #and its index
+        #Fill Initial metrics
+        value = resultValues[0][metricIdx]
+        initialMetricsLine.extend([str(value), END_OF_COLUMN])
+        initialMetrics.append(value)
 
-                    newTableLine.extend([valueStr, END_OF_COLUMN])
+      initialMetricsLine.append(END_OF_COLUMN)
 
-                newTableLine.append(END_OF_COLUMN)
+    else: #Target experiment failed
+      referenceMetrics = initialMetrics
 
-            #for idx in bestValuesIdx:
-            #    if (idx > 0):
-            #        newTableLine[idx] = MarkResultAsBest(newTableLine[idx])
+      for metricIdx in nMetrics:
+        experimentsLine.extend(["N/A", END_OF_COLUMN])
 
-            return newTableLine
+    experimentsLine.append(END_OF_COLUMN)
 
-    def CompareExperiments(self, reportParameters):
-        if (len(self.experimentsToCompare) > 1):
-            self.logger = Logger()
-            self.logger.CoolLog("Comparing experiments")
+    # normal experiments
+    for experiment in self.experimentsToCompare.keys():
+      if list(self.experimentsToCompare.keys()).index(experiment) == self.referenceExperimentIdx:
+        continue
 
-            #try:
+      resultValues = self.experimentsToCompare[experiment][benchmark]
+
+      if (resultValues == []):
+        for metricIdx in nMetrics:
+          experimentsLine.extend(["N/A", END_OF_COLUMN])
+
+        experimentsLine.append(END_OF_COLUMN)
+        continue
+
+      #if 'INITIAL' metrics haven't been printed yet
+      if (initialMetrics == []):
+          #take them from the table of this experiment
+
+          for metricIdx in nMetrics:
+            value = resultValues[0][metricIdx]
+            initialMetricsLine.extend([str(value), END_OF_COLUMN])
+            initialMetrics.append(value)
+
+          initialMetricsLine.append(END_OF_COLUMN)
+
+      #else compare 'INITIAL' metrics
+      else:
+        for metricIdx in nMetrics:
+          cmpResult = CompareValues(initialMetrics[metricIdx], resultValues[0][metricIdx])
+
+          if (cmpResult == NOT_EQUAL and metrics[metricIdx] != "Time"):
+            self.logger.Log("Error: not equal INIT metrics")
+
+      finalStageIdx = len(experiment.stages) - 1
+
+      for metricIdx in nMetrics:
+        valueStr = resultValues[finalStageIdx][metricIdx]
+
+        if (metrics[metricIdx] != "Time"):
+          percent  = 100 * valueStr / referenceMetrics[metricIdx]
+          valueStr = "%.2f" % percent
+
+        if (percent < bestValues[metricIdx]):
+          bestValues[metricIdx]    = percent #remember the best result
+          bestValuesIdx[metricIdx] = len(experimentsLine) #and its index
+
+        experimentsLine.extend([valueStr, END_OF_COLUMN])
+
+      experimentsLine.append(END_OF_COLUMN)
+
+    #for idx in bestValuesIdx:
+    #  if (idx > 0):
+    #    experimentsLine[idx] = MarkResultAsBest(experimentsLine[idx])
+
+    if (initialMetricsLine == []):
+      for metricIdx in nMetrics:
+        initialMetricsLine.extend(["N/A", END_OF_COLUMN])
+
+      initialMetricsLine.append(END_OF_COLUMN)
+
+    newTableLine = [benchmark, END_OF_COLUMN]
+    newTableLine.extend(initialMetricsLine)
+    newTableLine.extend(experimentsLine)
+    return newTableLine
+
+  def CompareExperiments(self, reportParameters):
+      if (len(self.experimentsToCompare) > 1):
+          self.logger = Logger()
+          self.logger.CoolLog("Comparing experiments")
+
+          try:
             reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp(), reportParameters)
             logFolder     = reportCreator.CreateLogFolder()
             cmpFileName   = reportCreator.GetReportTableName()
             self.GetExperimentsResults()
             self.MakeResultTable(cmpFileName)
 
-            """except:
-                import traceback
-                self.logger.Log("exception: %s" % (traceback.format_exc()))"""
+          except:
+              import traceback
+              self.logger.Log("exception: %s" % (traceback.format_exc()))
 
-            self.logger.Log("Comparing finished")
+          self.logger.Log("Comparing finished")
