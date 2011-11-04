@@ -10,49 +10,50 @@ FAILED  = "Failed"
 CHANGED = "Changed"
 
 class ExperimentResults:
-    errors           = []
-    resultFile       = "" #file with result table
-    pfstTables       = {} #benchmark: pfst
-    benchmarkResults = {} #result: [benchmarks]
+  errors           = []
+  resultFile       = "" #file with result table
+  pfstTables       = {} #benchmark: pfst
+  benchmarkResults = {} #result: [benchmarks]
 
-    def __init__(self):
-        self.errors           = []
-        self.resultFile       = ""
-        self.pfstTables       = {}
-        self.benchmarkResults = {}
+  def __init__(self):
+    self.errors           = []
+    self.resultFile       = ""
+    self.pfstTables       = {}
+    self.benchmarkResults = {}
 
-    def GetPFSTForBenchmark(self, benchmark):
-        return self.pfstTables[benchmark]
+  def GetPFSTForBenchmark(self, benchmark):
+    return self.pfstTables[benchmark]
 
-    def AddError(self, error):
-        self.errors.append(error)
+  def AddError(self, error):
+    self.errors.append(error)
 
-    def AddBenchmarkResult(self, benchmark, result):
-        if (not result in self.benchmarkResults.keys()):
-            self.benchmarkResults[result] = []
+  def AddBenchmarkResult(self, benchmark, result):
+    if (not result in self.benchmarkResults.keys()):
+      self.benchmarkResults[result] = []
 
-        self.benchmarkResults[result].append(benchmark)
+    self.benchmarkResults[result].append(benchmark)
 
-    def AddPFSTForBenchmark(self, benchmark, table):
-        self.pfstTables[benchmark] = table
+  def AddPFSTForBenchmark(self, benchmark, table):
+    self.pfstTables[benchmark] = table
 
-    def AsString(self):
-        resultStr = ""
+  def __str__(self):
+    resultStr = ""
 
-        for result in list(self.benchmarkResults.keys()):
-            resultStr += ("%s: %s benchmarks (" % (result, len(self.benchmarkResults[result])))
+    for (result, benchmarks) in list(self.benchmarkResults.iteritems()):
+      resultStr += ("%s: %s benchmarks (" % (result, len(benchmarks)))
 
-            for benchmark in (self.benchmarkResults[result]):
-                resultStr += ("%s; " % (benchmark))
-            resultStr += ")\n"
+      for benchmark in (benchmarks):
+        resultStr += ("%s; " % (benchmark))
 
-        for error in self.errors:
-            resultStr += ("%s\n" % (error))
+      resultStr += ")\n"
 
-        return (resultStr + "\n")
+    for error in self.errors:
+      resultStr += ("%s\n" % (error))
 
-    def Print(self):
-        print(self.AsString())
+    return (resultStr + "\n")
+
+  def Print(self):
+    print(self.__str__())
 
 class BaseExperiment:
   name        = ""

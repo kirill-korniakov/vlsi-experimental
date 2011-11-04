@@ -6,8 +6,8 @@ from ReportCreator import ReportCreator
 class ExperimentsComparator:
   referenceExperimentIdx = 0
 
-  logger = None
-  storage = None
+  logger               = None
+  storage              = None
   experimentsToCompare = {} #Group of experiments. Their results will be compared
                             #experiment: {benchmark: pfst}
 
@@ -31,8 +31,8 @@ class ExperimentsComparator:
 
   def GetExperimentsResults(self):
     for experiment in list(self.experimentsToCompare.keys()):
-      if (experiment in self.storage.experimentResults):
-        self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment].pfstTables
+      if (experiment.name in self.storage.experimentResults):
+        self.experimentsToCompare[experiment] = self.storage.experimentResults[experiment.name].pfstTables
 
       else:
         self.logger.Log("Error: results for %s not found" % (experiment.name))
@@ -93,7 +93,7 @@ class ExperimentsComparator:
   def MakeResultTable(self, resultFileName):
     groupExp = list(self.experimentsToCompare.keys())[0]
     self.PrintTableHeader(resultFileName, groupExp.metrics)
-    benchmarks = self.experimentsToCompare[groupExp].keys()
+    benchmarks = list(self.experimentsToCompare[groupExp].keys())
 
     for benchmark in benchmarks:
       newTableLine = self.CreateNewTableLine(benchmark, groupExp.metrics)
@@ -138,7 +138,7 @@ class ExperimentsComparator:
     experimentsLine.append(END_OF_COLUMN)
 
     # normal experiments
-    for experiment in self.experimentsToCompare.keys():
+    for experiment in list(self.experimentsToCompare.keys()):
       if list(self.experimentsToCompare.keys()).index(experiment) == self.referenceExperimentIdx:
         continue
 
@@ -203,19 +203,19 @@ class ExperimentsComparator:
     return newTableLine
 
   def CompareExperiments(self, reportParameters):
-      if (len(self.experimentsToCompare) > 1):
-          self.logger = Logger()
-          self.logger.CoolLog("Comparing experiments")
+    if (len(self.experimentsToCompare) > 1):
+      self.logger = Logger()
+      self.logger.CoolLog("Comparing experiments")
 
-          try:
-            reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp(), reportParameters)
-            logFolder     = reportCreator.CreateLogFolder()
-            cmpFileName   = reportCreator.GetReportTableName()
-            self.GetExperimentsResults()
-            self.MakeResultTable(cmpFileName)
+      try:
+        reportCreator = ReportCreator("Comparing", "Comparing " + GetTimeStamp(), reportParameters)
+        logFolder     = reportCreator.CreateLogFolder()
+        cmpFileName   = reportCreator.GetReportTableName()
+        self.GetExperimentsResults()
+        self.MakeResultTable(cmpFileName)
 
-          except:
-              import traceback
-              self.logger.Log("exception: %s" % (traceback.format_exc()))
+      except:
+        import traceback
+        self.logger.Log("exception: %s" % (traceback.format_exc()))
 
-          self.logger.Log("Comparing finished")
+      self.logger.Log("Comparing finished")

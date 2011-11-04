@@ -100,7 +100,7 @@ class ExperimentLauncher:
     benchmarks = self.CheckParametersAndPrepareBenchmarks()
 
     if (benchmarks == []):
-      self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
+      self.resultsStorage.AddExperimentResult(self.experiment.name, self.experimentResults)
       return
 
     for benchmark in benchmarks:
@@ -112,7 +112,7 @@ class ExperimentLauncher:
       self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks),\
                       benchmark))
 
-    self.resultsStorage.AddExperimentResult(self.experiment, self.experimentResults)
+    self.resultsStorage.AddExperimentResult(self.experiment.name, self.experimentResults)
 
   def RunPlacer(self, benchmark, logFolder, reportTable, generalParameters):
     self.experimentResults.AddPFSTForBenchmark(benchmark, [])
