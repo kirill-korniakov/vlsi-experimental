@@ -108,18 +108,14 @@ class ExperimentLauncher:
         self.AddErrorToResults("Reached maximum number of terminated benchmarks")
         break
 
-      self.RunPlacer(benchmark, logFolder, reportTable, generalParameters)
+      self.RunExperimentOnBenchmark(benchmark, logFolder, reportTable, generalParameters)
       self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks),\
                       benchmark))
 
     self.resultsStorage.AddExperimentResult(self.experiment.name, self.experimentResults)
 
-  def RunPlacer(self, benchmark, logFolder, reportTable, generalParameters):
+  def PreparePlacerParameters(self, benchmark, logFolder, generalParameters):
     self.experimentResults.AddPFSTForBenchmark(benchmark, [])
-    logFileName   = r"%s.log" % (os.path.basename(benchmark))
-    logFileName   = os.path.join(logFolder, logFileName)
-    fPlacerOutput = open(logFileName, 'w')
-    resultValues  = []
 
     defFile         = r"%s.def" % (benchmark)
     benchMarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
@@ -136,25 +132,30 @@ class ExperimentLauncher:
 
     milestonePixDirParam = "--plotter.milestonePixDirectory=%s" % (milestonePixFolder)
 
-    exeName = os.path.join(generalParameters.binDir, "itlPlaceRelease.exe")
-    params  = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam,\
-               milestonePixDirParam]
-    params.extend(self.experiment.cmdArgs)
+    exeName           = os.path.join(generalParameters.binDir, "itlPlaceRelease.exe")
+    placerParameters  = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam,\
+                         milestonePixDirParam]
+    placerParameters.extend(self.experiment.cmdArgs)
 
     #HACK: ugly hack for ISPD04 benchmarks
     if self.experiment.cfg.find("ispd04") != -1:
       lefFile      = r"%s.lef" % (benchmark)
       lefFile      = os.path.join(benchMarkFolder, lefFile)
       lefFileParam = "--params.lef=%s" % (lefFile)
-      params.append(lefFileParam)
+      placerParameters.append(lefFileParam)
 
-    benchmarkResult = ""
+    logFileName = r"%s.log" % (os.path.basename(benchmark))
+    logFileName = os.path.join(logFolder, logFileName)
+    return (placerParameters, logFileName)
+
+  def RunPlacer(self, placerParameters, logFileName, generalParameters):
+    fPlacerOutput = open(logFileName, 'w')
 
     try:
-      p = subprocess.Popen(params, stdout = fPlacerOutput, cwd = generalParameters.binDir)
+      p = subprocess.Popen(placerParameters, stdout = fPlacerOutput, cwd = generalParameters.binDir)
 
     except WindowsError:
-      error = "Error: can not call %s" % (exeName)
+      error = "Error: can not call %s" % (placerParameters[0])
       ReportErrorAndExit(error, self.logger, self.emailer)
 
     t_start = time.time()
@@ -167,32 +168,39 @@ class ExperimentLauncher:
       seconds_passed = time.time() - t_start
 
       try:
-        wasOpened = open(exeName, 'a')
+        wasOpened = open(placerParameters[0], 'a')
         wasOpened.close()
 
       except IOError:
         wasOpened = False
 
-    retcode = p.poll()
+    placerReturnCode = p.poll()
     self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
 
-    if retcode != 0:
-      self.logger.Log("Process retcode: %s" % (retcode))
-
-    if (retcode == None):
-      self.logger.Log("Time out on %s" % (benchmark))
-      self.nTerminatedBenchmarks += 1
-      self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
-
+    if (placerReturnCode == None):
       try:
         p.terminate()
 
       except Exception:
         pass
 
+    fPlacerOutput.close()
+    return placerReturnCode
+
+  def SaveResults(self, placerReturnCode, logFileName, benchmark, reportTable):
+    resultValues = []
+
+    if placerReturnCode != 0:
+      self.logger.Log("Process return code: %s" % (placerReturnCode))
+
+    if (placerReturnCode == None):
+      self.logger.Log("Time out on %s" % (benchmark))
+      self.nTerminatedBenchmarks += 1
+      self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
+
     else:
       (result, resultValues) = \
-              self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+          self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
       self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
       self.experimentResults.AddBenchmarkResult(benchmark, result)
@@ -200,7 +208,10 @@ class ExperimentLauncher:
       if (result == CHANGED):
         self.experimentResults.resultFile = reportTable
 
-    fPlacerOutput.close()
+  def RunExperimentOnBenchmark(self, benchmark, logFolder, reportTable, generalParameters):
+    placerParameters, logFileName = self.PreparePlacerParameters(benchmark, logFolder, generalParameters)
+    placerReturnCode              = self.RunPlacer(placerParameters, logFileName, generalParameters)
+    self.SaveResults(placerReturnCode, logFileName, benchmark, reportTable)
     #self.experimentResults.Print() #testing only
 
 def test():
