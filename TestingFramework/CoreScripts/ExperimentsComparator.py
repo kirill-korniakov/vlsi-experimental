@@ -32,21 +32,20 @@ class ExperimentsComparator:
 
       self.experimentsToCompare[newExperiment.name] = {}
 
+  def GetResultsForExperiment(self, experimentName):
+    if (experimentName in self.storage.experimentResults):
+      return self.storage.experimentResults[self.masterExperiment.name].pfstTables
+
+    self.logger.Log("Error: results for %s not found" % (experimentName))
+    return {}
+
   def GetExperimentsResults(self):
     #Masater experiment
-    if (self.masterExperiment.name in self.storage.experimentResults):
-      self.masterResuts = self.storage.experimentResults[self.masterExperiment.name].pfstTables
-
-    else:
-      self.logger.Log("Error: results for %s not found" % (experimentName))
+    self.masterResuts = self.GetResultsForExperiment(self.masterExperiment.name)
 
     #Normal experiments
     for experimentName in self.experimentsToCompare.iterkeys():
-      if (experimentName in self.storage.experimentResults):
-        self.experimentsToCompare[experimentName] = self.storage.experimentResults[experimentName].pfstTables
-
-      else:
-        self.logger.Log("Error: results for %s not found" % (experimentName))
+      self.experimentsToCompare[experimentName] = self.GetResultsForExperiment(experimentName)
 
   def PrintLabelAndBlanks(self, cols, label, nMetrics):
     cols.extend([END_OF_COLUMN, label])
