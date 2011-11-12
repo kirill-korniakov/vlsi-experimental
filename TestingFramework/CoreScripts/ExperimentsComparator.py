@@ -34,7 +34,7 @@ class ExperimentsComparator:
 
   def GetResultsForExperiment(self, experimentName):
     if (experimentName in self.storage.experimentResults):
-      return self.storage.experimentResults[self.masterExperiment.name].pfstTables
+      return self.storage.experimentResults[experimentName].pfstTables
 
     self.logger.Log("Error: results for %s not found" % (experimentName))
     return {}
