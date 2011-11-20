@@ -309,12 +309,6 @@ bool DoRemoveNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
     return false;
 }
 
-void PlotCongestionMapIfRequired(HDPGrid& grid)
-{
-    if (grid.Design().cfg.ValueOf("DesignFlow.DrawCongestionMap", false))
-        grid.Design().Plotter.PlotCongestionMaps(grid);
-}
-
 void RunFGRRoutingIfRequired(HDPGrid& grid)
 {
     if (grid.Design().cfg.ValueOf("DesignFlow.FGRRouting", false))
@@ -438,7 +432,6 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
 
     DoSTAIfCan(hd);
 
-    PlotCongestionMapIfRequired(DPGrid);
     RunFGRRoutingIfRequired(DPGrid);
 
     if (DoBufferingIfRequired(hd, "DesignFlow.Buffering"))

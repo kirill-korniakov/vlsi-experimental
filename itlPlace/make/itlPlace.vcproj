@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="itlPlace"
 	ProjectGUID="{10EDF02C-5EB0-4A8B-A45D-B00D27F0749D}"
 	RootNamespace="itlPlace"
@@ -1416,10 +1416,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\DetailedPlacement\Line.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\DetailedPlacement\OptimalRegion.cpp"
 					>
 				</File>
@@ -1429,10 +1425,6 @@
 				</File>
 				<File
 					RelativePath="..\src\DetailedPlacement\SlidingWindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\DetailedPlacement\TileGrid.cpp"
 					>
 				</File>
 				<File
@@ -9872,10 +9864,6 @@
 				Name="Plotter"
 				>
 				<File
-					RelativePath="..\src\Plotter\CongestionMaps.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Plotter\Drawer.cpp"
 					>
 				</File>
@@ -10390,23 +10378,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\Line.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\SAWindow.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\SlidingWindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\Tile.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\TileGrid.h"
 					>
 				</File>
 				<Filter

@@ -79,10 +79,6 @@ public:
   void PlotFullWires();
   void Plot2PinNets();
   void PlotMostCriticalPaths(HDesign& design, int n = -1);
-  void PlotCongestionMaps(HDPGrid& DPGrid);
-  void PlotCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines);
-  void PlotPinDensity(HDesign& hd, TileGrid& tg, int nMaxPins);
-  void PlotCriticalCongestionMap(HDesign& hd, TileGrid& tg, int nMaxLines);
 
   void PlotKi(int nClusters, int nNets, double* x, Color color);
 
