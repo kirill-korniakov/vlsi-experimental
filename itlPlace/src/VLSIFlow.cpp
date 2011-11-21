@@ -6,7 +6,6 @@
 #include "DetailedPlacement.h"
 #include "Timing.h"
 #include "Reporting.h"
-#include "TileGrid.h"
 #include "ExportToRouters.h"
 #include "FGR.h"
 #include "Utils.h"
