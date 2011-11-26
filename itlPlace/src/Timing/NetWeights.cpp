@@ -202,8 +202,6 @@ void PrepareNextNetWeightingLoop(HDesign& hd, int& nCyclesCounter)
 
   //nwtsFileName = Aux::CreateCoolFileName("Net weights\\", hd.Circuit.Name(), "nwts");
   defFileName  = hd.Circuit.Name() + "_" + Aux::IntToString(nCyclesCounter) + ".def";
-  ComputeNetWeights(hd);
-  //ExportNetWeights(hd, nwtsFileName.c_str());
   //ExportDEF(hd, defFileName);
   ComputeAndExportWeights(hd);
   ReportTNSWNSSequence(hd, tnsStr, wnsStr);
