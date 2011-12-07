@@ -2,7 +2,7 @@
 #include "PlotterData.h"
 #include "HDesign.h"
 
-void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col)
+void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -12,11 +12,13 @@ void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col)
         finish.x = DesignX2ImageX(x2);
         finish.y = DesignY2ImageY(y2);
         cvRectangle(IMG, start, finish, GetCvColor(col), CV_FILLED);
-        _AutoRefresh();
+
+        if (doRefresh)
+          _AutoRefresh();
     }
 }
 
-void HPlotter::DrawCircle(double x, double y, int radius, Color col)
+void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -24,11 +26,13 @@ void HPlotter::DrawCircle(double x, double y, int radius, Color col)
         center.x = DesignX2ImageX(x);
         center.y = DesignY2ImageY(y);
         cvCircle(IMG, center, radius, GetCvColor(col), 2);
-        _AutoRefresh();
+
+        if (doRefresh)
+          _AutoRefresh();
     }
 }
 
-void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col)
+void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -38,11 +42,13 @@ void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color c
         finish.x = DesignX2ImageX(x2);
         finish.y = DesignY2ImageY(y2);
         cvRectangle(IMG, start, finish, GetCvColor(col), 1);
-        _AutoRefresh();
+
+        if (doRefresh)
+          _AutoRefresh();
     }
 }
 
-void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col)
+void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -52,35 +58,13 @@ void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col)
         finish.x = DesignX2ImageX(x2);
         finish.y = DesignY2ImageY(y2);
         cvLine(IMG, start, finish, GetCvColor(col), 1);
-        _AutoRefresh();
+
+        if (doRefresh)
+          _AutoRefresh();
     }
 }
 
-void HPlotter::DrawCircle2(double x, double y, int radius, Color col)
-{
-    if (IsEnabled())
-    {
-        CvPoint center;
-        center.x = DesignX2ImageX(x);
-        center.y = DesignY2ImageY(y);
-        cvCircle(IMG, center, radius, GetCvColor(col), 2);
-    }
-}
-
-void HPlotter::DrawLine2(double x1, double y1, double x2, double y2, Color col)
-{
-    if (IsEnabled())
-    {
-        CvPoint start, finish;
-        start.x = DesignX2ImageX(x1);
-        start.y = DesignY2ImageY(y1);
-        finish.x = DesignX2ImageX(x2);
-        finish.y = DesignY2ImageY(y2);
-        cvLine(IMG, start, finish, GetCvColor(col), 1);
-    }
-}
-
-void HPlotter::DrawFilledRectangle2(double x, double y, double width, double height, Color col)
+void HPlotter::DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh)
 {
     if (!IsEnabled())
         return;
@@ -104,6 +88,9 @@ void HPlotter::DrawFilledRectangle2(double x, double y, double width, double hei
     {
         cvRectangle(IMG, start, finish, fillColor, CV_FILLED);
     }
+
+    if (doRefresh)
+      _AutoRefresh();
 }
 
 

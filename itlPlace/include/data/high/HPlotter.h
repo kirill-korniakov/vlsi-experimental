@@ -86,19 +86,14 @@ public:
   void PlotMu(double mu, int x, double scaling, Color color);
   void PlotMuLevel(double level, double scaling, Color color = Color_Black);
 
-  void PlotTileWires(double x1, double y1, double x2, double y2, int nLines, int nMaxLines);
-  void PlotTilePins(double x1, double y1, double x2, double y2, int nPins, int nMaxPins);
-
   //Draw methods
-  void DrawCircle2(double x, double y, int radius, Color col);
-  void DrawLine2(double x1, double y1, double x2, double y2, Color col);
-  void DrawFilledRectangle2(double x, double y, double width, double height, Color col);
+  void DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh = true);
   void DrawText(string text, double textSize = -1);
   void DrawTextInPoint(string text, double x, double y, double textSize = -1);
-  void DrawLine(double x1, double y1, double x2, double y2, Color col);
-  void DrawCircle(double x, double y, int radius, Color col);
-  void DrawRectangle(double x1, double y1, double x2, double y2, Color col);
-  void DrawBar(double x1, double y1, double x2, double y2, Color col);
+  void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+  void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true);
+  void DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+  void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
 
 protected:
   void* m_data;
