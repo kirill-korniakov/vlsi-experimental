@@ -87,12 +87,14 @@ public:
   void PlotMuLevel(double level, double scaling, Color color = Color_Black);
 
   //Draw methods
+  void DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
   void DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh = true);
+  void DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2, Color borderColor,
+                                     Color fillColor, bool doRefresh = true);
   void DrawText(string text, double textSize = -1);
   void DrawTextInPoint(string text, double x, double y, double textSize = -1);
   void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
   void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true);
-  void DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
   void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
 
 protected:

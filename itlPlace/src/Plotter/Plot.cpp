@@ -1,11 +1,11 @@
 #include "HPlotter.h"
-#include "PlotterData.h"
+#include "PlotterData.h" //
 #include "HDesign.h"
-#include "Auxiliary.h"
+#include "Auxiliary.h" //
 #include "AdaptiveRoute.h"
 #include "VanGinnekenTreeNode.h"
 
-#include "Utils.h"
+#include "Utils.h" //
 #include "OptimizationContext.h"
 
 void HPlotter::PlotCell(HCell cell, Color col)
@@ -13,46 +13,31 @@ void HPlotter::PlotCell(HCell cell, Color col)
     if (!IsEnabled())
         return;
 
-    CvPoint start, finish;
-    CvScalar cellBorderColor = cvScalar(255.0, 0.0, 0.0);
+    double startX  = m_hd.GetDouble<HCell::X>(cell);
+    double startY  = m_hd.GetDouble<HCell::Y>(cell);
+    double finishX = m_hd.GetDouble<HCell::X>(cell) + m_hd.GetDouble<HCell::Width>(cell);
+    double finishY = m_hd.GetDouble<HCell::Y>(cell) + m_hd.GetDouble<HCell::Height>(cell);
 
-    //draw border of cells
-    start.x = DesignX2ImageX(m_hd.GetDouble<HCell::X>(cell));
-    start.y = DesignY2ImageY(m_hd.GetDouble<HCell::Y>(cell));
-    finish.x = DesignX2ImageX(m_hd.GetDouble<HCell::X>(cell) + m_hd.GetDouble<HCell::Width>(cell));
-    finish.y = DesignY2ImageY(m_hd.GetDouble<HCell::Y>(cell) + m_hd.GetDouble<HCell::Height>(cell));
-
-    cvRectangle(IMG, start, finish, cellBorderColor);
-
-    //fill the cell
-    start.x++; start.y++;
-    finish.x--; finish.y--;
-    CvScalar fillColor = GetCvColor(col);
-    if (start.x <= finish.x && start.y <= finish.y)
-    {
-        cvRectangle(IMG, start, finish, fillColor, CV_FILLED);
-    }
+    DrawFilledRectangleWithBorder(startX, startY, finishX, finishY, Color_Blue, col, false);
 }
 
 void HPlotter::PlotSites()
 {
-    if (IsEnabled())
-    {
-        CvScalar siteColor = cvScalar(0.0, 0.0, 255.0);
-        CvPoint start, finish;
-        for (HPlacementRows::EnumeratorW row = m_hd.PlacementRows.GetEnumeratorW(); row.MoveNext(); )
-        {
-            for (int i = 0; i < row.VertSitesCount(); ++i)
-                for (int j = 0; j < row.HorizSitesCount(); ++j)
-                {
-                    start.x = DesignX2ImageX(row.X() + row.SiteWidth() * j);
-                    start.y = DesignY2ImageY(row.Y() + row.SiteHeight() * i);
-                    finish.x = DesignX2ImageX(row.X() + row.SiteWidth() * (j + 1));
-                    finish.y = DesignY2ImageY(row.Y() + row.SiteHeight() * (i + 1));
+    if (!IsEnabled())
+        return;
 
-                    cvRectangle(IMG, start, finish, siteColor, 1);
-                }
-        }
+    for (HPlacementRows::EnumeratorW row = m_hd.PlacementRows.GetEnumeratorW(); row.MoveNext(); )
+    {
+        for (int i = 0; i < row.VertSitesCount(); ++i)
+            for (int j = 0; j < row.HorizSitesCount(); ++j)
+            {
+                double x1 = row.X() + row.SiteWidth() * j;
+                double y1 = row.Y() + row.SiteHeight() * i;
+                double x2 = row.X() + row.SiteWidth() * (j + 1);
+                double y2 = row.Y() + row.SiteHeight() * (i + 1);
+
+                DrawRectangle(x1, y1, x2, y2, Color_Red, false);
+            }
     }
 }
 
@@ -60,43 +45,43 @@ void HPlotter::PlotSites()
 
 void HPlotter::PlotCriticalPath(HCriticalPath aPath)
 {
-    if (IsEnabled())
+    if (!IsEnabled())
+        return;
+
+    HCriticalPathWrapper criticalPathW = m_hd[aPath];
+
+    HCriticalPath::PointsEnumeratorW i = criticalPathW.GetEnumeratorW();
+    i.MoveNext();
+
+    CvPoint start, finish;
+    start.x = 10;
+    start.y = 10;
+    CvFont font;
+    cvInitFont( &font, CV_FONT_HERSHEY_COMPLEX, 1, 1, 0.0, 1, 1 ); 
+
+    HPinWrapper pin1 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())];
+    start.x = DesignX2ImageX(pin1.X());
+    start.y = DesignY2ImageY(pin1.Y());
+    cvCircle(IMG, start, 3, GetCvColor(Color_Peru), 3);
+    int index = 0;
+    for(; i.MoveNext(); index++)
     {
-        HCriticalPathWrapper criticalPathW = m_hd[aPath];
+        HPinWrapper pin2 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())]; 
 
-        HCriticalPath::PointsEnumeratorW i = criticalPathW.GetEnumeratorW();
-        i.MoveNext();
-
-        CvPoint start, finish;
-        start.x = 10;
-        start.y = 10;
-        CvFont font;
-        cvInitFont( &font, CV_FONT_HERSHEY_COMPLEX, 1, 1, 0.0, 1, 1 ); 
-
-        HPinWrapper pin1 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())];
         start.x = DesignX2ImageX(pin1.X());
         start.y = DesignY2ImageY(pin1.Y());
-        cvCircle(IMG, start, 3, GetCvColor(Color_Peru), 3);
-        int index = 0;
-        for(; i.MoveNext(); index++)
-        {
-            HPinWrapper pin2 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())]; 
+        finish.x = DesignX2ImageX(pin2.X());
+        finish.y = DesignY2ImageY(pin2.Y());
 
-            start.x = DesignX2ImageX(pin1.X());
-            start.y = DesignY2ImageY(pin1.Y());
-            finish.x = DesignX2ImageX(pin2.X());
-            finish.y = DesignY2ImageY(pin2.Y());
-
-            if (i.SignalDirection() == SignalDirection_Fall)
-                cvLine(IMG, start, finish, GetCvColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
-            else
-                cvLine(IMG, start, finish, GetCvColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
-            if (index <=1 )
-                cvCircle(IMG, finish, 2, GetCvColor(Color_Plum), 2);
-            else
-                cvCircle(IMG, finish, 2, GetCvColor(Color_Yellow), 2);
-            pin1 = pin2;
-        }
+        if (i.SignalDirection() == SignalDirection_Fall)
+            cvLine(IMG, start, finish, GetCvColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+        else
+            cvLine(IMG, start, finish, GetCvColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+        if (index <=1 )
+            cvCircle(IMG, finish, 2, GetCvColor(Color_Plum), 2);
+        else
+            cvCircle(IMG, finish, 2, GetCvColor(Color_Yellow), 2);
+        pin1 = pin2;
     }
 }
 

@@ -48,22 +48,6 @@ void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color c
     }
 }
 
-void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
-{
-    if (IsEnabled())
-    {
-        CvPoint start, finish;
-        start.x = DesignX2ImageX(x1);
-        start.y = DesignY2ImageY(y1);
-        finish.x = DesignX2ImageX(x2);
-        finish.y = DesignY2ImageY(y2);
-        cvLine(IMG, start, finish, GetCvColor(col), 1);
-
-        if (doRefresh)
-          _AutoRefresh();
-    }
-}
-
 void HPlotter::DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh)
 {
     if (!IsEnabled())
@@ -93,6 +77,47 @@ void HPlotter::DrawFilledRectangle(double x, double y, double width, double heig
       _AutoRefresh();
 }
 
+void HPlotter::DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2,
+                                             Color borderColor, Color fillColor, bool doRefresh)
+{
+    if (!IsEnabled())
+        return;
+
+    CvPoint start, finish;
+    start.x  = DesignX2ImageX(x1);
+    start.y  = DesignY2ImageY(y1);
+    finish.x = DesignX2ImageX(x2);
+    finish.y = DesignY2ImageY(y2);
+
+    //draw border
+    cvRectangle(IMG, start, finish, GetCvColor(borderColor), 1);
+
+    //fill rectangle
+    start.x++; start.y++;
+    finish.x--; finish.y--;
+
+    if (start.x <= finish.x && start.y <= finish.y)
+        cvRectangle(IMG, start, finish, GetCvColor(fillColor), CV_FILLED);
+
+    if (doRefresh)
+        _AutoRefresh();
+}
+
+void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+{
+    if (IsEnabled())
+    {
+        CvPoint start, finish;
+        start.x = DesignX2ImageX(x1);
+        start.y = DesignY2ImageY(y1);
+        finish.x = DesignX2ImageX(x2);
+        finish.y = DesignY2ImageY(y2);
+        cvLine(IMG, start, finish, GetCvColor(col), 1);
+
+        if (doRefresh)
+          _AutoRefresh();
+    }
+}
 
 void HPlotter::DrawText(string text, double textSize)
 {
