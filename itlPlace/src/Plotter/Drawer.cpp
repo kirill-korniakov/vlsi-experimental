@@ -18,18 +18,23 @@ void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bo
     }
 }
 
-void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh)
+void HPlotter::DrawCircle(double x, double y, int radius, Color col, int thickness, bool doRefresh)
 {
     if (IsEnabled())
     {
         CvPoint center;
         center.x = DesignX2ImageX(x);
         center.y = DesignY2ImageY(y);
-        cvCircle(IMG, center, radius, GetCvColor(col), 2);
+        cvCircle(IMG, center, radius, GetCvColor(col), thickness);
 
         if (doRefresh)
           _AutoRefresh();
     }
+}
+
+void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh)
+{
+    DrawCircle(x, y, radius, col, 2, doRefresh);
 }
 
 void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh)

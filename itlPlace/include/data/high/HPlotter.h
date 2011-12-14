@@ -94,6 +94,7 @@ public:
   void DrawText(string text, double textSize = -1);
   void DrawTextInPoint(string text, double x, double y, double textSize = -1);
   void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+  void DrawCircle(double x, double y, int radius, Color col, int thickness, bool doRefresh = true);
   void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true);
   void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
 

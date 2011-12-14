@@ -292,19 +292,18 @@ void HPlotter::Plot2PinNets()
 void HPlotter::PlotAntiGradients(int nClusters, double* coordinates, double* gradients, 
                                  double scaling, Color color)
 {
-    if (IsEnabled())
-    {
-        CvPoint start, finish;
+    if (!IsEnabled())
+        return;
 
-        for (int i = 0; i < nClusters; i++)
-        {
-            start.x = DesignX2ImageX(coordinates[2*i+0]);
-            start.y = DesignY2ImageY(coordinates[2*i+1]);
-            finish.x = DesignX2ImageX(coordinates[2*i+0] - scaling*gradients[2*i+0]);
-            finish.y = DesignY2ImageY(coordinates[2*i+1] - scaling*gradients[2*i+1]);
-            cvDrawLine(IMG, start, finish, GetCvColor(color));
-            cvDrawCircle(IMG, finish, 1, GetCvColor(color));
-        }
+    for (int i = 0; i < nClusters; i++)
+    {
+        double startX  = coordinates[2 * i + 0];
+        double startY  = coordinates[2 * i + 1];
+        double finishX = coordinates[2 * i + 0] - scaling * gradients[2 * i + 0];
+        double finishY = coordinates[2 * i + 1] - scaling * gradients[2 * i + 1];
+
+        DrawLine(startX, startY, finishX, finishY, color, false);
+        DrawCircle(finishX, finishY, 1, color, 1, false);
     }
 }
 
