@@ -25,7 +25,12 @@ void HPlotter::DrawCircle(double x, double y, int radius, Color col, int thickne
         CvPoint center;
         center.x = DesignX2ImageX(x);
         center.y = DesignY2ImageY(y);
-        cvCircle(IMG, center, radius, GetCvColor(col), thickness);
+
+        if (thickness > 0)
+            cvCircle(IMG, center, radius, GetCvColor(col), thickness);
+
+        else
+            cvCircle(IMG, center, radius, GetCvColor(col), CV_FILLED);
 
         if (doRefresh)
           _AutoRefresh();
@@ -229,5 +234,17 @@ void HPlotter::DrawTextInPoint(string text, double x, double y, double textSize 
     }
 
     delete [] str;
+}
 
+void HPlotter::DrawTextLine()
+{
+    if (IsEnabled())
+    {
+        CvPoint startTextLine, finishTextLine;
+        startTextLine.x  = 0;
+        startTextLine.y  = m_Data->textSpaceHeight;
+        finishTextLine.x = IMG->width;
+        finishTextLine.y = m_Data->textSpaceHeight;
+        cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
+    }
 }

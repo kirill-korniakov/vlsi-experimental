@@ -70,7 +70,7 @@ static int known_colors[][3] =
   { 131, 183, 227 } /*GradientInactiveCaption*/,
   { 128, 128, 128 } /*Gray*/,
   { 167, 166, 170 } /*GrayText*/,
-  {   0, 128,   0 } /*Green*/,
+  {   0, 255,   0 } /*Green*/,
   { 173, 255,  47 } /*GreenYellow*/,
   {  51,  94, 168 } /*Highlight*/,
   { 255, 255, 255 } /*HighlightText*/,

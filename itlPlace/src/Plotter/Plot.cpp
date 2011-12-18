@@ -355,89 +355,92 @@ void HPlotter::PlotPlacement()
     if (!IsEnabled())
         return;
 
-    CvPoint center;
-    CvPoint start, finish;
-
     for (HCells::PlaceableCellsEnumeratorW cell = m_hd.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
     {
         PlotCell(cell, _GetCellColor(cell));
     }
 
-    CvScalar terminalColor = cvScalar(0.0, 0.0, 255.0);
-    CvScalar terminalBackColor = cvScalar(64.0, 0.0, 0.0);
+    Color terminalColor = Color_Red;
+    Color terminalBackColor = Color_Desktop;
+
+    double startX, startY;
+    double finishX, finishY;
 
     for (HCells::TerminalsEnumeratorW terminal = m_hd.Cells.GetTerminalsEnumeratorW(); terminal.MoveNext(); )
     {
         //draw border of cells
-        start.x = DesignX2ImageX(terminal.X());
-        start.y = DesignY2ImageY(terminal.Y());
-        finish.x = DesignX2ImageX(terminal.X() + terminal.Width());
-        finish.y = DesignY2ImageY(terminal.Y() + terminal.Height());
-        if (start.x + 1 < finish.x && start.y + 1 < finish.y)
+        startX  = terminal.X();
+        startY  = terminal.Y();
+        finishX = terminal.X() + terminal.Width();
+        finishY = terminal.Y() + terminal.Height();
+
+        if ((DesignX2ImageX(startX) + 1 < DesignX2ImageX(finishX)) &&
+            (DesignY2ImageY(startY) + 1 < DesignY2ImageY(finishY)))
         {
-            cvRectangle(IMG, start, finish, terminalColor);
-            //fill
-            start.x++; start.y++;
-            finish.x--; finish.y--;
-            if (start.x < finish.x && start.y < finish.y)
-                cvRectangle(IMG, start, finish, terminalBackColor, CV_FILLED);
+            DrawFilledRectangleWithBorder(startX, startY, finishX, finishY, terminalColor,
+                                          terminalBackColor, false);
         }
         else
-            cvCircle(IMG, start, 2, terminalBackColor, CV_FILLED);
+        {
+            //Filled circle
+            DrawCircle(startX, startY, 2, terminalBackColor, -1, false);
+        }
     }
 
     //draw primary pins
-    CvScalar PIColor = cvScalar(0.0, 255.0, 0.0); //green
-    CvScalar POColor = cvScalar(0.0, 0.0, 255.0); //red
+    Color PIColor = Color_Green;
+    Color POColor = Color_Red;
+
+    double centerX, centerY;
+
     for (HPins::PrimariesEnumeratorW pin = m_hd.Pins.GetEnumeratorW(); pin.MoveNext(); )
     {
         if (!::IsNull(pin.Net()))
         {
-            center.x = DesignX2ImageX(pin.X());
-            center.y = DesignY2ImageY(pin.Y());
+            centerX = pin.X();
+            centerY = pin.Y();
+
             if (pin.IsPrimaryInput())
-                cvCircle(IMG, center, 3, PIColor, CV_FILLED);
+                DrawCircle(centerX, centerY, 3, PIColor, -1, false);
+
             else
-                cvCircle(IMG, center, 3, POColor, CV_FILLED);
+                DrawCircle(centerX, centerY, 3, POColor, -1, false);
         }
     }
 
     //draw placement region
-    CvScalar plBorderColor = cvScalar(0.0, 0.0, 255.0);
+    Color plBorderColor = Color_Red;
 
-    start.x = DesignX2ImageX(m_hd.Circuit.PlacementMinX());
-    start.y = DesignY2ImageY(m_hd.Circuit.PlacementMinY());
-    finish.x = DesignX2ImageX(m_hd.Circuit.PlacementMinX());
-    finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMaxY());
-    cvDrawLine(IMG, start, finish, plBorderColor);
+    startX  = m_hd.Circuit.PlacementMinX();
+    startY  = m_hd.Circuit.PlacementMinY();
+    finishX = m_hd.Circuit.PlacementMinX();
+    finishY = m_hd.Circuit.PlacementMaxY();
+    DrawLine(startX, startY, finishX, finishY, plBorderColor, false);
 
-    start = finish;
-    finish.x = DesignX2ImageX(m_hd.Circuit.PlacementMaxX());
-    finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMaxY());
-    cvDrawLine(IMG, start, finish, plBorderColor);
+    startX  = finishX;
+    startY  = finishY;
+    finishX = m_hd.Circuit.PlacementMaxX();
+    finishY = m_hd.Circuit.PlacementMaxY();
+    DrawLine(startX, startY, finishX, finishY, plBorderColor, false);
 
-    start = finish;
-    finish.x = DesignX2ImageX(m_hd.Circuit.PlacementMaxX());
-    finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMinY());
-    cvDrawLine(IMG, start, finish, plBorderColor);
+    startX  = finishX;
+    startY  = finishY;
+    finishX = m_hd.Circuit.PlacementMaxX();
+    finishY = m_hd.Circuit.PlacementMinY();
+    DrawLine(startX, startY, finishX, finishY, plBorderColor, false);
 
-    start = finish;
-    finish.x = DesignX2ImageX(m_hd.Circuit.PlacementMinX());
-    finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMinY());
-    cvDrawLine(IMG, start, finish, plBorderColor);
+    startX  = finishX;
+    startY  = finishY;
+    finishX = m_hd.Circuit.PlacementMinX();
+    finishY = m_hd.Circuit.PlacementMinY();
+    DrawLine(startX, startY, finishX, finishY, plBorderColor, false);
 
     //draw placement center
-    CvScalar centerColor = cvScalar(0.0, 0.0, 0.0);
-    center.x = DesignX2ImageX((m_hd.Circuit.PlacementMinX() + m_hd.Circuit.PlacementMaxX()) / 2.0);
-    center.y = DesignY2ImageY((m_hd.Circuit.PlacementMinY() + m_hd.Circuit.PlacementMaxY()) / 2.0);
-    cvCircle(IMG, center, 4, centerColor, 1);
+    centerX = (m_hd.Circuit.PlacementMinX() + m_hd.Circuit.PlacementMaxX()) / 2.0;
+    centerY = (m_hd.Circuit.PlacementMinY() + m_hd.Circuit.PlacementMaxY()) / 2.0;
+    DrawCircle(centerX, centerY, 4, Color_Black, 1, false);
 
-    CvPoint startTextLine, finishTextLine;
-    startTextLine.x = 0;
-    startTextLine.y = m_Data->textSpaceHeight;
-    finishTextLine.x = IMG->width;
-    finishTextLine.y = m_Data->textSpaceHeight;
-    cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
+    DrawTextLine();
 }
 
 void HPlotter::PlotPath(HDesign& design, HCriticalPath path, int pathNumber)

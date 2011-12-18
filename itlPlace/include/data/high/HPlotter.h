@@ -98,6 +98,8 @@ public:
   void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true);
   void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
 
+  void DrawTextLine();
+
 protected:
   void* m_data;
   HDesign& m_hd;
