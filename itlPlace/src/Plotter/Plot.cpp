@@ -457,54 +457,55 @@ void HPlotter::PlotPath(HDesign& design, HCriticalPath path, int pathNumber)
     design.Plotter.DrawText(signature);
     design.Plotter.Refresh("CriticalPaths.plotWait");
     design.Plotter.SaveImage(fileName,
-        design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_critical_path\\");
+    design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_critical_path\\");
 }
 
 void HPlotter::PlotBinGrid(int nBinRows, int nBinCols)
 {
-    if (IsEnabled())
+    if (!IsEnabled())
+        return;
+
+    double startX, startY;
+    double finishX, finishY;
+
+    Color color = Color_GrayText;
+    startY      = m_hd.Circuit.PlacementMinY();
+    finishY     = m_hd.Circuit.PlacementMaxY();
+
+    //vertical lines
+    for (int i = 1; i < nBinCols; i++)
     {
-        CvPoint start, finish;
+        startX = finishX = m_hd.Circuit.PlacementMinX() + i * m_hd.Circuit.PlacementWidth() / nBinCols;
+        DrawLine(startX, startY, finishX, finishY, color, false);
+    }
 
-        Color color = Color_GrayText;
-        start.y  = DesignY2ImageY(m_hd.Circuit.PlacementMinY());
-        finish.y = DesignY2ImageY(m_hd.Circuit.PlacementMaxY());
+    startX  = m_hd.Circuit.PlacementMinX();
+    finishX = m_hd.Circuit.PlacementMaxX();
 
-        //vertical lines
-        for (int i = 1; i < nBinCols; i++)
-        {
-            start.x = finish.x
-                = DesignX2ImageX(m_hd.Circuit.PlacementMinX() + i * m_hd.Circuit.PlacementWidth() / nBinCols);
-            cvDrawLine(IMG, start, finish, GetCvColor(color));
-        }
-
-        start.x  = DesignX2ImageX(m_hd.Circuit.PlacementMinX());
-        finish.x = DesignX2ImageX(m_hd.Circuit.PlacementMaxX());
-
-        //horizontal lines
-        for (int i = 1; i < nBinRows; i++)
-        {
-            start.y = finish.y
-                = DesignY2ImageY(m_hd.Circuit.PlacementMinY() + i * m_hd.Circuit.PlacementHeight() / nBinRows);
-            cvDrawLine(IMG, start, finish, GetCvColor(color));
-        }
+    //horizontal lines
+    for (int i = 1; i < nBinRows; i++)
+    {
+        startY = finishY = m_hd.Circuit.PlacementMinY() + i * m_hd.Circuit.PlacementHeight() / nBinRows;
+        DrawLine(startX, startY, finishX, finishY, color, false);
     }
 }
 
 void HPlotter::PlotFillBinGrid(AppCtx* context)
 {
-    if (!IsEnabled()) return;
+    if (!IsEnabled())
+        return;
 
-    CvPoint start, finish;
+    double startX, startY;
+    double finishX, finishY;
 
     for (int i = 0; i < context->sprData.binGrid.nBinCols; i++)
         for (int j = 0; j < context->sprData.binGrid.nBinRows; j++)
         {
-            start.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.0);
-            start.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord - context->sprData.binGrid.binHeight / 2.0);
-            finish.x = DesignX2ImageX(context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth / 2.0);
-            finish.y = DesignY2ImageY(context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight / 2.0);
-            cvRectangle(IMG, start, finish, GetCvColor(Color_LightPink), 1);
+            startX  = context->sprData.binGrid.bins[i][j].xCoord - context->sprData.binGrid.binWidth / 2.0;
+            startY  = context->sprData.binGrid.bins[i][j].yCoord - context->sprData.binGrid.binHeight / 2.0;
+            finishX = context->sprData.binGrid.bins[i][j].xCoord + context->sprData.binGrid.binWidth / 2.0;
+            finishY = context->sprData.binGrid.bins[i][j].yCoord + context->sprData.binGrid.binHeight / 2.0;
+            DrawRectangle(startX, startY, finishX, finishY, Color_LightPink, false);
 
             char str1[255], str2[255];
             sprintf(str1, Aux::SciFormat.c_str(), context->sprData.binGrid.bins[i][j].sumBufPotential);
