@@ -18,7 +18,7 @@ void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bo
     }
 }
 
-void HPlotter::DrawCircle(double x, double y, int radius, Color col, int thickness, bool doRefresh)
+void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh, int thickness)
 {
     if (IsEnabled())
     {
@@ -35,11 +35,6 @@ void HPlotter::DrawCircle(double x, double y, int radius, Color col, int thickne
         if (doRefresh)
           _AutoRefresh();
     }
-}
-
-void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh)
-{
-    DrawCircle(x, y, radius, col, 2, doRefresh);
 }
 
 void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
@@ -113,7 +108,8 @@ void HPlotter::DrawFilledRectangleWithBorder(double x1, double y1, double x2, do
         _AutoRefresh();
 }
 
-void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh,
+                        int thickness, int lineType)
 {
     if (IsEnabled())
     {
@@ -122,6 +118,22 @@ void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, b
         start.y = DesignY2ImageY(y1);
         finish.x = DesignX2ImageX(x2);
         finish.y = DesignY2ImageY(y2);
+        cvLine(IMG, start, finish, GetCvColor(col), thickness, lineType);
+
+        if (doRefresh)
+          _AutoRefresh();
+    }
+}
+
+void HPlotter::DrawKiLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+{
+    if (IsEnabled())
+    {
+        CvPoint start, finish;
+        start.x = HNormalX2ImageX(x1);
+        start.y = HNormalY2ImageY(y1);
+        finish.x = HNormalX2ImageX(x2);
+        finish.y = HNormalY2ImageY(y2);
         cvLine(IMG, start, finish, GetCvColor(col), 1);
 
         if (doRefresh)
@@ -247,4 +259,10 @@ void HPlotter::DrawTextLine()
         finishTextLine.y = m_Data->textSpaceHeight;
         cvLine(IMG, startTextLine, finishTextLine, GetCvColor(Color_Black), 1);
     }
+}
+
+void HPlotter::InitFont()
+{
+  CvFont font;
+  cvInitFont( &font, CV_FONT_HERSHEY_COMPLEX, 1, 1, 0.0, 1, 1 );
 }

@@ -93,10 +93,13 @@ public:
                                      Color fillColor, bool doRefresh = true);
   void DrawText(string text, double textSize = -1);
   void DrawTextInPoint(string text, double x, double y, double textSize = -1);
-  void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
-  void DrawCircle(double x, double y, int radius, Color col, int thickness, bool doRefresh = true);
-  void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true);
+  void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true,
+                int thickness = 1, int lineType = 8);
+  void DrawKiLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+  void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true, int thickness = 1);
   void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+
+  void InitFont();
 
   void DrawTextLine();
 

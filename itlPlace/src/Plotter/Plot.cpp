@@ -49,38 +49,39 @@ void HPlotter::PlotCriticalPath(HCriticalPath aPath)
         return;
 
     HCriticalPathWrapper criticalPathW = m_hd[aPath];
-
     HCriticalPath::PointsEnumeratorW i = criticalPathW.GetEnumeratorW();
     i.MoveNext();
 
-    CvPoint start, finish;
-    start.x = 10;
-    start.y = 10;
-    CvFont font;
-    cvInitFont( &font, CV_FONT_HERSHEY_COMPLEX, 1, 1, 0.0, 1, 1 ); 
+    double startX = 10;
+    double startY = 10;
+    double finishX, finishY;
+
+    InitFont();
 
     HPinWrapper pin1 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())];
-    start.x = DesignX2ImageX(pin1.X());
-    start.y = DesignY2ImageY(pin1.Y());
-    cvCircle(IMG, start, 3, GetCvColor(Color_Peru), 3);
+    startX = pin1.X();
+    startY = pin1.Y();
+    DrawCircle(startX, startY, 3, Color_Peru, false, 3);
     int index = 0;
     for(; i.MoveNext(); index++)
     {
         HPinWrapper pin2 = m_hd[m_hd.Get<HTimingPoint::Pin, HPin>(i.TimingPoint())]; 
 
-        start.x = DesignX2ImageX(pin1.X());
-        start.y = DesignY2ImageY(pin1.Y());
-        finish.x = DesignX2ImageX(pin2.X());
-        finish.y = DesignY2ImageY(pin2.Y());
+        startX  = pin1.X();
+        startY  = pin1.Y();
+        finishX = pin2.X();
+        finishY = pin2.Y();
 
         if (i.SignalDirection() == SignalDirection_Fall)
-            cvLine(IMG, start, finish, GetCvColor(Color_Black), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+            DrawLine(startX, startY, finishX, finishY, Color_Black, false,
+                     m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
         else
-            cvLine(IMG, start, finish, GetCvColor(Color_Red), m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
+            DrawLine(startX, startY, finishX, finishY, Color_Red, false,
+                     m_hd.cfg.ValueOf("CriticalPaths.thicknessLines", 1));
         if (index <=1 )
-            cvCircle(IMG, finish, 2, GetCvColor(Color_Plum), 2);
+            DrawCircle(finishX, finishY, 2, Color_Plum, false, 2);
         else
-            cvCircle(IMG, finish, 2, GetCvColor(Color_Yellow), 2);
+            DrawCircle(finishX, finishY, 2, Color_Yellow, false, 2);
         pin1 = pin2;
     }
 }
@@ -96,7 +97,7 @@ void HPlotter::PlotNetSteinerTree(HNet net, Color color)
     HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[src]];
     HSteinerPointWrapper nextPoint = srcPoint;
 
-    m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
+    DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
 
     TemplateTypes<HSteinerPoint>::stack points;
     points.push(srcPoint);
@@ -108,19 +109,19 @@ void HPlotter::PlotNetSteinerTree(HNet net, Color color)
         if (srcPoint.HasLeft())
         {
             nextPoint = srcPoint.Left();
-            m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+            DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
             points.push(nextPoint);
 
             if (srcPoint.HasRight())
             {
                 nextPoint = srcPoint.Right();
-                m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+                DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
                 points.push(nextPoint);
             }
         }
         else
         {
-            m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 1, color, false);
+            DrawCircle(srcPoint.X(), srcPoint.Y(), 1, color, false);
         }
     }
 }
@@ -134,7 +135,7 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
     HSteinerPointWrapper srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(m_hd.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(pointsEnumeratorW))]];
     HSteinerPointWrapper nextPoint = srcPoint;
 
-    m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
+    DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
     int pointCount = pointW.PointsCount();
     int pc = 1;
     TemplateTypes<HSteinerPoint>::stack points;
@@ -147,13 +148,13 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
         if (srcPoint.HasLeft())
         {
             nextPoint = srcPoint.Left();
-            m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+            DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
             points.push(nextPoint);
 
             if (srcPoint.HasRight())
             {
                 nextPoint = srcPoint.Right();
-                m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+                DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
                 points.push(nextPoint);
             }
         }
@@ -174,19 +175,19 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
                 pc+=2;
                 isCriticalPathLeaf = false;
                 srcPoint = m_hd[m_hd.SteinerPoints[m_hd.TimingPoints.Get<HTimingPoint::Pin, HPin>(pointsEnumeratorW.TimingPoint())]];
-                m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
+                DrawCircle(srcPoint.X(), srcPoint.Y(), 4, color, false);
                 bool f = false;
                 if (srcPoint.HasLeft())
                 {
                   f = true;
                     nextPoint = srcPoint.Left();
-                    m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+                    DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
                     points.push(nextPoint);
 
                     if (srcPoint.HasRight())
                     {
                         nextPoint = srcPoint.Right();
-                        m_hd.Plotter.DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
+                        DrawLine(srcPoint.X(), srcPoint.Y(), nextPoint.X(), nextPoint.Y(), color, false);
                         points.push(nextPoint);
                     }
                 }
@@ -197,7 +198,7 @@ void HPlotter::PlotCriticalPathSteinerTree(HCriticalPath path, Color color)
           }
           if (isCriticalPathLeaf)
           {
-            m_hd.Plotter.DrawCircle(srcPoint.X(), srcPoint.Y(), 1, color, false);
+            DrawCircle(srcPoint.X(), srcPoint.Y(), 1, color, false);
           }
               
         }
@@ -213,7 +214,7 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
     VanGinnekenTreeNode* srcPoint = tree;
     VanGinnekenTreeNode* nextPoint = srcPoint;
 
-    m_hd.Plotter.DrawCircle(srcPoint->x, srcPoint->y, 4, LineColor, false);
+    DrawCircle(srcPoint->x, srcPoint->y, 4, LineColor, false);
 
     TemplateTypes<VanGinnekenTreeNode*>::stack points;
     points.push(srcPoint);
@@ -225,42 +226,46 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
         if (srcPoint->HasLeft())
         {
             nextPoint = srcPoint->GetLeft();
-            m_hd.Plotter.DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
-            m_hd.Plotter.DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
+            DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
+            DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
             //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
             points.push(nextPoint);
 
             if (srcPoint->HasRight())
             {
                 nextPoint = srcPoint->GetRight();
-                m_hd.Plotter.DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
-                m_hd.Plotter.DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
+                DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
+                DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
                 //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
                 points.push(nextPoint);
             }
         }
         else
         {
-            m_hd.Plotter.DrawCircle(srcPoint->x, srcPoint->y, 1, LineColor, false);
+            DrawCircle(srcPoint->x, srcPoint->y, 1, LineColor, false);
         }
     }
 }
 
 void HPlotter::PlotNet(HNet net, Color color)
 {
-    CvPoint start, finish;
+    double startX, startY;
+    double finishX, finishY;
+
     HPinWrapper pin1 = m_hd[m_hd[net].Source()];
-    start.x = DesignX2ImageX(pin1.X());
-    start.y = DesignY2ImageY(pin1.Y());
-    cvCircle(IMG, start, 1, GetCvColor(color), 3);
+    startX = pin1.X();
+    startY = pin1.Y();
+    DrawCircle(startX, startY, 1, color, false, 3);
+    ///cvCircle(IMG, start, 1, color, 3);
+
     for (HNet::SinksEnumeratorW sew = m_hd[net].GetSinksEnumeratorW(); sew.MoveNext(); )
     {
-        start.x = DesignX2ImageX(pin1.X());
-        start.y = DesignY2ImageY(pin1.Y());
-        finish.x = DesignX2ImageX(sew.X());
-        finish.y = DesignY2ImageY(sew.Y());
-        cvCircle(IMG, finish, 1, GetCvColor(Color_Yellow), 2);
-        cvLine(IMG, start, finish, GetCvColor(Color_Red), 1, 1);
+        startX  = pin1.X();
+        startY  = pin1.Y();
+        finishX = sew.X();
+        finishY = sew.Y();
+        DrawCircle(finishX, finishY, 1, Color_Yellow, false, 2);
+        DrawLine(startX, startY, finishX, finishY, Color_Red, false, 1, 1);
     }
 }
 
@@ -303,7 +308,7 @@ void HPlotter::PlotAntiGradients(int nClusters, double* coordinates, double* gra
         double finishY = coordinates[2 * i + 1] - scaling * gradients[2 * i + 1];
 
         DrawLine(startX, startY, finishX, finishY, color, false);
-        DrawCircle(finishX, finishY, 1, color, 1, false);
+        DrawCircle(finishX, finishY, 1, color, false, 1);
     }
 }
 
@@ -321,33 +326,36 @@ void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
     //FIXME: find proper place
     InitializeHistogramWindow();
 
-    CvPoint start, finish;
+    double startX, startY;
+    double finishX, finishY;
+
     double meanK = 0.0;
 
     for (int i = 0; i < nNets; i++)
     {
-        meanK += x[2*nClusters + i];
-        start.x = HNormalX2ImageX((double)i/(double)nNets);
-        start.y = HNormalY2ImageY(0.0);
-        finish.x = start.x;
-        finish.y = HNormalY2ImageY(x[2*nClusters + i]/maxKi);
-        cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+        meanK += x[2 * nClusters + i];
+        //TODO: take this coordinates into account
+        startX  = (double)i / (double)nNets;
+        startY  = 0.0;
+        finishX = startX;
+        finishY = x[2 * nClusters + i] / maxKi;
+        DrawKiLine(startX, startY, finishX, finishY, color, false);
     }
 
     //plot one line
-    start.x  = HNormalX2ImageX(0.0);
-    finish.x = HNormalX2ImageX(1.0);
-    start.y  = HNormalY2ImageY(1.0/maxKi);
-    finish.y = HNormalY2ImageY(1.0/maxKi);
-    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
+    startX  = 0.0;
+    finishX = 1.0;
+    startY  = 1.0 / maxKi;
+    finishY = 1.0 / maxKi;
+    DrawKiLine(startX, startY, finishX, finishY, Color_Black, false);
 
     //plot mean ki
     meanK /= nNets;
-    start.x  = HNormalX2ImageX(0.0);
-    finish.x = HNormalX2ImageX(1.0);
-    start.y  = HNormalY2ImageY(meanK/maxKi);
-    finish.y = HNormalY2ImageY(meanK/maxKi);
-    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(Color_Black), 1);
+    startX  = 0.0;
+    finishX = 1.0;
+    startY  = meanK / maxKi;
+    finishY = meanK / maxKi;
+    DrawKiLine(startX, startY, finishX, finishY, Color_Black, false);
 }
 
 void HPlotter::PlotPlacement()
@@ -383,7 +391,7 @@ void HPlotter::PlotPlacement()
         else
         {
             //Filled circle
-            DrawCircle(startX, startY, 2, terminalBackColor, -1, false);
+            DrawCircle(startX, startY, 2, terminalBackColor, false, -1);
         }
     }
 
@@ -401,10 +409,10 @@ void HPlotter::PlotPlacement()
             centerY = pin.Y();
 
             if (pin.IsPrimaryInput())
-                DrawCircle(centerX, centerY, 3, PIColor, -1, false);
+                DrawCircle(centerX, centerY, 3, PIColor, false, -1);
 
             else
-                DrawCircle(centerX, centerY, 3, POColor, -1, false);
+                DrawCircle(centerX, centerY, 3, POColor, false, -1);
         }
     }
 
@@ -438,7 +446,7 @@ void HPlotter::PlotPlacement()
     //draw placement center
     centerX = (m_hd.Circuit.PlacementMinX() + m_hd.Circuit.PlacementMaxX()) / 2.0;
     centerY = (m_hd.Circuit.PlacementMinY() + m_hd.Circuit.PlacementMaxY()) / 2.0;
-    DrawCircle(centerX, centerY, 4, Color_Black, 1, false);
+    DrawCircle(centerX, centerY, 4, Color_Black, false);
 
     DrawTextLine();
 }
