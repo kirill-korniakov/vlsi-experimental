@@ -11,7 +11,8 @@ void HPlotter::PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color
 {
     if (CantPlotHistogram()) return;
 
-    int x = HNormalX2ImageX((double)tpIdx/(double)nTP);
+    ///int x = HNormalX2ImageX((double)tpIdx/(double)nTP);
+    int x = (double)tpIdx/(double)nTP;
     PlotMu(mu, x, scaling, color);
 }
 
@@ -19,12 +20,8 @@ void HPlotter::PlotMu(double mu, int x, double scaling, Color color)
 {
     if (CantPlotHistogram()) return;
 
-    CvPoint start, finish;
-    start.x = x;
-    start.y = HNormalY2ImageY(0.0);
-    finish.x = start.x;
-    finish.y = HNormalY2ImageY(mu * scaling);
-    cvDrawLine(m_Data->histogramImg, start, finish, GetCvColor(color));
+    double y = mu * scaling;
+    DrawLine(x, 0, x, y, color, false);
 }
 
 void HPlotter::PlotMuLevel(double level, double scaling, Color color)
