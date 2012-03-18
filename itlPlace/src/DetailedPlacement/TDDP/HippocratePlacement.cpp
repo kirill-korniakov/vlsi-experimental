@@ -120,16 +120,16 @@ void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::ve
 	}
 	if (maxIncrOfWTWL < 0) { //если длина проводов уменьшилась
 		//меняем эл-ты
-		hd.Plotter.SaveMilestoneImage("MOVE_B");
-		hd.Plotter.PlotCell(curCell, Color_Brown);
-		hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+		hd.Plotter->SaveMilestoneImage("MOVE_B");
+		hd.Plotter->PlotCell(curCell, Color_Brown);
+		hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 		hdpp.PutCell(curCell, VHole[k].row,VHole[k].col+PosInGap);
 
 		//ALERT("!!!k=%d pos=%d",k,PosInGap);
-		hd.Plotter.PlotCell(curCell, Color_Brown);
-		hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);	
-		hd.Plotter.SaveMilestoneImage("MOVE_A");
+		hd.Plotter->PlotCell(curCell, Color_Brown);
+		hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);	
+		hd.Plotter->SaveMilestoneImage("MOVE_A");
 		stat.incrementAttemptsSuccessful(MOVE);
 		for(int j = 0; j < curNets.size(); j++) 
 		{
@@ -175,9 +175,9 @@ void HippocratePlacementCOMPACT(HDPGrid& hdpp, HDesign& hd, HCell& curCell, BBox
 			{
 				for(int counter=0;counter<=(VHole[i].GapSize-hdpp.CellSitesNum(*IterCellInNet));counter++)
 				{
-					hd.Plotter.PlotCell(*IterCellInNet, Color_GrayText);
+					hd.Plotter->PlotCell(*IterCellInNet, Color_GrayText);
 					hdpp.PutCell(*IterCellInNet, VHole[i].row,VHole[i].col+counter);
-					hd.Plotter.PlotCell(*IterCellInNet, Color_Black);
+					hd.Plotter->PlotCell(*IterCellInNet, Color_Black);
 
 					//для каждого изменённого соединения проверяем выполнение ограничений
 					bool constraintsOK = true;
@@ -205,18 +205,18 @@ void HippocratePlacementCOMPACT(HDPGrid& hdpp, HDesign& hd, HCell& curCell, BBox
 		}
 		if (maxIncrOfWTWL < 0) { //если длина проводов уменьшилась
 			//меняем эл-ты
-			//hd.Plotter.SaveMilestoneImage("CompactSuccess1");
-			hd.Plotter.PlotCell(*IterCellInNet, Color_Brown);
-			hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+			//hd.Plotter->SaveMilestoneImage("CompactSuccess1");
+			hd.Plotter->PlotCell(*IterCellInNet, Color_Brown);
+			hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 			hdpp.PutCell(*IterCellInNet, VHole[k].row,VHole[k].col+PosInGap);
 
 			//ALERT("!!!k=%d pos=%d",k,PosInGap);
-			hd.Plotter.PlotCell(*IterCellInNet, Color_Red);
-			hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);	
-			hd.Plotter.SaveMilestoneImage("Compact_success2");
+			hd.Plotter->PlotCell(*IterCellInNet, Color_Red);
+			hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);	
+			hd.Plotter->SaveMilestoneImage("Compact_success2");
 			stat.incrementAttemptsSuccessful(COMPACT);
-		hd.Plotter.ShowPlacement();
+		hd.Plotter->ShowPlacement();
 		} 
 	}	
 }
@@ -290,8 +290,8 @@ void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::
 	int oldCurRow = hdpp.CellRow(curCell);
 	int oldCurCol = hdpp.CellColumn(curCell);
 
-	hd.Plotter.PlotCell(curCell, Color_Black);
-	hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+	hd.Plotter->PlotCell(curCell, Color_Black);
+	hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 	std::vector<HCell> ConnectedCells; //эл-ты, соединённые с текущим
 	int connectedCellsCount = 0;   //к-во эл-тов, соединённых с текущим
@@ -340,8 +340,8 @@ void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::
 	int centerCol = hdpp.FindColumn(centerX);
 	int centerRow = hdpp.FindRow(centerY);
 
-	hd.Plotter.DrawCircle(centerX,centerY,3,Color_Yellow);
-	hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+	hd.Plotter->DrawCircle(centerX,centerY,3,Color_Yellow);
+	hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 	bool putCurCell = false;
 	int left = 0, right = 0; //к-во свободных сайтов слева и справа от центра
@@ -390,8 +390,8 @@ void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::
 			putCurCell = true;
 		}
 	}
-	hd.Plotter.PlotCell(curCell, Color_Green);
-	hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+	hd.Plotter->PlotCell(curCell, Color_Green);
+	hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 	currentWnd = GetCurrentWindow(hdpp, RADIUS_OF_WINDOW, curCell);
 
@@ -420,8 +420,8 @@ void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::
 	}
 	numHoles = VHoles.size();
 
-	hd.Plotter.PlotCell(curCell, Color_Red);
-	hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+	hd.Plotter->PlotCell(curCell, Color_Red);
+	hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 	stat.incrementAttempts(CENTER);
 
 	//ищем для текущего лучшее место в центральном окне
@@ -456,9 +456,9 @@ void HippocratePlacementCENTER(HDPGrid& hdpp, HDesign& hd, HCell& curCell, std::
 		hdpp.PutCell(curCell, VHoles[k].row,VHoles[k].col+PosInGap);
 		stat.incrementAttemptsSuccessful(CENTER);
 	}
-	hd.Plotter.Clear();
-	hd.Plotter.PlotPlacement();
-	hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+	hd.Plotter->Clear();
+	hd.Plotter->PlotPlacement();
+	hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
 }
 
 
@@ -700,8 +700,8 @@ BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin)//GetCurrent
 {
 	//HPinWrapper pin  = hd[hd.Get<HTimingPoint::Pin, HPin>(pointsEnumW.TimingPoint())];
 	HNetWrapper netW = hd[myPin.Net()];
-	//hd.Plotter.PlotNet(netW);
-	//hd.Plotter.Refresh(HPlotter::NO_WAIT);
+	//hd.Plotter->PlotNet(netW);
+	//hd.Plotter->Refresh(HPlotter::NO_WAIT);
 
 	HNetWrapper::PinsEnumeratorW pinsEnumW = netW.GetPinsEnumeratorW();
 	HCell cell=hd[pinsEnumW].Cell();
@@ -750,11 +750,11 @@ BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin)//GetCurrent
 	xc=hdpp.ColumnX(tBBox.colCenter);
 	yc=hdpp.RowY(tBBox.rowCenter);
 
-	hd.Plotter.DrawRectangle(x1,y1,x2,y2,Color_Red);
-	hd.Plotter.DrawCircle(xc, yc, 6, Color_Red);
-	hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
-	hd.Plotter.SaveMilestoneImage("BBox");
-	//hd.Plotter.ShowPlacement();
+	hd.Plotter->DrawRectangle(x1,y1,x2,y2,Color_Red);
+	hd.Plotter->DrawCircle(xc, yc, 6, Color_Red);
+	hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
+	hd.Plotter->SaveMilestoneImage("BBox");
+	//hd.Plotter->ShowPlacement();
 
 	return tBBox;						
 }
@@ -867,8 +867,8 @@ void DoHippocratePlacement( HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat
 		Utils::IterateMostCriticalPaths(hd, -1, Utils::CriticalPathHandler(&callback, &PathCallback::ProcessPath2));
 	}
 	else{
-		hd.Plotter.ShowPlacement();
-		hd.Plotter.SaveMilestoneImage("Before_Hippocrate");
+		hd.Plotter->ShowPlacement();
+		hd.Plotter->SaveMilestoneImage("Before_Hippocrate");
 
 		Utils::CalculateHPWL(hd, true);
 
@@ -881,12 +881,12 @@ void DoHippocratePlacement( HDPGrid& hdpp, HDesign& hd, StatisticsAnalyser& stat
 			if(!(numOfPath%10)) ALERT("--Taking next path # %d", numOfPath);
 			numOfPath++;
 
-			hd.Plotter.PlotCriticalPath(critPathEnumW);
-			hd.Plotter.Refresh(HPlotter::WAIT_3_SECONDS);
+			hd.Plotter->PlotCriticalPath(critPathEnumW);
+			hd.Plotter->Refresh(HPlotter::WAIT_3_SECONDS);
 
 			callback.ProcessPath2(hd, critPathEnumW, -1);
 
-			hd.Plotter.ShowPlacement();
+			hd.Plotter->ShowPlacement();
 		}
 	}
 }
@@ -942,8 +942,8 @@ int FindFirstLeftCell(int row, int column, int R, HDPGrid& hdpp)	// Найти первый
 std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell)	// Вернуть окно элемента // moded
 {
 	std::vector<HCell> New;
-	hdpp.Design().Plotter.PlotCell(curCell, Color_Indigo);
-	hdpp.Design().Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+	hdpp.Design().Plotter->PlotCell(curCell, Color_Indigo);
+	hdpp.Design().Plotter->Refresh(HPlotter::WAIT_1_SECOND);
 	
 	int RL = 0; //кол-во cell'ов слева от текущего cell'а (в окне)
 	int row = hdpp.CellRow(curCell);        // номер ряда текущего cell'а
@@ -1115,9 +1115,9 @@ std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, std
 
 	std::vector<HCell>::iterator iterVCellsWindow=VCellsWindow.begin();
 
-	//hd.Plotter.PlotCell(curCell, Color_Red);
-	//hd.Plotter.Refresh(HPlotter::NO_WAIT);
-	//hd.Plotter.SaveMilestoneImage("CELLS_IN_WINDOW");
+	//hd.Plotter->PlotCell(curCell, Color_Red);
+	//hd.Plotter->Refresh(HPlotter::NO_WAIT);
+	//hd.Plotter->SaveMilestoneImage("CELLS_IN_WINDOW");
 
 
 	//ALERTFORMAT(("SORT1"));
@@ -1166,7 +1166,7 @@ std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, std
 	}
 	//ALERTFORMAT(("Num of Holes: %d", VPsCellWindow.size()));
 
-	hd.Plotter.ShowPlacement();
+	hd.Plotter->ShowPlacement();
 
 	VCellsWindow.clear();
 	return (VPsCellWindow);
@@ -1178,16 +1178,16 @@ std::vector<HCell> GetCellsConnectedWithCurrent(HDPGrid& hdpp, HDesign& hd, HCel
 	std::vector<HCell> ConnectedCells; //эл-ты, соединённые с текущим		
 	int connectedCellsCount = 0, j = 0;
 
-	//hd.Plotter.PlotCell(curCell, Color_Red);
-	//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+	//hd.Plotter->PlotCell(curCell, Color_Red);
+	//hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
 
 	//заполняем вектор эл-тов, соединённых с текущим
 	for(HCell::PinsEnumeratorW pin = hd.Get<HCell::Pins, HCell::PinsEnumeratorW>(curCell); pin.MoveNext(); ) {
 		HNet net = hd.Get<HPin::Net,HNet>(pin);
 		HNetWrapper netw = hd[hd.Get<HPin::Net,HNet>(pin)];
 		if(!::IsNull(net)) {
-			//hd.Plotter.PlotNet(netw);
-			//hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+			//hd.Plotter->PlotNet(netw);
+			//hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
 			if(pin == hd[hd.Get<HNet::Source, HPin>(netw)]) { //если source
 				for (HNet::PinsEnumeratorW npin = netw.GetPinsEnumeratorW(); npin.MoveNext(); ) {
 					if(npin!=hd[hd.Get<HNet::Source, HPin>(netw)])
@@ -1204,9 +1204,9 @@ std::vector<HCell> GetCellsConnectedWithCurrent(HDPGrid& hdpp, HDesign& hd, HCel
 		}
 	}
 	/*for(int i=0; i<ConnectedCells.size(); i++) {	
-	hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
-	hd.Plotter.PlotCell(ConnectedCells[i], Color_Black);
-	hd.Plotter.Refresh(HPlotter::WAIT_1_SECOND);
+	hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
+	hd.Plotter->PlotCell(ConnectedCells[i], Color_Black);
+	hd.Plotter->Refresh(HPlotter::WAIT_1_SECOND);
 	}*/
 	return ConnectedCells;
 }

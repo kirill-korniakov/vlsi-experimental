@@ -53,14 +53,15 @@ public:
              PinTypes(this),       RoutingLayers(this),  TimingArcTypes(this),
              Cells(this),          Pins(this),           Nets(this),
              SteinerPoints(this),  Wires(this),          Sites(this),
-             PlacementRows(this),  TimingPoints(this),   Plotter(*this),
-             CriticalPaths(this),  CriticalPathPoints(this)
+             PlacementRows(this),  TimingPoints(this),   CriticalPaths(this),
+             CriticalPathPoints(this)
   {
     _Design.Tech = 0;
+    Plotter = new HPlotter(*this);
   }
 
   HCircuit Circuit;
-  HPlotter Plotter;
+  HPlotter *Plotter;
   libconfig::ConfigExt cfg;
 
   HDESIGNCOLLECTION(Nets, HNets)

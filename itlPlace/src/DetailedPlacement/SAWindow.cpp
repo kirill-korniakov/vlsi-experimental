@@ -504,7 +504,7 @@ void MakeSAWindows(int nSteps, int nCells, int nRows, HDPGrid &_grid)
 
   time_t t2 = time(NULL);
   CheckOverlaps(_grid, 100, true);
-  _grid.Design().Plotter.PlotPlacement();
+  _grid.Design().Plotter->PlotPlacement();
   double currWL = Utils::CalculateHPWL(_grid.Design(), false);
   ALERT("final wl = %f, time: %f\n", currWL, difftime(t2, t1));
   ALERT("start wl = %f, improvement: %f% \n", startWL, ((startWL - currWL) * 100 / startWL));

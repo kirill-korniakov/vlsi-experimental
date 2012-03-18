@@ -6,7 +6,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
   unsigned errors_count = 0;
   HDesign& hd = grid.Design();
   if (drawMismatchses) 
-    hd.Plotter.SetAutoRefreshMinFrequency(200);
+    hd.Plotter->SetAutoRefreshMinFrequency(200);
 
   for (HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
   {
@@ -15,7 +15,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
     {
       if (drawMismatchses)
       {
-        hd.Plotter.DrawLine(
+        hd.Plotter->DrawLine(
           cell.X(),
           cell.Y(),
           grid.ColumnX(grid.CellColumn(cell)),
@@ -37,7 +37,7 @@ bool CheckGridConsistency(HDPGrid& grid, unsigned maxCellsToReport, double sensi
     ALERT("CheckGridConsistency: %d errors found", errors_count);
   }
   if (drawMismatchses) 
-    hd.Plotter.ResetAutoRefreshFrequency();
+    hd.Plotter->ResetAutoRefreshFrequency();
   return errors_count == 0;
 }
 
@@ -46,7 +46,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
   unsigned errors_count = 0;
   HDesign& hd = grid.Design();
   if (drawMismatchses) 
-    hd.Plotter.SetAutoRefreshMinFrequency(200);
+    hd.Plotter->SetAutoRefreshMinFrequency(200);
 
   for (HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
   {
@@ -57,7 +57,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
     {
       if (drawMismatchses)
       {
-        hd.Plotter.DrawBar(
+        hd.Plotter->DrawBar(
           cell.X(),
           cell.Y(),
           cell.X() + grid.SiteWidth() * grid.CellSitesNum(cell),
@@ -80,7 +80,7 @@ bool CheckGridBoundary(HDPGrid& grid, unsigned maxCellsToReport, bool drawMismat
     ALERT("CheckGridBoundary: %d errors found", errors_count);
   }
   if (drawMismatchses) 
-    hd.Plotter.ResetAutoRefreshFrequency();
+    hd.Plotter->ResetAutoRefreshFrequency();
   return errors_count == 0;
 }
 
@@ -89,7 +89,7 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
   unsigned errors_count = 0;
   HDesign& hd = grid.Design();
   if (drawOverlaps) 
-    hd.Plotter.SetAutoRefreshMinFrequency(5000);
+    hd.Plotter->SetAutoRefreshMinFrequency(5000);
 
   for (HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
   {
@@ -115,7 +115,7 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
         }
         if (drawOverlaps)
         {
-          hd.Plotter.DrawBar(
+          hd.Plotter->DrawBar(
             grid.ColumnX(column + i),
             grid.RowY(row),
             grid.ColumnX(column + i) + grid.SiteWidth(),
@@ -131,6 +131,6 @@ bool CheckOverlaps(HDPGrid& grid, unsigned maxCellsToReport, bool drawOverlaps)
     ALERT("CheckOverlaps: %d errors found", errors_count);
   }
   if (drawOverlaps) 
-    hd.Plotter.ResetAutoRefreshFrequency();
+    hd.Plotter->ResetAutoRefreshFrequency();
   return errors_count == 0;
 }

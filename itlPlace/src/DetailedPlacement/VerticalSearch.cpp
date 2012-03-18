@@ -253,7 +253,7 @@ bool VerticalSwapper::TryToMoveCellTowardsOptimalRegion()
       {//if there is enough space in a continual free space region
         if (TryToMoveWithoutShifting(rowIdx, maxFreeSpaceOrigin))
         {
-          //m_Grid.Design().Plotter.PlotCell(m_Cell);
+          //m_Grid.Design().Plotter->PlotCell(m_Cell);
           //ALERT("- %s\t", cellName.c_str()));
           return true;
         }
@@ -262,7 +262,7 @@ bool VerticalSwapper::TryToMoveCellTowardsOptimalRegion()
       {//if there is still enough space but shifting of other cells is needed
         if (TryToMoveWithShifting(rowIdx))
         {
-          //m_Grid.Design().Plotter.PlotCell(m_Cell);
+          //m_Grid.Design().Plotter->PlotCell(m_Cell);
           //ALERT("+ %s\t", cellName.c_str()));
           return true;
         }
@@ -419,7 +419,7 @@ void VerticalSwapper::FindOptimalRow()
 
   /*if (m_Grid.Design().cfg.ValueOf("DetailedPlacement.tmp_drawOptimalSites", false))
   {//TODO: delete or accept this plotting
-    m_Grid.Design().Plotter.DrawCircle(m_Grid.Design().Circuit.PlacementMinX() + m_OriginColIdx*m_Grid.SiteWidth(), 
+    m_Grid.Design().Plotter->DrawCircle(m_Grid.Design().Circuit.PlacementMinX() + m_OriginColIdx*m_Grid.SiteWidth(), 
       m_Grid.Design().Circuit.PlacementMinY() + m_OptimalRowIdx*m_Grid.SiteHeight(), 4, Color_Green);
   }*/
 
@@ -480,6 +480,6 @@ void VerticalSearch(HDPGrid& grid, ConstraintsController* checker)
   for (; pCell.MoveNext();)
   {
     hswapper.ProcessCell(pCell);
-    grid.Design().Plotter.AutoShowPlacement();
+    grid.Design().Plotter->AutoShowPlacement();
   }
 }

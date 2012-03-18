@@ -12,7 +12,7 @@
 MuReporter::MuReporter(HDesign& design)
 {
     if (design.cfg.ValueOf(".LagrangianRelaxation.Reporter.plotMus", false))
-        design.Plotter.InitializeHistogramWindow();
+        design.Plotter->InitializeHistogramWindow();
     scaling = 0.01;  //TODO: choose proper scale
     waitTime = design.cfg.ValueOf(".Plotting.plotWait", 1);
 
@@ -34,7 +34,7 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
         ReportMuHistogram(design);
     }
 
-    design.Plotter.ClearHistogram();
+    design.Plotter->ClearHistogram();
     string order = design.cfg.ValueOf(".LagrangianRelaxation.Reporter.order", "CriticalPath");
     if (order == "CriticalPath")
         PlotMusInCriticalPathOrder(design);
@@ -42,8 +42,8 @@ void MuReporter::Report(HDesign& design, TimingPointMus* mus, string msg)
         PlotMusInTopologicalOrder(design);
     else
         GLOGWARNING(LOGINPLACE, "Unknown LagrangianRelaxation.Reporter.order = %s", order.c_str());                    
-    design.Plotter.PlotMuLevel(1.0, scaling); //TODO: probably better to get initial mu
-    design.Plotter.RefreshHistogram((HPlotter::WaitTime)waitTime);
+    design.Plotter->PlotMuLevel(1.0, scaling); //TODO: probably better to get initial mu
+    design.Plotter->RefreshHistogram((HPlotter::WaitTime)waitTime);
 }
 
 void MuReporter::ReportMus(HDesign& design)
@@ -142,7 +142,7 @@ void MuReporter::PlotMusInTopologicalOrder(HDesign& design)
     int i = 0;
     for (HTimingPointWrapper pt = design[design.TimingPoints.FirstInternalPoint()]; !::IsNull(pt.GoNext()); i++)
     {
-        design.Plotter.PlotMu(i, nTimingPoints, mus->SumInMuA(pt), scaling, Color_Red);
+        design.Plotter->PlotMu(i, nTimingPoints, mus->SumInMuA(pt), scaling, Color_Red);
     }
 }
 
@@ -165,7 +165,7 @@ void MuReporter::PlotPathMus(HDesign& design, HCriticalPath path, int pathIdx)
     else
         color = Color_Orange;
 
-    design.Plotter.PlotMu(sum, plotX, scaling / nTP, color);
+    design.Plotter->PlotMu(sum, plotX, scaling / nTP, color);
     plotX += 1;
 }
 
@@ -178,5 +178,5 @@ void MuReporter::PlotMusInCriticalPathOrder(HDesign& design)
     Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, 
         Utils::CriticalPathHandler(this, &MuReporter::PlotPathMus));
 
-    design.Plotter.PlotMu(1.0, plotX, 1.0, Color_Black);
+    design.Plotter->PlotMu(1.0, plotX, 1.0, Color_Black);
 }

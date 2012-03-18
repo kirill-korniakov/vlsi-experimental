@@ -534,7 +534,7 @@ public:
     {return;
     std::stack<HSteinerPoint> points;
     HPinWrapper src = ((net,design).Source(), design);
-    design.Plotter.DrawCircle(src.X(), src.Y(), 4, col);
+    design.Plotter->DrawCircle(src.X(), src.Y(), 4, col);
     points.push(design.SteinerPoints[src]);
     while(!points.empty())
     {
@@ -543,15 +543,15 @@ public:
         {
             HSteinerPointWrapper lpt = (pt.Left(),design);
             points.push(lpt);
-            design.Plotter.DrawLine(pt.X(), pt.Y(), lpt.X(), lpt.Y(), col);
+            design.Plotter->DrawLine(pt.X(), pt.Y(), lpt.X(), lpt.Y(), col);
         }
         if (pt.HasRight())
         {
             HSteinerPointWrapper rpt = (pt.Right(),design);
             points.push(rpt);
-            design.Plotter.DrawLine(pt.X(), pt.Y(), rpt.X(), rpt.Y(), col);
+            design.Plotter->DrawLine(pt.X(), pt.Y(), rpt.X(), rpt.Y(), col);
         }
-        design.Plotter.DrawCircle(pt.X(), pt.Y(), 2, Color_Green);
+        design.Plotter->DrawCircle(pt.X(), pt.Y(), 2, Color_Green);
     }
     }
 };
@@ -676,8 +676,8 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
 
         HDPGrid grid(design);
         Legalization(grid);
-        grid.Design().Plotter.ShowPlacement();
-        grid.Design().Plotter.SaveMilestoneImage("LEG");
+        grid.Design().Plotter->ShowPlacement();
+        grid.Design().Plotter->SaveMilestoneImage("LEG");
     }
     ALERT("Inserted %d buffers", pb.InsertedBuffers);
 
@@ -712,8 +712,8 @@ void InsertRepeaters(HDesign& design)
         double rtime = (design.TimingPoints[net.Source()],design).RequiredTime() - (design.SteinerPoints[net.Source()],design).ObservedC() * dr;
         //double srtime = (getSink(design,net),design).RequiredTime();
         //double sc = (design.SteinerPoints[(getSink(design,net),design).Pin()],design).ObservedC();
-        design.Plotter.Clear();
-        design.Plotter.PlotPlacement();
+        design.Plotter->Clear();
+        design.Plotter->PlotPlacement();
         vg.DrawTree(net, Color_Black);
         int ins = vg.InsertBuffers(net);
         i += ins;
@@ -741,8 +741,8 @@ void InsertRepeaters(HDesign& design)
                 j);
             tns = tns1;
             wns = wns1;
-            design.Plotter.Refresh();//rtime > rtime1 ? HPlotter::WAIT_1_SECOND : HPlotter::WAIT_1_SECOND);
-            design.Plotter.SaveImage("","pix\\");
+            design.Plotter->Refresh();//rtime > rtime1 ? HPlotter::WAIT_1_SECOND : HPlotter::WAIT_1_SECOND);
+            design.Plotter->SaveImage("","pix\\");
         }
         j++;
     }

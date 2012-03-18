@@ -93,7 +93,7 @@ void DetailedPlacement(HDPGrid& grid)
     {
       GlobalSwap(grid, checker);
       LegalityControl(grid);
-      grid.Design().Plotter.Refresh();
+      grid.Design().Plotter->Refresh();
 
       wlAfterGlobalSwap = Utils::CalculateHPWL(grid.Design(), true);
 
@@ -114,7 +114,7 @@ void DetailedPlacement(HDPGrid& grid)
     {
       VerticalSearch(grid, checker);
       LegalityControl(grid);
-      grid.Design().Plotter.Refresh();
+      grid.Design().Plotter->Refresh();
 
       wlAfterVerticalSearch = Utils::CalculateHPWL(grid.Design(), true);
 
@@ -135,7 +135,7 @@ void DetailedPlacement(HDPGrid& grid)
     {
       HorizontalSearch(grid, checker);
       LegalityControl(grid);
-      grid.Design().Plotter.Refresh();
+      grid.Design().Plotter->Refresh();
 
       wlAfterHorizontalSearch = Utils::CalculateHPWL(grid.Design(), true);
 

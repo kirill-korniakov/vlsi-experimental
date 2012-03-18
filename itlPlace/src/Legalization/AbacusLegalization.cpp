@@ -336,14 +336,14 @@ void AbacusLegalization(HDPGrid& grid)
       if ((i + 1) % plotterStep == 0)
       {
         abacus.UpdateCellsCoordinates();
-        design.Plotter.ShowLegalizationState(plotterSpeed, drawSites);
+        design.Plotter->ShowLegalizationState(plotterSpeed, drawSites);
       }
   }//for (int i = 0; i < nCells; i++)
 
   abacus.UpdateCellsCoordinates();
 
   if (usePlotter)
-    design.Plotter.ShowLegalizationState(plotterSpeed, drawSites);
+    design.Plotter->ShowLegalizationState(plotterSpeed, drawSites);
   
   delete[] wCells;
 }

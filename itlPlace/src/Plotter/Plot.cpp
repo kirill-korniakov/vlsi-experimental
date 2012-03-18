@@ -228,7 +228,7 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
             nextPoint = srcPoint->GetLeft();
             DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
             DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
-            //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
+            //m_hd.Plotter->DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
             points.push(nextPoint);
 
             if (srcPoint->HasRight())
@@ -236,7 +236,7 @@ void HPlotter::PlotVGTree(VanGinnekenTreeNode* tree, Color LineColor, Color VGNo
                 nextPoint = srcPoint->GetRight();
                 DrawLine(srcPoint->x, srcPoint->y, nextPoint->x, nextPoint->y, LineColor, false);
                 DrawCircle(srcPoint->x, srcPoint->y, 1, VGNodeColor, false);
-                //m_hd.Plotter.DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
+                //m_hd.Plotter->DrawRectangle(nextPoint->x, nextPoint->y, nextPoint->x + DesignX2ImageX(5), nextPoint->y + DesignY2ImageY(5),  Color(color + 1));
                 points.push(nextPoint);
             }
         }
@@ -459,12 +459,12 @@ void HPlotter::PlotPath(HDesign& design, HCriticalPath path, int pathNumber)
     sprintf(fileName, "critical_path_%d", pathNumber);
     sprintf(signature, "critical path #%d %f", pathNumber, design.GetDouble<HCriticalPath::Criticality>(path));
 
-    design.Plotter.Clear();
-    design.Plotter.PlotPlacement();
-    design.Plotter.PlotCriticalPath(path);
-    design.Plotter.DrawText(signature);
-    design.Plotter.Refresh("CriticalPaths.plotWait");
-    design.Plotter.SaveImage(fileName,
+    design.Plotter->Clear();
+    design.Plotter->PlotPlacement();
+    design.Plotter->PlotCriticalPath(path);
+    design.Plotter->DrawText(signature);
+    design.Plotter->Refresh("CriticalPaths.plotWait");
+    design.Plotter->SaveImage(fileName,
     design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_critical_path\\");
 }
 

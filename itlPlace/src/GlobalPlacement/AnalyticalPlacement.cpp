@@ -368,7 +368,7 @@ int AnalyticalGlobalPlacement::InitializeTAO(HDesign& hd, ClusteringInformation 
     // Set solution vec and an initial guess
     SetVariablesValues(ci, x);
 
-    hd.Plotter.ShowGlobalPlacement(false, context.sprData.binGrid.nBinRows, 
+    hd.Plotter->ShowGlobalPlacement(false, context.sprData.binGrid.nBinRows, 
         context.sprData.binGrid.nBinCols, HPlotter::WAIT_1_SECOND);
 
     iCHKERRQ TaoAppSetInitialSolutionVec(taoapp, x);

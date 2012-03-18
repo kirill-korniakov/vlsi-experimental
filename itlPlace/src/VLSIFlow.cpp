@@ -64,8 +64,8 @@ void WriteFlowMetrics(TableFormatter& fmt, HDesign& design, const char* stageNam
         fmt.SetCell(7, Utils::WNS(design));
     }
 
-    design.Plotter.ShowPlacement();
-    design.Plotter.SaveMilestoneImage(tag.c_str());
+    design.Plotter->ShowPlacement();
+    design.Plotter->SaveMilestoneImage(tag.c_str());
 }
 
 bool DoRandomPlacementIfRequired(HDesign& hd, const char* cfgOptName)
@@ -157,7 +157,7 @@ void DoSTAIfCan(HDesign& hd)
         STA(hd);
         FindCriticalPaths(hd);
         PrintTimingReport(hd, hd.cfg.ValueOf("CriticalPaths.countLogReportCriticalPaths", 0));
-        hd.Plotter.PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
+        hd.Plotter->PlotMostCriticalPaths(hd, hd.cfg.ValueOf("CriticalPaths.countPlotCriticalPaths", 0));
     }
 }
 
@@ -216,7 +216,7 @@ bool DoHippocratePlacementIfRequired(HDesign& hd, const char* cfgOptName)
             ALERT("Not Legalized after!");
         }
         else ALERT("!!!Legalized after!");
-        hd.Plotter.ShowPlacement();
+        hd.Plotter->ShowPlacement();
 
         ALERT("STA after Hippocrate placement:");     
         STA(hd,true);
@@ -458,8 +458,8 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     FlowMetricsTableAddBorder(flowMetrics, hd);
 
     //EXPORT
-    hd.Plotter.ShowPlacement();
-    hd.Plotter.SaveMilestoneImage("FINAL", false);
+    hd.Plotter->ShowPlacement();
+    hd.Plotter->SaveMilestoneImage("FINAL", false);
     ExportDEF(hd, hd.cfg.ValueOf("benchmark.exportDEFFileName"));
 
     WRITELINE("");

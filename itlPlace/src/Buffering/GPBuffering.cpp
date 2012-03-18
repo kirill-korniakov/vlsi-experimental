@@ -390,14 +390,14 @@ void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& path
 void GPBuffering::Plot(AppCtx* context)
 {
     if (data->plotBuffer || data->plotBinGridValue)
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
 
     if (data->plotBinGridValue)
-        data->design.Plotter.PlotFillBinGrid(context);
+        data->design.Plotter->PlotFillBinGrid(context);
 
     if (data->plotBuffer || data->plotBinGridValue)
     {
-        data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->Refresh(HPlotter::WaitTime(data->plotterWaitTime));
+        data->design.Plotter->ShowPlacement();
     }     
 }

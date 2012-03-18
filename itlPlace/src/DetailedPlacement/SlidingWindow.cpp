@@ -556,7 +556,7 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, HCell cells[], int
     double sw_x2 = bounds[2 * i + 1];
     double sw_y1 = _grid.RowY(i + firstRowIdx);
     double sw_y2 = sw_y1 + _grid.SiteHeight();
-    _grid.Design().Plotter.DrawRectangle(sw_x1, sw_y1, sw_x2, sw_y2, Color_Black);
+    _grid.Design().Plotter->DrawRectangle(sw_x1, sw_y1, sw_x2, sw_y2, Color_Black);
 
     if (siteIndexes[i] + rowWidthInSites[i] > _grid.NumCols())
     {

@@ -272,7 +272,7 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
 
         if (vGAlgorithm->data->plotNets)
         {
-            vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, true, 
+            vGAlgorithm->data->design.Plotter->ShowNetSteinerTree(subNet, Color_Red, true, 
                 HPlotter::WaitTime(vGAlgorithm->data->plotterWaitTime));
         }
 
@@ -309,7 +309,7 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
 
             if (vGAlgorithm->data->plotNets)
             {
-                vGAlgorithm->data->design.Plotter.ShowNetSteinerTree(subNet, Color_Red, false, 
+                vGAlgorithm->data->design.Plotter->ShowNetSteinerTree(subNet, Color_Red, false, 
                     HPlotter::WaitTime(vGAlgorithm->data->plotterWaitTime));
             }
             j++;

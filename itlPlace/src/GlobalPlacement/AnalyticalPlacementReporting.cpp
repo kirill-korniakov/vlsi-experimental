@@ -81,7 +81,7 @@ void AnalyticalGlobalPlacement::ReportPreIterationInfo(HDesign& hd, AppCtx& cont
 
     ReportWeights(context);
 
-    hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false), 
+    hd.Plotter->ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false), 
         context.sprData.binGrid.nBinRows, context.sprData.binGrid.nBinCols);
 }
 
@@ -93,14 +93,14 @@ void AnalyticalGlobalPlacement::ReportPostIterationInfo(HDesign& hd, AppCtx& con
     //std::string defName = Aux::CreateCoolFileName("GP_Iters/", hd.Circuit.Name() + "_" + Aux::IntToString(iteration - 1), "def");
     //ExportDEF(hd, defName);
 
-    //hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false), 
+    //hd.Plotter->ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false), 
     //    context.spreadingData.binGrid.nBinRows, context.spreadingData.binGrid.nBinCols, HPlotter::WAIT_3_SECONDS);
 
     if (hd.cfg.ValueOf(".Plotting.saveTAOmilestones", false))
     {
-        hd.Plotter.ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false),
+        hd.Plotter->ShowGlobalPlacement(hd.cfg.ValueOf(".Plotting.plotWires", false),
             context.sprData.binGrid.nBinRows, context.sprData.binGrid.nBinCols);
-        hd.Plotter.SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration));
+        hd.Plotter->SaveMilestoneImage(Aux::Format("TAO%d.%d", metaIteration, iteration));
     }
 }
 

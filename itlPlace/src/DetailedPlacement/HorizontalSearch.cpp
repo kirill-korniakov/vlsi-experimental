@@ -247,7 +247,7 @@ void HorizontalSearch(HDPGrid& grid, ConstraintsController* checker)
   for (int i = 0; i < grid.NumRows(); ++i)
   {
     hswapper.ProcessRow(i);
-    grid.Design().Plotter.AutoShowPlacement();
+    grid.Design().Plotter->AutoShowPlacement();
     //ALERT("Row %d replaced.", i));
   }
 }

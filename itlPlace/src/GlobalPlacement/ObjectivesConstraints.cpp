@@ -117,7 +117,7 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
     static bool plotSolverState = context->hd->cfg.ValueOf(".Plotting.plotSolverState", false);
     if (plotSolverState)
     {
-        context->hd->Plotter.VisualizeState(context->ci->mCurrentNumberOfClusters, 
+        context->hd->Plotter->VisualizeState(context->ci->mCurrentNumberOfClusters, 
             context->sprData.binGrid.nBinRows, context->sprData.binGrid.nBinCols, 
             context->ci->netList.size(), 
             (double*)solution, 
@@ -126,10 +126,10 @@ void ReportDebugInfo(AppCtx* context, PetscScalar * solution, PetscScalar * grad
 
         if (context->useSumOfDelays)
         {
-            context->hd->Plotter.ClearHistogram();
-            context->hd->Plotter.PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
+            context->hd->Plotter->ClearHistogram();
+            context->hd->Plotter->PlotKi(context->ci->mCurrentNumberOfClusters, context->ci->netList.size(), 
                 (double*)solution, Color_Violet);
-            context->hd->Plotter.RefreshHistogram();
+            context->hd->Plotter->RefreshHistogram();
         }
     }
 }

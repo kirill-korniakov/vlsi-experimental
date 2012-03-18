@@ -273,12 +273,12 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 		sprintf(signature, "%s crossing = %d ", netw.Name().c_str(), crossing);
 
 		//FIXME: use public API (Show methods) of the plotter
-		design.Plotter.PlotNetSteinerTree(net, Color_Black);
-		design.Plotter.Refresh(HPlotter::WaitTime(intWaitTime));
-		design.Plotter.DrawText(signature);
-		design.Plotter.SaveImage("",design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_crossing_path\\");
-		design.Plotter.Clear();
-		design.Plotter.ShowPlacement();
+		design.Plotter->PlotNetSteinerTree(net, Color_Black);
+		design.Plotter->Refresh(HPlotter::WaitTime(intWaitTime));
+		design.Plotter->DrawText(signature);
+		design.Plotter->SaveImage("",design.cfg.ValueOf("plotter.pixDirectory", ".\\") + design.Circuit.Name() + "_crossing_path\\");
+		design.Plotter->Clear();
+		design.Plotter->ShowPlacement();
 	}
 	return crossingType;
 }

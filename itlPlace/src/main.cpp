@@ -55,7 +55,7 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
     design.SteinerPoints.Initialize();
     design.Wires.Initialize();
     InitializeTiming(design);
-    design.Plotter.Initialize();
+    design.Plotter->Initialize();
 }
 
 int main(int argc, char** argv)
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
         InitializeDesign(design, argc, argv);
 
         PinPlacement(design);//TODO: move from global placement to separate files.
-        design.Plotter.ShowPlacement(HPlotter::WAIT_3_SECONDS);
+        design.Plotter->ShowPlacement(HPlotter::WAIT_3_SECONDS);
 
         //REPORT CIRCUIT INFO
         ReportBenchmarkStatistics(design);

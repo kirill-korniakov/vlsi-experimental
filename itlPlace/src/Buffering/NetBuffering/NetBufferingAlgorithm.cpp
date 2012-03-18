@@ -85,13 +85,13 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
 
     if ((data->plotSteinerPoint) || (data->plotNets))
     {
-        data->design.Plotter.ShowNetSteinerTree(net, Color_Black, true, 
+        data->design.Plotter->ShowNetSteinerTree(net, Color_Black, true, 
             HPlotter::WaitTime(data->plotterWaitTime));
     }
 
     if (data->plotVGTree)
     {
-        data->design.Plotter.ShowVGTree(net, data->vGTree->GetSource(), 
+        data->design.Plotter->ShowVGTree(net, data->vGTree->GetSource(), 
             Color_Black, true, HPlotter::WaitTime(data->plotterWaitTime));
     }
 
@@ -107,7 +107,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
             data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
             if (data->plotBuffer)
             {
-                data->design.Plotter.DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
+                data->design.Plotter->DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
             }
         }
         if (isRealBuffering)
@@ -122,7 +122,7 @@ VGVariantsListElement NetBufferingAlgorithm::BufferingNet(HNet& net, bool isReal
 
     if ((data->plotSteinerPoint) || (data->plotVGTree) || (data->plotNets))
     {
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
     }
 
     return best;

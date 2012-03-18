@@ -42,7 +42,7 @@ int BufferingAllCriticalPath::BufferingCriticalPaths()
         FindCriticalPaths(data->design);
 
     if (data->plotBuffer)
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
 
     std::vector<HCriticalPath> paths(data->design.CriticalPaths.Count());
     int idx = 0;
@@ -85,8 +85,8 @@ int BufferingAllCriticalPath::BufferingCriticalPaths()
     }
     if (data->plotBuffer)
     {
-        data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->Refresh(HPlotter::WaitTime(data->plotterWaitTime));
+        data->design.Plotter->ShowPlacement();
     }
     ALERT("Buffers inserted: %d", bufferCount);
     ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
@@ -111,13 +111,13 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
 
     if ((data->plotSteinerPoint) || (data->plotNets))
     {
-        data->design.Plotter.ShowCriticalPathSteinerTree(criticalPath, Color_Black, true, 
+        data->design.Plotter->ShowCriticalPathSteinerTree(criticalPath, Color_Black, true, 
             HPlotter::WaitTime(data->plotterWaitTime));
     }
 
     /*if (data->plotVGTree)
     {
-    data->design.Plotter.ShowVGTree(net, &data->vGTree->GetSource(), 
+    data->design.Plotter->ShowVGTree(net, &data->vGTree->GetSource(), 
     Color_Black, true, HPlotter::WaitTime(data->plotterWaitTime));
     }*/
 
@@ -133,7 +133,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
             data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
             if (data->plotBuffer)
             {
-                data->design.Plotter.DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
+                data->design.Plotter->DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
             }
         }
         if (isRealBuffering)
@@ -169,7 +169,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
 
     if ((data->plotSteinerPoint) || (data->plotVGTree) || (data->plotNets))
     {
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
     }
 
     return best;
@@ -189,7 +189,7 @@ int PathBasedBuffering::BufferingNetlist()
         FindCriticalPaths(data->design);
 
     if (data->plotBuffer)
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
 
     int totalBufferCount = 0;
     ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
@@ -319,8 +319,8 @@ int PathBasedBuffering::BufferingNetlist()
 
     if (data->plotBuffer)
     {
-        data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->Refresh(HPlotter::WaitTime(data->plotterWaitTime));
+        data->design.Plotter->ShowPlacement();
     }
 
     ALERT("Buffers inserted: %d", totalBufferCount);
@@ -348,13 +348,13 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(CriticalPathBuff
 
     if ((data->plotSteinerPoint) || (data->plotNets))
     {
-        // data->design.Plotter.ShowCriticalPathSteinerTree(criticalPath, Color_Black, true, 
+        // data->design.Plotter->ShowCriticalPathSteinerTree(criticalPath, Color_Black, true, 
         //     HPlotter::WaitTime(data->plotterWaitTime));
     }
 
     /*if (data->plotVGTree)
     {
-    data->design.Plotter.ShowVGTree(net, &data->vGTree->GetSource(), 
+    data->design.Plotter->ShowVGTree(net, &data->vGTree->GetSource(), 
     Color_Black, true, HPlotter::WaitTime(data->plotterWaitTime));
     }*/
 
@@ -370,7 +370,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(CriticalPathBuff
             data->AddAreaBuffer(data->design[pos->GetBufferInfo()->Type()].SizeX() * data->design[pos->GetBufferInfo()->Type()].SizeY());
             if (data->plotBuffer)
             {
-                data->design.Plotter.DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
+                data->design.Plotter->DrawFilledRectangle(pos->GetPosition()->x, pos->GetPosition()->y, data->design[pos->GetBufferInfo()->Type()].SizeX(), data->design[pos->GetBufferInfo()->Type()].SizeY(), Color_Red, false);
             }
         }
         if (isRealBuffering)
@@ -404,7 +404,7 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(CriticalPathBuff
 
     if ((data->plotSteinerPoint) || (data->plotVGTree) || (data->plotNets))
     {
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
     }
 
     return best;
@@ -418,7 +418,7 @@ int PathBasedBuffering::BufferingNetlist2()
         FindCriticalPaths(data->design);
 
     if (data->plotBuffer)
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->ShowPlacement();
 
     int totalBufferCount = 0;
     ALERT("CriticalPaths count = %d", data->design.CriticalPaths.Count());
@@ -545,8 +545,8 @@ int PathBasedBuffering::BufferingNetlist2()
 
     if (data->plotBuffer)
     {
-        data->design.Plotter.Refresh(HPlotter::WaitTime(data->plotterWaitTime));
-        data->design.Plotter.ShowPlacement();
+        data->design.Plotter->Refresh(HPlotter::WaitTime(data->plotterWaitTime));
+        data->design.Plotter->ShowPlacement();
     }
 
     ALERT("Buffers inserted: %d", totalBufferCount);
@@ -575,7 +575,7 @@ RemoveBuffer::~RemoveBuffer()
 void RemoveBuffer::RemoveNewBuffering()
 {
     ALERT("Cells before remove = %d", data->design.Cells.PlaceableCellsCount());
-    data->design.Plotter.ShowPlacement();
+    data->design.Plotter->ShowPlacement();
     int bufferCount = 0;
     int startNewPinIndex = data->design._Design.NetList.nPinsEnd;
 
@@ -662,8 +662,8 @@ void RemoveBuffer::RemoveNewBuffering()
 
     ALERT("Cells after remove = %d", data->design.Cells.PlaceableCellsCount());
 
-    data->design.Plotter.ShowPlacement();
+    data->design.Plotter->ShowPlacement();
     STA(data->design);
     FindCriticalPaths(data->design);
-    data->design.Plotter.ShowPlacement();
+    data->design.Plotter->ShowPlacement();
 }
