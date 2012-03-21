@@ -2,6 +2,8 @@
 #include "PlotterData.h"
 #include "AdaptiveRoute.h"
 
+#include "OpenCVPlotter.h"
+
 //Show methods
 void HPlotter::ShowPlacement(WaitTime waitTime)
 {
@@ -10,7 +12,7 @@ void HPlotter::ShowPlacement(WaitTime waitTime)
     Refresh(waitTime);
 }
 
-void HPlotter::AutoShowPlacement(WaitTime waitTime)
+void OpenCVPlotter::AutoShowPlacement(WaitTime waitTime)
 {
     if (!IsEnabled())
         return;

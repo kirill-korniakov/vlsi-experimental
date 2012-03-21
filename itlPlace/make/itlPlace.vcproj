@@ -201,6 +201,7 @@
 				Name="VCPreBuildEventTool"
 				Description="Getting revision number"
 				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
+				ExcludedFromBuild="false"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -220,7 +221,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\src\Buffering\NetBuffering;..\src\Buffering\NetListBuffering;..\include\GlobalPlacement;..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
+				AdditionalIncludeDirectories="..\src\Buffering\NetBuffering;..\src\Buffering\NetListBuffering;..\include\Plotter;..\include\GlobalPlacement;..\include\3dParty;..\include\Buffering;..\include\data\Builders;..\include\data\Utils;..\include\data\auxiliary;..\include;..\include\config;..\include\data\low;..\include\data\high;..\include\data;..\include\PETSc\include;&quot;..\include\PETSc\bmake\$(ConfigurationName)&quot;;..\include\TAO\src\petsctao\include;..\include\TAO\include;..\include\PETSc\include\mpiuni;..\include\TAO"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBCONFIG_STATIC;WIN32;NOMINMAX"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -9880,6 +9881,17 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Plotter\OpenCVPlotter.cpp"
+					>
+					<FileConfiguration
+						Name="release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\src\Plotter\Plot.cpp"
 					>
 				</File>
@@ -11537,6 +11549,21 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Plotter"
+				>
+				<File
+					RelativePath="..\include\Plotter\OpenCVPlotter.h"
+					>
+					<FileConfiguration
+						Name="release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

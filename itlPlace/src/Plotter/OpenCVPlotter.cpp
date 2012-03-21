@@ -1,14 +1,24 @@
-#include "HPlotter.h"
+#include "OpenCVPlotter.h"
 #include "PlotterData.h"
 #include "Utils.h"
 
-HPlotter::~HPlotter()
+
+OpenCVPlotter::OpenCVPlotter(HDesign& design): HPlotter(design)
+{
+  m_data = new PlotterData();
+  IMG = 0;
+  m_Data->vw = NULL;
+  m_isDestroyed = true;
+  m_isHistogramDestroyed = true;
+}
+
+/*HPlotter::~HPlotter()
 {
   Destroy();
   DestroyHistogramWindow();
   delete m_Data;
-}
-
+}*/
+/*
 void HPlotter::Initialize()
 {
   if (_IsEnabled())
@@ -194,3 +204,4 @@ Color HPlotter::_GetCellColor(HCell plotCell)
   else
     return cell.IsSpecial() ? specCellBackColor : cell.IsSequential() ? seqCellBackColor :  combCellBackColor;
 }
+*/

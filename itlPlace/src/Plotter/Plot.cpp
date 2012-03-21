@@ -1,11 +1,9 @@
 #include "HPlotter.h"
-#include "PlotterData.h" //
 #include "HDesign.h"
-#include "Auxiliary.h" //
 #include "AdaptiveRoute.h"
 #include "VanGinnekenTreeNode.h"
 
-#include "Utils.h" //
+#include "Utils.h"
 #include "OptimizationContext.h"
 
 void HPlotter::PlotCell(HCell cell, Color col)
@@ -382,8 +380,7 @@ void HPlotter::PlotPlacement()
         finishX = terminal.X() + terminal.Width();
         finishY = terminal.Y() + terminal.Height();
 
-        if ((DesignX2ImageX(startX) + 1 < DesignX2ImageX(finishX)) &&
-            (DesignY2ImageY(startY) + 1 < DesignY2ImageY(finishY)))
+        if ((startX < finishX) && (startY < finishY))
         {
             DrawFilledRectangleWithBorder(startX, startY, finishX, finishY, terminalColor,
                                           terminalBackColor, false);

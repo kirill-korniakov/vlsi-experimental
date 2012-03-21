@@ -20,6 +20,8 @@
 #include "HCriticalPath.h"
 #include "HCriticalPathPoint.h"
 
+#include "OpenCVPlotter.h"
+
 #define HDESIGNCOLLECTION(field_name, col_type) \
 public: \
   col_type field_name; \
@@ -57,7 +59,8 @@ public:
              CriticalPathPoints(this)
   {
     _Design.Tech = 0;
-    Plotter = new HPlotter(*this);
+    //Plotter = new HPlotter(*this);
+    Plotter = new OpenCVPlotter(*this);
   }
 
   HCircuit Circuit;

@@ -16,7 +16,7 @@ class TileGrid;
 class HPlotter
 {
 public:
-  HPlotter(HDesign& design);
+  HPlotter::HPlotter(HDesign& design):m_hd(design) {}
   ~HPlotter();
 
   enum WaitTime
@@ -52,7 +52,7 @@ public:
 
   //Show methods
   void ShowPlacement(WaitTime waitTime = NO_WAIT);
-  void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
+  virtual void AutoShowPlacement(WaitTime waitTime = NO_WAIT) = 0;
   void ShowGlobalPlacement(bool plotWires, int nBinRows, int nBinCols, WaitTime waitTime = NO_WAIT);
   void VisualizeState(int nClusters, int nBinRows, int nBinCols, int nNets,
                       double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g);
