@@ -121,7 +121,7 @@ bool HPlotter::_IsEnabled()
   return m_hd.cfg.ValueOf("plotter.enabled", false);
 }
 
-void HPlotter::_AutoRefresh()
+/*void HPlotter::_AutoRefresh()
 {
   if (!IsEnabled())
     return;
@@ -130,7 +130,7 @@ void HPlotter::_AutoRefresh()
   {
     Refresh(NO_WAIT);
   }
-}
+}*/
 
 Color HPlotter::_GetCellColor(HCell plotCell)
 {

@@ -11,7 +11,6 @@ class VanGinnekenTreeNode;
 
 struct AppCtx;
 class HDPGrid;
-class TileGrid;
 
 class HPlotter
 {
@@ -58,17 +57,26 @@ public:
                       double* x, double* gLSE, double* gSOD, double* gLR, double* gQS, double* g);
   void ShowLegalizationState(WaitTime waitTime, bool drawSites);
   void ShowSteinerForest(Color color, WaitTime waitTime = NO_WAIT);
-  void ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
-  void ShowCriticalPathSteinerTree(HCriticalPath net, Color color, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, double textSize = -1);
-  void ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color VGNodeColor = Color_Red, double textSize = -1);
-  void ShowNet(HNet net, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT, Color color = Color_Peru, double textSize = -1);
+  void ShowNetSteinerTree(HNet net, Color color, bool isShowPlacement = false,
+                          WaitTime waitTime = NO_WAIT, double textSize = -1);
+
+  void ShowCriticalPathSteinerTree(HCriticalPath net, Color color, bool isShowPlacement = false,
+                                   WaitTime waitTime = NO_WAIT, double textSize = -1);
+
+  void ShowVGTree(HNet net, VanGinnekenTreeNode* tree, Color LineColor, bool isShowPlacement = false,
+                  WaitTime waitTime = NO_WAIT, Color VGNodeColor = Color_Red, double textSize = -1);
+
+  void ShowNet(HNet net, bool isShowPlacement = false, WaitTime waitTime = NO_WAIT,
+               Color color = Color_Peru, double textSize = -1);
   
   //Plot methods
   void PlotPlacement();
   static void PlotPath(HDesign& design, HCriticalPath path, int pathNumber);
   void PlotBinGrid(int nBinRows, int nBinCols);
   void PlotFillBinGrid(AppCtx* context);
-  void PlotAntiGradients(int nClusters, double* coordinates, double* gradients, double scaling, Color col);
+  void PlotAntiGradients(int nClusters, double* coordinates, double* gradients, double scaling,
+                         Color col);
+
   void PlotCell(HCell cell, Color col);
   void PlotSites();
   void PlotCriticalPath(HCriticalPath);
@@ -87,21 +95,31 @@ public:
   void PlotMuLevel(double level, double scaling, Color color = Color_Black);
 
   //Draw methods
-  void DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
-  void DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh = true);
-  void DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2, Color borderColor,
-                                     Color fillColor, bool doRefresh = true);
-  void DrawText(string text, double textSize = -1);
-  void DrawTextInPoint(string text, double x, double y, double textSize = -1);
-  void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true,
-                int thickness = 1, int lineType = 8);
-  void DrawKiLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
-  void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true, int thickness = 1);
-  void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
+  virtual void DrawRectangle(double x1, double y1, double x2, double y2, Color col,
+                             bool doRefresh = true) = 0;
 
-  void InitFont();
+  virtual void DrawFilledRectangle(double x, double y, double width, double height, Color col,
+                                   bool doRefresh = true) = 0;
 
-  void DrawTextLine();
+  virtual void DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2,
+                                        Color borderColor, Color fillColor, bool doRefresh = true) = 0;
+
+  virtual void DrawText(string text, double textSize = -1) = 0;
+  virtual void DrawTextInPoint(string text, double x, double y, double textSize = -1) = 0;
+  virtual void DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true,
+                        int thickness = 1, int lineType = 8) = 0;
+
+  virtual void DrawKiLine(double x1, double y1, double x2, double y2, Color col,
+                          bool doRefresh = true) = 0;
+
+  virtual void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true,
+                          int thickness = 1) = 0;
+
+  virtual void DrawBar(double x1, double y1, double x2, double y2, Color col,
+                       bool doRefresh = true) = 0;
+
+  virtual void InitFont() = 0;
+  virtual void DrawTextLine() = 0;
 
 protected:
   void* m_data;
@@ -111,7 +129,7 @@ protected:
 
 private:
   bool _IsEnabled();
-  void _AutoRefresh();
+  virtual void _AutoRefresh() = 0;
   bool CantPlotHistogram();
 
   Color _GetCellColor(HCell cell);

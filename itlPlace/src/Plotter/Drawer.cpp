@@ -1,14 +1,14 @@
-#include "HPlotter.h"
+#include "OpenCVPlotter.h"
 #include "PlotterData.h"
 #include "HDesign.h"
 
-void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+void OpenCVPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
         CvPoint start, finish;
-        start.x = DesignX2ImageX(x1);
-        start.y = DesignY2ImageY(y1);
+        start.x  = DesignX2ImageX(x1);
+        start.y  = DesignY2ImageY(y1);
         finish.x = DesignX2ImageX(x2);
         finish.y = DesignY2ImageY(y2);
         cvRectangle(IMG, start, finish, GetCvColor(col), CV_FILLED);
@@ -18,7 +18,7 @@ void HPlotter::DrawBar(double x1, double y1, double x2, double y2, Color col, bo
     }
 }
 
-void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh, int thickness)
+void OpenCVPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefresh, int thickness)
 {
     if (IsEnabled())
     {
@@ -37,7 +37,7 @@ void HPlotter::DrawCircle(double x, double y, int radius, Color col, bool doRefr
     }
 }
 
-void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+void OpenCVPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -53,7 +53,8 @@ void HPlotter::DrawRectangle(double x1, double y1, double x2, double y2, Color c
     }
 }
 
-void HPlotter::DrawFilledRectangle(double x, double y, double width, double height, Color col, bool doRefresh)
+void OpenCVPlotter::DrawFilledRectangle(double x, double y, double width, double height, Color col,
+                                        bool doRefresh)
 {
     if (!IsEnabled())
         return;
@@ -82,8 +83,8 @@ void HPlotter::DrawFilledRectangle(double x, double y, double width, double heig
       _AutoRefresh();
 }
 
-void HPlotter::DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2,
-                                             Color borderColor, Color fillColor, bool doRefresh)
+void OpenCVPlotter::DrawFilledRectangleWithBorder(double x1, double y1, double x2, double y2,
+                                                  Color borderColor, Color fillColor, bool doRefresh)
 {
     if (!IsEnabled())
         return;
@@ -108,8 +109,8 @@ void HPlotter::DrawFilledRectangleWithBorder(double x1, double y1, double x2, do
         _AutoRefresh();
 }
 
-void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh,
-                        int thickness, int lineType)
+void OpenCVPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh,
+                             int thickness, int lineType)
 {
     if (IsEnabled())
     {
@@ -125,7 +126,7 @@ void HPlotter::DrawLine(double x1, double y1, double x2, double y2, Color col, b
     }
 }
 
-void HPlotter::DrawKiLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
+void OpenCVPlotter::DrawKiLine(double x1, double y1, double x2, double y2, Color col, bool doRefresh)
 {
     if (IsEnabled())
     {
@@ -141,7 +142,7 @@ void HPlotter::DrawKiLine(double x1, double y1, double x2, double y2, Color col,
     }
 }
 
-void HPlotter::DrawText(string text, double textSize)
+void OpenCVPlotter::DrawText(string text, double textSize)
 {
     if (!IsEnabled())
         return;
@@ -194,7 +195,7 @@ void HPlotter::DrawText(string text, double textSize)
     delete [] str;
 }
 
-void HPlotter::DrawTextInPoint(string text, double x, double y, double textSize )
+void OpenCVPlotter::DrawTextInPoint(string text, double x, double y, double textSize)
 {
 
     if (!IsEnabled())
@@ -248,7 +249,7 @@ void HPlotter::DrawTextInPoint(string text, double x, double y, double textSize 
     delete [] str;
 }
 
-void HPlotter::DrawTextLine()
+void OpenCVPlotter::DrawTextLine()
 {
     if (IsEnabled())
     {
@@ -261,7 +262,7 @@ void HPlotter::DrawTextLine()
     }
 }
 
-void HPlotter::InitFont()
+void OpenCVPlotter::InitFont()
 {
   CvFont font;
   cvInitFont( &font, CV_FONT_HERSHEY_COMPLEX, 1, 1, 0.0, 1, 1 );
