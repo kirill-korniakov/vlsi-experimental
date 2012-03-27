@@ -201,7 +201,7 @@
 				Name="VCPreBuildEventTool"
 				Description="Getting revision number"
 				CommandLine="subwcrev.exe &quot;$(ProjectDir)..&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.tmpl&quot; &quot;$(ProjectDir)..\src\Data\Auxiliary\Revision.cpp&quot; -f"
-				ExcludedFromBuild="false"
+				ExcludedFromBuild="true"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -9883,13 +9883,6 @@
 				<File
 					RelativePath="..\src\Plotter\OpenCVPlotter.cpp"
 					>
-					<FileConfiguration
-						Name="release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\Plotter\Plot.cpp"

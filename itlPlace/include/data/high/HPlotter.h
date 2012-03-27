@@ -16,7 +16,8 @@ class HPlotter
 {
 public:
   HPlotter::HPlotter(HDesign& design):m_hd(design) {}
-  ~HPlotter();
+  virtual ~HPlotter() {}
+  virtual void Initialize() = 0;
 
   enum WaitTime
   { 
@@ -27,27 +28,25 @@ public:
     WAIT_10_SECONDS = 10000
   };
 
-  void Initialize();
-  bool IsEnabled();
-  void Destroy();
+  virtual bool IsEnabled() = 0;
+  virtual void Clear() = 0;
 
-  void Clear();
-  void Refresh(WaitTime waitTime = NO_WAIT);
   void Refresh(const string& cfgPath);
-  void SetAutoRefreshMinFrequency(int freq);
-  void ResetAutoRefreshFrequency();
+  virtual void Refresh(WaitTime waitTime = NO_WAIT) = 0;
+  virtual void SetAutoRefreshMinFrequency(int freq) = 0;
+  virtual void ResetAutoRefreshFrequency() = 0;
 
-  void InitializeHistogramWindow();
-  void DestroyHistogramWindow();
-  void ClearHistogram();
-  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
+  virtual void InitializeHistogramWindow() = 0;
+  ///void DestroyHistogramWindow();
+  virtual void ClearHistogram() = 0;
+  virtual void RefreshHistogram(WaitTime waitTime = NO_WAIT) = 0;
 
-  void SaveImage(string fileName = "", string dirName = ""); 
-  void SaveMilestoneImage(string fileSuffix, bool addToHtmlLog = true);
+  virtual void SaveImage(string fileName = "", string dirName = "") = 0;
+  virtual void SaveMilestoneImage(string fileSuffix, bool addToHtmlLog = true) = 0;
 
-  void StartVideoWriting(string fileName = "", string dirName = ""); 
-  void WriteCurrentFrame();
-  void StopVideoWriting();
+  virtual void StartVideoWriting(string fileName = "", string dirName = "") = 0;
+  virtual void WriteCurrentFrame() = 0;
+  virtual void StopVideoWriting() = 0;
 
   //Show methods
   void ShowPlacement(WaitTime waitTime = NO_WAIT);
@@ -92,7 +91,7 @@ public:
 
   void PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color);
   void PlotMu(double mu, int x, double scaling, Color color);
-  void PlotMuLevel(double level, double scaling, Color color = Color_Black);
+  virtual void PlotMuLevel(double level, double scaling, Color color = Color_Black) = 0;
 
   //Draw methods
   virtual void DrawRectangle(double x1, double y1, double x2, double y2, Color col,
@@ -122,15 +121,12 @@ public:
   virtual void DrawTextLine() = 0;
 
 protected:
-  void* m_data;
   HDesign& m_hd;
-  bool m_isDestroyed;
-  bool m_isHistogramDestroyed;
 
-private:
+protected:
   bool _IsEnabled();
   virtual void _AutoRefresh() = 0;
-  bool CantPlotHistogram();
+  virtual bool CantPlotHistogram() = 0;
 
   Color _GetCellColor(HCell cell);
 };

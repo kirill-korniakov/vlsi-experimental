@@ -1,9 +1,9 @@
-#include "HPlotter.h"
+#include "OpenCVPlotter.h"
 #include "PlotterData.h"
 #include "HDesign.h"
 #include "Auxiliary.h"
 
-void HPlotter::StartVideoWriting(string fileName, string dirName)
+void OpenCVPlotter::StartVideoWriting(string fileName, string dirName)
 {
     CvSize movieFrameSize = cvSize(m_Data->img->width, m_Data->img->height);
     string movieFileName;
@@ -23,14 +23,14 @@ void HPlotter::StartVideoWriting(string fileName, string dirName)
     //TODO: check if writer created
 }
 
-void HPlotter::WriteCurrentFrame()
+void OpenCVPlotter::WriteCurrentFrame()
 {
     //TODO: check if writer created
     cvWriteFrame(m_Data->vw, IMG);
 }
 
 
-void HPlotter::StopVideoWriting()
+void OpenCVPlotter::StopVideoWriting()
 {
     if (m_Data->vw)
     {

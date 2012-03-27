@@ -1,4 +1,4 @@
-#include "HPlotter.h"
+#include "OpenCVPlotter.h"
 #include "PlotterData.h"
 #include "HDesign.h"
 #include "Auxiliary.h"
@@ -30,7 +30,7 @@ static void SavePlotterImage(libconfig::ConfigExt& cfg, const std::string& fileN
         cvSaveImage(fileName.c_str(), image);
 }
 
-void HPlotter::SaveImage(string fileName, string dirName)
+void OpenCVPlotter::SaveImage(string fileName, string dirName)
 {
     if (!IsEnabled())
         return;
@@ -50,7 +50,7 @@ void HPlotter::SaveImage(string fileName, string dirName)
         m_hd.cfg.ValueOf("plotter.ImagesPaletteSize", 256));
 }
 
-void HPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
+void OpenCVPlotter::SaveMilestoneImage(string fileSuffix, bool addToHtmlLog)
 {
     if (!IsEnabled())
         return;

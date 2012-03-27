@@ -7,11 +7,18 @@ class OpenCVPlotter: public HPlotter
 {
 public:
   OpenCVPlotter(HDesign& design);
-  ~OpenCVPlotter() {}
+  ~OpenCVPlotter();
 
-  virtual void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
+  void Initialize();
+  bool IsEnabled();
+  void Destroy();
 
-  //Draw methods
+  void Clear();
+  void Refresh(WaitTime waitTime = NO_WAIT);
+  void SetAutoRefreshMinFrequency(int freq);
+  void ResetAutoRefreshFrequency();
+
+  //------Draw methods-----
   void DrawBar(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
   void DrawCircle(double x, double y, int radius, Color col, bool doRefresh = true, int thickness = 1);
   void DrawRectangle(double x1, double y1, double x2, double y2, Color col, bool doRefresh = true);
@@ -29,22 +36,9 @@ public:
   void DrawTextInPoint(string text, double x, double y, double textSize = -1);
   void InitFont();
   void DrawTextLine();
+  //--------------------------
 
-/*
-  void Initialize();
-  bool IsEnabled();
-  void Destroy();
-
-  void Clear();
-  void Refresh(WaitTime waitTime = NO_WAIT);
-  void Refresh(const string& cfgPath);
-  void SetAutoRefreshMinFrequency(int freq);
-  void ResetAutoRefreshFrequency();
-
-  void InitializeHistogramWindow();
-  void DestroyHistogramWindow();
-  void ClearHistogram();
-  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
+  virtual void AutoShowPlacement(WaitTime waitTime = NO_WAIT);
 
   void SaveImage(string fileName = "", string dirName = ""); 
   void SaveMilestoneImage(string fileSuffix, bool addToHtmlLog = true);
@@ -53,19 +47,20 @@ public:
   void WriteCurrentFrame();
   void StopVideoWriting();
 
+  void PlotMuLevel(double level, double scaling, Color color = Color_Black);
+  void InitializeHistogramWindow();
+  void DestroyHistogramWindow();
+  void ClearHistogram();
+  void RefreshHistogram(WaitTime waitTime = NO_WAIT);
+
 protected:
   void* m_data;
-  HDesign& m_hd;
   bool m_isDestroyed;
   bool m_isHistogramDestroyed;
-*/
 
 private:
-  ///bool _IsEnabled();
   void _AutoRefresh();
-  ///bool CantPlotHistogram();
-
-  ///Color _GetCellColor(HCell cell);
+  bool CantPlotHistogram();
 };
 
 #endif

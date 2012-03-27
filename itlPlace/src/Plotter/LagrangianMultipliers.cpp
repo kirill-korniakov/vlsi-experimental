@@ -1,11 +1,7 @@
 #include "HPlotter.h"
+#include "OpenCVPlotter.h"
 #include "HDesign.h"
 #include "PlotterData.h"
-
-bool HPlotter::CantPlotHistogram() 
-{
-    return !IsEnabled() || m_isHistogramDestroyed;
-}
 
 void HPlotter::PlotMu(int tpIdx, int nTP, double mu, double scaling, Color color)
 {
@@ -24,7 +20,12 @@ void HPlotter::PlotMu(double mu, int x, double scaling, Color color)
     DrawLine(x, 0, x, y, color, false);
 }
 
-void HPlotter::PlotMuLevel(double level, double scaling, Color color)
+bool OpenCVPlotter::CantPlotHistogram() 
+{
+    return !IsEnabled() || m_isHistogramDestroyed;
+}
+
+void OpenCVPlotter::PlotMuLevel(double level, double scaling, Color color)
 {
     if (CantPlotHistogram()) return;
 
@@ -43,7 +44,7 @@ void HPlotter::PlotMuLevel(double level, double scaling, Color color)
     cvPutText(m_Data->histogramImg, value, start, &font, GetCvColor(Color_Black));
 }
 
-void HPlotter::InitializeHistogramWindow()
+void OpenCVPlotter::InitializeHistogramWindow()
 {
     if (!_IsEnabled() || !m_isHistogramDestroyed)
         return;
@@ -62,7 +63,7 @@ void HPlotter::InitializeHistogramWindow()
     m_Data->histogramImg->origin = 1;
 }
 
-void HPlotter::DestroyHistogramWindow()
+void OpenCVPlotter::DestroyHistogramWindow()
 {
     if (!m_isHistogramDestroyed)
     {
@@ -73,14 +74,14 @@ void HPlotter::DestroyHistogramWindow()
     }
 }
 
-void HPlotter::ClearHistogram()
+void OpenCVPlotter::ClearHistogram()
 {
     if (CantPlotHistogram()) return;
 
     cvSet(m_Data->histogramImg, cvScalar(255.0, 255.0, 255.0));
 }
 
-void HPlotter::RefreshHistogram(WaitTime waitTime)
+void OpenCVPlotter::RefreshHistogram(WaitTime waitTime)
 {
     if (CantPlotHistogram()) return;
 
