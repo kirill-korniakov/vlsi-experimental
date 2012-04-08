@@ -523,6 +523,12 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         UpdateWeights(hd, context, QA, iteration);
 
+        bool plotBinOccupancy = hd.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
+        if (plotBinOccupancy)
+        {
+            hd.Plotter->PlotBinOccupancyMap(&context, "GP");
+        }
+
         if (hd.cfg.ValueOf(".UseBuffering", false))
         {
             if (metaIteration >= hd.cfg.ValueOf(".New_Buffering.NumberMetaIterationStartBuffering", 0))

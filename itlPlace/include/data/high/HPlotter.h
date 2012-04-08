@@ -93,6 +93,8 @@ public:
   void PlotMu(double mu, int x, double scaling, Color color);
   virtual void PlotMuLevel(double level, double scaling, Color color = Color_Black) = 0;
 
+  void PlotBinOccupancyMap(AppCtx* context, string fileSuffix);
+
   //Draw methods
   virtual void DrawRectangle(double x1, double y1, double x2, double y2, Color col,
                              bool doRefresh = true) = 0;

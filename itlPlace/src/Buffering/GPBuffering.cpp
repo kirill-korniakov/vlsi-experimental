@@ -333,6 +333,13 @@ void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPa
     ALERT("Minimal WNS: %f", minWNS);
     ALERT("Percent area compose buffers = %f", data->PercentAreaComposeBuffers());
 
+    bool plotBinOccupancy = data->design.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
+    if (plotBinOccupancy)
+    {
+        data->design.Plotter->PlotBinOccupancyMap(context, "Buf");
+        //data->design.Plotter->SaveMilestoneImage("Buf");
+    }
+
     ALERT("REMOVE NEW BUFFERING STARTED");
     removeBuffer->RemoveNewBuffering();
     ALERT("REMOVE NEW BUFFERING FINISHED");
@@ -348,8 +355,6 @@ bool GPBuffering::FIXME_GiveMeProperName(HNetWrapper net)
 void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& paths)
 {
     int bufferCount = 0;
-
-
 
     for(int j = 0; j < data->design.CriticalPaths.Count(); j++)
     {
