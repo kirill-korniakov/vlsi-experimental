@@ -9866,6 +9866,10 @@
 				Name="Plotter"
 				>
 				<File
+					RelativePath="..\src\Plotter\BinOccupancy.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Plotter\Drawer.cpp"
 					>
 				</File>
