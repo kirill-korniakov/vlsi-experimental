@@ -127,3 +127,42 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     }
     context.sprData.desiredCellsAreaAtEveryBin = context.sprData.totalCellArea / binGrid.nBins;
 }
+
+void BinGrid::SetBinGrid(BinGrid& binGrid)
+{
+    if (bins)
+        FreeMemory();
+
+    binHeight = binGrid.binHeight;
+    binWidth = binGrid.binWidth;
+    nBinCols = binGrid.nBinCols;
+    nBinRows = binGrid.nBinRows;
+    nBins = binGrid.nBins;
+
+    bins = new Bin*[nBinRows];
+    for (int i = 0; i < nBinRows; ++i)
+    {
+        bins[i] = new Bin[nBinCols];
+    }
+
+    for (int i = 0; i < nBinRows; ++i)
+        for (int j = 0; j < nBinCols; ++j)
+            bins[i][j] = bins[i][j];
+
+    for (int i = 0; i < nBinRows; ++i)
+    {
+        for (int j = 0; j < nBinCols; ++j)
+        {
+            bins[i][j].xCoord = (j + 0.5) * binWidth;
+            bins[i][j].yCoord = (i + 0.5) * binHeight;
+        }
+    }
+}
+void BinGrid::FreeMemory()
+{
+    for (int i = 0; i < nBinRows; ++i)
+    {
+        delete [] bins[i];
+    }
+    delete [] bins;
+}

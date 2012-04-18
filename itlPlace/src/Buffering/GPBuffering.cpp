@@ -51,8 +51,11 @@ double GPBuffering::CalcBufferArea(AppCtx* context, int binCol, int binRow, Buff
     double bufWidth = design[type].SizeX();
     double bufHeight = design[type].SizeY();
 
-    double x = bufferPosition.GetPosition()->x;
-    double y = bufferPosition.GetPosition()->y;
+    double minX = context->hd->Circuit.PlacementMinX();
+    double minY = context->hd->Circuit.PlacementMinY();
+
+    double x = bufferPosition.GetPosition()->x - bufWidth /2.0 - minX;
+    double y = bufferPosition.GetPosition()->y - bufHeight/2.0 - minY;
     double x2 = x + bufWidth;
     double y2 = y + bufHeight;
 
@@ -149,12 +152,15 @@ void GPBuffering::UpdateBinTable(AppCtx* context, VGVariantsListElement& buffers
     for (bufferPosition = buffers.GetBufferPosition()->begin(); 
         bufferPosition != buffers.GetBufferPosition()->end(); ++bufferPosition)
     {
+        double sizeBufferMultiplier = data->sizeBufferMultiplier;
         for (int binRow = 0; binRow < context->sprData.binGrid.nBinRows; binRow++)
         {
             for (int binCol = 0; binCol < context->sprData.binGrid.nBinCols; binCol++)
             {
                 double bsf = CalcBufferArea(context, binCol, binRow, *bufferPosition);
                 context->sprData.bufferPotentialOverBins[binRow][binCol] = bsf;
+                
+                context->sprData.totalBufferArea += bsf/sizeBufferMultiplier;
             }
         }
 
@@ -202,6 +208,7 @@ void GPBuffering::Init2(AppCtx* context, double HPWL, double LHPWL)
             context->sprData.bufferPotentialOverBins[i][j] = 0.0;
         }
     }
+    context->sprData.totalBufferArea = 0.0;
 }
 
 void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPath>& paths)
@@ -336,7 +343,7 @@ void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPa
     bool plotBinOccupancy = data->design.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
     if (plotBinOccupancy)
     {
-        data->design.Plotter->PlotBinOccupancyMap(context, "Buf");
+        data->design.Plotter->PlotBinOccupancyMap("Buf");
         //data->design.Plotter->SaveMilestoneImage("Buf");
     }
 

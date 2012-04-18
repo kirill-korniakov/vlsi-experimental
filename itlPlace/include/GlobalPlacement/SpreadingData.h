@@ -24,6 +24,11 @@ struct BinGrid
   int     nBinRows;
   int     nBinCols;
   int     nBins;
+
+  BinGrid() { bins = 0; }
+ 
+  void SetBinGrid(BinGrid& binGrid);
+  void FreeMemory();
 };
 
 struct SprData
@@ -41,6 +46,8 @@ struct SprData
   double    invPSX;
   double    invPSY;
 
+  double    totalBufferArea;
+
   double    sprWInitial;
 
   SprData()
@@ -48,6 +55,7 @@ struct SprData
     binGrid.bins = 0;
     clusterPotentialOverBins = 0;
     bufferPotentialOverBins = 0;
+    totalBufferArea = 0.0;
   }
 };
 

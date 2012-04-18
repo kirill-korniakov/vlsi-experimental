@@ -16,6 +16,7 @@
 #include "BufferingAlgorithm.h"
 #include "HippocratePlacement.h"
 #include "LRSizing.h"
+#include "OptimizationContext.h"
 
 void FlowMetricsTableAddBorder(TableFormatter& fmt, HDesign& design)
 {
@@ -437,8 +438,16 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
         WriteFlowMetrics(flowMetrics, hd, "Buffering", "BUF");
     if (DoRemoveNewBufferingIfRequired(hd, "DesignFlow.RemoveNewBuffering"))
         WriteFlowMetrics(flowMetrics, hd, "RemoveNewBuffering", "RNB");
-    if (DoNewBufferingIfRequired(hd, "DesignFlow.New_Buffering"))
+    if (DoNewBufferingIfRequired(hd, "DesignFlow.New_Buffering")) 
+    {
         WriteFlowMetrics(flowMetrics, hd, "New_Buffering", "NBUF");
+        bool plotBinOccupancy = hd.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
+        if (plotBinOccupancy)
+        {
+            hd.Plotter->PlotBinOccupancyMap("FINAL_BUF");
+            hd.Plotter->binGridForPlotting.FreeMemory();
+        }
+    }
 
     if (DoRandomPlacementIfRequired(hd, "DesignFlow.BufRandomPlacement"))
         WriteFlowMetrics(flowMetrics, hd, "RandomPlacement", "RNDB");

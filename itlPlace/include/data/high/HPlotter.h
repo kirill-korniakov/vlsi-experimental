@@ -6,6 +6,7 @@
 #include "HCriticalPath.h"
 #include "HNet.h"
 #include "HSteinerPoint.h"
+#include "SpreadingData.h"
 
 class VanGinnekenTreeNode;
 
@@ -93,7 +94,7 @@ public:
   void PlotMu(double mu, int x, double scaling, Color color);
   virtual void PlotMuLevel(double level, double scaling, Color color = Color_Black) = 0;
 
-  void PlotBinOccupancyMap(AppCtx* context, string fileSuffix);
+  void PlotBinOccupancyMap(string fileSuffix);
 
   //Draw methods
   virtual void DrawRectangle(double x1, double y1, double x2, double y2, Color col,
@@ -121,6 +122,9 @@ public:
 
   virtual void InitFont() = 0;
   virtual void DrawTextLine() = 0;
+
+public:
+  BinGrid binGridForPlotting;
 
 protected:
   HDesign& m_hd;

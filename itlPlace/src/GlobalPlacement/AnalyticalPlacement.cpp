@@ -518,23 +518,29 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
 
         ReportPostIterationInfo(hd, context, metaIteration, iteration);
 
+        bool plotBinOccupancy = hd.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
+        if (plotBinOccupancy)
+        {
+            hd.Plotter->binGridForPlotting.SetBinGrid(context.sprData.binGrid);
+            hd.Plotter->PlotBinOccupancyMap("GP");
+        }
+
         if (IsTimeToExit(hd, ci, context, QA, iteration))
             break;
 
         UpdateWeights(hd, context, QA, iteration);
-
-        bool plotBinOccupancy = hd.cfg.ValueOf("LSE.GlobalPlacement.Plotting.BinOccupancyMap.plotBinOccupancy", false);
-        if (plotBinOccupancy)
-        {
-            hd.Plotter->PlotBinOccupancyMap(&context, "GP");
-        }
-
+        
         if (hd.cfg.ValueOf(".UseBuffering", false))
         {
             if (metaIteration >= hd.cfg.ValueOf(".New_Buffering.NumberMetaIterationStartBuffering", 0))
             {
+                //ALERT("------------GP---------------totalBufferArea %f", context.sprData.totalBufferArea);
                 GPBuffering bufferer(hd);
                 bufferer.DoBuffering(context, QA->GetBackHPWL(), QA->GetBackLHPWL());
+
+                int nBins = context.sprData.binGrid.nBins;
+                context.sprData.desiredCellsAreaAtEveryBin = (context.sprData.totalCellArea + context.sprData.totalBufferArea)/nBins;
+                //ALERT("------------BF---------------totalBufferArea %f", context.sprData.totalBufferArea);
             }
         }
 

@@ -13,8 +13,8 @@ void InitWeights(double* x, AppCtx* context)
     context->weights.sprW = 1.0;
 
     //FIXME: just try
-    GPBuffering bufferer(*(context->hd));
-    bufferer.DoBuffering(*context, 0, 0);
+    //GPBuffering bufferer(*(context->hd));
+    //bufferer.DoBuffering(*context, 0, 0);
     TotalCostAndGradients(context, x);
 
     double lseInitialRatio = context->hd->cfg.ValueOf(".Weights.lseInitialRatio", 1.0);
