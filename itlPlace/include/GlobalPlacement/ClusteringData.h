@@ -26,15 +26,15 @@ struct Cluster
 
 struct MergeCandidate
 {
-  int clusterIdx;
-  int bestNeighborIdx;
+  HCluster clusterIdx;
+  HCluster bestNeighborIdx;
   double score;
 
   MergeCandidate()
   {
     score = 0.0;
-    bestNeighborIdx = -1;
-    clusterIdx = -1;
+    //bestNeighborIdx = HClusters::Null();
+    //clusterIdx = HClusters::Null();
   }
 };
 
@@ -44,15 +44,15 @@ struct MergeCandidate
 // можно представить следующей структурой
 struct MergedCluster
 {
-  int cluster1Idx;
-  int cluster2Idx;
+  HCluster cluster1Idx;
+  HCluster cluster2Idx;
   size_t nCellsInCluster1;
 };
 
 class ClusteredNet
 {
 public:
-  std::vector<int> clusterIdxs;
+  std::vector<HCluster> clusterIdxs;
   
   double weight;
   double k;
@@ -74,14 +74,13 @@ public:
 typedef std::list<MergedCluster> ClusteringLog;
 typedef std::list<ClusteringLog>::reverse_iterator ClusteringLogIterator;
 
-typedef std::vector<ClusteredNet> NetList;  //перечень существующих соединений между кластерами
-typedef std::list<NetList>::reverse_iterator NetListIterator;
+//typedef std::vector<ClusteredNet> ClusteringNetList0;  //перечень существующих соединений между кластерами
+//typedef std::list<NetList>::reverse_iterator NetListIterator;
 
-typedef std::vector<int> ConnectionsVector;// перечень индексов соединений, в которые входит текущий кластер
+typedef std::vector<HClusteredNet> ConnectionsVector;// перечень индексов соединений, в которые входит текущий кластер
 
-typedef double (*pAffinityFunction)(HDesign& hd, 
-                                    const int& firstClusterIdx, const int& secondClusterIdx,
-                                    std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
-                                    std::vector<ConnectionsVector>& currTableOfAdjacentNets);
+typedef double (*pAffinityFunction)(HDesign& hd, HCluster& firstClusterIdx, HCluster& secondClusterIdx, 
+                                                   std::vector<Cluster>& clusters, HClusteredNets* netList,
+                                                   std::vector<ConnectionsVector>& currTableOfAdjacentNets);
 
 #endif

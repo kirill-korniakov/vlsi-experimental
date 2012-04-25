@@ -8,6 +8,7 @@
 #include "LRCExtraction.h"
 #include "LTiming.h"
 #include "LDetailedPlacement.h"
+#include "LClusterization.h"
 
 struct LDesign
 {
@@ -18,6 +19,7 @@ struct LDesign
   LRCExtraction RCExtraction;
   LTiming Timing;
   LDetailedPlacement DetailedPlacement;
+  LClusterization Clusterization;
 
   //clusterization
   //global placement

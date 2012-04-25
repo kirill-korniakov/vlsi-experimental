@@ -122,16 +122,25 @@ void AnalyticalGlobalPlacement::ReportIterationInfo(ClusteringInformation& ci, A
     WRITELINE("");
     ALERT("RELAXATION ITERATION STARTED");
     ALERT("Number of clusters: %d", ci.mCurrentNumberOfClusters);
-    ALERT("Number of nets: %d", ci.netList.size());
+    ALERT("Number of nets: %d", ci.design.ClustersNetList.ClusteredNetCount());
 }
 
 void AnalyticalGlobalPlacement::ReportClusterCoordinates(AppCtx* context)
 {
     int clusterIdx = -1;
-    while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+    //for (HClusters::ClustersEnumeratorW cluster = context->hd->Cluster.GetEnumeratorW(); cluster.MoveNext(); clusterIdx++)
+    //{
+    //    while (cluster.IsFake())
+    //    {
+    //        cluster.MoveNext();
+    //        clusterIdx++;
+    //    }
+    //while (GetNextActiveClusterIdx(context->ci, clusterIdx))
+    //{
+    for (HClusters::ClustersNotFakeEnumeratorW cluster = context->hd->Cluster.GetNotFakeEnumeratorW(); cluster.MoveNext(); clusterIdx++)
     {
         ALERT("Cluster %d coordinates: [%.3f, %.3f]", clusterIdx,
-            context->ci->clusters[clusterIdx].xCoord, context->ci->clusters[clusterIdx].yCoord);
+            cluster.XCoord(), cluster.YCoord());
     }
     WRITELINE("");
 }

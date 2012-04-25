@@ -57,6 +57,7 @@ struct LNetList
   IDType *cellType;//from Tech
   CellOrientation* cellOrient;
   PlacementStatus* cellPlStatus;
+  IDType *cellCluster;
 
   LCellTypeBound cellTypeBounds[MacroType_Last + 2]; //each element is start position
   IDType& nCellsEnd;
@@ -120,6 +121,7 @@ struct LNetList
     cellType = 0;
     cellPlStatus = 0;
     cellWidth = 0;
+    cellCluster = 0;
     pinCellIdx = 0;
     pinNetIdx = 0;
     pinOffsetX = 0;

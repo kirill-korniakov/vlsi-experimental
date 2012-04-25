@@ -17,6 +17,7 @@ void HCells::Initialize(int cellsLimit)
   m_ld->NetList.cellX[0] = 0;
   m_ld->NetList.cellY[0] = 0;
   m_ld->NetList.cellPlStatus[0] = PlacementStatus_Default;
+  m_ld->NetList.cellCluster[0] = 0;
 
   for(int i = 0; i < MacroType_Last + 2; i++)
   {
@@ -45,6 +46,7 @@ void HCells::Grow(int cellsLimit)
   ::Grow(&m_ld->NetList.cellX, old_size, cellsLimit);
   ::Grow(&m_ld->NetList.cellY, old_size, cellsLimit);
   ::Grow(&m_ld->NetList.cellPlStatus, old_size, cellsLimit);
+  ::Grow(&m_ld->NetList.cellCluster, old_size, cellsLimit);
   m_ld->NetList.nCellsLimit = cellsLimit;
   OnGrow(old_size, cellsLimit);
 }
@@ -63,6 +65,7 @@ void HCells::Swap(HCell& first, HCell& second)
   ::Swap(m_ld->NetList.cellPlStatus + ::ToID(first), m_ld->NetList.cellPlStatus + ::ToID(second));
   ::Swap(m_ld->NetList.cellX + ::ToID(first), m_ld->NetList.cellX + ::ToID(second));
   ::Swap(m_ld->NetList.cellY + ::ToID(first), m_ld->NetList.cellY + ::ToID(second));
+  ::Swap(m_ld->NetList.cellCluster + ::ToID(first), m_ld->NetList.cellCluster + ::ToID(second));
 
   ::Swap(&first, &second);
 }

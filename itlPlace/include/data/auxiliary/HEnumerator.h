@@ -53,6 +53,32 @@ public:
 };
 
 template <class Item, class Collection, int disambiguation = 0>
+class HREnumeratorW : public Item
+{
+protected:
+    IDType m_start;
+    IDType m_end;
+
+public:
+    HREnumeratorW(Collection* data, IDType aStart, IDType aEnd)
+        : Item(data, aEnd),
+        m_end(aEnd),
+        m_start(aStart)
+    {
+    }
+
+    void Reset()
+    {
+        ::FromID(*this, m_start - 1);
+    }
+
+    bool MoveNext()
+    {
+        return --__GetID(*this) > aStart;
+    }
+};
+
+template <class Item, class Collection, int disambiguation = 0>
 class HEnumeratorW : public Item
 {
 protected:

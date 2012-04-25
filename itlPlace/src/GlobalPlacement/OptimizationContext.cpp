@@ -7,22 +7,26 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   ci = &aci;
 
   int j = 0;
-  solutionIdx2clusterIdxLUT = new int[2*CalculateNumberOfActiveClusters(aci) + static_cast<int>(ci->clusters.size())]; 
-  clusterIdx2solutionIdxLUT = solutionIdx2clusterIdxLUT + 2*CalculateNumberOfActiveClusters(aci); 
-  for(int i = 0; i < static_cast<int>(ci->clusters.size()); i++)
+  solutionIdx2clusterIdxLUT = new HCluster[2*CalculateNumberOfActiveClusters(aci)]; 
+  //clusterIdx2solutionIdxLUT = new int[static_cast<int>(ci->design.Cluster.ClustersCount())]; 
+  int i = 0;
+  for (HClusters::ClustersEnumeratorW en = ci->design.Cluster.GetEnumeratorW(); en.MoveNext(); i++)
+  //for(int i = 0; i < static_cast<int>(ci->clusters.size()); i++)
   {
-    if (!ci->clusters[i].isFake)
+    if (!en.IsFake())
     {
-      clusterIdx2solutionIdxLUT[i] = j;
-      solutionIdx2clusterIdxLUT[2*j+0] = i;
-      solutionIdx2clusterIdxLUT[2*j+1] = i;
+        en.SetclusterIdx2solutionIdxLUT(j);
+        //clusterIdx2solutionIdxLUT[::ToID(en) - 1] = j;
+      solutionIdx2clusterIdxLUT[2*j+0] = en;
+      solutionIdx2clusterIdxLUT[2*j+1] = en;
       ++j;
     }
     else
-      clusterIdx2solutionIdxLUT[i] = -1;
+        en.SetclusterIdx2solutionIdxLUT(-1);
+      //clusterIdx2solutionIdxLUT[::ToID(en) - 1] = -1;
   }
   //x,y,ki
-  nVariables = 2 * ci->mCurrentNumberOfClusters + ci->netList.size();
+  nVariables = 2 * ci->mCurrentNumberOfClusters + ci->design.ClustersNetList.ClusteredNetCount();
 
   criteriaValues.gLSE = new double[4*nVariables];
   criteriaValues.gSOD = criteriaValues.gLSE + nVariables;
@@ -32,8 +36,8 @@ void AppCtx::Initialize(HDesign& ahd, ClusteringInformation& aci)
   ConstructBinGrid(ahd, *this, 
     ahd.cfg.ValueOf("Clustering.desiredNumberOfClustersAtEveryBin", 10));
 
-  netListSizes = new int[ci->netList.size()];
-  CalculateNetListSizes(ci->netList, netListSizes);
+  //netListSizes = new int[ci->netList.size()];
+  //CalculateNetListSizes(ci->netList, netListSizes);
   
   useLogSumExp          = ahd.cfg.ValueOf(".useLogSumExp", false);
   useSumOfDelays        = ahd.cfg.ValueOf(".useSumOfDelays", false);
@@ -69,7 +73,7 @@ void AppCtx::FreeMemory()
 
   //TODO: check correctness of memory deletion
   delete[] LSEdata.precalcedExponents;
-  delete[] netListSizes;
+  //delete[] netListSizes;
   delete[] solutionIdx2clusterIdxLUT;
   delete[] criteriaValues.gLSE;
 }

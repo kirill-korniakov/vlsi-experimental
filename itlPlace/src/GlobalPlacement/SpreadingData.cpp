@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void DetermineDimensionsOfBinGrid(HDesign& hd, vector<Cluster>& clusters, 
+void DetermineDimensionsOfBinGrid(HDesign& hd,  
                                   const int nClusters, BinGrid& binGrid,
                                   int desiredNumberOfClustersAtEveryBin)
 {
@@ -44,7 +44,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     double**& bufferPotentialOverBins = context.sprData.bufferPotentialOverBins;
 
     // Calculate current bin grid
-    DetermineDimensionsOfBinGrid(hd, context.ci->clusters, context.ci->mCurrentNumberOfClusters, 
+    DetermineDimensionsOfBinGrid(hd, context.ci->mCurrentNumberOfClusters, 
         binGrid, desiredNumberOfClustersAtEveryBin);
 
     //TODO: correct this potential radius calculation
@@ -118,11 +118,11 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     binGrid.nBins = binGrid.nBinCols * binGrid.nBinRows;
 
     context.sprData.totalCellArea = 0.0;
-    for (int i = 0; i < static_cast<int>(context.ci->clusters.size()); ++i)
+    for (HClusters::ClustersEnumeratorW i = context.hd->Cluster.GetEnumeratorW(); i.MoveNext();)
     {
-        if (context.ci->clusters[i].isFake == false)
+        if (i.IsFake() == false)
         {
-            context.sprData.totalCellArea += context.ci->clusters[i].area;
+            context.sprData.totalCellArea += i.Area();
         }
     }
     context.sprData.desiredCellsAreaAtEveryBin = context.sprData.totalCellArea / binGrid.nBins;

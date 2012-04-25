@@ -10,64 +10,86 @@
 #define DONT_MARK_NEIGHBORS_INVALID false
 
 
-inline int CellToClusterIdx(ClusteringInformation& ci, HCell cell)
-{
-    return ::ToID(cell) - 1;
-}
+//inline int CellToClusterIdx(ClusteringInformation& ci, HCell cell)
+//{
+//    return ::ToID(cell) - 1;
+//}
 
 
 void InitializeClusters(HDesign& hd, ClusteringInformation& ci)
 {
-    ASSERT(ci.clusters.size() >= hd.Cells.PlaceableCellsCount());
+    ASSERT(hd.Cluster.ClustersCount() >= hd.Cells.PlaceableCellsCount());
     //put clusters
     int clusterIdx = 0;
+    HClusters::ClustersEnumeratorW cluster = hd.Cluster.GetEnumeratorW();
+    cluster.MoveNext();
     for (HCells::PlaceableCellsEnumeratorW cell = hd.Cells.GetPlaceableCellsEnumeratorW(); cell.MoveNext(); )
     {
-        ci.clusters[clusterIdx].cells.push_back(cell);
-        ci.clusters[clusterIdx].area = cell.Width() * cell.Height();
-        ASSERT(CellToClusterIdx(ci, cell) == clusterIdx);
-        clusterIdx++;
+        cluster.Cells()->push_back(cell);
+        cell.SetCluster(cluster);
+        cluster.SetArea(cell.Width() * cell.Height());
+        cluster.SetIsPrimary(false);
+        cluster.SetIsTerminals(false);
+        cluster.SetIsValid(true);
+        cluster.SetIsFake(false);
+
+        //ASSERT(CellToClusterIdx(ci, cell) == clusterIdx);
+        cluster.MoveNext();
     }
 }
 
-int AssignClusterIdx(HDesign& hd, ClusteringInformation& ci, HPinWrapper& pin)
+HCluster AssignClusterIdx(HDesign& hd, ClusteringInformation& ci, HPinWrapper& pin)
 {
-    int clusterIdx = 0;
+    HCluster clusterIdx;
 
     if (pin.IsPrimary())
     {
-        clusterIdx = SHIFT_NUMBER_FOR_PRIMARY_PINS + (int)ci.primaryPins.size();
+        //clusterIdx = SHIFT_NUMBER_FOR_PRIMARY_PINS + (int)ci.primaryPins.size();   
+        clusterIdx = hd.Cluster.AllocateClusterUnreal();
+        HClusterWrapper clust = hd[clusterIdx];
+        clust.Setid((int)ci.primaryPins.size());        
+        clust.SetIsPrimary(true);
+        clust.SetIsTerminals(false);
+        clust.SetIsValid(true);
+        clust.SetIsFake(false);
         ci.primaryPins.push_back(pin);
     }
     else if (hd.GetBool<HCell::IsTerminal>(pin.Cell()))
     {
-        clusterIdx = SHIFT_NUMBER_FOR_TERMINALS + (int)ci.terminalCells.size();
+        //clusterIdx = SHIFT_NUMBER_FOR_TERMINALS + (int)ci.terminalCells.size();        
+        clusterIdx = hd.Cluster.AllocateClusterUnreal();
+        HClusterWrapper clust = hd[clusterIdx];
+        clust.SetIsPrimary(false);
+        clust.SetIsTerminals(true);
+        clust.SetIsValid(true);
+        clust.SetIsFake(false);
+        clust.Setid((int)ci.terminalCells.size());
         ci.terminalCells.push_back(pin.Cell());
     }
     else
     {
-        clusterIdx = CellToClusterIdx(ci, pin.Cell());
+        clusterIdx = hd[pin.Cell()].Cluster();
     }
 
     return clusterIdx;
 }
 
-void MoveValueToTheFirstPosition(IntVector& vector, int value)
+void MoveValueToTheFirstPosition(std::vector<HCluster>& vector, HCluster value)
 {
-    IntIterator iter = find(vector.begin(), vector.end(), value);
+    std::vector<HCluster>::iterator iter = find(vector.begin(), vector.end(), value);
     ASSERT(iter != vector.end());
     vector.erase(iter);
     vector.insert(vector.begin(), value);
 }
 
-void AssignClusters(HDesign& design, ClusteringInformation& ci, HNetWrapper& net, int netIdx)
+void AssignClusters(HDesign& design, ClusteringInformation& ci, HNetWrapper& net, HClusteredNet netIdx)
 {
-    IntVector& idxs = ci.netList[netIdx].clusterIdxs;
+    std::vector<HCluster>& idxs = (*design[netIdx].clusterIdxs());
 
     //put pins (we also add terminals and primary pins for LogSumExp calculation)
     idxs.resize(net.PinsCount());
     int i = 0;
-    int sourceIdx; //WARNING: be careful with this source
+    HCluster sourceIdx; //WARNING: be careful with this source
     for (HNet::PinsEnumeratorW pin = net.GetPinsEnumeratorW(); pin.MoveNext(); ++i)
     {
         idxs[i] = AssignClusterIdx(design, ci, pin);
@@ -76,28 +98,31 @@ void AssignClusters(HDesign& design, ClusteringInformation& ci, HNetWrapper& net
 
     //remove duplicates
     sort(idxs.begin(), idxs.end());
-    IntIterator iter = unique(idxs.begin(), idxs.end());
+    std::vector<HCluster>::iterator iter = unique(idxs.begin(), idxs.end());
     idxs.resize(iter - idxs.begin());
 
     //move source to the first position
     MoveValueToTheFirstPosition(idxs, sourceIdx); 
 }
 
-void AssignWeightForClusteredNet(HDesign& hd, ClusteringInformation& ci, int netIdx)
+void AssignWeightForClusteredNet(HDesign& hd, ClusteringInformation& ci, HClusteredNet netIdx)
 {
   double maxWeight = 0.0;
   //find original nets connected to all clusters in this clustered net
-  for (int i = 0; i < static_cast<int>(ci.netList[netIdx].clusterIdxs.size()); i++)
+  HClusteredNetWrapper netIdxW = hd[netIdx];
+  for (int i = 0; i < static_cast<int>(netIdxW.clusterIdxs()->size()); i++)
   {
-    int currClusterIdx = ci.netList[netIdx].clusterIdxs[i];
+    HClusterWrapper currClusterIdx = hd[(*netIdxW.clusterIdxs())[i]];
 
-    if (!IsMovableCell(currClusterIdx) || ci.clusters[currClusterIdx].isFake)
+    if ((currClusterIdx.IsPrimary() || currClusterIdx.IsTerminals()) || currClusterIdx.IsFake())
       continue;
 
     //for all cells in this cluster ci.clusters[clusterIdx].isFake
-    for (int j = 0; j < static_cast<int>(ci.clusters[currClusterIdx].cells.size()); j++)
+    for (std::vector<HCell>::iterator cell = currClusterIdx.Cells()->begin(); 
+        cell <  currClusterIdx.Cells()->end(); cell++)
+    //for (int j = 0; j < currClusterIdx.Cells().size(); j++)
     {
-      HCell currCell = ci.clusters[currClusterIdx].cells[j];
+      HCell currCell = *cell;
 
       for (HCell::PinsEnumerator pe = hd.Get<HCell::Pins, HCell::PinsEnumerator>(currCell);
            pe.MoveNext(); )
@@ -112,33 +137,40 @@ void AssignWeightForClusteredNet(HDesign& hd, ClusteringInformation& ci, int net
   }
 
   ASSERT(maxWeight > 0);
-  ci.netList[netIdx].weight = maxWeight;
+    netIdxW.Setweight(maxWeight);
+  //ci.netList[netIdx].weight = maxWeight;
 }
 
 void WriteWeightsToClusteredNets(HDesign& hd, ClusteringInformation& ci)
 {
-  int netIdx = 0;
+  HClusteredNets::ClusteredNetsEnumeratorW netIdx = hd.ClustersNetList.GetEnumeratorW();
+  netIdx.MoveNext();
 
-  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); ++netIdx)
+  for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); netIdx.MoveNext())
   {
-    ci.netList[netIdx].weight = net.Weight();
+    netIdx.Setweight(net.Weight());
+    //ci.netList[netIdx].weight = net.Weight();
     //AssignWeightForClusteredNet(hd, ci, netIdx);
   }
 }
 
 void InitializeNetList(HDesign& hd, ClusteringInformation& ci)
 {
-    ci.netList.resize(hd.Nets.Count(NetKind_Active));
-
+    //ci.netList.resize(hd.Nets.Count(NetKind_Active));
+    hd.ClustersNetList = (*hd.NetLevels.AllocateNetLevel());
+    hd.ClustersNetList.Resize(hd.Nets.Count(NetKind_Active));
     //put nets
-    int netIdx = 0;
-    for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); ++netIdx)
+    HClusteredNets::ClusteredNetsEnumeratorW netIdx = hd.ClustersNetList.GetEnumeratorW();
+    netIdx.MoveNext();
+
+    for (HNets::ActiveNetsEnumeratorW net = hd.Nets.GetActiveNetsEnumeratorW(); net.MoveNext(); netIdx.MoveNext())
     {
         AssignClusters(hd, ci, net, netIdx);
     }
 
     WriteWeightsToClusteredNets(hd, ci);
-    ci.netLevels.push_back(ci.netList);
+    hd.ClustersNetList = (*hd.NetLevels.CreateCopy());
+    //ci.netLevels.push_back(ci.netList);
 }
 
 //we add terminals and primary pins for LogSumExp calculation
@@ -168,20 +200,20 @@ void PrintClusteringInfo(HDesign& hd, ClusteringInformation& ci, int nClusters)
     int upLimit = ci.mCurrentNumberOfClusters;
     if (nClusters >= 0)
         upLimit = nClusters;
-
-    for (int i = 0; i<upLimit; i++)
+    int i = 0;
+    for (HClusters::ClustersEnumeratorW cluster = hd.Cluster.GetEnumeratorW(); cluster.MoveNext() && (i < upLimit); i++)
     {
         ALERT("cluster %d:\t", i);
-        if (ci.clusters[i].isFake)
+        if (cluster.IsFake())
         {
             ALERT("FAKE");
             continue;
         }
         else
         {
-            for (int j = 0; j < static_cast<int>(ci.clusters[i].cells.size()); j++)
+            for (std::vector<HCell>::iterator cell = cluster.Cells()->begin(); cell <  cluster.Cells()->end(); cell++)
             {
-                ALERT(hd[ci.clusters[i].cells[j]].Name().c_str());
+                ALERT(hd[(*cell)].Name().c_str());
             }
         }
     }
@@ -190,27 +222,33 @@ void PrintClusteringInfo(HDesign& hd, ClusteringInformation& ci, int nClusters)
 void CreateTableOfAdjacentNets(HDesign& hd, ClusteringInformation& ci)
 {
     //prepare table
-    ci.tableOfAdjacentNets.clear();
-    ci.tableOfAdjacentNets.resize(ci.clusters.size());
-
+    //ci.tableOfAdjacentNets.clear();
+    //ci.tableOfAdjacentNets.resize(hd.Cluster.ClustersCount());
+    hd.Cluster.ClearTableOfAdjacentNets();
     //fill the table
-    for (int netIdx = 0; netIdx < (int)ci.netList.size(); ++netIdx)
+    for (HClusteredNets::ClusteredNetsEnumeratorW netIdx = hd.ClustersNetList.GetEnumeratorW(); netIdx.MoveNext(); )
+    //for (int netIdx = 0; netIdx < (int)ci.netList.size(); ++netIdx)
     {
-        for (int j = 0; j < (int)ci.netList[netIdx].clusterIdxs.size(); ++j)
+
+        for (int j = 0; j < (int)netIdx.clusterIdxs()->size(); ++j)
         {
-            int clusterIdx = ci.netList[netIdx].clusterIdxs[j];
-            if (IsMovableCell(clusterIdx) && !ci.clusters[clusterIdx].isFake)
-                ci.tableOfAdjacentNets[clusterIdx].push_back(netIdx);
+            HClusterWrapper clusterIdx = hd[(*netIdx.clusterIdxs())[j]];
+            if (!clusterIdx.IsTerminals() && !clusterIdx.IsPrimary() && !clusterIdx.IsFake())
+            
+                clusterIdx.tableOfAdjacentNets()->push_back(netIdx);
+
+                //ci.tableOfAdjacentNets[::ToID(clusterIdx) - 1].push_back(netIdx);
         }
     }
 
     //remove duplicated nets
-    for (unsigned int i = 0; i < ci.tableOfAdjacentNets.size(); i++)
+    for (HClusters::ClustersEnumeratorW i = hd.Cluster.GetEnumeratorW(); i.MoveNext();)
+    //for (unsigned int i = 0; i < ci.tableOfAdjacentNets.size(); i++)
     {
-        std::sort(ci.tableOfAdjacentNets[i].begin(), ci.tableOfAdjacentNets[i].end());
+        std::sort(i.tableOfAdjacentNets()->begin(), i.tableOfAdjacentNets()->end());
         ConnectionsVector::iterator newEnd
-            = unique(ci.tableOfAdjacentNets[i].begin(), ci.tableOfAdjacentNets[i].end());
-        ci.tableOfAdjacentNets[i].resize(newEnd - ci.tableOfAdjacentNets[i].begin());
+            = unique(i.tableOfAdjacentNets()->begin(), i.tableOfAdjacentNets()->end());
+        i.tableOfAdjacentNets()->resize(newEnd - i.tableOfAdjacentNets()->begin());
     }
 }
 
@@ -219,14 +257,15 @@ void CreateTableOfAdjacentNets(HDesign& hd, ClusteringInformation& ci)
 bool GetNextActiveClusterIdx(ClusteringInformation* ci, /*ref*/ int& clusterIdx)
 {
     //CHECK:what about terminals and primary pins?
-    do
-    {
-        ++clusterIdx;
-    } while (clusterIdx < (int)ci->clusters.size() && ci->clusters[clusterIdx].isFake);
-    return clusterIdx < (int)ci->clusters.size();
+    //do
+    //{
+    //    ++clusterIdx;
+    //} while (clusterIdx < (int)ci->clusters.size() && ci->clusters[clusterIdx].isFake);
+    return false;//clusterIdx < (int)ci->clusters.size();
 }
 
-double AffinityLite(HDesign& hd, std::vector<int>& a, std::vector<int>& b, int* netListSizes, Cluster& ac, Cluster& bc)
+double AffinityLite(HDesign& hd, std::vector<HClusteredNet>& a, std::vector<HClusteredNet>& b, 
+                    HCluster& ac, HCluster& bc)
 {
     double result = 0.0;
     long size1 = static_cast<int>(a.size());
@@ -242,8 +281,9 @@ double AffinityLite(HDesign& hd, std::vector<int>& a, std::vector<int>& b, int* 
             ++pos2;
         else
         {
-            if (netListSizes[a[pos1]] > 1)
-                result += hd._Design.NetList.netWeight[pos1] / ((netListSizes[a[pos1]] - 1) * ac.area * bc.area);
+            if (hd[a[pos1]].clusterIdxs()->size() > 1)
+                result += hd._Design.NetList.netWeight[pos1] / (( hd[a[pos1]].clusterIdxs()->size() - 1) *
+                hd[ac].Area() * hd[bc].Area());
             ++pos1;
             ++pos2;
         }
@@ -251,76 +291,79 @@ double AffinityLite(HDesign& hd, std::vector<int>& a, std::vector<int>& b, int* 
     return result;
 }
 
-double Affinity(HDesign& hd, const int& firstClusterIdx, const int& secondClusterIdx, 
-                std::vector<Cluster>& clusters, NetList& netList, int* netListSizes,
-                std::vector<ConnectionsVector>& currTableOfAdjacentNets)
-{
-    return AffinityLite(hd, currTableOfAdjacentNets[firstClusterIdx],
-        currTableOfAdjacentNets[secondClusterIdx],
-        netListSizes,
-        clusters[firstClusterIdx],
-        clusters[secondClusterIdx]);
-}
+//double Affinity(HDesign& hd, HCluster& firstClusterIdx, HCluster& secondClusterIdx, 
+//                std::vector<Cluster>& clusters, HClusteredNets* netList, 
+//                std::vector<ConnectionsVector>& currTableOfAdjacentNets)
+//{
+//    return AffinityLite(hd, currTableOfAdjacentNets[::ToID(firstClusterIdx) - 1],
+//        currTableOfAdjacentNets[::ToID(secondClusterIdx) - 1],
+//        firstClusterIdx,
+//        secondClusterIdx);
+//}
 
-void CalculateNetListSizes(NetList& netList, int* netListSizes)
-{
-    int netListSize = (int)netList.size();
-    for (int i = 0; i < netListSize; i++)
-        netListSizes[i] = (int)netList[i].clusterIdxs.size();
-}
+//void CalculateNetListSizes(HClusteredNets* netList, int* netListSizes)
+//{
+//    //int netListSize = (int)netList.size();
+//    //for (int i = 0; i < netListSize; i++)
+//    //    netListSizes[i] = (int)netList[i].clusterIdxs.size();
+//}
 
-bool AreClustersMergeable(ClusteringInformation& ci, int clusterIdx, int neighborCandidateIdx)
+bool AreClustersMergeable(ClusteringInformation& ci, HCluster clusterIdx, HCluster neighborCandidateIdx)
 {
     if (clusterIdx == neighborCandidateIdx) 
         return false;
 
     //WARNING: do not join following 2 is statement, because we have
     //to call IsMovableCell() first
-    if (!IsMovableCell(neighborCandidateIdx)) return false;
-    return !ci.clusters[neighborCandidateIdx].isFake;
+    if (ci.design[neighborCandidateIdx].IsTerminals() || ci.design[neighborCandidateIdx].IsPrimary()) return false;
+    return !ci.design[neighborCandidateIdx].IsFake();
 }
 
-int FindBestNeighbour(HDesign& hd, ClusteringInformation& ci, int* netListSizes, MergeCandidate& mergeCandidate)
+int FindBestNeighbour(HDesign& hd, ClusteringInformation& ci, MergeCandidate& mergeCandidate)
 {
     mergeCandidate.score = 0.0;
-    IntVector& mrgNets = ci.tableOfAdjacentNets[mergeCandidate.clusterIdx];
-    for(IntIterator j = mrgNets.begin(); j != mrgNets.end(); ++j)
+    //IntVector& mrgNets = ci.tableOfAdjacentNets[::ToID(mergeCandidate.clusterIdx) - 1];
+    for(std::vector<HClusteredNet>::iterator j = hd[mergeCandidate.clusterIdx].tableOfAdjacentNets()->begin(); 
+        j != hd[mergeCandidate.clusterIdx].tableOfAdjacentNets()->end(); ++j)
     {
-        IntVector& mrgClusters = ci.netList[*j].clusterIdxs;
-        for (IntIterator k = mrgClusters.begin(); k != mrgClusters.end(); ++k)
+        std::vector<HCluster>& mrgClusters = (*hd[(*j)].clusterIdxs()); //ci.netList[*j].clusterIdxs;
+        for (std::vector<HCluster>::iterator k = mrgClusters.begin(); k != mrgClusters.end(); k++)
         {
             if (!AreClustersMergeable(ci, mergeCandidate.clusterIdx, *k)) continue;
 
             //double score = Affinity(hd, mergeCandidate.clusterIdx, *k, ci.clusters, ci.netList, 
             //                        netListSizes, ci.tableOfAdjacentNets);
 
-            double score = AffinityLite(hd,
-                ci.tableOfAdjacentNets[mergeCandidate.clusterIdx],
-                ci.tableOfAdjacentNets[*k],
-                netListSizes,
-                ci.clusters[mergeCandidate.clusterIdx],
-                ci.clusters[*k]);
+            double score = AffinityLite(hd, 
+                (*hd[mergeCandidate.clusterIdx].tableOfAdjacentNets()),
+                (*hd[(*k)].tableOfAdjacentNets()),
+                //ci.tableOfAdjacentNets[::ToID(mergeCandidate.clusterIdx) - 1],
+                //ci.tableOfAdjacentNets[::ToID(*k) - 1],                
+                mergeCandidate.clusterIdx,
+                *k);
 
             if (mergeCandidate.score < score)
             {
                 ASSERT(score > 0.0);
                 mergeCandidate.score = score;
-                mergeCandidate.bestNeighborIdx = *k;
+                mergeCandidate.bestNeighborIdx = (*k);
             }
         }
     }
     return OK;
 }
 
-int MarkNeighboursAsInvalid(ClusteringInformation& ci, int clusterIdx)
+int MarkNeighboursAsInvalid(ClusteringInformation& ci, HCluster clusterIdx)
 {
-    IntVector& mrgNets = ci.tableOfAdjacentNets[clusterIdx];
-    for(IntIterator j = mrgNets.begin(); j != mrgNets.end(); ++j)
+    //IntVector& mrgNets = ci.tableOfAdjacentNets[clusterIdx];
+    //for(IntIterator j = mrgNets.begin(); j != mrgNets.end(); ++j)
+    for(std::vector<HClusteredNet>::iterator j = ci.design[clusterIdx].tableOfAdjacentNets()->begin(); 
+        j != ci.design[clusterIdx].tableOfAdjacentNets()->end(); ++j)
     {
-        IntVector& mrgClusters = ci.netList[*j].clusterIdxs;
-        for (IntIterator k = mrgClusters.begin(); k != mrgClusters.end(); ++k)
-            if (clusterIdx != *k && IsMovableCell(*k))
-                ci.clusters[*k].isValid = false;
+        std::vector<HCluster>& mrgClusters = (*ci.design[(*j)].clusterIdxs()); // ci.netList[*j].clusterIdxs;
+        for (std::vector<HCluster>::iterator k = mrgClusters.begin(); k != mrgClusters.end(); ++k)
+            if ((clusterIdx != *k) && (!ci.design[(*k)].IsTerminals() && !ci.design[(*k)].IsPrimary()))
+                ci.design[(*k)].SetIsValid(false);
     }
     return OK;
 }
@@ -328,9 +371,22 @@ int MarkNeighboursAsInvalid(ClusteringInformation& ci, int clusterIdx)
 int CalculateNumberOfActiveClusters(ClusteringInformation& ci)
 {
     int nActiveClusters = 0;
-    int clusterIdx = -1;
-    while (GetNextActiveClusterIdx(&ci, clusterIdx))
+    int clusterIdx = 0;
+    bool f = 0;
+    for (HClusters::ClustersNotFakeEnumeratorW cluster = ci.design.Cluster.GetNotFakeEnumeratorW(); cluster.MoveNext();)
+    //for (HClusters::ClustersEnumeratorW cluster = ci.design.Cluster.GetEnumeratorW(); cluster.MoveNext(); clusterIdx++)
+    {
+        
+        /*while (cluster.IsFake() && !f)
+        {
+            if (!cluster.MoveNext())
+                f = 1;
+            clusterIdx++;
+        }*/
+    //while (GetNextActiveClusterIdx(&ci, clusterIdx))
+        //if (!f)
         nActiveClusters++;
+    }
     return nActiveClusters;
 }
 
@@ -340,11 +396,13 @@ void UnclusterLevelUp(HDesign& hd, ClusteringInformation& ci, ClusteringLogItera
 
     for (; iter != clusteringLogIterator->rend(); ++iter)
     {
-        ci.clusters[iter->cluster1Idx].cells.resize(iter->nCellsInCluster1);
-        ci.clusters[iter->cluster1Idx].area -= ci.clusters[iter->cluster2Idx].area;
-        ci.clusters[iter->cluster2Idx].isFake = false;
-        ci.clusters[iter->cluster2Idx].xCoord = ci.clusters[iter->cluster1Idx].xCoord;
-        ci.clusters[iter->cluster2Idx].yCoord = ci.clusters[iter->cluster1Idx].yCoord;
+        HClusterWrapper cluster1Idx = hd[iter->cluster1Idx];
+        HClusterWrapper cluster2Idx = hd[iter->cluster2Idx];
+        cluster1Idx.Cells()->resize(iter->nCellsInCluster1);
+        cluster1Idx.SetArea(cluster1Idx.Area() - cluster2Idx.Area());
+        cluster2Idx.SetIsFake(false);
+        cluster2Idx.SetXCoord(cluster1Idx.XCoord());
+        cluster2Idx.SetYCoord(cluster1Idx.YCoord());
     }
 
     ci.mCurrentNumberOfClusters = CalculateNumberOfActiveClusters(ci);
@@ -372,43 +430,44 @@ int ShiftHeadAccordingToScore(std::list<MergeCandidate>& mergeCandidates)
     return OK;
 }
 
-void MergeCurrTableOfAdjacentNets(std::vector<ConnectionsVector>& currTableOfAdjacentNets, 
-                                  const int cluster1Idx, const int cluster2Idx)
+void MergeCurrTableOfAdjacentNets(HDesign& design, 
+                                  const HCluster cluster1Idx, const HCluster cluster2Idx)
 {
-    ConnectionsVector tempMergedVector(currTableOfAdjacentNets[cluster1Idx].size() 
-        + currTableOfAdjacentNets[cluster2Idx].size());
+    
+    ConnectionsVector tempMergedVector(design[cluster1Idx].tableOfAdjacentNets()->size() 
+        + design[cluster2Idx].tableOfAdjacentNets()->size());
 
-    merge(currTableOfAdjacentNets[cluster1Idx].begin(), currTableOfAdjacentNets[cluster1Idx].end(), 
-        currTableOfAdjacentNets[cluster2Idx].begin(), currTableOfAdjacentNets[cluster2Idx].end(),
+    merge(design[cluster1Idx].tableOfAdjacentNets()->begin(), design[cluster1Idx].tableOfAdjacentNets()->end(), 
+        design[cluster2Idx].tableOfAdjacentNets()->begin(), design[cluster2Idx].tableOfAdjacentNets()->end(),
         tempMergedVector.begin());
 
     ConnectionsVector::iterator newEnd = unique(tempMergedVector.begin(), tempMergedVector.end());
-    currTableOfAdjacentNets[cluster1Idx].resize(newEnd - tempMergedVector.begin());
-    copy(tempMergedVector.begin(), newEnd, currTableOfAdjacentNets[cluster1Idx].begin());
+    design[cluster1Idx].tableOfAdjacentNets()->resize(newEnd - tempMergedVector.begin());
+    copy(tempMergedVector.begin(), newEnd, design[cluster1Idx].tableOfAdjacentNets()->begin());
 }
 
-void MergeCellIdxs(std::vector<Cluster>& clusters, const int& clusterIdx1, const int& clusterIdx2)
+void MergeCellIdxs(ClusteringInformation& ci, HCluster clusterIdx1, HCluster clusterIdx2)
 {
-    int size1 = clusters[clusterIdx1].cells.size();
-    int size2 = clusters[clusterIdx2].cells.size();
+    int size1 = ci.design[clusterIdx1].Cells()->size();
+    int size2 = ci.design[clusterIdx2].Cells()->size();
 
     std::vector<HCell> tempVector;
     tempVector.resize(size1 + size2);
-    copy(clusters[clusterIdx1].cells.begin(), clusters[clusterIdx1].cells.end(), tempVector.begin());
-    copy(clusters[clusterIdx2].cells.begin(), clusters[clusterIdx2].cells.end(), tempVector.begin() + size1);
+    copy(ci.design[clusterIdx1].Cells()->begin(), ci.design[clusterIdx1].Cells()->end(), tempVector.begin());
+    copy(ci.design[clusterIdx2].Cells()->begin(), ci.design[clusterIdx2].Cells()->end(), tempVector.begin() + size1);
 
-    clusters[clusterIdx1].cells.resize(size1 + size2);
-    copy(tempVector.begin(), tempVector.end(), clusters[clusterIdx1].cells.begin());
+    ci.design[clusterIdx1].Cells()->resize(size1 + size2);
+    copy(tempVector.begin(), tempVector.end(), ci.design[clusterIdx1].Cells()->begin());
 }
 
-void UpdateNetList(std::vector<ConnectionsVector>& currTableOfAdjacentNets, NetList& netList, 
-                   const int firstClusterIdx, const int secondClusterIdx)
+void UpdateNetList(HDesign& design, HClusteredNets* netList, 
+                   HCluster firstClusterIdx, HCluster secondClusterIdx)
 {
-    std::vector<int>::iterator iter;
-    for (int j = 0; j < static_cast<int>(currTableOfAdjacentNets[secondClusterIdx].size()); ++j)
+    std::vector<HCluster>::iterator iter;
+    for (int j = 0; j < static_cast<int>(design[secondClusterIdx].tableOfAdjacentNets()->size()); ++j)
     {
-        int netIdx = currTableOfAdjacentNets[secondClusterIdx][j];
-        IntVector& clusterIdxs = netList[netIdx].clusterIdxs;
+        HClusteredNetWrapper netIdx = netList->MakeWrapper((*design[secondClusterIdx].tableOfAdjacentNets())[j]);
+        std::vector<HCluster>& clusterIdxs = (*netIdx.clusterIdxs());
 
         if (clusterIdxs.size() == 0)
             continue;
@@ -419,7 +478,7 @@ void UpdateNetList(std::vector<ConnectionsVector>& currTableOfAdjacentNets, NetL
         (*iter) = firstClusterIdx;
 
         //save head of the vector
-        int head = clusterIdxs[0];
+        HCluster head = clusterIdxs[0];
 
         //remove duplicates
         sort(clusterIdxs.begin(), clusterIdxs.end());
@@ -438,22 +497,22 @@ void UpdateNetList(std::vector<ConnectionsVector>& currTableOfAdjacentNets, NetL
 }
 
 // the result is stored in clusterIdx1
-int MergePairOfClusters(const int cluster1Idx, const int cluster2Idx, 
-                        std::vector<Cluster>& clusters, NetList& netList,
-                        std::vector<ConnectionsVector>& currTableOfAdjacentNets)
+int MergePairOfClusters(HCluster cluster1Idx, HCluster cluster2Idx, 
+                        ClusteringInformation& ci, HClusteredNets* netList)
 {
-    MergeCurrTableOfAdjacentNets(currTableOfAdjacentNets, cluster1Idx, cluster2Idx);
-    MergeCellIdxs(clusters, cluster1Idx, cluster2Idx);
-    UpdateNetList(currTableOfAdjacentNets, netList, cluster1Idx, cluster2Idx);
+    MergeCurrTableOfAdjacentNets(ci.design, cluster1Idx, cluster2Idx);
+    MergeCellIdxs(ci, cluster1Idx, cluster2Idx);
+    UpdateNetList(ci.design, netList, cluster1Idx, cluster2Idx);
 
-    clusters[cluster1Idx].xCoord = (clusters[cluster1Idx].xCoord * clusters[cluster1Idx].area + 
-        clusters[cluster2Idx].xCoord * clusters[cluster2Idx].area) / 
-        (clusters[cluster1Idx].area + clusters[cluster2Idx].area);
-    clusters[cluster1Idx].yCoord = (clusters[cluster1Idx].yCoord * clusters[cluster1Idx].area + 
-        clusters[cluster2Idx].yCoord * clusters[cluster2Idx].area) / 
-        (clusters[cluster1Idx].area + clusters[cluster2Idx].area);
-    clusters[cluster1Idx].area += clusters[cluster2Idx].area;
-    clusters[cluster2Idx].isFake = true;
+    ci.design[cluster1Idx].SetXCoord((ci.design[cluster1Idx].XCoord() * ci.design[cluster1Idx].Area() + 
+        ci.design[cluster2Idx].XCoord() * ci.design[cluster2Idx].Area()) / 
+        (ci.design[cluster1Idx].Area() + ci.design[cluster2Idx].Area()));
+
+    ci.design[cluster1Idx].SetYCoord((ci.design[cluster1Idx].YCoord() * ci.design[cluster1Idx].Area() + 
+        ci.design[cluster2Idx].YCoord() * ci.design[cluster2Idx].Area()) / 
+        (ci.design[cluster1Idx].Area() + ci.design[cluster2Idx].Area()));
+    ci.design[cluster1Idx].SetArea(ci.design[cluster1Idx].Area() + ci.design[cluster2Idx].Area());
+    ci.design[cluster2Idx].SetIsFake(true);
 
     return OK;
 }
@@ -463,46 +522,17 @@ bool PredicateMergePairGreater(MergeCandidate elem1, MergeCandidate elem2)
     return elem1.score > elem2.score;
 }
 
-bool PredicateNetListLess(ClusteredNet elem1, ClusteredNet elem2)
+bool IsEqualNetListBinaryPredicate(HClusteredNetWrapper& elem1, HClusteredNetWrapper& elem2)
 {
-    int size1 = static_cast<int>(elem1.clusterIdxs.size());
-    int size2 = static_cast<int>(elem2.clusterIdxs.size());
-
-    if (size1 < size2)
-        return true;
-    else if (size1 > size2)
-        return false;
-
-    for (int i = 0; i < size1; ++i)
-    {
-        if (elem1.clusterIdxs[i] < elem2.clusterIdxs[i])
-            return true;
-        else if (elem1.clusterIdxs[i] > elem2.clusterIdxs[i])
-            return false;
-    }
-
-    // сортировка по весам в обратном порядке
-    // при применении функции unique автоматически будет выбран первый нет
-    // при таком способе сортировки у этого нета будет максимальный вес
-    if (elem1.weight > elem2.weight)
-        return true;
-    else if (elem1.weight < elem2.weight)
-        return false;
-
-    return false;
-}
-
-bool IsEqualNetListBinaryPredicate(ClusteredNet elem1, ClusteredNet elem2)
-{
-    int size1 = static_cast<int>(elem1.clusterIdxs.size());
-    int size2 = static_cast<int>(elem2.clusterIdxs.size());
+    int size1 = static_cast<int>(elem1.clusterIdxs()->size());
+    int size2 = static_cast<int>(elem2.clusterIdxs()->size());
 
     if (size1 != size2)
         return false;
 
     for (int i = 0; i < size2; ++i)
     {
-        if (elem1.clusterIdxs[i] != elem2.clusterIdxs[i])
+        if ((*elem1.clusterIdxs())[i] != (*elem2.clusterIdxs())[i])
             return false;
     }
 
@@ -524,41 +554,46 @@ double CalculateTotalCellArea(HDesign &hd)
 void InitializeMergeCandidates(ClusteringInformation& ci, std::list<MergeCandidate>& mergeCandidates)
 {
     mergeCandidates.clear();
-    mergeCandidates.resize(ci.clusters.size());
+    mergeCandidates.resize(ci.design.Cluster.ClustersCount());
 
     std::list<MergeCandidate>::iterator mcIter;
     int clusterIdx = 0;
+    HClusters::ClustersEnumeratorW en = ci.design.Cluster.GetEnumeratorW();
+    en.MoveNext();
     for (mcIter = mergeCandidates.begin(); mcIter != mergeCandidates.end(); mcIter++)
     {
-        mcIter->clusterIdx = clusterIdx;
-        mcIter->bestNeighborIdx = -1; 
+        mcIter->clusterIdx = en;
+        mcIter->bestNeighborIdx = ci.design.Cluster.Null(); 
         mcIter->score = 0.0;
         clusterIdx++;
+        en.MoveNext();
     }
 }
 
 void CalculateScores(HDesign& hd, ClusteringInformation& ci, 
-                     std::list<MergeCandidate>& mergeCandidates, int*& netListSizes)
+                     std::list<MergeCandidate>& mergeCandidates)
 {
     std::list<MergeCandidate>::iterator mcIter;
     for (mcIter = mergeCandidates.begin(); mcIter != mergeCandidates.end(); mcIter++)
     {
         MergeCandidate& mc = *mcIter;
-        FindBestNeighbour(hd, ci, netListSizes, mc);
+        FindBestNeighbour(hd, ci, mc);
     }
 }
 
 void InitializeClustersData(ClusteringInformation& ci, std::vector<MergeCandidate>& clustersData)
 {
-    for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
+    int i = 0;
+    for (HClusters::ClustersEnumeratorW en = ci.design.Cluster.GetEnumeratorW(); en.MoveNext(); i++)
+    //for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
     {
-        clustersData[i].clusterIdx = i;
+        clustersData[i].clusterIdx = en;
         clustersData[i].score = 0.0;
     }
 }
 
 void CalculateScores(HDesign& hd, ClusteringInformation& ci, 
-                     std::vector<MergeCandidate>& clustersData, int*& netListSizes)
+                     std::vector<MergeCandidate>& clustersData)
 {
     InitializeClustersData(ci, clustersData);
 
@@ -566,117 +601,31 @@ void CalculateScores(HDesign& hd, ClusteringInformation& ci,
     for (mcIter = clustersData.begin(); mcIter != clustersData.end(); mcIter++)
     {
         MergeCandidate& mc = *mcIter;
-        FindBestNeighbour(hd, ci, netListSizes, mc);
+        FindBestNeighbour(hd, ci, mc);
     }
 }
 
-NetList::iterator FindInVector(NetList::iterator start, 
-                               NetList::iterator end, 
-                               ClusteredNet item)
+//HClusteredNets::ClusteredNetsEnumeratorW FindInVector(HClusteredNets::ClusteredNetsEnumeratorW start, 
+//                               HClusteredNets::ClusteredNetsEnumeratorW end, 
+//                               HClusteredNetWrapper item)
+//{
+//    HClusteredNets::ClusteredNetsEnumeratorW iter = start;
+//    while (iter != end && !IsEqualNetListBinaryPredicate(iter, item))
+//    {
+//        ++iter;
+//    }
+//    return iter;
+//}
+
+void Swap(HClusteredNet& i1, HClusteredNet& i2)
 {
-    NetList::iterator iter = start;
-    while (iter != end && !IsEqualNetListBinaryPredicate(*iter, item))
-    {
-        ++iter;
-    }
-    return iter;
+    HClusteredNet tmp;
+    tmp = i1;
+    i1 = i2;
+    i2 = tmp;
 }
 
-void Swap(NetList::iterator i1, NetList::iterator i2)
-{
-    ClusteredNet tmp;
-    tmp = *i1;
-    *i1 = *i2;
-    *i2 = tmp;
-}
 
-void PurifyNetList(HDesign& hd, ClusteringInformation& ci)
-{
-    // Points to where the unique vector ends (and the duplicating part starts)
-    NetList::iterator netListIter;
-    string aggregationMethod = hd.cfg.ValueOf(".NetWeighting.APlace.aggregationMethod", "max");
-
-    sort(ci.netList.begin(), ci.netList.end(), PredicateNetListLess);
-    ALERT("NetList size before one cluster nets removing: %d", ci.netList.size());
-    //delete nets with less than 2 clusters
-    netListIter = ci.netList.begin();
-    while (netListIter->clusterIdxs.size() < 2) 
-        ++netListIter;
-    ci.netList.erase(ci.netList.begin(), netListIter);
-    ALERT("NetList size after  one cluster nets removing: %d", ci.netList.size());
-
-    //delete duplicated nets
-    if (hd.cfg.ValueOf(".Clustering.deleteDuplicatingNets", true))
-    {
-        // This will point to the last element of unique part of the vector
-        NetList::iterator lastUniqueIdx = ci.netList.begin();
-        if (aggregationMethod == "sum-1")
-        {
-            ALERT("Aggregation method for net weights inheritance is SUM-1");
-            for (netListIter = ci.netList.begin(); netListIter != ci.netList.end(); ++netListIter)
-            {
-                while (netListIter != ci.netList.end() && 
-                    IsEqualNetListBinaryPredicate(*netListIter, *lastUniqueIdx))
-                {
-                    lastUniqueIdx->weight += netListIter->weight - 1;
-                    ++netListIter;
-                }
-                if (netListIter != ci.netList.end())
-                {
-                    *(++lastUniqueIdx) = *netListIter;
-                } else
-                    break;
-            }
-            /* Now lastUniqueIdx points to the last unique value, for instance for vector<int>
-            was:
-            4 5 5 5 5 5 5 6 7 7 7 7 7 9 9 9 9
-            now:
-            4 5 6 7 9 5 5 6 7 7 7 7 7 9 9 9 9
-            ^
-            |
-            lastUniqueIdx
-            so we need to increment it
-            */
-            ++lastUniqueIdx;
-        } else if (aggregationMethod == "sum")
-        {
-            ALERT("Aggregation method for net weights inheritance is SUM");
-            for (netListIter = ci.netList.begin(); netListIter != ci.netList.end(); ++netListIter)
-            {
-                while (netListIter != ci.netList.end() && 
-                    IsEqualNetListBinaryPredicate(*netListIter, *lastUniqueIdx))
-                {
-                    lastUniqueIdx->weight += netListIter->weight;
-                    ++netListIter;
-                }
-                if (netListIter != ci.netList.end())
-                {
-                    *(++lastUniqueIdx) = *netListIter;
-                } else
-                    break;
-            }
-            /* Now lastUniqueIdx points to the last unique value, for instance for vector<int>
-            was:
-            4 5 5 5 5 5 5 6 7 7 7 7 7 9 9 9 9
-            now:
-            4 5 6 7 9 5 5 6 7 7 7 7 7 9 9 9 9
-            ^
-            |
-            lastUniqueIdx
-            so we need to increment it
-            */
-            ++lastUniqueIdx;
-        } else
-            /* In this case the net with maximum weight will be inherited */
-        {
-            ALERT("Aggregation method for net weights inheritance is MAX");
-            lastUniqueIdx = unique(ci.netList.begin(), ci.netList.end(),
-                IsEqualNetListBinaryPredicate);
-        }
-        ci.netList.resize(lastUniqueIdx - ci.netList.begin());
-        ALERT("NetList size after duplicates removing: %d", ci.netList.size());
-    }
-}
 
 void EraseZeroScorePairs(std::list<MergeCandidate>& mergeCandidates)
 {
@@ -698,18 +647,18 @@ void EraseZeroScorePairs(std::list<MergeCandidate>& mergeCandidates)
 }
 
 void CreateListOfMergeCandidates(HDesign& hd, ClusteringInformation& ci, 
-                                 int*& netListSizes, std::list<MergeCandidate>& mergeCandidates)
+                                 std::list<MergeCandidate>& mergeCandidates)
 {
     InitializeMergeCandidates(ci, mergeCandidates);
-    CalculateScores(hd, ci, mergeCandidates, netListSizes);
+    CalculateScores(hd, ci, mergeCandidates);
     mergeCandidates.sort(PredicateMergePairGreater);
     EraseZeroScorePairs(mergeCandidates);
 }
 
-bool IsMergedAreaAcceptable(ClusteringInformation &ci, int currClusterIdx, int bestNeighborIdx, double maxClusterArea)
+bool IsMergedAreaAcceptable(ClusteringInformation &ci, HCluster currClusterIdx, HCluster bestNeighborIdx, double maxClusterArea)
 {
-    ASSERT(bestNeighborIdx >= 0);
-    return ci.clusters[currClusterIdx].area + ci.clusters[bestNeighborIdx].area <= maxClusterArea;
+    //ASSERT(bestNeighborIdx >= 0);
+    return ci.design[currClusterIdx].Area() + ci.design[bestNeighborIdx].Area() <= maxClusterArea;
 }
 
 void PrintMergeCandidates(std::list<MergeCandidate>& mergeCandidates)
@@ -730,10 +679,10 @@ void MergeClusters(HDesign& hd, ClusteringInformation& ci)
     int targetNClusters = static_cast<int>(ci.mCurrentNumberOfClusters / ci.mClusterRatio);
     double maxClusterArea = (CalculateTotalCellArea(hd) / targetNClusters) * ci.mClustersAreaTolerance;
 
-    int* netListSizes = new int[ci.netList.size()];
-    CalculateNetListSizes(ci.netList, netListSizes);
+    //int* netListSizes = new int[ci.netList.size()];
+    //CalculateNetListSizes(ci.netList, netListSizes);
 
-    CreateListOfMergeCandidates(hd, ci, netListSizes, mergeCandidates);
+    CreateListOfMergeCandidates(hd, ci, mergeCandidates);
 
     //PrintMergeCandidates(mergeCandidates);
 
@@ -741,25 +690,27 @@ void MergeClusters(HDesign& hd, ClusteringInformation& ci)
     int mergedCount = 0;
     while (mergeCandidates.size() && ci.mCurrentNumberOfClusters - mergedCount > targetNClusters)
     {
+        if (mergedCount == 244)
+            int yy = 0;
         std::list<MergeCandidate>::iterator headCandidate = mergeCandidates.begin();
-        int currClusterIdx  = headCandidate->clusterIdx;
-        int bestNeighborIdx = headCandidate->bestNeighborIdx;
+        HCluster currClusterIdx  = headCandidate->clusterIdx;
+        HCluster bestNeighborIdx = headCandidate->bestNeighborIdx;
 
-        if (ci.clusters[currClusterIdx].isValid && 
+        if (hd[currClusterIdx].IsValid() && 
             IsMergedAreaAcceptable(ci, currClusterIdx, bestNeighborIdx, maxClusterArea)) 
         {//merge
-            MergePairOfClusters(currClusterIdx, bestNeighborIdx, ci.clusters, 
-                ci.netList, ci.tableOfAdjacentNets);
+            MergePairOfClusters(currClusterIdx, bestNeighborIdx, ci, 
+                &ci.design.ClustersNetList);
             mergedCount++;
 
             //save merge info to the log
             MergedCluster mergedCluster;
             mergedCluster.cluster1Idx = currClusterIdx;
             mergedCluster.cluster2Idx = bestNeighborIdx;
-            mergedCluster.nCellsInCluster1 = ci.clusters[currClusterIdx].cells.size();
+            mergedCluster.nCellsInCluster1 = hd[currClusterIdx].Cells()->size();
             thisLevelClusteringLog.push_back(mergedCluster);
 
-            CalculateNetListSizes(ci.netList, netListSizes);
+            //CalculateNetListSizes(ci.netList, netListSizes);
 
             MarkNeighboursAsInvalid(ci, bestNeighborIdx);
             MarkNeighboursAsInvalid(ci, currClusterIdx);
@@ -777,19 +728,19 @@ void MergeClusters(HDesign& hd, ClusteringInformation& ci)
 
             //shift head of the list
             MergeCandidate& mc = *headCandidate;
-            FindBestNeighbour(hd, ci, netListSizes, mc);
+            FindBestNeighbour(hd, ci, mc);
             ShiftHeadAccordingToScore(mergeCandidates);
             //reset validity - now cluster is valid, mark it
-            ci.clusters[currClusterIdx].isValid = true;
+            hd[currClusterIdx].SetIsValid(true);
         }
-        else if (!ci.clusters[currClusterIdx].isValid)
+        else if (!hd[currClusterIdx].IsValid())
         {
             //shift head of the list
             MergeCandidate& mc = *headCandidate;
-            FindBestNeighbour(hd, ci, netListSizes, mc);
+            FindBestNeighbour(hd, ci, mc);
             ShiftHeadAccordingToScore(mergeCandidates);
             //reset validity - now cluster is valid, mark it
-            ci.clusters[currClusterIdx].isValid = true;
+            hd[currClusterIdx].SetIsValid(true);
         }
         else
         {//we shouldn't merge this pair of clusters - they are too fat
@@ -798,14 +749,16 @@ void MergeClusters(HDesign& hd, ClusteringInformation& ci)
     }
 
     ci.clusteringLog.push_back(thisLevelClusteringLog);
-    delete[] netListSizes;
+    //delete[] netListSizes;
 }
 
 void MarkClustersAsValid(ClusteringInformation& ci)
 {
-    for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
+    for (HClusters::ClustersEnumeratorW en = ci.design.Cluster.GetEnumeratorW(); en.MoveNext();)
+    //for (int i = 0; i < static_cast<int>(ci.clusters.size()); ++i)
     {
-        ci.clusters[i].isValid = true;
+        en.SetIsValid(true);
+        //ci.clusters[i].isValid = true;
     }
 }
 
@@ -817,8 +770,7 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
     ALERT("CLUSTERING STARTED");
 
     ci.mCurrentNumberOfClusters = hd.Cells.MovableCellsCount();
-    ci.clusters.resize(ci.mCurrentNumberOfClusters);
-
+    ci.design.Cluster.Resize(ci.mCurrentNumberOfClusters);
     if (hd.cfg.ValueOf(".Clustering.useClusteringInformationFromFile", false))
     {//LOAD CLUSTERING INFO AND ESCAPE
         string fileName = ci.GetClusteringInformationFileName(hd);
@@ -841,8 +793,8 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
     {
         MergeClusters(hd, ci);
 
-        PurifyNetList(hd, ci);
-        ci.netLevels.push_back(ci.netList);
+        hd.NetLevels.PurifyNetList();
+        //ci.netLevels.push_back(ci.netList);
         CreateTableOfAdjacentNets(hd, ci);
 
         ci.mCurrentNumberOfClusters = CalculateNumberOfActiveClusters(ci);
@@ -850,12 +802,14 @@ int Clustering(HDesign& hd, ClusteringInformation& ci)
 
         PrintClusteringInfo(hd, ci, 0);
     }
+    hd.ClustersNetList = (*hd.NetLevels.RewritePastCopy());
+    hd.NetLevels.GetNetLelev()->pop_back();
     ALERT("CLUSTERING FINISHED");
-    ALERT("The number of levels is %u", ci.netLevels.size());
+    ALERT("The number of levels is %u", ci.design.NetLevels.NetLevelsCount());
 
 ClusteringExport:
     //EXPORT CLUSTERING
-    if (ci.netLevels.size() > 1)
+    if (ci.design.NetLevels.NetLevelsCount() > 1)
     {//do not export 1 level clustering
         string fileName = ci.GetClusteringInformationFileName(hd);
         ci.SaveToFile(fileName.c_str(), hd.Circuit.Name().c_str(), hd);

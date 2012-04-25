@@ -5,6 +5,7 @@
 #include "HMacroType.h"
 #include "HPin.h"
 #include "Index.h"
+#include "HCluster.h"
 
 BEGINITEM(HCell, HCellWrapper)
 
@@ -23,12 +24,13 @@ BEGINITEM(HCell, HCellWrapper)
     IsTerminal,
     IsSpecial,
     IsSequential,
-    IsCombinational
+    IsCombinational,
+    Cluster
   };
 
   typedef HEnumerator<HPin> PinsEnumerator;
   typedef HEnumeratorW<HPinWrapper, HPins> PinsEnumeratorW;
-
+  
 ENDITEM(HCell)
 
 BEGINHCOLLECTION(HCells, HCell)
@@ -136,6 +138,11 @@ public:
   GETTER(HCell::PinsEnumerator, HCell::Pins)
     { return HCell::PinsEnumerator(m_ld->NetList.cellPinStartIdx[ARGID],
                                    m_ld->NetList.cellPinEndIdx[ARGID]); }
+  GETTER(HCluster, HCell::Cluster)
+    {        
+        return ::__ConstructPtr<HCluster>(m_ld->NetList.cellCluster[ARGID]);
+    }
+
  
   GETTER(HCell::PinsEnumeratorW, HCell::Pins); //implemented in HExternalMethods.h
 
@@ -180,6 +187,10 @@ public:
     else
       LOGINFO("Unable to set placement status for cell having unknown macrotype");
   }
+  SETTER(HCluster, HCell::Cluster)
+  {
+      m_ld->NetList.cellCluster[ARGID] = ::ToID(value);
+  }
 
 ENDHCOLLECTION(HCells)
 
@@ -193,6 +204,7 @@ BEGINWRAPPER(HCellWrapper, HCells)
   PROPERTYWD(double, Height)
   PROPERTYWD(CellOrientation, Orientation)
   PROPERTYWD(::PlacementStatus, PlacementStatus)
+  PROPERTYWD(HCluster, Cluster)
   PROPERTYW(HMacroType, MacroType, Type)
 
   //Getters
