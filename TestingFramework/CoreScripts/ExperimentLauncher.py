@@ -10,7 +10,8 @@ from BaseExperiment import *
 from Emailer import Emailer
 from ResultsStorage import ResultsStorage
 from ReportCreator import ReportCreator
-from CoreFunctions import Logger, ReportErrorAndExit
+from Logger import Logger
+from CoreFunctions import ReportErrorAndExit
 from ParametersParsing import GeneralParameters
 
 TERMINATED = "Terminated"

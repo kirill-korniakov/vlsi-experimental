@@ -14,31 +14,6 @@ NOT_EQUAL = "NotEqual"
 def GetTimeStamp():
     return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
-class Logger:
-    startTime   = time.time()
-    logFileName = r"./%s_TF.log" % (GetTimeStamp())
-
-    def LogWorkTime(self):
-        runTime = time.time() - self.startTime
-        self.Log("RUNTIME %2.2i:%2.2i" % (int(runTime / 60), int(runTime % 60)))
-
-    def CoolLog(self, message):
-        self.Log("\n")
-        self.Log("######################################################")
-        self.Log("####### %s" % (message))
-        self.Log("######################################################")
-        self.LogWorkTime()
-        self.Log("\n")
-
-    def Log(self, message):
-        print(message)
-        log = open(self.logFileName, 'a')
-        log.write(("%s\n") % (message))
-        log.close()
-
-    def LogStartMessage(self):
-        self.CoolLog("Started on %s" % (GetTimeStamp()))
-
 def Absolutize(x):
     divisor = x[0]
     if divisor != 0.0:

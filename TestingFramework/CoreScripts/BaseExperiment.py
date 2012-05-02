@@ -1,8 +1,9 @@
 import os
 from ParametersParsing import GeneralParameters
 from LogParser import LogParser, PFST, PQAT
-from CoreFunctions import END_OF_COLUMN, Logger, CreateConfigParser, WriteStringToFile,\
-                          MakeTableInPercents, PrintTableToFile, Logger
+from Logger import Logger
+from CoreFunctions import END_OF_COLUMN, CreateConfigParser, WriteStringToFile,\
+                          MakeTableInPercents, PrintTableToFile
 
 OK      = "Ok"
 NEW     = "New"

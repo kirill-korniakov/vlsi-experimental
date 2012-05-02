@@ -4,7 +4,8 @@ from CoreScripts.Checker import Checker
 from ParametersParsing import TestRunnerParameters, EmailerParameters, ReportParameters
 from CoreScripts.Emailer import Emailer
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import Logger, CreateConfigParser, DeleteOldLogs
+from CoreScripts.Logger import Logger
+from CoreScripts.CoreFunctions import CreateConfigParser, DeleteOldLogs
 from Experiment_HippocrateDP import Experiment_HippocrateDP
 from Experiment_HPWL import Experiment_HPWL
 from Experiment_LR import Experiment_LR

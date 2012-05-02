@@ -1,8 +1,9 @@
 import os
+from Logger import Logger
 import CoreScripts
 from CoreScripts.BaseExperiment import OK, CHANGED, NEW, FAILED, BaseExperiment
 from CoreScripts.CoreFunctions import SAME, EQUAL, NOT_EQUAL, END_OF_COLUMN, CompareValues,\
-                                      WriteStringToFile, Logger
+                                      WriteStringToFile
 
 class Checker(BaseExperiment):
     masterLogFolder = ""

@@ -1,4 +1,4 @@
-from CoreFunctions import Logger
+from Logger import Logger
 from BaseExperiment import ExperimentResults
 
 class ResultsStorage:

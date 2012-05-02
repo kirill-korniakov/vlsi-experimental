@@ -12,7 +12,8 @@ from SolutionBuilder import SolutionBuilder
 from ResultsStorage import ResultsStorage
 from ExperimentLauncher import ExperimentLauncher
 from ExperimentsComparator import ExperimentsComparator
-from CoreFunctions import Logger, GetTimeStamp, CreateConfigParser
+from CoreFunctions import GetTimeStamp, CreateConfigParser
+from Logger import Logger
 
 from ParametersParsing import TestRunnerParameters, EmailerParameters, RepoParameters,\
      ReportParameters, GeneralParameters, LogParserParameters, Tools

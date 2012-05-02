@@ -1,7 +1,8 @@
-from CoreFunctions import Logger, GetTimeStamp, END_OF_COLUMN, WriteStringToFile, CompareValues,\
+from CoreFunctions import GetTimeStamp, END_OF_COLUMN, WriteStringToFile, CompareValues,\
                           NOT_EQUAL, MarkResultAsBest
 
 from ReportCreator import ReportCreator
+from Logger import Logger
 
 class ExperimentsComparator:
   logger               = None

@@ -3,7 +3,8 @@ import sys
 import os
 
 from Emailer import Emailer
-from CoreFunctions import Logger, ReportErrorAndExit, RemoveDir
+from Logger import Logger
+from CoreFunctions import ReportErrorAndExit, RemoveDir
 
 class SvnWorker:
     logger            = None

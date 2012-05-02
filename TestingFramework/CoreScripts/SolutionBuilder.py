@@ -7,7 +7,7 @@ from datetime import date
 import time
 
 from Emailer import Emailer
-from CoreFunctions import Logger
+from Logger import Logger
 
 class SolutionBuilder:
   emailer = None
