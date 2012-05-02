@@ -21,10 +21,12 @@ class SolutionBuilder:
 
     slnPath = generalParameters.slnPath
     res     = 0
-    args    = [tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
+    #args    = [tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
+    args    = "%s %s /t:%s /p:Configuration=Release" % (tools.MSBuild, slnPath, mode)
+    logger.Log("Building solution using command: %s" % (args))
 
     try:
-      res = subprocess.call(args)
+      res = subprocess.call(args, shell = True)
 
     except WindowsError:
       error = ("Error: can not call %s" % (Tools.MSBuild))
