@@ -11,9 +11,12 @@ SAME      = "same"
 EQUAL     = "equal"
 NOT_EQUAL = "NotEqual"
 
+def GetTimeStamp():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+
 class Logger:
     startTime   = time.time()
-    logFileName = r"./TF.log"
+    logFileName = r"./%s_TF.log" % (GetTimeStamp())
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime
@@ -35,9 +38,6 @@ class Logger:
 
     def LogStartMessage(self):
         self.CoolLog("Started on %s" % (GetTimeStamp()))
-
-def GetTimeStamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 def Absolutize(x):
     divisor = x[0]
@@ -165,4 +165,26 @@ def CreateConfigParser():
   cfgParser.read(configFile)
   return cfgParser
 
+def DeleteOldLogs(logsDir, daysToStoreLogs = 7):
+  if (not os.path.exists(logsDir)):
+    print("Error: %s doesn't exist" % (logsDir))
+    return
 
+  for element in os.listdir(logsDir):
+    fullName        = os.path.join(logsDir, element)
+    creationTime    = os.path.getctime(fullName)
+    currentTime     = time.time()
+    secondsToExpire = creationTime - currentTime + daysToStoreLogs * 86400 #seconds in 24 hours
+    #print("Ctime: %s. Time now: %s\nExpires in %s seconds" % (creationTime, currentTime, secondsToExpire))
+
+    if (secondsToExpire < 0):
+        print("File or directory %s is too old. Deleting..." % (element))
+
+        if (os.path.isfile(fullName)):
+          os.remove(fullName)
+
+        else:
+          RemoveDir(fullName)
+
+if (__name__ == "__main__"):
+  DeleteOldLogs(r"C:\Users\beljakov.alexander.a\Desktop\VLSI\TestingFramework\Reports")

@@ -40,5 +40,11 @@ def test():
   testRunner.AddExperimentToGroup(eLeg)
   testRunner.Run()
 
+def test2():
+  testRunner = TestRunner()
+  eSGNW      = Experiment_Weighting()
+  testRunner.Append(eSGNW)
+  testRunner.Run()
+
 if (__name__ == "__main__"):
-  test()
+  test2()

@@ -1,10 +1,10 @@
 from ConfigParser import ConfigParser
 
 from CoreScripts.Checker import Checker
-from ParametersParsing import TestRunnerParameters, EmailerParameters
+from ParametersParsing import TestRunnerParameters, EmailerParameters, ReportParameters
 from CoreScripts.Emailer import Emailer
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import Logger, CreateConfigParser
+from CoreScripts.CoreFunctions import Logger, CreateConfigParser, DeleteOldLogs
 from Experiment_HippocrateDP import Experiment_HippocrateDP
 from Experiment_HPWL import Experiment_HPWL
 from Experiment_LR import Experiment_LR
@@ -51,6 +51,9 @@ def NightExperiment(testRunner):
 
 def RunNightExperiments():
   cfgParser                  = CreateConfigParser()
+  reportParameters           = ReportParameters(cfgParser)
+  DeleteOldLogs(reportParameters.logFolder)
+
   nightTestParams            = TestRunnerParameters(cfgParser)
   nightTestParams.doBuild    = True
   nightTestParams.doCheckout = True

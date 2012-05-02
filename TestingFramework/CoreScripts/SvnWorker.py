@@ -29,10 +29,11 @@ class SvnWorker:
 
         for i in range(10):
             try:
-                retcode = subprocess.call(command)
+                retcode = subprocess.call(command, shell = True)
 
-            except WindowsError:
-                error = "Error: can not call svn.exe"
+            except Exception:
+                import traceback
+                error = "Error: can not call svn.exe: %s" % (traceback.format_exc())
                 ReportErrorAndExit(error, self.logger, self.emailer)
 
             if retcode == 0:
@@ -59,8 +60,8 @@ class SvnWorker:
         #url = 'http://svn.software.unn.ru/VLSI/CODE/trunk/TestingFramework'
         #to = '../../qqq'
 
-        #command = "C:\\Program Files (x86)\\CollabNet\\Subversion Client\\svn.exe co%s %s %s"\
-        command = "svn co --username belyakov --password 'njz%s %s %s"\
+        #command = "svn co --username belyakov --password 'njz%s %s %s"\
+        command = r'"C:\Program Files (x86)\CollabNet\Subversion Client\svn.exe" co%s %s %s'\
                     % (rev, url, to)
         return command
 
