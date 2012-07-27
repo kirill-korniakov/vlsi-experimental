@@ -1,5 +1,5 @@
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_HPWL(BaseExperiment):
@@ -8,10 +8,7 @@ class Experiment_HPWL(BaseExperiment):
                                 ["HPWL"], ["DP"])
 
     def CreateEmptyTable(self, reportTable):
-        cols = ["Benchmark"]
-        cols.append(END_OF_COLUMN)
-        cols.append("HPWL")
-
+        cols = ["Benchmark", "HPWL"]
         WriteStringToFile(cols, reportTable)
 
 def test():

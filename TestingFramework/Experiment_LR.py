@@ -1,5 +1,5 @@
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_LR(BaseExperiment):
@@ -11,24 +11,24 @@ class Experiment_LR(BaseExperiment):
         self.doParsePQAT = True
 
     def CreateEmptyTable(self, reportTable):
-        cols = ["Benchmark", END_OF_COLUMN, "initHPWL", END_OF_COLUMN, "lrHPWL", END_OF_COLUMN, "dpHPWL", END_OF_COLUMN,\
-        "initTWL", END_OF_COLUMN, "lrTWL", END_OF_COLUMN, "dpTWL", END_OF_COLUMN,\
-        "initTNS", END_OF_COLUMN, "lrTNS", END_OF_COLUMN, "dpTNS", END_OF_COLUMN,\
-        "initWNS", END_OF_COLUMN, "lrWNS", END_OF_COLUMN, "dpWNS", END_OF_COLUMN, END_OF_COLUMN,\
-        "lrHPWL%", END_OF_COLUMN, "dpHPWL%", END_OF_COLUMN, "lrTWL%", END_OF_COLUMN, "dpTWL%", END_OF_COLUMN,\
-        "lrTNS%", END_OF_COLUMN, "dpTNS%", END_OF_COLUMN, "lrWNS%", END_OF_COLUMN, "dpWNS%"]
+        cols = ["Benchmark", "initHPWL", "lrHPWL", "dpHPWL",\
+        "initTWL", "lrTWL", "dpTWL",\
+        "initTNS", "lrTNS", "dpTNS",\
+        "initWNS", "lrWNS", "dpWNS", "",\
+        "lrHPWL%", "dpHPWL%", "lrTWL%", "dpTWL%", \
+        "lrTNS%", "dpTNS%", "lrWNS%", "dpWNS%"]
 
         WriteStringToFile(cols, reportTable)
 
     def AddStringToTable(self, values, benchmark, reportTable):
-        cols = [benchmark, END_OF_COLUMN]
+        cols = [benchmark]
 
         #print absolute values
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
-                cols.extend([str(values[row][col]), END_OF_COLUMN])
+                cols.append(str(values[row][col]))
 
-        cols.append(END_OF_COLUMN)
+        cols.append("")
 
         #print percents
         for col in range(len(self.metrics)):

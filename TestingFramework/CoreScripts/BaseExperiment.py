@@ -2,8 +2,7 @@ import os
 from ParametersParsing import GeneralParameters
 from LogParser import LogParser, PFST, PQAT
 from Logger import Logger
-from CoreFunctions import END_OF_COLUMN, CreateConfigParser, WriteStringToFile,\
-                          MakeTableInPercents, PrintTableToFile
+from CoreFunctions import CreateConfigParser, WriteStringToFile, MakeTableInPercents, PrintTableToFile
 
 OK      = "Ok"
 NEW     = "New"
@@ -92,15 +91,14 @@ class BaseExperiment:
     self.benchmarks = os.path.join(self.generalParameters.benchmarkCheckoutPath, benchmarks)
 
   def CreateEmptyTable(self, reportTable):
-    cols = ["Benchmark", END_OF_COLUMN]
+    cols = ["Benchmark"]
 
     #write header of a table.
     for row in range(len(self.stages)):
       for col in range(len(self.metrics)):
         cols.append("%s_%s" % (self.metrics[col], self.stages[row]))
-        cols.append(END_OF_COLUMN)
 
-      cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
+      cols.append("") #an empty column between metrics on different stages
 
     WriteStringToFile(cols, reportTable)
 
@@ -118,13 +116,13 @@ class BaseExperiment:
     PrintTableToFile(PQATFileName, table, metrics)
 
   def AddStringToTable(self, values, benchmark, reportTable):
-    cols = [benchmark, END_OF_COLUMN]
+    cols = [benchmark]
 
     for row in range(len(self.stages)):
       for col in range(len(self.metrics)):
-        cols.extend([str(values[row][col]), END_OF_COLUMN])
+        cols.append(str(values[row][col]))
 
-      cols.append(END_OF_COLUMN) #an empty column between metrics on different stages
+      cols.append("") #an empty column between metrics on different stages
 
     #write metrics to the file
     WriteStringToFile(cols, reportTable)

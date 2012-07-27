@@ -1,5 +1,5 @@
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_HippocrateDP(BaseExperiment):
@@ -10,12 +10,10 @@ class Experiment_HippocrateDP(BaseExperiment):
           "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list", _metrics, _stages)
 
     def CreateEmptyTable(self, reportTable):
-      cols = [END_OF_COLUMN, "GP + Leg", END_OF_COLUMN, END_OF_COLUMN, END_OF_COLUMN, END_OF_COLUMN,\
-              "GP + Leg + HippocrateDP"]
+      cols = ["", "GP + Leg", "", "", "", "GP + Leg + HippocrateDP"]
       WriteStringToFile(cols, reportTable)
 
-      cols = ["Benchmark", END_OF_COLUMN, "HPWL", END_OF_COLUMN, "TNS", END_OF_COLUMN, "WNS",\
-              END_OF_COLUMN, END_OF_COLUMN, "HPWL", END_OF_COLUMN, "TNS", END_OF_COLUMN, "WNS"]
+      cols = ["Benchmark", "HPWL", "TNS", "WNS", "", "HPWL", "TNS", "WNS"]
       WriteStringToFile(cols, reportTable)
 
 def test():

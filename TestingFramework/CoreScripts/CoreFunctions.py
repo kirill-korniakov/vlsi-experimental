@@ -4,8 +4,8 @@ import datetime
 from datetime import date
 from ConfigParser import ConfigParser
 
-CONFIG_FILE   = "Parameters.conf"
-END_OF_COLUMN = ";"
+CONFIG_FILE = "Parameters.conf"
+DELIMITER   = ";"
 
 SAME      = "same"
 EQUAL     = "equal"
@@ -74,8 +74,12 @@ def ReportErrorAndExit(error, logger, emailer):
 def MarkResultAsBest(col):
     return "* " + col
 
-def WriteStringToFile(cols, tableFileName):
+def WriteStringToFile2(cols, tableFileName):
   printStr = ""
+
+  """
+  ";".join(cols)
+  """
 
   for col in cols:
     if (col == END_OF_COLUMN):
@@ -83,6 +87,18 @@ def WriteStringToFile(cols, tableFileName):
     else:
       printStr += str(col)
 
+  printStr += "\n"
+  resultFile = open(tableFileName, 'a')
+  resultFile.write(printStr.replace(".", ","))
+  resultFile.close()
+
+def WriteStringToFile(cols, tableFileName):
+  #printStr = "%s\n" % (DELIMITER.join(cols))
+  printStr = ""
+  for value in cols:
+    printStr += "%s%s" % (value, DELIMITER)
+
+  printStr = printStr[:-1]
   printStr += "\n"
   resultFile = open(tableFileName, 'a')
   resultFile.write(printStr.replace(".", ","))
@@ -110,7 +126,7 @@ def ExtractXYFromTable(table):
 
   return (xValues, yValues)
 
-def PrintTableToFile(tableFileName, table, metrics, stages = []):
+def PrintTableToFile2(tableFileName, table, metrics, stages = []):
   cols = ["stage", END_OF_COLUMN]
 
   for col in metrics:
@@ -130,6 +146,23 @@ def PrintTableToFile(tableFileName, table, metrics, stages = []):
     for value in currStage:
       cols.extend([str(value), END_OF_COLUMN])
 
+    WriteStringToFile(cols, tableFileName)
+    currStageIdx += 1
+
+def PrintTableToFile(tableFileName, table, metrics, stages = []):
+  cols = ["stage"]
+  cols.extend(metrics)
+  WriteStringToFile(cols, tableFileName)
+  currStageIdx = 0
+
+  for currStage in table:
+    currStageName = str(currStageIdx)
+
+    if (stages):
+      currStageName = stages[currStageIdx]
+
+    cols = [currStageName]
+    cols.extend(currStage)
     WriteStringToFile(cols, tableFileName)
     currStageIdx += 1
 

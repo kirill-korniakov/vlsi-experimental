@@ -1,5 +1,5 @@
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import END_OF_COLUMN, WriteStringToFile
+from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_New_Buffering(BaseExperiment):

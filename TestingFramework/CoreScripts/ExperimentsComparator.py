@@ -1,5 +1,4 @@
-from CoreFunctions import GetTimeStamp, END_OF_COLUMN, WriteStringToFile, CompareValues,\
-                          NOT_EQUAL, MarkResultAsBest
+from CoreFunctions import GetTimeStamp, WriteStringToFile, CompareValues, NOT_EQUAL, MarkResultAsBest
 
 from ReportCreator import ReportCreator
 from Logger import Logger
@@ -49,10 +48,10 @@ class ExperimentsComparator:
       self.experimentsToCompare[experimentName] = self.GetResultsForExperiment(experimentName)
 
   def PrintLabelAndBlanks(self, cols, label, nMetrics):
-    cols.extend([END_OF_COLUMN, label])
+    cols.extend(["", label])
 
     for col in nMetrics:
-      cols.append(END_OF_COLUMN)
+      cols.append("")
 
   def PrintTableHeader(self, resultFileName):
     metrics  = self.masterExperiment.metrics
@@ -70,30 +69,31 @@ class ExperimentsComparator:
     WriteStringToFile(cols, resultFileName)
 
     # Second line of the table header
-    cols = ["benchmark", END_OF_COLUMN]
+    cols = ["benchmark"]
 
     #Init values
-    for row in nMetrics:
-      cols.extend([metrics[row], END_OF_COLUMN])
-
-    cols.append(END_OF_COLUMN)
+    """for row in nMetrics:
+      cols.append(metrics[row])"""
+    cols.extend(metrics)
+    cols.append("") #an empty column between INIT and experiments'es values
 
     #Target experiment's values
-    for row in nMetrics:
-      cols.extend([metrics[row], END_OF_COLUMN])
+    ##for row in nMetrics: #TODO: check
+    ##  cols.append(metrics[row])
+    cols.extend(metrics)
+    cols.append("")
 
-    cols.append(END_OF_COLUMN)
     nNormalExperiments = len(self.experimentsToCompare)
 
     for experimentName in xrange(nNormalExperiments):
       for row in nMetrics:
         if (metrics[row] != "Time"):
-          cols.extend([metrics[row] + "%", END_OF_COLUMN])
+          cols.append(metrics[row] + "%")
 
         else:
-          cols.extend([metrics[row], END_OF_COLUMN])
+          cols.append(metrics[row])
 
-      cols.append(END_OF_COLUMN)
+      cols.append("") #an empty column between experiments'es results
 
     WriteStringToFile(cols, resultFileName)
 
@@ -125,23 +125,23 @@ class ExperimentsComparator:
         #Fill reference metrics
         finalStageIdx = len(self.masterExperiment.stages) - 1
         value         = resultValues[finalStageIdx][metricIdx]
-        experimentsLine.extend([str(value), END_OF_COLUMN])
+        experimentsLine.append(str(value))
         referenceMetrics.append(value)
 
         #Fill Initial metrics
         value = resultValues[0][metricIdx]
-        initialMetricsLine.extend([str(value), END_OF_COLUMN])
+        initialMetricsLine.append(str(value))
         initialMetrics.append(value)
 
-      initialMetricsLine.append(END_OF_COLUMN)
+      initialMetricsLine.append("")
 
     else: #Target experiment failed
       referenceMetrics = initialMetrics
 
       for metricIdx in nMetrics:
-        experimentsLine.extend(["N/A", END_OF_COLUMN])
+        experimentsLine.append("N/A")
 
-    experimentsLine.append(END_OF_COLUMN)
+    experimentsLine.append("")
 
     # normal experiments
     for experimentName, experimentResults in self.experimentsToCompare.iteritems():
@@ -149,9 +149,9 @@ class ExperimentsComparator:
 
       if (resultValues == []):
         for metricIdx in nMetrics:
-          experimentsLine.extend(["N/A", END_OF_COLUMN])
+          experimentsLine.append("N/A")
 
-        experimentsLine.append(END_OF_COLUMN)
+        experimentsLine.append("")
         continue
 
       #if 'INITIAL' metrics haven't been printed yet
@@ -159,10 +159,10 @@ class ExperimentsComparator:
           #take them from the table of this experiment
           for metricIdx in nMetrics:
             value = resultValues[0][metricIdx]
-            initialMetricsLine.extend([str(value), END_OF_COLUMN])
+            initialMetricsLine.append(str(value))
             initialMetrics.append(value)
 
-          initialMetricsLine.append(END_OF_COLUMN)
+          initialMetricsLine.append("")
 
       #else compare 'INITIAL' metrics
       else:
@@ -185,9 +185,9 @@ class ExperimentsComparator:
           bestValues[metricIdx]    = percent #remember the best result
           bestValuesIdx[metricIdx] = len(experimentsLine) #and its index
 
-        experimentsLine.extend([valueStr, END_OF_COLUMN])
+        experimentsLine.append(valueStr)
 
-      experimentsLine.append(END_OF_COLUMN)
+      experimentsLine.append("")
 
     #for idx in bestValuesIdx:
     #  if (idx > 0):
@@ -195,11 +195,11 @@ class ExperimentsComparator:
 
     if (initialMetricsLine == []):
       for metricIdx in nMetrics:
-        initialMetricsLine.extend(["N/A", END_OF_COLUMN])
+        initialMetricsLine.append("N/A")
 
-      initialMetricsLine.append(END_OF_COLUMN)
+      initialMetricsLine.append("")
 
-    newTableLine = [benchmark, END_OF_COLUMN]
+    newTableLine = [benchmark]
     newTableLine.extend(initialMetricsLine)
     newTableLine.extend(experimentsLine)
     return newTableLine
