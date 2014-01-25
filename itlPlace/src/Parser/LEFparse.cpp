@@ -1,12 +1,12 @@
 #include "HDesign.h"
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include "RoutingLayersBuilder.h"
 #include "MacroTypesBuilder.h"
 #include "SitesBuilder.h"
 #include "MacroTypeUtils.h"
 
-#include "LEF\\lefrReader.hpp"
+#include "lefrReader.hpp"
 
 struct LEFParserData
 {
@@ -289,7 +289,7 @@ void freeCB(void* name)
 
 void ParseLEF(HDesign& design)
 {
-  ConfigContext ctx = design.cfg.OpenContext("LEFParser");
+  ConfigContext ctx(design.cfg.OpenContext("LEFParser"));
 
   if(!design.HasTechInfo())
     design.SetTechInfo();

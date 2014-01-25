@@ -1,6 +1,6 @@
 #include "HPlotter.h"
-#include "HDesign.h"
 #include "PlotterData.h"
+#include "HDesign.h"
 #include "OptimizationContext.h"
 
 #define MAX_COLOR 255

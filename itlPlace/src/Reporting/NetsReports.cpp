@@ -272,7 +272,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 
 		sprintf(signature, "%s crossing = %d ", netw.Name().c_str(), crossing);
 
-		//FIXME: use public API (Show methods) of the plotter
+        //TODO: use public API (Show methods) of the plotter
 		design.Plotter->PlotNetSteinerTree(net, Color_Black);
 		design.Plotter->Refresh(HPlotter::WaitTime(intWaitTime));
 		design.Plotter->DrawText(signature);

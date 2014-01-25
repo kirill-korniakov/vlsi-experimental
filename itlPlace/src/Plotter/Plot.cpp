@@ -321,7 +321,7 @@ void HPlotter::PlotKi(int nClusters, int nNets, double* x, Color color)
     if (!IsEnabled() || maxKi <= 0.0) 
         return;
 
-    //FIXME: find proper place
+    //TODO: find proper place
     InitializeHistogramWindow();
 
     double startX, startY;

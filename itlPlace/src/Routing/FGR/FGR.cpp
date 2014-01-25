@@ -16,6 +16,8 @@ using std::map;
 using std::numeric_limits;
 using std::make_pair;
 using std::ofstream;
+using std::min;
+using std::max;
 
 #include "FGR.h"
 #include "stdTypes.h"
@@ -27,13 +29,13 @@ bool CompareByBox::operator()(const SubNetIdType &a, const SubNetIdType &b) cons
                    static_cast<double>(nets[a.first].subnets[a.second].two.x));
   double aH = fabs(static_cast<double>(nets[a.first].subnets[a.second].one.y) - 
                    static_cast<double>(nets[a.first].subnets[a.second].two.y));
-  pair<double,double> costA(aW+aH,min(aW,aH)/max(aW,aH));
+  pair<double,double> costA(aW+aH,std::min(aW,aH)/std::max(aW,aH));
 
   double bW = fabs(static_cast<double>(nets[b.first].subnets[b.second].one.x) - 
                    static_cast<double>(nets[b.first].subnets[b.second].two.x));
   double bH = fabs(static_cast<double>(nets[b.first].subnets[b.second].one.y) - 
                    static_cast<double>(nets[b.first].subnets[b.second].two.y));
-  pair<double,double> costB(bW+bH, min(bW,bH)/max(bW,bH));
+  pair<double,double> costB(bW+bH, std::min(bW,bH)/std::max(bW,bH));
 
   return costA < costB;
 }
@@ -69,13 +71,13 @@ CostType DLMCost::operator()(IdType edgeId, IdType netId) const
   else
   {
     const CapType capacity = fgr.edges[edgeId].capacity;
-    const CapType newUsage = fgr.edges[edgeId].usage + max(fgr.minWidths[fgr.edges[edgeId].layer],
+    const CapType newUsage = fgr.edges[edgeId].usage + std::max(fgr.minWidths[fgr.edges[edgeId].layer],
                              fgr.nets[netId].minWidth) + fgr.minSpacings[fgr.edges[edgeId].layer];
 
     if(newUsage > capacity)
     {
       return edgeBase + fgr.edges[edgeId].historyCost*
-             min(powMax, pow(powBase, static_cast<CostType>(newUsage - capacity)/static_cast<CostType>(capacity)));
+             std::min(powMax, pow(powBase, static_cast<CostType>(newUsage - capacity)/static_cast<CostType>(capacity)));
     }
     else
     {
@@ -135,8 +137,8 @@ CostType FGR::routeSubNet(const SubNetIdType &subNetId, bool allowOverflow, bool
 
   if(bboxConstrain)
   {
-    const Point botleft(min(snet.one.x, snet.two.x), min(snet.one.y, snet.two.y), 0);
-    const Point topright(max(snet.one.x, snet.two.x), max(snet.one.y, snet.two.y), 0);
+    const Point botleft(std::min(snet.one.x, snet.two.x), std::min(snet.one.y, snet.two.y), 0);
+    const Point topright(std::max(snet.one.x, snet.two.x), std::max(snet.one.y, snet.two.y), 0);
 
     const bool doNotAllowOverflow = false;
     totalCost = routeMaze(subNetId, doNotAllowOverflow, botleft, topright, f, path);
@@ -234,7 +236,7 @@ CostType FGR::routeMaze(const SubNetIdType &subNetId, bool allowOverflow,
       break;
     }
 
-    const CapType addedUsage = max(netMinWidth, minWidths[tile.z]) + minSpacings[tile.z];
+    const CapType addedUsage = std::max(netMinWidth, minWidths[tile.z]) + minSpacings[tile.z];
 
     if(tiles[tile.z][tile.y][tile.x].incX != numeric_limits<IdType>::max())
     {
@@ -712,11 +714,11 @@ void FGR::layerAssignment(void)
             {
               if(!nets[netId].hashedSegments.contains(fulltiles[j][prevTile.y][prevTile.x].incX))
               {
-                double addedUsage = max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
-                double overflow = max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].incX].usage -
+                double addedUsage = std::max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
+                double overflow = std::max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].incX].usage -
                                           fulledges[fulltiles[j][prevTile.y][prevTile.x].incX].capacity);
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -735,7 +737,7 @@ void FGR::layerAssignment(void)
               {
                 double overflow = -1.;
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -756,7 +758,7 @@ void FGR::layerAssignment(void)
           assert(prevTile.x == fullPrevTile.x && prevTile.y == fullPrevTile.y);
 
           // add the stuff in
-          for(CoordType j = min(fullPrevTile.z, bestLayer); j < max(fullPrevTile.z, bestLayer); ++j)
+          for(CoordType j = std::min(fullPrevTile.z, bestLayer); j < std::max(fullPrevTile.z, bestLayer); ++j)
           {
             assignedSegments.push_back(fulltiles[j][prevTile.y][prevTile.x].incZ);
           }
@@ -776,11 +778,11 @@ void FGR::layerAssignment(void)
             {
               if(!nets[netId].hashedSegments.contains(fulltiles[j][prevTile.y][prevTile.x].decX))
               {
-                double addedUsage = max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
-                double overflow = max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].decX].usage -
+                double addedUsage = std::max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
+                double overflow = std::max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].decX].usage -
                                           fulledges[fulltiles[j][prevTile.y][prevTile.x].decX].capacity);
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -799,7 +801,7 @@ void FGR::layerAssignment(void)
               {
                 double overflow = -1.;
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -820,7 +822,7 @@ void FGR::layerAssignment(void)
           assert(prevTile.x == fullPrevTile.x && prevTile.y == fullPrevTile.y);
 
           // add the stuff in
-          for(CoordType j = min(fullPrevTile.z, bestLayer); j < max(fullPrevTile.z, bestLayer); ++j)
+          for(CoordType j = std::min(fullPrevTile.z, bestLayer); j < std::max(fullPrevTile.z, bestLayer); ++j)
           {
             assignedSegments.push_back(fulltiles[j][prevTile.y][prevTile.x].incZ);
           }
@@ -846,11 +848,11 @@ void FGR::layerAssignment(void)
             {
               if(!nets[netId].hashedSegments.contains(fulltiles[j][prevTile.y][prevTile.x].incY))
               {
-                double addedUsage = max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
-                double overflow = max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].incY].usage -
+                double addedUsage = std::max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
+                double overflow = std::max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].incY].usage -
                                           fulledges[fulltiles[j][prevTile.y][prevTile.x].incY].capacity);
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -869,7 +871,7 @@ void FGR::layerAssignment(void)
               {
                 double overflow = -1.;
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -890,7 +892,7 @@ void FGR::layerAssignment(void)
           assert(prevTile.x == fullPrevTile.x && prevTile.y == fullPrevTile.y);
 
           // add the stuff in
-          for(CoordType j = min(fullPrevTile.z, bestLayer); j < max(fullPrevTile.z, bestLayer); ++j)
+          for(CoordType j = std::min(fullPrevTile.z, bestLayer); j < std::max(fullPrevTile.z, bestLayer); ++j)
           {
             assignedSegments.push_back(fulltiles[j][prevTile.y][prevTile.x].incZ);
           }
@@ -910,11 +912,11 @@ void FGR::layerAssignment(void)
             {
               if(!nets[netId].hashedSegments.contains(fulltiles[j][prevTile.y][prevTile.x].decY))
               {
-                double addedUsage = max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
-                double overflow = max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].decY].usage -
+                double addedUsage = std::max(nets[netId].minWidth, minWidths[j]) + minSpacings[j];
+                double overflow = std::max(0., addedUsage + fulledges[fulltiles[j][prevTile.y][prevTile.x].decY].usage -
                                           fulledges[fulltiles[j][prevTile.y][prevTile.x].decY].capacity);
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -933,7 +935,7 @@ void FGR::layerAssignment(void)
               {
                 double overflow = -1.;
                 unsigned neededVias = 0;
-                for(CoordType k = min(j, fullPrevTile.z); k < max(j, fullPrevTile.z); ++k)
+                for(CoordType k = std::min(j, fullPrevTile.z); k < std::max(j, fullPrevTile.z); ++k)
                 {
                   if(!nets[netId].hashedSegments.contains(fulltiles[k][prevTile.y][prevTile.x].incZ))
                   {
@@ -954,7 +956,7 @@ void FGR::layerAssignment(void)
           assert(prevTile.x == fullPrevTile.x && prevTile.y == fullPrevTile.y);
 
           // add the stuff in
-          for(CoordType j = min(fullPrevTile.z, bestLayer); j < max(fullPrevTile.z, bestLayer); ++j)
+          for(CoordType j = std::min(fullPrevTile.z, bestLayer); j < std::max(fullPrevTile.z, bestLayer); ++j)
           {
             assignedSegments.push_back(fulltiles[j][prevTile.y][prevTile.x].incZ);
           }
@@ -967,7 +969,7 @@ void FGR::layerAssignment(void)
     while(currTile != endTile);
 
     // connect to the last tile
-    for(CoordType j = min(fullCurrTile.z, endTile.z); j < max(fullCurrTile.z, endTile.z); ++j)
+    for(CoordType j = std::min(fullCurrTile.z, endTile.z); j < std::max(fullCurrTile.z, endTile.z); ++j)
     {
       assignedSegments.push_back(fulltiles[j][fullCurrTile.y][fullCurrTile.x].incZ);
     }
@@ -982,7 +984,7 @@ void FGR::layerAssignment(void)
     {
       const IdType edgeId = snet.segments[j];
 
-      const CapType addedUsage = fulledges[edgeId].type == VIA ? 1 : max(nets[netId].minWidth, minWidths[fulledges[edgeId].layer]) +
+      const CapType addedUsage = fulledges[edgeId].type == VIA ? 1 : std::max(nets[netId].minWidth, minWidths[fulledges[edgeId].layer]) +
                                                                      minSpacings[fulledges[edgeId].layer];
 
       if(!nets[netId].hashedSegments.contains(edgeId))
@@ -1100,9 +1102,9 @@ double FGR::congEstScoreSegment(IdType netId, const Point &a, const Point &b)
 {
   double xFirstScore = 0.;
 
-  for(unsigned j = min(a.x, b.x); j < max(a.x, b.x); ++j)
+  for(unsigned j = std::min(a.x, b.x); j < std::max(a.x, b.x); ++j)
   {
-    unsigned ycoord = min(a.y, b.y);
+    unsigned ycoord = std::min(a.y, b.y);
     double usage = 0., cap = 0., hist = 0., typUsage = 0., useful = 0.;
     for(unsigned k = 0; k < tiles.size(); ++k)
     {
@@ -1125,17 +1127,17 @@ double FGR::congEstScoreSegment(IdType netId, const Point &a, const Point &b)
 
     if(usage <= cap)
     {
-      xFirstScore += edgeBase + hist*max(1., usage/cap);
+      xFirstScore += edgeBase + hist * std::max(1., usage/cap);
     }
     else
     {
-      xFirstScore += edgeBase + hist*min(powMax, pow(powBase, (usage - cap)/(cap)));
+      xFirstScore += edgeBase + hist * std::min(powMax, pow(powBase, (usage - cap)/(cap)));
     }
   }
 
-  for(unsigned j = min(a.y, b.y); j < max(a.y, b.y); ++j)
+  for(unsigned j = std::min(a.y, b.y); j < std::max(a.y, b.y); ++j)
   {
-    unsigned xcoord = max(a.x, b.x);
+    unsigned xcoord = std::max(a.x, b.x);
     double usage = 0., cap = 0., hist = 0., typUsage = 0., useful = 0.;
     for(unsigned k = 0; k < tiles.size(); ++k)
     {
@@ -1158,19 +1160,19 @@ double FGR::congEstScoreSegment(IdType netId, const Point &a, const Point &b)
 
     if(usage <= cap)
     {
-      xFirstScore += edgeBase + hist*max(1., usage/cap);
+      xFirstScore += edgeBase + hist * std::max(1., usage/cap);
     }
     else
     {
-      xFirstScore += edgeBase + hist*min(powMax, pow(powBase, (usage - cap)/(cap)));
+      xFirstScore += edgeBase + hist * std::min(powMax, pow(powBase, (usage - cap)/(cap)));
     }
   }
 
   double yFirstScore = 0.;
 
-  for(unsigned j = min(a.y, b.y); j < max(a.y, b.y); ++j)
+  for(unsigned j = std::min(a.y, b.y); j < std::max(a.y, b.y); ++j)
   {
-    unsigned xcoord = min(a.x, b.x);
+    unsigned xcoord = std::min(a.x, b.x);
     double usage = 0., cap = 0., hist = 0., typUsage = 0., useful = 0.;
     for(unsigned k = 0; k < tiles.size(); ++k)
     {
@@ -1193,17 +1195,17 @@ double FGR::congEstScoreSegment(IdType netId, const Point &a, const Point &b)
 
     if(usage <= cap)
     {
-      yFirstScore += edgeBase + hist*max(1., usage/cap);
+      yFirstScore += edgeBase + hist * std::max(1., usage/cap);
     }
     else
     {
-      yFirstScore += edgeBase + hist*min(powMax, pow(powBase, (usage - cap)/(cap)));
+      yFirstScore += edgeBase + hist * std::min(powMax, pow(powBase, (usage - cap)/(cap)));
     }
   }
 
-  for(unsigned j = min(a.x, b.x); j < max(a.x, b.x); ++j)
+  for(unsigned j = std::min(a.x, b.x); j < std::max(a.x, b.x); ++j)
   {
-    unsigned ycoord = max(a.y, b.y);
+    unsigned ycoord = std::max(a.y, b.y);
     double usage = 0., cap = 0., hist = 0., typUsage = 0., useful = 0.;
     for(unsigned k = 0; k < tiles.size(); ++k)
     {

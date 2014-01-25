@@ -13,17 +13,18 @@ using namespace libconfig;
 
 void RunFlowWrapper(HDesign& hd, TableFormatter& flowMetrics)
 {
-    __try
+    try //TODO: here was __try
     {
         RunFlow(hd, flowMetrics);
     }
-    __finally
+    catch(...) // and here __finally, need to think about it more
     {
-        flowMetrics.Print();
-
-        WRITELINE();
-        ALERT("Thats All!");
+        ALERT("We've caught exception! Please investigate this!");
     }
+
+    flowMetrics.Print();
+    WRITELINE();
+    ALERT("Thats All!");
 }
 
 void InitializeDesign(HDesign& design, int argc, char** argv)
@@ -66,7 +67,9 @@ int main(int argc, char** argv)
         ::gCfg.LoadConfiguration("itlVLSI.cfg");
         Logger::InitializeLogging(::gCfg);
         Logger::Global.PrintRevisionNumber();
-        InitFLUTE();//initialize routing
+
+        //initialize routing
+        InitFLUTE();
 
         //benchmark initialization
         HDesign design;

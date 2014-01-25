@@ -42,7 +42,7 @@
 /* # include <sys/param.h> */
 /* # endif */
 #include "FEF_stringhash.h"
-#include "lex.h"
+#include "LEF_lex.h"
 #include "lefiDefs.hpp"
 #include "lefiUser.hpp"
 #include "lefiUtil.hpp"

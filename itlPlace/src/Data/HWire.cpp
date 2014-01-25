@@ -2,6 +2,17 @@
 
 COLLECTIONCONSTRUCTOR(HWires)
 
+//properties specializations
+PROPERTYA(HWires, double, HWire::Length, m_ld->Routing.netWL)
+PROPERTYA(HWires, RoutingType, HWire::RoutingType, m_ld->Routing.netRoutingType)
+
+//getters specializations
+GETTER(HWires, HSteinerPoint, HWire::RootPoint)
+  { return ::__ConstructPtr<HSteinerPoint>(m_ld->NetList.netPins[m_ld->NetList.netPinStart[ARGID]]); }
+
+GETTER(HWires, HNet, HWire::Net)
+  { return ::__ConstructPtr<HNet>(arg); }
+
 void HWires::NetsGrowEventHandler(int netsFrom, int netsTo)
 {
 	Grow(netsFrom == 0 ? 1 : netsFrom, netsTo);

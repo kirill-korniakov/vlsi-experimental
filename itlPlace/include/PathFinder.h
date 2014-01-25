@@ -1,3 +1,5 @@
+#pragma once
+
 #include "HDesign.h"
 
 struct Edge
@@ -9,7 +11,7 @@ struct Edge
 
 typedef std::vector<HCell> CellVector;
 typedef std::vector<Edge> PathType;
-typedef std::vector<std::vector<Edge>> PathesStorageType;
+typedef std::vector<std::vector<Edge> > PathesStorageType;
 
 void RemoveDuplicates(CellVector& dest, CellVector& src);
 

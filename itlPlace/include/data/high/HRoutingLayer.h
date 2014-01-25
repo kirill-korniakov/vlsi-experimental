@@ -43,16 +43,16 @@ BEGINHCOLLECTION(HRoutingLayers, HRoutingLayer)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HRoutingLayer::Name, m_ld->Tech->layerName)
-  PROPERTYA(LayerDirection, HRoutingLayer::Direction, m_ld->Tech->layerDirection)
-  PROPERTYA(double, HRoutingLayer::RPerDist, m_ld->Tech->layerRPerDist)
-  PROPERTYA(double, HRoutingLayer::CPerDist, m_ld->Tech->layerCPerDist)
-  PROPERTYA(double, HRoutingLayer::EdgeCap, m_ld->Tech->layerEdgeCap)
-  PROPERTYA(double, HRoutingLayer::Width, m_ld->Tech->layerWidth)
-  PROPERTYA(double, HRoutingLayer::Pitch, m_ld->Tech->layerPitch)
-
 ENDHCOLLECTION(HRoutingLayers)
+
+//properties specializations
+PROPERTYADECL(HRoutingLayers, string, HRoutingLayer::Name, m_ld->Tech->layerName)
+PROPERTYADECL(HRoutingLayers, LayerDirection, HRoutingLayer::Direction, m_ld->Tech->layerDirection)
+PROPERTYADECL(HRoutingLayers, double, HRoutingLayer::RPerDist, m_ld->Tech->layerRPerDist)
+PROPERTYADECL(HRoutingLayers, double, HRoutingLayer::CPerDist, m_ld->Tech->layerCPerDist)
+PROPERTYADECL(HRoutingLayers, double, HRoutingLayer::EdgeCap, m_ld->Tech->layerEdgeCap)
+PROPERTYADECL(HRoutingLayers, double, HRoutingLayer::Width, m_ld->Tech->layerWidth)
+PROPERTYADECL(HRoutingLayers, double, HRoutingLayer::Pitch, m_ld->Tech->layerPitch)
 
 BEGINWRAPPER(HRoutingLayerWrapper, HRoutingLayers)
 

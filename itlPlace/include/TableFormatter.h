@@ -69,7 +69,7 @@ private:
   string ConvertToString(int val, int colIdx)
   {
     char buf[12];
-    _itoa(val, buf, 10);
+    sprintf(buf, "%d", val);
     return buf;
   }
 
@@ -102,7 +102,7 @@ private:
     int sum = 0;
     for (int i = 0; i < count; ++i)
       sum += m_Columns[i + startColIdx].Width + 1;
-    return max(0, sum - 1);
+    return std::max(0, sum - 1);
   }
 
   void IncreaseWidth(int startColIdx, int count, int increment)
@@ -191,7 +191,7 @@ private:
         string result;
         result.reserve(width);
         while ((int)result.length() < width)
-          result.append(row.Cells[colIdx].Value, 0,  min(len, width - (int)result.length()));
+          result.append(row.Cells[colIdx].Value, 0, std::min(len, width - (int)result.length()));
         return result;
       }
     default:
@@ -315,7 +315,7 @@ public:
       if (m_LastRow != 0)
         m_LastRow->AllocateCells(colIdx + 1);
     }
-    m_Columns[colIdx].Width = max(m_Columns[colIdx].Width, width);
+    m_Columns[colIdx].Width = std::max(m_Columns[colIdx].Width, width);
   }
 
   void SetColumnAlign(int colIdx, Align align)
@@ -416,14 +416,15 @@ public:
     }
 
     bool headClosed = true;
-    if (writeToHTML && logger->HasHTMLStream())
-      if (m_Rows.front().RType == RowType_Header)
-      {
+    if (writeToHTML && logger->HasHTMLStream()) {
+      if (m_Rows.front().RType == RowType_Header) {
         logger->WriteToHTMLStream(false, "<thead>\n");
         headClosed = false;
       }
-      else
+      else {
         logger->WriteToHTMLStream(false, "<tbody>\n");
+      }
+    }
 
     for (RowsList::iterator row = m_Rows.begin(); row != m_Rows.end(); ++row)
     {

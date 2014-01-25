@@ -30,6 +30,11 @@ bool operator < (HCluster& cluster)
     return __uid < cluster.__uid;
 }
 
+bool operator < (const HCluster& cluster) const
+{
+    return __uid < cluster.__uid;
+}
+
 ENDITEM(HCluster)
 
 BEGINHCOLLECTION(HClusters, HCluster)
@@ -71,43 +76,43 @@ public:
     //Getters & Setters
     GETTERS_SETTERS_DEFINITION()
 
-        //properties specializations
-        //PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
-        GETTERA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
-        GETTERA(std::vector<HClusteredNet>*, HCluster::tableOfAdjacentNets, m_ld->Clusterization.tableOfAdjacentNets)
-        PROPERTYA(double, HCluster::XCoord, m_ld->Clusterization.xCoord)
-        PROPERTYA(double, HCluster::YCoord, m_ld->Clusterization.yCoord)
-        PROPERTYA(double, HCluster::Area, m_ld->Clusterization.area)
-        PROPERTYA(double, HCluster::PotentialMultiplier, m_ld->Clusterization.potentialMultiplier)
-        PROPERTYA(bool,   HCluster::IsValid, m_ld->Clusterization.isValid)
-        PROPERTYA(bool,   HCluster::IsFake, m_ld->Clusterization.isFake)
-        PROPERTYA(bool,   HCluster::IsTerminals, m_ld->Clusterization.isTerminals)
-        PROPERTYA(bool,   HCluster::IsPrimary, m_ld->Clusterization.isPrimary)
-        PROPERTYA(int,   HCluster::id, m_ld->Clusterization.id)
-        PROPERTYA(int,   HCluster::clusterIdx2solutionIdxLUT, m_ld->Clusterization.clusterIdx2solutionIdxLUT)
-        PROPERTYA(bool,   HCluster::isCPoint, m_ld->Clusterization.isCPoint)
+ENDHCOLLECTION(HClusters)
 
-        ENDHCOLLECTION(HClusters)
+//properties specializations
+//PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+GETTERADECL(HClusters, std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+GETTERADECL(HClusters, std::vector<HClusteredNet>*, HCluster::tableOfAdjacentNets, m_ld->Clusterization.tableOfAdjacentNets)
+PROPERTYADECL(HClusters, double, HCluster::XCoord, m_ld->Clusterization.xCoord)
+PROPERTYADECL(HClusters, double, HCluster::YCoord, m_ld->Clusterization.yCoord)
+PROPERTYADECL(HClusters, double, HCluster::Area, m_ld->Clusterization.area)
+PROPERTYADECL(HClusters, double, HCluster::PotentialMultiplier, m_ld->Clusterization.potentialMultiplier)
+PROPERTYADECL(HClusters, bool,   HCluster::IsValid, m_ld->Clusterization.isValid)
+PROPERTYADECL(HClusters, bool,   HCluster::IsFake, m_ld->Clusterization.isFake)
+PROPERTYADECL(HClusters, bool,   HCluster::IsTerminals, m_ld->Clusterization.isTerminals)
+PROPERTYADECL(HClusters, bool,   HCluster::IsPrimary, m_ld->Clusterization.isPrimary)
+PROPERTYADECL(HClusters, int,   HCluster::id, m_ld->Clusterization.id)
+PROPERTYADECL(HClusters, int,   HCluster::clusterIdx2solutionIdxLUT, m_ld->Clusterization.clusterIdx2solutionIdxLUT)
+PROPERTYADECL(HClusters, bool,   HCluster::isCPoint, m_ld->Clusterization.isCPoint)
 
-        BEGINWRAPPER(HClusterWrapper, HClusters)
+BEGINWRAPPER(HClusterWrapper, HClusters)
 
-        //properties
-        //PROPERTYWD(std::vector<HCell>*, Cells)
-        GETTERWD(std::vector<HCell>*, Cells)
-        GETTERWD(std::vector<HClusteredNet>*, tableOfAdjacentNets)
-        PROPERTYWD(double, XCoord)
-        PROPERTYWD(double, YCoord)
-        PROPERTYWD(double, Area)
-        PROPERTYWD(double, PotentialMultiplier)
-        PROPERTYWD(bool, IsValid)
-        PROPERTYWD(bool, IsFake)
-        PROPERTYWD(bool, IsTerminals)
-        PROPERTYWD(bool, IsPrimary)
-        PROPERTYWD(int, id)
-        PROPERTYWD(int, clusterIdx2solutionIdxLUT)
-        PROPERTYWD(bool, isCPoint)
+//properties
+//PROPERTYWD(std::vector<HCell>*, Cells)
+GETTERWD(std::vector<HCell>*, Cells)
+GETTERWD(std::vector<HClusteredNet>*, tableOfAdjacentNets)
+PROPERTYWD(double, XCoord)
+PROPERTYWD(double, YCoord)
+PROPERTYWD(double, Area)
+PROPERTYWD(double, PotentialMultiplier)
+PROPERTYWD(bool, IsValid)
+PROPERTYWD(bool, IsFake)
+PROPERTYWD(bool, IsTerminals)
+PROPERTYWD(bool, IsPrimary)
+PROPERTYWD(int, id)
+PROPERTYWD(int, clusterIdx2solutionIdxLUT)
+PROPERTYWD(bool, isCPoint)
 
-        ENDWRAPPER(HClusterWrapper)
+ENDWRAPPER(HClusterWrapper)
 
 //typedef HEnumeratorW<HClusterWrapper, HClusters> ClustersNotFakeEnumeratorW;
     class HClusters::ClustersNotFakeEnumeratorW : public HEnumeratorW<HClusterWrapper, HClusters, 1>

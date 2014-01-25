@@ -45,27 +45,17 @@ BEGINHCOLLECTION(HCriticalPaths, HCriticalPath)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  PROPERTYA(PathExtractionType, HCriticalPath::ExtractionType, m_ld->Timing.cpExtractionType);
-
-  //getters specializations
-  GETTER(double, HCriticalPath::Criticality); //implemented in HExternalMethods.h
-
-  GETTER(int, HCriticalPath::PointsCount)
-  { return m_ld->Timing.cpAfterLastPointIdx[ARGID] 
-    - m_ld->Timing.cpFirstPointIdx[ARGID]; }
-
-  GETTER(HCriticalPath::PointsEnumerator, HCriticalPath::Points)
-  { return HCriticalPath::PointsEnumerator(m_ld->Timing.cpFirstPointIdx[ARGID],
-      m_ld->Timing.cpAfterLastPointIdx[ARGID]); }
-
-  GETTER(HCriticalPath::PointsEnumeratorW, HCriticalPath::Points); //implemented in HExternalMethods.h
-
-  GETTERA2(HCriticalPathPoint, HCriticalPath::StartPoint, m_ld->Timing.cpFirstPointIdx);
-
-  GETTER(HCriticalPathPoint, HCriticalPath::EndPoint)
-  { return ::__ConstructPtr<HCriticalPathPoint>(m_ld->Timing.cpAfterLastPointIdx[ARGID] - 1); }
-
 ENDHCOLLECTION(HCriticalPaths)
+
+PROPERTYADECL(HCriticalPaths, PathExtractionType, HCriticalPath::ExtractionType, m_ld->Timing.cpExtractionType)
+
+//getters specializations
+GETTER(HCriticalPaths, double, HCriticalPath::Criticality); //implemented in HExternalMethods.h
+GETTER(HCriticalPaths, int, HCriticalPath::PointsCount);
+GETTER(HCriticalPaths, HCriticalPath::PointsEnumerator, HCriticalPath::Points);
+GETTER(HCriticalPaths, HCriticalPath::PointsEnumeratorW, HCriticalPath::Points); //implemented in HExternalMethods.h
+GETTER(HCriticalPaths, HCriticalPathPoint, HCriticalPath::EndPoint);
+GETTERA2DECL(HCriticalPaths, HCriticalPathPoint, HCriticalPath::StartPoint, m_ld->Timing.cpFirstPointIdx);
 
 BEGINWRAPPER(HCriticalPathWrapper, HCriticalPaths)
 

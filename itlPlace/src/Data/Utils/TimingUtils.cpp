@@ -64,8 +64,8 @@ DriverPhisics Utils::GetArcPhisics(HDesign& design, HTimingArcType timingArc, Si
       result.T = arc.TIntrinsicFall();
       break;
     case SignalDirection_Average:
-      result.R = max(arc.ResistanceFall(), arc.ResistanceRise());
-      result.T = max(arc.TIntrinsicFall(), arc.TIntrinsicRise());
+      result.R = std::max(arc.ResistanceFall(), arc.ResistanceRise());
+      result.T = std::max(arc.TIntrinsicFall(), arc.TIntrinsicRise());
       break;
     default:
       GLOGCRITICAL(LOGINPLACE, "Unknown signal direction: %d", ph);
@@ -90,8 +90,8 @@ DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, Sig
   for (HPinType::ArcsEnumeratorW arc = design[driver].GetArcsEnumeratorW(); arc.MoveNext(); )
   {
     DriverPhisics arcph = GetArcPhisics(design, arc, ph);
-    result.R = max(result.R, arcph.R);
-    result.T = max(result.T, arcph.T);
+    result.R = std::max(result.R, arcph.R);
+    result.T = std::max(result.T, arcph.T);
   }
 
   return result;
@@ -163,9 +163,9 @@ DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, Signal
       double arcTime;
       HTimingArcType arc1 = FindArrivalArc(design, design.TimingPoints[driver], SignalDirection_Fall, arcTime, inverted);
       HTimingArcType arc2 = FindArrivalArc(design, design.TimingPoints[driver], SignalDirection_Rise, arcTime, inverted);
-      result.R = max(design.GetDouble<HTimingArcType::ResistanceRise>(arc2)
+      result.R = std::max(design.GetDouble<HTimingArcType::ResistanceRise>(arc2)
         , design.GetDouble<HTimingArcType::ResistanceFall>(arc1));
-      result.T = max(design.GetDouble<HTimingArcType::TIntrinsicRise>(arc2)
+      result.T = std::max(design.GetDouble<HTimingArcType::TIntrinsicRise>(arc2)
         , design.GetDouble<HTimingArcType::TIntrinsicFall>(arc1));
     }
     break;
@@ -195,15 +195,16 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, Sign
   for(HCell::PinsEnumeratorW pin = design.Get<HCell::Pins, HCell::PinsEnumeratorW>(element); pin.MoveNext(); )
   {
     if (::IsNull(pin.Net())) continue;
+
     if (pin.Direction() == PinDirection_INPUT)
     {
-      result.C = max(result.C, GetSinkCapacitance(design, pin.Type(), ph));
+      result.C = std::max(result.C, GetSinkCapacitance(design, pin.Type(), ph));
     }
     else if (pin.Direction() == PinDirection_OUTPUT)
     {
       DriverPhisics pinPh = GetDriverWorstPhisics(design, pin.Type(), ph);
-      result.R = max(result.R, pinPh.R);
-      result.T = max(result.T, pinPh.T);
+      result.R = std::max(result.R, pinPh.R);
+      result.T = std::max(result.T, pinPh.T);
     }
     else if (PinFunction_Signal == design.Get<HPinType::Function, PinFunction>(pin.Type()))
     {
@@ -211,7 +212,7 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, Sign
     }
     else
     {
-      GLOGWARNING(LOGINPLACE, "Special pin has net: %d", pin);
+      GLOGWARNING(LOGINPLACE, "Special pin has name \"%s\"", pin.Name().c_str()); //KNOTE: shall probably print net too
     }
   }
   return result;
@@ -226,13 +227,13 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HMacroType elementT
   {
     if (pin.Direction() == PinDirection_INPUT)
     {
-      result.C = max(result.C, GetSinkCapacitance(design, pin, ph));
+      result.C = std::max(result.C, GetSinkCapacitance(design, pin, ph));
     }
     else if (pin.Direction() == PinDirection_OUTPUT)
     {
       DriverPhisics pinPh = GetDriverWorstPhisics(design, pin, ph);
-      result.R = max(result.R, pinPh.R);
-      result.T = max(result.T, pinPh.T);
+      result.R = std::max(result.R, pinPh.R);
+      result.T = std::max(result.T, pinPh.T);
     }
     else if (PinFunction_Signal == pin.Function())
     {
@@ -270,7 +271,7 @@ DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HCell element, Si
     }
     else
     {
-      GLOGWARNING(LOGINPLACE, "Special pin has net: %d", pin);
+      GLOGWARNING(LOGINPLACE, "Special pin has name \"%s\"", pin.Name().c_str()); //KNOTE: shall probably print net too
     }
   }
 

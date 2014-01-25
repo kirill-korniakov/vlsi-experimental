@@ -12,7 +12,7 @@ void InitWeights(double* x, AppCtx* context)
     context->weights.lrW  = 1.0;
     context->weights.sprW = 1.0;
 
-    //FIXME: just try
+    //TODO: just try
     //GPBuffering bufferer(*(context->hd));
     //bufferer.DoBuffering(*context, 0, 0);
     TotalCostAndGradients(context, x);

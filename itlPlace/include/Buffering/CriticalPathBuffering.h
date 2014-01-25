@@ -79,10 +79,10 @@ public:
         if (indexPoint < pointCount)
             return (*design)[points[indexPoint]].SignalDirection();
         else
-            return SignalDirection::SignalDirection_Default;
+            return SignalDirection_Default;
     }
 
-    double Criticality()
+    double Criticality() const
     {
         if (!isSplit)
             return criticality;
@@ -97,8 +97,13 @@ class CriticalPathBufferingComparator
 public:
     CriticalPathBufferingComparator(HDesign& hd): design(hd) {}
 
-    bool operator() (CriticalPathBuffering& path1, CriticalPathBuffering& path2) const
+    bool operator() (const CriticalPathBuffering& path1, const CriticalPathBuffering& path2) const
     { 
+        return path1.Criticality() < path2.Criticality();
+    }
+
+    bool operator() (CriticalPathBuffering& path1, CriticalPathBuffering& path2) const
+    {
         return path1.Criticality() < path2.Criticality();
     }
 };
@@ -122,11 +127,16 @@ public:
 
         HCriticalPaths::Enumerator i = design.CriticalPaths.GetEnumerator();
         i.MoveNext();
-        list = new CriticalPathBuffering(0, (i,design).PointsCount(), design.GetDouble<HCriticalPath::Criticality>(i),(i,design).GetEnumeratorW(), &design);
+        //CriticalPathBuffering(int ind, int pc, double cri, HCriticalPath::PointsEnumeratorW& cppw, HDesign* hd)
+        HCriticalPath::PointsEnumeratorW tmp = (i, design).GetEnumeratorW();
+        list = new CriticalPathBuffering(0, (i,design).PointsCount(), design.GetDouble<HCriticalPath::Criticality>(i),
+                                         tmp, &design);
         CriticalPathBuffering* cur = list;
-        for(;i.MoveNext() ;)
+        for(;i.MoveNext();)
         {
-            cur->next = new CriticalPathBuffering(idx, (i,design).PointsCount(), design.GetDouble<HCriticalPath::Criticality>(i), (i,design).GetEnumeratorW(), &design);
+            HCriticalPath::PointsEnumeratorW tmp2 = (i,design).GetEnumeratorW();
+            cur->next = new CriticalPathBuffering(idx, (i,design).PointsCount(), design.GetDouble<HCriticalPath::Criticality>(i),
+                                                  tmp2, &design);
             cur = cur->next;
             last = cur;
             idx++;

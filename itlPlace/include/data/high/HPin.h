@@ -53,50 +53,28 @@ BEGINHCOLLECTION(HPins, HPin)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(double, HPin::OffsetX, m_ld->NetList.pinOffsetX)
-  PROPERTYA(double, HPin::OffsetY, m_ld->NetList.pinOffsetY)
-  PROPERTYA(PinDirection, HPin::Direction, m_ld->NetList.pinDirection)
-  PROPERTYA2(HPinType, HPin::Type, m_ld->NetList.pinType)
-
-  //getters specializations
-  GETTER(bool, HPin::IsPrimary)
-    { return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0; }
-  GETTER(bool, HPin::IsPrimaryInput)
-    { return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0
-      && m_ld->NetList.pinDirection[ARGID] == PinDirection_OUTPUT; }
-  GETTER(bool, HPin::IsPrimaryOutput)
-    { return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0
-      && m_ld->NetList.pinDirection[ARGID] == PinDirection_INPUT; }
-  GETTER(double, HPin::X)
-    { return m_ld->NetList.cellX[m_ld->NetList.pinCellIdx[ARGID]]
-      + m_ld->NetList.pinOffsetX[ARGID]; }
-  GETTER(double, HPin::Y)
-    { return m_ld->NetList.cellY[m_ld->NetList.pinCellIdx[ARGID]]
-      + m_ld->NetList.pinOffsetY[ARGID]; }
-  GETTER(string, HPin::Name)
-    {
-      return ARGID < m_ld->NetList.nPinsStart
-        ? m_ld->NetList.pinName[ARGID]
-        : m_ld->Tech->pinName[m_ld->NetList.pinType[ARGID]];
-    }
-
-  GETTER(HCell, HPin::Cell);       //implemented in HExternalMethods.h
-  GETTER(HNet, HPin::Net);         //implemented in HExternalMethods.h
-  GETTER(HNet, HPin::OriginalNet); //implemented in HExternalMethods.h
-
-  //setters specialization
-  SETTER(HNet, HPin::Net); //implemented in HExternalMethods.h
-
-  SETTER(string, HPin::Name)
-  { 
-    if (ARGID < m_ld->NetList.nPinsStart)
-			m_ld->NetList.pinName[ARGID] = value;
-		else
-      LOGERROR("Unable to set name for non primary arg.");
-  }
-
 ENDHCOLLECTION(HPins)
+
+//properties specializations
+PROPERTYADECL(HPins, double, HPin::OffsetX, m_ld->NetList.pinOffsetX)
+PROPERTYADECL(HPins, double, HPin::OffsetY, m_ld->NetList.pinOffsetY)
+PROPERTYADECL(HPins, PinDirection, HPin::Direction, m_ld->NetList.pinDirection)
+PROPERTYA2DECL(HPins, HPinType, HPin::Type, m_ld->NetList.pinType)
+
+//getters specializations
+GETTER(HPins, bool, HPin::IsPrimary);
+GETTER(HPins, bool, HPin::IsPrimaryInput);
+GETTER(HPins, bool, HPin::IsPrimaryOutput);
+GETTER(HPins, double, HPin::X);
+GETTER(HPins, double, HPin::Y);
+GETTER(HPins, string, HPin::Name);
+GETTER(HPins, HCell, HPin::Cell);       //implemented in HExternalMethods.h
+GETTER(HPins, HNet, HPin::Net);         //implemented in HExternalMethods.h
+GETTER(HPins, HNet, HPin::OriginalNet); //implemented in HExternalMethods.h
+
+//setters specialization
+SETTER(HPins, HNet, HPin::Net); //implemented in HExternalMethods.h
+SETTER(HPins, string, HPin::Name);
 
 BEGINWRAPPER(HPinWrapper, HPins)
 

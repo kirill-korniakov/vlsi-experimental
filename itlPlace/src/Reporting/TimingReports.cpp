@@ -334,6 +334,19 @@ void ReportTopologicalOrder(HDesign& design)
     }
 }
 
+struct MacroComparer
+{
+  bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
+  {
+    return left.Name() < right.Name();
+  }
+
+  bool operator() (const HMacroTypeWrapper& left, const HMacroTypeWrapper& right) const
+  {
+    return left.Name() < right.Name();
+  }
+};
+
 void ReportMacrotypesShort(HDesign& design)
 {
   int numCols = 0;
@@ -351,13 +364,13 @@ void ReportMacrotypesShort(HDesign& design)
   for(HMacroTypes::EnumeratorW macro = design.MacroTypes.GetEnumeratorW(); macro.MoveNext();)
     macros.push_back(macro);
 
-  struct MacroComparer
-  {
-    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
-    {
-      return left.Name() < right.Name();
-    }
-  };
+//  struct MacroComparer
+//  {
+//    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
+//    {
+//      return left.Name() < right.Name();
+//    }
+//  };
 
   std::sort(macros.begin(), macros.end(), MacroComparer());
 
@@ -444,13 +457,18 @@ void ReportLibraryPhisics(HDesign& design, SignalDirection sd)
   for(HMacroTypes::EnumeratorW macro = design.MacroTypes.GetEnumeratorW(); macro.MoveNext();)
     macros.push_back(macro);
 
-  struct MacroComparer
-  {
-    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
-    {
-      return left.Name() < right.Name();
-    }
-  };
+//  struct MacroComparer
+//  {
+//    bool operator() (HMacroTypeWrapper& left, HMacroTypeWrapper& right)
+//    {
+//      return left.Name() < right.Name();
+//    }
+
+//    bool operator() (const HMacroTypeWrapper& left, const HMacroTypeWrapper& right) const
+//    {
+//      return left.Name() < right.Name();
+//    }
+//  };
 
   std::sort(macros.begin(), macros.end(), MacroComparer());
   

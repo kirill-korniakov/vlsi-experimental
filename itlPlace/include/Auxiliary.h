@@ -4,6 +4,8 @@
 #include "math.h"
 #include "stdTypes.h"
 
+#include "Grow.h"
+
 namespace Aux
 {
   static const std::string SciFormat = "%.2e";
@@ -77,7 +79,7 @@ namespace Aux
   template<class MultipliersType>
   MultipliersType ScalarProduct(std::vector<MultipliersType> vec1, std::vector<MultipliersType> vec2)
   {
-    int minSize = min((int)vec1.size(), (int)vec2.size());
+    int minSize = std::min((int)vec1.size(), (int)vec2.size());
     MultipliersType sum = 0.0;
 
     int i = 0;

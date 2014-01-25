@@ -1,8 +1,13 @@
 #ifndef __PLOTTER_DATA__
 #define __PLOTTER_DATA__
 
+//KNOTE: here is naming conflict
+#undef WRITE
 #include "OpenCV/cv.h"
 #include "OpenCV/highgui.h"
+#define WRITE Logger::Global.Write
+
+using std::string;
 
 struct PlotterData
 {

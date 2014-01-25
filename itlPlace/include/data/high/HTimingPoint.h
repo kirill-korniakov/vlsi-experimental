@@ -75,141 +75,55 @@ public:
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(double, HTimingPoint::FallArrivalTime, m_ld->Timing.tpFallArrivalTime)
-  PROPERTYA(double, HTimingPoint::RiseArrivalTime, m_ld->Timing.tpRiseArrivalTime)
-  PROPERTYA(double, HTimingPoint::FallRequiredTime, m_ld->Timing.tpFallRequiredTime)
-  PROPERTYA(double, HTimingPoint::RiseRequiredTime, m_ld->Timing.tpRiseRequiredTime)
-  PROPERTYA2(HTimingPoint, HTimingPoint::NextPoint, m_ld->Timing.tpArrivalPropagationOrder);
-  PROPERTYA2(HTimingPoint, HTimingPoint::PreviousPoint, m_ld->Timing.tpRequiredPropagationOrder);
-
-  //getters specializations
-  GETTER(double, HTimingPoint::ArrivalTime)
-    { return max(GetDouble<HTimingPoint::FallArrivalTime>(arg), GetDouble<HTimingPoint::RiseArrivalTime>(arg)); }
-
-  GETTER(double, HTimingPoint::RequiredTime)
-    { return min(GetDouble<HTimingPoint::FallRequiredTime>(arg), GetDouble<HTimingPoint::RiseRequiredTime>(arg)); }
-
-  GETTER(HPin, HTimingPoint::Pin)
-    { return ::__ConstructPtr<HPin>(arg); }
-
-  GETTER(bool, HTimingPoint::IsTimingStartPoint);
-  GETTER(bool, HTimingPoint::IsTimingEndPoint);
-
-  GETTER(double, HTimingPoint::FallSlack)
-    { return GetDouble<HTimingPoint::FallRequiredTime>(arg) - GetDouble<HTimingPoint::FallArrivalTime>(arg); }
-
-  GETTER(double, HTimingPoint::RiseSlack)
-    { return GetDouble<HTimingPoint::RiseRequiredTime>(arg) - GetDouble<HTimingPoint::RiseArrivalTime>(arg); }
-
-  GETTER(double, HTimingPoint::Slack)
-    { return GetDouble<HTimingPoint::RequiredTime>(arg) - GetDouble<HTimingPoint::ArrivalTime>(arg); }
-
-  GETTER(double, HTimingPoint::FallNegativeSlack)
-    { return max(0.0, -GetDouble<HTimingPoint::FallSlack>(arg)); }
-
-  GETTER(double, HTimingPoint::RiseNegativeSlack)
-    { return max(0.0, -GetDouble<HTimingPoint::RiseSlack>(arg)); }
-
-  GETTER(double, HTimingPoint::NegativeSlack)
-    { return max(0.0, -GetDouble<HTimingPoint::Slack>(arg)); }
-
-  GETTER(HTimingPoint, HTimingPoint::FallRequiredAncestor)
-    { return ::__ConstructPtr<HTimingPoint, IDType>(m_ld->Timing.tpFallRequiredAncestorPoint[ARGID] & (~mc_InversedSignalFlag)); }
-
-  GETTER(HTimingPoint, HTimingPoint::RiseRequiredAncestor)
-    { return ::__ConstructPtr<HTimingPoint, IDType>(m_ld->Timing.tpRiseRequiredAncestorPoint[ARGID] & (~mc_InversedSignalFlag)); }
-
-  GETTER(HTimingPoint, HTimingPoint::FallArrivalAncestor)
-    { return ::__ConstructPtr<HTimingPoint, IDType>(m_ld->Timing.tpFallArrivalAncestorPoint[ARGID] & (~mc_InversedSignalFlag)); }
-
-  GETTER(HTimingPoint, HTimingPoint::RiseArrivalAncestor)
-    { return ::__ConstructPtr<HTimingPoint, IDType>(m_ld->Timing.tpRiseArrivalAncestorPoint[ARGID] & (~mc_InversedSignalFlag)); }
-
-  GETTER(HTimingPoint, HTimingPoint::RequiredAncestor)
-    { return Get<HTimingPoint::RiseRequiredAncestor, HTimingPoint>(arg); }
-
-  GETTER(HTimingPoint, HTimingPoint::ArrivalAncestor)
-    { return Get<HTimingPoint::RiseArrivalAncestor, HTimingPoint>(arg); }
-
-  GETTER(bool, HTimingPoint::IsRiseArrivalInversed)
-    { return 0 != (m_ld->Timing.tpRiseArrivalAncestorPoint[ARGID] & mc_InversedSignalFlag); }
-
-  GETTER(bool, HTimingPoint::IsFallArrivalInversed)
-    { return 0 != (m_ld->Timing.tpFallArrivalAncestorPoint[ARGID] & mc_InversedSignalFlag); }
-
-  GETTER(bool, HTimingPoint::IsRiseRequiredInversed)
-    { return 0 != (m_ld->Timing.tpRiseRequiredAncestorPoint[ARGID] & mc_InversedSignalFlag); }
-
-  GETTER(bool, HTimingPoint::IsFallRequiredInversed)
-    { return 0 != (m_ld->Timing.tpFallRequiredAncestorPoint[ARGID] & mc_InversedSignalFlag); }
-
-  //setters specialization
-  SETTER(double, HTimingPoint::ArrivalTime)
-  {
-    Set<HTimingPoint::RiseArrivalTime>(arg, value);
-    Set<HTimingPoint::FallArrivalTime>(arg, value);
-  }
-
-  SETTER(double, HTimingPoint::RequiredTime)
-  {
-    Set<HTimingPoint::RiseRequiredTime>(arg, value);
-    Set<HTimingPoint::FallRequiredTime>(arg, value);
-  }
-
-  SETTERA2(HTimingPoint, HTimingPoint::FallRequiredAncestor, m_ld->Timing.tpFallRequiredAncestorPoint);
-  SETTERA2(HTimingPoint, HTimingPoint::RiseRequiredAncestor, m_ld->Timing.tpRiseRequiredAncestorPoint);
-  SETTERA2(HTimingPoint, HTimingPoint::FallArrivalAncestor, m_ld->Timing.tpFallArrivalAncestorPoint);
-  SETTERA2(HTimingPoint, HTimingPoint::RiseArrivalAncestor, m_ld->Timing.tpRiseArrivalAncestorPoint);
-
-  SETTER(HTimingPoint, HTimingPoint::RequiredAncestor)
-  {
-    Set<HTimingPoint::RiseRequiredAncestor>(arg, value);
-    Set<HTimingPoint::FallRequiredAncestor>(arg, value);
-  }
-
-  SETTER(HTimingPoint, HTimingPoint::ArrivalAncestor)
-  {
-    Set<HTimingPoint::RiseArrivalAncestor>(arg, value);
-    Set<HTimingPoint::FallArrivalAncestor>(arg, value);
-  }
-
-  SETTER(bool, HTimingPoint::IsRiseArrivalInversed)
-  {
-    if (value)
-      m_ld->Timing.tpRiseArrivalAncestorPoint[ARGID] |= mc_InversedSignalFlag;
-    else
-      m_ld->Timing.tpRiseArrivalAncestorPoint[ARGID] &= ~mc_InversedSignalFlag;
-  }
-
-  SETTER(bool, HTimingPoint::IsFallArrivalInversed)
-  {
-    if (value)
-      m_ld->Timing.tpFallArrivalAncestorPoint[ARGID] |= mc_InversedSignalFlag;
-    else
-      m_ld->Timing.tpFallArrivalAncestorPoint[ARGID] &= ~mc_InversedSignalFlag;
-  }
-
-  SETTER(bool, HTimingPoint::IsRiseRequiredInversed)
-  {
-    if (value)
-      m_ld->Timing.tpRiseRequiredAncestorPoint[ARGID] |= mc_InversedSignalFlag;
-    else
-      m_ld->Timing.tpRiseRequiredAncestorPoint[ARGID] &= ~mc_InversedSignalFlag;
-  }
-
-  SETTER(bool, HTimingPoint::IsFallRequiredInversed)
-  {
-    if (value)
-      m_ld->Timing.tpFallRequiredAncestorPoint[ARGID] |= mc_InversedSignalFlag;
-    else
-      m_ld->Timing.tpFallRequiredAncestorPoint[ARGID] &= ~mc_InversedSignalFlag;
-  }
-
 //event handlers
 private: void PinsGrowEventHandler(int pinsFrom, int pinsTo);
 
 ENDHCOLLECTION(HTimingPoints)
+
+//properties specializations
+PROPERTYADECL(HTimingPoints, double, HTimingPoint::FallArrivalTime, m_ld->Timing.tpFallArrivalTime)
+PROPERTYADECL(HTimingPoints, double, HTimingPoint::RiseArrivalTime, m_ld->Timing.tpRiseArrivalTime)
+PROPERTYADECL(HTimingPoints, double, HTimingPoint::FallRequiredTime, m_ld->Timing.tpFallRequiredTime)
+PROPERTYADECL(HTimingPoints, double, HTimingPoint::RiseRequiredTime, m_ld->Timing.tpRiseRequiredTime)
+PROPERTYA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::NextPoint, m_ld->Timing.tpArrivalPropagationOrder);
+PROPERTYA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::PreviousPoint, m_ld->Timing.tpRequiredPropagationOrder);
+
+//getters specializations
+GETTER(HTimingPoints, double, HTimingPoint::ArrivalTime);
+GETTER(HTimingPoints, double, HTimingPoint::RequiredTime);
+GETTER(HTimingPoints, HPin, HTimingPoint::Pin);
+GETTER(HTimingPoints, bool, HTimingPoint::IsTimingStartPoint);
+GETTER(HTimingPoints, bool, HTimingPoint::IsTimingEndPoint);
+GETTER(HTimingPoints, double, HTimingPoint::FallSlack);
+GETTER(HTimingPoints, double, HTimingPoint::RiseSlack);
+GETTER(HTimingPoints, double, HTimingPoint::Slack);
+GETTER(HTimingPoints, double, HTimingPoint::FallNegativeSlack);
+GETTER(HTimingPoints, double, HTimingPoint::RiseNegativeSlack);
+GETTER(HTimingPoints, double, HTimingPoint::NegativeSlack);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::FallRequiredAncestor);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::RiseRequiredAncestor);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::FallArrivalAncestor);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::RiseArrivalAncestor);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::RequiredAncestor);
+GETTER(HTimingPoints, HTimingPoint, HTimingPoint::ArrivalAncestor);
+GETTER(HTimingPoints, bool, HTimingPoint::IsRiseArrivalInversed);
+GETTER(HTimingPoints, bool, HTimingPoint::IsFallArrivalInversed);
+GETTER(HTimingPoints, bool, HTimingPoint::IsRiseRequiredInversed);
+GETTER(HTimingPoints, bool, HTimingPoint::IsFallRequiredInversed);
+
+//setters specialization
+SETTER(HTimingPoints, double, HTimingPoint::ArrivalTime);
+SETTER(HTimingPoints, double, HTimingPoint::RequiredTime);
+SETTERA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::FallRequiredAncestor, m_ld->Timing.tpFallRequiredAncestorPoint);
+SETTERA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::RiseRequiredAncestor, m_ld->Timing.tpRiseRequiredAncestorPoint);
+SETTERA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::FallArrivalAncestor, m_ld->Timing.tpFallArrivalAncestorPoint);
+SETTERA2DECL(HTimingPoints, HTimingPoint, HTimingPoint::RiseArrivalAncestor, m_ld->Timing.tpRiseArrivalAncestorPoint);
+SETTER(HTimingPoints, HTimingPoint, HTimingPoint::RequiredAncestor);
+SETTER(HTimingPoints, HTimingPoint, HTimingPoint::ArrivalAncestor);
+SETTER(HTimingPoints, bool, HTimingPoint::IsRiseArrivalInversed);
+SETTER(HTimingPoints, bool, HTimingPoint::IsFallArrivalInversed);
+SETTER(HTimingPoints, bool, HTimingPoint::IsRiseRequiredInversed);
+SETTER(HTimingPoints, bool, HTimingPoint::IsFallRequiredInversed);
 
 BEGINWRAPPER(HTimingPointWrapper, HTimingPoints)
 

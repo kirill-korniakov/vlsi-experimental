@@ -243,7 +243,8 @@ private:
         for (int j = (int)Buffers.size() - 1; j >= 0; --j)
         {
             RLnode* pred = &dummy;
-            for (RLnode* y = dummy.next; y != 0; pred = y, y = y->next)
+            RLnode* y;
+            for (y = dummy.next; y != 0; pred = y, y = y->next)
             {
                 if (::Equals(z[j]->DownstreamCapacitance, y->DownstreamCapacitance))
                 {

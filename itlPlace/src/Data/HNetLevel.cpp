@@ -1,5 +1,11 @@
 #include "HDesign.h"
 
+//properties specializations
+//PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+PROPERTYA(HNetLevels, double, HNetLevel::weight, m_ld->Clusterization.weight[0])
+PROPERTYA(HNetLevels, double, HNetLevel::k, m_ld->Clusterization.k[0])
+PROPERTYA(HNetLevels, int,   HNetLevel::idNet, m_ld->Clusterization.idNet[0])
+
 void HNetLevels::Initialize(int NetLevelLimit)
 {
     CHECKIFINITIALIZED();

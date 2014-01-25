@@ -47,27 +47,21 @@ BEGINHCOLLECTION(HMacroTypes, HMacroType)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HMacroType::Name, m_ld->Tech->macroName)
-  PROPERTYA(string, HMacroType::OriginalName, m_ld->Tech->macroOriginalName)
-  PROPERTYA(MacroType, HMacroType::Type, m_ld->Tech->macroType)
-  PROPERTYA(double, HMacroType::SizeX, m_ld->Tech->macroSizeX)
-  PROPERTYA(double, HMacroType::SizeY, m_ld->Tech->macroSizeY)
-  PROPERTYA(double, HMacroType::OriginX, m_ld->Tech->macroOriginX)
-  PROPERTYA(double, HMacroType::OriginY, m_ld->Tech->macroOriginY)
-
-  //getters specializations
-  GETTER(int, HMacroType::PinsCount)
-    { return m_ld->Tech->macroPinEnd[ARGID]
-           - m_ld->Tech->macroPinStart[ARGID]; }
-
-  GETTER(HMacroType::PinsEnumerator, HMacroType::PinTypesEnumerator)
-    { return HMacroType::PinsEnumerator(m_ld->Tech->macroPinStart[ARGID],
-                                       m_ld->Tech->macroPinEnd[ARGID]); }
-
-  GETTER(HMacroType::PinsEnumeratorW, HMacroType::PinTypesEnumerator); //implemented in HExternalMethods.h
-
 ENDHCOLLECTION(HMacroTypes)
+
+//properties specializations
+PROPERTYADECL(HMacroTypes, string, HMacroType::Name, m_ld->Tech->macroName)
+PROPERTYADECL(HMacroTypes, string, HMacroType::OriginalName, m_ld->Tech->macroOriginalName)
+PROPERTYADECL(HMacroTypes, MacroType, HMacroType::Type, m_ld->Tech->macroType)
+PROPERTYADECL(HMacroTypes, double, HMacroType::SizeX, m_ld->Tech->macroSizeX)
+PROPERTYADECL(HMacroTypes, double, HMacroType::SizeY, m_ld->Tech->macroSizeY)
+PROPERTYADECL(HMacroTypes, double, HMacroType::OriginX, m_ld->Tech->macroOriginX)
+PROPERTYADECL(HMacroTypes, double, HMacroType::OriginY, m_ld->Tech->macroOriginY)
+
+//getters specializations
+GETTER(HMacroTypes, int, HMacroType::PinsCount);
+GETTER(HMacroTypes, HMacroType::PinsEnumerator, HMacroType::PinTypesEnumerator);
+GETTER(HMacroTypes, HMacroType::PinsEnumeratorW, HMacroType::PinTypesEnumerator); //implemented in HExternalMethods.h
 
 BEGINWRAPPER(HMacroTypeWrapper, HMacroTypes)
 

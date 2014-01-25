@@ -19,6 +19,8 @@ using std::string;
 using std::map;
 using std::numeric_limits;
 using std::make_pair;
+using std::min;
+using std::max;
 
 #include "FGR.h"
 #include "stdTypes.h"

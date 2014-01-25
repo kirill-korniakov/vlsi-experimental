@@ -668,8 +668,8 @@ double CalculateBetta(HDesign& hd, HPinWrapper sink, double oldMDist)
 inline double CalculateGamma(HDesign& hd)
 {
 	static double r = hd.RoutingLayers.Physics.RPerDist; //удельное сопротивление
-	static double с = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
-	static double gamma=CONST_Kd*r*с*0.5;
+    static double c = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+    static double gamma=CONST_Kd*r*c*0.5;
 	return gamma;
 }		
 
@@ -1382,24 +1382,29 @@ void PathCallback::ProcessPath2(HDesign& hd, HCriticalPath path, int pathNumber)
 	{
 		if(hd.cfg.ValueOf("HippocratePlacement.SWAP", false)){
 			std::vector<HCell> curWnd = GetCurrentWindow(hdpp, RADIUS_OF_WINDOW,Iter->Cell());
-			HippocratePlacementSWAP(hdpp, hd, Iter->Cell(), curWnd, stat);
+            HCell curCell = Iter->Cell();
+            HippocratePlacementSWAP(hdpp, hd, curCell, curWnd, stat);
 		}
 		if(hd.cfg.ValueOf("HippocratePlacement.COMPACT", false)){
 			BBox curBBox = GetCurrentBBox3(hdpp, hd, *Iter);
-			HippocratePlacementCOMPACT(hdpp, hd, Iter->Cell(), curBBox, stat);						
+            HCell curCell = Iter->Cell();
+            HippocratePlacementCOMPACT(hdpp, hd, curCell, curBBox, stat);
 		}
 		if(hd.cfg.ValueOf("HippocratePlacement.MOVE",false)){
 			std::vector<HCell> curWnd = GetCurrentWindow(hdpp, RADIUS_OF_WINDOW,Iter->Cell());
-			HippocratePlacementMOVE(hdpp, hd, Iter->Cell(), curWnd, stat);
+            HCell curCell = Iter->Cell();
+            HippocratePlacementMOVE(hdpp, hd, curCell, curWnd, stat);
 		}
 		if(hd.cfg.ValueOf("HippocratePlacement.CENTER", false)){
 			std::vector<HCell> curWnd = GetCurrentWindow(hdpp, RADIUS_OF_WINDOW,Iter->Cell());
-			HippocratePlacementCENTER(hdpp, hd, Iter->Cell(), curWnd, stat);						
+            HCell curCell = Iter->Cell();
+            HippocratePlacementCENTER(hdpp, hd, curCell, curWnd, stat);
 		}
 		if(hd.cfg.ValueOf("HippocratePlacement.LOCALMOVE", false)){
 			//LWindow curWnd;
 			//GetCurrentWindow(hdpp, RADIUS_OF_WINDOW, curCell, curWnd);
-			HippocratePlacementLOCALMOVE(hdpp, hd, Iter->Cell(), stat);
+            HCell curCell = Iter->Cell();
+            HippocratePlacementLOCALMOVE(hdpp, hd, curCell, stat);
 		}
 
 		thpwlWatcher.doReport();

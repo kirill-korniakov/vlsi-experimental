@@ -1,8 +1,13 @@
 #include "HDesign.h"
 
-
-
 COLLECTIONCONSTRUCTOR(HClusteredNets)
+
+//properties specializations
+//PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+GETTERA(HClusteredNets, std::vector<HCluster>*, HClusteredNet::clusterIdxs, m_ld->Clusterization.clusterIdxs[id])
+PROPERTYA(HClusteredNets, double, HClusteredNet::weight, m_ld->Clusterization.weight[id])
+PROPERTYA(HClusteredNets, double, HClusteredNet::k, m_ld->Clusterization.k[id])
+PROPERTYA(HClusteredNets, int,   HClusteredNet::idNet, m_ld->Clusterization.idNet[id])
 
 void HClusteredNets::Initialize(int clusteredNetsLimit, int idLevel)
 {

@@ -18,9 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lex.h"
-#include "FEF_malloc.h"
-#include "FEF_util.h"
+#include "LEF_lex.h"
+#include "LEF_FEF_malloc.h"
+#include "LEF_FEF_util.h"
 
 extern char lefDebug[100];
 

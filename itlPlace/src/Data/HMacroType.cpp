@@ -2,6 +2,26 @@
 
 COLLECTIONCONSTRUCTOR(HMacroTypes)
 
+//properties specializations
+PROPERTYA(HMacroTypes, string, HMacroType::Name, m_ld->Tech->macroName)
+PROPERTYA(HMacroTypes, string, HMacroType::OriginalName, m_ld->Tech->macroOriginalName)
+PROPERTYA(HMacroTypes, MacroType, HMacroType::Type, m_ld->Tech->macroType)
+PROPERTYA(HMacroTypes, double, HMacroType::SizeX, m_ld->Tech->macroSizeX)
+PROPERTYA(HMacroTypes, double, HMacroType::SizeY, m_ld->Tech->macroSizeY)
+PROPERTYA(HMacroTypes, double, HMacroType::OriginX, m_ld->Tech->macroOriginX)
+PROPERTYA(HMacroTypes, double, HMacroType::OriginY, m_ld->Tech->macroOriginY)
+
+//getters specializations
+GETTER(HMacroTypes, int, HMacroType::PinsCount)
+{ return m_ld->Tech->macroPinEnd[ARGID]
+       - m_ld->Tech->macroPinStart[ARGID]; }
+
+GETTER(HMacroTypes, HMacroType::PinsEnumerator, HMacroType::PinTypesEnumerator)
+{ return HMacroType::PinsEnumerator(m_ld->Tech->macroPinStart[ARGID],
+                                   m_ld->Tech->macroPinEnd[ARGID]); }
+
+GETTER(HMacroTypes, HMacroType::PinsEnumeratorW, HMacroType::PinTypesEnumerator); //implemented in HExternalMethods.h
+
 void HMacroTypes::Initialize(int macrosLimit)
 {
   CHECKIFINITIALIZED();

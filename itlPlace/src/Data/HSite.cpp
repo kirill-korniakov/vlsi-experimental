@@ -2,6 +2,11 @@
 
 COLLECTIONCONSTRUCTOR(HSites)
 
+//properties specializations
+PROPERTYA(HSites, string, HSite::Name, m_ld->Tech->siteName)
+PROPERTYA(HSites, double, HSite::Width, m_ld->Tech->siteWidth)
+PROPERTYA(HSites, double, HSite::Height, m_ld->Tech->siteHeight)
+
 void HSites::Initialize(int sitesLimit)
 {
   CHECKIFINITIALIZED();

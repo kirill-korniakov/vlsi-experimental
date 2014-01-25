@@ -6,7 +6,7 @@
 void BufferingAndReport(HDesign& design)
 {
     {
-        ConfigContext ctx = design.cfg.OpenContext("Buffering");
+        ConfigContext ctx(design.cfg.OpenContext("Buffering"));
 
         BufferInfo buf = BufferInfo::Create(design);
         //VanGinneken vg(design);

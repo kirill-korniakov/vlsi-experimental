@@ -59,7 +59,7 @@ namespace Builders
         m_last_pin
       );
 
-    ///FIXME: determine right origin and remove this
+    //TODO: determine right origin and remove this
     for(HMacroType::PinsEnumeratorW pin = (*this)->GetEnumeratorW(); pin.MoveNext(); )
     {
       pin.SetOriginX(0.5 * (*this)->SizeX());

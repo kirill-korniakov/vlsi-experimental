@@ -82,9 +82,10 @@ static void __config_locale_override()
   setlocale(LC_NUMERIC, "C");
 
 #elif defined(__APPLE__)
-  
-  locale_t loc = newlocale(LC_NUMERIC_MASK, "C", NULL);
-  uselocale(loc);
+
+  //FIXME: disabled localization because of compilation error
+  //locale_t loc = newlocale(LC_NUMERIC_MASK, "C", NULL);
+  //uselocale(loc);
 
 #elif ((defined HAVE_NEWLOCALE) && (defined HAVE_USELOCALE))
   

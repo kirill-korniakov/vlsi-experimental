@@ -35,23 +35,20 @@ BEGINHCOLLECTION(HWires, HWire)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(double, HWire::Length, m_ld->Routing.netWL)
-  PROPERTYA(RoutingType, HWire::RoutingType, m_ld->Routing.netRoutingType)
-
-  //getters specializations
-  GETTER(HSteinerPoint, HWire::RootPoint)
-    { return ::__ConstructPtr<HSteinerPoint>(m_ld->NetList.netPins[m_ld->NetList.netPinStart[ARGID]]); }
-
-  GETTER(HNet, HWire::Net)
-    { return ::__ConstructPtr<HNet>(arg); }
-
 //event handlers
 private: void NetsGrowEventHandler(int netsFrom, int netsTo);
 private: void NetsSwapEventHandler(HNet first, HNet second);
 private: void NetsAddEventHandler(HNet net);
 
 ENDHCOLLECTION(HWires)
+
+//properties specializations
+PROPERTYADECL(HWires, double, HWire::Length, m_ld->Routing.netWL)
+PROPERTYADECL(HWires, RoutingType, HWire::RoutingType, m_ld->Routing.netRoutingType)
+
+//getters specializations
+GETTER(HWires, HSteinerPoint, HWire::RootPoint);
+GETTER(HWires, HNet, HWire::Net);
 
 BEGINWRAPPER(HWireWrapper, HWires)
 

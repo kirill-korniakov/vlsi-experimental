@@ -45,15 +45,27 @@ inline int Round(double val) { return int(val > 0.0 ? val + 0.5 : val - 0.5); }
 inline bool Equals(double v1, double v2, const double eps = 1e-8)
 {
   if (v1 >= 0.0)
+  {
     if (v2 <= 0.0)
+    {
       return v1 - v2 < eps;
+    }
     else
+    {
       return v1 < v2 ? (v2 - v1 < v2 * eps) : (v1 - v2 < v1 * eps);
-  if (v1 < 0.0)
+    }
+  }
+  else if (v1 < 0.0)
+  {
     if (v2 >= 0.0)
+    {
       return v2 - v1 < eps;
+    }
     else
+    {
       return v1 < v2 ? (v1 - v2 > v1 * eps) : (v2 - v1 > v2 * eps);
+    }
+  }
   return false;
 }
 

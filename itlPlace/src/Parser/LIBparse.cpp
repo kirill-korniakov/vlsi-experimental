@@ -2,7 +2,7 @@
 #include "TimingArcsBuilder.h"
 #include "Utils.h"
 #include "Auxiliary.h"
-#include "Liberty\\si2dr_liberty.h"
+#include "si2dr_liberty.h"
 
 struct LutTable
 {
@@ -493,8 +493,8 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
       
       if (strcmp(tbl.variable_1, "input_net_transition") == 0)
         ::Swap(&r, &a);
-      r = max(r, 0.0);
-      t = max(t, 0.0);
+      r = std::max(r, 0.0);
+      t = std::max(t, 0.0);
 
       data.ArcsBuilder->SetResistanceRise(r * data.resistance_to_kohm_factor);
       data.ArcsBuilder->SetTIntrinsicRise(t * data.time_to_ns_factor);
@@ -518,8 +518,8 @@ void ReadTimingLUTs(si2drGroupIdT timing_group, LIBParserData& data)
       
       if (strcmp(tbl.variable_1, "input_net_transition") == 0)
         ::Swap(&r, &a);
-      r = max(r, 0.0);
-      t = max(t, 0.0);
+      r = std::max(r, 0.0);
+      t = std::max(t, 0.0);
 
       data.ArcsBuilder->SetResistanceFall(r * data.resistance_to_kohm_factor);
       data.ArcsBuilder->SetTIntrinsicFall(t * data.time_to_ns_factor);
@@ -566,7 +566,7 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
       double t,x1,x2;
       ExtractPhisicsFromLUT(tbl, t, x1, x2);
       
-      t = max(t, 0.0);
+      t = std::max(t, 0.0);
       
       data.ArcsBuilder->SetResistanceRise(0.0);
       data.ArcsBuilder->SetTIntrinsicRise(t * data.time_to_ns_factor);
@@ -588,7 +588,7 @@ void ReadConstraintLUTs(si2drGroupIdT timing_group, LIBParserData& data)
       double t,x1,x2;
       ExtractPhisicsFromLUT(tbl, t, x1, x2);
       
-      t = max(t, 0.0);
+      t = std::max(t, 0.0);
       
       data.ArcsBuilder->SetResistanceFall(0.0);
       data.ArcsBuilder->SetTIntrinsicFall(t * data.time_to_ns_factor);
@@ -875,7 +875,7 @@ void ReadLibraries(si2drGroupsIdT groups, LIBParserData& data)
 
 void ParseLIB(HDesign& design)
 {
-  ConfigContext ctx = design.cfg.OpenContext("LIBParser");
+  ConfigContext ctx(design.cfg.OpenContext("LIBParser"));
 
   si2drErrorT err;
   ALERT("Lib file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.lib"));

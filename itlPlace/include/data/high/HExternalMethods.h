@@ -7,8 +7,8 @@
 inline void HSteinerPoints::InheritPinCoordinates(HSteinerPoint point)
 {
   HPin pin = Get<HSteinerPoint::Pin, HPin>(point);
-  Set<HSteinerPoint::X>(point, m_hd->GetDouble<HPin::X>(pin));
-  Set<HSteinerPoint::Y>(point, m_hd->GetDouble<HPin::Y>(pin));
+  Set<HSteinerPoint::X>(point, m_hd->Pins.GetDouble<HPin::X>(pin));
+  Set<HSteinerPoint::Y>(point, m_hd->Pins.GetDouble<HPin::Y>(pin));
 }
 
 //Timing arcs
@@ -103,7 +103,7 @@ IGETTER(HPinType::ArcsEnumeratorW, HPinType::ArcTypesEnumerator, HPinTypes)
 IGETTER(bool, HTimingPoint::IsTimingStartPoint, HTimingPoints)
 {
   HPin pin = Get<HTimingPoint::Pin, HPin>(arg);
-  if (m_hd->Get<HPin::Direction, PinDirection>(pin) != PinDirection_OUTPUT)
+  if (m_hd->Pins.Get<HPin::Direction, PinDirection>(pin) != PinDirection_OUTPUT)
     return false;
   if (m_hd->GetBool<HPin::IsPrimary>(pin))
     return true;

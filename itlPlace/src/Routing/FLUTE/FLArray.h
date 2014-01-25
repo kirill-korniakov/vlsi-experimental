@@ -1,14 +1,18 @@
+#pragma once
+
 #include "Grow.h"
 
-template<class T, int initialD, int D = initialD>
+template<class T, int initialD>
 class FLArray
 {
 private:
   T* m_Data;
   int m_Capacity;
+  int D;
 public:
   FLArray()
   {
+    D = initialD;
     m_Capacity = initialD + D;
     m_Data = 0;
     ::Grow(&m_Data, 0, m_Capacity);
@@ -16,6 +20,7 @@ public:
 
   FLArray(int initCap)
   {
+    D = initialD;
     m_Capacity = initCap + D;
     m_Data = 0;
     ::Grow(&m_Data, 0, m_Capacity);

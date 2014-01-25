@@ -218,7 +218,7 @@ int CountActivePins(int cells_size, int* nActivePinsForCell)
 
 void FindTopologicalOrder(HDesign& design)
 {
-  ConfigContext ctx = design.cfg.OpenContext("TopologicalOrder");
+  ConfigContext ctx(design.cfg.OpenContext("TopologicalOrder"));
   //ALERT("TIMING PRIOR OPERATIONS STARTED (finding topological order)...");
 
   HTimingPointWrapper tp_arrival = design[design.TimingPoints.TopologicalOrderRoot()];

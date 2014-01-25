@@ -37,12 +37,12 @@ BEGINHCOLLECTION(HSites, HSite)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HSite::Name, m_ld->Tech->siteName)
-  PROPERTYA(double, HSite::Width, m_ld->Tech->siteWidth)
-  PROPERTYA(double, HSite::Height, m_ld->Tech->siteHeight)
-
 ENDHCOLLECTION(HSites)
+
+//properties specializations
+PROPERTYADECL(HSites, string, HSite::Name, m_ld->Tech->siteName)
+PROPERTYADECL(HSites, double, HSite::Width, m_ld->Tech->siteWidth)
+PROPERTYADECL(HSites, double, HSite::Height, m_ld->Tech->siteHeight)
 
 BEGINWRAPPER(HSiteWrapper, HSites)
 

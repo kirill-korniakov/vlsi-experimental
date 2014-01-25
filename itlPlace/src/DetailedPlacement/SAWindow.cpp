@@ -7,7 +7,7 @@
 
 #include "SAWindow.h"
 #include <math.h>
-#include <conio.h>
+//#include <conio.h>
 #include <time.h>
 
 #define nItersOnSortedCells 1000
@@ -410,7 +410,7 @@ void SAWindow::InsertCell()
   RectangularWindowElement currCell = cells[firstCellInd];
   cells[firstCellInd] = cells[secondCellInd];
 
-  int rightCell = min(secondCellInd + 1, nCells);
+  int rightCell = std::min(secondCellInd + 1, nCells);
 
   for (int i = firstCellInd + 1; i < rightCell; i++)
   {
@@ -508,5 +508,5 @@ void MakeSAWindows(int nSteps, int nCells, int nRows, HDPGrid &_grid)
   double currWL = Utils::CalculateHPWL(_grid.Design(), false);
   ALERT("final wl = %f, time: %f\n", currWL, difftime(t2, t1));
   ALERT("start wl = %f, improvement: %f% \n", startWL, ((startWL - currWL) * 100 / startWL));
-  _getch();
+  //_getch();
 }

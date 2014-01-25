@@ -93,51 +93,28 @@ BEGINHCOLLECTION(HNets, HNet)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HNet::Name, m_ld->NetList.netName)
-  PROPERTYA(double, HNet::HPWL, m_ld->NetList.netHPWL)
-  PROPERTYA(double, HNet::Weight, m_ld->NetList.netWeight)
-  PROPERTYA(double, HNet::LNet, m_ld->NetList.netLnet)
-  
-  //getters specializations
-  GETTERA(NetKind, HNet::Kind, m_ld->NetList.netKind)
-
-  GETTER(HPin, HNet::Source)
-    { return ::__ConstructPtr<HPin>(m_ld->NetList.netPins[m_ld->NetList.netPinStart[ARGID]]); }
-
-  GETTER(HPin, HNet::LastSink)
-    { return ::__ConstructPtr<HPin>(m_ld->NetList.netPins[m_ld->NetList.netPinEnd[ARGID] - 1]); }
-
-  GETTER(int, HNet::PinsCount)
-    { return m_ld->NetList.netPinEnd[ARGID]
-           - m_ld->NetList.netPinStart[ARGID]; }
-
-  GETTER(int, HNet::SinksCount)
-    { return m_ld->NetList.netPinEnd[ARGID]
-           - m_ld->NetList.netPinStart[ARGID] - 1; }
-  
-  GETTER(HNet::PinsEnumeratorW, HNet::Pins);
-  GETTER(HNet::SinksEnumeratorW, HNet::Sinks);
-
-  //setters specializations
-  SETTER(HPin, HNet::Source)
-    { AssignPin(arg, m_ld->NetList.netPinStart[ARGID], value); }
-
-  SETTER(NetKind, HNet::Kind)
-  {
-#pragma warning( push )
-#pragma warning(disable:6385)
-    if (m_ld->NetList.netKind[ARGID] != value)
-    {
-      m_ld->NetList.nNetsByKind[value] += 1;
-      m_ld->NetList.nNetsByKind[m_ld->NetList.netKind[ARGID]] -= 1;
-      m_ld->NetList.netKind[ARGID] = value;
-    }
-#pragma warning( pop )
-  }
-
   private: void PinsGrowEventHandler(int pinsFrom, int pinsTo);
 ENDHCOLLECTION(HNets)
+
+//properties specializations
+PROPERTYADECL(HNets, string, HNet::Name, m_ld->NetList.netName)
+PROPERTYADECL(HNets, double, HNet::HPWL, m_ld->NetList.netHPWL)
+PROPERTYADECL(HNets, double, HNet::Weight, m_ld->NetList.netWeight)
+PROPERTYADECL(HNets, double, HNet::LNet, m_ld->NetList.netLnet)
+
+//getters specializations
+GETTERADECL(HNets, NetKind, HNet::Kind, m_ld->NetList.netKind)
+
+GETTER(HNets, HPin, HNet::Source);
+GETTER(HNets, HPin, HNet::LastSink);
+GETTER(HNets, int, HNet::PinsCount);
+GETTER(HNets, int, HNet::SinksCount);
+GETTER(HNets, HNet::PinsEnumeratorW, HNet::Pins);
+GETTER(HNets, HNet::SinksEnumeratorW, HNet::Sinks);
+
+//setters specializations
+SETTER(HNets, HPin, HNet::Source);
+SETTER(HNets, NetKind, HNet::Kind);
 
 BEGINWRAPPER(HNetWrapper, HNets)
 

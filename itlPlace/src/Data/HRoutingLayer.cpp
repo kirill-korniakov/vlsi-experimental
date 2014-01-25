@@ -2,6 +2,15 @@
 
 COLLECTIONCONSTRUCTOR(HRoutingLayers)
 
+//properties specializations
+PROPERTYA(HRoutingLayers, string, HRoutingLayer::Name, m_ld->Tech->layerName)
+PROPERTYA(HRoutingLayers, LayerDirection, HRoutingLayer::Direction, m_ld->Tech->layerDirection)
+PROPERTYA(HRoutingLayers, double, HRoutingLayer::RPerDist, m_ld->Tech->layerRPerDist)
+PROPERTYA(HRoutingLayers, double, HRoutingLayer::CPerDist, m_ld->Tech->layerCPerDist)
+PROPERTYA(HRoutingLayers, double, HRoutingLayer::EdgeCap, m_ld->Tech->layerEdgeCap)
+PROPERTYA(HRoutingLayers, double, HRoutingLayer::Width, m_ld->Tech->layerWidth)
+PROPERTYA(HRoutingLayers, double, HRoutingLayer::Pitch, m_ld->Tech->layerPitch)
+
 void HRoutingLayers::Initialize(int layersLimit)
 {
   CHECKIFINITIALIZED();

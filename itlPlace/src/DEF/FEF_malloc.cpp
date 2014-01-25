@@ -17,7 +17,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
+#ifdef WIN32
+  #include <malloc.h> //KNOTE: commented by Kirill
+#endif
 
 #include "lex.h"
 #include "FEF_malloc.h"

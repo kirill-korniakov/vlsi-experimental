@@ -13,12 +13,12 @@ void TranslateTechnology(HDesign& design)
       if (design.cfg.Exists(msection))
       {
         msection += '.';
-        string macro_name = design.cfg.ValueOf(msection + mt.Name(), mt.Name());
+        string macro_name = design.cfg.ValueOf(msection + mt.Name(), mt.Name().c_str());
         if (!macro_name.empty())
           mt.SetName(macro_name);
         for (HMacroType::PinsEnumeratorW pin = mt.GetEnumeratorW(); pin.MoveNext(); )
         {
-          string pin_name = design.cfg.ValueOf(msection + pin.Name(), pin.Name());
+          string pin_name = design.cfg.ValueOf(msection + pin.Name(), pin.Name().c_str());
           if (!pin_name.empty())
             pin.SetName(pin_name);
         }

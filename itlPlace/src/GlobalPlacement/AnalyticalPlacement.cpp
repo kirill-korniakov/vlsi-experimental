@@ -18,7 +18,7 @@ using namespace AnalyticalGlobalPlacement;
 
 void GlobalPlacement(HDesign& hd, std::string cfgContext)
 {
-    ConfigContext ctx = hd.cfg.OpenContext(cfgContext);
+    ConfigContext ctx(hd.cfg.OpenContext(cfgContext));
 
     WRITELINE("");
     ALERT("ANALYTICAL PLACEMENT STARTED");
@@ -28,7 +28,7 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
 
     Clustering(hd, ci);
 
-    ConfigContext ctx1 = hd.cfg.OpenContext("GlobalPlacement");
+    ConfigContext ctx1(hd.cfg.OpenContext("GlobalPlacement"));
 
     //set initial placement
     if (hd.cfg.ValueOf(".placeToTheCenter", false))
@@ -62,6 +62,8 @@ void GlobalPlacement(HDesign& hd, std::string cfgContext)
     ALERT("ANALYTICAL PLACEMENT FINISHED");
 }
 
+#define _MAX_PATH 256
+
 int TaoInit(const char* taoCmd)
 {
     int argc = 1;
@@ -81,7 +83,8 @@ int TaoInit(const char* taoCmd)
     int i = 0;
 
     char path[_MAX_PATH];
-    GetModuleFileName(NULL, path, _MAX_PATH);
+    //FIXME: implement cross-platform binary identification
+    //GetModuleFileName(NULL, path, _MAX_PATH);
     argv[i++] = path;
 
     char seps[] = " \n";
@@ -559,7 +562,7 @@ int AnalyticalGlobalPlacement::Solve(HDesign& hd, ClusteringInformation& ci, App
     while (1)
     {
         ReportPreIterationInfo(hd, context, metaIteration, iteration);
-        //FIXME: finish the try to implement multiple spreading grids
+        //TODO: finish the try to implement multiple spreading grids
         //ConstructBinGrid(hd, context, ci.clusters.size() / pow(4.0, (double)iteration));
         //PetscScalar* solution;
         //VecGetArray(x, &solution);

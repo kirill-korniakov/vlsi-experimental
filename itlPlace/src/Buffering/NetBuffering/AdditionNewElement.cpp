@@ -63,7 +63,7 @@ void  StandartAdditionNewElement::InsertBuffer(TemplateTypes<NewBuffer>::list& n
 }
 
 void StandartAdditionNewElement::AddSinksToNet(HNet& subNet, VanGinnekenTreeNode* node, 
-                                               HNetWrapper::PinsEnumeratorW& subNetPinEnumW, 
+                                               HNetWrapper::PinsEnumeratorW& subNetPinEnumW,
                                                TemplateTypes<NewBuffer>::list& newBuffer)
 {
     NewBuffer* bufferNumber = FindBufferNumberByIndex(node, newBuffer);
@@ -268,7 +268,8 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
         vGAlgorithm->data->design.Nets.Set<HNet::Source, HPin>(subNet, vGAlgorithm->data->design[net].Source());
 
         AddPointToSteinerTree(*j, newBuffer);
-        AddSinksToNet(subNet, node, vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
+        HNetWrapper::PinsEnumeratorW enumerator = vGAlgorithm->data->design[subNet].GetSinksEnumeratorW();
+        AddSinksToNet(subNet, node, enumerator, newBuffer);
 
         if (vGAlgorithm->data->plotNets)
         {
@@ -304,8 +305,8 @@ void StandartAdditionNewElement::CreateNets(HNet& net, TemplateTypes<NewBuffer>:
 
             NewBuffer& nodeStart2 = *j;
             AddPointToSteinerTree(*j, newBuffer);
-            AddSinksToNet(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), 
-                vGAlgorithm->data->design[subNet].GetSinksEnumeratorW(), newBuffer);
+            HNetWrapper::PinsEnumeratorW enumerator = vGAlgorithm->data->design[subNet].GetSinksEnumeratorW();
+            AddSinksToNet(subNet, nodeStart2.Positions.GetPosition()->GetLeft(), enumerator, newBuffer);
 
             if (vGAlgorithm->data->plotNets)
             {

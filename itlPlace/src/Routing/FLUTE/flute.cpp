@@ -3,17 +3,24 @@
 #include <limits.h>
 #include <math.h>
 #include "flute.h"
+#include "FLArray.h"
 
-#if D<=7
-#define MGROUP 5040/4  // Max. # of groups, 7! = 5040
-#define MPOWV 15  // Max. # of POWVs per group
+using std::min;
+using std::max;
+
+#define D 9         // LUT is used for d <= D, D <= 9
+
+#if (D<=7)
+  #define MGROUP 5040/4  // Max. # of groups, 7! = 5040
+  #define MPOWV 15  // Max. # of POWVs per group
 #elif D==8
-#define MGROUP 40320/4  // Max. # of groups, 8! = 40320
-#define MPOWV 33  // Max. # of POWVs per group
-#elif D==9
-#define MGROUP 362880/4  // Max. # of groups, 9! = 362880
-#define MPOWV 79  // Max. # of POWVs per group
+  #define MGROUP 40320/4  // Max. # of groups, 8! = 40320
+  #define MPOWV 33  // Max. # of POWVs per group
+#elif (D==9)
+  #define MGROUP 362880/4  // Max. # of groups, 9! = 362880
+  #define MPOWV 79  // Max. # of POWVs per group
 #endif
+
 int numgrp[10]={0,0,0,0,6,30,180,1260,10080,90720};
 
 struct csoln 

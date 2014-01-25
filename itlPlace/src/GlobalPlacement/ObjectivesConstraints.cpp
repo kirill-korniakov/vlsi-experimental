@@ -6,7 +6,7 @@
 #include "Spreading.h"
 
 #include "time.h"
-#include "omp.h"
+//FIXME:#include "omp.h"
 
 extern timetype expTime;
 

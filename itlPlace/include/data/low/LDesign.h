@@ -1,5 +1,4 @@
-#ifndef __LOW_DESIGN_H__
-#define __LOW_DESIGN_H__
+#pragma once
 
 #include "LCircuit.h"
 #include "LNetList.h"
@@ -24,6 +23,3 @@ struct LDesign
   //clusterization
   //global placement
 };
-
-
-#endif __LOW_DESIGN_H__

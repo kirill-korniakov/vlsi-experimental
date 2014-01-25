@@ -1,8 +1,22 @@
 #include "HDesign.h"
 
-
-
 COLLECTIONCONSTRUCTOR(HClusters)
+
+//properties specializations
+//PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+GETTERA(HClusters, std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+GETTERA(HClusters, std::vector<HClusteredNet>*, HCluster::tableOfAdjacentNets, m_ld->Clusterization.tableOfAdjacentNets)
+PROPERTYA(HClusters, double, HCluster::XCoord, m_ld->Clusterization.xCoord)
+PROPERTYA(HClusters, double, HCluster::YCoord, m_ld->Clusterization.yCoord)
+PROPERTYA(HClusters, double, HCluster::Area, m_ld->Clusterization.area)
+PROPERTYA(HClusters, double, HCluster::PotentialMultiplier, m_ld->Clusterization.potentialMultiplier)
+PROPERTYA(HClusters, bool,   HCluster::IsValid, m_ld->Clusterization.isValid)
+PROPERTYA(HClusters, bool,   HCluster::IsFake, m_ld->Clusterization.isFake)
+PROPERTYA(HClusters, bool,   HCluster::IsTerminals, m_ld->Clusterization.isTerminals)
+PROPERTYA(HClusters, bool,   HCluster::IsPrimary, m_ld->Clusterization.isPrimary)
+PROPERTYA(HClusters, int,   HCluster::id, m_ld->Clusterization.id)
+PROPERTYA(HClusters, int,   HCluster::clusterIdx2solutionIdxLUT, m_ld->Clusterization.clusterIdx2solutionIdxLUT)
+PROPERTYA(HClusters, bool,   HCluster::isCPoint, m_ld->Clusterization.isCPoint)
 
 void HClusters::Initialize(int clusterLimit)
 {

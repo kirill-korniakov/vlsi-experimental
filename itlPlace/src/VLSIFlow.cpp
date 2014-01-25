@@ -261,7 +261,7 @@ bool DoBufferingIfRequired(HDesign& hd, const char* cfgOptName)
     //BUFFERING
     if (hd.cfg.ValueOf(cfgOptName, false))
     {
-        ConfigContext ctx = hd.cfg.OpenContext("Buffering");
+        ConfigContext ctx(hd.cfg.OpenContext("Buffering"));
         //ExportDEF(hd, "bb_" + hd.Circuit.Name() + ".def");
 
         if (hd.cfg.ValueOf("Buffering.DoIterative", false))
@@ -280,7 +280,7 @@ bool DoNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
     if (hd.cfg.ValueOf(cfgOptName, false))
     {
         ALERT("NEW BUFFERING STARTED");
-        ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+        ConfigContext ctx(hd.cfg.OpenContext("New_Buffering"));
         HVGAlgorithm buf(hd);
         buf.NetlistBuffering();
         STA(hd);
@@ -297,7 +297,7 @@ bool DoRemoveNewBufferingIfRequired(HDesign& hd, const char* cfgOptName)
     {
         //RemoveNewBuffering
         ALERT("REMOVE NEW BUFFERING STARTED");
-        ConfigContext ctx = hd.cfg.OpenContext("New_Buffering");
+        ConfigContext ctx(hd.cfg.OpenContext("New_Buffering"));
         HVGAlgorithm buf(hd);
         buf.RemoveNewBuffering();
 
@@ -345,7 +345,7 @@ void RunFlow(HDesign& hd, TableFormatter& flowMetrics)
     //START MACROLOOP OF DESIGN
     if (hd.cfg.ValueOf("DesignFlow.nMacroIterations", 0) > 0)
     {
-        ConfigContext ctx = hd.cfg.OpenContext("MacroLoop");
+        ConfigContext ctx(hd.cfg.OpenContext("MacroLoop"));
         PlacementQualityAnalyzer QA = PlacementQualityAnalyzer(hd, hd.cfg.ValueOf(".QAcriteria",
             PlacementQualityAnalyzer::GetMetricName(PlacementQualityAnalyzer::MetricTNSleg)));
 

@@ -95,13 +95,13 @@ extern void DuplicateConsoleOutput(const string& fileName);
 
 void Logger::InitializeLogging(libconfig::ConfigExt& cfg)
 {
-  ConfigContext ctx = cfg.OpenContext("Logger");
+  ConfigContext ctx(cfg.OpenContext("Logger"));
 
   ms_MaxWarningsToDisplay = (unsigned)cfg.ValueOf<int>(".maximumDisplayWarnings", -1);
   ms_MaxErrorsToDisplay =   (unsigned)cfg.ValueOf<int>(".maximumDisplayErrors", -1);
   ms_MaxErrorsAllowed =     (unsigned)cfg.ValueOf<int>(".maximumErrors", 3);
   ms_ExitOnAssert =         cfg.ValueOf(".exitOnAssert", true);
-  ms_LogFileName =          cfg.ValueOf(".logFile", string("stdout"));
+  ms_LogFileName =          cfg.ValueOf(".logFile", "stdout"); //KNOTE: /*string("stdout")*/
   ms_DuplicateOutput =      cfg.ValueOf(".duplicateConsoleOutput", true);
   ms_CSSFileName =          cfg.ValueOf(".CSSFileName", "itlPlace.css");
   ms_EmbeedCSS =            cfg.ValueOf(".EmbeedCSS", true);

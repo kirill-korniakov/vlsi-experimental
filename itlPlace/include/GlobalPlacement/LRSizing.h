@@ -1,10 +1,12 @@
 #ifndef __LRSIZING__
 #define __LRSIZING__
+
 #include "HDesign.h"
-#include <hdpgrid.h>
-#include <vector>
+#include "hdpgrid.h"
 #include "LinearRegression.h"
 #include "LRSizingTimer.h"
+
+#include <vector>
 
 struct StPEdge
 {

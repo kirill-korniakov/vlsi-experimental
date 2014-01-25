@@ -66,7 +66,7 @@ public:
 
   void operator() (const T1& arg1) const
   {
-    for(ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
+    for(typename ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
       (*i)(arg1);
   }
 };
@@ -98,7 +98,7 @@ public:
 
   void operator() (const T1& arg1, const T2& arg2) const
   {
-    for(ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
+    for(typename ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
       (*i)(arg1, arg2);
   }
 };
@@ -130,7 +130,7 @@ public:
 
   void operator() (const T1& arg1, const T2& arg2, const T3& arg3) const
   {
-    for(ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
+    for(typename ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
       (*i)(arg1, arg2, arg3);
   }
 };
@@ -162,7 +162,7 @@ public:
 
   void operator() (const T1& arg1, const T2& arg2, const T3& arg3, const T4& arg4) const
   {
-    for(ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
+    for(typename ListenersList::const_iterator i = _lst.begin(); i != _lst.end(); ++i)
       (*i)(arg1, arg2, arg3, arg4);
   }
 };

@@ -1,5 +1,4 @@
-#ifndef __HIGH_DESIGN_H__
-#define __HIGH_DESIGN_H__
+#pragma once 
 
 #pragma warning(disable:4355)
 
@@ -16,13 +15,13 @@
 #include "HSite.h"
 #include "HPlacementRow.h"
 #include "HTimingPoint.h"
-#include "HPlotter.h"
 #include "HCriticalPath.h"
 #include "HCriticalPathPoint.h"
 #include "HCluster.h"
 #include "HClusteredNet.h"
 #include "HNetLevel.h"
 
+#include "HPlotter.h"
 #include "OpenCVPlotter.h"
 
 #define HDESIGNCOLLECTION(field_name, col_type) \
@@ -116,5 +115,3 @@ template<typename H>
 inline typename H::WrapperType operator, (HDesign& design, H obj) { return design[obj]; }
 
 #include "HExternalMethods.h"
-
-#endif //__HIGH_DESIGN_H__

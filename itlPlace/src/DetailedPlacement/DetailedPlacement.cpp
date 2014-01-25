@@ -16,7 +16,7 @@ void LegalityControl(HDPGrid& grid)
 
 void DetailedPlacement(HDPGrid& grid)
 {
-  ConfigContext ctx = grid.Design().cfg.OpenContext("DetailedPlacement");
+  ConfigContext ctx(grid.Design().cfg.OpenContext("DetailedPlacement"));
 
   WRITELINE("");
   ALERT("DETAILED PLACEMENT STARTED\n");

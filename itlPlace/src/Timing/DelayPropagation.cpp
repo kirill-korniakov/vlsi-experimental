@@ -18,11 +18,11 @@ void CalcArrivalTimeOnOutputPin(HDesign& design, HPin pin, DelayPropagation<sdNu
   if (design.GetInt<HPinType::TimingArcsCount>(ptype) == 0) return;
 
   HSteinerPoint this_point = design.SteinerPoints[pin];
-  DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
+  typename DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
 
-  DelayPropagation<sdNum>::TimeType worstTime = -DBL_MAX;
-  DelayPropagation<sdNum>::BoolType worstInversed = false;
-  DelayPropagation<sdNum>::TimingPoint worstRelatedPoint = design.TimingPoints.Null();
+  typename DelayPropagation<sdNum>::TimeType worstTime = -DBL_MAX;
+  typename DelayPropagation<sdNum>::BoolType worstInversed = false;
+  typename DelayPropagation<sdNum>::TimingPoint worstRelatedPoint = design.TimingPoints.Null();
 
   for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
     arc.MoveNext(); )
@@ -32,8 +32,8 @@ void CalcArrivalTimeOnOutputPin(HDesign& design, HPin pin, DelayPropagation<sdNu
     HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(pin)];
 
     //arc delays
-    DelayPropagation<sdNum>::BoolType inversed;
-    DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeArrival(arc, observedC, dp.GetArrivalTime(startPoint), inversed);
+    typename DelayPropagation<sdNum>::BoolType inversed;
+    typename DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeArrival(arc, observedC, dp.GetArrivalTime(startPoint), inversed);
     //remember results
     dp.AccumulateWorstArrivalInFirst(worstTime, worstInversed, worstRelatedPoint, time, inversed, startPoint);
   }//for (HPinType::ArcsEnumeratorW arc
@@ -78,8 +78,8 @@ void CalcRequiredTimeOnInputPins(HDesign& design, HPin outPin, DelayPropagation<
   HSteinerPoint this_point = design.SteinerPoints[outPin];
   HTimingPoint tp = design.TimingPoints[outPin];
 
-  DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
-  DelayPropagation<sdNum>::TimeType ptTime = dp.GetRequiredTime(tp);
+  typename DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(this_point);
+  typename DelayPropagation<sdNum>::TimeType ptTime = dp.GetRequiredTime(tp);
 
   //apply each arc that gives worst known solution
   for (HPinType::ArcsEnumeratorW arc = design.Get<HPinType::ArcTypesEnumerator, HPinType::ArcsEnumeratorW>(ptype);
@@ -89,8 +89,8 @@ void CalcRequiredTimeOnInputPins(HDesign& design, HPin outPin, DelayPropagation<
 
     HTimingPoint startPoint = design.TimingPoints[arc.GetStartPin(outPin)];
 
-    DelayPropagation<sdNum>::BoolType inversed;
-    DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, ptTime, inversed);
+    typename DelayPropagation<sdNum>::BoolType inversed;
+    typename DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, ptTime, inversed);
 
     dp.AccumulateWorstRequiredOnPin(startPoint, time, inversed, tp);
   }//for (HPinType::ArcsEnumeratorW arc
@@ -256,7 +256,7 @@ HTimingArcType FindArc(HDesign& design,
     HPin startPin = design.Get<HTimingPoint::Pin, HPin>(startPoint);
     HSteinerPoint endStPoint = design.SteinerPoints[endPin];
 
-    DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(endStPoint);
+    typename DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(endStPoint);
     bool found = false;
     arcTime = arcSelector.GetBestPossibleTime();
     HTimingArcType wArc = design.TimingArcTypes.Null();
@@ -270,8 +270,8 @@ HTimingArcType FindArc(HDesign& design,
         && arc.GetStartPin(endPin) == startPin)
       {
         found = true;
-        DelayPropagation<sdNum>::BoolType timeInversed;
-        DelayPropagation<sdNum>::TimeType time = arcSelector.GetArcOutputTime(dp, arc, observedC, startPoint, endPoint, timeInversed);
+        typename DelayPropagation<sdNum>::BoolType timeInversed;
+        typename DelayPropagation<sdNum>::TimeType time = arcSelector.GetArcOutputTime(dp, arc, observedC, startPoint, endPoint, timeInversed);
 
         if (arcSelector.FirstTimeIsWorse(time, arcTime))
         {
@@ -297,15 +297,20 @@ HTimingArcType FindArc(HDesign& design,
 template<int sdNum>
 struct ArcSelectorBase
 {
-  typedef DelayPropagation<sdNum> DP;
-  typedef typename DP::CapacitanceType CapacitanceType;
-  typedef typename DP::TimeType TimeType;
-  typedef typename DP::BoolType BoolType;
+  typedef DelayPropagation<sdNum> DP1;
+  typedef typename DP1::CapacitanceType CapacitanceType1;
+  typedef typename DP1::TimeType TimeType1;
+  typedef typename DP1::BoolType BoolType1;
 };
 
 template<int sdNum>
 struct ArrivalArcSelectorBase: public ArcSelectorBase<sdNum>
 {
+  typedef typename ArcSelectorBase<sdNum>::TimeType1 TimeType;
+  typedef typename ArcSelectorBase<sdNum>::DP1 DP;
+  typedef typename ArcSelectorBase<sdNum>::CapacitanceType1 CapacitanceType;
+  typedef typename ArcSelectorBase<sdNum>::BoolType1 BoolType;
+
   HTimingPoint GetEndPoint(HDesign& design, HTimingPoint basePoint) const { return basePoint; }
   double GetBestPossibleTime() const {return -DBL_MAX;}
   TimeType GetArcOutputTime(DP& dp, const HTimingArcTypeWrapper& arc,
@@ -348,6 +353,11 @@ struct ArrivalArcSelector2DFall: public ArrivalArcSelectorBase<2>
 template<int sdNum>
 struct RequiredArcSelectorBase: public ArcSelectorBase<sdNum>
 {
+  typedef typename ArcSelectorBase<sdNum>::TimeType1 TimeType;
+  typedef typename ArcSelectorBase<sdNum>::DP1 DP;
+  typedef typename ArcSelectorBase<sdNum>::CapacitanceType1 CapacitanceType;
+  typedef typename ArcSelectorBase<sdNum>::BoolType1 BoolType;
+
   HTimingPoint GetStartPoint(HDesign& design, HTimingPoint basePoint) const { return basePoint; }
   double GetBestPossibleTime() const {return DBL_MAX;}
   TimeType GetArcOutputTime(DP& dp, const HTimingArcTypeWrapper& arc,

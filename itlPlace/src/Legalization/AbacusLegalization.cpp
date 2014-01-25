@@ -266,7 +266,7 @@ void InitialiseCellsWeights(WAbacusCell* wCells, int nWCells, HDesign& hd, const
 void AbacusLegalization(HDPGrid& grid)
 {
   HDesign& design = grid.Design();
-  ConfigContext ctx = design.cfg.OpenContext("Abacus");
+  ConfigContext ctx(design.cfg.OpenContext("Abacus"));
 
   WAbacusCell* wCells = new WAbacusCell[design.Cells.PlaceableCellsCount()];
 

@@ -37,14 +37,6 @@ BEGINHCOLLECTION(HTimingArcTypes, HTimingArcType)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(TimingType, HTimingArcType::Type, m_ld->Tech->arcType)
-  PROPERTYA(TimingSense, HTimingArcType::TimingSense, m_ld->Tech->arcSense)
-  PROPERTYA(double, HTimingArcType::ResistanceRise, m_ld->Tech->arcResistanceRise)
-  PROPERTYA(double, HTimingArcType::ResistanceFall, m_ld->Tech->arcResistanceFall)
-  PROPERTYA(double, HTimingArcType::TIntrinsicRise, m_ld->Tech->arcTIntrinsicRise)
-  PROPERTYA(double, HTimingArcType::TIntrinsicFall, m_ld->Tech->arcTIntrinsicFall)
-
   //special getters
   HPinType GetStartPinType(HTimingArcType arcType, HPinType endPinType) const;
   HPin GetStartPin(HTimingArcType arcType, HPin endPin) const;
@@ -56,6 +48,14 @@ private: void PinTypesGrowEventHandler(int aFrom, int aTo);
 private: void PinTypeAddedEventHandler(HPinType type);
 
 ENDHCOLLECTION(HTimingArcTypes)
+
+//properties specializations
+PROPERTYADECL(HTimingArcTypes, TimingType, HTimingArcType::Type, m_ld->Tech->arcType)
+PROPERTYADECL(HTimingArcTypes, TimingSense, HTimingArcType::TimingSense, m_ld->Tech->arcSense)
+PROPERTYADECL(HTimingArcTypes, double, HTimingArcType::ResistanceRise, m_ld->Tech->arcResistanceRise)
+PROPERTYADECL(HTimingArcTypes, double, HTimingArcType::ResistanceFall, m_ld->Tech->arcResistanceFall)
+PROPERTYADECL(HTimingArcTypes, double, HTimingArcType::TIntrinsicRise, m_ld->Tech->arcTIntrinsicRise)
+PROPERTYADECL(HTimingArcTypes, double, HTimingArcType::TIntrinsicFall, m_ld->Tech->arcTIntrinsicFall)
 
 BEGINWRAPPER(HTimingArcTypeWrapper, HTimingArcTypes)
 

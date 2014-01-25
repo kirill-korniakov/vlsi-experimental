@@ -1,4 +1,5 @@
 #include "Reporting.h"
+#include "HDesign.h"
 
 void ReportPlacementArea(HDesign& design)
 {

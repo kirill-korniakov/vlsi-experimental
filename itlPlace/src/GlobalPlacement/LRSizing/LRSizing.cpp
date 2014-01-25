@@ -203,7 +203,7 @@ double LRSizer::CalcNewX(HCell& cell,std::vector<double>& vMu,std::vector<double
   double root = sqrt(CalcB(cell,vMu,vX) / CalcA(cell, vMu, vX)); 
   std::vector<double> cellSizes;
   timer->GetCellFamily(cell, cellSizes);
-  return min(cellSizes.back(), max(cellSizes.front(), root));
+  return std::min(cellSizes.back(), std::max(cellSizes.front(), root));
 }
 
 void LRSizer::UpdateVX(std::vector<double>& newVX, std::vector<double>& vMu)

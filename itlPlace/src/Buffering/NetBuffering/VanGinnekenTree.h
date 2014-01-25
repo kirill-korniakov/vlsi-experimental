@@ -6,17 +6,12 @@
 #include "CriticalPathBuffering.h"
 #include "Utils.h"
 
+#include "VanGinnekenData.h"
+
 class HDPGrid;
-class VGAlgorithmData;
+//class VGAlgorithmData;
 class UpdateVanGinnekenTree;
 using namespace Utils;
-
-enum PartitionType
-{
-    LINEAR               = 0, //0 - обычное линейное разбиение
-    DYNAMIC              = 1, //1 - динамическое распределение точек,
-    LEGAL_POSITIONS_ONLY = 2  //2 - легальное распределение точек (использовать только с 1 или 2 типом буферизации)
-};
 
 class VanGinnekenTree
 {

@@ -13,7 +13,7 @@
  */
 
 #include "lefrReader.hpp"
-#include "lex.h"
+#include "LEF_lex.h"
 #include <stdlib.h>
 #include <string.h>
 #include "lefiDebug.hpp"

@@ -54,7 +54,7 @@ namespace TOInternal
   {
   protected:
     RootStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { this->operator*() = Design().TimingPoints.TopologicalOrderRoot(); }
+    void Reset() { this->operator*() = EnumeratorBase::Design().TimingPoints.TopologicalOrderRoot(); }
   };
 
   template<class EnumeratorBase>
@@ -62,7 +62,7 @@ namespace TOInternal
   {
   protected:
     FIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { this->operator*() = Design().TimingPoints.FirstInternalPoint(); }
+    void Reset() { this->operator*() = EnumeratorBase::Design().TimingPoints.FirstInternalPoint(); }
   };
 
   template<class EnumeratorBase>
@@ -70,7 +70,7 @@ namespace TOInternal
   {
   protected:
     BeforeFIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { this->operator*() = Design().TimingPoints.FirstInternalPoint(); this->GoPrevious(); }
+    void Reset() { this->operator*() = EnumeratorBase::Design().TimingPoints.FirstInternalPoint(); this->GoPrevious(); }
   };
 
   template<class EnumeratorBase>
@@ -78,7 +78,7 @@ namespace TOInternal
   {
   protected:
     LIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { this->operator*() = Design().TimingPoints.LastInternalPoint(); }
+    void Reset() { this->operator*() = EnumeratorBase::Design().TimingPoints.LastInternalPoint(); }
   };
 
   template<class EnumeratorBase>
@@ -86,7 +86,7 @@ namespace TOInternal
   {
   protected:
     AfterLIStartPointsEnumerator(HDesign& hd) : EnumeratorBase(hd) {}
-    void Reset() { this->operator*() = Design().TimingPoints.LastInternalPoint(); this->GoNext(); }
+    void Reset() { this->operator*() = EnumeratorBase::Design().TimingPoints.LastInternalPoint(); this->GoNext(); }
   };
 
 
@@ -97,11 +97,11 @@ namespace TOInternal
   class ForvardEnumerator<BaseEnumeratorType, true> : public BaseEnumeratorType
   {
   public:
-    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
+    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {BaseEnumeratorType::Reset();}
 
     bool MoveNext()
     {
-      if (*this == GetEndPoint())
+      if (*this == BaseEnumeratorType::GetEndPoint())
         return false;
       this->GoNext();
       return true;
@@ -113,11 +113,11 @@ namespace TOInternal
   {
     //typedef typename BaseEnumeratorType BaseEnumeratorType;
   public:
-    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
+    ForvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {BaseEnumeratorType::Reset();}
 
     bool MoveNext()
     {
-      return this->GoNext() != GetEndPoint();
+      return this->GoNext() != BaseEnumeratorType::GetEndPoint();
     }
   };
 
@@ -129,11 +129,11 @@ namespace TOInternal
   class BackvardEnumerator<BaseEnumeratorType, true> : public BaseEnumeratorType
   {
   public:
-    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
+    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {BaseEnumeratorType::Reset();}
 
     bool MoveNext()
     {
-      if (*this == GetEndPoint())
+      if (*this == BaseEnumeratorType::GetEndPoint())
         return false;
       this->GoPrevious();
       return true;
@@ -144,11 +144,11 @@ namespace TOInternal
   class BackvardEnumerator<BaseEnumeratorType, false> : public BaseEnumeratorType
   {
   public:
-    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {Reset();}
+    BackvardEnumerator(HDesign& hd) : BaseEnumeratorType(hd) {BaseEnumeratorType::Reset();}
 
     bool MoveNext()
     {
-      return this->GoPrevious() != GetEndPoint();
+      return this->GoPrevious() != BaseEnumeratorType::GetEndPoint();
     }
   };
 

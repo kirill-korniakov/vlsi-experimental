@@ -22,6 +22,8 @@ using std::numeric_limits;
 using std::make_pair;
 using std::swap;
 using std::ofstream;
+using std::min;
+using std::max;
 
 #include "FGR.h"
 using namespace fgr;

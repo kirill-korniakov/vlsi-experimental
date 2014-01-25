@@ -68,7 +68,8 @@ void Utils::NormalizeCellsOrder(HDesign& design)
     {
       if (CompareCells(design._Design, ContrIndex, Index))
       {
-        design.Cells.Swap(::__ConstructPtr<HCell>(ContrIndex), Y);
+        HCell tempCell = ::__ConstructPtr<HCell>(ContrIndex);
+        design.Cells.Swap(tempCell, Y);
         goto Sort7L1;
       }
 Sort7L2:    ContrIndex--;
@@ -77,7 +78,8 @@ Sort7L2:    ContrIndex--;
     {
       if (CompareCells(design._Design, ContrIndex, Index))
       {
-        design.Cells.Swap(::__ConstructPtr<HCell>(Index), Y);
+        HCell tempCell = ::__ConstructPtr<HCell>(Index);
+        design.Cells.Swap(tempCell, Y);
         goto Sort7L2;
       }
 Sort7L1:    Index++;

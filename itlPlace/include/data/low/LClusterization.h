@@ -1,5 +1,4 @@
-#ifndef __LOW_CLUSTERIZATION_H__
-#define __LOW_CLUSTERIZATION_H__
+#pragma once
 
 #include <vector>
 
@@ -79,5 +78,3 @@ struct LClusterization
 
     };	
 };
-
-#endif __LOW_CLUSTERIZATION_H__

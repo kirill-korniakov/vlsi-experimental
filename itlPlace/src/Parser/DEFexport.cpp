@@ -2,11 +2,11 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <ctime>
 
-#include "DEF\\defwWriter.hpp"
-#include "DEF\\defwWriterCalls.hpp"
+#include "defwWriter.hpp"
+#include "defwWriterCalls.hpp"
 
 ///TODO: think about list of parameters for export
 struct DEFexportData
@@ -291,7 +291,7 @@ string GetExportDEFFileName(HDesign& hd, const string& defName)
 
 void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
 {
-  ConfigContext ctx = design.cfg.OpenContext("DEFExport");
+  ConfigContext ctx(design.cfg.OpenContext("DEFExport"));
 
   WRITELINE("");
   //ALERT("DEF export");
@@ -299,7 +299,7 @@ void ExportDEF(HDesign& design, const string& defName, bool useOriginalNames)
   FILE * fout;
   if ((fout = fopen(defName.c_str(), "w")) == 0)
   {
-    LOGERROR("Could not open output def file.");
+    LOGERROR(("Could not open output def file: " + defName).c_str());
     return;
   }
 

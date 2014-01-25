@@ -34,11 +34,11 @@ BEGINHCOLLECTION(HCriticalPathPoints, HCriticalPathPoint)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(::SignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
-  PROPERTYA2(HTimingPoint, HCriticalPathPoint::TimingPoint, m_ld->Timing.cppTimingPointID)
-
 ENDHCOLLECTION(HCriticalPathPoints)
+
+//properties specializations
+PROPERTYADECL(HCriticalPathPoints, ::SignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
+PROPERTYA2DECL(HCriticalPathPoints, HTimingPoint, HCriticalPathPoint::TimingPoint, m_ld->Timing.cppTimingPointID)
 
 BEGINWRAPPER(HCriticalPathPointWrapper, HCriticalPathPoints)
 

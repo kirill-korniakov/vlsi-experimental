@@ -4,6 +4,7 @@
 #include "HDesign.h"
 #include "MuReporter.h"
 #include "DelayPropagation.h"
+#include "TimingArcUtils.h"
 
 class TimingPointMus
 {
@@ -75,8 +76,8 @@ private:
     void GetMuIn(HDesign& design, HTimingPoint pt, std::vector<double>& inMus);
     void GetMuOut(HDesign& design, HTimingPoint pt, std::vector<double>& outMus);
 
-    double BorderValue(double value) { return max(0.01, min(value, 0.99)); }
-    double ZeroBorderValue(double value) { return max(0.01, value); }
+    double BorderValue(double value) { return std::max(0.01, std::min(value, 0.99)); }
+    double ZeroBorderValue(double value) { return std::max(0.01, value); }
     void SetMuS(HTimingPoint pt, double value) { MuS[::ToID(pt)] = BorderValue(value); }
     void SetInMuA(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][index] = ZeroBorderValue(value); }
     void SetInMuR(HTimingPoint pt, int index, double value) { MuIn[::ToID(pt)][MuIn[::ToID(pt)].size() - 1 - index] = ZeroBorderValue(value); }
@@ -165,12 +166,12 @@ private:
             HPinType epType = design.Get<HPin::Type, HPinType>(endPin);
 
             HSteinerPoint inPinSP = design.SteinerPoints[startPin];
-            DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(inPinSP);
+            typename DelayPropagation<sdNum>::CapacitanceType observedC = dp.GetObservedC(inPinSP);
 
-            DelayPropagation<sdNum>::TimeType endReqTime = dp.GetRequiredTime(tp);
-            DelayPropagation<sdNum>::BoolType inversed;
+            typename DelayPropagation<sdNum>::TimeType endReqTime = dp.GetRequiredTime(tp);
+            typename DelayPropagation<sdNum>::BoolType inversed;
             HTimingArcTypeWrapper arc = design[Utils::FindTimingArc(design, spType, epType)];
-            DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, endReqTime, inversed);
+            typename DelayPropagation<sdNum>::TimeType time = dp.GetArcOutputTimeRequired(arc, observedC, endReqTime, inversed);
             dp.AccumulateWorstRequiredOnPin(start, time, inversed, tp);
         }
     };

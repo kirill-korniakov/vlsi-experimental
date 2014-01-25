@@ -46,7 +46,7 @@ static inline cpuclock_t	get_cpuclock();		// get CPU clocks stamp
 	}
 
 #elif defined(_WIN32)
-
+    #define NOMINMAX
 	#include <windows.h>
 
 	static __int64	perf_freq;

@@ -58,7 +58,7 @@ void ConstructBinGrid(HDesign& hd, AppCtx& context, int aDesiredNumberOfClusters
     int maxAffectedCols = CalcMaxAffectedArea(potentialRadiusX, binGrid.binWidth);
 
     //free memory from previous iteration
-    //FIXME: last iteration causes memory leak
+    //TODO: last iteration causes memory leak
     if (clusterPotentialOverBins)
     {
         for (int i = 0; i<maxAffectedRows; i++)

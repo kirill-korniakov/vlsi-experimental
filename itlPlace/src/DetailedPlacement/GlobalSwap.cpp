@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include <stdlib.h>
-#include <conio.h>
+//#include <conio.h>
 
 GlobalSwapper::GlobalSwapper(HDPGrid& g, int optimalRegionHalfWidth, int optimalRegionHalfHeight,
   ConstraintsController* _checker): m_Grid(g), m_OptimalRegionHalfWidth(optimalRegionHalfWidth),
@@ -400,14 +400,14 @@ bool GlobalSwapper::TryToExchangeWithCell()
           if (neededSpace4Current > 0)
           {
             site4Current -= neededSpace4Current;
-            site4Current = max(0, site4Current);
+            site4Current = std::max(0, site4Current);
           }
           site4Trial = currCellColIdx;
           neededSpace4Trial = trialCellWidthInSites - (m_CellWidthInSites + rightFreeSpace);
           if (neededSpace4Trial > 0)
           {
             site4Trial -= neededSpace4Trial;
-            site4Trial = max(0, site4Trial);
+            site4Trial = std::max(0, site4Trial);
           }
           //exchange cells
           m_Grid.PutCellFast(m_Cell, m_Grid.CellRow(trialCell), site4Current);
@@ -497,7 +497,7 @@ void GlobalSwapper::ProcessCell(HCell cell)
 
 void GlobalSwap(HDPGrid& grid, ConstraintsController* checker)
 {
-  ConfigContext ctx = grid.Design().cfg.OpenContext("GlobalSwap");
+  ConfigContext ctx(grid.Design().cfg.OpenContext("GlobalSwap"));
 
   GlobalSwapper gswapper(grid, 
     grid.Design().cfg.ValueOf(".optimalRegionHalfWidth", 14),

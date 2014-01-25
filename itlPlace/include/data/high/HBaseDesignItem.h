@@ -1,5 +1,4 @@
-#ifndef __HIGH_BASEDESIGNITEM_H__
-#define __HIGH_BASEDESIGNITEM_H__
+#pragma once
 
 #include "LDesign.h"
 #include "stdTypes.h"
@@ -28,6 +27,8 @@ template<class T> struct TypesChooser<T, true>
   typedef typename T::WrapperType WrapperType;
 };
 
+void InitLD(LDesign*& m_ld, HDesign*& m_hd);
+
 template<class Element>
 class HBaseCollection
 {
@@ -36,8 +37,10 @@ protected:
   HDesign* m_hd;
   bool m_initialized;
 
-  HBaseCollection(HDesign* hd): m_hd(hd), m_ld(&hd->_Design), m_initialized(false)
+  HBaseCollection(HDesign* hd):
+      m_hd(hd), m_initialized(false)
   {
+      InitLD(m_ld, m_hd);
   }
 
 public:
@@ -72,67 +75,85 @@ inline Ptr __ConstructPtr(Arg base) { return *((Ptr*)&base); }
 /***** Standard macro templates for core classes *****/
 //abstract getters/setter definition
 #define GETTERS_SETTERS_DEFINITION() \
-  template<Property prop, class RetType> \
+  template<int prop, class RetType> \
   RetType Get(ItemType elem) const \
-  { Property_is_not_implemented } \
+  { /*Property_is_not_implemented*/ } \
   \
-  template<Property prop, class ArgType> \
+  template<int prop, class ArgType> \
   void Set(ItemType elem, const ArgType& value) \
-  { Property_is_readonly_or_is_not_implemented } \
+  { /*Property_is_readonly_or_is_not_implemented*/ } \
   \
-  template<Property prop> \
+  template<int prop> \
   double GetDouble(ItemType elem) const {return Get<prop, double>(elem);} \
   \
-  template<Property prop> \
+  template<int prop> \
   int GetInt(ItemType elem) const {return Get<prop, int>(elem);} \
   \
-  template<Property prop> \
+  template<int prop> \
   bool GetBool(ItemType elem) const {return Get<prop, bool>(elem);} \
   \
-  template<Property prop> \
+  template<int prop> \
   string GetString(ItemType elem) const {return Get<prop, string>(elem);}
 
 //shortcut for argument ID
 #define ARGID (::ToID(arg))
 
 //getters macrodefinitions
-#define GETTER(RetType, Property) \
-  template<> RetType Get<Property, RetType>(ItemType arg) const
+#define GETTER(CollType, RetType, Property) \
+  template<> RetType CollType::Get<Property, RetType>(ItemType arg) const
 
 #define IGETTER(RetType, Property, Collection) \
   template<> inline RetType Collection::Get<Property, RetType>(Collection::ItemType arg) const
 
-#define GETTERA(RetType, Property, ArrayName) \
-  GETTER(RetType, Property) \
+#define GETTERA(CollType, RetType, Property, ArrayName) \
+  GETTER(CollType, RetType, Property) \
   { return ArrayName[ARGID]; }
 
-#define GETTERA2(RetType, Property, ArrayName) \
-  GETTER(RetType, Property) \
+#define GETTERA2(CollType, RetType, Property, ArrayName) \
+  GETTER(CollType, RetType, Property) \
   { return ::__ConstructPtr<RetType, IDType>(ArrayName[ARGID]); }
 
 //setters macro definitions
-#define SETTER(PropType, Property) \
-  template<> void Set<Property>(ItemType arg, const PropType& value)
+#define SETTER(CollType, PropType, Property) \
+  template<> void CollType::Set<Property>(ItemType arg, const PropType& value)
 
-#define SETTERA(PropType, Property, ArrayName) \
-  SETTER(PropType, Property) \
+#define SETTERA(CollType, PropType, Property, ArrayName) \
+  SETTER(CollType, PropType, Property) \
   { ArrayName[ARGID] = value; }
 
-#define SETTERA2(PropType, Property, ArrayName) \
-  SETTER(PropType, Property) \
+#define SETTERA2(CollType, PropType, Property, ArrayName) \
+  SETTER(CollType, PropType, Property) \
   { ArrayName[ARGID] = ::ToID(value); }
 
 #define ISETTER(ArgType, Property, Collection) \
   template<> inline void Collection::Set<Property, ArgType>(Collection::ItemType arg, const ArgType& value)
 
 //dual getter & setter definition
-#define PROPERTYA(PropType, Property, ArrayName) \
-GETTERA(PropType, Property, ArrayName)\
-SETTERA(PropType, Property, ArrayName)
+#define PROPERTYA(CollType, PropType, Property, ArrayName) \
+GETTERA(CollType, PropType, Property, ArrayName)\
+SETTERA(CollType, PropType, Property, ArrayName)
 
-#define PROPERTYA2(PropType, Property, ArrayName) \
-GETTERA2(PropType, Property, ArrayName)\
-SETTERA2(PropType, Property, ArrayName)
+#define PROPERTYA2(CollType, PropType, Property, ArrayName) \
+GETTERA2(CollType, PropType, Property, ArrayName)\
+SETTERA2(CollType, PropType, Property, ArrayName)
+
+// Declarations for header files
+#define PROPERTYADECL(CollType, PropType, Property, ArrayName) \
+GETTER(CollType, PropType, Property);\
+SETTER(CollType, PropType, Property);
+
+#define PROPERTYA2DECL(CollType, PropType, Property, ArrayName) \
+GETTER(CollType, PropType, Property);\
+SETTER(CollType, PropType, Property);
+
+#define GETTERADECL(CollType, RetType, Property, ArrayName) \
+  GETTER(CollType, RetType, Property);
+
+#define GETTERA2DECL(CollType, RetType, Property, ArrayName) \
+  GETTER(CollType, RetType, Property);
+
+#define SETTERA2DECL(CollType, PropType, Property, ArrayName) \
+  SETTER(CollType, PropType, Property);
 
 //wrapper's getters macrodefinitions
 #define GETTERWEX(RetType, GetterName) \
@@ -185,7 +206,7 @@ public: \
   typedef wrapper_type SelfType; \
   typedef collection_type CollectionType; \
   typedef collection_type::ItemType BaseType; \
-  friend class CollectionType; \
+  friend class collection_type; \
   \
 protected: \
   CollectionType *m_Parent; \
@@ -268,6 +289,3 @@ collection_type::collection_type(HDesign *aHd): collection_type::BaseType(aHd) {
 HDesign& collection_type::Parent() { return *m_hd; }
 
 #define CHECKIFINITIALIZED() {if (m_initialized) return; m_initialized = true;}
-
-
-#endif //__HIGH_BASEDESIGNITEM_H__

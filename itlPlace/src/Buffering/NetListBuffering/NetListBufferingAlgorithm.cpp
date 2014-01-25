@@ -159,10 +159,11 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(HCriticalPath cr
             newBuffer.sort();
 
 
-            additionNewElement->CreateNets(data->design.Pins.Get<HPin::Net, HNet>(
-                data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(
-                data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(
-                data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath)))), newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
+            HNet tempNet = data->design.Pins.Get<HPin::Net, HNet>(
+                        data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(
+                        data->design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(
+                        data->design.CriticalPaths.Get<HCriticalPath::StartPoint, HCriticalPathPoint>(criticalPath))));
+            additionNewElement->CreateNets(tempNet, newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
             delete [] newNet;
         }
     }
@@ -396,8 +397,9 @@ VGVariantsListElement PathBasedBuffering::BufferingCriticalPath(CriticalPathBuff
             newBuffer.sort();
 
 
-            additionNewElement->CreateNets(data->design.Pins.Get<HPin::Net, HNet>(
-                data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(criticalPath.TimingPointStart())), newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
+            HNet tempNet = data->design.Pins.Get<HPin::Net, HNet>(
+                        data->design.TimingPoints.Get<HTimingPoint::Pin, HPin>(criticalPath.TimingPointStart()));
+            additionNewElement->CreateNets(tempNet, newBuffer, newNet, data->vGTree->GetSource()->GetLeft(), newNetCount);
             delete [] newNet;
         }
     }

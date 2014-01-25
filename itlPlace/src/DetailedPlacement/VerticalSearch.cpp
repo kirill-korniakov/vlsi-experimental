@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Auxiliary.h"
 #include <stdlib.h>
-#include <conio.h>
+//#include <conio.h>
 
 VerticalSwapper::VerticalSwapper(HDPGrid& g, int searchZoneSize, int nRowsToSearch,
   ConstraintsController* _checker): m_Grid(g), m_searchZoneSize(searchZoneSize),
@@ -377,14 +377,14 @@ bool VerticalSwapper::TryToExchangeWithCell()
           if (neededSpace4Current > 0)
           {
             site4Current -= neededSpace4Current;
-            site4Current = max(0, site4Current);
+            site4Current = std::max(0, site4Current);
           }
           site4Trial = currCellColIdx;
           neededSpace4Trial = trialCellWidthInSites - (m_CellWidthInSites + rightFreeSpace);
           if (neededSpace4Trial > 0)
           {
             site4Trial -= neededSpace4Trial;
-            site4Trial = max(0, site4Trial);
+            site4Trial = std::max(0, site4Trial);
           }
           //exchange cells
           m_Grid.PutCellFast(m_Cell, m_Grid.CellRow(trialCell), site4Current);
@@ -469,7 +469,7 @@ void VerticalSwapper::ProcessCell(HCell cell)
 
 void VerticalSearch(HDPGrid& grid, ConstraintsController* checker)
 {
-  ConfigContext ctx = grid.Design().cfg.OpenContext("VerticalSearch");
+  ConfigContext ctx(grid.Design().cfg.OpenContext("VerticalSearch"));
 
   VerticalSwapper hswapper(grid, 
     grid.Design().cfg.ValueOf(".searchZoneSize", 7),

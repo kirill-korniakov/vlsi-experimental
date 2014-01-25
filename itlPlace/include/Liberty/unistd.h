@@ -1,8 +1,9 @@
 #ifndef __UNISTD_H__
 #define __UNISTD_H__
 
-#include <io.h>
-#include <process.h>
+//KNOTE: 2 lines below commented by Kirill
+//#include <io.h>
+//#include <process.h>
 
 #define F_OK 0
 

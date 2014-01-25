@@ -2,6 +2,7 @@
 #define __HIGH_ENUMERTOR_H__
 
 #include "Index.h"
+#include "HBaseDesignItem.h"
 
 template <class Item, int disambiguation = 0>
 class HEnumerator : public Item
@@ -19,7 +20,7 @@ public:
 
   void Reset()
   {
-    ::FromID(*this, m_start - 1);
+    FromID(*this, m_start - 1);
   }
 
   bool MoveNext()
@@ -43,7 +44,7 @@ public:
 
   void Reset()
   {
-    ::FromID(*this, base - 1);
+    FromID(*this, base - 1);
   }
 
   bool MoveNext()
@@ -69,12 +70,12 @@ public:
 
     void Reset()
     {
-        ::FromID(*this, m_start - 1);
+        FromID(*this, m_start - 1);
     }
 
     bool MoveNext()
     {
-        return --__GetID(*this) > aStart;
+        return --__GetID(*this) > m_start; //TODO: looks like a bug
     }
 };
 
@@ -95,7 +96,7 @@ public:
 
   void Reset()
   {
-    ::FromID(*this, m_start - 1);
+    FromID(*this, m_start - 1);
   }
 
   bool MoveNext()
@@ -126,7 +127,7 @@ public:
   {
     if(++m_curPos < m_Index.Size())
     {
-      ::FromID(*this, m_Index[m_curPos]);
+      FromID(*this, m_Index[m_curPos]);
       return true;
     }
     return false;
@@ -154,7 +155,7 @@ public:
   {
     if(++m_curPos < m_Index.Size())
     {
-      ::FromID(*this, m_Index[m_curPos]);
+      FromID(*this, m_Index[m_curPos]);
       return true;
     }
     return false;

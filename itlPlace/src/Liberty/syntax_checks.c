@@ -5846,7 +5846,7 @@ static void check_ref_times(si2drGroupIdT group)
 					
 					for(i = 0; i < refvals.items; i++ )
 					{
-						if( !strncasecmp(refvals.template[i], nam,200)
+                        if( !strncasecmp_fixme(refvals.template[i], nam,200)
 							&& refvals.val[i] == val 
 							&& (refvals.translew[i] == translewval ))
 						{

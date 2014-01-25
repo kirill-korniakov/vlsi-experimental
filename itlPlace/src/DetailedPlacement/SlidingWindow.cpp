@@ -7,7 +7,7 @@
 #include "SlidingWindow.h"
 #include "stdlib.h"
 #include <algorithm>
-#include <conio.h>
+//#include <conio.h>
 #include <math.h>
 
 void QuickSortRowElement(WindowElement* a, long N)
@@ -229,7 +229,7 @@ double WindowWithNotOrderedCells::ConvertXY_To_X(HCell cell)
   if ((rowInd < 0) || (rowInd >= m_grid.NumRows()))
   {
     LOGERROR("error in ConvertXY_To_X!");
-    _getch();
+    //_getch();
     return -1;
   }
 
@@ -561,7 +561,7 @@ bool GetWindowParams(int firstRowIdx, int nRows, int &nCells, HCell cells[], int
     if (siteIndexes[i] + rowWidthInSites[i] > _grid.NumCols())
     {
       LOGERROR("error while counting sites\n");
-      _getch();
+      //_getch();
     }
   }
 
@@ -585,7 +585,7 @@ void MakeWindows(int nSteps, int nCells, int _nRows, HDPGrid &_grid)
     bool isWindowCreated = false;
     int nFoundCells = nCells;
     firstRowIdx = rand() % (_grid.NumRows() - _nRows); //circuit.nRows;        
-    int nRows = min(_grid.NumRows() - firstRowIdx, _nRows);
+    int nRows = std::min(_grid.NumRows() - firstRowIdx, _nRows);
     GetStartPoint(siteIndexes, nRows, _grid);
     isWindowCreated = GetWindowParams(firstRowIdx, nRows, nFoundCells, capturedCells, siteIndexes,
       x_array, _grid);
@@ -600,6 +600,6 @@ void MakeWindows(int nSteps, int nCells, int _nRows, HDPGrid &_grid)
     WRITE("bounds penalty: %f\n", slidingWindow->g1WindowBounds());
     WRITE("recalc WL: %f\n", slidingWindow->CalcWL());
     delete slidingWindow;
-    _getch();
+    //_getch();
   }
 }

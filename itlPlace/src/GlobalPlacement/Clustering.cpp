@@ -3,7 +3,7 @@
 #include <vector>
 #include "math.h"
 #include <stdlib.h>
-#include <conio.h>
+//#include <conio.h>
 
 //TODO: do smth with this trash
 #define MARK_NEIGHBORS_INVALID true
@@ -666,7 +666,7 @@ void PrintMergeCandidates(std::list<MergeCandidate>& mergeCandidates)
     for (std::list<MergeCandidate>::iterator iter = mergeCandidates.begin(); 
         iter != mergeCandidates.end(); iter++)
     {
-        WRITE("(%d, %d)\t", iter->clusterIdx, iter->bestNeighborIdx);
+        WRITE("(%d, %d)\t", iter->clusterIdx.id, iter->bestNeighborIdx.id); //KNOTE: added .id
     }
     WRITELINE("");
 }

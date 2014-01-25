@@ -1,5 +1,6 @@
 #pragma once
 
+//#include "HDesign.h"
 #include "HBaseDesignItem.h"
 #include "HCell.h"
 #include "Color.h"
@@ -8,6 +9,7 @@
 #include "HSteinerPoint.h"
 #include "SpreadingData.h"
 
+class HDesign;
 class VanGinnekenTreeNode;
 
 struct AppCtx;
@@ -16,7 +18,7 @@ class HDPGrid;
 class HPlotter
 {
 public:
-  HPlotter::HPlotter(HDesign& design):m_hd(design) {}
+  HPlotter(HDesign& design):m_hd(design) {}
   virtual ~HPlotter() {}
   virtual void Initialize() = 0;
 

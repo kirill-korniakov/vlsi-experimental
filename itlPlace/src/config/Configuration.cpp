@@ -237,9 +237,8 @@ searchStart:
       if (path[sz] == '.') ++dotsCount;
     
     if (m_Trace)
-    {
-      ALERT("cfgtrace - Context: %s   Path: %s", m_Context.Context().c_str(), path.c_str());
-    }
+      ALERT("cfgtrace - Context: %s, Path: %s", m_Context.Context().c_str(), path.c_str());
+
     config_setting_t* result = 0;
 #ifndef NO_CONFIG_CACHE
     ConfigCache::iterator chr = m_Context.CurrentCache().find(path);
@@ -273,7 +272,7 @@ searchStart:
   {
     int idx1 = m_FileName.find_last_of('\\');
     int idx2 = m_FileName.find_last_of('/');
-    int idx  = max(idx1, idx2);
+    int idx  = std::max(idx1, idx2);
 
     if (idx < 0)
     {
@@ -525,9 +524,10 @@ searchStart:
     case CONFIG_TYPE_BOOL:
       WRITELINE("Cfg option changed: %s = %s", fpath.c_str(), (bool)ValueOf(path) ? "true" : "false");
       break;
-    case CONFIG_TYPE_INT64:
-      WRITELINE("Cfg option changed: %s = %I64xL", fpath.c_str(), (__int64)ValueOf(path));
-      break;
+    //FIXME: __int64_t is not cross-platform
+    //case CONFIG_TYPE_INT64:
+    //  WRITELINE("Cfg option changed: %s = %I64xL", fpath.c_str(), (__int64_t)ValueOf(path));
+    //  break;
     case CONFIG_TYPE_FLOAT:
       WRITELINE("Cfg option changed: %s = %f", fpath.c_str(), (float)ValueOf(path));
       break;
@@ -592,7 +592,9 @@ searchStart:
       nextSetting = config_setting_add(setting, currentPath.c_str() + startPos, type);
       if (nextSetting == 0)
       {
-        GLOGERROR(LOGINPLACE, "Unable to create setting [%s.%s]", GetFullName(setting).c_str(), currentPath.c_str() + startPos);
+        const char* fullName = GetFullName(setting).c_str();
+        const char* tmp = currentPath.c_str() + startPos;
+        GLOGERROR(LOGINPLACE, "Unable to create setting [%s.%s]", fullName, tmp);
         return 0;
       }
       setting = nextSetting;

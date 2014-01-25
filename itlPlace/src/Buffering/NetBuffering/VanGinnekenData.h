@@ -3,7 +3,7 @@
 
 #include "BufferInfo.h"
 #include "Utils.h"
-#include "VanGinnekenTree.h"
+//#include "VanGinnekenTree.h"
 
 class VanGinnekenTree;
 class HWirePhysicalParams;
@@ -34,6 +34,13 @@ enum TypeNetListBuffering
 {
     BUFFERING_ALL_CRITICAL_PATH = 0,
     PATH_BASED = 1
+};
+
+enum PartitionType
+{
+    LINEAR               = 0, //0 - обычное линейное разбиение
+    DYNAMIC              = 1, //1 - динамическое распределение точек,
+    LEGAL_POSITIONS_ONLY = 2  //2 - легальное распределение точек (использовать только с 1 или 2 типом буферизации)
 };
 
 class VGAlgorithmData

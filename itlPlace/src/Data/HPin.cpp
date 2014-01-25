@@ -2,6 +2,53 @@
 
 COLLECTIONCONSTRUCTOR(HPins)
 
+//properties specializations
+PROPERTYA(HPins, double, HPin::OffsetX, m_ld->NetList.pinOffsetX)
+PROPERTYA(HPins, double, HPin::OffsetY, m_ld->NetList.pinOffsetY)
+PROPERTYA(HPins, PinDirection, HPin::Direction, m_ld->NetList.pinDirection)
+PROPERTYA2(HPins, HPinType, HPin::Type, m_ld->NetList.pinType)
+
+//getters specializations
+GETTER(HPins, bool, HPin::IsPrimary)
+{ return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0; }
+
+GETTER(HPins, bool, HPin::IsPrimaryInput)
+{ return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0
+  && m_ld->NetList.pinDirection[ARGID] == PinDirection_OUTPUT; }
+
+GETTER(HPins, bool, HPin::IsPrimaryOutput)
+{ return ARGID < m_ld->NetList.nPrimariesEnd && ARGID > 0
+  && m_ld->NetList.pinDirection[ARGID] == PinDirection_INPUT; }
+
+GETTER(HPins, double, HPin::X)
+{ return m_ld->NetList.cellX[m_ld->NetList.pinCellIdx[ARGID]] + m_ld->NetList.pinOffsetX[ARGID]; }
+
+GETTER(HPins, double, HPin::Y)
+{ return m_ld->NetList.cellY[m_ld->NetList.pinCellIdx[ARGID]] + m_ld->NetList.pinOffsetY[ARGID]; }
+
+GETTER(HPins, string, HPin::Name)
+{
+  return ARGID < m_ld->NetList.nPinsStart
+    ? m_ld->NetList.pinName[ARGID]
+    : m_ld->Tech->pinName[m_ld->NetList.pinType[ARGID]];
+}
+
+GETTER(HPins, HCell, HPin::Cell);       //implemented in HExternalMethods.h
+GETTER(HPins, HNet, HPin::Net);         //implemented in HExternalMethods.h
+GETTER(HPins, HNet, HPin::OriginalNet); //implemented in HExternalMethods.h
+
+//setters specialization
+SETTER(HPins, HNet, HPin::Net); //implemented in HExternalMethods.h
+
+SETTER(HPins, string, HPin::Name)
+{
+if (ARGID < m_ld->NetList.nPinsStart)
+        m_ld->NetList.pinName[ARGID] = value;
+    else
+  LOGERROR("Unable to set name for non primary arg.");
+}
+
+
 void HPins::Initialize(int primariesNum, int pinsLimit)
 {
   CHECKIFINITIALIZED();

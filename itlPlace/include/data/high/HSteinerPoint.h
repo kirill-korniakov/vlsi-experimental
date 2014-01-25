@@ -57,41 +57,6 @@ BEGINHCOLLECTION(HSteinerPoints, HSteinerPoint)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA2(HSteinerPoint, HSteinerPoint::Left, m_ld->Routing.rpLeft)
-  PROPERTYA2(HSteinerPoint, HSteinerPoint::Right, m_ld->Routing.rpRight)
-  PROPERTYA(double, HSteinerPoint::X, m_ld->Routing.rpX)
-  PROPERTYA(double, HSteinerPoint::Y, m_ld->Routing.rpY)
-  PROPERTYA(double, HSteinerPoint::RisePointC, m_ld->RCExtraction.rceRisePointC)
-  PROPERTYA(double, HSteinerPoint::FallPointC, m_ld->RCExtraction.rceFallPointC)
-  PROPERTYA(double, HSteinerPoint::PointC, m_ld->RCExtraction.rceRisePointC)
-  PROPERTYA(double, HSteinerPoint::RiseObservedC, m_ld->RCExtraction.rceRiseObservedC)
-  PROPERTYA(double, HSteinerPoint::FallObservedC, m_ld->RCExtraction.rceFallObservedC)
-  PROPERTYA(double, HSteinerPoint::ObservedC, m_ld->RCExtraction.rceRiseObservedC)
-  PROPERTYA(double, HSteinerPoint::RisePathDelay, m_ld->RCExtraction.rceRisePathDelay)
-  PROPERTYA(double, HSteinerPoint::FallPathDelay, m_ld->RCExtraction.rceFallPathDelay)
-  PROPERTYA(double, HSteinerPoint::PathDelay, m_ld->RCExtraction.rceRisePathDelay)
-  PROPERTYA(double, HSteinerPoint::ExtractedC, m_ld->RCExtraction.rceExtractedC)
-  PROPERTYA(double, HSteinerPoint::ExtractedR, m_ld->RCExtraction.rceExtractedR)
-
-  //getters specializations
-  GETTER(bool, HSteinerPoint::HasLeft)
-    { return !::IsNull(Get<HSteinerPoint::Left, HSteinerPoint>(arg)); }
-
-  GETTER(bool, HSteinerPoint::HasRight)
-    { return !::IsNull(Get<HSteinerPoint::Right, HSteinerPoint>(arg)); }
-
-  GETTER(bool, HSteinerPoint::IsInternal)
-    { return ARGID < 0; }
-
-  GETTER(HPin, HSteinerPoint::Pin)
-  { 
-    if (ARGID >= 0)
-      return ::__ConstructPtr<HPin>(arg);
-    else
-      return ::__ConstructPtr<HPin>(0);
-  }
-
   //special setters
   void InheritPinCoordinates(HSteinerPoint point); //implemented in HExternalMethods.h
 
@@ -99,6 +64,29 @@ private: void PinsGrowEventHandler(int pinsFrom, int pinsTo);
 private: void PinAllocatedEventHandler(HPin pin);
 
 ENDHCOLLECTION(HSteinerPoints)
+
+//properties specializations
+PROPERTYA2DECL(HSteinerPoints, HSteinerPoint, HSteinerPoint::Left, m_ld->Routing.rpLeft)
+PROPERTYA2DECL(HSteinerPoints, HSteinerPoint, HSteinerPoint::Right, m_ld->Routing.rpRight)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::X, m_ld->Routing.rpX)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::Y, m_ld->Routing.rpY)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::RisePointC, m_ld->RCExtraction.rceRisePointC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::FallPointC, m_ld->RCExtraction.rceFallPointC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::PointC, m_ld->RCExtraction.rceRisePointC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::RiseObservedC, m_ld->RCExtraction.rceRiseObservedC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::FallObservedC, m_ld->RCExtraction.rceFallObservedC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::ObservedC, m_ld->RCExtraction.rceRiseObservedC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::RisePathDelay, m_ld->RCExtraction.rceRisePathDelay)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::FallPathDelay, m_ld->RCExtraction.rceFallPathDelay)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::PathDelay, m_ld->RCExtraction.rceRisePathDelay)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::ExtractedC, m_ld->RCExtraction.rceExtractedC)
+PROPERTYADECL(HSteinerPoints, double, HSteinerPoint::ExtractedR, m_ld->RCExtraction.rceExtractedR)
+
+//getters specializations
+GETTER(HSteinerPoints, bool, HSteinerPoint::HasLeft);
+GETTER(HSteinerPoints, bool, HSteinerPoint::HasRight);
+GETTER(HSteinerPoints, bool, HSteinerPoint::IsInternal);
+GETTER(HSteinerPoints, HPin, HSteinerPoint::Pin);
 
 BEGINWRAPPER(HSteinerPointWrapper, HSteinerPoints)
 

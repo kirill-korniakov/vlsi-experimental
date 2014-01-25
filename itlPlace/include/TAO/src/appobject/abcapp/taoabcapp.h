@@ -2,7 +2,8 @@
 #define TAOABCAPP_H
 
 #include "taoappobject.h"
-#include "src/vector/tvecdouble.h"
+//#include "src/vector/tvecdouble.h"
+#include "tvecdouble.h"
 
 class TaoABCApplication: public TaoApplication{
 

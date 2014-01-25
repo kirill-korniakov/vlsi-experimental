@@ -1,6 +1,6 @@
 #include "HDesign.h"
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <map>
 #include "Utils.h"
 #include "CellsBuilder.h"
@@ -8,7 +8,7 @@
 #include "PlacementRowsBuilder.h"
 #include "NetsBuilder.h"
 
-#include "DEF\\defrReader.hpp"
+#include "defrReader.hpp"
 
 struct DEFParserData
 {
@@ -445,7 +445,7 @@ int siteCB(defrCallbackType_e c, defiSite *site, defiUserData ud)
 
 void ParseDEF(HDesign& design)
 {
-  ConfigContext ctx = design.cfg.OpenContext("DEFParser");
+  ConfigContext ctx(design.cfg.OpenContext("DEFParser"));
 
   DEFParserData userData(&design);
 
@@ -486,12 +486,15 @@ void ParseDEF(HDesign& design)
 
   defrReset();
 
-  FILE* defFile = fopen(design.cfg.ValueOf("benchmark.def"), "r");
+  string defFileName = design.cfg.ValueOf("benchmark.def");
+  ALERT("Going to read DEF file: %s", defFileName.c_str());
+
+  FILE* defFile = fopen(defFileName.c_str(), "r");
   CRITICAL_ASSERT(defFile != NULL);
 
-  ALERT("DEF file %s parsing started...", (const char*)design.cfg.ValueOf("benchmark.def"));
+  ALERT("DEF file %s parsing started...", defFileName.c_str());
   
-  int defReaderStatus = defrRead(defFile, design.cfg.ValueOf("benchmark.def"), (void*)(&userData), 0);
+  int defReaderStatus = defrRead(defFile, defFileName.c_str(), (void*)(&userData), 0);
   ASSERT(defReaderStatus == PARSE_OK);
 
   fclose(defFile);

@@ -6,9 +6,12 @@ string ClusteringInformation::GetClusteringInformationFileName(HDesign& hd)
     string fileName = hd.cfg.ValueOf(".Clustering.clusteringInformationLoadFileName");
     if (fileName == "")
     {
-        fileName = Aux::Format(".\\ClusteringInformation\\%s_%s_%d.ci",
-            (const char*)hd.cfg.ValueOf("params.techname", "IWLS"),
-            hd.Circuit.Name().c_str(),
+        const char* techname = hd.cfg.ValueOf("params.techname", "IWLS");
+        string name = hd.Circuit.Name();
+        fileName = Aux::Format(
+            "./ClusteringInformation/%s_%s_%d.ci",
+            techname,
+            name.c_str(),
             hd.Cells.CellsCount());
     }
     return fileName;
@@ -367,7 +370,7 @@ void ClusteringInformation::SaveClustersToFile(FILE* rf, HDesign& hd)
 
       for (unsigned int j = 0; j < clustersCellsSize; ++j)
       {
-            fprintf(rf, "\t%s\n", hd[(*cluster.Cells())[j]].Name().c_str()); 
+            fprintf(rf, "\t%s\n", hd[(*clusterU.Cells())[j]].Name().c_str());
           //std::cout << clusters[i].cells[j].Name << std::endl;
       }
   }
@@ -450,7 +453,8 @@ void ClusteringInformation::SaveCurrTableOfAdjacentNetsToFile(FILE* rf)
 
     for (unsigned int j = 0; j < connectionsVectorSize; ++j)
     {
-      fprintf(rf, "\t%d\n", (*i.tableOfAdjacentNets())[j]);
+      HClusteredNet net = (*i.tableOfAdjacentNets())[j];
+      fprintf(rf, "\t%d\n", net.idNet); //KNOTE: added .idNet
     }
   }
 

@@ -1,7 +1,14 @@
-#ifndef __REPORTING_H__
-#define __REPORTING_H__
+#pragma once
 
-#include "HDesign.h"
+//#include "HDesign.h"
+class HDesign;
+class HNet;
+class HPin;
+class HTimingPoint;
+class HCriticalPath;
+
+#include <string>
+using std::string;
 
 struct CrossingReport
 {
@@ -44,7 +51,5 @@ void ReportTNSWNSSequence(HDesign& hd, string &tnsStr, string &wnsStr);
 
 void PrintTimingReport(HDesign& hd, int nPaths = -1);
 void ReportMacrotypesShort(HDesign& design);
-void ReportLibraryPhisics(HDesign& design, SignalDirection sd);
+void ReportLibraryPhisics(HDesign& design, int/*SignalDirection*/ sd);
 void PrintPath(HDesign& design, HCriticalPath path, int pathNumber);
-
-#endif //__REPORTING_H__

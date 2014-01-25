@@ -17,7 +17,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <ctype.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include "lex.h"
 #include "lefiDebug.hpp"
 #include "lefrReader.hpp"
@@ -1077,7 +1077,7 @@ void lefInfo(int msgNum, const char *s) {
       if (!hasOpenedLogFile) {
          if ((lefrLog = fopen("lefRWarning.log", "w")) == 0) {
             printf("WARNING (LEFPARS-3500): Unable to open the file lefRWarning.log in %s.\n",
-            getcwd(NULL, 64));
+            "FIXME"/*getcwd(NULL, 64)*/);
             printf("Info messages will not be printed.\n");
          } else {
             hasOpenedLogFile = 1;
@@ -1089,7 +1089,7 @@ void lefInfo(int msgNum, const char *s) {
       } else {
          if ((lefrLog = fopen("lefRWarning.log", "a")) == 0) {
             printf("WARNING (LEFPARS-3500): Unable to open the file lefRWarning.log in %s.\n",
-            getcwd(NULL, 64));
+            "FIXME"/*getcwd(NULL, 64)*/);
             printf("Info messages will not be printed.\n");
          } else {
             fprintf(lefrLog, "\nInfo from file: %s\n\n", lefrFileName);
@@ -1119,7 +1119,7 @@ void lefWarning(int msgNum, const char *s) {
       if (!hasOpenedLogFile) {
          if ((lefrLog = fopen("lefRWarning.log", "w")) == 0) {
             printf("WARNING (LEFPARS-2500): Unable to open the file lefRWarning.log in %s.\n",
-            getcwd(NULL, 64));
+            "FIXME"/*getcwd(NULL, 64)*/);
             printf("Warning messages will not be printed.\n");
          } else {
             hasOpenedLogFile = 1; 
@@ -1131,7 +1131,7 @@ void lefWarning(int msgNum, const char *s) {
       } else {
          if ((lefrLog = fopen("lefRWarning.log", "a")) == 0) {
             printf("WARNING (LEFPARS-2501): Unable to open the file lefRWarning.log in %s.\n",
-            getcwd(NULL, 64));
+            "FIXME"/*getcwd(NULL, 64)*/);
             printf("Warning messages will not be printed.\n");
          } else {
             fprintf(lefrLog, "\nWarnings from file: %s\n\n", lefrFileName);

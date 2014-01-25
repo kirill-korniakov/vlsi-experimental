@@ -56,7 +56,7 @@ int strcasecmp(const char *s1, const char *s2)
   }
 } 
 
-int strncasecmp(const char *s1, const char *s2, int n)
+int strncasecmp_fixme(const char *s1, const char *s2, int n)
 {
   register unsigned char u1, u2;
   for (;n > 0; n--) {

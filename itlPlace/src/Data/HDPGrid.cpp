@@ -128,7 +128,7 @@ void HDPGrid::FindCellsPositions()
 int HDPGrid::FindRow(double y)
 {
   DPGridRow* row = std::lower_bound(m_rows, m_rows + nRows, y);
-  int ret = max(0, (int)(row - m_rows - 1));
+  int ret = std::max(0, (int)(row - m_rows - 1));
   if (ret < nRows - 1)
   {
     if (y - m_rows[ret].y > m_rows[ret + 1].y - y)
@@ -145,5 +145,5 @@ int HDPGrid::FindColumn(double x)
   //DPGridColumn* col = std::lower_bound(m_columns, m_columns + nColumns, x);
   //int ret = col - m_columns - 1;
   int ret = (int)(0.49999999 + (x - m_columns[0].x) / SiteWidth());
-  return min(max(0, ret), nColumns - 1);
+  return std::min(std::max(0, ret), nColumns - 1);
 }

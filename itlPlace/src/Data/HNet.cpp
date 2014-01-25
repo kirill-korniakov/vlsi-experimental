@@ -2,6 +2,49 @@
 
 COLLECTIONCONSTRUCTOR(HNets)
 
+//properties specializations
+PROPERTYA(HNets, string, HNet::Name, m_ld->NetList.netName)
+PROPERTYA(HNets, double, HNet::HPWL, m_ld->NetList.netHPWL)
+PROPERTYA(HNets, double, HNet::Weight, m_ld->NetList.netWeight)
+PROPERTYA(HNets, double, HNet::LNet, m_ld->NetList.netLnet)
+
+//getters specializations
+GETTERA(HNets, NetKind, HNet::Kind, m_ld->NetList.netKind)
+
+GETTER(HNets, HPin, HNet::Source)
+  { return ::__ConstructPtr<HPin>(m_ld->NetList.netPins[m_ld->NetList.netPinStart[ARGID]]); }
+
+GETTER(HNets, HPin, HNet::LastSink)
+  { return ::__ConstructPtr<HPin>(m_ld->NetList.netPins[m_ld->NetList.netPinEnd[ARGID] - 1]); }
+
+GETTER(HNets, int, HNet::PinsCount)
+  { return m_ld->NetList.netPinEnd[ARGID]
+         - m_ld->NetList.netPinStart[ARGID]; }
+
+GETTER(HNets, int, HNet::SinksCount)
+  { return m_ld->NetList.netPinEnd[ARGID]
+         - m_ld->NetList.netPinStart[ARGID] - 1; }
+
+GETTER(HNets, HNet::PinsEnumeratorW, HNet::Pins);
+GETTER(HNets, HNet::SinksEnumeratorW, HNet::Sinks);
+
+//setters specializations
+SETTER(HNets, HPin, HNet::Source)
+  { AssignPin(arg, m_ld->NetList.netPinStart[ARGID], value); }
+
+SETTER(HNets, NetKind, HNet::Kind)
+{
+#pragma warning( push )
+#pragma warning(disable:6385)
+  if (m_ld->NetList.netKind[ARGID] != value)
+  {
+    m_ld->NetList.nNetsByKind[value] += 1;
+    m_ld->NetList.nNetsByKind[m_ld->NetList.netKind[ARGID]] -= 1;
+    m_ld->NetList.netKind[ARGID] = value;
+  }
+#pragma warning( pop )
+}
+
 void HNets::PinsGrowEventHandler(int pinsFrom, int pinsTo)
 {
   if(m_ld->NetList.nNetPinLimit < pinsTo)

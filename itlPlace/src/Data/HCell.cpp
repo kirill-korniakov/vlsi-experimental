@@ -2,6 +2,87 @@
 
 COLLECTIONCONSTRUCTOR(HCells)
 
+//properties specializations
+PROPERTYA(HCells, string, HCell::Name, m_ld->NetList.cellName)
+PROPERTYA(HCells, double, HCell::X, m_ld->NetList.cellX)
+PROPERTYA(HCells, double, HCell::Y, m_ld->NetList.cellY)
+PROPERTYA(HCells, double, HCell::Width, m_ld->NetList.cellWidth)
+PROPERTYA(HCells, double, HCell::Height, m_ld->NetList.cellHeight)
+PROPERTYA(HCells, CellOrientation, HCell::Orientation, m_ld->NetList.cellOrient)
+PROPERTYA2(HCells, HMacroType, HCell::MacroType, m_ld->NetList.cellType)
+
+//getters specializations
+GETTERA(HCells, PlacementStatus, HCell::PlacementStatus, m_ld->NetList.cellPlStatus)
+GETTER(HCells, bool, HCell::IsTerminal)
+{ return Get<HCell::PlacementStatus, PlacementStatus>(arg) != PlacementStatus_Movable; }
+GETTER(HCells, bool, HCell::IsSpecial)
+{ return m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] <= MacroType_LastSpecial
+  && m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] >= MacroType_FirstSpecial; }
+GETTER(HCells, bool, HCell::IsSequential)
+{ return m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] <= MacroType_LastSequential
+  && m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] >= MacroType_FirstSequential; }
+GETTER(HCells, bool, HCell::IsCombinational)
+{ return m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] >= MacroType_FirstCombinational
+  && m_ld->Tech->macroType[m_ld->NetList.cellType[ARGID]] <= MacroType_LastCombinational; }
+GETTER(HCells, int, HCell::PinsCount)
+{ return m_ld->NetList.cellPinEndIdx[ARGID]
+       - m_ld->NetList.cellPinStartIdx[ARGID]; }
+GETTER(HCells, HCell::PinsEnumerator, HCell::Pins)
+{ return HCell::PinsEnumerator(m_ld->NetList.cellPinStartIdx[ARGID],
+                               m_ld->NetList.cellPinEndIdx[ARGID]); }
+GETTER(HCells, HCluster, HCell::Cluster)
+{
+    return ::__ConstructPtr<HCluster>(m_ld->NetList.cellCluster[ARGID]);
+}
+
+GETTER(HCells, HCell::PinsEnumeratorW, HCell::Pins); //implemented in HExternalMethods.h
+
+//setters specialization
+SETTER(HCells, PlacementStatus, HCell::PlacementStatus)
+{
+IDType mt_id = m_ld->NetList.cellType[ARGID];
+if (mt_id != 0)
+{
+  IDType m_type = m_ld->Tech->macroType[mt_id];
+  switch (Get<HCell::PlacementStatus, PlacementStatus>(arg))
+  {
+  case PlacementStatus_Fictive:
+    m_ld->NetList.cellTypeBounds[m_type + 1].nFictive -= 1;
+    break;
+  case PlacementStatus_Fixed:
+    m_ld->NetList.cellTypeBounds[m_type + 1].nTerminals -= 1;
+    break;
+  case PlacementStatus_Movable:
+    break;
+  default:
+    LOGERROR("Unknown placement status detected");
+    break;
+  }
+
+  switch (value)
+  {
+  case PlacementStatus_Fictive:
+    m_ld->NetList.cellTypeBounds[m_type + 1].nFictive += 1;
+    break;
+  case PlacementStatus_Fixed:
+    m_ld->NetList.cellTypeBounds[m_type + 1].nTerminals += 1;
+    break;
+  case PlacementStatus_Movable:
+    break;
+  default:
+    LOGERROR("Unknown placement status detected");
+    break;
+  }
+  m_ld->NetList.cellPlStatus[ARGID] = value;
+}//if (mt_id != 0)
+else
+  LOGINFO("Unable to set placement status for cell having unknown macrotype");
+}
+SETTER(HCells, HCluster, HCell::Cluster)
+{
+  m_ld->NetList.cellCluster[ARGID] = ::ToID(value);
+}
+
 void HCells::Initialize(int cellsLimit)
 {
   CHECKIFINITIALIZED();

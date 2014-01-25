@@ -2,6 +2,41 @@
 
 COLLECTIONCONSTRUCTOR(HSteinerPoints)
 
+//properties specializations
+PROPERTYA2(HSteinerPoints, HSteinerPoint, HSteinerPoint::Left, m_ld->Routing.rpLeft)
+PROPERTYA2(HSteinerPoints, HSteinerPoint, HSteinerPoint::Right, m_ld->Routing.rpRight)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::X, m_ld->Routing.rpX)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::Y, m_ld->Routing.rpY)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::RisePointC, m_ld->RCExtraction.rceRisePointC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::FallPointC, m_ld->RCExtraction.rceFallPointC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::PointC, m_ld->RCExtraction.rceRisePointC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::RiseObservedC, m_ld->RCExtraction.rceRiseObservedC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::FallObservedC, m_ld->RCExtraction.rceFallObservedC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::ObservedC, m_ld->RCExtraction.rceRiseObservedC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::RisePathDelay, m_ld->RCExtraction.rceRisePathDelay)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::FallPathDelay, m_ld->RCExtraction.rceFallPathDelay)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::PathDelay, m_ld->RCExtraction.rceRisePathDelay)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::ExtractedC, m_ld->RCExtraction.rceExtractedC)
+PROPERTYA(HSteinerPoints, double, HSteinerPoint::ExtractedR, m_ld->RCExtraction.rceExtractedR)
+
+//getters specializations
+GETTER(HSteinerPoints, bool, HSteinerPoint::HasLeft)
+  { return !::IsNull(Get<HSteinerPoint::Left, HSteinerPoint>(arg)); }
+
+GETTER(HSteinerPoints, bool, HSteinerPoint::HasRight)
+  { return !::IsNull(Get<HSteinerPoint::Right, HSteinerPoint>(arg)); }
+
+GETTER(HSteinerPoints, bool, HSteinerPoint::IsInternal)
+  { return ARGID < 0; }
+
+GETTER(HSteinerPoints, HPin, HSteinerPoint::Pin)
+{
+  if (ARGID >= 0)
+    return ::__ConstructPtr<HPin>(arg);
+  else
+    return ::__ConstructPtr<HPin>(0);
+}
+
 void HSteinerPoints::PinsGrowEventHandler(int pinsFrom, int pinsTo)
 {
   int internalTo = (int)(m_ld->NetList.nPinsLimit 

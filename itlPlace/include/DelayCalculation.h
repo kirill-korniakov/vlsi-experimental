@@ -346,7 +346,7 @@ enum SignalModel
 template<LayersModel lmodel, SignalModel smodel>
 inline void CalculateNetDelays(HDesign& design, HNet net, DelayCalculationInternals::PointsContainer& ptContainer)
 {
-  This_method_should_not_be_instantiated;
+  /*This_method_should_not_be_instantiated*/;
 }
 
 template<>
@@ -456,7 +456,7 @@ inline void CalculateNetDelays<LayersModel_TwoDirections, SignalModel_RiseFall>
 template<LayersModel lmodel, SignalModel smodel>
 inline void CalculateWireDelays(HDesign& design)
 {
-  ConfigContext ctx = design.cfg.OpenContext("DelayCalculator");
+  ConfigContext ctx(design.cfg.OpenContext("DelayCalculator"));
   //ALERT("RC EXTRACTION & DELAY CALCULATION STARTED...");
 
   DelayCalculationInternals::PointsContainer ptContainer(design.cfg.ValueOf(".initialNetPointsReserve", 90));
@@ -470,7 +470,8 @@ inline void CalculateWireDelays(HDesign& design)
 template<LayersModel lmodel, SignalModel smodel>
 inline void CalculateNetDelays(HDesign& design, HNet net)
 {
-  ConfigContext ctx = design.cfg.OpenContext("DelayCalculator");
+  ConfigContext ctx(design.cfg.OpenContext("DelayCalculator"));
+
   DelayCalculationInternals::PointsContainer ptContainer(design.cfg.ValueOf(".initialNetPointsReserve", 90));
   CalculateNetDelays<lmodel, smodel>(design, net, ptContainer);
 }

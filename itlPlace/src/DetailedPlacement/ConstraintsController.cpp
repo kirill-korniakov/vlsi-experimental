@@ -59,8 +59,8 @@ void HippocrateChecker::CalculateGamma()
 {
   HDesign& hd = grid.Design();
   double r    = hd.RoutingLayers.Physics.RPerDist; //удельное сопротивление
-  double с    = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
-  gamma       = CONST_Kd * r * с * 0.5;
+  double c    = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+  gamma       = CONST_Kd * r * c * 0.5;
 }
 
 bool HippocrateChecker::CheckConstraintsOnNet(ExtNet& net)

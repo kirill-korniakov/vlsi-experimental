@@ -1,3 +1,4 @@
+#pragma once
 
 #include "CellUtils.h"
 #include "CriticalPathUtils.h"

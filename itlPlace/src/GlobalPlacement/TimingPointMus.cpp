@@ -159,12 +159,14 @@ double TimingPointMus::SumOutMuR(HDesign& design, HTimingPoint pt)
 
 void TimingPointMus::ScaleOutMuRByIndex(HDesign& design, HTimingPoint pt, double multiplier, int index)
 {
-    IterateOutMu(design, pt, ScaleMuR(multiplier, index));
+    TimingPointMus::ScaleMuR tmp = ScaleMuR(multiplier, index);
+    IterateOutMu(design, pt, tmp);
 }
 
 void TimingPointMus::ScaleOutMuR(HDesign& design, HTimingPoint pt, double multiplier)
 {
-    IterateOutMu(design, pt, ScaleMuR(multiplier));
+    TimingPointMus::ScaleMuR tmp = ScaleMuR(multiplier);
+    IterateOutMu(design, pt, tmp);
 }
 
 void TimingPointMus::ScaleInMuA(HTimingPoint pt, double multiplier)

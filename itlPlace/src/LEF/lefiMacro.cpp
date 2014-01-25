@@ -14,7 +14,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "lex.h"
+#include "LEF_lex.h"
 #include "lefiMacro.hpp"
 #include "lefiMisc.hpp"
 #include "lefiDebug.hpp"

@@ -5,7 +5,7 @@
 
 void Legalization(HDPGrid& grid)
 {
-    ConfigContext ctx = grid.Design().cfg.OpenContext("Legalization");
+    ConfigContext ctx(grid.Design().cfg.OpenContext("Legalization"));
 
     bool doReport = grid.Design().cfg.ValueOf(".doReport", false);
     if (doReport)

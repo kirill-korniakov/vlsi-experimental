@@ -2,6 +2,14 @@
 
 COLLECTIONCONSTRUCTOR(HTimingArcTypes)
 
+//properties specializations
+PROPERTYA(HTimingArcTypes, TimingType, HTimingArcType::Type, m_ld->Tech->arcType)
+PROPERTYA(HTimingArcTypes, TimingSense, HTimingArcType::TimingSense, m_ld->Tech->arcSense)
+PROPERTYA(HTimingArcTypes, double, HTimingArcType::ResistanceRise, m_ld->Tech->arcResistanceRise)
+PROPERTYA(HTimingArcTypes, double, HTimingArcType::ResistanceFall, m_ld->Tech->arcResistanceFall)
+PROPERTYA(HTimingArcTypes, double, HTimingArcType::TIntrinsicRise, m_ld->Tech->arcTIntrinsicRise)
+PROPERTYA(HTimingArcTypes, double, HTimingArcType::TIntrinsicFall, m_ld->Tech->arcTIntrinsicFall)
+
 void HTimingArcTypes::PinTypesGrowEventHandler(int aFrom, int aTo)
 {
   ::Grow(&m_ld->Tech->pinArcStartIdx, aFrom, aTo);

@@ -2,6 +2,29 @@
 
 COLLECTIONCONSTRUCTOR(HPinTypes)
 
+//properties specializations
+PROPERTYA(HPinTypes, string, HPinType::Name, m_ld->Tech->pinName)
+PROPERTYA(HPinTypes, string, HPinType::OriginalName, m_ld->Tech->pinOriginalName)
+PROPERTYA(HPinTypes, PinFunction, HPinType::Function, m_ld->Tech->pinFunction)
+PROPERTYA(HPinTypes, PinDirection, HPinType::Direction, m_ld->Tech->pinDirection)
+PROPERTYA(HPinTypes, double, HPinType::OriginX, m_ld->Tech->pinOriginX)
+PROPERTYA(HPinTypes, double, HPinType::OriginY, m_ld->Tech->pinOriginY)
+PROPERTYA(HPinTypes, double, HPinType::FallCapacitance, m_ld->Tech->pinFallCapacitance)
+PROPERTYA(HPinTypes, double, HPinType::RiseCapacitance, m_ld->Tech->pinRiseCapacitance)
+PROPERTYA(HPinTypes, double, HPinType::Capacitance, m_ld->Tech->pinCapacitance)
+
+//getters specializations
+GETTER(HPinTypes, int, HPinType::TimingArcsCount)
+{ return m_ld->Tech->pinArcEndIdx[ARGID]
+       - m_ld->Tech->pinArcStartIdx[ARGID]; }
+
+GETTER(HPinTypes, HPinType::ArcsEnumerator, HPinType::ArcTypesEnumerator)
+{ return HPinType::ArcsEnumerator(m_ld->Tech->pinArcStartIdx[ARGID],
+                                  m_ld->Tech->pinArcEndIdx[ARGID]); }
+
+GETTER(HPinTypes, HPinType::ArcsEnumeratorW, HPinType::ArcTypesEnumerator); //implemented in HExternalMethods.h
+
+
 void HPinTypes::Initialize(int pinsLimit)
 {
   CHECKIFINITIALIZED();

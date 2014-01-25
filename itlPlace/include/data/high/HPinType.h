@@ -46,29 +46,23 @@ BEGINHCOLLECTION(HPinTypes, HPinType)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HPinType::Name, m_ld->Tech->pinName)
-  PROPERTYA(string, HPinType::OriginalName, m_ld->Tech->pinOriginalName)
-  PROPERTYA(PinFunction, HPinType::Function, m_ld->Tech->pinFunction)
-  PROPERTYA(PinDirection, HPinType::Direction, m_ld->Tech->pinDirection)
-  PROPERTYA(double, HPinType::OriginX, m_ld->Tech->pinOriginX)
-  PROPERTYA(double, HPinType::OriginY, m_ld->Tech->pinOriginY)
-  PROPERTYA(double, HPinType::FallCapacitance, m_ld->Tech->pinFallCapacitance)
-  PROPERTYA(double, HPinType::RiseCapacitance, m_ld->Tech->pinRiseCapacitance)
-  PROPERTYA(double, HPinType::Capacitance, m_ld->Tech->pinCapacitance)
-
-  //getters specializations
-  GETTER(int, HPinType::TimingArcsCount)
-    { return m_ld->Tech->pinArcEndIdx[ARGID]
-           - m_ld->Tech->pinArcStartIdx[ARGID]; }
-
-  GETTER(HPinType::ArcsEnumerator, HPinType::ArcTypesEnumerator)
-    { return HPinType::ArcsEnumerator(m_ld->Tech->pinArcStartIdx[ARGID],
-                                      m_ld->Tech->pinArcEndIdx[ARGID]); }
-
-  GETTER(HPinType::ArcsEnumeratorW, HPinType::ArcTypesEnumerator); //implemented in HExternalMethods.h
-
 ENDHCOLLECTION(HPinTypes)
+
+//properties specializations
+PROPERTYADECL(HPinTypes, string, HPinType::Name, m_ld->Tech->pinName)
+PROPERTYADECL(HPinTypes, string, HPinType::OriginalName, m_ld->Tech->pinOriginalName)
+PROPERTYADECL(HPinTypes, PinFunction, HPinType::Function, m_ld->Tech->pinFunction)
+PROPERTYADECL(HPinTypes, PinDirection, HPinType::Direction, m_ld->Tech->pinDirection)
+PROPERTYADECL(HPinTypes, double, HPinType::OriginX, m_ld->Tech->pinOriginX)
+PROPERTYADECL(HPinTypes, double, HPinType::OriginY, m_ld->Tech->pinOriginY)
+PROPERTYADECL(HPinTypes, double, HPinType::FallCapacitance, m_ld->Tech->pinFallCapacitance)
+PROPERTYADECL(HPinTypes, double, HPinType::RiseCapacitance, m_ld->Tech->pinRiseCapacitance)
+PROPERTYADECL(HPinTypes, double, HPinType::Capacitance, m_ld->Tech->pinCapacitance)
+
+//getters specializations
+GETTER(HPinTypes, int, HPinType::TimingArcsCount);
+GETTER(HPinTypes, HPinType::ArcsEnumerator, HPinType::ArcTypesEnumerator);
+GETTER(HPinTypes, HPinType::ArcsEnumeratorW, HPinType::ArcTypesEnumerator); //implemented in HExternalMethods.h
 
 BEGINWRAPPER(HPinTypeWrapper, HPinTypes)
 

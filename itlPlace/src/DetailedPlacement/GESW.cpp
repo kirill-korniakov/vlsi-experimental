@@ -5,7 +5,11 @@
 * email: alexander.belyakov@mail.itlab.unn.ru
 */
 
-#include "..\include\GESW.h"
+
+//FIXME: disabled because of compilation error
+#if 0
+
+#include "GESW.h"
 #include "Legalization.h"
 #include "mpi.h"
 //#include <math.h>
@@ -86,7 +90,7 @@ void GlobalExpertOptimization(HDPGrid &_grid, int _argc, char** _argv)
     bool isWindowCreated = false;
     int nFoundCells = numOfCells;
     firstRowIdx = std::rand() % (_grid.NumRows() - numOfRows); //9circuit.nRows;        
-    int nRows = min(_grid.NumRows() - firstRowIdx, numOfRows);
+    int nRows = std::min(_grid.NumRows() - firstRowIdx, numOfRows);
     GetStartPoint(siteIndexes, nRows, _grid);
     isWindowCreated = GetWindowParams(firstRowIdx, nRows, nFoundCells, capturedCells, siteIndexes,
       x_array, _grid);
@@ -188,7 +192,7 @@ void GlobalExpertOptimization(HDPGrid &_grid, int _argc, char** _argv)
     slidingWindow = NULL;
     //_getch();
   }
-  _getch();
+  //_getch();
 }
 
 void GlobalExpertOptimizationDebug(HDPGrid &_grid, int _argc, char** _argv)
@@ -207,3 +211,5 @@ void GlobalExpertOptimizationDebug(HDPGrid &_grid, int _argc, char** _argv)
     GlobalExpertSolver GE_solver;    
   }
 }
+
+#endif

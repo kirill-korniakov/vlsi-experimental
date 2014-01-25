@@ -12,7 +12,7 @@
  *  check www.openeda.org for details.
  */
 
-#include <malloc.h>
+//#include <malloc.h> //KNOTE: commented by Kirill
 #include <stdlib.h>
 #include <string.h>
 #include "defrReader.hpp"

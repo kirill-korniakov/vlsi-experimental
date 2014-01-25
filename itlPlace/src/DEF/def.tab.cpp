@@ -592,7 +592,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
+//#include <malloc.h> //KNOTE: commented by Kirill
 #include "defrReader.hpp"
 #include "lex.h"
 #include "defiUser.hpp"

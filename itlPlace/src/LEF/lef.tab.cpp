@@ -33,6 +33,8 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
+#include "LEF_lex.h" //KNOTE
+
 /* Identify Bison output.  */
 #define YYBISON 1
 

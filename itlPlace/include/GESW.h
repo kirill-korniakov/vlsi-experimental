@@ -8,7 +8,7 @@
 #ifndef _GE_SW_H_
 #define _GE_SW_H_
 
-#include <conio.h>
+//#include <conio>
 #include "SlidingWindow.h"
 #include "GlobalExpertSolver.h"
 //#include <mpi.h>

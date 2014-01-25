@@ -5,7 +5,7 @@
 #include "Math.h"
 
 #define DTYPE double //for FLUTE
-#define MAXD 90 //for FLUTE
+//#define MAXD 90 //for FLUTE
 #define MAX_TREE_NODES(n) ((n) * 2 - 2) //max number of points in Steiner Tree
 #define DEFAULT_ACCURACY 3 //default gAccuracy for FLUTE
 #define STEINER_TREE_MAX_NEIGHBOURS_COUNT 4
@@ -15,8 +15,8 @@ namespace FLUTE
 #pragma warning(push)
 #pragma warning(disable: 4244 4005 4101 4305)
 
-#include "FLUTE\\FLArray.h"
-#include "FLUTE\\flute.cpp"
+#include "FLArray.h"
+#include "flute.cpp"
 
 #pragma warning(pop)
 }

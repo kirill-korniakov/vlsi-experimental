@@ -3,6 +3,7 @@
 #include "STA.h"
 #include "Timing.h"
 #include "Reporting.h"
+#include "VanGinnekenTree.h"
 
 void MoveBinIndexesIntoBorders(AppCtx* context, int& min_col, int& min_row, int& max_col, int& max_row);
 void DetermineBordersOfClusterPotential(int& min_col, int& max_col, 
@@ -18,7 +19,7 @@ void GPBuffering::DoBuffering(AppCtx& context, double HPWL, double LHPWL)
 {
     WRITELINE("");
     ALERT("GPBuffering STARTED");
-    ConfigContext ctx = data->design.cfg.OpenContext("New_Buffering");
+    ConfigContext ctx(data->design.cfg.OpenContext("New_Buffering"));
 
     if (!isInitialize) 
         Initialize();
@@ -352,7 +353,7 @@ void GPBuffering::FillBinTablePathBased(AppCtx* context, std::vector<HCriticalPa
     ALERT("REMOVE NEW BUFFERING FINISHED");
 }
 
-bool GPBuffering::FIXME_GiveMeProperName(HNetWrapper net)
+bool GPBuffering::TODO_GiveMeProperName(HNetWrapper net)
 {
     return  (data->countPinInBufferingInterconnection == 0) || 
             ((net.PinsCount() <= data->countPinInBufferingInterconnection) && (!data->isExactPinCountRequired)) ||
@@ -372,7 +373,7 @@ void GPBuffering::FillBinTable(AppCtx* context, std::vector<HCriticalPath>& path
             {
                 if (!data->netVisit[::ToID(net)])
                 {
-                    if (FIXME_GiveMeProperName(net))
+                    if (TODO_GiveMeProperName(net))
                     {
                         bool isBufferingNet = true;
                         if (!data->isNetContainPrimaryPin)            

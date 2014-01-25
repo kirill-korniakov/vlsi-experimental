@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <io.h>
 #include <sys/stat.h>
+
+//#include <io.h> //KNOTE: commented by Kirill
 
 namespace Aux
 {
@@ -207,7 +208,10 @@ namespace Aux
 
         for (unsigned int i = 0; i < dirName.length(); i++)
             if (dirName[i] == '\\')
-                CreateDirectory(dirName.substr(0, i).c_str(), NULL);
+            {
+                //FIXME: implement cross-platform directory creation
+                //CreateDirectory(dirName.substr(0, i).c_str(), NULL);
+            }
 
         return GetUniqueName(dirName, timeStamp, fileNameBase, extension);
     }
@@ -216,7 +220,8 @@ namespace Aux
     { 
         char myBuff[256];
         memset(myBuff, '\0', 256); 
-        _itoa(intValue, myBuff, 10); 
+        //itoa(intValue, myBuff, 10);
+        sprintf(myBuff, "%d", intValue);
 
         string strRetVal = myBuff;
         while (strRetVal.size() < length)
@@ -289,16 +294,27 @@ namespace Aux
     }
 
     string Format(const char* format, ...)
-    {
-        va_list  argList;
+    {   
+        //TODO: hardcoded 256 may be bad
+//        va_list  argList;
+//        va_start(argList, format);
+
+//        int len = vsnprintf(0, 0, format, argList);
+//        string result(len+1, 0);
+//        vsnprintf((char*)result.c_str(), len + 1, format, argList);
+
+//        va_end(argList);
+
+//        return result;
+
+        char buff[256];
+
+        va_list argList;
         va_start(argList, format);
-
-        int len = vsnprintf(0, 0, format, argList);
-        string result(len, 0);
-        vsnprintf((char*)result.c_str(), len + 1, format, argList);
-
+        vsnprintf(buff, 256, format, argList);
         va_end(argList);
 
+        string result(buff);
         return result;
     }
 }

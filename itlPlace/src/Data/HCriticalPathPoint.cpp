@@ -2,6 +2,10 @@
 
 COLLECTIONCONSTRUCTOR(HCriticalPathPoints)
 
+//properties specializations
+PROPERTYA(HCriticalPathPoints, ::SignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
+PROPERTYA2(HCriticalPathPoints, HTimingPoint, HCriticalPathPoint::TimingPoint, m_ld->Timing.cppTimingPointID)
+
 void HCriticalPathPoints::Initialize(int pointsLimit)
 {
   m_initialized = true;
@@ -56,6 +60,11 @@ void HCriticalPathPoints::SetPoints(HCriticalPath path, HCriticalPathPoint first
   {
     --pt2;
     while(pt1 < pt2)
-      Swap(::__ConstructPtr<HCriticalPathPoint>(pt1++), ::__ConstructPtr<HCriticalPathPoint>(pt2--));
+    {
+      //KNOTE: not sure if this is correct without reference
+      HCriticalPathPoint first = ::__ConstructPtr<HCriticalPathPoint>(pt1++);
+      HCriticalPathPoint second = ::__ConstructPtr<HCriticalPathPoint>(pt2--);
+      Swap(first, second);
+    }
   }
 }

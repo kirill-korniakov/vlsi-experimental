@@ -10,8 +10,10 @@
 #include "taomat.h"
 #include "taolinearsolver.h"
 #include "taoappobject.h"
-#include "src/appobject/abcapp/taoabcapp.h"
-#include "src/lsolver/taomatselfsolver.h"
+//#include "src/appobject/abcapp/taoabcapp.h"
+#include "taoabcapp.h"
+//#include "src/lsolver/taomatselfsolver.h"
+#include "taomatselfsolver.h"
 
 
 /*  Convergence flags.

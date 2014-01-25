@@ -67,15 +67,16 @@ ENDITEM(HNetLevel)
 
         GETTERS_SETTERS_DEFINITION()
 
+ENDHCOLLECTION2(HNetLevels)
 
-            //properties specializations
-            //PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
-            PROPERTYA(double, HNetLevel::weight, m_ld->Clusterization.weight[0])
-            PROPERTYA(double, HNetLevel::k, m_ld->Clusterization.k[0])
-            PROPERTYA(int,   HNetLevel::idNet, m_ld->Clusterization.idNet[0])
+//properties specializations
+//PROPERTYA(std::vector<HCell>*, HCluster::Cells, m_ld->Clusterization.cells)
+PROPERTYADECL(HNetLevels, double, HNetLevel::weight, m_ld->Clusterization.weight[0])
+PROPERTYADECL(HNetLevels, double, HNetLevel::k, m_ld->Clusterization.k[0])
+PROPERTYADECL(HNetLevels, int,   HNetLevel::idNet, m_ld->Clusterization.idNet[0])
 
-            ENDHCOLLECTION2(HNetLevels)
-            BEGINWRAPPER(HNetLevelWrapper, HNetLevels)
+BEGINWRAPPER(HNetLevelWrapper, HNetLevels)
+
 public:
 
     //properties

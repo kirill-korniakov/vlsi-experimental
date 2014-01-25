@@ -2,6 +2,26 @@
 
 COLLECTIONCONSTRUCTOR(HCriticalPaths)
 
+PROPERTYA(HCriticalPaths, PathExtractionType, HCriticalPath::ExtractionType, m_ld->Timing.cpExtractionType);
+
+//getters specializations
+GETTER(HCriticalPaths, double, HCriticalPath::Criticality); //implemented in HExternalMethods.h
+
+GETTER(HCriticalPaths, int, HCriticalPath::PointsCount)
+{ return m_ld->Timing.cpAfterLastPointIdx[ARGID]
+- m_ld->Timing.cpFirstPointIdx[ARGID]; }
+
+GETTER(HCriticalPaths, HCriticalPath::PointsEnumerator, HCriticalPath::Points)
+{ return HCriticalPath::PointsEnumerator(m_ld->Timing.cpFirstPointIdx[ARGID],
+  m_ld->Timing.cpAfterLastPointIdx[ARGID]); }
+
+GETTER(HCriticalPaths, HCriticalPath::PointsEnumeratorW, HCriticalPath::Points); //implemented in HExternalMethods.h
+
+GETTERA2(HCriticalPaths, HCriticalPathPoint, HCriticalPath::StartPoint, m_ld->Timing.cpFirstPointIdx);
+
+GETTER(HCriticalPaths, HCriticalPathPoint, HCriticalPath::EndPoint)
+{ return ::__ConstructPtr<HCriticalPathPoint>(m_ld->Timing.cpAfterLastPointIdx[ARGID] - 1); }
+
 #define CP_POINTS_ALLOC_SIZE 100
 #define CP_PATHS_ALLOC_SIZE 10
 

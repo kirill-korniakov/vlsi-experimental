@@ -238,7 +238,7 @@ void HorizontalSwapper::DetermineDirection()
 
 void HorizontalSearch(HDPGrid& grid, ConstraintsController* checker)
 {
-  ConfigContext ctx = grid.Design().cfg.OpenContext("HorizontalSearch");
+  ConfigContext ctx(grid.Design().cfg.OpenContext("HorizontalSearch"));
 
   HorizontalSwapper hswapper(grid, grid.Design().cfg.ValueOf(".horizontalGroupSize", 4), checker);
 

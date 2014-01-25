@@ -5,9 +5,9 @@
 //    #include <ext/hash_map>
 //    namespace std { using namespace __gnu_cxx; }
 //#else
-//#ifdef _HAS_ITERATOR_DEBUGGING
-//#undef _HAS_ITERATOR_DEBUGGING
-//#endif
+//    #ifdef _HAS_ITERATOR_DEBUGGING
+//        #undef _HAS_ITERATOR_DEBUGGING
+//    #endif
 //    #define _HAS_ITERATOR_DEBUGGING 0
 //    #include <hash_map>
 //    namespace std { using namespace stdext; }

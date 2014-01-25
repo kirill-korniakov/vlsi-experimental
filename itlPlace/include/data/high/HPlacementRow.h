@@ -48,27 +48,24 @@ BEGINHCOLLECTION(HPlacementRows, HPlacementRow)
   //Getters & Setters
   GETTERS_SETTERS_DEFINITION()
 
-  //properties specializations
-  PROPERTYA(string, HPlacementRow::Name, m_ld->DetailedPlacement.rowName)
-  PROPERTYA(double, HPlacementRow::SiteWidth, m_ld->DetailedPlacement.rowStepX)
-  PROPERTYA(double, HPlacementRow::SiteHeight, m_ld->DetailedPlacement.rowStepY)
-  PROPERTYA(double, HPlacementRow::X, m_ld->DetailedPlacement.rowX)
-  PROPERTYA(double, HPlacementRow::Y, m_ld->DetailedPlacement.rowY)
-  PROPERTYA(int, HPlacementRow::HorizSitesCount, m_ld->DetailedPlacement.rowXSitesNum)
-  PROPERTYA(int, HPlacementRow::VertSitesCount, m_ld->DetailedPlacement.rowYSitesNum)
-  PROPERTYA(CellOrientation, HPlacementRow::Orientation, m_ld->DetailedPlacement.rowSiteOrient)
-  PROPERTYA2(HSite, HPlacementRow::Site, m_ld->DetailedPlacement.rowSite)
-  PROPERTYA2(HPlacementRow, HPlacementRow::NextRow, m_ld->DetailedPlacement.rowNextRow)
-  PROPERTYA2(HPlacementRow, HPlacementRow::PreviousRow, m_ld->DetailedPlacement.rowPreviousRow)
-
-  //getters specializations
-  GETTER(bool, HPlacementRow::IsHorizontal)
-    { return Get<HPlacementRow::VertSitesCount, int>(arg) == 1; }
-
-  GETTER(bool, HPlacementRow::IsVertical)
-    { return Get<HPlacementRow::HorizSitesCount, int>(arg) == 1; }
-
 ENDHCOLLECTION(HPlacementRows)
+
+//properties specializations
+PROPERTYADECL(HPlacementRows, string, HPlacementRow::Name, m_ld->DetailedPlacement.rowName)
+PROPERTYADECL(HPlacementRows, double, HPlacementRow::SiteWidth, m_ld->DetailedPlacement.rowStepX)
+PROPERTYADECL(HPlacementRows, double, HPlacementRow::SiteHeight, m_ld->DetailedPlacement.rowStepY)
+PROPERTYADECL(HPlacementRows, double, HPlacementRow::X, m_ld->DetailedPlacement.rowX)
+PROPERTYADECL(HPlacementRows, double, HPlacementRow::Y, m_ld->DetailedPlacement.rowY)
+PROPERTYADECL(HPlacementRows, int, HPlacementRow::HorizSitesCount, m_ld->DetailedPlacement.rowXSitesNum)
+PROPERTYADECL(HPlacementRows, int, HPlacementRow::VertSitesCount, m_ld->DetailedPlacement.rowYSitesNum)
+PROPERTYADECL(HPlacementRows, CellOrientation, HPlacementRow::Orientation, m_ld->DetailedPlacement.rowSiteOrient)
+PROPERTYA2DECL(HPlacementRows, HSite, HPlacementRow::Site, m_ld->DetailedPlacement.rowSite)
+PROPERTYA2DECL(HPlacementRows, HPlacementRow, HPlacementRow::NextRow, m_ld->DetailedPlacement.rowNextRow)
+PROPERTYA2DECL(HPlacementRows, HPlacementRow, HPlacementRow::PreviousRow, m_ld->DetailedPlacement.rowPreviousRow)
+
+//getters specializations
+GETTER(HPlacementRows, bool, HPlacementRow::IsHorizontal);
+GETTER(HPlacementRows, bool, HPlacementRow::IsVertical);
 
 BEGINWRAPPER(HPlacementRowWrapper, HPlacementRows)
 
