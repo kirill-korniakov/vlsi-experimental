@@ -7,6 +7,10 @@ project(itlPlace)
 ##SET(PETSC_ARCH X86_64)
 #SET(MAKE_EXECUTABLE nmake)
 
+#FIXME: hardcoded paths
+set(FOR_GOOGLE_HASH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/c++/4.2.1/")
+set(TAO_LIBRARIES_PATH "/Users/kirill-kornyakov/Work/VLSI/Dependencies/tao-1.9/lib/x86_64/")
+
 MESSAGE("OpenCV_DIR: ${OpenCV_DIR}")
 MESSAGE("PETSC_DIR: ${PETSC_DIR}")
 MESSAGE("PETSC_ARCH: ${PETSC_ARCH}")
@@ -32,8 +36,11 @@ ENDMACRO()
 
 HEADER_DIRECTORIES(hdrs)
 INCLUDE_DIRECTORIES(${hdrs} ${PETSC_INCLUDES})
+INCLUDE_DIRECTORIES(${hdrs} ${FOR_GOOGLE_HASH})
 
-LINK_DIRECTORIES(/Users/kirill-kornyakov/Work/VLSI/Dependencies/tao-1.9/lib/x86_64/)
+SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -stdlib=libstdc++")
+
+LINK_DIRECTORIES(${TAO_LIBRARIES_PATH})
 SET(TAO_LIBRARIES tao taopetsc)
 
 # Add application

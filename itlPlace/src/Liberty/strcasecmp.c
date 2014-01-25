@@ -41,7 +41,7 @@ static const unsigned char charmap[] = {
 	(uc)'\370',(uc)'\371',(uc)'\372',(uc)'\373',(uc)'\374',(uc)'\375',(uc)'\376',(uc)'\377',
 };
 
-int strcasecmp(const char *s1, const char *s2)
+int strcasecmp_fixme(const char *s1, const char *s2)
 {
   register unsigned char u1, u2;
   for (;;) {
