@@ -3,7 +3,7 @@ from CoreFunctions import GetTimeStamp
 
 class Logger:
     startTime   = time.time()
-    logFileName = r"./%s_TF.log" % (GetTimeStamp())
+    logFileName = r"./Logs/%s_TF.log" % (GetTimeStamp()) # TODO: use ReportCreator.CreateLogFolder
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime
@@ -18,6 +18,8 @@ class Logger:
         self.Log("\n")
 
     def Log(self, message):
+        message = ">> " + message
+
         print(message)
         log = open(self.logFileName, 'a')
         log.write(("%s\n") % (message))

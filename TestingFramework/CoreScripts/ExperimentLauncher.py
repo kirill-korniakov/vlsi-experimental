@@ -64,6 +64,7 @@ class ExperimentLauncher:
 
     #check if all benchmarks can be found
     for i in range(len(benchmarks)):
+      benchmarks[i] = benchmarks[i].strip()
       benchmark       = r"%s.def" % (benchmarks[i])
       benchmarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
       benchmark       = os.path.join(benchmarkFolder, benchmark)
@@ -133,7 +134,7 @@ class ExperimentLauncher:
 
     milestonePixDirParam = "--plotter.milestonePixDirectory=%s" % (milestonePixFolder)
 
-    exeName           = os.path.join(generalParameters.binDir, "itlPlaceRelease.exe")
+    exeName           = os.path.join(generalParameters.binDir, "itlPlace") #FIXME: introduce variable
     placerParameters  = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam,\
                          milestonePixDirParam]
     placerParameters.extend(self.experiment.cmdArgs)
@@ -151,33 +152,39 @@ class ExperimentLauncher:
 
   def RunPlacer(self, placerParameters, logFileName, generalParameters):
     fPlacerOutput = open(logFileName, 'w')
+    self.logger.Log("Output will be redirected to: " + logFileName)
+    self.logger.Log("Working directory is set to: " + generalParameters.binDir)
 
-    try:
-      p = subprocess.Popen(placerParameters, stdout = fPlacerOutput, cwd = generalParameters.binDir)
+    try: # FIXME: this place is debugged now; may be use placerParameters directly
+      #p = subprocess.Popen(placerParameters, stdout = fPlacerOutput, cwd = generalParameters.binDir)
+      params = placerParameters
+      params[0] = "./" + os.path.basename(params[0])
+      p = subprocess.Popen(params, cwd = generalParameters.binDir, stdout = fPlacerOutput)
+      self.logger.Log("Executed the following command:\n" + " ".join(params) + "\n")
 
-    except WindowsError:
-      error = "Error: can not call %s" % (placerParameters[0])
+    except Exception, e:
+      error = "Error: can not call %s \n" % (placerParameters[0])
+      error = error + "Exception message: " + str(e)
       ReportErrorAndExit(error, self.logger, self.emailer)
 
-    t_start = time.time()
-    seconds_passed = 0
+    #FIXME: here we wait for placer to finish, but we need a cross-platform way to do this
+    p.wait()
+    # t_start = time.time()
+    # seconds_passed = 0
+    # wasOpened = False
+    # time.sleep(1)
+    # while(wasOpened == False and seconds_passed < generalParameters.maxTimeForBenchmark):
+    #   seconds_passed = time.time() - t_start
 
-    wasOpened = False
-    time.sleep(1)
+    #   try:
+    #     wasOpened = open(placerParameters[0], 'a')
+    #     wasOpened.close()
 
-    while(wasOpened == False and seconds_passed < generalParameters.maxTimeForBenchmark):
-      seconds_passed = time.time() - t_start
-
-      try:
-        wasOpened = open(placerParameters[0], 'a')
-        wasOpened.close()
-
-      except IOError:
-        wasOpened = False
+    #   except IOError:
+    #     wasOpened = False
+    # self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
 
     placerReturnCode = p.poll()
-    self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
-
     if (placerReturnCode == None):
       try:
         p.terminate()
