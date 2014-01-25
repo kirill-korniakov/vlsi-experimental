@@ -29,10 +29,6 @@
 #define PETSC_REPLACE_DIR_SEPARATOR '\\'
 #endif
 
-#ifndef PETSC_USE_SOCKET_VIEWER
-#define PETSC_USE_SOCKET_VIEWER 1
-#endif
-
 #ifndef PETSC_RESTRICT
 #define PETSC_RESTRICT  __restrict__
 #endif
@@ -45,8 +41,8 @@
 #define PETSC_HAVE_BLASLAPACK 1
 #endif
 
-#ifndef PETSC_HAVE_FORTRAN
-#define PETSC_HAVE_FORTRAN 1
+#ifndef PETSC_USE_SOCKET_VIEWER
+#define PETSC_USE_SOCKET_VIEWER 1
 #endif
 
 #ifndef PETSC_HAVE_STRING_H
@@ -145,20 +141,8 @@
 #define PETSC_HAVE_SYS_TIME_H 1
 #endif
 
-#ifndef PETSC_USING_F90
-#define PETSC_USING_F90 1
-#endif
-
-#ifndef PETSC_PRINTF_FORMAT_CHECK
-#define PETSC_PRINTF_FORMAT_CHECK(A,B) __attribute__((format (printf, A, B)))
-#endif
-
 #ifndef PETSC_C_STATIC_INLINE
 #define PETSC_C_STATIC_INLINE static inline
-#endif
-
-#ifndef PETSC_HAVE_FORTRAN_UNDERSCORE
-#define PETSC_HAVE_FORTRAN_UNDERSCORE 1
 #endif
 
 #ifndef PETSC_HAVE_CXX_NAMESPACE
@@ -170,11 +154,7 @@
 #endif
 
 #ifndef PETSC_C_RESTRICT
-#define PETSC_C_RESTRICT  __restrict__
-#endif
-
-#ifndef PETSC_USE_F90_SRC_IMPL
-#define PETSC_USE_F90_SRC_IMPL 1
+#define PETSC_C_RESTRICT restrict
 #endif
 
 #ifndef PETSC_CXX_RESTRICT
@@ -185,16 +165,16 @@
 #define PETSC_CXX_STATIC_INLINE static inline
 #endif
 
-#ifndef PETSC_HAVE_LIBFLAPACK
-#define PETSC_HAVE_LIBFLAPACK 1
+#ifndef PETSC_HAVE_LIBF2CBLAS
+#define PETSC_HAVE_LIBF2CBLAS 1
+#endif
+
+#ifndef PETSC_HAVE_LIBF2CLAPACK
+#define PETSC_HAVE_LIBF2CLAPACK 1
 #endif
 
 #ifndef PETSC_HAVE_ERF
 #define PETSC_HAVE_ERF 1
-#endif
-
-#ifndef PETSC_HAVE_LIBFBLAS
-#define PETSC_HAVE_LIBFBLAS 1
 #endif
 
 #ifndef PETSC_ARCH_NAME
@@ -202,7 +182,7 @@
 #endif
 
 #ifndef PETSC_ARCH
-#define PETSC_ARCH darwin12
+#define PETSC_ARCH darwin13
 #endif
 
 #ifndef PETSC_DIR
@@ -215,10 +195,6 @@
 
 #ifndef PETSC_USE_ERRORCHECKING
 #define PETSC_USE_ERRORCHECKING 1
-#endif
-
-#ifndef PETSC_MISSING_DREAL
-#define PETSC_MISSING_DREAL 1
 #endif
 
 #ifndef PETSC_BITS_PER_BYTE
@@ -239,10 +215,6 @@
 
 #ifndef PETSC_SIZEOF_LONG
 #define PETSC_SIZEOF_LONG 8
-#endif
-
-#ifndef PETSC_USE_FORTRANKIND
-#define PETSC_USE_FORTRANKIND 1
 #endif
 
 #ifndef PETSC_SIZEOF_CHAR
@@ -393,10 +365,6 @@
 #define PETSC_HAVE_MEMMOVE 1
 #endif
 
-#ifndef PETSC_HAVE__GFORTRAN_IARGC
-#define PETSC_HAVE__GFORTRAN_IARGC 1
-#endif
-
 #ifndef PETSC_SIGNAL_CAST
 #define PETSC_SIGNAL_CAST  
 #endif
@@ -419,10 +387,6 @@
 
 #ifndef PETSC_USE_GDB_DEBUGGER
 #define PETSC_USE_GDB_DEBUGGER 1
-#endif
-
-#ifndef PETSC_HAVE_GFORTRAN_IARGC
-#define PETSC_HAVE_GFORTRAN_IARGC 1
 #endif
 
 #ifndef PETSC_USE_KBYTES_FOR_SIZE
@@ -471,6 +435,10 @@
 
 #ifndef HAVE_GZIP
 #define HAVE_GZIP 1
+#endif
+
+#ifndef PETSC_BLASLAPACK_UNDERSCORE
+#define PETSC_BLASLAPACK_UNDERSCORE 1
 #endif
 
 #endif
