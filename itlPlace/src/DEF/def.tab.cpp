@@ -594,7 +594,7 @@
 #include <string.h>
 //#include <malloc.h> //KNOTE: commented by Kirill
 #include "defrReader.hpp"
-#include "lex.h"
+#include "DEF/lex.h"
 #include "defiUser.hpp"
 #include "defrCallBacks.hpp"
 

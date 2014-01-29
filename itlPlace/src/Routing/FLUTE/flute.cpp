@@ -132,10 +132,11 @@ DTYPE flute_wl(int d, DTYPE x[], DTYPE y[], int acc)
     DTYPE minval, l, xu, xl, yu, yl;
     FLArray<int, MAXD> s;
     int i, j, k, minidx;
-    struct point {
-        DTYPE x, y;
-        int o;
-    } /*pt[MAXD], *ptp[MAXD],*/ *tmpp;
+//    struct point {
+//        DTYPE x, y;
+//        int o;
+//    } /*pt[MAXD], *ptp[MAXD],*/
+    point *tmpp;
     FLArray<point, MAXD> pt(d+1);
     FLArray<point*, MAXD> ptp(d+1);
 
@@ -553,10 +554,11 @@ Tree flute(int d, DTYPE x[], DTYPE y[], int acc)
     DTYPE /*xs[MAXD], ys[MAXD],*/ minval;
     FLArray<int, MAXD> s;
     int i, j, k, minidx;
-    struct point {
-        DTYPE x, y;
-        int o;
-    } /*pt[MAXD], *ptp[MAXD],*/ *tmpp;
+//    struct point {
+//        DTYPE x, y;
+//        int o;
+//    } /*pt[MAXD], *ptp[MAXD],*/ *tmpp;
+    point *tmpp;
     FLArray<point, MAXD> pt(d+1);
     FLArray<point*, MAXD> ptp(d+1);
     Tree t;

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <stdarg.h>
 
 //#include <io.h> //KNOTE: commented by Kirill
 

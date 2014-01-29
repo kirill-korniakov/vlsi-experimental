@@ -45,7 +45,7 @@ SET(TAO_LIBRARIES tao taopetsc)
 
 # Add application
 SET(app "itlPlace")
-FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/*.y" "src/config/*.c*")
+FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/config/*.c*") #"src/*.y"
 ADD_EXECUTABLE(${app} ${srcs})
 TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${PETSC_LIBRARIES} ${TAO_LIBRARIES})
 

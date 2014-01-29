@@ -2,7 +2,7 @@
 #include "Configuration.h"
 #include "Grow.h"
 #include "Logging.h"
-#include "Math.h"
+#include "math.h" //FIXME: buildling on Mac
 
 #define DTYPE double //for FLUTE
 //#define MAXD 90 //for FLUTE

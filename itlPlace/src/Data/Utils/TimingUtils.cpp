@@ -4,7 +4,7 @@
 
 using namespace Utils;
 
-double Utils::GetNetLoad(HDesign& design, HNet net, SignalDirection ph)
+double Utils::GetNetLoad(HDesign& design, HNet net, KSignalDirection ph)
 {
   double load = 0.0;
   for (HNet::SinksEnumeratorW sink = design[net].GetSinksEnumeratorW(); sink.MoveNext(); )
@@ -13,7 +13,7 @@ double Utils::GetNetLoad(HDesign& design, HNet net, SignalDirection ph)
   return load;
 }
 
-SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPinType sink, SignalDirection ph)
+SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPinType sink, KSignalDirection ph)
 {
   switch (ph)
   {
@@ -32,12 +32,12 @@ SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPinType sink, SignalDire
   };
 }
 
-SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPin sink, SignalDirection ph)
+SinkPhisics Utils::GetSinkCapacitance(HDesign& design, HPin sink, KSignalDirection ph)
 {
   return GetSinkCapacitance(design, design.Get<HPin::Type, HPinType>(sink), ph);
 }
 
-DriverPhisics Utils::GetArcPhisics(HDesign& design, HTimingArcType timingArc, SignalDirection ph)
+DriverPhisics Utils::GetArcPhisics(HDesign& design, HTimingArcType timingArc, KSignalDirection ph)
 {
   DriverPhisics result;
   result.C = result.T = result.R = 0.0;
@@ -76,7 +76,7 @@ DriverPhisics Utils::GetArcPhisics(HDesign& design, HTimingArcType timingArc, Si
   return result;
 }
 
-DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, SignalDirection ph)
+DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, KSignalDirection ph)
 {
   DriverPhisics result;
   result.C = result.T = result.R = 0.0;
@@ -97,7 +97,7 @@ DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPinType driver, Sig
   return result;
 }
 
-DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPinType driver, SignalDirection ph)
+DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPinType driver, KSignalDirection ph)
 {
   ASSERT((design.Get<HPinType::Direction, PinDirection>(driver) == PinDirection_OUTPUT));
 
@@ -126,7 +126,7 @@ DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPinType driver, S
   return result;
 }
 
-DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, SignalDirection ph)
+DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, KSignalDirection ph)
 {
   ASSERT((design.Get<HPin::Direction, PinDirection>(driver) == PinDirection_OUTPUT));
   HPinType driverType = design.Get<HPin::Type, HPinType>(driver);
@@ -177,17 +177,17 @@ DriverPhisics Utils::GetDriverTimingPhisics(HDesign& design, HPin driver, Signal
   return result;
 }
 
-DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPin driver, SignalDirection ph)
+DriverPhisics Utils::GetDriverWorstPhisics(HDesign& design, HPin driver, KSignalDirection ph)
 {
   return GetDriverWorstPhisics(design, design.Get<HPin::Type, HPinType>(driver), ph);
 }
 
-DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPin driver, SignalDirection ph)
+DriverPhisics Utils::GetDriverAveragePhisics(HDesign& design, HPin driver, KSignalDirection ph)
 {
   return GetDriverAveragePhisics(design, design.Get<HPin::Type, HPinType>(driver), ph);
 }
 
-DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, SignalDirection ph)
+DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, KSignalDirection ph)
 {
   DriverPhisics result;
   result.T = result.R = result.C = 0.0;
@@ -218,7 +218,7 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HCell element, Sign
   return result;
 }
 
-DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HMacroType elementType, SignalDirection ph)
+DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HMacroType elementType, KSignalDirection ph)
 {
   DriverPhisics result;
   result.T = result.R = result.C = 0.0;
@@ -243,7 +243,7 @@ DriverPhisics Utils::GetElementWorstPhisics(HDesign& design, HMacroType elementT
   return result;
 }
 
-DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HCell element, SignalDirection ph)
+DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HCell element, KSignalDirection ph)
 {
   DriverPhisics result;
   result.T = result.R = result.C = 0.0;
@@ -285,7 +285,7 @@ DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HCell element, Si
   return result;
 }
 
-DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HMacroType elementType, SignalDirection ph)
+DriverPhisics Utils::GetElementAveragePhisics(HDesign& design, HMacroType elementType, KSignalDirection ph)
 {
   DriverPhisics result;
   result.T = result.R = result.C = 0.0;

@@ -146,7 +146,7 @@ IGETTER(double, HCriticalPath::Criticality, HCriticalPaths)
   HCriticalPathPoint cpt = this->Get<HCriticalPath::ExtractionType, PathExtractionType>(arg) == PathExtractionType_Arrival
     ? this->Get<HCriticalPath::EndPoint, HCriticalPathPoint>(arg)
     : this->Get<HCriticalPath::StartPoint, HCriticalPathPoint>(arg);
-  if (m_hd->Get<HCriticalPathPoint::SignalDirection, ::SignalDirection>(cpt) == SignalDirection_Fall)
+  if (m_hd->Get<HCriticalPathPoint::SignalDirection, ::KSignalDirection>(cpt) == SignalDirection_Fall)
     return m_hd->GetDouble<HTimingPoint::FallSlack>(m_hd->Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cpt));
   else
     return m_hd->GetDouble<HTimingPoint::RiseSlack>(m_hd->Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cpt));

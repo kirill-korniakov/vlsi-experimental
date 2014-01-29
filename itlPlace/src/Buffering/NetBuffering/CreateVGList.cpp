@@ -5,7 +5,7 @@
 
 HTimingArcType FindArrivalArc(HDesign& hd,
                               HTimingPoint arcEndPoint,
-                              SignalDirection dir,
+                              KSignalDirection dir,
                               double& arcTime,
                               bool& isInversed);
 

@@ -1,10 +1,10 @@
 #include "Timing.h"
 
 template<PathExtractionType ext>
-inline HTimingPoint GetAncestor(const HTimingPointWrapper& point, SignalDirection dir);
+inline HTimingPoint GetAncestor(const HTimingPointWrapper& point, KSignalDirection dir);
 
 template<>
-inline HTimingPoint GetAncestor<PathExtractionType_Arrival>(const HTimingPointWrapper& point, SignalDirection dir)
+inline HTimingPoint GetAncestor<PathExtractionType_Arrival>(const HTimingPointWrapper& point, KSignalDirection dir)
 {
   switch(dir)
   {
@@ -21,7 +21,7 @@ inline HTimingPoint GetAncestor<PathExtractionType_Arrival>(const HTimingPointWr
 }
 
 template<>
-inline HTimingPoint GetAncestor<PathExtractionType_Required>(const HTimingPointWrapper& point, SignalDirection dir)
+inline HTimingPoint GetAncestor<PathExtractionType_Required>(const HTimingPointWrapper& point, KSignalDirection dir)
 {
   switch(dir)
   {
@@ -38,12 +38,12 @@ inline HTimingPoint GetAncestor<PathExtractionType_Required>(const HTimingPointW
 }
 
 template<PathExtractionType ext>
-bool IsSignalInverted(HDesign& design, HTimingPoint current_point, SignalDirection current_dir);
+bool IsSignalInverted(HDesign& design, HTimingPoint current_point, KSignalDirection current_dir);
 
 template<>
 bool IsSignalInverted<PathExtractionType_Arrival>(HDesign& design,
                                                   HTimingPoint current_point,
-                                                  SignalDirection current_dir)
+                                                  KSignalDirection current_dir)
 {
   switch(current_dir)
   {
@@ -62,7 +62,7 @@ bool IsSignalInverted<PathExtractionType_Arrival>(HDesign& design,
 template<>
 bool IsSignalInverted<PathExtractionType_Required>(HDesign& design,
                                                   HTimingPoint current_point,
-                                                  SignalDirection current_dir)
+                                                  KSignalDirection current_dir)
 {
   switch(current_dir)
   {
@@ -79,7 +79,7 @@ bool IsSignalInverted<PathExtractionType_Required>(HDesign& design,
 }
 
 template<PathExtractionType ext>
-void ExtractPath(HDesign& design, HTimingPoint extractionStartPoint, SignalDirection extractionStartDirection)
+void ExtractPath(HDesign& design, HTimingPoint extractionStartPoint, KSignalDirection extractionStartDirection)
 {
   HTimingPointWrapper sPoint = design[extractionStartPoint];
   if (sPoint.Slack() < 0.0)
@@ -88,7 +88,7 @@ void ExtractPath(HDesign& design, HTimingPoint extractionStartPoint, SignalDirec
     first_point.SetSignalDirection(extractionStartDirection);
     first_point.SetTimingPoint(sPoint);
     HCriticalPathPointWrapper last_point = first_point;
-    SignalDirection current_direction = extractionStartDirection;
+    KSignalDirection current_direction = extractionStartDirection;
     HTimingPointWrapper next_point = sPoint;
     while(!::IsNull(next_point = GetAncestor<ext>(sPoint, current_direction)))
     {

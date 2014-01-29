@@ -22,8 +22,8 @@
 #include "defiDebug.hpp"
 #include "defiMisc.hpp"
 #include "defiUtil.hpp"
-#include "lex.h"
-#include "FEF_stringhash.h"
+#include "DEF/lex.h"
+#include "DEF/FEF_stringhash.h"
 
 extern int defyyparse(void);  // do the parsing
 extern void lex_init(void);   // start the lexer

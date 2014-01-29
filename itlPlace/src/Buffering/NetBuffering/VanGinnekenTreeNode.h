@@ -25,7 +25,7 @@ public:
     double x,y; //координаты узла дерев
     NodeType type; 
     int index;
-    SignalDirection signalDirection; //известен только у точек с типом SOURCE_AND_SINK
+    KSignalDirection signalDirection; //известен только у точек с типом SOURCE_AND_SINK
 
     bool HasLeft();
     bool HasRight();

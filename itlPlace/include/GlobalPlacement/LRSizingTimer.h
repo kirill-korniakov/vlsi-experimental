@@ -3,7 +3,7 @@
 
 #include "LinearRegression.h"
 #include "HDesign.h"
-#include <hdpgrid.h>
+#include "HDPGrid.h"
 #include <vector>
 class LRSizingTimer
 {

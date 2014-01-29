@@ -427,7 +427,7 @@ void ReportMacrotypesShort(HDesign& design)
   tf.Print();
 }
 
-void ReportLibraryPhisics(HDesign& design, SignalDirection sd)
+void ReportLibraryPhisics(HDesign& design, KSignalDirection sd)
 {
   ALERT("Library phisics report:");
   int numCols = 0;

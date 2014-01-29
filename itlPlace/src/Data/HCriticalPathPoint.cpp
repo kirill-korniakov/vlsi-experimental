@@ -3,7 +3,7 @@
 COLLECTIONCONSTRUCTOR(HCriticalPathPoints)
 
 //properties specializations
-PROPERTYA(HCriticalPathPoints, ::SignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
+PROPERTYA(HCriticalPathPoints, ::KSignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
 PROPERTYA2(HCriticalPathPoints, HTimingPoint, HCriticalPathPoint::TimingPoint, m_ld->Timing.cppTimingPointID)
 
 void HCriticalPathPoints::Initialize(int pointsLimit)

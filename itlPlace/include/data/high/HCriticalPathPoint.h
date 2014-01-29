@@ -37,13 +37,13 @@ BEGINHCOLLECTION(HCriticalPathPoints, HCriticalPathPoint)
 ENDHCOLLECTION(HCriticalPathPoints)
 
 //properties specializations
-PROPERTYADECL(HCriticalPathPoints, ::SignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
+PROPERTYADECL(HCriticalPathPoints, ::KSignalDirection, HCriticalPathPoint::SignalDirection, m_ld->Timing.cppSigDirection)
 PROPERTYA2DECL(HCriticalPathPoints, HTimingPoint, HCriticalPathPoint::TimingPoint, m_ld->Timing.cppTimingPointID)
 
 BEGINWRAPPER(HCriticalPathPointWrapper, HCriticalPathPoints)
 
   //properties specializations
-  PROPERTYWD(::SignalDirection, SignalDirection)
+  PROPERTYWD(::KSignalDirection, SignalDirection)
   PROPERTYWD(HTimingPoint, TimingPoint)
 
 ENDWRAPPER(HCriticalPathPointWrapper)

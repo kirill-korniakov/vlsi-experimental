@@ -294,7 +294,7 @@ namespace Utils
 
   void CalculateLNets(HDesign& hd)
   {
-    const SignalDirection sigDir = SignalDirection_Average;
+    const KSignalDirection sigDir = SignalDirection_Average;
 
     for (HNets::NetsEnumeratorW net = hd.Nets.GetFullEnumeratorW(); net.MoveNext(); )
       net.SetLNet(Utils::LNet(

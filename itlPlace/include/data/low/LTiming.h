@@ -3,7 +3,7 @@
 
 #include "stdTypes.h"
 
-enum SignalDirection
+enum KSignalDirection
 {
   SignalDirection_Rise = 0,
   SignalDirection_Fall = 1,
@@ -38,7 +38,7 @@ struct LTiming
   int tpFirstInternalPoint;
   int tpLastInternalPoint;
 
-  SignalDirection* cppSigDirection;
+  KSignalDirection* cppSigDirection;
   IDType* cppTimingPointID;
   int ncppLimit;
   int ncppsEnd;

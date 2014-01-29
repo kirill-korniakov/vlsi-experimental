@@ -36,7 +36,9 @@ namespace Buffering
                 {
                     if (EDGE.HasLeft())
                     {
-                        int left = EDGE.GetLeftEdge();
+                        //FIXME: fixing compilation on Ubuntu
+                        //int left = EDGE.GetLeftEdge();
+                        int left = EDGE.LeftEdge;
                         return ThisType(left, st.StartPointValue(edges.Edges[left]));
                     }
                     else
@@ -50,7 +52,9 @@ namespace Buffering
             {
                 if ((st.IsEndPoint(Coord, EDGE) || EDGE.Length < EPS) && EDGE.HasRight())
                 {
-                    int right = EDGE.GetRightEdge();
+                    //FIXME: fixing compilation on Ubuntu
+                    //int right = EDGE.GetRightEdge();
+                    int right = EDGE.RightEdge;
                     return ThisType(right, st.StartPointValue(edges.Edges[right]));
                 }
                 else

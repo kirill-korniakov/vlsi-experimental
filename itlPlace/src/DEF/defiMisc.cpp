@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "lex.h"
+#include "DEF/lex.h"
 #include "defiDebug.hpp"
 #include "defiMisc.hpp"
 

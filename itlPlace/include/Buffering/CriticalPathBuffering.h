@@ -74,7 +74,7 @@ public:
         return design->CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>( points[0]);
     }
 
-    SignalDirection SignalDirection() 
+    KSignalDirection SignalDirection()
     {
         if (indexPoint < pointCount)
             return (*design)[points[indexPoint]].SignalDirection();

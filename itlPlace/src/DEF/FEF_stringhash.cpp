@@ -31,9 +31,9 @@
 #include <strings.h>
 #endif
 #include <ctype.h>
-#include "FEF_util.h"
+#include "DEF/FEF_util.h"
 #include "FEF_malloc.h"
-#include "FEF_stringhash.h"
+#include "DEF/FEF_stringhash.h"
 #include "defiDebug.hpp"
 
 static int hashval(const char *str);

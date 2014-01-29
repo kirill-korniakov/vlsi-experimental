@@ -2,7 +2,7 @@
 #define __LRSIZING__
 
 #include "HDesign.h"
-#include "hdpgrid.h"
+#include "HDPGrid.h"
 #include "LinearRegression.h"
 #include "LRSizingTimer.h"
 

@@ -15,20 +15,20 @@ namespace Utils
 
   typedef double SinkPhisics;
 
-  SinkPhisics GetSinkCapacitance(HDesign& design, HPinType sink, SignalDirection ph);
-  SinkPhisics GetSinkCapacitance(HDesign& design, HPin sink, SignalDirection ph);
-  DriverPhisics GetArcPhisics(HDesign& design, HTimingArcType timingArc, SignalDirection ph);
-  DriverPhisics GetDriverWorstPhisics(HDesign& design, HPinType driver, SignalDirection ph);
-  DriverPhisics GetDriverAveragePhisics(HDesign& design, HPinType driver, SignalDirection ph);
-  DriverPhisics GetDriverTimingPhisics(HDesign& design, HPin driver, SignalDirection ph);
-  DriverPhisics GetDriverWorstPhisics(HDesign& design, HPin driver, SignalDirection ph);
-  DriverPhisics GetDriverAveragePhisics(HDesign& design, HPin driver, SignalDirection ph);
-  DriverPhisics GetElementWorstPhisics(HDesign& design, HCell element, SignalDirection ph);
-  DriverPhisics GetElementWorstPhisics(HDesign& design, HMacroType elementType, SignalDirection ph);
-  DriverPhisics GetElementAveragePhisics(HDesign& design, HCell element, SignalDirection ph);
-  DriverPhisics GetElementAveragePhisics(HDesign& design, HMacroType elementType, SignalDirection ph);
+  SinkPhisics GetSinkCapacitance(HDesign& design, HPinType sink, KSignalDirection ph);
+  SinkPhisics GetSinkCapacitance(HDesign& design, HPin sink, KSignalDirection ph);
+  DriverPhisics GetArcPhisics(HDesign& design, HTimingArcType timingArc, KSignalDirection ph);
+  DriverPhisics GetDriverWorstPhisics(HDesign& design, HPinType driver, KSignalDirection ph);
+  DriverPhisics GetDriverAveragePhisics(HDesign& design, HPinType driver, KSignalDirection ph);
+  DriverPhisics GetDriverTimingPhisics(HDesign& design, HPin driver, KSignalDirection ph);
+  DriverPhisics GetDriverWorstPhisics(HDesign& design, HPin driver, KSignalDirection ph);
+  DriverPhisics GetDriverAveragePhisics(HDesign& design, HPin driver, KSignalDirection ph);
+  DriverPhisics GetElementWorstPhisics(HDesign& design, HCell element, KSignalDirection ph);
+  DriverPhisics GetElementWorstPhisics(HDesign& design, HMacroType elementType, KSignalDirection ph);
+  DriverPhisics GetElementAveragePhisics(HDesign& design, HCell element, KSignalDirection ph);
+  DriverPhisics GetElementAveragePhisics(HDesign& design, HMacroType elementType, KSignalDirection ph);
 
-  double GetNetLoad(HDesign& design, HNet net, SignalDirection ph);
+  double GetNetLoad(HDesign& design, HNet net, KSignalDirection ph);
 
   inline double LBuf(const DriverPhisics& bdriver, const SinkPhisics& bsink, const HWirePhysicalParams& wires)
   {

@@ -9,6 +9,8 @@
 #include "ConfigContext.h"
 #include "Logging.h"
 
+#include <string.h>
+
 namespace libconfig
 {
 class SearchStackOverflowException : public SettingException

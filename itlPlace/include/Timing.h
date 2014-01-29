@@ -54,13 +54,13 @@ void GetRequiredArc(HDesign& hd,
 
 HTimingArcType FindArrivalArc(HDesign& hd,
                          HTimingPoint arcEndPoint,
-                         SignalDirection dir,
+                         KSignalDirection dir,
                          double& arcTime,
                          bool& isInversed);
 
 HTimingArcType FindRequiredArc(HDesign& hd,
                          HTimingPoint arcStartPoint,
-                         SignalDirection dir,
+                         KSignalDirection dir,
                          double& arcTime,
                          bool& isInversed);
 

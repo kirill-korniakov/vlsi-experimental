@@ -1,5 +1,5 @@
 #include "HDPGrid.h"
-#include <Math.h>
+#include <math.h>
 #include <algorithm>
 
 bool operator< (double y, const HDPGrid::DPGridRow& row)

@@ -21,9 +21,9 @@
   #include <malloc.h> //KNOTE: commented by Kirill
 #endif
 
-#include "lex.h"
+#include "DEF/lex.h"
 #include "FEF_malloc.h"
-#include "FEF_util.h"
+#include "DEF/FEF_util.h"
 #include "defiDebug.hpp"
 
 extern char defDebug[100];

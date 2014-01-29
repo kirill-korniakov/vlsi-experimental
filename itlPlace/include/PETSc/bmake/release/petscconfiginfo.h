@@ -1,2 +1,0 @@
-static const char *petscconfigureruntime = "Fri Jul  3 21:38:39 2009";
-static const char *petscconfigureoptions = "--with-mpi=0 --download-c-blas-lapack=1 --with-cc=\"win32fe cl --nodetect\" --with-cxx=\"win32fe cl --nodetect\" --AR=\"win32fe lib -a\" CPPFFLAGS=-D_CRT_SECURE_NO_DEPRECATE --with-fortran=0 --with-clanguage=C++ --with-x=0 --with-debugging=0 --useThreads=0 --with-timer=nt --useThreads=0 --with-shared=0";

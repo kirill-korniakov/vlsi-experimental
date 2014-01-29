@@ -25,7 +25,7 @@ private:
   HPinType m_OutPin;
 public:
 
-  static const SignalDirection SignalModel = SignalDirection_None;
+  static const KSignalDirection SignalModel = SignalDirection_None;
 
   double Rb() const {return m_R;}
   double Cb() const {return m_C;}

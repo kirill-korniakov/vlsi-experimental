@@ -1132,6 +1132,7 @@ public:
 		return m_Closure.IsLess(x.m_Closure);	}
 	bool operator >(const FastDelegate3 &x) const {
 		return x.m_Closure.IsLess(m_Closure);	}
+
 	// Binding to non-const member functions
 	template < class X, class Y >
 	FastDelegate3(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {
@@ -1139,6 +1140,7 @@ public:
 	template < class X, class Y >
 	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3)) {
 		m_Closure.bindmemfunc(detail::implicit_cast<X*>(pthis), function_to_bind);	}
+
 	// Binding to const member functions.
 	template < class X, class Y >
 	FastDelegate3(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) const) {
@@ -1146,19 +1148,23 @@ public:
 	template < class X, class Y >
 	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) const) {
 		m_Closure.bindconstmemfunc(detail::implicit_cast<const X *>(pthis), function_to_bind);	}
+
 	// Static functions. We convert them into a member function call.
 	// This constructor also provides implicit conversion
 	FastDelegate3(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {
 		bind(function_to_bind);	}
+
 	// for efficiency, prevent creation of a temporary
 	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {
 		bind(function_to_bind);	}
 	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3)) {
 		m_Closure.bindstaticfunc(this, &FastDelegate3::InvokeStaticFunction, 
 			function_to_bind); }
+
 	// Invoke the delegate
 	RetType operator() (Param1 p1, Param2 p2, Param3 p3) const {
 	return (m_Closure.GetClosureThis()->*(m_Closure.GetClosureMemPtr()))(p1, p2, p3); }
+
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
 	typedef struct SafeBoolStruct {
@@ -1166,6 +1172,7 @@ private:
 		StaticFunctionPtr m_nonzero;
 	} UselessTypedef;
     typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+
 public:
 	operator unspecified_bool_type() const {
         return empty()? 0: &SafeBoolStruct::m_nonzero;

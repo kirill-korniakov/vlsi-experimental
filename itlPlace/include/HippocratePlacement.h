@@ -5,9 +5,10 @@
 
 #include "HDesign.h"
 #include "Utils.h"
-#include <algorithm>
-#include <hdpgrid.h>
+#include "HDPGrid.h"
 #include <STA.h>
+
+#include <algorithm>
 #include <stack>
 
 #define RADIUS_OF_WINDOW  5

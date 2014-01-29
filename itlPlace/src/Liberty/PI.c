@@ -5389,12 +5389,12 @@ si2drValueTypeT   si2drDefineGetValueType( si2drDefineIdT def,
 		if( (si2drObjectTypeT)(def.v1) != SI2DR_DEFINE )
 		{
 			*err = SI2DR_INVALID_OBJECTTYPE;
-            return "";
+            return (si2drValueTypeT)"";
 		}
 		if( master_group_hash == 0 )
 		{
 			*err = SI2DR_INTERNAL_SYSTEM_ERROR;
-            return "";
+            return (si2drValueTypeT)"";
 		}
 	}
 	switch( d->valtype )

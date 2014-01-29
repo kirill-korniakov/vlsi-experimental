@@ -568,16 +568,14 @@ HTimingPoint getSink(HDesign& hd, HNet net)
     return hd.TimingPoints[sink];
 }
 
-void InsertRepeaters2(HDesign& design, double slackTreshold)
-{
-    struct PathBuffering
+    struct PathBuffering1
     {
         VanGinneken2 VG;
         int InsertedBuffers;
         double BufferedPercent;
         double MaxCriticality;
 
-        PathBuffering(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(1.0), BufferedPercent(percent) {}
+        PathBuffering1(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(1.0), BufferedPercent(percent) {}
 
         bool ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
         {
@@ -600,19 +598,20 @@ void InsertRepeaters2(HDesign& design, double slackTreshold)
         }
     };
 
+void InsertRepeaters2(HDesign& design, double slackTreshold)
+{
     STA(design, true, true);
     FindCriticalPaths(design);
     ALERT("TWLbb=%.6f", Utils::CalculateTWL(design));
-    PathBuffering pb(design, slackTreshold);
-    Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
+    PathBuffering1 pb(design, slackTreshold);
+    Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering1::ProcessPath));
     ALERT("TWLab=%.6f", Utils::CalculateTWL(design));
     ALERT("Inserted %d buffers", pb.InsertedBuffers);
     STA(design, true, false);
 }
 
-void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
-{
-    struct PathBuffering
+//TODO: Merge it with the PathBuffering1
+    struct PathBuffering2
     {
         VanGinneken2 VG;
         int InsertedBuffers;
@@ -620,7 +619,7 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
         double BufferedPercent;
         double MaxCriticality;
 
-        PathBuffering(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(0.0), BufferedPercent(percent) {}
+        PathBuffering2(HDesign& design, double percent): VG(design), InsertedBuffers(0), MaxCriticality(0.0), BufferedPercent(percent) {}
 
         bool ProcessPath(HDesign& design, HCriticalPath path, int pathNumber)
         {
@@ -643,8 +642,11 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
         }
     };
 
+
+void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
+{
     //ConfigContext ctx = design.cfg.OpenContext("Buffering");
-    PathBuffering pb(design, bufferedPercent);
+    PathBuffering2 pb(design, bufferedPercent);
     TableFormatter tf(6);
     tf.NewRow();
     tf.SetCell(0, "#");
@@ -672,7 +674,7 @@ void InsertRepeaters2(HDesign& design, int iterations, double bufferedPercent)
         tf.SetCell(5, pb.InsertedBuffers);
 
         int before = pb.InsertedBuffers;
-        Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering::ProcessPath));
+        Utils::IterateMostCriticalPaths(design, Utils::ALL_PATHS, Utils::CriticalPathStopableHandler(&pb, &PathBuffering2::ProcessPath));
         ALERT("Inserted %d buffers in %d paths", pb.InsertedBuffers - before, pb.PathsBuffered);
 
         HDPGrid grid(design);

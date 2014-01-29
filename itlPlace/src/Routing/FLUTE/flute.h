@@ -27,6 +27,11 @@ typedef struct
     Branch *branch;   // array of tree branches
 } Tree;
 
+struct point {
+    DTYPE x, y;
+    int o;
+}; /*pt[MAXD], *ptp[MAXD],*/
+
 // Major functions
 extern void readLUT();
 extern DTYPE flute_wl(int d, DTYPE x[], DTYPE y[], int acc);

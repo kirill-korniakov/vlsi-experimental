@@ -20,10 +20,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "lex.h"
+#include "DEF/lex.h"
 #include "defiDefs.hpp"
 #include "def.tab.h"
-#include "FEF_stringhash.h"
+#include "DEF/FEF_stringhash.h"
 #include "defiDebug.hpp"
 
 void STR_add_to_stringtab_Int(void *hdl, const char *str, int inValue) {

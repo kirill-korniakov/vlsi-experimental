@@ -109,6 +109,8 @@
 #include <iterator>             // for facts about iterator tags
 #include <google/type_traits.h> // for true_type, integral_constant, etc.
 
+#include <stddef.h> //KNOTE: adding for compilation on Ubuntu
+
 _START_GOOGLE_NAMESPACE_
 
 using STL_NAMESPACE::pair;
