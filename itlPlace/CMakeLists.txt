@@ -7,9 +7,13 @@ project(itlPlace)
 ##SET(PETSC_ARCH X86_64)
 #SET(MAKE_EXECUTABLE nmake)
 
-#FIXME: hardcoded paths
+#TODO: hardcoded paths
 set(FOR_GOOGLE_HASH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/c++/4.2.1/")
-set(TAO_LIBRARIES_PATH "/Users/kirill-kornyakov/Work/VLSI/Dependencies/tao-1.9/lib/x86_64/")
+if(APPLE)
+  set(TAO_LIBRARIES_PATH "/Users/kirill-kornyakov/Work/VLSI/Dependencies/tao-1.9/lib/x86_64/")
+else()
+  set(TAO_LIBRARIES_PATH "/home/kirill/Work/vlsi-deps/tao-1.9/lib/ubuntu-64/")
+endif()
 
 MESSAGE("OpenCV_DIR: ${OpenCV_DIR}")
 MESSAGE("PETSC_DIR: ${PETSC_DIR}")
@@ -23,6 +27,9 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(PETSc COMPONENTS CXX)
 
+MESSAGE("PETSC LIBS: ${PETSC_LIBRARIES}")
+
+# Glob for headers
 MACRO(HEADER_DIRECTORIES return_list)
     FILE(GLOB_RECURSE new_list "include/*.h" "src/*.h")
     SET(dir_list "include")
@@ -47,7 +54,7 @@ SET(TAO_LIBRARIES tao taopetsc)
 SET(app "itlPlace")
 FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/config/*.c*") #"src/*.y"
 ADD_EXECUTABLE(${app} ${srcs})
-TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${PETSC_LIBRARIES} ${TAO_LIBRARIES})
+TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${TAO_LIBRARIES} ${PETSC_LIBRARIES})
 
 # DEBUGGING SECTION
 FUNCTION(JOIN values separator result)
