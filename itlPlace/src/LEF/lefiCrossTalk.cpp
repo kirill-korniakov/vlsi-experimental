@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "LEF_lex.h"
+#include "LEF/lex.h"
 #include "lefiCrossTalk.hpp"
 #include "lefiDebug.hpp"
 

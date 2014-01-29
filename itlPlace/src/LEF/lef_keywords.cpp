@@ -17,9 +17,9 @@
 #include "lefiDefs.hpp"
 #include "lef.tab.h"
 #include "lefiDebug.hpp"
-#include "LEF_FEF_stringhash.h"
+#include "LEF/FEF_stringhash.h"
 #include "crypt.hpp"
-#include "LEF_lex.h"
+#include "LEF/lex.h"
 
 void lef_add_to_stringtab_Int(void *hdl, const char *str, int inValue) {
     int *value;

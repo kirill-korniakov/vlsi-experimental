@@ -22,7 +22,7 @@
 #endif
 
 #include "DEF/lex.h"
-#include "FEF_malloc.h"
+#include "DEF/FEF_malloc.h"
 #include "DEF/FEF_util.h"
 #include "defiDebug.hpp"
 

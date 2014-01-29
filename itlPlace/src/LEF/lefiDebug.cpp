@@ -14,7 +14,7 @@
 
 #include "lefiDebug.hpp"
 #include "lefrReader.hpp"
-#include "LEF_lex.h"
+#include "LEF/lex.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

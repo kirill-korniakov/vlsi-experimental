@@ -27,9 +27,9 @@
 #include <strings.h>
 #endif
 #include <ctype.h>
-#include "LEF_FEF_util.h"
-#include "LEF_FEF_malloc.h"
-#include "FEF_stringhash.h"
+#include "LEF/FEF_util.h"
+#include "LEF/FEF_malloc.h"
+#include "LEF/FEF_stringhash.h"
 
 static int hashval(const char *str);
 static int rehashval(const char *str);

@@ -15,9 +15,9 @@
 #include "lefiMisc.hpp"
 #include <string.h>
 #include <stdlib.h>
-#include "LEF_lex.h"
+#include "LEF/lex.h"
 #include "lefiDebug.hpp"
-#include "LEF_FEF_stringhash.h"
+#include "LEF/FEF_stringhash.h"
 #include "lefiUtil.hpp"
 
 
