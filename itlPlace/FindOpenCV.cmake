@@ -11,7 +11,7 @@
 #
 # Created: 10 Jan 2012 Dirk Van Haerenborgh<dirk.vanhaerenborgh@hogent.be>
 
-if(NOT "${OpenCV_DIR}" STREQUAL "")
+if("${OpenCV_DIR}" STREQUAL "")
 
 if(NOT "${CMAKE_PREFIX_PATH}" STREQUAL "")
     set(ENV{PKG_CONFIG_PATH} "${CMAKE_PREFIX_PATH}/lib/pkgconfig:${CMAKE_PREFIX_PATH}/lib64/pkgconfig:$ENV{PKG_CONFIG_PATH}")

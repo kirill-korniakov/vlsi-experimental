@@ -60,5 +60,5 @@ FUNCTION(JOIN values separator result)
   SET(${result} "${_TMP_STR}" PARENT_SCOPE)
 ENDFUNCTION()
 
-JOIN("${PETSC_LIBRARIES}" "\n" output)
-#MESSAGE("${output}")
+JOIN("${OpenCV_LIBS}" "\n" output)
+#MESSAGE("Hey! ${output}")
