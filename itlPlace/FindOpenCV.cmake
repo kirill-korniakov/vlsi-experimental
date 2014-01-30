@@ -11,6 +11,8 @@
 #
 # Created: 10 Jan 2012 Dirk Van Haerenborgh<dirk.vanhaerenborgh@hogent.be>
 
+if(NOT "${OpenCV_DIR}" STREQUAL "")
+
 if(NOT "${CMAKE_PREFIX_PATH}" STREQUAL "")
     set(ENV{PKG_CONFIG_PATH} "${CMAKE_PREFIX_PATH}/lib/pkgconfig:${CMAKE_PREFIX_PATH}/lib64/pkgconfig:$ENV{PKG_CONFIG_PATH}")
 endif(NOT "${CMAKE_PREFIX_PATH}" STREQUAL "")
@@ -33,3 +35,5 @@ SET(OpenCV_LIBS ${OpenCV_LIBRARIES} )
 SET(OpenCV_INCLUDE_DIR ${OpenCV_INCLUDE_DIRS})
 SET(OpenCV_LIB_DIR ${OpenCV_LIBRARY_DIRS})
 SET(OpenCV_PREFIX ${OpenCV_ROOT})
+
+endif()
