@@ -4,7 +4,7 @@ project(itlPlace)
 # This is for debugging on Win only
 #SET(OpenCV_DIR C:/Kornyakov/opencv-build-qtcreator)
 #SET(PETSC_DIR c:/Kornyakov/itlplace-on-mac/itlPlace/3rdparty/PETSc)
-##SET(PETSC_ARCH X86_64)
+#SET(PETSC_ARCH X86_64)
 #SET(MAKE_EXECUTABLE nmake)
 
 MESSAGE("OpenCV_DIR: ${OpenCV_DIR}")
