@@ -1,0 +1,75 @@
+<center><a href="tao_solver.h">Actual source code: tao_solver.h</a></center><br>
+
+<html>
+<head>
+<title></title>
+<meta name="generator" content="c2html 0.9.5">
+<meta name="date" content="2007-08-29T19:21:57+00:00">
+</head>
+
+<body bgcolor="#FFFFFF">
+<pre width="80"><a name="line1">  1: </a>!
+<a name="line2">  2: </a>!  $Id$;
+<a name="line3">  3: </a>!
+<a name="line4">  4: </a>!  Include file <font color="#4169E1">for</font> Fortran use of the TAO package
+
+<a name="line6">  6: </a><strong><font color="#228B22">#define TAO_SOLVER         PetscFortranAddr</font></strong>
+<a name="line7">  7: </a><strong><font color="#228B22">#define TAO_APPLICATION    PetscFortranAddr</font></strong>
+<a name="line8">  8: </a><strong><font color="#228B22">#define TaoApplication     PetscFortranAddr</font></strong>
+<a name="line9">  9: </a><strong><font color="#228B22">#define TaoVecF            PetscFortranAddr</font></strong>
+<a name="line10"> 10: </a><strong><font color="#228B22">#define TaoMatF            PetscFortranAddr</font></strong>
+<a name="line11"> 11: </a><strong><font color="#228B22">#define TaoIndexSetF       PetscFortranAddr</font></strong>
+<a name="line12"> 12: </a><strong><font color="#228B22">#define TaoLinearSolverF   PetscFortranAddr</font></strong>
+<a name="line13"> 13: </a><strong><font color="#228B22">#define TaoMethod          const character*(80)</font></strong>
+<a name="line14"> 14: </a><strong><font color="#228B22">#define TaoTerminateReason integer</font></strong>
+
+<a name="line16"> 16: </a><font color="#A020F0">#include </font><font color="#666666">"finclude/tao_general.h"</font><font color="#A020F0"></font>
+
+<a name="line18"> 18: </a><font color="#A020F0">#if !defined (PETSC_AVOID_DECLARATIONS)</font>
+<a name="line19"> 19: </a>!
+<a name="line20"> 20: </a>!  Convergence flags.
+<a name="line21"> 21: </a>!  Be sure to check that these match the flags in $TAO_DIR/include/tao_solver.h
+<a name="line22"> 22: </a>!
+<a name="line23"> 23: </a>      integer TAO_CONVERGED_ATOL        
+<a name="line24"> 24: </a>      integer TAO_CONVERGED_RTOL
+<a name="line25"> 25: </a>      integer TAO_CONVERGED_TRTOL
+<a name="line26"> 26: </a>      integer TAO_CONVERGED_MINF
+<a name="line27"> 27: </a>      integer TAO_DIVERGED_MAXITS
+<a name="line28"> 28: </a>      integer TAO_DIVERGED_NAN
+<a name="line29"> 29: </a>      integer TAO_DIVERGED_MAXFCN
+<a name="line30"> 30: </a>      integer TAO_DIVERGED_LS_FAILURE
+<a name="line31"> 31: </a>      integer TAO_DIVERGED_TR_REDUCTION
+<a name="line32"> 32: </a>      integer TAO_CONTINUE_ITERATING
+
+<a name="line34"> 34: </a>      parameter (TAO_CONVERGED_ATOL          =  2)
+<a name="line35"> 35: </a>      parameter (TAO_CONVERGED_RTOL          =  3)
+<a name="line36"> 36: </a>      parameter (TAO_CONVERGED_TRTOL         =  4)
+<a name="line37"> 37: </a>      parameter (TAO_CONVERGED_MINF          =  5)
+<a name="line38"> 38: </a>      parameter (TAO_DIVERGED_MAXITS         = -2)
+<a name="line39"> 39: </a>      parameter (TAO_DIVERGED_NAN            = -4)
+<a name="line40"> 40: </a>      parameter (TAO_DIVERGED_MAXFCN         = -5)
+<a name="line41"> 41: </a>      parameter (TAO_DIVERGED_LS_FAILURE     = -6)
+<a name="line42"> 42: </a>      parameter (TAO_DIVERGED_TR_REDUCTION   = -7)
+<a name="line43"> 43: </a>      parameter (TAO_CONTINUE_ITERATING      =  0)
+<a name="line44"> 44: </a>!
+<a name="line45"> 45: </a>!  Some TAO Fortran functions that the user might pass as arguments
+<a name="line46"> 46: </a>!
+<a name="line47"> 47: </a>      external TAODEFAULTCOMPUTEHESSIAN
+<a name="line48"> 48: </a>      external TAODEFAULTCOMPUTEHESSIANCOLOR
+<a name="line49"> 49: </a>!
+<a name="line50"> 50: </a>! not yet defined
+<a name="line51"> 51: </a>!
+<a name="line52"> 52: </a>!      external TAODEFAULTMONITOR
+<a name="line53"> 53: </a>!      external TAOLGMONITOR
+<a name="line54"> 54: </a>!      external TAOVECVIEWMONITOR
+<a name="line55"> 55: </a>!      external TAOVECVIEWUPDATEMONITOR
+<a name="line56"> 56: </a>!      external TAOCONVERGED_DEFAULT
+<a name="line57"> 57: </a>!      external TAOAPPLY_LINESEARCH
+
+<a name="line59"> 59: </a>!  End of Fortran include file <font color="#4169E1">for</font> the TAO package
+
+<a name="line61"> 61: </a><font color="#A020F0">#endif</font>
+</pre>
+</body>
+
+</html>

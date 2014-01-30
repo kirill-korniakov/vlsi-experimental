@@ -1,0 +1,16 @@
+remoteclean: 
+
+remote: 
+
+.F.o: 
+	-@echo "Your system was not configured for Fortran use"
+	-@echo "  Check configure.log under the checkFortranCompiler test for the specific failure"
+	-@echo "  You can reconfigure using --with-fc=<usable compiler> to enable Fortran"
+
+libc: ${LIBNAME}(${OBJSC} ${SOBJSC})
+
+libf: ${OBJSF}
+	-${AR} ${AR_FLAGS} ${LIBNAME} ${OBJSF}
+
+shared_arch: 
+

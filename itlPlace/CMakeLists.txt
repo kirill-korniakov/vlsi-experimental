@@ -7,17 +7,14 @@ project(itlPlace)
 ##SET(PETSC_ARCH X86_64)
 #SET(MAKE_EXECUTABLE nmake)
 
-#TODO: hardcoded paths
-set(FOR_GOOGLE_HASH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/c++/4.2.1/")
-if(APPLE)
-  set(TAO_LIBRARIES_PATH "/Users/kirill-kornyakov/Work/VLSI/Dependencies/tao-1.9/lib/x86_64/")
-else()
-  set(TAO_LIBRARIES_PATH "/home/kirill/Work/vlsi-deps/tao-1.9/lib/ubuntu-64/")
-endif()
-
 MESSAGE("OpenCV_DIR: ${OpenCV_DIR}")
 MESSAGE("PETSC_DIR: ${PETSC_DIR}")
 MESSAGE("PETSC_ARCH: ${PETSC_ARCH}")
+MESSAGE("TAO_DIR: ${TAO_DIR}")
+
+#TODO: hardcoded paths
+set(FOR_GOOGLE_HASH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/c++/4.2.1/")
+set(TAO_LIBRARIES_PATH "${TAO_DIR}/lib/${PETSC_ARCH}")
 
 # Optional commands
 #SET(CMAKE_BUILD_TYPE Release)
@@ -26,8 +23,6 @@ MESSAGE("PETSC_ARCH: ${PETSC_ARCH}")
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(PETSc COMPONENTS CXX)
-
-MESSAGE("PETSC LIBS: ${PETSC_LIBRARIES}")
 
 # Glob for headers
 MACRO(HEADER_DIRECTORIES return_list)

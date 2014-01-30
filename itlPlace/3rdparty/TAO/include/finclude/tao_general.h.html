@@ -1,0 +1,66 @@
+<center><a href="tao_general.h">Actual source code: tao_general.h</a></center><br>
+
+<html>
+<head>
+<title></title>
+<meta name="generator" content="c2html 0.9.5">
+<meta name="date" content="2007-08-29T19:21:57+00:00">
+</head>
+
+<body bgcolor="#FFFFFF">
+<pre width="80"><a name="line1">  1: </a>!
+<a name="line2">  2: </a>!  $Id$;
+<a name="line3">  3: </a>!
+<a name="line4">  4: </a>!  Base include file <font color="#4169E1">for</font> Fortran use of the TAO package.
+<a name="line5">  5: </a>!
+<a name="line6">  6: </a><font color="#A020F0">#include </font><font color="#666666">"petscconf.h"</font><font color="#A020F0"></font>
+
+<a name="line8">  8: </a><font color="#A020F0">#include </font><font color="#666666">"finclude/tao_def.h"</font><font color="#A020F0"></font>
+
+<a name="line10"> 10: </a><font color="#A020F0">#if !defined (PETSC_AVOID_DECLARATIONS)</font>
+<a name="line11"> 11: </a>! ------------------------------------------------------------------------
+<a name="line12"> 12: </a>!     Non Common block stuff declared first
+<a name="line13"> 13: </a>!    
+<a name="line14"> 14: </a>!     Flags
+<a name="line15"> 15: </a>!
+<a name="line16"> 16: </a>      integer   TAO_TRUE,TAO_FALSE,TAO_DECIDE
+<a name="line17"> 17: </a>      integer   TAO_DEFAULT_INTEGER,TAO_DETERMINE
+
+<a name="line19"> 19: </a>      parameter (TAO_TRUE = PETSC_TRUE)
+<a name="line20"> 20: </a>      parameter (TAO_FALSE = PETSC_FALSE)
+<a name="line21"> 21: </a>      parameter (TAO_DECIDE = PETSC_DECIDE)
+<a name="line22"> 22: </a>      parameter (TAO_DETERMINE = PETSC_DETERMINE)
+<a name="line23"> 23: </a>      parameter (TAO_DEFAULT_INTEGER = PETSC_DEFAULT_INTEGER)
+
+<a name="line25"> 25: </a>! ----------------------------------------------------------------------------
+<a name="line26"> 26: </a>!     BEGIN COMMON-BLOCK VARIABLES
+
+<a name="line28"> 28: </a>!     Fortran Null
+<a name="line29"> 29: </a>!
+<a name="line30"> 30: </a>      character*(80)     TAO_NULL_CHARACTER
+<a name="line31"> 31: </a>      PetscInt    TAO_NULL_INTEGER
+<a name="line32"> 32: </a>      PetscFortranDouble TAO_NULL_DOUBLE
+<a name="line33"> 33: </a>      PetscScalar        TAO_NULL_SCALAR
+<a name="line34"> 34: </a>!
+<a name="line35"> 35: </a>!     A TAO_NULL_FUNCTION pointer
+<a name="line36"> 36: </a>!
+<a name="line37"> 37: </a>!      external TAO_NULL_FUNCTION
+<a name="line38"> 38: </a>!
+<a name="line39"> 39: </a>!     Common block to store some of the TAO constants,
+<a name="line40"> 40: </a>!     which can be set only at runtime.
+<a name="line41"> 41: </a>!     (A string should be in a different common block.)
+<a name="line42"> 42: </a>!  
+<a name="line43"> 43: </a>      common /taofortran1/ TAO_NULL_CHARACTER
+<a name="line44"> 44: </a>      common /taofortran2/ TAO_NULL_INTEGER
+<a name="line45"> 45: </a>      common /taofortran3/ TAO_NULL_SCALAR
+<a name="line46"> 46: </a>      common /taofortran4/ TAO_NULL_DOUBLE
+
+<a name="line48"> 48: </a>!     END COMMON-BLOCK VARIABLES
+<a name="line49"> 49: </a>! ----------------------------------------------------------------------------
+
+<a name="line51"> 51: </a><font color="#A020F0">#endif</font>
+
+</pre>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+
+This is the location of private include files that may be needed by 
+several different TAO components. The application user should 
+NEVER include any of these files.
