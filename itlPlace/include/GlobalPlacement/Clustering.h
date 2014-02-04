@@ -37,10 +37,10 @@ public:
     std::vector<HCell> terminalCells;  //they aren't clustered, but  they has their own cluster index
     HDesign& design; 
 
-    std::list<ClusteringLog> clusteringLog; // информация для перехода между уровнями кластеризации
+    std::list<ClusteringLog> clusteringLog; // РёРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РїРµСЂРµС…РѕРґР° РјРµР¶РґСѓ СѓСЂРѕРІРЅСЏРјРё РєР»Р°СЃС‚РµСЂРёР·Р°С†РёРё
 
     //HClusteredNets netList;
-    //std::list<ClusteringNetList0> netLevels;  // список нетлистов на каждом уровне кластеризации
+    //std::list<ClusteringNetList0> netLevels;  // СЃРїРёСЃРѕРє РЅРµС‚Р»РёСЃС‚РѕРІ РЅР° РєР°Р¶РґРѕРј СѓСЂРѕРІРЅРµ РєР»Р°СЃС‚РµСЂРёР·Р°С†РёРё
 
     //std::vector<ConnectionsVector> tableOfAdjacentNets;
     //pAffinityFunction affinityFunction;

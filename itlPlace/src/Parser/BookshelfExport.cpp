@@ -1,40 +1,40 @@
 #include "BookshelfExport.h"
-#include <iostream>//неободимо для ввода вывода
-#include <time.h>//необходимо для определения времени
+#include <iostream>//РЅРµРѕР±РѕРґРёРјРѕ РґР»СЏ РІРІРѕРґР° РІС‹РІРѕРґР°
+#include <time.h>//РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІСЂРµРјРµРЅРё
 #include "Configuration.h"
 #include "CellUtils.h"
-//string GenerateFileName()//добавляет в название pl файла название программы и время через подчеркивание
+//string GenerateFileName()//РґРѕР±Р°РІР»СЏРµС‚ РІ РЅР°Р·РІР°РЅРёРµ pl С„Р°Р№Р»Р° РЅР°Р·РІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ Рё РІСЂРµРјСЏ С‡РµСЂРµР· РїРѕРґС‡РµСЂРєРёРІР°РЅРёРµ
 //{	 
-//	time_t ltime;//время 
+//	time_t ltime;//РІСЂРµРјСЏ 
 //	time( &ltime );
-//	string fileName;//возвращаемая строка
-//	char newFileName[256];//временная строка
+//	string fileName;//РІРѕР·РІСЂР°С‰Р°РµРјР°СЏ СЃС‚СЂРѕРєР°
+//	char newFileName[256];//РІСЂРµРјРµРЅРЅР°СЏ СЃС‚СЂРѕРєР°
 //	char *pVal;
 //	int nBinRows = 1, nBinCols = 1;
 //
 //	if ( std::string( cfg.lookup( "benchmark.def" )).c_str() != 0 )
-//	  strcpy(newFileName,  std::string( cfg.lookup( "benchmark.def" )).c_str())	 ;//берем имя из конфига
+//	  strcpy(newFileName,  std::string( cfg.lookup( "benchmark.def" )).c_str())	 ;//Р±РµСЂРµРј РёРјСЏ РёР· РєРѕРЅС„РёРіР°
 //	
 //	pVal = strrchr(newFileName, '\\');
 //	
 //	if ( pVal ) 
 //		strcpy(newFileName,  ++pVal);
 //	
-//	pVal = strrchr(newFileName , '.');//удаляем расширение файла
+//	pVal = strrchr(newFileName , '.');//СѓРґР°Р»СЏРµРј СЂР°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р°
 //	
 //	if ( pVal ) 
 //		pVal[0] = '\0';
 //	
-//	strcat(newFileName, "itlPlace ");//пишем название программы
-//	strcat(newFileName, ctime( &ltime ));//пишем время
+//	strcat(newFileName, "itlPlace ");//РїРёС€РµРј РЅР°Р·РІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
+//	strcat(newFileName, ctime( &ltime ));//РїРёС€РµРј РІСЂРµРјСЏ
 //	pVal = strrchr(newFileName, '\n');
 //	
 //	if ( pVal ) 
 //		pVal[0] = '\0'; 
 //  
-//	strcat(newFileName, ".pl");//добавляем нужное расширение файла
+//	strcat(newFileName, ".pl");//РґРѕР±Р°РІР»СЏРµРј РЅСѓР¶РЅРѕРµ СЂР°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р°
 //  
-//	while ( 1 )//заменяем пробел подчеркиванием
+//	while ( 1 )//Р·Р°РјРµРЅСЏРµРј РїСЂРѕР±РµР» РїРѕРґС‡РµСЂРєРёРІР°РЅРёРµРј
 //	{ 
 //		pVal = strchr(newFileName, ' ');
 //		if ( pVal ) 
@@ -45,7 +45,7 @@
 //	
 //	while ( 1 )
 //	{ 
-//		pVal = strchr(newFileName, ':');//заменяем : подчеркиванием
+//		pVal = strchr(newFileName, ':');//Р·Р°РјРµРЅСЏРµРј : РїРѕРґС‡РµСЂРєРёРІР°РЅРёРµРј
 //		if( pVal ) 
 //			pVal[0] = '_';
 //		else 
@@ -53,15 +53,15 @@
 //	};
 //	
 //	fileName = newFileName;
-//	return fileName;//выводим
+//	return fileName;//РІС‹РІРѕРґРёРј
 //}//GenerateFileName()
 //
 //
-//string getStringOrientation(CellOrientation i_Orientation)//возвращает строковое значение орентации
+//string getStringOrientation(CellOrientation i_Orientation)//РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕСЂРµРЅС‚Р°С†РёРё
 //{
 //	std::string sOrientation = "N";
 //		
-//	if ( i_Orientation == 0 ) //определяем ориентацию фейла
+//	if ( i_Orientation == 0 ) //РѕРїСЂРµРґРµР»СЏРµРј РѕСЂРёРµРЅС‚Р°С†РёСЋ С„РµР№Р»Р°
 //	  sOrientation = "N";
 //	
 //	if ( i_Orientation == 1 ) 
@@ -88,11 +88,11 @@
 //	return sOrientation;
 //};//getStringOrientation
 
-void PrintToPL( HDesign& hd, const std::string fileName )//печать в фейл.pl
+void PrintToPL( HDesign& hd, const std::string fileName )//РїРµС‡Р°С‚СЊ РІ С„РµР№Р».pl
 {  
 
 
-	 time_t ltime;//время
+	 time_t ltime;//РІСЂРµРјСЏ
 	 time( &ltime );
 	 FILE *dataFile;
  
@@ -100,7 +100,7 @@ void PrintToPL( HDesign& hd, const std::string fileName )//печать в фейл.pl
 	 
 	 printf( "Dumping placement to \" %s \"", fileName.c_str());
 
-	if (( dataFile = fopen(fileName.c_str(), "w")) == 0)//открылся ли файл
+	if (( dataFile = fopen(fileName.c_str(), "w")) == 0)//РѕС‚РєСЂС‹Р»СЃСЏ Р»Рё С„Р°Р№Р»
   {
     printf( "ERROR: could not open output pl file. %s \n", fileName.c_str());
     return ; ///TODO: think about error codes
@@ -113,19 +113,19 @@ void PrintToPL( HDesign& hd, const std::string fileName )//печать в фейл.pl
    fprintf( dataFile , "# Wire length: %d\n", 0);
    fprintf( dataFile , "#_Bin grid: %d x %d\n\n" , nBinRows, nBinCols);
 	 
-	 for(HCells::CellsEnumeratorW i = hd.Cells.GetEnumeratorW() ; i.MoveNext(); )//цикл печати элементов
+	 for(HCells::CellsEnumeratorW i = hd.Cells.GetEnumeratorW() ; i.MoveNext(); )//С†РёРєР» РїРµС‡Р°С‚Рё СЌР»РµРјРµРЅС‚РѕРІ
 	 {
      if (i.PlacementStatus() != PlacementStatus_Movable
        && i.PlacementStatus() != PlacementStatus_Fixed)
        continue;
 
-		 if ( ferror(dataFile ) != 0) //проверка на ошибку
+		 if ( ferror(dataFile ) != 0) //РїСЂРѕРІРµСЂРєР° РЅР° РѕС€РёР±РєСѓ
 		 {
        printf( "ERROR: %d At a seal in a file %s \n", ferror(dataFile), fileName.c_str());
 			 return;
 		 }
 	
-		 //печатаем в файл имя, x, y, ориентация
+		 //РїРµС‡Р°С‚Р°РµРј РІ С„Р°Р№Р» РёРјСЏ, x, y, РѕСЂРёРµРЅС‚Р°С†РёСЏ
 		 fprintf(dataFile,
        "%8s %10.3f %10.3f : %s\n", 
        i.Name().c_str(),
@@ -135,5 +135,5 @@ void PrintToPL( HDesign& hd, const std::string fileName )//печать в фейл.pl
        );
 	 }
 	 
-	 fclose( dataFile );//закрываем файл
+	 fclose( dataFile );//Р·Р°РєСЂС‹РІР°РµРј С„Р°Р№Р»
 }

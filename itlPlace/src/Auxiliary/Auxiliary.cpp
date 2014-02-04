@@ -13,7 +13,7 @@ namespace Aux
 {
     const int TIME_STRING_LENGTH = 32;
 
-    //уравнение dT=a0 + a1*index_1 + a2 * index_2
+    //СѓСЂР°РІРЅРµРЅРёРµ dT=a0 + a1*index_1 + a2 * index_2
     void MNK(const double *index_1,
         const double *index_2,
         const double *values,
@@ -27,7 +27,7 @@ namespace Aux
 
         double *A = new double [n * m * dim];
 
-        //иходная матрица A = [1,index_1,index_2] , (n*m строк)
+        //РёС…РѕРґРЅР°СЏ РјР°С‚СЂРёС†Р° A = [1,index_1,index_2] , (n*m СЃС‚СЂРѕРє)
         for(int i1 = 0 ; i1 < n ; i1++)
             for(int j1 = 0 ; j1 < m ; j1++)
             {
@@ -192,10 +192,10 @@ namespace Aux
 
     string CreateCoolFileName(string dirName, string fileNameBase, string extension)
     {
-        //Директория должна заканчиваться \\
-        //папки будут создаваться в папке bin
-        //Имя не содержит директории и не содержит расширения
-        //Расширение обязательно
+        //Р”РёСЂРµРєС‚РѕСЂРёСЏ РґРѕР»Р¶РЅР° Р·Р°РєР°РЅС‡РёРІР°С‚СЊСЃСЏ \\
+        //РїР°РїРєРё Р±СѓРґСѓС‚ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РІ РїР°РїРєРµ bin
+        //РРјСЏ РЅРµ СЃРѕРґРµСЂР¶РёС‚ РґРёСЂРµРєС‚РѕСЂРёРё Рё РЅРµ СЃРѕРґРµСЂР¶РёС‚ СЂР°СЃС€РёСЂРµРЅРёСЏ
+        //Р Р°СЃС€РёСЂРµРЅРёРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ
 
         char timeStamp[TIME_STRING_LENGTH];
         GetApplicationTimeStamp(timeStamp);

@@ -46,7 +46,7 @@ _WriteFile(
   return VLSIWriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 }
 
-// Смещение + База = Виртуальный Адрес
+// РЎРјРµС‰РµРЅРёРµ + Р‘Р°Р·Р° = Р’РёСЂС‚СѓР°Р»СЊРЅС‹Р№ РђРґСЂРµСЃ
 #define RVATOVA( base, offset )(((DWORD)(base) + (DWORD)(offset))) 
 
 static int OverrideFunction(DWORD oldFunc, DWORD newFunc)
@@ -60,7 +60,7 @@ static int OverrideFunction(DWORD oldFunc, DWORD newFunc)
     for (int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++ )
     {
       BYTE *pimage = (BYTE*)hMods[i]; 
-      // Получаем указатели на стандартные структуры данных PE заголовка
+      // РџРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»Рё РЅР° СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹ РґР°РЅРЅС‹С… PE Р·Р°РіРѕР»РѕРІРєР°
       IMAGE_DOS_HEADER *idh
         = (IMAGE_DOS_HEADER*)pimage;
       IMAGE_OPTIONAL_HEADER *ioh
@@ -76,7 +76,7 @@ static int OverrideFunction(DWORD oldFunc, DWORD newFunc)
         //printf("Empty import section\n");
         continue;
       }
-      // Получаем адрес секции .idata(первого элемента IMAGE_IMPORT_DESCRIPTOR)
+      // РџРѕР»СѓС‡Р°РµРј Р°РґСЂРµСЃ СЃРµРєС†РёРё .idata(РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р° IMAGE_IMPORT_DESCRIPTOR)
       IMAGE_IMPORT_DESCRIPTOR *iid
         = (IMAGE_IMPORT_DESCRIPTOR*)(pimage + ioh->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress );
 

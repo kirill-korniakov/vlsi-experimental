@@ -31,24 +31,24 @@ typedef HNet* pHNet;
 typedef HCell* pHCell;
 
 struct PseudoCell{
-	int row, col; //координаты левого нижнего угла
+	int row, col; //РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ РЅРёР¶РЅРµРіРѕ СѓРіР»Р°
 	int GapSize;  
 };
 
 struct PossiblePos{
-	int row, col; //координаты левого нижнего угла
+	int row, col; //РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ РЅРёР¶РЅРµРіРѕ СѓРіР»Р°
 };
 struct SpecWindow
 {
-	int StartRow, StartCol, FinishRow, FinishCol; //коодинаты левого верхнего и правого нижнего
+	int StartRow, StartCol, FinishRow, FinishCol; //РєРѕРѕРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ Рё РїСЂР°РІРѕРіРѕ РЅРёР¶РЅРµРіРѕ
 };
 class LWindow
 {
 public:
-	int R;					// Радиус
-	int count;			// Количество элементов
-	HCell* cells;   // Массив элементов
-	//НЕТ КОНСТРУКТОРА КОПИРОВАНИЯ
+	int R;					// Р Р°РґРёСѓСЃ
+	int count;			// РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
+	HCell* cells;   // РњР°СЃСЃРёРІ СЌР»РµРјРµРЅС‚РѕРІ
+	//РќР•Рў РљРћРќРЎРўР РЈРљРўРћР Рђ РљРћРџРР РћР’РђРќРРЇ
 	LWindow();
 	~LWindow(); 
 };
@@ -71,8 +71,8 @@ struct BBox
 
 class StatisticsAnalyser{
 private:
-	int numOfSWAPAttepmts;                   //Количество попыток переставить элементы
-	int numOfSWAPSuccessfulAttempts;         //и количество удачных попыток
+	int numOfSWAPAttepmts;                   //РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРїС‹С‚РѕРє РїРµСЂРµСЃС‚Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚С‹
+	int numOfSWAPSuccessfulAttempts;         //Рё РєРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°С‡РЅС‹С… РїРѕРїС‹С‚РѕРє
 	int numOfMOVEAttepmts;
 	int numOfMOVESuccessfulAttempts;
 	int numOfLOCALMOVEAttepmts;
@@ -116,9 +116,9 @@ public:
 
 bool isCellExists(HDPGrid& hdpp, int row, int col);
 
-double CalculateAlpha(HDesign& hd, HNet changedNet); //Alpha вычисляется для выходных пинов
-double CalculateBetta(HDesign& hd, HPinWrapper sink, double oldMDist);  //Betta вычисляется для входных пинов и PO
-inline double CalculateGamma(HDesign& hd);  //Gamma вычисляется для проводов
+double CalculateAlpha(HDesign& hd, HNet changedNet); //Alpha РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РґР»СЏ РІС‹С…РѕРґРЅС‹С… РїРёРЅРѕРІ
+double CalculateBetta(HDesign& hd, HPinWrapper sink, double oldMDist);  //Betta РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РґР»СЏ РІС…РѕРґРЅС‹С… РїРёРЅРѕРІ Рё PO
+inline double CalculateGamma(HDesign& hd);  //Gamma РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РґР»СЏ РїСЂРѕРІРѕРґРѕРІ
 
 
 double CalculateDeltaArrivalTime(HDesign& hd, HPinWrapper sink);
@@ -127,22 +127,22 @@ __inline double GetNetWeight(HDesign& hd, HNet& net);
 
 double CalculateDiffWTWL(HDesign& hd, std::vector<HNet>& netvector, bool updateCachedValues);
 
-std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);// Нужно для MOVE, SWAP
-BBox GetCurrentBBox(HDPGrid& hdpp, HDesign& hd, const HCriticalPath::PointsEnumeratorW&);// Нужно для CENTER, COMPACT
+std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);// РќСѓР¶РЅРѕ РґР»СЏ MOVE, SWAP
+BBox GetCurrentBBox(HDPGrid& hdpp, HDesign& hd, const HCriticalPath::PointsEnumeratorW&);// РќСѓР¶РЅРѕ РґР»СЏ CENTER, COMPACT
 
-bool ControlOfConstraints(HDPGrid& hdpp, HDesign& hd, HNet net, int oldRow, int oldCol, HCell& curCell); //проверка ограничений
+bool ControlOfConstraints(HDPGrid& hdpp, HDesign& hd, HNet net, int oldRow, int oldCol, HCell& curCell); //РїСЂРѕРІРµСЂРєР° РѕРіСЂР°РЅРёС‡РµРЅРёР№
 
-std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellsWindow);//по окну LWindow возвращает вектор дырок в нем// moded
+std::vector<PseudoCell> getPseudoCellsFromWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellsWindow);//РїРѕ РѕРєРЅСѓ LWindow РІРѕР·РІСЂР°С‰Р°РµС‚ РІРµРєС‚РѕСЂ РґС‹СЂРѕРє РІ РЅРµРј// moded
 std::vector<PossiblePos> getVPossibleHorizontalPos(HDPGrid& hdpp, HCell curCell);
 std::vector<HCell> getSpecialWindow(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox);//window for COMPACT
-std::vector<PseudoCell> getPseudoCellsFromSpecWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellInSpWind);//вход - упорядоченный вектор элементов(окно от левого верхнего к правому нижнему), выход - вектор дырок в нем
+std::vector<PseudoCell> getPseudoCellsFromSpecWindow(HDPGrid& hdpp, HDesign& hd, std::vector<HCell>& VCellInSpWind);//РІС…РѕРґ - СѓРїРѕСЂСЏРґРѕС‡РµРЅРЅС‹Р№ РІРµРєС‚РѕСЂ СЌР»РµРјРµРЅС‚РѕРІ(РѕРєРЅРѕ РѕС‚ Р»РµРІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ Рє РїСЂР°РІРѕРјСѓ РЅРёР¶РЅРµРјСѓ), РІС‹С…РѕРґ - РІРµРєС‚РѕСЂ РґС‹СЂРѕРє РІ РЅРµРј
 PossiblePos GetCenterNearestPos (HCell& NetCell, std::vector<PseudoCell>& VGap);
 
 SpecWindow getSpecWindForCell(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox );
 std::vector<PseudoCell> getGapsForCell(HDPGrid& hdpp, HDesign& hd, HCell& CellFromNet, BBox& curBBox, bool InsideGaps );
 std::vector<HPinWrapper> CellsInPath(HDesign& hd, HCriticalPath path);
 BBox GetCurrentBBox3(HDPGrid& hdpp, HDesign& hd, HPinWrapper& myPin);
-std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);	// Вернуть окно элемента // moded
+std::vector<HCell> GetCurrentWindow(HDPGrid& hdpp, int R, HCell curCell);	// Р’РµСЂРЅСѓС‚СЊ РѕРєРЅРѕ СЌР»РµРјРµРЅС‚Р° // moded
 
 
 //void DoAllMethodsWithPath(HDesign&, HCriticalPath, int);
@@ -155,7 +155,7 @@ void DoAllMethodsWithPath(HDesign&, HCriticalPath, int);
 //public:
 
 
-//============= ПРЕОБРАЗОВАНИЯ ===================
+//============= РџР Р•РћР‘Р РђР—РћР’РђРќРРЇ ===================
 void HippocratePlacementMOVE(HDPGrid& hdpp, HDesign& hd, /*int numOfPath,int numOfPoint, */HCell& curCell, std::vector<HCell>& currentWnd, StatisticsAnalyser& stat);
 void HippocratePlacementCOMPACT(HDPGrid& hdpp, HDesign& hd, HCell& curCell, BBox curBBox, StatisticsAnalyser& stat);
 void HippocratePlacementLOCALMOVE(HDPGrid& hdpp, HDesign& hd, HCell& curCell, StatisticsAnalyser& stat);
@@ -169,8 +169,8 @@ void HippocratePlacementFinalize();
 
 //};
 
-//классы-компараторы для сортировки элементов в окне 
-//(нужно для getPseudoCellsFromWindow для нахождения дырок)
+//РєР»Р°СЃСЃС‹-РєРѕРјРїР°СЂР°С‚РѕСЂС‹ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё СЌР»РµРјРµРЅС‚РѕРІ РІ РѕРєРЅРµ 
+//(РЅСѓР¶РЅРѕ РґР»СЏ getPseudoCellsFromWindow РґР»СЏ РЅР°С…РѕР¶РґРµРЅРёСЏ РґС‹СЂРѕРє)
 class CellRowComparator{
 public:
 	HDPGrid& hdpp;

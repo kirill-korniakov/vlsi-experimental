@@ -84,8 +84,8 @@ void ReportMacroTypeInfo(HDesign& design)
       WRITELINE("     # Direction =\t%d", enuPin.Direction());
       WRITELINE("     # Function  =\t%s", Utils::GetPinFunctionStr(enuPin.Function()));
 
-      //извиняюсь, но дальше написана хрень какая-то
-      //в таком виде это просто нельзя использовать
+      //РёР·РІРёРЅСЏСЋСЃСЊ, РЅРѕ РґР°Р»СЊС€Рµ РЅР°РїРёСЃР°РЅР° С…СЂРµРЅСЊ РєР°РєР°СЏ-С‚Рѕ
+      //РІ С‚Р°РєРѕРј РІРёРґРµ СЌС‚Рѕ РїСЂРѕСЃС‚Рѕ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
       //for (HCells::CellsEnumeratorW cell = 
       //  design.Cells.GetEnumeratorW(); cell.MoveNext(); )
       //  for (HCell::PinsEnumeratorW enuPinCell = 
