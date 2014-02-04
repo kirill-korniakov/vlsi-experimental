@@ -8,9 +8,9 @@ project(itlPlace)
 #SET(MAKE_EXECUTABLE nmake)
 
 MESSAGE("OpenCV_DIR: ${OpenCV_DIR}")
-MESSAGE("PETSC_DIR: ${PETSC_DIR}")
+MESSAGE("PETSC_DIR:  ${PETSC_DIR}")
 MESSAGE("PETSC_ARCH: ${PETSC_ARCH}")
-MESSAGE("TAO_DIR: ${TAO_DIR}")
+MESSAGE("TAO_DIR:    ${TAO_DIR}")
 
 #TODO: hardcoded paths
 set(FOR_GOOGLE_HASH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/c++/4.2.1/")
@@ -21,11 +21,13 @@ set(TAO_LIBRARIES_PATH "${TAO_DIR}/lib/${PETSC_ARCH}")
 #SET(CMAKE_CXX_FLAGS "-ferror-limit=3")
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-FIND_PACKAGE(OpenCV REQUIRED)
-FIND_PACKAGE(PETSc COMPONENTS CXX)
 
-set(PETSC_INCLUDES "${PETSC_INCLUDES};${PETSC_DIR}/include/mpiuni")
-set(PETSC_LIBRARIES "${PETSC_LIBRARIES};${PETSC_DIR}/lib/${PETSC_ARCH}/libf2clapack.a;${PETSC_DIR}/lib/${PETSC_ARCH}/libf2cblas.a;${PETSC_DIR}/lib/${PETSC_ARCH}/libmpiuni.a")
+FIND_PACKAGE(PETSc COMPONENTS CXX)
+SET(PETSC_INCLUDES "${PETSC_INCLUDES};${PETSC_DIR}/include/mpiuni")
+SET(PETSC_LIBRARIES "${PETSC_LIBRARIES};${PETSC_DIR}/lib/${PETSC_ARCH}/libf2clapack.a;${PETSC_DIR}/lib/${PETSC_ARCH}/libf2cblas.a;${PETSC_DIR}/lib/${PETSC_ARCH}/libmpiuni.a")
+
+FIND_PACKAGE(OpenCV REQUIRED)
+MESSAGE("OpenCV_LIBS: ${OpenCV_LIBS}")
 
 # Glob for headers
 MACRO(HEADER_DIRECTORIES return_list)
@@ -54,7 +56,7 @@ FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/conf
 ADD_EXECUTABLE(${app} ${srcs})
 TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${TAO_LIBRARIES} ${PETSC_LIBRARIES})
 
-# DEBUGGING SECTION
+# Debugging CMake
 FUNCTION(JOIN values separator result)
   STRING(REPLACE ";" "${separator}" _TMP_STR "${values}")
   SET(${result} "${_TMP_STR}" PARENT_SCOPE)
