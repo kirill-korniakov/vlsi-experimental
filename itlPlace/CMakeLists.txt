@@ -63,4 +63,4 @@ FUNCTION(JOIN values separator result)
 ENDFUNCTION()
 
 JOIN("${OpenCV_LIBS}" "\n" output)
-#MESSAGE("Hey! ${output}")
+#MESSAGE("Hey: ${output}")
