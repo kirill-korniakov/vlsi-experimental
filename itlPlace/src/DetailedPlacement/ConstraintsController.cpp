@@ -58,8 +58,8 @@ HippocrateChecker::HippocrateChecker(HDPGrid& _grid): HPWLChecker(_grid)
 void HippocrateChecker::CalculateGamma()
 {
   HDesign& hd = grid.Design();
-  double r    = hd.RoutingLayers.Physics.RPerDist; //удельное сопротивление
-  double c    = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+  double r    = hd.RoutingLayers.Physics.RPerDist; //СѓРґРµР»СЊРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ
+  double c    = hd.RoutingLayers.Physics.LinearC;  //СѓРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕС‘РјРєРѕСЃС‚СЊ
   gamma       = CONST_Kd * r * c * 0.5;
 }
 
@@ -150,22 +150,22 @@ double CalculateAlpha(HNet changedNet, HDesign& hd)
 {
   HPin source    = hd.Get<HNet::Source, HPin>(changedNet);
   double Rdriver = Utils::GetDriverWorstPhisics(hd, source, SignalDirection_None).R;
-  double c       = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+  double c       = hd.RoutingLayers.Physics.LinearC;  //СѓРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕС‘РјРєРѕСЃС‚СЊ
   return (Rdriver * c);
 }
 
 double CalculateBetta(HPinWrapper sink, double oldMDist, HDesign& hd)
 {
-  double r     = hd.RoutingLayers.Physics.RPerDist; //удельное сопротивление
-  double c     = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+  double r     = hd.RoutingLayers.Physics.RPerDist; //СѓРґРµР»СЊРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ
+  double c     = hd.RoutingLayers.Physics.LinearC;  //СѓРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕС‘РјРєРѕСЃС‚СЊ
   double csink = Utils::GetSinkCapacitance(hd, sink, SignalDirection_None);
   return (CONST_Kd * r * (c * oldMDist + csink));
 }
 
 double CalculateEstimatedTime(HPinWrapper sink, double oldMDist, HDesign& hd)
 {
-  double r     = hd.RoutingLayers.Physics.RPerDist; //удельное сопротивление
-  double c     = hd.RoutingLayers.Physics.LinearC;  //удельная электроёмкость
+  double r     = hd.RoutingLayers.Physics.RPerDist; //СѓРґРµР»СЊРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ
+  double c     = hd.RoutingLayers.Physics.LinearC;  //СѓРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕС‘РјРєРѕСЃС‚СЊ
   double csink = Utils::GetSinkCapacitance(hd, sink, SignalDirection_None);
   return (CONST_Kd * r * (c * oldMDist / 2 + csink));
 }
@@ -173,12 +173,12 @@ double CalculateEstimatedTime(HPinWrapper sink, double oldMDist, HDesign& hd)
 double CalculateDeltaArrivalTime(HPinWrapper sink, HDesign& hd)
 {
 	HCell cell = sink.Cell();
-	double cellAT; //AT для элемента
-	double sinkAT; //AT для sink
+	double cellAT; //AT РґР»СЏ СЌР»РµРјРµРЅС‚Р°
+	double sinkAT; //AT РґР»СЏ sink
 	HTimingPointWrapper tpsink = hd[hd.TimingPoints[sink]];
 	sinkAT = tpsink.ArrivalTime();
 	cellAT = sinkAT;
-	std::vector<HPin> inpPin;	//входные пины элемента
+	std::vector<HPin> inpPin;	//РІС…РѕРґРЅС‹Рµ РїРёРЅС‹ СЌР»РµРјРµРЅС‚Р°
 
 	for (HCell::PinsEnumeratorW pin = hd.Get<HCell::Pins, HCell::PinsEnumeratorW>(cell);
        pin.MoveNext(); )
@@ -194,7 +194,7 @@ double CalculateDeltaArrivalTime(HPinWrapper sink, HDesign& hd)
 			inpPin.push_back(pin);
 	}
 
-	//рассматриваем все входные пины элемента
+	//СЂР°СЃСЃРјР°С‚СЂРёРІР°РµРј РІСЃРµ РІС…РѕРґРЅС‹Рµ РїРёРЅС‹ СЌР»РµРјРµРЅС‚Р°
 	for (int i = 0; i < inpPin.size(); i++)
   {
 		HTimingPointWrapper tp = hd[hd.TimingPoints[inpPin[i]]];

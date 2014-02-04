@@ -110,8 +110,8 @@ private:
   int m_CellLeftSiteIdx;
   int m_SearchZoneLeftSiteIdx;
   int m_OptimalRowIdx;
-  const int m_searchZoneSize;   // характеризует величину зоны поиска в очередном ряду (кол-во сайтов для поиска есть
-  // произведение этой величины на размер селла в сайтах) 
+  const int m_searchZoneSize;   // С…Р°СЂР°РєС‚РµСЂРёР·СѓРµС‚ РІРµР»РёС‡РёРЅСѓ Р·РѕРЅС‹ РїРѕРёСЃРєР° РІ РѕС‡РµСЂРµРґРЅРѕРј СЂСЏРґСѓ (РєРѕР»-РІРѕ СЃР°Р№С‚РѕРІ РґР»СЏ РїРѕРёСЃРєР° РµСЃС‚СЊ
+  // РїСЂРѕРёР·РІРµРґРµРЅРёРµ СЌС‚РѕР№ РІРµР»РёС‡РёРЅС‹ РЅР° СЂР°Р·РјРµСЂ СЃРµР»Р»Р° РІ СЃР°Р№С‚Р°С…) 
   const int m_nRowsToSearch;
 
   bool TryToMoveWithShifting(int rowIdx);

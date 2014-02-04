@@ -150,7 +150,7 @@ public:
 
     void drob()
     {
-        //попарный перебор
+        //РїРѕРїР°СЂРЅС‹Р№ РїРµСЂРµР±РѕСЂ
         CriticalPathBuffering* cur = list;    
         CriticalPathBuffering* old1 = list; 
         CriticalPathBuffering* old2 = list; 
@@ -167,7 +167,7 @@ public:
                         for(;(cur->MoveNext() && (!cur->isSplit));)
                             for(;(cur2->MoveNext() && (!cur->isSplit));)
                             {
-                                //если неты совпадут
+                                //РµСЃР»Рё РЅРµС‚С‹ СЃРѕРІРїР°РґСѓС‚
                                 if (design.Pins.Get<HPin::Net, HNet>(design.TimingPoints.Get<HTimingPoint::Pin, HPin>(design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cur->points[cur->indexPoint]))) == 
                                     design.Pins.Get<HPin::Net, HNet>(design.TimingPoints.Get<HTimingPoint::Pin, HPin>(design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cur2->points[cur2->indexPoint]))))
                                 {
@@ -180,7 +180,7 @@ public:
                                     if ((cur->pointCount == 0) || (cur2->pointCount == 0))
                                         int ty = 0;
 
-                                    //если совпадают начала путей
+                                    //РµСЃР»Рё СЃРѕРІРїР°РґР°СЋС‚ РЅР°С‡Р°Р»Р° РїСѓС‚РµР№
                                     if ((oldindex1 == 1) && (oldindex2))
                                     {
                                         oldindex1 = -1;
@@ -193,7 +193,7 @@ public:
 
                                     bool f = false;
                                     int c = 0, c1 = 0, c2 = 0;
-                                    //выделяем совпадающие
+                                    //РІС‹РґРµР»СЏРµРј СЃРѕРІРїР°РґР°СЋС‰РёРµ
                                     for (;cur->MoveNext() && cur2->MoveNext();)
                                     {
                                         if (design.Pins.Get<HPin::Net, HNet>(design.TimingPoints.Get<HTimingPoint::Pin, HPin>(design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cur->points[cur->indexPoint]))) 
@@ -211,7 +211,7 @@ public:
                                     
                                     if ((c % 2) != 0)
                                         int uyu = 0;
-                                    //создаем новый путь
+                                    //СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№ РїСѓС‚СЊ
                                     if (c != 0)
                                     {
                                         CriticalPathBuffering* ncpb = new CriticalPathBuffering();
@@ -233,7 +233,7 @@ public:
                                         
                                     }
 
-                                    //если конци не совпали, выделяем для концов
+                                    //РµСЃР»Рё РєРѕРЅС†Рё РЅРµ СЃРѕРІРїР°Р»Рё, РІС‹РґРµР»СЏРµРј РґР»СЏ РєРѕРЅС†РѕРІ
                                     if (f)
                                     {
                                         nets.push_back(design.Pins.Get<HPin::Net, HNet>(design.TimingPoints.Get<HTimingPoint::Pin, HPin>(design.CriticalPathPoints.Get<HCriticalPathPoint::TimingPoint, HTimingPoint>(cur->points[cur->indexPoint - 1])))); 
@@ -289,7 +289,7 @@ public:
                                             ncpb2->points[j2] = *i2;
                                     }
 
-                                    //обрубаем старые
+                                    //РѕР±СЂСѓР±Р°РµРј СЃС‚Р°СЂС‹Рµ
                                     cur->indexPoint = oldindex1;
                                     cur2->indexPoint = oldindex2;
 

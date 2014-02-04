@@ -15,7 +15,7 @@
 //TODO: function for cell family name
 //TODO: class CellFamily 
 //TODO: GetCellFamilyRC()
-//TODO обход всех нетов и для каждого получаем вектор отр
+//TODO РѕР±С…РѕРґ РІСЃРµС… РЅРµС‚РѕРІ Рё РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕР»СѓС‡Р°РµРј РІРµРєС‚РѕСЂ РѕС‚СЂ
 void LRSizer::ApplySizing(std::vector<double>& X)
 {
   ASSERT(cells->size() == X.size());
@@ -346,7 +346,7 @@ void LRSizer::SolveLDP()
 double LRSizer::FindOutputLambdaSum(HTimingPoint point)
 {
   double sumOfLambda = 0;
-  //Выходные арки
+  //Р’С‹С…РѕРґРЅС‹Рµ Р°СЂРєРё
   HPin pin = design.Get<HTimingPoint::Pin, HPin>(point);
   if (design.Get<HPin::Direction, PinDirection>(pin) == PinDirection_OUTPUT)
   {
@@ -365,7 +365,7 @@ double LRSizer::FindOutputLambdaSum(HTimingPoint point)
     //cell input pin, iterate cell arcs
     HPin inputPin = pin;
     HCell cell = (design, inputPin).Cell();
-    //шпаргалка
+    //С€РїР°СЂРіР°Р»РєР°
     // (design,cell) \
     // (cell,design) --> HCellWrapper
     // design[cell]  /

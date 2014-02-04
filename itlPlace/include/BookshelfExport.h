@@ -5,8 +5,8 @@
  
 void PrintToPL(HDesign& hd, const std::string fileName);
 
-//string GenerateFileName();//добавляет в название pl файла название программы и время через подчеркивание
+//string GenerateFileName();//РґРѕР±Р°РІР»СЏРµС‚ РІ РЅР°Р·РІР°РЅРёРµ pl С„Р°Р№Р»Р° РЅР°Р·РІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ Рё РІСЂРµРјСЏ С‡РµСЂРµР· РїРѕРґС‡РµСЂРєРёРІР°РЅРёРµ
 
-//string getStringOrientation(CellOrientation i_Orientation);//возвращает строковое значение орентации
+//string getStringOrientation(CellOrientation i_Orientation);//РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕСЂРµРЅС‚Р°С†РёРё
 
 #endif//__BOOKSHELFEXPORT_H__

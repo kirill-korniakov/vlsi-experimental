@@ -152,7 +152,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 			Ai = (yi2 - yi1)/(xi2 - xi1);
 			Bi = yi1 - Ai * xi1;
 
-			//начало1
+			//РЅР°С‡Р°Р»Рѕ1
 			TemplateTypes<HSteinerPoint>::stack points2;
 			HSteinerPointWrapper srcPoint2 = design[design.SteinerPoints[src]];
 			HSteinerPointWrapper nextPoint2 = srcPoint2;
@@ -190,7 +190,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 					}
 				}
 			}
-			//конец1
+			//РєРѕРЅРµС†1
 
 			if (srcPoint.HasRight())
 			{
@@ -202,7 +202,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 				Ai = (yi2 - yi1)/(xi2 - xi1);
 				Bi = yi1 - Ai * xi1;
 
-				//начало2
+				//РЅР°С‡Р°Р»Рѕ2
 				TemplateTypes<HSteinerPoint>::stack points2;
 				HSteinerPointWrapper srcPoint2 = design[design.SteinerPoints[src]];
 				HSteinerPointWrapper nextPoint2 = srcPoint2;
@@ -240,7 +240,7 @@ CrossingReport SteinerTreeReport(HDesign& design, HNet net, bool isReport, int i
 						}
 					}
 				}
-				//конец2
+				//РєРѕРЅРµС†2
 			}
 		}
 		else

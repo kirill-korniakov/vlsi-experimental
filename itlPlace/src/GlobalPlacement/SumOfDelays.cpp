@@ -1,6 +1,6 @@
 #include "SumOfDelays.h"
 #include "LogSumExp.h"
-///!!!ни где не используется
+///!!!РЅРё РіРґРµ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
 double GetNetKOpt(PetscScalar* coordinates, int nClusterCoordinates, HClusteredNet i, AppCtx* context)
 {
   double kopt = (CalcNetLSE(context, coordinates, i) 

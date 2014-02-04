@@ -199,8 +199,8 @@ private:
         for (RLnode* nd = list; nd != 0; nd = nd->next)
         {
             nd->RequiredTime = nd->RequiredTime
-                - 0.5 * WirePhisics.RPerDist * WirePhisics.LinearC * l * l //ñîáñòâåííàÿ çàäåðæêà íà ïðîâîäå
-                - WirePhisics.RPerDist * l * nd->DownstreamCapacitance; //çàäåðæêà íà îáîçðåâàåìîé ¸ìêîñòè
+                - 0.5 * WirePhisics.RPerDist * WirePhisics.LinearC * l * l //ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð°Ñ Ð·Ð°Ð´ÐµÑ€Ð¶ÐºÐ° Ð½Ð° Ð¿Ñ€Ð¾Ð²Ð¾Ð´Ðµ
+                - WirePhisics.RPerDist * l * nd->DownstreamCapacitance; //Ð·Ð°Ð´ÐµÑ€Ð¶ÐºÐ° Ð½Ð° Ð¾Ð±Ð¾Ð·Ñ€ÐµÐ²Ð°ÐµÐ¼Ð¾Ð¹ Ñ‘Ð¼ÐºÐ¾ÑÑ‚Ð¸
             nd->DownstreamCapacitance += l * WirePhisics.LinearC; //wire capacitance
         }
     }
