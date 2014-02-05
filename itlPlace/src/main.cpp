@@ -31,7 +31,7 @@ void InitializeDesign(HDesign& design, int argc, char** argv)
 {
     design.Initialize();
 
-    design.cfg.LoadConfiguration(argc > 1 ? argv[1] : "default.cfg");
+    design.cfg.LoadConfiguration(argc > 1 ? argv[1] : "./cfg/default.cfg");
     design.cfg.SetArguments(argc, argv);
 
     ParseLEF(design);
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
     try
     {
         //global initializations
-        ::gCfg.LoadConfiguration("itlVLSI.cfg");
+        ::gCfg.LoadConfiguration("./cfg/itlVLSI.cfg");
         Logger::InitializeLogging(::gCfg);
         Logger::Global.PrintRevisionNumber();
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#define POWVFILE "POWV9.dat"    // LUT for POWV (Wirelength Vector)
-#define POSTFILE "POST9.dat"    // LUT for POST (Steiner Tree)
+#define POWVFILE "./technology/POWV9.dat"    // LUT for POWV (Wirelength Vector)
+#define POSTFILE "./technology/POST9.dat"    // LUT for POST (Steiner Tree)
 //FIXME: another is defined in FLUTERoute.cpp:8
 #define MAXD 150    // max. degree of a net that can be handled
                     // Setting MAXD to more than 150 is not recommended

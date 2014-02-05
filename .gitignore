@@ -1,3 +1,4 @@
 .DS_Store
 *.user
 itlPlace-build
+itlPlace/cfg/Replicated_*

@@ -57,6 +57,12 @@ FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/conf
 ADD_EXECUTABLE(${app} ${srcs})
 TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${TAO_LIBRARIES} ${PETSC_LIBRARIES})
 
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ln -sf ../../itlPlace/cfg "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfg"
+    COMMAND ln -sf ../../itlPlace/technology "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/technology"
+)
+
 # Debugging CMake
 FUNCTION(JOIN values separator result)
   STRING(REPLACE ";" "${separator}" _TMP_STR "${values}")
