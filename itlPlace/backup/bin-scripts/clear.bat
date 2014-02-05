@@ -1,0 +1,10 @@
+del .\ExportDEF\*.def
+del .\log\*.log
+del .\log\*.htm
+del .\log\*.html
+del .\pix\*.jpg
+del .\pix\milestones\*.jpg
+del .\video\*.avi
+del .\*.nwts
+del .\Replicated_*.cfg
+del .\*Warning.log
