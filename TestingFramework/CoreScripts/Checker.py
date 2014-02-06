@@ -48,16 +48,18 @@ class Checker(BaseExperiment):
         WriteStringToFile(cols, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
+        logger = Logger()
+        logger.Log("Parsing: " + logName)
         currentValues = self.ParseLog(logName)
 
         if (currentValues == []):
           return [FAILED, []]
 
         masterLogName = os.path.join(self.masterLogFolder, os.path.basename(logName))
+        logger.Log("Parsing: " + masterLogName)
         masterValues  = self.ParseLog(masterLogName)
 
         if (masterValues == []):
-            logger = Logger()
             logger.Log("Experiment has not failed but master log is empty or does not exist\n")
             return [NEW, currentValues]
 
