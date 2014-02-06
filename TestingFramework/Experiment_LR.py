@@ -45,7 +45,7 @@ class Experiment_LR(BaseExperiment):
 
 def TestRun():
     e = Experiment_LR()
-    e.SetBenchmarksList("IWLS_GP_fast.list")
+    e.SetBenchmarksList("IWLS_GP_r1511_fast.list")
 
     testRunner = TestRunner()
     testRunner.Append(e)

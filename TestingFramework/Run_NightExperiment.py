@@ -14,24 +14,26 @@ from Experiment_New_Buffering import Experiment_New_Buffering
 from FastCheckRunner import FastCheckRunner
 
 def NightExperiment(testRunner):
+  referenceLogs = "ReferenceLogs" #TODO: read from config
+
   exp_HPWL = Experiment_HPWL()
-  chk_HPWL_IWLS = Checker(exp_HPWL, r"MasterLogs/HPWL/IWLS")
+  chk_HPWL_IWLS = Checker(exp_HPWL, referenceLogs + r"/HPWL/IWLS")
 
   exp_HPWL.name = "ISPD04 HPWL Experiment"
   exp_HPWL.SetConfig("hpwl_ispd04.cfg")
   exp_HPWL.SetBenchmarksList("ISPD04.list")
-  chk_HPWL_ISPD = Checker(exp_HPWL, r"MasterLogs/HPWL/ISPD")
+  chk_HPWL_ISPD = Checker(exp_HPWL, referenceLogs + r"/HPWL/ISPD")
 
-  chk_LR  = Checker(Experiment_LR(), r"MasterLogs/LR")
-  chk_BUF = Checker(Experiment_New_Buffering(), r"MasterLogs/New_Buffering/IWLS")
-  chk_HDP = Checker(Experiment_HippocrateDP(), r"MasterLogs/HippocrateDP/Aleksandr")
+  chk_LR  = Checker(Experiment_LR(), referenceLogs + r"/LR")
+  chk_BUF = Checker(Experiment_New_Buffering(), referenceLogs + r"/New_Buffering/IWLS")
+  chk_HDP = Checker(Experiment_HippocrateDP(), referenceLogs + r"/HippocrateDP")
 
   exp_W   = Experiment_Weighting()
-  chk_SGW = Checker(exp_W, r"MasterLogs/Weighting/SensitivityGuided")
+  chk_SGW = Checker(exp_W, referenceLogs + r"/Weighting/SensitivityGuided")
 
   exp_W.name = "APlace weighting experiment"
   exp_W.SetConfig("APlace_weighting.cfg")
-  chk_APW = Checker(exp_W, r"MasterLogs/Weighting/SensitivityGuided")
+  chk_APW = Checker(exp_W, referenceLogs + r"/Weighting/SensitivityGuided")
 
   testRunner.Append(chk_BUF)
   testRunner.AddExperimentToGroup(chk_SGW)
