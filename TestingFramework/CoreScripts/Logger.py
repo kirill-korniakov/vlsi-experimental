@@ -1,9 +1,15 @@
 import time
 from CoreFunctions import GetTimeStamp
+from CfgParserFactory import CfgParserFactory
 
 class Logger:
+    factory = CfgParserFactory()
+    cfgParser = factory.createCfgParser()
+
+    selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
+
     startTime   = time.time()
-    logFileName = r"./Logs/%s_TF.log" % (GetTimeStamp()) # TODO: use ReportCreator.CreateLogFolder
+    logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp()) #TODO: use ReportCreator.CreateLogFolder
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime

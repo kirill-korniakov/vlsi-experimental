@@ -1,5 +1,9 @@
 .DS_Store
 *.user
+*.pyc
+
 itlPlace-build
 itlPlace/cfg/Replicated_*
 Benchmarks/IWLS_GP_r1511
+CurrentLogs
+TFLogs
