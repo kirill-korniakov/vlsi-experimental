@@ -5,16 +5,17 @@ NOT_FOUND = -1.0
 PFST = "PFST"
 PQAT = "PQAT"
 
-class LogParser:
-    logName     = ""
-    tableHeader = ""
-    parameters  = None
 
-    def __init__(self, logName, tableType = PFST, cfgParser = None):
+class LogParser:
+    logName = ""
+    tableHeader = ""
+    parameters = None
+
+    def __init__(self, logName, tableType=PFST, cfgParser=None):
         self.logName = logName
 
         if (cfgParser == None):
-          cfgParser  = CreateConfigParser()
+            cfgParser = CreateConfigParser()
 
         self.parameters = LogParserParameters(cfgParser)
 
@@ -24,7 +25,7 @@ class LogParser:
         else:
             self.tableHeader = self.parameters.PQATTableHeader
 
-    def GetFromTable(self, stageTag, metricTag, tableType = PFST):
+    def GetFromTable(self, stageTag, metricTag, tableType=PFST):
         try:
             log = open(self.logName, 'r')
             lines = log.readlines()
@@ -35,7 +36,7 @@ class LogParser:
             return NOT_FOUND
 
         #move to the table
-        lineIdx       = 0
+        lineIdx = 0
         borderPattern = self.parameters.PFSTBorderPattern
 
         for line in lines:
@@ -49,7 +50,7 @@ class LogParser:
             return NOT_FOUND
 
         #find colIdx
-        metrics = lines[lineIdx+1].split()
+        metrics = lines[lineIdx + 1].split()
         colIdx = 0
         for metric in metrics:
             if metrics[colIdx].find(metricTag) == 0:
@@ -85,7 +86,7 @@ class LogParser:
                 value = float(value.replace(",", "."))
 
                 if (value == NOT_FOUND):
-                    del table[currStage] #delete empty field
+                    del table[currStage]  #delete empty field
                     return table
 
                 table[currStage].append(value)
@@ -105,17 +106,17 @@ class LogParser:
                 value = str(self.GetFromTable(stages[row], metrics[col]))
 
                 if (value == str(NOT_FOUND)):
-                   return []
+                    return []
 
                 table[row][col] = float(value.replace(",", "."))
 
         return table
 
     def GetStageTag(self):
-        log   = open(self.logName, 'r')
+        log = open(self.logName, 'r')
         lines = log.readlines()
         log.close()
-        lineIdx    = 0
+        lineIdx = 0
         linesCount = 0
 
         for line in lines:
@@ -123,8 +124,8 @@ class LogParser:
 
         for line in lines:
             if line.find(self.tableHeader) != -1:
-                colIdx    = 0
-                metrics   = lines[lineIdx + 1].split()
+                colIdx = 0
+                metrics = lines[lineIdx + 1].split()
                 metricTag = "Tag"
 
                 for metric in metrics:
@@ -138,19 +139,19 @@ class LogParser:
                     print("Tag %s not found" % (metricTag))
                     return NOT_FOUND
 
-                lineIdx    = lineIdx + 3
+                lineIdx = lineIdx + 3
                 columCount = 0;
-                i          = lineIdx
+                i = lineIdx
 
-                while ((lines[i].find(self.parameters.PFSTBorderPattern) == -1)\
-                        and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                while ((lines[i].find(self.parameters.PFSTBorderPattern) == -1) \
+                               and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     columCount = columCount + 1
                     i = i + 1
 
                 tagList = []
 
-                while ((lines[lineIdx].find(self.parameters.PFSTBorderPattern) == -1)\
-                        and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
+                while ((lines[lineIdx].find(self.parameters.PFSTBorderPattern) == -1) \
+                               and (lines[i].find("Thats All") == -1) and (i <= linesCount)):
                     ll = lines[lineIdx].split()
                     tagList.append(ll[colIdx])
                     lineIdx = lineIdx + 1

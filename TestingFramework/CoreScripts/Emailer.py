@@ -11,25 +11,26 @@ import os
 from Logger import Logger
 from ParametersParsing import EmailerParameters
 
+
 class Emailer:
     logger = None
 
-    def __init__(self, parameters = EmailerParameters()):
-        self.logger     = Logger()
+    def __init__(self, parameters=EmailerParameters()):
+        self.logger = Logger()
         self.parameters = parameters
 
     def PrepareAndSendMail(self, subject, text, attachmentFiles):
         self.send_mail(
-            self.parameters.sender,     # from
-            self.parameters.recipients, # to
-            subject,                    # subject
-            text,                       # text
-            attachmentFiles,            # attachment files
-            self.parameters.smtpserver, # SMTP server
-            25,                         # port
-            self.parameters.smtpuser,   # login
-            self.parameters.smtppass,   # password
-            0)                          # TTLS
+            self.parameters.sender,  # from
+            self.parameters.recipients,  # to
+            subject,  # subject
+            text,  # text
+            attachmentFiles,  # attachment files
+            self.parameters.smtpserver,  # SMTP server
+            25,  # port
+            self.parameters.smtpuser,  # login
+            self.parameters.smtppass,  # password
+            0)  # TTLS
 
     def PrepareAndSendMailIfRequired(self, text, attachmentFiles):
         if (self.parameters.doSendMail == True):
@@ -37,29 +38,29 @@ class Emailer:
             self.logger.Log("Sending email with results:\n%s" % (text))
             self.PrepareAndSendMail(subject, text, attachmentFiles)
 
-    def SendMessageAndExit(self, text, attachmentFiles = []):
+    def SendMessageAndExit(self, text, attachmentFiles=[]):
         self.PrepareAndSendMailIfRequired(text, attachmentFiles)
         exit(1)
 
     def send_mail(self,
-        sender,               # from e-mail address
-        to,                   # to e-mail address list
-        subject,              # message subject
-        text,                 # text message
-        files  = [],          # attachment files
-        server = "localhost", # SMTP server
-        port   = 0,           # SMTP server port
-        login  = "",          # login if requared or ""
-        passwd = "",          # password
-        ttls   = 0,           # TTLS flag (0/1)
-        debuglevel = 0):      # debug level
+                  sender,  # from e-mail address
+                  to,  # to e-mail address list
+                  subject,  # message subject
+                  text,  # text message
+                  files=[],  # attachment files
+                  server="localhost",  # SMTP server
+                  port=0,  # SMTP server port
+                  login="",  # login if requared or ""
+                  passwd="",  # password
+                  ttls=0,  # TTLS flag (0/1)
+                  debuglevel=0):  # debug level
         assert type(to) == list
         assert type(files) == list
 
         msg = MIMEMultipart()
-        msg["From"]    = sender
-        msg["To"]      = COMMASPACE.join(to)
-        msg["Date"]    = formatdate(localtime = True)
+        msg["From"] = sender
+        msg["To"] = COMMASPACE.join(to)
+        msg["Date"] = formatdate(localtime=True)
         msg["Subject"] = subject
 
         msg.attach(MIMEText(text))
@@ -69,7 +70,7 @@ class Emailer:
             part = MIMEBase("application", "octet-stream")
             #part.set_payload(open(file, "rb").read())
             #encoders.encode_base64(part)
-            file_content = open(file,"rb").read()
+            file_content = open(file, "rb").read()
             part.set_payload(b64encode(file_content).decode("ascii"))
             part["Content-Transfer-Encoding"] = "base64"
             part.add_header("Content-Disposition", 'attachment; filename="%s"' % os.path.basename(file))

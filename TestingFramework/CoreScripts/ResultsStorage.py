@@ -1,37 +1,37 @@
 from Logger import Logger
-from BaseExperiment import ExperimentResults
+
 
 class ResultsStorage:
-  logger            = None
-  experimentResults = {} #experimentName: experimentResult
+    logger = None
+    experimentResults = {}  #experimentName: experimentResult
 
-  def __init__(self):
-    self.logger = Logger()
+    def __init__(self):
+        self.logger = Logger()
 
-  def AddExperimentResult(self, experimentName, result):
-    if (experimentName in list(self.experimentResults.keys())):
-      self.logger.Log("Error: the result for experiment %s is already stored" % experimentName)
+    def AddExperimentResult(self, experimentName, result):
+        if (experimentName in list(self.experimentResults.keys())):
+            self.logger.Log("Error: the result for experiment %s is already stored" % experimentName)
 
-    self.experimentResults[experimentName] = result
+        self.experimentResults[experimentName] = result
 
-  def __str__(self):
-    resultStr = ""
+    def __str__(self):
+        resultStr = ""
 
-    for experimentName, experimentResult in self.experimentResults.iteritems():
-      resultStr += ("%s:\n%s\n" % (experimentName, experimentResult.__str__()))
+        for experimentName, experimentResult in self.experimentResults.iteritems():
+            resultStr += ("%s:\n%s\n" % (experimentName, experimentResult.__str__()))
 
-    return resultStr
+        return resultStr
 
-  def LogResults(self):
-    self.logger.Log("\nResults:\n%s" % self.__str__())
+    def LogResults(self):
+        self.logger.Log("\nResults:\n%s" % self.__str__())
 
-  def SendResults(self, emailer):
-    attachmentFiles = []
+    def SendResults(self, emailer):
+        attachmentFiles = []
 
-    for experimentResult in self.experimentResults.itervalues():
-      resultFile = experimentResult.resultFile
+        for experimentResult in self.experimentResults.itervalues():
+            resultFile = experimentResult.resultFile
 
-      if (resultFile != ""):
-        attachmentFiles.append(resultFile)
+            if (resultFile != ""):
+                attachmentFiles.append(resultFile)
 
-    emailer.PrepareAndSendMailIfRequired(self.__str__(), attachmentFiles)
+        emailer.PrepareAndSendMailIfRequired(self.__str__(), attachmentFiles)

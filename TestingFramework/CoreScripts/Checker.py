@@ -1,8 +1,9 @@
 import os
+
 from Logger import Logger
-import CoreScripts
 from CoreScripts.BaseExperiment import OK, CHANGED, NEW, FAILED, BaseExperiment
-from CoreScripts.CoreFunctions import SAME, EQUAL, NOT_EQUAL, CompareValues, WriteStringToFile
+from CoreScripts.CoreFunctions import NOT_EQUAL, CompareValues, WriteStringToFile
+
 
 class Checker(BaseExperiment):
     masterLogFolder = ""
@@ -11,15 +12,15 @@ class Checker(BaseExperiment):
         BaseExperiment.CopyingConstructor(self, baseExperimnet)
         self.masterLogFolder = masterLogFolder
 
-    def CompareTables(self, table1, table2, eps = 0.001):
+    def CompareTables(self, table1, table2, eps=0.001):
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
                 compare_result = CompareValues(table1[row][col], table2[row][col])
 
                 if (compare_result == NOT_EQUAL):
-                  return(CHANGED)
+                    return (CHANGED)
 
-        return(OK)
+        return (OK)
 
     def CreateEmptyTable(self, reportTable):
         cols = ["Benchmark"]
@@ -30,7 +31,7 @@ class Checker(BaseExperiment):
                 cols.append("Current %s_%s" % (self.metrics[col], self.stages[row]))
                 cols.append("Master %s_%s" % (self.metrics[col], self.stages[row]))
 
-            cols.append("") #an empty column between metrics on different stages
+            cols.append("")  #an empty column between metrics on different stages
 
         WriteStringToFile(cols, reportTable)
 
@@ -42,7 +43,7 @@ class Checker(BaseExperiment):
                 cols.append(str(currentValues[row][col]))
                 cols.append(str(masterValues[row][col]))
 
-            cols.append("") #an empty column between metrics on different stages
+            cols.append("")  #an empty column between metrics on different stages
 
         #write metrics to the file
         WriteStringToFile(cols, reportTable)
@@ -53,11 +54,11 @@ class Checker(BaseExperiment):
         currentValues = self.ParseLog(logName)
 
         if (currentValues == []):
-          return [FAILED, []]
+            return [FAILED, []]
 
         masterLogName = os.path.join(self.masterLogFolder, os.path.basename(logName))
         logger.Log("Parsing: " + masterLogName)
-        masterValues  = self.ParseLog(masterLogName)
+        masterValues = self.ParseLog(masterLogName)
 
         if (masterValues == []):
             logger.Log("Experiment has not failed but master log is empty or does not exist\n")

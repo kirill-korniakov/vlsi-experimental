@@ -1,17 +1,19 @@
 import time
 import os
+
 from CoreFunctions import GetTimeStamp
 from CfgParserFactory import CfgParserFactory
+
 
 class Logger:
     factory = CfgParserFactory()
     cfgParser = factory.createCfgParser()
 
     selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
-    if os.path.exists(selfLogFolder) != True: #TODO: use ReportCreator.CreateLogFolder
-      os.mkdir(selfLogFolder)
+    if os.path.exists(selfLogFolder) != True:  #TODO: use ReportCreator.CreateLogFolder
+        os.mkdir(selfLogFolder)
 
-    startTime   = time.time()
+    startTime = time.time()
     logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp())
 
     def LogWorkTime(self):
@@ -37,5 +39,6 @@ class Logger:
     def LogStartMessage(self):
         self.CoolLog("Started on %s" % (GetTimeStamp()))
 
+
 if (__name__ == "__main__"):
-  pass
+    pass
