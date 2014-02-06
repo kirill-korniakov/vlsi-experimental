@@ -1,7 +1,6 @@
 import os
 import time
 import datetime
-from datetime import date
 from ConfigParser import ConfigParser
 
 CONFIG_FILE = "Parameters.conf"
@@ -29,7 +28,7 @@ def Absolutize(x):
 
 def PrintAbsValues(po, sequence):
     if len(sequence):
-        po.write(("%s;%s;%s" % (str(Absolutize(sequence)).replace(", ", ";")[1:-1], str(min(sequence)), \
+        po.write(("%s;%s;%s" % (str(Absolutize(sequence)).replace(", ", ";")[1:-1], str(min(sequence)),
                                 str(Average(sequence)))).replace(".", ","))
         po.write(2 * ";")
 
@@ -58,18 +57,18 @@ def RemoveDir(dirName):
 
 
 def RemovePermissions(filePath):
-    if (not os.access(filePath, os.W_OK)):
+    if not os.access(filePath, os.W_OK):
         os.chmod(filePath, 666)
 
 
 def CompareValues(value1, value2, eps=0.001):
-    if (value1 == value2):
+    if value1 == value2:
         return SAME
 
     value1 = float(value1)
     value2 = float(value2)
 
-    if (abs(value1 - value2) < eps):
+    if abs(value1 - value2) < eps:
         return EQUAL
 
     return NOT_EQUAL
@@ -92,7 +91,7 @@ def WriteStringToFile2(cols, tableFileName):
     """
 
     for col in cols:
-        if (col == END_OF_COLUMN):
+        if col == END_OF_COLUMN:
             printStr += ";"
         else:
             printStr += str(col)
@@ -121,7 +120,7 @@ def MakeTableInPercents(table):
 
     for stage in table:
         for col in range(len(stage)):
-            if ((currStageIdx > 0) and (table[0][col] > 0)):
+            if (currStageIdx > 0) and (table[0][col] > 0):
                 table[currStageIdx][col] = stage[col] * 100 / table[0][col]
 
         currStageIdx += 1
@@ -137,10 +136,11 @@ def ExtractXYFromTable(table):
         xValues.append(currStage[1])
         yValues.append(currStage[0])
 
-    return (xValues, yValues)
+    return xValues, yValues
 
 
-def PrintTableToFile2(tableFileName, table, metrics, stages=[]):
+def PrintTableToFile2(tableFileName, table, metrics, stages=None):
+    if not stages: stages = []
     cols = ["stage", END_OF_COLUMN]
 
     for col in metrics:
@@ -152,7 +152,7 @@ def PrintTableToFile2(tableFileName, table, metrics, stages=[]):
     for currStage in table:
         currStageName = str(currStageIdx)
 
-        if (stages):
+        if stages:
             currStageName = stages[currStageIdx]
 
         cols = [currStageName, END_OF_COLUMN]
@@ -164,7 +164,8 @@ def PrintTableToFile2(tableFileName, table, metrics, stages=[]):
         currStageIdx += 1
 
 
-def PrintTableToFile(tableFileName, table, metrics, stages=[]):
+def PrintTableToFile(tableFileName, table, metrics, stages=None):
+    if not stages: stages = []
     cols = ["stage"]
     cols.extend(metrics)
     WriteStringToFile(cols, tableFileName)
@@ -173,7 +174,7 @@ def PrintTableToFile(tableFileName, table, metrics, stages=[]):
     for currStage in table:
         currStageName = str(currStageIdx)
 
-        if (stages):
+        if stages:
             currStageName = stages[currStageIdx]
 
         cols = [currStageName]
@@ -191,8 +192,8 @@ def CreateConfigParser():
 
 
 def DeleteOldLogs(logsDir, daysToStoreLogs=7):
-    if (not os.path.exists(logsDir)):
-        print("Error: %s doesn't exist" % (logsDir))
+    if not os.path.exists(logsDir):
+        print("Error: %s doesn't exist" % logsDir)
         return
 
     for element in os.listdir(logsDir):
@@ -202,15 +203,15 @@ def DeleteOldLogs(logsDir, daysToStoreLogs=7):
         secondsToExpire = creationTime - currentTime + daysToStoreLogs * 86400  #seconds in 24 hours
         #print("Ctime: %s. Time now: %s\nExpires in %s seconds" % (creationTime, currentTime, secondsToExpire))
 
-        if (secondsToExpire < 0):
-            print("File or directory %s is too old. Deleting..." % (element))
+        if secondsToExpire < 0:
+            print("File or directory %s is too old. Deleting..." % element)
 
-            if (os.path.isfile(fullName)):
+            if os.path.isfile(fullName):
                 os.remove(fullName)
 
             else:
                 RemoveDir(fullName)
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     DeleteOldLogs(r"C:\Users\beljakov.alexander.a\Desktop\VLSI\TestingFramework\Reports")

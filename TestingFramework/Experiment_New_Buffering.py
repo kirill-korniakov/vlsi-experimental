@@ -1,5 +1,4 @@
 from CoreScripts.TestRunner import TestRunner
-from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
 
@@ -21,7 +20,6 @@ def TestRun():
     TotalAllowableBuffersAreas = ['0.001', '0.005', '0.01', '0.03']
     Intervals = ['2', '20']
     AdaptiveSizeBufferMultipliers = ['false', 'true']
-    UseBufferings = ['false', 'true']
     NumberMetaIterationStartBufferings = ['1', '2']
 
     testRunner = TestRunner()
@@ -36,7 +34,7 @@ def TestRun():
                                " --LSE.GlobalPlacement.New_Buffering.TotalAllowableBuffersArea=" + TotalAllowableBuffersArea,
                                " --LSE.GlobalPlacement.New_Buffering.NumberMetaIterationStartBuffering=" + NumberMetaIterationStartBuffering,
                                " --LSE.GlobalPlacement.New_Buffering.Interval=" + Interval]
-                    print(cmdArgs);
+                    print(cmdArgs)
 
                     e = BaseExperiment(expName, 'New_buffering.cfg', 'IWLS05.list', metrics, stages, cmdArgs)
                     testRunner.AddExperimentToGroup(e)
@@ -52,6 +50,6 @@ def New_Buffering():
     testRunner.Run()
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     #TestRun()
     New_Buffering()

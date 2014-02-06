@@ -13,11 +13,11 @@ class Experiment_LR(BaseExperiment):
         self.doParsePQAT = True
 
     def CreateEmptyTable(self, reportTable):
-        cols = ["Benchmark", "initHPWL", "lrHPWL", "dpHPWL", \
-                "initTWL", "lrTWL", "dpTWL", \
-                "initTNS", "lrTNS", "dpTNS", \
-                "initWNS", "lrWNS", "dpWNS", "", \
-                "lrHPWL%", "dpHPWL%", "lrTWL%", "dpTWL%", \
+        cols = ["Benchmark", "initHPWL", "lrHPWL", "dpHPWL",
+                "initTWL", "lrTWL", "dpTWL",
+                "initTNS", "lrTNS", "dpTNS",
+                "initWNS", "lrWNS", "dpWNS", "",
+                "lrHPWL%", "dpHPWL%", "lrTWL%", "dpTWL%",
                 "lrTNS%", "dpTNS%", "lrWNS%", "dpWNS%"]
 
         WriteStringToFile(cols, reportTable)
@@ -55,5 +55,5 @@ def TestRun():
     testRunner.Run()
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     TestRun()

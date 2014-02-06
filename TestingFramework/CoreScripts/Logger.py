@@ -6,11 +6,14 @@ from CfgParserFactory import CfgParserFactory
 
 
 class Logger:
+    def __init__(self):
+        pass
+
     factory = CfgParserFactory()
     cfgParser = factory.createCfgParser()
 
     selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
-    if os.path.exists(selfLogFolder) != True:  #TODO: use ReportCreator.CreateLogFolder
+    if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder
         os.mkdir(selfLogFolder)
 
     startTime = time.time()
@@ -23,7 +26,7 @@ class Logger:
     def CoolLog(self, message):
         self.Log("\n")
         self.Log("######################################################")
-        self.Log("####### %s" % (message))
+        self.Log("####### %s" % message)
         self.Log("######################################################")
         self.LogWorkTime()
         self.Log("\n")
@@ -33,12 +36,12 @@ class Logger:
 
         print(message)
         log = open(self.logFileName, 'a')
-        log.write(("%s\n") % (message))
+        log.write("%s\n" % message)
         log.close()
 
     def LogStartMessage(self):
         self.CoolLog("Started on %s" % (GetTimeStamp()))
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     pass

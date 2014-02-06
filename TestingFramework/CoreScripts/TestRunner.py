@@ -1,11 +1,3 @@
-import os
-import sys
-import time
-import datetime
-from datetime import date
-import subprocess
-from ConfigParser import ConfigParser
-
 from Emailer import Emailer
 from SvnWorker import SvnWorker
 from SolutionBuilder import SolutionBuilder
@@ -15,7 +7,7 @@ from ExperimentsComparator import ExperimentsComparator
 from CoreFunctions import GetTimeStamp, CreateConfigParser
 from Logger import Logger
 from ParametersParsing import TestRunnerParameters, EmailerParameters, RepoParameters, \
-    ReportParameters, GeneralParameters, LogParserParameters, Tools
+    ReportParameters, GeneralParameters, Tools
 
 
 class TestRunner:
@@ -27,10 +19,10 @@ class TestRunner:
     comparator = ExperimentsComparator(storage)
 
     def __init__(self, parameters=None, emailer=None):
-        if (parameters == None):
+        if parameters is None:
             parameters = TestRunnerParameters(self.cfgParser)
 
-        if (emailer == None):
+        if emailer is None:
             emailerParameters = EmailerParameters(self.cfgParser)
             emailer = Emailer(emailerParameters)
 
@@ -43,7 +35,7 @@ class TestRunner:
         return 0
 
     def AddExperimentToGroup(self, newExperiment):
-        if (self.Append(newExperiment) != 0):
+        if self.Append(newExperiment) != 0:
             return
 
         self.comparator.AddExperimentToGroup(newExperiment)
@@ -81,5 +73,5 @@ def test():
     testRunner.Run()
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

@@ -31,7 +31,7 @@ class ExperimentResults:
         self.errors.append(error)
 
     def AddBenchmarkResult(self, benchmark, result):
-        if (not result in self.benchmarkResults.keys()):
+        if not result in self.benchmarkResults.keys():
             self.benchmarkResults[result] = []
 
         self.benchmarkResults[result].append(benchmark)
@@ -45,15 +45,15 @@ class ExperimentResults:
         for (result, benchmarks) in list(self.benchmarkResults.iteritems()):
             resultStr += ("%s: %s benchmarks (" % (result, len(benchmarks)))
 
-            for benchmark in (benchmarks):
-                resultStr += ("%s; " % (benchmark))
+            for benchmark in benchmarks:
+                resultStr += ("%s; " % benchmark)
 
             resultStr += ")\n"
 
         for error in self.errors:
-            resultStr += ("%s\n" % (error))
+            resultStr += ("%s\n" % error)
 
-        return (resultStr + "\n")
+        return resultStr + "\n"
 
     def Print(self):
         print(self.__str__())
@@ -71,7 +71,8 @@ class BaseExperiment:
     cfgParser = CreateConfigParser()
     generalParameters = GeneralParameters(cfgParser)
 
-    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs=[]):
+    def __init__(self, name, cfg, benchmarks, metrics, stages, cmdArgs=None):
+        if not cmdArgs: cmdArgs = []
         self.name = name
         self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
         self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
@@ -108,7 +109,7 @@ class BaseExperiment:
 
     def ParseLog(self, logName):
         parser = LogParser(logName, PFST, self.cfgParser)
-        return (parser.ParsePFST(self.metrics, self.stages))
+        return parser.ParsePFST(self.metrics, self.stages)
 
     def ParsePQATAndPrintTable(self, logName):
         metrics = ["HPWL", "TNS", "WNS"]
@@ -132,28 +133,28 @@ class BaseExperiment:
         WriteStringToFile(cols, reportTable)
 
     def MakeResultTable(self, logFolder, reportTable):
-        if (os.path.exists(logFolder) == False):
+        if os.path.exists(logFolder) == False:
             logger = Logger()
-            logger.Log("Error: folder %s does not exist" % (logFolder))
+            logger.Log("Error: folder %s does not exist" % logFolder)
             return
 
         reportTable = os.path.join(logFolder, reportTable)
         self.CreateEmptyTable(reportTable)
 
         for log in os.listdir(logFolder):
-            if (os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1])):
+            if os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1]):
                 benchmark = os.path.splitext(log)[0]
                 self.ParseLogAndFillTable(os.path.join(logFolder, log), benchmark, reportTable)
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         values = self.ParseLog(logName)
 
-        if (values == []):
+        if values == []:
             return [FAILED, []]
 
         self.AddStringToTable(values, benchmark, reportTable)
 
-        if (self.doParsePQAT == True):
+        if self.doParsePQAT == True:
             self.ParsePQATAndPrintTable(logName)
 
         return [OK, values]
@@ -162,7 +163,7 @@ class BaseExperiment:
 def TestResultTableMaking():
     stages = ["LEG", "DP"]
     metrics = ["HPWL", "TNS", "WNS"]
-    experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list", \
+    experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list",
                                 metrics, stages)
 
     experiment.MakeResultTable(r"..\Reports\HippocrateDP", "TestTable2.csv")
@@ -173,7 +174,7 @@ def test():
 
     stages = ["LEG", "DP"]
     metrics = ["HPWL", "TNS", "WNS"]
-    experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list", \
+    experiment = BaseExperiment("HippocrateDP experiment", "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list",
                                 metrics, stages)
 
     testRunner = TestRunner()
@@ -181,5 +182,5 @@ def test():
     testRunner.Run()
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

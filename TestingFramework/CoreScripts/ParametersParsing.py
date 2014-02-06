@@ -11,10 +11,10 @@ class TestRunnerParameters:
         doBuild = cfgParser.get("TestRunnerParameters", "doBuild")
         doCheckout = cfgParser.get("TestRunnerParameters", "doCheckout")
 
-        if (doBuild == "True"):
+        if doBuild == "True":
             self.doBuild = True
 
-        if (doCheckout == "True"):
+        if doCheckout == "True":
             self.doCheckout = True
 
     def PrintParameters(self):
@@ -31,7 +31,7 @@ class EmailerParameters:
     smtppass = "itlPlace"
 
     def __init__(self, cfgParser=None):
-        if (cfgParser != None):
+        if cfgParser is not None:
             doSendMail = cfgParser.get("EmailerParameters", "doSendMail")
             self.subject = cfgParser.get("EmailerParameters", "subject")
             self.sender = cfgParser.get("EmailerParameters", "sender")
@@ -42,12 +42,12 @@ class EmailerParameters:
 
             self.recipients = recipientsStr.split(",")
 
-            if (doSendMail == "True"):
+            if doSendMail == "True":
                 self.doSendMail = True
 
     def PrintParameters(self):
         print("Emailer parameters:\ndoSendMail = %s\nsubject = %s\nrecipients = %s\nsender = %s\n\
-           smtpserver = %s\nsmtpuser = %s\nsmtppass = %s" % (self.doSendMail, self.subject, \
+           smtpserver = %s\nsmtpuser = %s\nsmtppass = %s" % (self.doSendMail, self.subject,
                                                              str(self.recipients), self.sender, self.smtpserver,
                                                              self.smtpuser, self.smtppass))
 
@@ -63,7 +63,7 @@ class RepoParameters:
         self.benchRepoPath = r"%s" % (cfgParser.get("RepoParameters", "benchRepoPath"))
 
     def PrintParameters(self):
-        print("Repo parameters:\nrepoPath = %s\nsrcRepoPath = %s\nbenchRepoPath = %s" % \
+        print("Repo parameters:\nrepoPath = %s\nsrcRepoPath = %s\nbenchRepoPath = %s" %
               (self.repoPath, self.srcRepoPath, self.benchRepoPath))
 
 
@@ -74,7 +74,7 @@ class ReportParameters:
         self.logFolder = r"%s" % (cfgParser.get("ReportParameters", "logFolder"))
 
     def PrintParameters(self):
-        print("Report parameters:\nlogFolder = %s" % (self.logFolder))
+        print("Report parameters:\nlogFolder = %s" % self.logFolder)
 
 
 class GeneralParameters:
@@ -95,7 +95,7 @@ class GeneralParameters:
 
     def PrintParameters(self):
         print("General parameters:\nmaxTimeForBenchmark = %d\nbenchmarkCheckoutPath = %s\ncheckoutPath = \
-          %s\nbuildLog = %s\nslnPath = %s\nbinDir = %s" % (self.maxTimeForBenchmark, \
+          %s\nbuildLog = %s\nslnPath = %s\nbinDir = %s" % (self.maxTimeForBenchmark,
                                                            self.benchmarkCheckoutPath, self.checkoutPath, self.buildLog,
                                                            self.slnPath, self.binDir))
 
@@ -111,7 +111,7 @@ class LogParserParameters:
         self.PFSTBorderPattern = cfgParser.get("LogParserParameters", "PFSTBorderPattern")
 
     def PrintParameters(self):
-        print("LogParser parameters:\nPFSTTableHeader = %s\nPQATTableHeader = %s\nPFSTBorderPattern = %s" % \
+        print("LogParser parameters:\nPFSTTableHeader = %s\nPQATTableHeader = %s\nPFSTBorderPattern = %s" %
               (self.PFSTTableHeader, self.PQATTableHeader, self.PFSTBorderPattern))
 
 
@@ -161,5 +161,5 @@ def test():
         traceback.print_exc()
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

@@ -11,7 +11,7 @@ class FastCheckRunner(TestRunner):
     def Append(self, newExperiment):
         expName = newExperiment.name
 
-        if (expName in self.checkersParameters):
+        if expName in self.checkersParameters:
             newExperiment.SetBenchmarksList(self.checkersParameters[expName])
             return TestRunner.Append(self, newExperiment)
 

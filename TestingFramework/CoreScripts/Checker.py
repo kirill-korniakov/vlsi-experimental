@@ -12,15 +12,15 @@ class Checker(BaseExperiment):
         BaseExperiment.CopyingConstructor(self, baseExperimnet)
         self.masterLogFolder = masterLogFolder
 
-    def CompareTables(self, table1, table2, eps=0.001):
+    def CompareTables(self, table1, table2):
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
                 compare_result = CompareValues(table1[row][col], table2[row][col])
 
-                if (compare_result == NOT_EQUAL):
-                    return (CHANGED)
+                if compare_result == NOT_EQUAL:
+                    return CHANGED
 
-        return (OK)
+        return OK
 
     def CreateEmptyTable(self, reportTable):
         cols = ["Benchmark"]
@@ -53,20 +53,20 @@ class Checker(BaseExperiment):
         logger.Log("Parsing: " + logName)
         currentValues = self.ParseLog(logName)
 
-        if (currentValues == []):
+        if currentValues == []:
             return [FAILED, []]
 
         masterLogName = os.path.join(self.masterLogFolder, os.path.basename(logName))
         logger.Log("Parsing: " + masterLogName)
         masterValues = self.ParseLog(masterLogName)
 
-        if (masterValues == []):
+        if masterValues == []:
             logger.Log("Experiment has not failed but master log is empty or does not exist\n")
             return [NEW, currentValues]
 
         self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)
 
-        if (self.doParsePQAT == True):
+        if self.doParsePQAT == True:
             self.ParsePQATAndPrintTable(logName)
 
         return [self.CompareTables(currentValues, masterValues), currentValues]

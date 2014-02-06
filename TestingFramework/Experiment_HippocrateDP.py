@@ -7,7 +7,7 @@ class Experiment_HippocrateDP(BaseExperiment):
     def __init__(self):
         _metrics = ["HPWL", "TNS", "WNS"]
         _stages = ["LEG", "DP"]
-        BaseExperiment.__init__(self, "HippocrateDP experiment", \
+        BaseExperiment.__init__(self, "HippocrateDP experiment",
                                 "HippocrateDP.cfg", "IWLS_GP_Hippocrate.list", _metrics, _stages)
 
     def CreateEmptyTable(self, reportTable):
@@ -30,5 +30,5 @@ def test():
     #e.MakeResultTable(r".\Reports\HippocrateDP_experiment_HippocrateDP.cfg_2011-01-01_14-12-44", "HippocrateDPTable.csv")
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

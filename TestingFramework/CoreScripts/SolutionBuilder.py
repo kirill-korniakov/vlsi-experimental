@@ -1,9 +1,5 @@
 import subprocess
-import sys
 import os
-import datetime
-from datetime import date
-import time
 
 from Emailer import Emailer
 from Logger import Logger
@@ -23,13 +19,13 @@ class SolutionBuilder:
         res = 0
         #args    = [tools.MSBuild, slnPath, "/t:" + mode, "/p:Configuration=Release"]
         args = "%s %s /t:%s /p:Configuration=Release" % (tools.MSBuild, slnPath, mode)
-        logger.Log("Building solution using command: %s" % (args))
+        logger.Log("Building solution using command: %s" % args)
 
         try:
             res = subprocess.call(args, shell=True)
 
         except WindowsError:
-            error = ("Error: can not call %s" % (Tools.MSBuild))
+            error = ("Error: can not call %s" % Tools.MSBuild)
             ReportErrorAndExit(error, logger, self.emailer)
 
         except Exception:
@@ -38,12 +34,12 @@ class SolutionBuilder:
             error = "Error: %s" % (traceback.format_exc())
             ReportErrorAndExit(error, logger, self.emailer)
 
-        if (res != 0):
+        if res != 0:
             error = "Build failed!"
             print(error)
             buildLog = generalParameters.buildLog
 
-            if (os.path.exists(buildLog)):
+            if os.path.exists(buildLog):
                 self.emailer.SendMessageAndExit(error, [buildLog])
 
             else:
@@ -68,5 +64,5 @@ def test():
     solutionBuilder.BuildSln(generalParameters, tools)
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

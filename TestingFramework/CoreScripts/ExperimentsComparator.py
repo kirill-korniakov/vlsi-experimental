@@ -1,4 +1,4 @@
-from CoreFunctions import GetTimeStamp, WriteStringToFile, CompareValues, NOT_EQUAL, MarkResultAsBest
+from CoreFunctions import GetTimeStamp, WriteStringToFile, CompareValues, NOT_EQUAL
 
 from ReportCreator import ReportCreator
 from Logger import Logger
@@ -19,25 +19,25 @@ class ExperimentsComparator:
         self.experimentsToCompare = {}
 
     def AddExperimentToGroup(self, newExperiment):
-        if (self.masterExperiment == None):
+        if self.masterExperiment is None:
             self.masterExperiment = newExperiment
 
         else:
-            if (newExperiment.benchmarks != self.masterExperiment.benchmarks):
+            if newExperiment.benchmarks != self.masterExperiment.benchmarks:
                 self.logger.Log("Error: list files are not equal!")
                 exit(1)
 
-            if (newExperiment.metrics != self.masterExperiment.metrics):
+            if newExperiment.metrics != self.masterExperiment.metrics:
                 self.logger.Log("Error: metrics are not equal!")
                 exit(1)
 
             self.experimentsToCompare[newExperiment.name] = {}
 
     def GetResultsForExperiment(self, experimentName):
-        if (experimentName in self.storage.experimentResults):
+        if experimentName in self.storage.experimentResults:
             return self.storage.experimentResults[experimentName].pfstTables
 
-        self.logger.Log("Error: results for %s not found" % (experimentName))
+        self.logger.Log("Error: results for %s not found" % experimentName)
         return {}
 
     def GetExperimentsResults(self):
@@ -48,9 +48,11 @@ class ExperimentsComparator:
         for experimentName in self.experimentsToCompare.iterkeys():
             self.experimentsToCompare[experimentName] = self.GetResultsForExperiment(experimentName)
 
-    def PrintLabelAndBlanks(self, cols, label, nMetrics):
+    @staticmethod
+    def PrintLabelAndBlanks(cols, label, nMetrics):
         cols.extend(["", label])
 
+        #FIXME: bug, unused `col` variable
         for col in nMetrics:
             cols.append("")
 
@@ -88,7 +90,7 @@ class ExperimentsComparator:
 
         for experimentName in xrange(nNormalExperiments):
             for row in nMetrics:
-                if (metrics[row] != "Time"):
+                if metrics[row] != "Time":
                     cols.append(metrics[row] + "%")
 
                 else:
@@ -121,7 +123,7 @@ class ExperimentsComparator:
         referenceMetrics = []
         resultValues = self.masterResuts[benchmark]
 
-        if (resultValues != []):  #If target experiment succeed on current benchmark
+        if resultValues != []:  #If target experiment succeed on current benchmark
             for metricIdx in nMetrics:
                 #Fill reference metrics
                 finalStageIdx = len(self.masterExperiment.stages) - 1
@@ -148,7 +150,7 @@ class ExperimentsComparator:
         for experimentName, experimentResults in self.experimentsToCompare.iteritems():
             resultValues = experimentResults[benchmark]
 
-            if (resultValues == []):
+            if resultValues == []:
                 for metricIdx in nMetrics:
                     experimentsLine.append("N/A")
 
@@ -156,7 +158,7 @@ class ExperimentsComparator:
                 continue
 
             #if 'INITIAL' metrics haven't been printed yet
-            if (initialMetrics == []):
+            if initialMetrics == []:
                 #take them from the table of this experiment
                 for metricIdx in nMetrics:
                     value = resultValues[0][metricIdx]
@@ -170,7 +172,7 @@ class ExperimentsComparator:
                 for metricIdx in nMetrics:
                     cmpResult = CompareValues(initialMetrics[metricIdx], resultValues[0][metricIdx])
 
-                    if (cmpResult == NOT_EQUAL and metrics[metricIdx] != "Time"):
+                    if cmpResult == NOT_EQUAL and metrics[metricIdx] != "Time":
                         self.logger.Log("Error: not equal INIT metrics")
 
             finalStageIdx = - 1  #Index of the last elemnt in the list
@@ -178,11 +180,11 @@ class ExperimentsComparator:
             for metricIdx in nMetrics:
                 valueStr = resultValues[finalStageIdx][metricIdx]
 
-                if (metrics[metricIdx] != "Time"):
+                if metrics[metricIdx] != "Time":
                     percent = 100 * valueStr / referenceMetrics[metricIdx]
                     valueStr = "%.2f" % percent
 
-                if (percent < bestValues[metricIdx]):
+                if percent < bestValues[metricIdx]:
                     bestValues[metricIdx] = percent  #remember the best result
                     bestValuesIdx[metricIdx] = len(experimentsLine)  #and its index
 
@@ -194,7 +196,7 @@ class ExperimentsComparator:
         #  if (idx > 0):
         #    experimentsLine[idx] = MarkResultAsBest(experimentsLine[idx])
 
-        if (initialMetricsLine == []):
+        if initialMetricsLine == []:
             for metricIdx in nMetrics:
                 initialMetricsLine.append("N/A")
 
@@ -206,7 +208,7 @@ class ExperimentsComparator:
         return newTableLine
 
     def CompareExperiments(self, reportParameters):
-        if (len(self.experimentsToCompare) > 0):
+        if len(self.experimentsToCompare) > 0:
             self.logger = Logger()
             self.logger.CoolLog("Comparing experiments")
 

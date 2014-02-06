@@ -1,17 +1,9 @@
 import subprocess
-import sys
-import os
-import datetime
-from datetime import date
-import time
 
 from BaseExperiment import *
-from Emailer import Emailer
-from ResultsStorage import ResultsStorage
 from ReportCreator import ReportCreator
 from Logger import Logger
 from CoreFunctions import ReportErrorAndExit
-from ParametersParsing import GeneralParameters
 
 
 TERMINATED = "Terminated"
@@ -40,14 +32,14 @@ class ExperimentLauncher:
 
     def CheckParameters(self):
         #check if config file can be found
-        if (not os.path.exists(self.experiment.cfg)):
-            error = "Error: file '%s' not found" % (self.experiment.cfg)
+        if not os.path.exists(self.experiment.cfg):
+            error = "Error: file '%s' not found" % self.experiment.cfg
             self.AddErrorToResults(error)
             return False
 
         #check if benchmarks list file can be found
-        if (not os.path.exists(self.experiment.benchmarks)):
-            error = "Error: file '%s' not found" % (self.experiment.benchmarks)
+        if not os.path.exists(self.experiment.benchmarks):
+            error = "Error: file '%s' not found" % self.experiment.benchmarks
             self.AddErrorToResults(error)
             return False
 
@@ -70,29 +62,29 @@ class ExperimentLauncher:
             benchmarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
             benchmark = os.path.join(benchmarkFolder, benchmark)
 
-            if (not os.path.exists(benchmark)):
+            if not os.path.exists(benchmark):
                 notFoundBenchmarks.append(benchmarks[i])
 
         #print and delete from list benchmarks which were not found
-        if (notFoundBenchmarks != []):
+        if notFoundBenchmarks != []:
             for benchmark in notFoundBenchmarks:
                 benchmarks.remove(benchmark)
-                notFoundBenchmarksStr += ' "%s";' % (benchmark)
+                notFoundBenchmarksStr += ' "%s";' % benchmark
 
-            error = "Error: benchmarks %s were not found!" % (notFoundBenchmarksStr)
+            error = "Error: benchmarks %s were not found!" % notFoundBenchmarksStr
             self.AddErrorToResults(error)
 
         nFoundBenchmarks = len(benchmarks)
         return benchmarks
 
     def CheckParametersAndPrepareBenchmarks(self):
-        if (not self.CheckParameters()):
+        if not self.CheckParameters():
             return []
 
         return self.PrepareBenchmarks()
 
     def RunExperiment(self, generalParameters, reportParameters):
-        self.logger.Log("Config: %s" % (self.experiment.cfg))
+        self.logger.Log("Config: %s" % self.experiment.cfg)
         self.logger.Log("Benchmarks: %s" % self.experiment.benchmarks)
 
         reportCreator = ReportCreator(self.experiment.name, self.experiment.cfg, reportParameters)
@@ -102,17 +94,17 @@ class ExperimentLauncher:
         self.experiment.CreateEmptyTable(reportTable)
         benchmarks = self.CheckParametersAndPrepareBenchmarks()
 
-        if (benchmarks == []):
+        if benchmarks == []:
             self.resultsStorage.AddExperimentResult(self.experiment.name, self.experimentResults)
             return
 
         for benchmark in benchmarks:
-            if (self.nTerminatedBenchmarks >= MAX_TERMINATED_BENCHMARKS_NUM):
+            if self.nTerminatedBenchmarks >= MAX_TERMINATED_BENCHMARKS_NUM:
                 self.AddErrorToResults("Reached maximum number of terminated benchmarks")
                 break
 
             self.RunExperimentOnBenchmark(benchmark, logFolder, reportTable, generalParameters)
-            self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), \
+            self.logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks),
                                                           benchmark))
 
         self.resultsStorage.AddExperimentResult(self.experiment.name, self.experimentResults)
@@ -120,36 +112,36 @@ class ExperimentLauncher:
     def PreparePlacerParameters(self, benchmark, logFolder, generalParameters):
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
 
-        defFile = r"%s.def" % (benchmark)
+        defFile = r"%s.def" % benchmark
         benchMarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
         defFile = os.path.join(benchMarkFolder, defFile)
-        defFileParam = "--params.def=%s" % (defFile)
+        defFileParam = "--params.def=%s" % defFile
 
         pixFolder = os.path.abspath(os.path.join(logFolder, os.path.basename(benchmark), "pix"))
-        pixDirParam = "--plotter.pixDirectory=%s" % (pixFolder)
+        pixDirParam = "--plotter.pixDirectory=%s" % pixFolder
 
         milestonePixFolder = os.path.abspath(os.path.join(pixFolder, "milestones"))
 
-        if (os.path.exists(milestonePixFolder) != True):
+        if os.path.exists(milestonePixFolder) != True:
             os.makedirs(milestonePixFolder)
 
-        milestonePixDirParam = "--plotter.milestonePixDirectory=%s" % (milestonePixFolder)
+        milestonePixDirParam = "--plotter.milestonePixDirectory=%s" % milestonePixFolder
 
         exeName = os.path.join(generalParameters.binDir, "itlPlace")  #FIXME: introduce variable
-        placerParameters = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam, \
+        placerParameters = [exeName, os.path.abspath(self.experiment.cfg), defFileParam, pixDirParam,
                             milestonePixDirParam]
         placerParameters.extend(self.experiment.cmdArgs)
 
         #HACK: ugly hack for ISPD04 benchmarks
         if self.experiment.cfg.find("ispd04") != -1:
-            lefFile = r"%s.lef" % (benchmark)
+            lefFile = r"%s.lef" % benchmark
             lefFile = os.path.join(benchMarkFolder, lefFile)
-            lefFileParam = "--params.lef=%s" % (lefFile)
+            lefFileParam = "--params.lef=%s" % lefFile
             placerParameters.append(lefFileParam)
 
         logFileName = r"%s.log" % (os.path.basename(benchmark))
         logFileName = os.path.join(logFolder, logFileName)
-        return (placerParameters, logFileName)
+        return placerParameters, logFileName
 
     def RunPlacer(self, placerParameters, logFileName, generalParameters):
         fPlacerOutput = open(logFileName, 'w')
@@ -186,7 +178,7 @@ class ExperimentLauncher:
         # self.logger.Log("Seconds passed: %.2f" % (seconds_passed))
 
         placerReturnCode = p.poll()
-        if (placerReturnCode == None):
+        if placerReturnCode is None:
             try:
                 p.terminate()
 
@@ -200,10 +192,10 @@ class ExperimentLauncher:
         resultValues = []
 
         if placerReturnCode != 0:
-            self.logger.Log("Process return code: %s" % (placerReturnCode))
+            self.logger.Log("Process return code: %s" % placerReturnCode)
 
-        if (placerReturnCode == None):
-            self.logger.Log("Time out on %s" % (benchmark))
+        if placerReturnCode is None:
+            self.logger.Log("Time out on %s" % benchmark)
             self.nTerminatedBenchmarks += 1
             self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
 
@@ -214,7 +206,7 @@ class ExperimentLauncher:
             self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
             self.experimentResults.AddBenchmarkResult(benchmark, result)
 
-            if (result == CHANGED):
+            if result == CHANGED:
                 self.experimentResults.resultFile = reportTable
 
     def RunExperimentOnBenchmark(self, benchmark, logFolder, reportTable, generalParameters):
@@ -228,5 +220,5 @@ def test():
     pass
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     test()

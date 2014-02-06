@@ -48,9 +48,9 @@ class SvnWorker:
         return
 
     def FormCommand(self, rev=""):
-        if (rev != ""):
-            self.logger.Log("Checking out revision %s" % (rev))
-            rev = " -r %s" % (rev)
+        if rev != "":
+            self.logger.Log("Checking out revision %s" % rev)
+            rev = " -r %s" % rev
 
         else:
             self.logger.Log("Checking out HEAD revision")
@@ -75,7 +75,7 @@ class SvnWorker:
         self.doCheckOut(command)
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     from ConfigParser import ConfigParser
     from ParametersParsing import EmailerParameters, GeneralParameters, RepoParameters
 

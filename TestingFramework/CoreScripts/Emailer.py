@@ -1,10 +1,8 @@
 import smtplib
-import email
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.utils import COMMASPACE, formatdate
-from email import encoders
 from base64 import b64encode
 import os
 
@@ -33,27 +31,20 @@ class Emailer:
             0)  # TTLS
 
     def PrepareAndSendMailIfRequired(self, text, attachmentFiles):
-        if (self.parameters.doSendMail == True):
+        if self.parameters.doSendMail == True:
             subject = self.parameters.subject
-            self.logger.Log("Sending email with results:\n%s" % (text))
+            self.logger.Log("Sending email with results:\n%s" % text)
             self.PrepareAndSendMail(subject, text, attachmentFiles)
 
-    def SendMessageAndExit(self, text, attachmentFiles=[]):
+    def SendMessageAndExit(self, text, attachmentFiles=None):
+        if not attachmentFiles: attachmentFiles = []
         self.PrepareAndSendMailIfRequired(text, attachmentFiles)
         exit(1)
 
-    def send_mail(self,
-                  sender,  # from e-mail address
-                  to,  # to e-mail address list
-                  subject,  # message subject
-                  text,  # text message
-                  files=[],  # attachment files
-                  server="localhost",  # SMTP server
-                  port=0,  # SMTP server port
-                  login="",  # login if requared or ""
-                  passwd="",  # password
-                  ttls=0,  # TTLS flag (0/1)
+    @staticmethod
+    def send_mail(sender, to, subject, text, files=None, server="localhost", port=0, login="", passwd="", ttls=0,
                   debuglevel=0):  # debug level
+        if not files: files = []
         assert type(to) == list
         assert type(files) == list
 

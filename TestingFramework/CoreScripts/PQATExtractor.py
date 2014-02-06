@@ -8,16 +8,16 @@ from CoreFunctions import PrintTableToFile, MakeTableInPercents, ExtractXYFromTa
 def ParseAndPlotPQAT(logFolder, doPlotCharts):
     metrics = ["HPWL", "TNS", "WNS"]
 
-    if (logFolder == ""):
+    if logFolder == "":
         logFolder = os.getcwd()
 
     for log in os.listdir(logFolder):
-        if (os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1])):
+        if os.path.isfile(os.path.join(logFolder, log)) and (".log" == os.path.splitext(log)[-1]):
             logName = os.path.join(logFolder, log)
             parser = LogParser(logName, PQAT)
             table = parser.ParsePQAT(metrics)
 
-            if (table == []):
+            if table == []:
                 print("Error: table is empty")
                 return
 
@@ -32,7 +32,7 @@ def ParseAndPlotPQAT(logFolder, doPlotCharts):
             yValues[0] = 100
 
             #Plot
-            if (doPlotCharts):
+            if doPlotCharts:
                 PlotChartForBenchmark(logName, xValues, "TNS", yValues, "HPWL")
 
 
@@ -45,13 +45,13 @@ def Run():
     logFolder = r"../Reports/LR"
     doPlotCharts = True
 
-    if (os.path.exists(logFolder) == False):
-        print("folder %s does not exist" % (logFolder))
+    if os.path.exists(logFolder) == False:
+        print("folder %s does not exist" % logFolder)
         return
 
     ParseAndPlotPQAT(logFolder, doPlotCharts)
     print("Finished")
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     Run()

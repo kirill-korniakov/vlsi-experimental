@@ -9,7 +9,7 @@ class ResultsStorage:
         self.logger = Logger()
 
     def AddExperimentResult(self, experimentName, result):
-        if (experimentName in list(self.experimentResults.keys())):
+        if experimentName in list(self.experimentResults.keys()):
             self.logger.Log("Error: the result for experiment %s is already stored" % experimentName)
 
         self.experimentResults[experimentName] = result
@@ -31,7 +31,7 @@ class ResultsStorage:
         for experimentResult in self.experimentResults.itervalues():
             resultFile = experimentResult.resultFile
 
-            if (resultFile != ""):
+            if resultFile != "":
                 attachmentFiles.append(resultFile)
 
         emailer.PrepareAndSendMailIfRequired(self.__str__(), attachmentFiles)
