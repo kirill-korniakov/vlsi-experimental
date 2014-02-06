@@ -4,8 +4,8 @@ compiler:
   - clang
 before_script:
   - cd ./Benchmarks
-  - tar xvzf ./IWLS_GP_r1511.zip
-  - tar xvzf ./IWLS05.zip
+  - tar -xvzf ./IWLS_GP_r1511.zip
+  - tar -xvzf ./IWLS05.zip
   - cd ..
   - sudo apt-get install libopencv-dev
   - mkdir itlPlace-build
