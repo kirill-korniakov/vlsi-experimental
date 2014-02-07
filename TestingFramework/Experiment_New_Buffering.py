@@ -5,7 +5,7 @@ from CoreScripts.BaseExperiment import BaseExperiment
 class Experiment_New_Buffering(BaseExperiment):
     def __init__(self):
         _metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
-        _stages = ['INIT', 'GP', 'NBUF', 'LEGB']
+        _stages = ['INIT', 'NBUF', 'LEGB']
 
         BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)', 'NewBuffering.cfg', 'IWLS05.list',
                                 _metrics, _stages)
@@ -15,7 +15,7 @@ def TestRun():
     #e.MakeResultTable('buf', '111')
 
     metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
-    stages = ['INIT', 'GP', 'NBUF', 'LEGB']
+    stages = ['INIT', 'NBUF', 'LEGB']
 
     TotalAllowableBuffersAreas = ['0.001', '0.005', '0.01', '0.03']
     Intervals = ['2', '20']

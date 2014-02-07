@@ -99,7 +99,8 @@ class LogParser:
         if stages == []:
             stages.extend(self.GetStageTag())
 
-        table = [[0 for col in range(len(metrics))] for row in range(len(stages))]
+        # table = [[0 for col in range(len(metrics))] for row in range(len(stages))]
+        table = [([0] * len(metrics)) for i in range(len(stages))]
 
         for col in range(len(metrics)):
             for row in range(len(stages)):

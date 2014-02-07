@@ -22,18 +22,18 @@ class Checker(BaseExperiment):
 
         return OK
 
-    def CreateEmptyTable(self, reportTable):
+    def CreateEmptyTable(self, report_table):
         cols = ["Benchmark"]
 
-        #write header of a table.
+        # Write header of a table
         for row in range(len(self.stages)):
             for col in range(len(self.metrics)):
                 cols.append("Current %s_%s" % (self.metrics[col], self.stages[row]))
                 cols.append("Master %s_%s" % (self.metrics[col], self.stages[row]))
 
-            cols.append("")  #an empty column between metrics on different stages
+            cols.append("")  # An empty column between metrics on different stages
 
-        WriteStringToFile(cols, reportTable)
+        WriteStringToFile(cols, report_table)
 
     def AddStringToTable(self, currentValues, masterValues, benchmark, reportTable):
         cols = [benchmark]
