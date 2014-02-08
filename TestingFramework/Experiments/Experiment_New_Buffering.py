@@ -4,7 +4,7 @@ from CoreScripts.BaseExperiment import BaseExperiment
 
 class Experiment_New_Buffering(BaseExperiment):
     def __init__(self):
-        _metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
+        _metrics = ['Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
         _stages = ['INIT', 'NBUF', 'LEGB']
 
         BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)', 'NewBuffering.cfg', 'IWLS05.list',

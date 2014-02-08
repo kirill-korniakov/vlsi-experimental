@@ -1,27 +1,55 @@
 import os
+import sys
+path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(path)
+
+import unittest
 
 from CoreScripts import ExperimentLauncher, GeneralParameters, ReportParameters, ResultsStorage, Logger, \
     ComparisonResult
 from CoreScripts.CfgParserFactory import CfgParserFactory
 from CoreScripts.Checker import Checker
 from CoreScripts.ReportCreator import ReportCreator
+from Experiments.Experiment_HPWL import Experiment_HPWL
 from Experiments.Experiment_HippocrateDP import Experiment_HippocrateDP
+from Experiments.Experiment_LR import Experiment_LR
+from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
 from unittest import TestCase
 
 
-class HippocrateTest(TestCase):
-    benchmark_list = "IWLS_GP_Hippocrate.list"
-    referenceLogFolder = "/HippocrateDP"
-
+class RegressionTest(TestCase):
     nTerminatedBenchmarks = 0
     MAX_TERMINATED_BENCHMARKS_NUM = 3
 
-    def test_full(self):
+    def test_hippocrate_detailed_placement(self):
+        self.benchmark_list = "IWLS_GP_Hippocrate.list"
+        self.referenceLogFolder = "/HippocrateDP"
+        experiment = Experiment_HippocrateDP()
+        self.run_experiment(experiment)
+
+    def test_new_buffering(self):
+        self.benchmark_list = "IWLS_GP_r1511_New_Buffering.list"
+        self.referenceLogFolder = "/New_Buffering/IWLS"
+        experiment = Experiment_New_Buffering()
+        self.run_experiment(experiment)
+
+    def DISABLED_test_HPWL_placement(self):
+        self.benchmark_list = "IWLS05.list"
+        self.referenceLogFolder = "/HPWL/IWLS"
+        experiment = Experiment_HPWL()
+        self.run_experiment(experiment)
+
+    def DISABLED_test_lr(self):
+        self.benchmark_list = "IWLS_GP_r1511_fast.list"
+        self.referenceLogFolder = "/LR"
+        experiment = Experiment_LR()
+        self.run_experiment(experiment)
+
+    def run_experiment(self, experiment):
         cfgParser = CfgParserFactory.createCfgParser()
         referenceLogs = os.path.join(CfgParserFactory.get_root_dir(),
                                      cfgParser.get("ReportParameters", "ReferenceLogs"))
 
-        experiment = Experiment_HippocrateDP()
         experiment.SetBenchmarksList(self.benchmark_list)
         checked_HDP = Checker(experiment, referenceLogs + self.referenceLogFolder)
         experiment = checked_HDP
@@ -54,3 +82,6 @@ class HippocrateTest(TestCase):
             self.assertEqual(ComparisonResult.OK, result, "Benchmark's result wasn't OK")
 
             logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
+
+if __name__ == "__main__":
+    unittest.main()

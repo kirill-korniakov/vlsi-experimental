@@ -62,7 +62,7 @@ def RemovePermissions(filePath):
         os.chmod(filePath, 666)
 
 
-def CompareValues(value1, value2, eps=0.001):
+def CompareValues(value1, value2, eps=0.01):
     if value1 == value2:
         return NumberComparisonResult.SAME
 

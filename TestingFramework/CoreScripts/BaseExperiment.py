@@ -8,7 +8,7 @@ from CoreFunctions import CreateConfigParser, WriteStringToFile, MakeTableInPerc
 
 
 class ComparisonResult:
-    OK = "Ok"
+    OK = "OK"
     NEW = "New"
     FAILED = "Failed"
     CHANGED = "Changed"
@@ -43,13 +43,8 @@ class ExperimentResults:
     def __str__(self):
         resultStr = ""
 
-        for (result, benchmarks) in list(self.benchmarkResults.iteritems()):
-            resultStr += ("%s: %s benchmarks (" % (result, len(benchmarks)))
-
-            for benchmark in benchmarks:
-                resultStr += ("%s; " % benchmark)
-
-            resultStr += ")\n"
+        for (benchmark, result) in list(self.benchmarkResults.iteritems()):
+            resultStr += ("%s: %s\n" % (result, benchmark))
 
         for error in self.errors:
             resultStr += ("%s\n" % error)
