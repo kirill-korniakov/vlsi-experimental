@@ -9,8 +9,7 @@ class Logger:
     def __init__(self):
         pass
 
-    factory = CfgParserFactory()
-    cfgParser = factory.createCfgParser()
+    cfgParser = CfgParserFactory.createCfgParser()
 
     selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
     if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder

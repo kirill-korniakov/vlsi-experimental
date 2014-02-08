@@ -9,10 +9,12 @@ from Experiment_HPWL import Experiment_HPWL
 from Experiment_LR import Experiment_LR
 from Experiment_Weighting import Experiment_Weighting
 from Experiment_New_Buffering import Experiment_New_Buffering
+from CoreScripts.CfgParserFactory import CfgParserFactory
 
 
 def NightExperiment(testRunner):
-    referenceLogs = "ReferenceLogs"  #TODO: read from config
+    cfgParser = CfgParserFactory.createCfgParser()
+    referenceLogs = cfgParser.get("ReportParameters", "ReferenceLogs")
 
     exp_HPWL = Experiment_HPWL()
     chk_HPWL_IWLS = Checker(exp_HPWL, referenceLogs + r"/HPWL/IWLS")
