@@ -7,11 +7,11 @@ from Logger import Logger
 from CoreFunctions import CreateConfigParser, WriteStringToFile, MakeTableInPercents, PrintTableToFile
 
 
-OK = "Ok"
-NEW = "New"
-FAILED = "Failed"
-CHANGED = "Changed"
-
+class ComparisonResult:
+    OK = "Ok"
+    NEW = "New"
+    FAILED = "Failed"
+    CHANGED = "Changed"
 
 class ExperimentResults:
     errors = []
@@ -32,10 +32,10 @@ class ExperimentResults:
         self.errors.append(error)
 
     def AddBenchmarkResult(self, benchmark, result):
-        if not result in self.benchmarkResults.keys():
-            self.benchmarkResults[result] = []
+        if not benchmark in self.benchmarkResults.keys():
+            self.benchmarkResults[benchmark] = []
 
-        self.benchmarkResults[result].append(benchmark)
+        self.benchmarkResults[benchmark] = result
 
     def AddPFSTForBenchmark(self, benchmark, table):
         self.pfstTables[benchmark] = table
@@ -76,7 +76,7 @@ class BaseExperiment:
         if not cmdArgs: cmdArgs = []
         self.name = name
         self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
-        self.benchmarks = os.path.join(CfgParserFactory.get_root_dir(), self.generalParameters.benchmarkCheckoutPath) + benchmarks
+        self.benchmarks = self.SetBenchmarksList(benchmarks)
         self.cmdArgs = cmdArgs
         self.metrics = metrics
         self.stages = stages
@@ -94,7 +94,7 @@ class BaseExperiment:
         self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
 
     def SetBenchmarksList(self, benchmarks):
-        self.benchmarks = os.path.join(self.generalParameters.benchmarkCheckoutPath, benchmarks)
+        self.benchmarks = os.path.join(CfgParserFactory.get_root_dir(), self.cfgParser.get("GeneralParameters", "benchmarkLists"), benchmarks)
 
     def CreateEmptyTable(self, reportTable):
         cols = ["Benchmark"]

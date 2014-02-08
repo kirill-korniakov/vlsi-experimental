@@ -12,15 +12,15 @@ MAX_TERMINATED_BENCHMARKS_NUM = 3
 
 class ExperimentLauncher:
     logger = None
-    emailer = None
+    mailer = None
     experiment = None
     resultsStorage = None
     experimentResults = None
     nTerminatedBenchmarks = 0
 
-    def __init__(self, experiment, resultsStorage, emailer):
+    def __init__(self, experiment, resultsStorage, mailer):
         self.logger = Logger()
-        self.emailer = emailer
+        self.mailer = mailer
         self.experiment = experiment
         self.resultsStorage = resultsStorage
         self.experimentResults = ExperimentResults()
@@ -158,7 +158,7 @@ class ExperimentLauncher:
         except Exception, e:
             error = "Error: can not call %s \n" % (placerParameters[0])
             error = error + "Exception message: " + str(e)
-            ReportErrorAndExit(error, self.logger, self.emailer)
+            ReportErrorAndExit(error, self.logger, self.mailer)
 
         #FIXME: here we wait for placer to finish, but we need a cross-platform way to do this
         p.wait()
@@ -189,36 +189,24 @@ class ExperimentLauncher:
         return placerReturnCode
 
     def SaveResults(self, placerReturnCode, logFileName, benchmark, reportTable):
-        resultValues = []
-
         if placerReturnCode != 0:
             self.logger.Log("Process return code: %s" % placerReturnCode)
-
-        if placerReturnCode is None:
+            return
+        elif placerReturnCode is None:
             self.logger.Log("Time out on %s" % benchmark)
             self.nTerminatedBenchmarks += 1
             self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
+            return
 
-        else:
-            (result, resultValues) = \
-                self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+        (result, pfst_values) = self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
-            self.experimentResults.AddPFSTForBenchmark(benchmark, resultValues)
-            self.experimentResults.AddBenchmarkResult(benchmark, result)
+        self.experimentResults.AddPFSTForBenchmark(benchmark, pfst_values)
+        self.experimentResults.AddBenchmarkResult(benchmark, result)
 
-            if result == CHANGED:
-                self.experimentResults.resultFile = reportTable
+        if result == ComparisonResult.CHANGED:
+            self.experimentResults.resultFile = reportTable
 
     def RunExperimentOnBenchmark(self, benchmark, logFolder, reportTable, generalParameters):
         placerParameters, logFileName = self.PreparePlacerParameters(benchmark, logFolder, generalParameters)
         placerReturnCode = self.RunPlacer(placerParameters, logFileName, generalParameters)
         self.SaveResults(placerReturnCode, logFileName, benchmark, reportTable)
-        #self.experimentResults.Print() #testing only
-
-
-def test():
-    pass
-
-
-if __name__ == "__main__":
-    test()

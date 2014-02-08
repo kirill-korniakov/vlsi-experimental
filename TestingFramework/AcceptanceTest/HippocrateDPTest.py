@@ -1,33 +1,56 @@
 import os
-from CoreScripts import Logger
+
+from CoreScripts import ExperimentLauncher, GeneralParameters, ReportParameters, ResultsStorage, Logger, \
+    ComparisonResult
 from CoreScripts.CfgParserFactory import CfgParserFactory
 from CoreScripts.Checker import Checker
-from CoreScripts.TestRunner import TestRunner
+from CoreScripts.ReportCreator import ReportCreator
 from Experiments.Experiment_HippocrateDP import Experiment_HippocrateDP
 from unittest import TestCase
 
 
 class HippocrateTest(TestCase):
-    name = "HippocrateDP experiment"
     benchmark_list = "IWLS_GP_Hippocrate.list"
+    referenceLogFolder = "/HippocrateDP"
 
-    def test_simple(self):
-        self.assertEqual(1, 1)
+    nTerminatedBenchmarks = 0
+    MAX_TERMINATED_BENCHMARKS_NUM = 3
 
     def test_full(self):
         cfgParser = CfgParserFactory.createCfgParser()
-        referenceLogs = os.path.join(CfgParserFactory.get_root_dir(), cfgParser.get("ReportParameters", "ReferenceLogs"))
+        referenceLogs = os.path.join(CfgParserFactory.get_root_dir(),
+                                     cfgParser.get("ReportParameters", "ReferenceLogs"))
 
-        chk_HDP = Checker(Experiment_HippocrateDP(), referenceLogs + r"/HippocrateDP")
+        experiment = Experiment_HippocrateDP()
+        experiment.SetBenchmarksList(self.benchmark_list)
+        checked_HDP = Checker(experiment, referenceLogs + self.referenceLogFolder)
+        experiment = checked_HDP
 
-        testRunner = TestRunner()
-        testRunner.Append(chk_HDP)
+        generalParameters = GeneralParameters(cfgParser)
+        reportParameters = ReportParameters(cfgParser)
 
-        try:
-            testRunner.Run()
+        storage = ResultsStorage()
+        launcher = ExperimentLauncher(checked_HDP, storage, None)
 
-        except Exception:
-            import traceback
+        logger = Logger()
+        logger.Log("Config: %s" % experiment.cfg)
+        logger.Log("Benchmarks: %s" % experiment.benchmarks)
 
-            logger = Logger()
-            logger.Log("exception: %s" % (traceback.format_exc()))
+        reportCreator = ReportCreator(experiment.name, experiment.cfg, reportParameters)
+        logFolder = reportCreator.CreateLogFolder()
+        reportTable = reportCreator.GetReportTableName()
+
+        experiment.CreateEmptyTable(reportTable)
+        benchmarks = launcher.CheckParametersAndPrepareBenchmarks()
+
+        for benchmark in benchmarks:
+            if self.nTerminatedBenchmarks >= self.MAX_TERMINATED_BENCHMARKS_NUM:
+                logger.Log("Reached maximum number of terminated benchmarks")
+                break
+
+            launcher.RunExperimentOnBenchmark(benchmark, logFolder, reportTable, generalParameters)
+
+            result = launcher.experimentResults.benchmarkResults.get(benchmark)
+            self.assertEqual(ComparisonResult.OK, result, "Benchmark's result wasn't OK")
+
+            logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))

@@ -31,6 +31,7 @@ class Logger:
         message = ">> " + message
 
         print(message)
+
         log = open(self.logFileName, 'a')
         log.write("%s\n" % message)
         log.close()
