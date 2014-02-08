@@ -1,6 +1,7 @@
 import os
 import traceback
 from ConfigParser import ConfigParser
+from CoreScripts.CfgParserFactory import CfgParserFactory
 
 
 class TestRunnerParameters:
@@ -23,7 +24,7 @@ class TestRunnerParameters:
 
 class EmailerParameters:
     doSendMail = False
-    subject = "Test"
+    subject = "UnitTest"
     recipients = None
     sender = "itlab.vlsi@yandex.ru"
     smtpserver = "smtp.yandex.com"
@@ -87,11 +88,11 @@ class GeneralParameters:
 
     def __init__(self, cfgParser):
         self.maxTimeForBenchmark = cfgParser.getint("GeneralParameters", "maxTimeForBenchmark")
-        self.benchmarkCheckoutPath = r"%s" % (cfgParser.get("GeneralParameters", "benchmarkCheckoutPath"))
-        self.checkoutPath = r"%s" % (cfgParser.get("GeneralParameters", "checkoutPath"))
-        self.buildLog = r"%s" % (cfgParser.get("GeneralParameters", "buildLog"))
-        self.slnPath = r"%s" % (cfgParser.get("GeneralParameters", "slnPath"))
-        self.binDir = r"%s" % (cfgParser.get("GeneralParameters", "binDir"))
+        self.benchmarkCheckoutPath = os.path.join(CfgParserFactory.get_root_dir(), r"%s" % (cfgParser.get("GeneralParameters", "benchmarkCheckoutPath")))
+        self.checkoutPath = os.path.join(CfgParserFactory.get_root_dir(), r"%s" % (cfgParser.get("GeneralParameters", "checkoutPath")))
+        self.buildLog = os.path.join(CfgParserFactory.get_root_dir(), r"%s" % (cfgParser.get("GeneralParameters", "buildLog")))
+        self.slnPath = os.path.join(CfgParserFactory.get_root_dir(), r"%s" % (cfgParser.get("GeneralParameters", "slnPath")))
+        self.binDir = os.path.join(CfgParserFactory.get_root_dir(), r"%s" % (cfgParser.get("GeneralParameters", "binDir")))
 
     def PrintParameters(self):
         print("General parameters:\nmaxTimeForBenchmark = %d\nbenchmarkCheckoutPath = %s\ncheckoutPath = \

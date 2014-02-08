@@ -7,16 +7,13 @@ from CfgParserFactory import CfgParserFactory
 
 class Logger:
     def __init__(self):
-        pass
+        cfgParser = CfgParserFactory.createCfgParser()
+        selfLogFolder = CfgParserFactory.get_root_dir() + cfgParser.get("ReportParameters", "selfLogFolder")
+        if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder
+            os.mkdir(selfLogFolder)
 
-    cfgParser = CfgParserFactory.createCfgParser()
-
-    selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
-    if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder
-        os.mkdir(selfLogFolder)
-
-    startTime = time.time()
-    logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp())
+        self.startTime = time.time()
+        self.logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp())
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime

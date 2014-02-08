@@ -1,4 +1,5 @@
 import os
+from CoreScripts.CfgParserFactory import CfgParserFactory
 
 from ParametersParsing import GeneralParameters
 from LogParser import LogParser, PFST, PQAT
@@ -75,7 +76,7 @@ class BaseExperiment:
         if not cmdArgs: cmdArgs = []
         self.name = name
         self.cfg = os.path.join(self.generalParameters.binDir, "cfg", cfg)
-        self.benchmarks = self.generalParameters.benchmarkCheckoutPath + benchmarks
+        self.benchmarks = os.path.join(CfgParserFactory.get_root_dir(), self.generalParameters.benchmarkCheckoutPath) + benchmarks
         self.cmdArgs = cmdArgs
         self.metrics = metrics
         self.stages = stages

@@ -4,7 +4,7 @@ from CoreScripts.Emailer import *
 def test():
     print("Send test mail")
 
-    subject = "Test Mail"
+    subject = "UnitTest Mail"
     text = "This is automatically generated mail. Please do not reply."
     attachmentFiles = []
 
