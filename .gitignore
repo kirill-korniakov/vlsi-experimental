@@ -1,2 +1,11 @@
 .DS_Store
 *.user
+*.pyc
+.idea
+
+itlPlace-build
+itlPlace/cfg/Replicated_*
+Benchmarks/IWLS_GP_r1511
+Benchmarks/IWLS05
+CurrentLogs
+TFLogs

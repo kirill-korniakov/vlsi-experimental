@@ -1,7 +1,0 @@
-Placement Flow Stages Table
-StageName         Tag Time(sec) Cells HPWL(nm)  TWL(nm)
--------------------------------------------------------
-GlobalPlacement   GP     35,843 12752 16015313 17489547
-Legalization      LEG    35,923 12752 18110740 19932080
-DetailedPlacement DP     51,677 12752 16175050 18054110
--------------------------------------------------------

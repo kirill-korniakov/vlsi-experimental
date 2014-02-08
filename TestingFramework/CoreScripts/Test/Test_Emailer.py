@@ -1,5 +1,6 @@
 from CoreScripts.Emailer import *
 
+
 def test():
     print("Send test mail")
 
@@ -12,5 +13,6 @@ def test():
     emailer = Emailer(ep)
 
     emailer.PrepareAndSendMail(subject, text, attachmentFiles)
+
 
 test()

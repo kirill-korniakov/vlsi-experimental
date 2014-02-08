@@ -46,6 +46,7 @@ INCLUDE_DIRECTORIES(${hdrs} ${FOR_GOOGLE_HASH})
 INCLUDE_DIRECTORIES(${hdrs} ${PETSC_INCLUDES})
 
 SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -stdlib=libstdc++")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
 
 LINK_DIRECTORIES(${TAO_LIBRARIES_PATH})
 SET(TAO_LIBRARIES tao taopetsc)
@@ -55,6 +56,12 @@ SET(app "itlPlace")
 FILE(GLOB_RECURSE srcs "include/*.h*" "src/*.cpp" "src/*.c" "src/*.h*" "src/config/*.c*") #"src/*.y"
 ADD_EXECUTABLE(${app} ${srcs})
 TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${TAO_LIBRARIES} ${PETSC_LIBRARIES})
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ln -sf ../../itlPlace/cfg "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfg"
+    COMMAND ln -sf ../../itlPlace/technology "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/technology"
+)
 
 # Debugging CMake
 FUNCTION(JOIN values separator result)

@@ -15,4 +15,4 @@ def PlotChartForBenchmark(benchmark, xValues, xMetric, yValues, yMetric):
     plt.ylabel(yMetric)
     plt.grid(True)
     #plt.show()
-    fig.savefig(r"%s.png" % (benchmark))
+    fig.savefig(r"%s.png" % benchmark)

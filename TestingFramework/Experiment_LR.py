@@ -2,21 +2,23 @@ from CoreScripts.TestRunner import TestRunner
 from CoreScripts.CoreFunctions import WriteStringToFile
 from CoreScripts.BaseExperiment import BaseExperiment
 
+
 class Experiment_LR(BaseExperiment):
     def __init__(self):
         _metrics = ["HPWL", "TWL", "TNS", "WNS"]
-        _stages  = ["INIT", "LEG"]
-        BaseExperiment.__init__(self, "LR experiment IWLS05GP", "LR.cfg", r"IWLS_GP_r1511\IWLS_GP.list", _metrics, _stages)
+        _stages = ["INIT", "LEG"]
+        BaseExperiment.__init__(self, "LR experiment IWLS05GP", "LR.cfg", r"IWLS_GP_r1511\IWLS_GP.list", _metrics,
+                                _stages)
 
         self.doParsePQAT = True
 
     def CreateEmptyTable(self, reportTable):
-        cols = ["Benchmark", "initHPWL", "lrHPWL", "dpHPWL",\
-        "initTWL", "lrTWL", "dpTWL",\
-        "initTNS", "lrTNS", "dpTNS",\
-        "initWNS", "lrWNS", "dpWNS", "",\
-        "lrHPWL%", "dpHPWL%", "lrTWL%", "dpTWL%", \
-        "lrTNS%", "dpTNS%", "lrWNS%", "dpWNS%"]
+        cols = ["Benchmark", "initHPWL", "lrHPWL", "dpHPWL",
+                "initTWL", "lrTWL", "dpTWL",
+                "initTNS", "lrTNS", "dpTNS",
+                "initWNS", "lrWNS", "dpWNS", "",
+                "lrHPWL%", "dpHPWL%", "lrTWL%", "dpTWL%",
+                "lrTNS%", "dpTNS%", "lrWNS%", "dpWNS%"]
 
         WriteStringToFile(cols, reportTable)
 
@@ -43,13 +45,15 @@ class Experiment_LR(BaseExperiment):
 
         WriteStringToFile(cols, reportTable)
 
+
 def TestRun():
     e = Experiment_LR()
-    e.SetBenchmarksList("IWLS_GP_fast.list")
+    e.SetBenchmarksList("IWLS_GP_r1511_fast.list")
 
     testRunner = TestRunner()
     testRunner.Append(e)
     testRunner.Run()
 
-if (__name__ == "__main__"):
+
+if __name__ == "__main__":
     TestRun()

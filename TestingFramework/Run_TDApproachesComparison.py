@@ -1,8 +1,8 @@
-import Experiment_LR
 from Experiment_LR import *
 
 import Experiment_Buffering
 from Experiment_Buffering import *
+
 
 def LRvsBuffering():
     benchmarkList = 'IWLS05_GP.list'
@@ -14,5 +14,6 @@ def LRvsBuffering():
     testRunner.Append(exp_LR)
     testRunner.Append(exp_Buffering)
     testRunner.Run()
+
 
 LRvsBuffering()
