@@ -1,4 +1,4 @@
-from Experiment_LR import *
+from Experiments.Experiment_LR import *
 
 import Experiment_Buffering
 from Experiment_Buffering import *

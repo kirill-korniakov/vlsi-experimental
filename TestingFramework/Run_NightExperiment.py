@@ -4,12 +4,12 @@ from CoreScripts.Emailer import Emailer
 from CoreScripts.TestRunner import TestRunner
 from CoreScripts.Logger import Logger
 from CoreScripts.CoreFunctions import CreateConfigParser, DeleteOldLogs
-from Experiment_HippocrateDP import Experiment_HippocrateDP
-from Experiment_HPWL import Experiment_HPWL
-from Experiment_LR import Experiment_LR
-from Experiment_Weighting import Experiment_Weighting
-from Experiment_New_Buffering import Experiment_New_Buffering
 from CoreScripts.CfgParserFactory import CfgParserFactory
+from Experiments.Experiment_HPWL import Experiment_HPWL
+from Experiments.Experiment_LR import Experiment_LR
+from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
+from Experiments.Experiment_HippocrateDP import Experiment_HippocrateDP
+from Experiments.Experiment_Weighting import Experiment_Weighting
 
 
 def NightExperiment(testRunner):
