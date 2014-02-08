@@ -53,9 +53,8 @@ class ExperimentLauncher:
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
         benchmarks = [x for x in benchmarks if len(x.strip())]
-        self.logger.Log("\n  * %s\n" % ("\n  * ".join(benchmarks)))
 
-        #check if all benchmarks can be found
+        # Check if all benchmarks can be found
         for i in range(len(benchmarks)):
             benchmarks[i] = benchmarks[i].strip()
             benchmark = r"%s.def" % (benchmarks[i])
@@ -65,7 +64,7 @@ class ExperimentLauncher:
             if not os.path.exists(benchmark):
                 notFoundBenchmarks.append(benchmarks[i])
 
-        #print and delete from list benchmarks which were not found
+        # Print and delete from list benchmarks which were not found
         if notFoundBenchmarks != []:
             for benchmark in notFoundBenchmarks:
                 benchmarks.remove(benchmark)
@@ -145,15 +144,15 @@ class ExperimentLauncher:
 
     def RunPlacer(self, placerParameters, logFileName, generalParameters):
         fPlacerOutput = open(logFileName, 'w')
-        self.logger.Log("Output will be redirected to: " + logFileName)
-        self.logger.Log("Working directory is set to: " + generalParameters.binDir)
+        self.logger.LogD("Output will be redirected to: " + logFileName)
+        self.logger.LogD("Working directory is set to: " + generalParameters.binDir)
 
         try:  # FIXME: this place is debugged now; may be use placerParameters directly
             #p = subprocess.Popen(placerParameters, stdout = fPlacerOutput, cwd = generalParameters.binDir)
             params = placerParameters
             params[0] = "./" + os.path.basename(params[0])
             p = subprocess.Popen(params, cwd=generalParameters.binDir, stdout=fPlacerOutput)
-            self.logger.Log("Executed the following command:\n" + " ".join(params) + "\n")
+            self.logger.LogD("Executed the following command:\n" + " ".join(params) + "\n")
 
         except Exception, e:
             error = "Error: can not call %s \n" % (placerParameters[0])

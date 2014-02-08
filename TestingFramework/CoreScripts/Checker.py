@@ -49,14 +49,14 @@ class Checker(BaseExperiment):
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         logger = Logger()
-        logger.Log("Parsing: " + logName)
+        logger.LogD("Parsing: " + logName)
         currentValues = self.ParseLog(logName)
 
         if currentValues == []:
             return [ComparisonResult.FAILED, []]
 
         referenceLogName = os.path.join(self.referenceLogFolder, os.path.basename(logName))
-        logger.Log("Parsing: " + referenceLogName)
+        logger.LogD("Parsing: " + referenceLogName)
         referenceValues = self.ParseLog(referenceLogName)
 
         if referenceValues == []:

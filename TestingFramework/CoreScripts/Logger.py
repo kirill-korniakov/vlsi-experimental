@@ -4,6 +4,11 @@ import os
 from CoreFunctions import GetTimeStamp
 from CfgParserFactory import CfgParserFactory
 
+class LoggingLevel:
+    DEBUG = 0
+    RELEASE = 1
+
+loggingLevel = LoggingLevel.RELEASE
 
 class Logger:
     def __init__(self):
@@ -31,6 +36,16 @@ class Logger:
         message = ">> " + message
 
         print(message)
+
+        log = open(self.logFileName, 'a')
+        log.write("%s\n" % message)
+        log.close()
+
+    def LogD(self, message):
+        message = ">> " + message
+
+        if loggingLevel == LoggingLevel.DEBUG:
+            print(message)
 
         log = open(self.logFileName, 'a')
         log.write("%s\n" % message)

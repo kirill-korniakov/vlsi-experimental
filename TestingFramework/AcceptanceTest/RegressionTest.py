@@ -20,6 +20,10 @@ from unittest import TestCase
 class RegressionTest(TestCase):
     nTerminatedBenchmarks = 0
     MAX_TERMINATED_BENCHMARKS_NUM = 3
+    # TODO:
+    # "APlace weighting experiment": "IWLS05.list",
+    # "HPWL_ISPD": "ISPD04.list", -- crash
+    # "Weighting (SGNW) experiment": "IWLS05.list", -- crash
 
     def test_hippocrate_detailed_placement(self):
         self.benchmark_list = "IWLS_GP_Hippocrate.list"
@@ -61,8 +65,8 @@ class RegressionTest(TestCase):
         launcher = ExperimentLauncher(checked_HDP, storage, None)
 
         logger = Logger()
-        logger.Log("Config: %s" % experiment.cfg)
-        logger.Log("Benchmarks: %s" % experiment.benchmarks)
+        logger.LogD("Config: %s" % experiment.cfg)
+        logger.LogD("Benchmarks: %s" % experiment.benchmarks)
 
         reportCreator = ReportCreator(experiment.name, experiment.cfg, reportParameters)
         logFolder = reportCreator.CreateLogFolder()
@@ -70,6 +74,7 @@ class RegressionTest(TestCase):
 
         experiment.CreateEmptyTable(reportTable)
         benchmarks = launcher.CheckParametersAndPrepareBenchmarks()
+        logger.LogD("List of benchmarks:\n   * %s\n" % ("\n   * ".join(benchmarks)))
 
         for benchmark in benchmarks:
             if self.nTerminatedBenchmarks >= self.MAX_TERMINATED_BENCHMARKS_NUM:
@@ -81,7 +86,9 @@ class RegressionTest(TestCase):
             result = launcher.experimentResults.benchmarkResults.get(benchmark)
             self.assertEqual(ComparisonResult.OK, result, "Benchmark's result wasn't OK")
 
-            logger.Log("[%s/%s] %s is finished\n" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
+            logger.LogD("[%s/%s] %s is finished" % (benchmarks.index(benchmark) + 1, len(benchmarks), benchmark))
+
+        logger.LogD("Experiment is finished\n")
 
 if __name__ == "__main__":
     unittest.main()
