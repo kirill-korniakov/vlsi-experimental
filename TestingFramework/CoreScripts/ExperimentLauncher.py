@@ -55,11 +55,15 @@ class ExperimentLauncher:
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
         benchmarks = [x for x in benchmarks if len(x.strip())]
 
+        cfgParser = CfgParserFactory.createCfgParser()
+        benchmarkFolder = os.path.join(CfgParserFactory.get_root_dir(),
+                                       cfgParser.get("GeneralParameters", "benchmarkCheckoutPath"))
+
         # Check if all benchmarks can be found
         for i in range(len(benchmarks)):
             benchmarks[i] = benchmarks[i].strip()
             benchmark = r"%s.def" % (benchmarks[i])
-            benchmarkFolder = os.path.dirname(os.path.abspath(benchmark_list))
+            # benchmarkFolder = os.path.dirname(os.path.abspath(benchmark_list))
             benchmark = os.path.join(benchmarkFolder, benchmark)
 
             if not os.path.exists(benchmark):
@@ -112,8 +116,11 @@ class ExperimentLauncher:
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
 
         defFile = r"%s.def" % benchmark
-        benchMarkFolder = os.path.dirname(os.path.abspath(benchmark))
-        defFile = os.path.join(benchMarkFolder, defFile)
+        cfgParser = CfgParserFactory.createCfgParser()
+        benchmarkFolder = os.path.join(CfgParserFactory.get_root_dir(),
+                                       cfgParser.get("GeneralParameters", "benchmarkCheckoutPath"))
+        # benchMarkFolder = os.path.dirname(os.path.abspath(benchmark))
+        defFile = os.path.join(benchmarkFolder, defFile)
         defFileParam = "--params.def=%s" % defFile
 
         pixFolder = os.path.abspath(os.path.join(logFolder, os.path.basename(benchmark), "pix"))
