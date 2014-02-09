@@ -37,18 +37,19 @@ class ExperimentLauncher:
             self.AddErrorToResults(error)
             return False
 
-        #check if benchmarks list file can be found
-        if not os.path.exists(self.experiment.benchmarks):
-            error = "Error: file '%s' not found" % self.experiment.benchmarks
-            self.AddErrorToResults(error)
-            return False
-
         return True
 
-    def PrepareBenchmarks(self):
+    @staticmethod
+    def PrepareBenchmarks(benchmark_list):
+        #check if benchmarks list file can be found
+        if not os.path.exists(benchmark_list):
+            error = "Error: file '%s' not found" % benchmark_list
+            # self.AddErrorToResults(error)
+            return None
+
         notFoundBenchmarksStr = ""
         notFoundBenchmarks = []
-        benchmarks = (open(self.experiment.benchmarks).read()).split("\n")
+        benchmarks = (open(benchmark_list).read()).split("\n")
 
         # Perform filtering of empty lines and commented by # benchmarks
         benchmarks = [x for x in benchmarks if not x.strip().startswith('#')]
@@ -58,7 +59,7 @@ class ExperimentLauncher:
         for i in range(len(benchmarks)):
             benchmarks[i] = benchmarks[i].strip()
             benchmark = r"%s.def" % (benchmarks[i])
-            benchmarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
+            benchmarkFolder = os.path.dirname(os.path.abspath(benchmark_list))
             benchmark = os.path.join(benchmarkFolder, benchmark)
 
             if not os.path.exists(benchmark):
@@ -71,9 +72,8 @@ class ExperimentLauncher:
                 notFoundBenchmarksStr += ' "%s";' % benchmark
 
             error = "Error: benchmarks %s were not found!" % notFoundBenchmarksStr
-            self.AddErrorToResults(error)
+            # self.AddErrorToResults(error)
 
-        nFoundBenchmarks = len(benchmarks)
         return benchmarks
 
     def CheckParametersAndPrepareBenchmarks(self):
@@ -112,7 +112,7 @@ class ExperimentLauncher:
         self.experimentResults.AddPFSTForBenchmark(benchmark, [])
 
         defFile = r"%s.def" % benchmark
-        benchMarkFolder = os.path.dirname(os.path.abspath(self.experiment.benchmarks))
+        benchMarkFolder = os.path.dirname(os.path.abspath(benchmark))
         defFile = os.path.join(benchMarkFolder, defFile)
         defFileParam = "--params.def=%s" % defFile
 

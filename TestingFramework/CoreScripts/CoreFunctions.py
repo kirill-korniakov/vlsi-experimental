@@ -13,7 +13,7 @@ class NumberComparisonResult:
     NOT_EQUAL = "NotEqual"
 
 def GetTimeStamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")
 
 
 def Absolutize(x):

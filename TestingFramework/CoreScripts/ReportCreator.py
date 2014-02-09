@@ -28,7 +28,7 @@ class ReportCreator:
             os.mkdir(self.currentLogs)
 
         if os.path.exists(self.logFolder):
-            newFolderName = "%s_backup_from_%s" % (self.logFolder, GetTimeStamp())
+            newFolderName = "%s_backup_from_%s_%s" % (self.logFolder, GetTimeStamp())
             os.rename(self.logFolder, newFolderName)
 
         os.mkdir(self.logFolder)
