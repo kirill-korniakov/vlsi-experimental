@@ -2,7 +2,7 @@ import os
 from CoreScripts.CfgParserFactory import CfgParserFactory
 
 from ParametersParsing import GeneralParameters
-from LogParser import LogParser, PFST, PQAT
+from LogParser import LogParser, TableType
 from Logger import Logger
 from CoreFunctions import CreateConfigParser, WriteStringToFile, MakeTableInPercents, PrintTableToFile
 
@@ -17,16 +17,21 @@ class ExperimentResults:
     errors = []
     resultFile = ""  #file with result table
     pfstTables = {}  #benchmark: pfst
+    pfstRefTables = {}  #benchmark: pfst
     benchmarkResults = {}  #result: [benchmarks]
 
     def __init__(self):
         self.errors = []
         self.resultFile = ""
         self.pfstTables = {}
+        self.pfstRefTables = {}
         self.benchmarkResults = {}
 
     def GetPFSTForBenchmark(self, benchmark):
         return self.pfstTables[benchmark]
+
+    def GetReferencePFSTForBenchmark(self, benchmark):
+        return self.pfstRefTables[benchmark]
 
     def AddError(self, error):
         self.errors.append(error)
@@ -39,6 +44,9 @@ class ExperimentResults:
 
     def AddPFSTForBenchmark(self, benchmark, table):
         self.pfstTables[benchmark] = table
+
+    def AddReferencePFSTForBenchmark(self, benchmark, table):
+        self.pfstRefTables[benchmark] = table
 
     def __str__(self):
         resultStr = ""
@@ -104,12 +112,12 @@ class BaseExperiment:
         WriteStringToFile(cols, reportTable)
 
     def ParseLog(self, logName):
-        parser = LogParser(logName, PFST, self.cfgParser)
+        parser = LogParser(logName, TableType.PFST, self.cfgParser)
         return parser.ParsePFST(self.metrics, self.stages)
 
     def ParsePQATAndPrintTable(self, logName):
         metrics = ["HPWL", "TNS", "WNS"]
-        parser = LogParser(logName, PQAT, self.cfgParser)
+        parser = LogParser(logName, TableType.PQAT, self.cfgParser)
         table = parser.ParsePQAT(metrics)
         table = MakeTableInPercents(table)
         pqatName = r"%s.csv" % (os.path.basename(logName))
@@ -146,14 +154,14 @@ class BaseExperiment:
         values = self.ParseLog(logName)
 
         if values == []:
-            return [FAILED, []]
+            return [ComparisonResult.FAILED, []]
 
         self.AddStringToTable(values, benchmark, reportTable)
 
         if self.doParsePQAT == True:
             self.ParsePQATAndPrintTable(logName)
 
-        return [OK, values]
+        return [ComparisonResult.OK, values]
 
 
 def TestResultTableMaking():

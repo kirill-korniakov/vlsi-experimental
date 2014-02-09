@@ -204,8 +204,9 @@ class ExperimentLauncher:
             self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
             return
 
-        (result, pfst_values) = self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
+        (result, pfst_values, pfst_reference_values) = self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
 
+        self.experimentResults.AddReferencePFSTForBenchmark(benchmark, pfst_reference_values)
         self.experimentResults.AddPFSTForBenchmark(benchmark, pfst_values)
         self.experimentResults.AddBenchmarkResult(benchmark, result)
 

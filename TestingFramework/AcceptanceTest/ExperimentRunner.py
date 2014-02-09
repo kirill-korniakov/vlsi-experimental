@@ -22,7 +22,6 @@ class ExperimentRunner:
         return benchmarks
 
     def run_experiment(self, experiment, benchmark, referenceLogFolder):
-        # experiment.SetBenchmarksList(benchmark_list)
         checked_HDP = Checker(experiment, self.referenceLogs + referenceLogFolder)
         experiment = checked_HDP
 
@@ -41,12 +40,10 @@ class ExperimentRunner:
         reportTable = reportCreator.GetReportTableName()
 
         experiment.CreateEmptyTable(reportTable)
-        # benchmarks = launcher.CheckParametersAndPrepareBenchmarks()
-        # logger.LogD("List of benchmarks:\n   * %s\n" % ("\n   * ".join(benchmarks)))
 
         launcher.RunExperimentOnBenchmark(benchmark, logFolder, reportTable, generalParameters)
-        result = launcher.experimentResults.benchmarkResults.get(benchmark)
-
         logger.LogD("Experiment is finished: %s\n" % benchmark)
 
-        return result
+        # result = launcher.experimentResults.benchmarkResults.get(benchmark)
+
+        return launcher.experimentResults

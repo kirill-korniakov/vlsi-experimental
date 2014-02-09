@@ -68,4 +68,4 @@ class Checker(BaseExperiment):
         if self.doParsePQAT:
             self.ParsePQATAndPrintTable(logName)
 
-        return self.CompareTables(currentValues, referenceValues), currentValues
+        return self.CompareTables(currentValues, referenceValues), currentValues, referenceValues
