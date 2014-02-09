@@ -6,7 +6,7 @@ from CoreScripts.BaseExperiment import BaseExperiment
 class Experiment_HPWL(BaseExperiment):
     def __init__(self):
         BaseExperiment.__init__(self, "IWLS05 HPWL experiment", "hpwl_iwls05.cfg", "IWLS05.list",
-                                ["HPWL"], ["DP"])
+                                ["HPWL"], ["GP", "LEG", "DP"])
 
     def CreateEmptyTable(self, reportTable):
         cols = ["Benchmark", "HPWL"]
