@@ -3,13 +3,15 @@ compiler:
   - gcc
   - clang
 before_script:
+  - sudo apt-get update
   - sudo apt-get install libopencv-dev
-  - sudo easy_install nose
+  - sudo pip install nose
+  - sudo pip install nose-timer
   - unzip ./Benchmarks/IWLS_GP_r1511.zip -d ./Benchmarks
   - unzip ./Benchmarks/IWLS05.zip -d ./Benchmarks
   - mkdir itlPlace-build
   - cd ./itlPlace-build
   - cmake -DPETSC_DIR=../itlPlace/3rdparty/PETSc -DPETSC_ARCH=ubuntu-64 -DTAO_DIR=../itlPlace/3rdparty/TAO ../itlPlace/
-script: (make -j5 && nosetests ../TestingFramework/AcceptanceTest/TestSanity.py)
+script: (make -j5 && nosetests --with-timer ../TestingFramework/AcceptanceTest/)
 notifications:
   email: false
