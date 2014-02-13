@@ -6,13 +6,14 @@ from ConfigParser import ConfigParser
 CONFIG_FILE = "Parameters.conf"
 DELIMITER = ";"
 
-SAME = "same"
-EQUAL = "equal"
-NOT_EQUAL = "NotEqual"
 
+class NumberComparisonResult:
+    SAME = "same"
+    EQUAL = "equal"
+    NOT_EQUAL = "NotEqual"
 
 def GetTimeStamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f")
 
 
 def Absolutize(x):
@@ -61,17 +62,19 @@ def RemovePermissions(filePath):
         os.chmod(filePath, 666)
 
 
-def CompareValues(value1, value2, eps=0.001):
+def CompareValues(value1, value2, eps=0.01):
     if value1 == value2:
-        return SAME
+        return NumberComparisonResult.SAME
 
     value1 = float(value1)
     value2 = float(value2)
 
-    if abs(value1 - value2) < eps:
-        return EQUAL
+    relative_eps = min(value1, value2) * eps
 
-    return NOT_EQUAL
+    if abs(value1 - value2) < relative_eps:
+        return NumberComparisonResult.EQUAL
+
+    return NumberComparisonResult.NOT_EQUAL
 
 
 def ReportErrorAndExit(error, logger, emailer):

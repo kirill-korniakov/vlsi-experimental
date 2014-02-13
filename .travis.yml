@@ -3,14 +3,13 @@ compiler:
   - gcc
   - clang
 before_script:
-  - cd ./Benchmarks
-  - unzip ./IWLS_GP_r1511.zip
-  - unzip ./IWLS05.zip
-  - cd ..
   - sudo apt-get install libopencv-dev
+  - sudo easy_install nose
+  - unzip ./Benchmarks/IWLS_GP_r1511.zip -d ./Benchmarks
+  - unzip ./Benchmarks/IWLS05.zip -d ./Benchmarks
   - mkdir itlPlace-build
   - cd ./itlPlace-build
-  - cmake -DPETSC_DIR=../itlPlace/3rdparty/PETSc/ -DPETSC_ARCH=ubuntu-64 -DTAO_DIR=../itlPlace/3rdparty/TAO ../itlPlace/
-script: (make -j5 && cd ../TestingFramework && python ./Run_NightExperiment_fast.py)
+  - cmake -DPETSC_DIR=../itlPlace/3rdparty/PETSc -DPETSC_ARCH=ubuntu-64 -DTAO_DIR=../itlPlace/3rdparty/TAO ../itlPlace/
+script: (make -j5 && nosetests ../TestingFramework/AcceptanceTest/TestSanity.py)
 notifications:
   email: false

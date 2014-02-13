@@ -2,8 +2,10 @@ from CoreFunctions import CreateConfigParser
 from ParametersParsing import LogParserParameters
 
 NOT_FOUND = -1.0
-PFST = "PFST"
-PQAT = "PQAT"
+
+class TableType:
+    PFST = "PFST"
+    PQAT = "PQAT"
 
 
 class LogParser:
@@ -11,7 +13,7 @@ class LogParser:
     tableHeader = ""
     parameters = None
 
-    def __init__(self, logName, tableType=PFST, cfgParser=None):
+    def __init__(self, logName, tableType=TableType.PFST, cfgParser=None):
         self.logName = logName
 
         if cfgParser is None:
@@ -19,9 +21,8 @@ class LogParser:
 
         self.parameters = LogParserParameters(cfgParser)
 
-        if tableType == PFST:
+        if tableType == TableType.PFST:
             self.tableHeader = self.parameters.PFSTTableHeader
-
         else:
             self.tableHeader = self.parameters.PQATTableHeader
 
@@ -82,7 +83,7 @@ class LogParser:
             table.append([])
 
             for col in range(len(metrics)):
-                value = str(self.GetFromTable(str(currStage), metrics[col], PQAT))
+                value = str(self.GetFromTable(str(currStage), metrics[col], TableType.PQAT))
                 value = float(value.replace(",", "."))
 
                 if value == NOT_FOUND:

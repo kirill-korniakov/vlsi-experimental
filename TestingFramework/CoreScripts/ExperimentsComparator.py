@@ -1,4 +1,4 @@
-from CoreFunctions import GetTimeStamp, WriteStringToFile, CompareValues, NOT_EQUAL
+from CoreFunctions import GetTimeStamp, WriteStringToFile, CompareValues, NumberComparisonResult
 
 from ReportCreator import ReportCreator
 from Logger import Logger

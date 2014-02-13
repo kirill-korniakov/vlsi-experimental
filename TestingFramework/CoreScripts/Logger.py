@@ -4,20 +4,21 @@ import os
 from CoreFunctions import GetTimeStamp
 from CfgParserFactory import CfgParserFactory
 
+class LoggingLevel:
+    DEBUG = 0
+    RELEASE = 1
+
+loggingLevel = LoggingLevel.RELEASE
 
 class Logger:
     def __init__(self):
-        pass
+        cfgParser = CfgParserFactory.createCfgParser()
+        selfLogFolder = CfgParserFactory.get_root_dir() + cfgParser.get("ReportParameters", "selfLogFolder")
+        if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder
+            os.mkdir(selfLogFolder)
 
-    factory = CfgParserFactory()
-    cfgParser = factory.createCfgParser()
-
-    selfLogFolder = cfgParser.get("ReportParameters", "selfLogFolder")
-    if not os.path.exists(selfLogFolder):  #TODO: use ReportCreator.CreateLogFolder
-        os.mkdir(selfLogFolder)
-
-    startTime = time.time()
-    logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp())
+        self.startTime = time.time()
+        self.logFileName = selfLogFolder + r"TF_%s.log" % (GetTimeStamp())
 
     def LogWorkTime(self):
         runTime = time.time() - self.startTime
@@ -35,6 +36,17 @@ class Logger:
         message = ">> " + message
 
         print(message)
+
+        log = open(self.logFileName, 'a')
+        log.write("%s\n" % message)
+        log.close()
+
+    def LogD(self, message):
+        message = ">> " + message
+
+        if loggingLevel == LoggingLevel.DEBUG:
+            print(message)
+
         log = open(self.logFileName, 'a')
         log.write("%s\n" % message)
         log.close()

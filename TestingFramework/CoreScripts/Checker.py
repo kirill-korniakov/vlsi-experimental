@@ -1,26 +1,25 @@
 import os
 
 from Logger import Logger
-from CoreScripts.BaseExperiment import OK, CHANGED, NEW, FAILED, BaseExperiment
-from CoreScripts.CoreFunctions import NOT_EQUAL, CompareValues, WriteStringToFile
+from CoreScripts.BaseExperiment import ComparisonResult, BaseExperiment
+from CoreScripts.CoreFunctions import NumberComparisonResult, CompareValues, WriteStringToFile
 
 
 class Checker(BaseExperiment):
-    masterLogFolder = ""
+    referenceLogFolder = ""
 
-    def __init__(self, baseExperimnet, masterLogFolder):
-        BaseExperiment.CopyingConstructor(self, baseExperimnet)
-        self.masterLogFolder = masterLogFolder
+    def __init__(self, baseExperiment, masterLogFolder):
+        BaseExperiment.CopyingConstructor(self, baseExperiment)
+        self.referenceLogFolder = masterLogFolder
 
     def CompareTables(self, table1, table2):
         for col in range(len(self.metrics)):
             for row in range(len(self.stages)):
                 compare_result = CompareValues(table1[row][col], table2[row][col])
+                if compare_result == NumberComparisonResult.NOT_EQUAL:
+                    return ComparisonResult.CHANGED
 
-                if compare_result == NOT_EQUAL:
-                    return CHANGED
-
-        return OK
+        return ComparisonResult.OK
 
     def CreateEmptyTable(self, report_table):
         cols = ["Benchmark"]
@@ -50,23 +49,23 @@ class Checker(BaseExperiment):
 
     def ParseLogAndFillTable(self, logName, benchmark, reportTable):
         logger = Logger()
-        logger.Log("Parsing: " + logName)
+        logger.LogD("Parsing: " + logName)
         currentValues = self.ParseLog(logName)
 
         if currentValues == []:
-            return [FAILED, []]
+            return [ComparisonResult.FAILED, []]
 
-        masterLogName = os.path.join(self.masterLogFolder, os.path.basename(logName))
-        logger.Log("Parsing: " + masterLogName)
-        masterValues = self.ParseLog(masterLogName)
+        referenceLogName = os.path.join(self.referenceLogFolder, os.path.basename(logName))
+        logger.LogD("Parsing: " + referenceLogName)
+        referenceValues = self.ParseLog(referenceLogName)
 
-        if masterValues == []:
+        if referenceValues == []:
             logger.Log("Experiment has not failed but master log is empty or does not exist\n")
-            return [NEW, currentValues]
+            return [ComparisonResult.NEW, currentValues]
 
-        self.AddStringToTable(currentValues, masterValues, benchmark, reportTable)
+        self.AddStringToTable(currentValues, referenceValues, benchmark, reportTable)
 
-        if self.doParsePQAT == True:
+        if self.doParsePQAT:
             self.ParsePQATAndPrintTable(logName)
 
-        return [self.CompareTables(currentValues, masterValues), currentValues]
+        return self.CompareTables(currentValues, referenceValues), currentValues, referenceValues
