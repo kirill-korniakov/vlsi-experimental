@@ -1,6 +1,5 @@
 import os
 
-from Logger import Logger
 from CoreScripts.BaseExperiment import ComparisonResult, BaseExperiment
 from CoreScripts.CoreFunctions import NumberComparisonResult, CompareValues, WriteStringToFile
 

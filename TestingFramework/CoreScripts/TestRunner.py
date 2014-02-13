@@ -3,8 +3,7 @@ from ExperimentLauncher import ExperimentLauncher
 from ExperimentsComparator import ExperimentsComparator
 from CoreFunctions import GetTimeStamp, CreateConfigParser
 from Logger import Logger
-from ParametersParsing import TestRunnerParameters, EmailerParameters, RepoParameters, \
-    ReportParameters, GeneralParameters, Tools
+from ParametersParsing import TestRunnerParameters, ReportParameters, GeneralParameters
 
 
 class TestRunner:

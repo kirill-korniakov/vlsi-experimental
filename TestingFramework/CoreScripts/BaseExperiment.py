@@ -1,9 +1,8 @@
 import os
-from CoreScripts.CfgParserFactory import CfgParserFactory
 
+from CoreScripts.CfgParserFactory import CfgParserFactory
 from ParametersParsing import GeneralParameters
 from LogParser import LogParser, TableType
-from Logger import Logger
 from CoreFunctions import CreateConfigParser, WriteStringToFile, MakeTableInPercents, PrintTableToFile
 
 

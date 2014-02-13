@@ -1,6 +1,7 @@
 import os
 import sys
 from CoreScripts import Logger
+from Experiments.Experiment_HPWL import Experiment_HPWL
 
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(path)
@@ -22,6 +23,15 @@ class TestSanity:
         benchmark_list = "sanity/HippocrateDP.list"
         referenceLogFolder = "/HippocrateDP"
         experiment = Experiment_HippocrateDP(self.logger)
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
+
+    def test_hpwl_placement(self):
+        benchmark_list = "sanity/HPWL_IWLS.list"
+        referenceLogFolder = "/HPWL/IWLS-initial-mac-state"
+        experiment = Experiment_HPWL(self.logger)
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:

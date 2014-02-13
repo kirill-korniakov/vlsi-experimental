@@ -2,7 +2,6 @@ import subprocess
 
 from BaseExperiment import *
 from ReportCreator import ReportCreator
-from Logger import Logger
 from CoreFunctions import ReportErrorAndExit
 
 
