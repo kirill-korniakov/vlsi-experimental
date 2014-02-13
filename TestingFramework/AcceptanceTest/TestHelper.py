@@ -14,8 +14,8 @@ class TestHelper:
             print [round(b / a, 2) for a, b in zip(x[0], x[1])]
             print ""
 
-    def run(self, experiment, benchmark, referenceLogFolder):
-        experiment_results = self.experimentRunner.run_experiment(experiment, benchmark, referenceLogFolder)
+    def run(self, logger, experiment, benchmark, referenceLogFolder):
+        experiment_results = self.experimentRunner.run_experiment(logger, experiment, benchmark, referenceLogFolder)
         result = experiment_results.benchmarkResults.get(benchmark)
         if result != ComparisonResult.OK:
             self.print_differences(experiment_results, benchmark)

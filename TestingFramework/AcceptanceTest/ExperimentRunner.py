@@ -21,7 +21,7 @@ class ExperimentRunner:
         benchmarks = ExperimentLauncher.PrepareBenchmarks(benchmark_list)
         return benchmarks
 
-    def run_experiment(self, experiment, benchmark, referenceLogFolder):
+    def run_experiment(self, logger, experiment, benchmark, referenceLogFolder):
         checked_HDP = Checker(experiment, self.referenceLogs + referenceLogFolder)
         experiment = checked_HDP
 
@@ -29,9 +29,8 @@ class ExperimentRunner:
         reportParameters = ReportParameters(self.cfgParser)
 
         storage = ResultsStorage()
-        launcher = ExperimentLauncher(checked_HDP, storage, None)
+        launcher = ExperimentLauncher(checked_HDP, storage, logger)
 
-        logger = Logger()
         logger.LogD("Config: %s" % experiment.cfg)
         logger.LogD("Benchmarks: %s" % experiment.benchmarks)
 
@@ -43,7 +42,5 @@ class ExperimentRunner:
 
         launcher.RunExperimentOnBenchmark(benchmark, logFolder, reportTable, generalParameters)
         logger.LogD("Experiment is finished: %s\n" % benchmark)
-
-        # result = launcher.experimentResults.benchmarkResults.get(benchmark)
 
         return launcher.experimentResults

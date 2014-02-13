@@ -1,5 +1,7 @@
 import os
 import sys
+from CoreScripts import Logger
+
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(path)
 
@@ -13,18 +15,19 @@ from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
 
 class TestSanity:
     test_helper = TestHelper()
+    logger = Logger()
 
     # @nottest
     def test_hippocrate(self):
         benchmark_list = "sanity/HippocrateDP.list"
         referenceLogFolder = "/HippocrateDP"
-        experiment = Experiment_HippocrateDP()
+        experiment = Experiment_HippocrateDP(self.logger)
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
-            yield self.test_helper.run, experiment, benchmark, referenceLogFolder
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest # Because of difference in Linux
+    @nottest # Because of difference on Linux
     def test_new_buffering(self):
         benchmark_list = "sanity/New_Buffering.list"
         referenceLogFolder = "/New_Buffering/IWLS"
@@ -32,7 +35,7 @@ class TestSanity:
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
-            yield self.test_helper.run, experiment, benchmark, referenceLogFolder
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
 if __name__ == "__main__":
     nose.main()

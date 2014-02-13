@@ -12,15 +12,13 @@ MAX_TERMINATED_BENCHMARKS_NUM = 3
 
 class ExperimentLauncher:
     logger = None
-    mailer = None
     experiment = None
     resultsStorage = None
     experimentResults = None
     nTerminatedBenchmarks = 0
 
-    def __init__(self, experiment, resultsStorage, mailer):
-        self.logger = Logger()
-        self.mailer = mailer
+    def __init__(self, experiment, resultsStorage, logger):
+        self.logger = logger
         self.experiment = experiment
         self.resultsStorage = resultsStorage
         self.experimentResults = ExperimentResults()
