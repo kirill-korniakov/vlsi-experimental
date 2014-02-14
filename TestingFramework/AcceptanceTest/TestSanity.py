@@ -28,6 +28,7 @@ class TestSanity:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
+    # @nottest
     def test_hpwl_placement(self):
         benchmark_list = "sanity/HPWL_IWLS.list"
         referenceLogFolder = "/HPWL/IWLS-initial-mac-state"

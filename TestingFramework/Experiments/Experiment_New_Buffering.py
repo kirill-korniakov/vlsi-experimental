@@ -3,12 +3,12 @@ from CoreScripts.BaseExperiment import BaseExperiment
 
 
 class Experiment_New_Buffering(BaseExperiment):
-    def __init__(self):
+    def __init__(self, logger):
         _metrics = ['Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
         _stages = ['INIT', 'NBUF', 'LEGB']
 
         BaseExperiment.__init__(self, 'IWLS05 new_buffering experiment (NBL)', 'NewBuffering.cfg', 'IWLS05.list',
-                                _metrics, _stages)
+                                _metrics, _stages, logger)
 
 
 def TestRun():
