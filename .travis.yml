@@ -12,7 +12,9 @@ before_script:
   - unzip ./Benchmarks/IWLS_GP_r1511.zip -d ./Benchmarks
   - mkdir ./itlPlace-build
   - cd ./itlPlace-build
+script:
   - cmake -DPETSC_DIR=../itlPlace/3rdparty/PETSc -DPETSC_ARCH=ubuntu-64 -DTAO_DIR=../itlPlace/3rdparty/TAO ../itlPlace/
-script: (make -j5 && cd ../TestingFramework && nosetests --with-timer ./CoreScripts/tests ./AcceptanceTest/TestSanity.py)
+  - make -j5
+  - nosetests --with-timer ../TestingFramework/CoreScripts/tests ../TestingFramework/AcceptanceTest/TestSanity.py
 notifications:
   email: false
