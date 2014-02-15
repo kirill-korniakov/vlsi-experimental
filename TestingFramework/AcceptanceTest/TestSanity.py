@@ -38,11 +38,11 @@ class TestSanity:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest # Because of difference on Linux
+    # @nottest # Because of difference on Linux
     def test_new_buffering(self):
         benchmark_list = "sanity/New_Buffering.list"
-        referenceLogFolder = "/New_Buffering/IWLS"
-        experiment = Experiment_New_Buffering()
+        referenceLogFolder = "/New_Buffering/IWLS-initial-mac-state"
+        experiment = Experiment_New_Buffering(self.logger)
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
