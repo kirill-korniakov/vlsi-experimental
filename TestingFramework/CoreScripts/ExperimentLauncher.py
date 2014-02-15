@@ -141,7 +141,7 @@ class ExperimentLauncher:
         #HACK: ugly hack for ISPD04 benchmarks
         if self.experiment.cfg.find("ispd04") != -1:
             lefFile = r"%s.lef" % benchmark
-            lefFile = os.path.join(benchMarkFolder, lefFile)
+            lefFile = os.path.join(benchmarkFolder, lefFile)
             lefFileParam = "--params.lef=%s" % lefFile
             placerParameters.append(lefFileParam)
 

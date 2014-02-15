@@ -12,8 +12,6 @@ class Experiment_New_Buffering(BaseExperiment):
 
 
 def TestRun():
-    #e.MakeResultTable('buf', '111')
-
     metrics = ['Time', 'Cells', 'HPWL', 'TWL', 'TNS', 'WNS']
     stages = ['INIT', 'NBUF', 'LEGB']
 
@@ -40,16 +38,5 @@ def TestRun():
                     testRunner.AddExperimentToGroup(e)
     testRunner.Run()
 
-
-def New_Buffering():
-    #benchmarkList = 'new_buf_IWLS05_GP.list'
-    exp_New_Buffering = Experiment_New_Buffering()  #'IWLS05 New_Buffering experiment ', 'New_Buffering.cfg', benchmarkList
-
-    testRunner = TestRunner()
-    testRunner.Append(exp_New_Buffering)
-    testRunner.Run()
-
-
 if __name__ == "__main__":
-    #TestRun()
-    New_Buffering()
+    TestRun()

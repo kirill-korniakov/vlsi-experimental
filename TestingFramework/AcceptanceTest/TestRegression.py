@@ -62,6 +62,17 @@ class TestRegression:
     # exp_HPWL.SetConfig("hpwl_ispd04.cfg")
     # exp_HPWL.SetBenchmarksList("ISPD04.list")
     # chk_HPWL_ISPD = Checker(exp_HPWL, referenceLogs + r"/HPWL/ISPD")
+    # @nottest
+    def test_hpwl_ispd04(self):
+        benchmark_list = "ISPD04.list"
+        experiment = Experiment_HPWL(self.logger)
+        experiment.SetConfig("hpwl_ispd04.cfg")
+        experiment.name = "HPWL ISPD04"
+        referenceLogFolder = "/HPWL/ISPD"
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
     ## Sensitivity-Guided Weighting, "IWLS05.list" -- crash
     # exp_W = Experiment_Weighting()
