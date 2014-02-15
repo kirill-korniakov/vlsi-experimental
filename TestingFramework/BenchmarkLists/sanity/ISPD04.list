@@ -1,7 +1,7 @@
 ## Here is the full list of ISPD04 benchmarks
 
-ISPD04/ibm01
-#ISPD04/ibm02
+#ISPD04/ibm01 -- Results differ on Mac and Ubuntu
+ISPD04/ibm02
 #ISPD04/ibm03
 #ISPD04/ibm04
 #ISPD04/ibm05

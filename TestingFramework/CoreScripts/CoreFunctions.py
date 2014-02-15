@@ -84,7 +84,6 @@ def ReportErrorAndExit(error, logger):
 def MarkResultAsBest(col):
     return "* " + col
 
-
 def WriteStringToFile2(cols, tableFileName):
     printStr = ""
 
