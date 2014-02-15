@@ -2,6 +2,7 @@ import os
 import sys
 from CoreScripts import Logger
 from Experiments.Experiment_HPWL import Experiment_HPWL
+from Experiments.Experiment_LR import Experiment_LR
 
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(path)
@@ -48,32 +49,29 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # TODO: enable tests below
-
-    ## Lagrangian Relaxation
-    # def DISABLED_test_lr(self):
-    #     benchmark_list = "IWLS_GP_r1511_fast.list"
-    #     referenceLogFolder = "/LR"
-    #     experiment = Experiment_LR()
-    #     self.experimentRunner.run_experiment(experiment, benchmark_list, referenceLogFolder)
-
-    ## HPWL placement on ISPD04 benchmarks, "ISPD04.list" -- crash
-    # exp_HPWL.name = "ISPD04 HPWL Experiment"
-    # exp_HPWL.SetConfig("hpwl_ispd04.cfg")
-    # exp_HPWL.SetBenchmarksList("ISPD04.list")
-    # chk_HPWL_ISPD = Checker(exp_HPWL, referenceLogs + r"/HPWL/ISPD")
-    # @nottest
-    def test_hpwl_ispd04(self):
-        benchmark_list = "ISPD04.list"
-        experiment = Experiment_HPWL(self.logger)
-        experiment.SetConfig("hpwl_ispd04.cfg")
-        experiment.name = "HPWL ISPD04"
-        referenceLogFolder = "/HPWL/ISPD"
+    @nottest
+    def test_lr(self):
+        benchmark_list = "regression/LR.list"
+        referenceLogFolder = "/LR-initial-mac-state"
+        experiment = Experiment_LR(self.logger)
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
+    # @nottest
+    def test_hpwl_ispd04(self):
+        benchmark_list = "regression/ISPD04.list"
+        experiment = Experiment_HPWL(self.logger)
+        experiment.SetConfig("hpwl_ispd04.cfg")
+        experiment.name = "HPWL ISPD04"
+        referenceLogFolder = "/HPWL/ISPD-initial-mac-state"
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
+
+    # TODO: enable tests below
     ## Sensitivity-Guided Weighting, "IWLS05.list" -- crash
     # exp_W = Experiment_Weighting()
     # chk_SGW = Checker(exp_W, referenceLogs + r"/Weighting/SensitivityGuided")

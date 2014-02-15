@@ -3,11 +3,11 @@ from CoreScripts.BaseExperiment import BaseExperiment
 
 
 class Experiment_LR(BaseExperiment):
-    def __init__(self):
+    def __init__(self, logger):
         _metrics = ["HPWL", "TWL", "TNS", "WNS"]
         _stages = ["INIT", "LEG"]
         BaseExperiment.__init__(self, "LR experiment IWLS05GP", "LR.cfg", r"IWLS_GP_r1511\IWLS_GP.list", _metrics,
-                                _stages)
+                                _stages, logger)
 
         self.doParsePQAT = True
 
