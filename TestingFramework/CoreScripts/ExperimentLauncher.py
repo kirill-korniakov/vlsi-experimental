@@ -75,6 +75,9 @@ class ExperimentLauncher:
             error = "Error: benchmarks %s were not found!" % notFoundBenchmarksStr
             # self.AddErrorToResults(error)
 
+        if benchmarks == []:
+            return None
+
         return benchmarks
 
     def CheckParametersAndPrepareBenchmarks(self):
@@ -161,7 +164,7 @@ class ExperimentLauncher:
         except Exception, e:
             error = "Error: can not call %s \n" % (placerParameters[0])
             error = error + "Exception message: " + str(e)
-            ReportErrorAndExit(error, self.logger, self.mailer)
+            ReportErrorAndExit(error, self.logger)
 
         #FIXME: here we wait for placer to finish, but we need a cross-platform way to do this
         p.wait()

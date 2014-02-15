@@ -19,6 +19,7 @@ class ExperimentRunner:
         benchmark_list = os.path.join(CfgParserFactory.get_root_dir(),
                                       self.cfgParser.get("GeneralParameters", "benchmarkLists"), benchmark_list)
         benchmarks = ExperimentLauncher.PrepareBenchmarks(benchmark_list)
+        
         return benchmarks
 
     def run_experiment(self, logger, experiment, benchmark, referenceLogFolder):
