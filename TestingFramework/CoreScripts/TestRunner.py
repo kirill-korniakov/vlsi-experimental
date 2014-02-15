@@ -42,7 +42,6 @@ class TestRunner:
             launcher.RunExperiment(generalParameters, reportParameters)
 
         self.storage.LogResults()
-        self.storage.SendResults(self.emailer)
 
         self.comparator.CompareExperiments(reportParameters)
         logger.CoolLog("Finish")

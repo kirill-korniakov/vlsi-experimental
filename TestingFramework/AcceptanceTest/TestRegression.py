@@ -38,7 +38,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest # Because of difference on Linux
+    @nottest
     def test_new_buffering(self):
         benchmark_list = "regression/New_Buffering.list"
         referenceLogFolder = "/New_Buffering/IWLS-initial-mac-state"
