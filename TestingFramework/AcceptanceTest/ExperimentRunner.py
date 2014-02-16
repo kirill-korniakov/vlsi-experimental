@@ -23,14 +23,14 @@ class ExperimentRunner:
         return benchmarks
 
     def run_experiment(self, logger, experiment, benchmark, referenceLogFolder):
-        checked_HDP = Checker(experiment, self.referenceLogs + referenceLogFolder)
-        experiment = checked_HDP
+        checker = Checker(experiment, self.referenceLogs + referenceLogFolder)
+        experiment = checker
 
         generalParameters = GeneralParameters(self.cfgParser)
         reportParameters = ReportParameters(self.cfgParser)
 
         storage = ResultsStorage()
-        launcher = ExperimentLauncher(checked_HDP, storage, logger)
+        launcher = ExperimentLauncher(checker, storage, logger)
 
         logger.LogD("Config: %s" % experiment.cfg)
         logger.LogD("Benchmarks: %s" % experiment.benchmarks)

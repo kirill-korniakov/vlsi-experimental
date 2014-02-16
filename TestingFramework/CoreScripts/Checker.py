@@ -46,25 +46,27 @@ class Checker(BaseExperiment):
         #write metrics to the file
         WriteStringToFile(cols, reportTable)
 
-    def ParseLogAndFillTable(self, logName, benchmark, reportTable):
-        # logger = Logger()
-        self.logger.LogD("Parsing: " + logName)
-        currentValues = self.ParseLog(logName)
-
-        if currentValues == []:
-            return [ComparisonResult.FAILED, []]
-
+    def read_reference_values(self, logName):
         referenceLogName = os.path.join(self.referenceLogFolder, os.path.basename(logName))
         self.logger.LogD("Parsing: " + referenceLogName)
         referenceValues = self.ParseLog(referenceLogName)
 
         if referenceValues == []:
             self.logger.Log("Experiment has not failed but master log is empty or does not exist\n")
-            return [ComparisonResult.NEW, currentValues]
+            return None
+
+        return referenceValues
+
+    def ParseLogAndFillTable(self, logName, benchmark, reportTable, referenceValues):
+        self.logger.LogD("Parsing: " + logName)
+        currentValues = self.ParseLog(logName)
+
+        if currentValues == []:
+            return [ComparisonResult.FAILED, None]
 
         self.AddStringToTable(currentValues, referenceValues, benchmark, reportTable)
 
         if self.doParsePQAT:
             self.ParsePQATAndPrintTable(logName)
 
-        return self.CompareTables(currentValues, referenceValues), currentValues, referenceValues
+        return self.CompareTables(currentValues, referenceValues), currentValues

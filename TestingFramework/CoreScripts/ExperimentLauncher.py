@@ -195,6 +195,17 @@ class ExperimentLauncher:
         return placerReturnCode
 
     def SaveResults(self, placerReturnCode, logFileName, benchmark, reportTable):
+        reference_values = self.experiment.read_reference_values(logFileName)
+        self.experimentResults.AddReferencePFSTForBenchmark(benchmark, reference_values)
+
+        (result, pfst_values) = self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable, reference_values)
+
+        self.experimentResults.AddPFSTForBenchmark(benchmark, pfst_values)
+        self.experimentResults.AddBenchmarkResult(benchmark, result)
+
+        if result == ComparisonResult.CHANGED:
+            self.experimentResults.resultFile = reportTable
+
         if placerReturnCode != 0:
             self.logger.Log("Process return code: %s" % placerReturnCode)
             return
@@ -203,15 +214,6 @@ class ExperimentLauncher:
             self.nTerminatedBenchmarks += 1
             self.experimentResults.AddBenchmarkResult(benchmark, TERMINATED)
             return
-
-        (result, pfst_values, pfst_reference_values) = self.experiment.ParseLogAndFillTable(logFileName, benchmark, reportTable)
-
-        self.experimentResults.AddReferencePFSTForBenchmark(benchmark, pfst_reference_values)
-        self.experimentResults.AddPFSTForBenchmark(benchmark, pfst_values)
-        self.experimentResults.AddBenchmarkResult(benchmark, result)
-
-        if result == ComparisonResult.CHANGED:
-            self.experimentResults.resultFile = reportTable
 
     def RunExperimentOnBenchmark(self, benchmark, logFolder, reportTable, generalParameters):
         placerParameters, logFileName = self.PreparePlacerParameters(benchmark, logFolder, generalParameters)

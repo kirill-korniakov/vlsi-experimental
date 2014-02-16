@@ -7,7 +7,9 @@ class TestHelper:
 
     def print_differences(self, experiment_results, benchmark):
         ref_pfst = experiment_results.pfstRefTables.get(benchmark)
+        assert ref_pfst != None
         curr_pfst = experiment_results.pfstTables.get(benchmark)
+        assert curr_pfst != None
         for x in zip(ref_pfst, curr_pfst):
             print x[0]
             print x[1]
