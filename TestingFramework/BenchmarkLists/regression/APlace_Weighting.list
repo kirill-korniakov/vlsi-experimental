@@ -1,6 +1,6 @@
 IWLS05/s298
-#IWLS05/pci_spoci_ctrl
-#IWLS05/tv80
+IWLS05/pci_spoci_ctrl
+IWLS05/tv80
 #IWLS05/ac97_ctrl
 #IWLS05/b21
 #IWLS05/b22

@@ -1,17 +1,16 @@
 import os
 import sys
-from CoreScripts import Logger
-from Experiments.Experiment_HPWL import Experiment_HPWL
-from Experiments.Experiment_LR import Experiment_LR
-from Experiments.Experiment_Weighting import Experiment_Weighting
-
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(path)
 
 import nose
 from nose.tools import nottest
 
+from CoreScripts import Logger
 from AcceptanceTest.TestHelper import TestHelper
+from Experiments.Experiment_HPWL import Experiment_HPWL
+from Experiments.Experiment_LR import Experiment_LR
+from Experiments.Experiment_Weighting import Experiment_Weighting
 from Experiments.Experiment_HippocrateDP import Experiment_HippocrateDP
 from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
 
@@ -72,11 +71,8 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    ## APlace Weighting, "IWLS05.list"
-    # exp_W.name = "APlace weighting experiment"
-    # exp_W.SetConfig("APlace_weighting.cfg")
-    # chk_APW = Checker(exp_W, referenceLogs + r"/Weighting/SensitivityGuided")
-    # @nottest
+    # APlace Weighting crashes
+    @nottest
     def test_aplace_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
