@@ -59,8 +59,8 @@ TARGET_LINK_LIBRARIES(${app} ${OpenCV_LIBS} ${TAO_LIBRARIES} ${PETSC_LIBRARIES})
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ln -fhs "${CMAKE_SOURCE_DIR}/cfg" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfg"
-    COMMAND ln -fhs "${CMAKE_SOURCE_DIR}/technology" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/technology"
+    COMMAND ln -fns "${CMAKE_SOURCE_DIR}/cfg" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfg"
+    COMMAND ln -fns "${CMAKE_SOURCE_DIR}/technology" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/technology"
 )
 
 # Debugging CMake
