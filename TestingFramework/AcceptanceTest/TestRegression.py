@@ -84,7 +84,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest
+    # @nottest
     def test_sgnw_weighting(self):
         benchmark_list = "regression/SGNW_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
