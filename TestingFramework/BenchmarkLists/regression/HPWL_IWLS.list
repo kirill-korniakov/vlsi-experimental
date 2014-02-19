@@ -5,7 +5,7 @@ IWLS05/ac97_ctrl
 IWLS05/b21
 IWLS05/b22
 ## Below are failures because of some issues with clustering
-#IWLS05/b17
-#IWLS05/ethernet
-#IWLS05/b18
-#IWLS05/des_perf
+IWLS05/b17
+IWLS05/ethernet
+IWLS05/b18
+IWLS05/des_perf

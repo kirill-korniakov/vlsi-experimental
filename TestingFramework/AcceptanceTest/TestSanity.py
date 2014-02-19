@@ -3,6 +3,7 @@ import sys
 from CoreScripts import Logger
 from Experiments.Experiment_HPWL import Experiment_HPWL
 from Experiments.Experiment_LR import Experiment_LR
+from Experiments.Experiment_Weighting import Experiment_Weighting
 
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(path)
@@ -66,6 +67,28 @@ class TestSanity:
         experiment.SetConfig("hpwl_ispd04.cfg")
         experiment.name = "HPWL ISPD04"
         referenceLogFolder = "/HPWL/ISPD-initial-mac-state"
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
+
+    # @nottest
+    def test_aplace_weighting(self):
+        benchmark_list = "sanity/Weighting.list"
+        experiment = Experiment_Weighting(self.logger)
+        experiment.SetConfig("APlace_weighting.cfg")
+        experiment.name = "APlace Weighting"
+        referenceLogFolder = "/Weighting/APlace-initial-mac-state"
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
+
+    # @nottest
+    def test_sgnw_weighting(self):
+        benchmark_list = "sanity/Weighting.list"
+        experiment = Experiment_Weighting(self.logger)
+        referenceLogFolder = "/Weighting/SensitivityGuided-initial-mac-state"
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:

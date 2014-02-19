@@ -71,24 +71,23 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # Both weighting approaches crash on clustering
     @nottest
     def test_aplace_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
         experiment.SetConfig("APlace_weighting.cfg")
         experiment.name = "APlace Weighting"
-        referenceLogFolder = "/Weighting/APlace"
+        referenceLogFolder = "/Weighting/APlace-initial-mac-state"
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_sgnw_weighting(self):
-        benchmark_list = "regression/SGNW_Weighting.list"
+        benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
-        referenceLogFolder = "/Weighting/SensitivityGuided"
+        referenceLogFolder = "/Weighting/SensitivityGuided-initial-mac-state"
 
         benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
         for benchmark in benchmarks:
