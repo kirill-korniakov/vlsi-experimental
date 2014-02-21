@@ -19,7 +19,7 @@ class TestRegression:
     test_helper = TestHelper()
     logger = Logger()
 
-    # @nottest
+    @nottest
     def test_hippocrate(self):
         benchmark_list = "sanity/HippocrateDP.list"
         referenceLogFolder = "/HippocrateDP"
@@ -39,7 +39,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_new_buffering(self):
         benchmark_list = "regression/New_Buffering.list"
         referenceLogFolder = "/New_Buffering/IWLS-initial-mac-state"
@@ -49,7 +49,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_lr(self):
         benchmark_list = "regression/LR.list"
         referenceLogFolder = "/LR-initial-mac-state"
@@ -59,7 +59,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_hpwl_ispd04(self):
         benchmark_list = "regression/ISPD04.list"
         experiment = Experiment_HPWL(self.logger)
@@ -71,7 +71,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_aplace_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
@@ -83,7 +83,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_sgnw_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
