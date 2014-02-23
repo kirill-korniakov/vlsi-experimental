@@ -29,7 +29,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_hpwl_placement(self):
         benchmark_list = "regression/HPWL_IWLS.list"
         referenceLogFolder = "/HPWL/IWLS-initial-mac-state"
@@ -59,7 +59,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest
+    # @nottest
     def test_hpwl_ispd04(self):
         benchmark_list = "regression/ISPD04.list"
         experiment = Experiment_HPWL(self.logger)
@@ -71,7 +71,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest
+    # @nottest
     def test_aplace_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
@@ -83,9 +83,9 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    @nottest
+    # @nottest
     def test_sgnw_weighting(self):
-        benchmark_list = "regression/APlace_Weighting.list"
+        benchmark_list = "regression/SGNW_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
         referenceLogFolder = "/Weighting/SensitivityGuided-initial-mac-state"
 

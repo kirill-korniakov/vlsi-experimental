@@ -17,6 +17,9 @@ from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
 
 
 class TestSanity:
+    _multiprocess_can_split_ = True
+    _multiprocess_shared_ = True
+
     test_helper = TestHelper()
     logger = Logger()
 
