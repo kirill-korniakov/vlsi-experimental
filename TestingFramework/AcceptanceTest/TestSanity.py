@@ -34,6 +34,18 @@ class TestSanity:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
     # @nottest
+    def test_hippocrate_boris(self):
+        benchmark_list = "sanity/HippocrateDP.list"
+        experiment = Experiment_HippocrateDP(self.logger)
+        experiment.SetConfig("boris_hippocrate_ALL.cfg")
+        experiment.stages = ["LEG", "HP"]
+        referenceLogFolder = "/boris_hippocrate_ALL"
+
+        benchmarks = self.test_helper.expand_benchmark_list(benchmark_list)
+        for benchmark in benchmarks:
+            yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
+
+    # @nottest
     def test_hpwl_placement(self):
         benchmark_list = "sanity/HPWL_IWLS.list"
         referenceLogFolder = "/HPWL/IWLS-initial-mac-state"
