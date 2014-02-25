@@ -16,6 +16,9 @@ from Experiments.Experiment_New_Buffering import Experiment_New_Buffering
 
 
 class TestRegression:
+    _multiprocess_can_split_ = True
+    _multiprocess_shared_ = True
+
     test_helper = TestHelper()
     logger = Logger()
 
@@ -71,7 +74,7 @@ class TestRegression:
         for benchmark in benchmarks:
             yield self.test_helper.run, self.logger, experiment, benchmark, referenceLogFolder
 
-    # @nottest
+    @nottest
     def test_aplace_weighting(self):
         benchmark_list = "regression/APlace_Weighting.list"
         experiment = Experiment_Weighting(self.logger)
