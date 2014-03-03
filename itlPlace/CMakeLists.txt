@@ -62,7 +62,7 @@ add_custom_command(
     COMMAND ln -fns "${CMAKE_SOURCE_DIR}/cfg" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfg"
     COMMAND ln -fns "${CMAKE_SOURCE_DIR}/technology" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/technology"
     COMMAND mkdir -p "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ClusteringInformation"
-    COMMAND mkdir -p "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetWeight"
+    COMMAND mkdir -p "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetWeights"
     COMMAND mkdir -p "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExportDEF"
 )
 
