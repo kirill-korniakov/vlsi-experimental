@@ -264,7 +264,7 @@ void AnalyticalGlobalPlacement::WriteCellsCoordinates2Clusters(HDesign& hd, Clus
 
 void AnalyticalGlobalPlacement::ExportNetWeights( NetList::iterator &netListIter, ClusteringInformation &ci, int &i ) 
 {
-    FILE* resultFile = fopen("Before relax", "a");
+    FILE* resultFile = fopen("net-weights-before-relax.nwts", "a");
     for (netListIter = ci.netList.begin(), i = 0; netListIter != ci.netList.end() && i < 10; ++netListIter, ++i)
     {
         fprintf(resultFile, "%f\n", netListIter->weight);
